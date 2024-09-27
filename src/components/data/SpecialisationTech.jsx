@@ -1,0 +1,30 @@
+const SpecialisationTech = [
+  "Internet of Things (IoT)",
+  "Machine Learning and Artificial Intelligence",
+  "Developer Operations (DevOps+CI/CD)",
+  "Computer Network Administration",
+  "Block Chain (Web3/Cryptocurrency)",
+  "Data Science and Analytics",
+  "UI/UX Design/Graphic Design",
+  "Web Hosting and Deployment Services",
+  "Mobile App Deployment (PlayStore/Apple Store)",
+  "Cybersecurity and Computer Security",
+  "Cloud Computing (AWS/GCP/Azure)",
+  "Game App Development",
+  "Native Android App Development",
+  "Native IOS App Development",
+  "Frontend App Development",
+  "Backend App Development",
+  "Containerisation and Orchestration",
+  "Fullstack App Development (Frontend+Backend)",
+  "Database Management (SQL/NoSQL)",
+  "Programming Languages",
+  "Multiplatform App Development (Android+IOS)",
+  "Desktop App Development",
+  "WordPress Web Development",
+  "Operating Systems (Linux/MacOS/Windows)",
+  "Zero None Of These (Other)",
+].sort();
+
+
+export default SpecialisationTech;

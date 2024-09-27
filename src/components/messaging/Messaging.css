@@ -1,0 +1,9 @@
+.delete-message-btn:hover{
+    color: rgba(192, 3, 3, 0.907)
+}
+
+.container-messages:hover{
+box-shadow: -1px -1px 5px inset;
+border-radius: .5rem;
+
+}

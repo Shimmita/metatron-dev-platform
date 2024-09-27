@@ -1,0 +1,12 @@
+.attendants-container{
+    display: grid;
+    gap: 5px;
+    grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+    max-height: 70vh;
+}
+
+
+.attendee-messages, .video-container{
+    max-height: 70vh;
+}
+
