@@ -3,10 +3,10 @@ import {
   FavoriteRounded,
   LeaderboardRounded,
   LocationOnRounded,
-  MenuRounded,
+  MoreVertRounded,
   PersonAddRounded,
   StarsRounded,
-  VerifiedRounded
+  VerifiedRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -136,7 +136,7 @@ const CardFeed = () => {
                   aria-expanded={openMoreVertPost ? "true" : undefined}
                   onClick={handleClickMoreVertPost}
                 >
-                  <MenuRounded sx={{ width: 22, height: 22 }} />
+                  <MoreVertRounded sx={{ width: 22, height: 22 }} />
                 </IconButton>
               </Tooltip>
 
@@ -176,15 +176,15 @@ const CardFeed = () => {
               {/* smallest screen */}
               {screenWidth <= 350 ? (
                 <>
-                  <Typography variant="body2">Fullstack Dev </Typography>
-                  <Typography variant="body2">React|Nodejs|Django </Typography>
+                  <Typography variant="body2">Software Dev </Typography>
+                  <Typography variant="body2">React|Nodejs|Python </Typography>
                 </>
               ) : (
                 <>
                   {/* mediaum to larger screens */}
                   <Typography variant="body2">Fullstack Developer </Typography>
                   <Typography variant="body2">
-                    React | Nodejs | Django{" "}
+                    React | Nodejs | Python{" "}
                   </Typography>
                 </>
               )}
@@ -252,9 +252,6 @@ const CardFeed = () => {
             }}
           />
         </CardActionArea>
-
-        {/* show divider actions light mode */}
-        {!isDarkMode && <Divider component={"div"} className="p-2" />}
 
         <Box
           display={"flex "}

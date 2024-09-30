@@ -1,9 +1,8 @@
 import { Avatar, Box, Typography } from "@mui/material";
 import React, { lazy, Suspense } from "react";
+import { Puff } from "react-loader-spinner";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import AppLogo from "./images/logo_sm.png";
-
-import { Puff } from "react-loader-spinner";
 
 const HomePageLazy = lazy(() => import("./components/account/HomePage"));
 const RecoverAuthLay = lazy(() => import("./components/auth/RecoverAuth"));
@@ -22,7 +21,6 @@ const App = () => {
       <Suspense
         fallback={
           <Box
-            bgcolor={"#D9D8E7"}
             color={"text.primary"}
             style={{
               display: "flex",
@@ -40,7 +38,7 @@ const App = () => {
               <Avatar
                 sx={{ width: 100, height: 100 }}
                 src={AppLogo}
-                alt="KENYA"
+                alt="logo"
               />
 
               <Typography
@@ -51,7 +49,7 @@ const App = () => {
               >
                 METATRON
               </Typography>
-              <Puff color="blue" width={45} height={45} />
+              <Puff color="#1976D2" width={45} height={45} />
             </Box>
           </Box>
         }

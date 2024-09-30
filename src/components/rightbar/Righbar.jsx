@@ -1,53 +1,96 @@
-import { Backdrop, Box, Divider, Typography } from "@mui/material";
+import {
+  PeopleRounded,
+  SchoolRounded,
+  WhatshotRounded,
+} from "@mui/icons-material";
+import { Backdrop, Box, Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import BasicSpeedDial from "../custom/SpeedDial";
 import useScrolledDown from "../hooks/useScrolledDown";
+import ConnectRequest from "./ConnectRequest";
 import RightBarEvents from "./RightBarEvents";
 import TopDailyPosts from "./TopDailyPost";
 
 const RightbarAll = ({ mode }) => {
   // backdrop state
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
-  const { isScrolledDown } = useSelector((state) => state.appUI);
+
+  // redux states
+  const { isScrolledDown, isSidebarRighbar } = useSelector(
+    (state) => state.appUI
+  );
 
   // run the listening component hook
   useScrolledDown();
 
-  // return the best width for the rightbar
   return (
     <Box
       flex={2}
       marginRight={window.screen.availWidth > 1200 ? "5%" : "0"}
       p={2}
-      sx={{ display: { xs: "none", sm: "none", md: "none" } }}
+      sx={{
+        display: {
+          xs: "none",
+          sm: "none",
+          md: isSidebarRighbar ? "block" : "none",
+        },
+      }}
     >
       <Box position={"fixed"} color={"text.primary"} className="mt-0">
-        <Box bgcolor={"background.default"} className="shadow rounded pe-2 ">
-          <Box display={"flex"} justifyContent={"center"}>
-            <Typography fontWeight={"bold"} color={"primary"} className="mt-2">
-              TOP TRENDING POST
+        {/* connection requests */}
+        <Box
+          bgcolor={"background.default"}
+          className="shadow rounded pe-2 mb-3 "
+        >
+          <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
+            <Typography
+              display={"flex"}
+              gap={3}
+              fontWeight={"bold"}
+              gutterBottom
+              color={"primary"}
+            >
+              <span className="pt-1">CONNECT REQUEST</span>
+              <PeopleRounded />
             </Typography>
           </Box>
 
           <Box display={"flex"} justifyContent={"center"}>
+            <ConnectRequest />
+          </Box>
+        </Box>
+        {/* trending post */}
+        <Box bgcolor={"background.default"} className="shadow rounded pe-2 ">
+          <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
+            <Typography
+              display={"flex"}
+              gap={4}
+              fontWeight={"bold"}
+              color={"primary"}
+            >
+              <span className="pt-1">TRENDING POSTS</span>
+              <WhatshotRounded />
+            </Typography>
+          </Box>
+          <Box display={"flex"} justifyContent={"center"}>
             <TopDailyPosts />
           </Box>
         </Box>
-        {/* show divider in dark mode */}
-        {mode === "dark" && (
-          <Divider component={"div"} variant="inset" className="p-2" />
-        )}
+
+        {/* events */}
 
         <Box bgcolor={"background.default"} className="shadow mt-3 rounded ">
           <Box display={"flex"} justifyContent={"center"}>
             <Typography
+              display={"flex"}
+              gap={3}
               fontWeight={"bold"}
               gutterBottom
               color={"primary"}
-              className="mt-2"
             >
-              EVENTS AND COURSES
+              <span className="pt-1">LEARNING EVENTS</span>{" "}
+              <SchoolRounded sx={{ width: 24, height: 24 }} />
             </Typography>
           </Box>
 

@@ -3,13 +3,15 @@ import { IconButton, TextField, Tooltip } from "@mui/material";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import * as React from "react";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 const style = {
   position: "absolute",
   bottom: 0,
-  left: "62%",
+  left: CustomDeviceIsSmall() || CustomDeviceTablet() ? "50%" : "62%",
   transform: "translate(-50%, -50%)",
-  width: 500,
+  width: CustomDeviceIsSmall() ? 350 : 500,
   bgcolor: "background.paper",
   boxShadow: 24,
   borderRadius: 2,
@@ -18,7 +20,7 @@ const style = {
 
 export default function ModalSendMessage({ showModal, setShowModal }) {
   // max size of message
-  const messageMax = 50;
+  const messageMax = 100;
   // control showing of fab and input text
   const [messageInput, setMessageInput] = React.useState("");
 
@@ -55,7 +57,7 @@ export default function ModalSendMessage({ showModal, setShowModal }) {
               placeholder="write your message..."
             />
             {/* icon send */}
-            <Tooltip arrow title='send'>
+            <Tooltip arrow title="send">
               <IconButton className="border">
                 <SendRounded color={"success"} sx={{ width: 24, height: 24 }} />
               </IconButton>

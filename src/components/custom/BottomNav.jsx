@@ -1,8 +1,4 @@
-import {
-  Home,
-  SchoolRounded,
-  Work
-} from "@mui/icons-material";
+import { Home, SchoolRounded, Work } from "@mui/icons-material";
 import {
   BottomNavigation,
   BottomNavigationAction,
@@ -65,7 +61,7 @@ const BottomNav = () => {
           <BottomNavigationAction
             onClick={handleJobContent}
             label="Jobs"
-            icon={<Work sx={{ width: 30, height: 30 }}/>}
+            icon={<Work sx={{ width: 30, height: 30 }} />}
           />
         </Tooltip>
 

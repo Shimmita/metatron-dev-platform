@@ -20,13 +20,10 @@ function Homepage() {
   useScrolledDown();
   // check scrolling behavior by tracking from redux state
   const { isScrolledDown } = useSelector((state) => state.appUI);
+
   return (
     <ThemeProvider theme={darkTheme}>
-      <Box
-        bgcolor={mode === "dark" ? "background.default" : "#D9D8E7"}
-        // bgcolor={mode === "dark" ? "background.default" : "#F1F1F1"}
-        color={"text.primary"}
-      >
+      <Box bgcolor={"background.default"} color={"text.primary"}>
         <Stack direction={"column"}>
           {/* nav+content */}
           <Stack direction={"column"}>

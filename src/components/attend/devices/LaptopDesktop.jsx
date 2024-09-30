@@ -1,7 +1,7 @@
 import { Box, Divider, IconButton, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { handleScrolledDown } from "../../redux/AppUI";
+import { handleScrolledDown } from "../../../redux/AppUI";
 
 import {
   CallEndRounded,
@@ -13,16 +13,15 @@ import {
   VideocamRounded,
   ViewSidebarRounded,
 } from "@mui/icons-material";
-import AttendantsContainer from "./AttendantsContainer";
-import "./LiveAttend.css";
-import MessageContainer from "./MessageContainer";
-import video from "../../video.mp4";
+import video from "../../../video.mp4";
+import AttendantsContainer from "../AttendantsContainer";
+import "../LiveAttend.css";
+import MessageContainer from "../MessageContainer";
 
-function LiveAttend() {
+function LaptopDesktop() {
   const [showSidebar, setShowSidebar] = React.useState(true);
   const [showPeople, setShowPeople] = React.useState(true);
   const [showMessage, setShowMessage] = React.useState(false);
-  const [showTips, setShowTips] = React.useState(false);
   const [useCamera, setUseCamera] = React.useState(false);
   const [useAudio, setUseAudio] = React.useState(false);
   const [shareScreen, setShareScreen] = React.useState(false);
@@ -75,14 +74,14 @@ function LiveAttend() {
 
   return (
     <Box width={"100%"} height={"90vh"}>
-      {/* container */}
-      <Box maxHeight={600} className="rounded-2 p-2">
+      <Box maxHeight={"70vh"}
+      >
         <Box display={"flex"} gap={2}>
           {/* sidebar live */}
           <Box
             flex={1}
             p={2}
-            className="shadow rounded-2"
+            className="shadow rounded-2 "
             bgcolor={"background.default"}
             display={showSidebar ? "block" : "none"}
           >
@@ -122,7 +121,6 @@ function LiveAttend() {
                 </Box>
               </Box>
 
-              <Divider component={"div"} />
               <Typography
                 variant="body2"
                 fontWeight={"bold"}
@@ -131,7 +129,7 @@ function LiveAttend() {
                 textAlign={"center"}
                 textTransform={"uppercase"}
               >
-                {showPeople ? "Attendance Room (300)" : "Chat Room"}
+                {showPeople ? "Attendance Room (300)" : "Comment Room"}
               </Typography>
 
               {/* sidebar  container */}
@@ -148,32 +146,74 @@ function LiveAttend() {
             className="rounded-2 shadow"
             bgcolor={"background.default"}
           >
+            <Box>
+              {/* live title */}
+              <Typography
+                variant="body2"
+                fontWeight={"bold"}
+                textAlign={"center"}
+                textTransform={"uppercase"}
+                gutterBottom
+                color={"primary"}
+              >
+                Live Software Devlopment Event
+              </Typography>
+
+              {/* live subtitle */}
+              <Typography
+                variant="body2"
+                fontWeight={"bold"}
+                textAlign={"center"}
+                textTransform={"capitalize"}
+              >
+                Kotlin Multiplatform (KMP)
+              </Typography>
+            </Box>
+
+            {/* live screen feed */}
+            <Box
+              display={"flex"}
+              justifyContent={"center"}
+              className="video-container"
+            >
+              {/* video container */}
+              <video
+                className="rounded-2"
+                width={"100%"}
+                src={video}
+                autoPlay
+                controls
+              >
+                <Typography color={"error"}>video not supported</Typography>
+              </video>
+            </Box>
+
+            {/* controls here */}
             <Box
               display={"flex"}
               justifyContent={"space-between"}
               alignItems={"center"}
+              mt={2}
             >
-              {/* main controls */}
+              {/* toggle button when clicked hide sidebar */}
+              <Box>
+                <Box>
+                  <Tooltip
+                    title={showSidebar ? "close sidebar" : "show sidebar"}
+                    arrow
+                  >
+                    <IconButton className="border" onClick={handleShowSidebar}>
+                      <ViewSidebarRounded
+                        color={showSidebar ? "primary" : "inherit"}
+                      />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+              </Box>
+
               <Box>
                 {/* event controls  */}
                 <Box display={"flex"} gap={2} alignItems={"center"}>
-                  {/* toggle button when clicked hide sidebar */}
-                  <Box>
-                    <Tooltip
-                      title={showSidebar ? "close sidebar" : "show sidebar"}
-                      arrow
-                    >
-                      <IconButton
-                        className="border"
-                        onClick={handleShowSidebar}
-                      >
-                        <ViewSidebarRounded
-                          color={showSidebar ? "primary" : "inherit"}
-                        />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-
                   {/* toggle show of video camera */}
                   <Box>
                     <Tooltip
@@ -246,51 +286,6 @@ function LiveAttend() {
                 </Box>
               </Box>
             </Box>
-
-            {/* divider */}
-            <Divider component={"div"} className="mb-1" />
-
-            <Box>
-              {/* live title */}
-              <Typography
-                variant="body2"
-                fontWeight={"bold"}
-                textAlign={"center"}
-                textTransform={"uppercase"}
-                gutterBottom
-                color={"primary"}
-              >
-                Live Software Devlopment Event
-              </Typography>
-
-              {/* live subtitle */}
-              <Typography
-                variant="body2"
-                fontWeight={"bold"}
-                textAlign={"center"}
-                textTransform={"capitalize"}
-              >
-                Kotlin Multiplatform (KMP)
-              </Typography>
-            </Box>
-
-            {/* live screen feed */}
-            <Box
-              display={"flex"}
-              justifyContent={"center"}
-              className="video-container"
-            >
-              {/* video container */}
-              <video
-                className="rounded-2"
-                width={"100%"}
-                src={video}
-                autoPlay
-                controls
-              >
-                <Typography color={"error"}>video not supported</Typography>
-              </video>
-            </Box>
           </Box>
         </Box>
       </Box>
@@ -298,4 +293,4 @@ function LiveAttend() {
   );
 }
 
-export default LiveAttend;
+export default LaptopDesktop;

@@ -73,7 +73,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
         color={"text.primary"}
         sx={{
-          marginRight: CustomDeviceTablet() ? 1 : CustomLandScape() ? 2 : null,
+          marginRight: CustomDeviceTablet() && 1,
+          border: isDarkMode && "1px solid gray",
         }}
       >
         <Box
@@ -716,8 +717,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               >
                 Select your county. This helps in promoting your county and our
                 country <span className="fw-bold">KENYA</span> as a whole in
-                accordance to technological embracement and advancement
-                countrywide.
+                accordance to technological embracement countrywide.
               </Typography>
               <Box className="mb-3">
                 <TextField
@@ -760,7 +760,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   value={gitHub}
                   onChange={(e) => setGitHub(e.target.value)}
                   id="github-gitlab"
-                  label={"project link (optional)"}
+                  label={"version control link (optional)"}
                   placeholder=" https://github.com/username/project-name.git"
                 />
               </Box>

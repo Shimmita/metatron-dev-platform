@@ -32,7 +32,7 @@ function MessageLayout() {
             </Typography>
           }
           secondary={"Kindly redo on SQl Delight installation I'm stuck"}
-        /> 
+        />
       </ListItem>
       <Divider variant="inset" component="li" />
     </List>

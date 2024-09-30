@@ -1,6 +1,8 @@
 import { AddCommentRounded } from "@mui/icons-material";
 import { Box, Fab } from "@mui/material";
 import React from "react";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import MessageLayout from "./MessageLayout";
 import ModalSendMessage from "./ModalSendMessage";
 
@@ -16,6 +18,9 @@ function MessageContainer() {
   };
   return (
     <Box
+      maxHeight={`${
+        CustomDeviceIsSmall() || CustomDeviceTablet() ? "38vh" : "70vh"
+      }`}
       sx={{
         overflowX: "auto",
         // Hide scrollbar for Chrome, Safari and Opera
@@ -26,7 +31,6 @@ function MessageContainer() {
         msOverflowStyle: "none",
         scrollbarWidth: "none",
       }}
-      className="attendee-messages"
     >
       <Box>
         {/* messages render container */}
@@ -43,10 +47,11 @@ function MessageContainer() {
         <Box
           sx={{
             position: "absolute",
-            bottom: 60,
+            right: "45%",
+            bottom: 5,
           }}
         >
-          <Fab onClick={handleShowingModal} size="medium" color="success">
+          <Fab onClick={handleShowingModal} size="medium" color="primary">
             <AddCommentRounded />
           </Fab>
         </Box>

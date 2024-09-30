@@ -1,4 +1,3 @@
-import { StarsRounded } from "@mui/icons-material";
 import { Avatar, Box, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import logo from "../../images/dev.jpeg";
@@ -13,33 +12,30 @@ function AttendantsLayout({ index }) {
           <Avatar src={logo} alt="image" />
         </Box>
 
-        {/* firstname of the user */}
-        <Box display={"flex"} justifyContent={"center"}>
-          <Typography
-            fontWeight={"bold"}
-            color={"primary"}
-            gutterBottom
-            variant="body2"
-          >
-            {index} Jonathan
-          </Typography>
-        </Box>
+        {/* index */}
+        <Typography textAlign={"center"} color={"black"} variant="body2">
+          {index}
+        </Typography>
+        {/* name */}
+        <Typography
+          fontWeight={"bold"}
+          color={"primary"}
+          gutterBottom
+          textAlign={"center"}
+          variant="body2"
+        >
+          Jonathan
+        </Typography>
 
         {/* occupation of the user */}
-        <Box
-          gap={1}
-          alignItems={"center"}
-          display={"flex"}
-          justifyContent={"center"}
-        >
-          <StarsRounded color="primary" sx={{ width: 16, height: 16 }} />
+        <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
           <Typography
             color={"text.secondary"}
             fontWeight={"bold"}
             gutterBottom
             variant="caption"
           >
-            ML/AI Eng
+            Software Dev
           </Typography>
         </Box>
       </Tooltip>

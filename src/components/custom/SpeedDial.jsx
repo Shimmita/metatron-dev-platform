@@ -19,7 +19,7 @@ const actions = [
   },
   {
     icon: <Add color="primary" sx={{ width: 24, height: 24 }} />,
-    name: "Post Tech",
+    name: "Tech Post",
   },
 ];
 
@@ -53,7 +53,7 @@ export default function BasicSpeedDial() {
             icon={action.icon}
             className="shadow border"
             onClick={(e) => {
-              if (action.name.toLowerCase() === "post tech") {
+              if (action.name.toLowerCase() === "tech post") {
                 // open tech posting model
                 setOpenModalTech(true);
               }
@@ -83,7 +83,10 @@ export default function BasicSpeedDial() {
       />
 
       {/* Post Job Modal */}
-      <PostJobModal openModalJob={openModalJob} setOpenModalJob={setOpenModalJob} />
+      <PostJobModal
+        openModalJob={openModalJob}
+        setOpenModalJob={setOpenModalJob}
+      />
     </Box>
   );
 }

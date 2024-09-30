@@ -7,13 +7,14 @@ import useScrolledDown from "../hooks/useScrolledDown";
 
 import { Oval } from "react-loader-spinner";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
 const UserProfile = lazy(() => import("../profile/UserProfile"));
 const PostDetailsContainer = lazy(() => import("../post/PostDetailsContiner"));
 
 const AccountPremium = lazy(() => import("../more/account/AccountPremium"));
 const AccountFriends = lazy(() => import("../more/account/AccountFriends"));
 const AccountPosts = lazy(() => import("../more/account/AccountPosts"));
-const LiveAttend = lazy(() => import("../attend/LiveAttend"));
+const LiveAttend = lazy(() => import("../attend/LiveAttendRender"));
 const AccountSettingsTabs = lazy(() =>
   import("../more/account/AccountSettings")
 );
@@ -30,18 +31,17 @@ const EventsBookMarks = lazy(() => import("../events/EventsBookMarks"));
 
 const Feed = () => {
   // backdrop state
-  const { isScrolledDown, isDarkMode } = useSelector((state) => state.appUI);
+  const { isScrolledDown } = useSelector((state) => state.appUI);
 
   // run the listening component hook
   useScrolledDown();
 
   return (
     <Box
+      marginRight={CustomFeedEquidstance()}
       flex={3}
       p={CustomDeviceTablet() ? 2 : 1}
-      bgcolor={isDarkMode ? "background.default" : "transparent"}
       color={"text.primary"}
-      marginRight={window.screen.availWidth > 1250 && "3%"}
     >
       <Suspense
         fallback={
@@ -55,7 +55,7 @@ const Feed = () => {
               height: "90vh",
             }}
           >
-            {/* loader */}
+            {/* loader be shown before actual loading of content */}
             <Oval color="#1876D2" width={30} height={30} />
           </Box>
         }
@@ -74,7 +74,7 @@ const Feed = () => {
           <Route path="/events/live" element={<EventsLive />} />
           <Route path="/events/bookmarks" element={<EventsBookMarks />} />
           <Route path="/events/upcoming" element={<EventsUpcoming />} />
-          <Route path="/events/live-attend" element={<LiveAttend />} />
+          <Route path="/events/live-attending" element={<LiveAttend />} />
           <Route path="/posts/details" element={<PostDetailsContainer />} />
           <Route path="/users/profile" element={<UserProfile />} />
         </Routes>

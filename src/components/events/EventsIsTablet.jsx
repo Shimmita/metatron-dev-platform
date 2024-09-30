@@ -2,7 +2,7 @@ import {
   Add,
   Bookmark,
   CalendarMonthRounded,
-  LiveTvRounded
+  LiveTvRounded,
 } from "@mui/icons-material";
 import {
   Box,
@@ -54,7 +54,7 @@ export default function EventsTablet() {
             <LiveTvRounded sx={{ color: "#CF4B3F" }} />
           </ListItemIcon>
           <ListItemText
-            primary={<Typography variant="body2">Live Events</Typography>}
+            primary={<Typography variant="body2">Live Stream</Typography>}
           />
         </ListItemButton>
         <Typography variant="body2">20</Typography>
@@ -74,7 +74,7 @@ export default function EventsTablet() {
             />{" "}
           </ListItemIcon>
           <ListItemText
-            primary={<Typography variant="body2">Upcoming Events</Typography>}
+            primary={<Typography variant="body2">View Upcoming</Typography>}
           />
         </ListItemButton>
         <Typography className="fw-normal " variant="body2">
@@ -93,7 +93,7 @@ export default function EventsTablet() {
             <Bookmark color="primary" />
           </ListItemIcon>
           <ListItemText
-            primary={<Typography variant="body2">Event Bookmark </Typography>}
+            primary={<Typography variant="body2">My Bookmarks </Typography>}
           />
         </ListItemButton>
         <Typography className="fw-normal" variant="body2">

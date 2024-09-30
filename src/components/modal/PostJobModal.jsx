@@ -70,7 +70,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
         color={"text.primary"}
         sx={{
-          marginRight: CustomDeviceTablet() ? 1 : CustomLandScape() ? 2 : null,
+          marginRight: CustomDeviceTablet() && 1,
+          border: isDarkMode && "1px solid gray",
         }}
       >
         <Box

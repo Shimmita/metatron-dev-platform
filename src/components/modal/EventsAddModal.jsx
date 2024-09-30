@@ -1,4 +1,4 @@
-import { Add, Close, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Add, Close } from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -18,7 +18,6 @@ import AppLogo from "../../images/logo_sm.png";
 import EventsAdddata from "../data/EventsAddData";
 import SubsectionTech from "../data/SubsectionTech";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
 import CustomModalHeight from "../utilities/CustomModalHeight";
 
 const StyledModalEvent = styled(Modal)({
@@ -76,7 +75,8 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd }) => {
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
         color={"text.primary"}
         sx={{
-          marginRight: CustomDeviceTablet() ? 1 : CustomLandScape() ? 2 : null,
+          marginRight: CustomDeviceTablet() && 1,
+          border: isDarkMode && "1px solid gray",
         }}
       >
         <Box
@@ -94,13 +94,6 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd }) => {
             <Box>
               <Avatar sx={{ width: 60, height: 60 }} src={AppLogo} alt="logo" />
             </Box>
-            {/* preview  */}
-
-            <Tooltip title={"preview"}>
-              <IconButton onClick={handleClickShowPreview}>
-                {showPreview ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </Tooltip>
 
             {/*  button for posting */}
             <Tooltip title={"post"}>
@@ -791,6 +784,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd }) => {
                   <Box
                     display={"flex"}
                     justifyContent={"space-around"}
+                    gap={1}
                     alignItems={"center"}
                   >
                     <Box>

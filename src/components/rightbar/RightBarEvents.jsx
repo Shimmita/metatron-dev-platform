@@ -44,7 +44,7 @@ export default function RightBarEvents() {
             mb={3}
           >
             <LiveTvRounded color={"error"} />
-            <Typography variant="body2">View Live Ongoing Events</Typography>
+            <Typography variant="body2">Live Stream Events</Typography>
             <Typography variant="body2" color={"text.secondary"}>
               50
             </Typography>
@@ -63,7 +63,7 @@ export default function RightBarEvents() {
               color={"primary"}
               sx={{ width: 23, height: 23 }}
             />
-            <Typography variant="body2">Check Upcoming Events</Typography>
+            <Typography variant="body2">Explore Upcoming </Typography>
             <Typography variant="body2" color={"text.secondary"}>
               200
             </Typography>
@@ -82,7 +82,7 @@ export default function RightBarEvents() {
               color={"primary"}
               sx={{ width: 23, height: 23 }}
             />
-            <Typography variant="body2">Saved Event Bookmarks</Typography>
+            <Typography variant="body2">My Event Bookmarks</Typography>
             <Typography variant="body2" color={"text.secondary"}>
               10
             </Typography>
@@ -97,7 +97,7 @@ export default function RightBarEvents() {
             mb={3}
           >
             <AddRounded color={"primary"} sx={{ width: 23, height: 23 }} />
-            <Typography variant="body2">Add Your New Event</Typography>
+            <Typography variant="body2">Add New Event</Typography>
             <Typography variant="body2" color={"text.secondary"}>
               create
             </Typography>

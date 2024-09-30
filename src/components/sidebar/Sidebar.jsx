@@ -8,10 +8,14 @@ import {
   Home,
   Lightbulb,
   MonetizationOn,
+  NavigationRounded,
   People,
+  PeopleRounded,
+  PersonAddRounded,
   PostAdd,
   QuestionMark,
   Report,
+  SchoolRounded,
   Settings,
   Smartphone,
   Support,
@@ -20,17 +24,14 @@ import {
   Avatar,
   Box,
   Collapse,
+  IconButton,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   styled,
   Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
+  Tooltip,
   Typography,
 } from "@mui/material";
 
@@ -54,7 +55,7 @@ const Sidebar = ({ setMode, mode }) => {
   const screenWidth = window.screen.availWidth;
 
   // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { isDarkMode, isSidebarRighbar } = useSelector((state) => state.appUI);
 
   const dispatch = useDispatch();
 
@@ -145,278 +146,338 @@ const Sidebar = ({ setMode, mode }) => {
       sx={{
         display: {
           xs: "none",
-          sm: CustomDeviceTablet() ? "none" : "none",
-          md: "none",
+          sm: CustomDeviceTablet()
+            ? isSidebarRighbar
+              ? "block"
+              : "none"
+            : "none",
+          md: isSidebarRighbar ? "block" : "none",
           marginRight: CustomDeviceTablet() && "5rem",
         },
       }}
     >
       <Box position={"fixed"} width={correctWidthInPercentage()}>
-        <Box bgcolor={"background.default"} className="shadow rounded mt-0">
-          <BoxAvatarContent>
-            <Box width={"100%"} className="profile-header">
-              <Box
-                display={"flex"}
-                justifyContent={"center"}
-                alignItems={"center"}
-                p={1}
-              >
-                <Avatar
-                  alt={"user image"}
-                  src={devImage}
-                  sx={{ width: 70, height: 70, marginTop: 0 }}
-                />
+        <Box>
+          <Box bgcolor={"background.default"} className="shadow rounded mt-0">
+            <BoxAvatarContent>
+              <Box width={"100%"} className="profile-header rounded">
+                <Box
+                  display={"flex"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  p={1}
+                >
+                  <Avatar
+                    alt={"user image"}
+                    src={devImage}
+                    sx={{ width: 70, height: 70, marginTop: 0 }}
+                  />
+                </Box>
               </Box>
-            </Box>
 
-            <Typography
-              textAlign={"center"}
-              fontWeight={"bold"}
-              color={"primary"}
-            >
-              SHIMITA DOUGLAS
-            </Typography>
-
-            <Typography
-              maxWidth={screenWidth > 1250 ? 300 : 250}
-              className="px-2"
-              textTransform={"capitalize"}
-              variant="body2"
-            >
-              Software developer specialized in React, Nodejs, Django and
-              Android
-            </Typography>
-          </BoxAvatarContent>
-
-          <Box>
-            <Table aria-label="table">
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Typography variant="body2">Following</Typography>{" "}
-                  </TableCell>
-                  <TableCell align="right">
-                    <Typography variant="body2">Followers</Typography>{" "}
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <Typography variant="body2">100K</Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <Typography variant="body2">10K</Typography>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </Box>
-        </Box>
-
-        <Box bgcolor={"background.default"} className="p-1 shadow rounded mt-3">
-          <Typography
-            className=" mt-2"
-            fontWeight={"bold"}
-            textAlign={"center"}
-            color={"primary"}
-          >
-            NAVIGATION MENU
-          </Typography>
-          <List>
-            <ListItemButton onClick={handleReturnHome}>
-              <ListItemIcon>
-                <Home color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={<Typography variant="body2"> Homepage</Typography>}
-              />
-            </ListItemButton>
-
-            <ListItemButton
-              onClick={(e) => setOpenAccountMore(!openAccountMore)}
-            >
-              <ListItemIcon>
-                <AccountBox color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={<Typography variant="body2">Account </Typography>}
-              />
-              {openAccountMore ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-
-            <Collapse
-              className=" border-top"
-              in={openAccountMore}
-              timeout="auto"
-              unmountOnExit
-            >
-              <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 8 }} onClick={handleShowMyPost}>
-                  <ListItemIcon>
-                    <PostAdd color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="body2">Posts</Typography>}
-                  />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 8 }} onClick={handleShowMyPeople}>
-                  <ListItemIcon>
-                    <People color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="body2">Friends</Typography>}
-                  />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 8 }} onClick={handleShowSettings}>
-                  <ListItemIcon>
-                    <Settings color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="body2">Settings</Typography>}
-                  />
-                </ListItemButton>
-                <ListItemButton sx={{ pl: 8 }} onClick={handleShowPremium}>
-                  <ListItemIcon>
-                    <MonetizationOn color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="body2">Premium</Typography>}
-                  />
-                </ListItemButton>
-              </List>
-            </Collapse>
-
-            <ListItemButton onClick={(e) => setOpenHelp(!openHelp)}>
-              <ListItemIcon>
-                <Support color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={<Typography variant="body2">Help Center </Typography>}
-              />
-              {openHelp ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-
-            <Collapse
-              className=" border-top"
-              in={openHelp}
-              timeout="auto"
-              unmountOnExit
-            >
-              <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 8 }} onClick={handleShowAboutPage}>
-                  <ListItemIcon>
-                    <Lightbulb color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="body2">About</Typography>}
-                  />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 8 }} onClick={handleShowReportUser}>
-                  <ListItemIcon>
-                    <Report color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="body2">Report</Typography>}
-                  />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 8 }} onClick={handleShowQuestions}>
-                  <ListItemIcon>
-                    <QuestionMark color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="body2">Q & A</Typography>}
-                  />
-                </ListItemButton>
-
-                <ListItemButton sx={{ pl: 8 }} onClick={handleShowEmailAssist}>
-                  <ListItemIcon>
-                    <Email color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="body2">Email</Typography>}
-                  />
-                </ListItemButton>
-              </List>
-            </Collapse>
-
-            <ListItemButton onClick={(e) => setOpenMobileApp(!openMobileApp)}>
-              <ListItemIcon>
-                <Smartphone color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={<Typography variant="body2">Install App </Typography>}
-              />
-              {openMobileApp ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
-
-            <Collapse
-              className=" border-top"
-              in={openMobileApp}
-              timeout="auto"
-              unmountOnExit
-            >
-              <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 8 }}>
-                  <ListItemIcon>
-                    <Download color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={<Typography variant="body2">Download</Typography>}
-                  />
-                </ListItemButton>
-              </List>
-            </Collapse>
-
-            <ListItemButton
-              LinkComponent={"a"}
-              href="#home"
-              onClick={handleShowDarkMode}
-            >
-              <ListItemIcon>
-                <DarkMode color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary={
-                  <Typography variant="body2">
-                    <Typography variant="body2">Change Theme</Typography>
-                  </Typography>
-                }
-              />
-              <Switch
-                checked={isDarkMode}
-                onChange={(e) => setMode(mode === "light" ? "dark" : "light")}
-              />
-            </ListItemButton>
-            {/* show account level status */}
-            <Box mt={1}>
-              <AccountLevelStep />
-            </Box>
-          </List>
-        </Box>
-        {/* box for Events displayed for tablets only */}
-        {CustomDeviceTablet() && (
-          <>
-            <Box
-              bgcolor={"background.default"}
-              className="mt-3 shadow p-1 rounded"
-            >
               <Typography
-                gutterBottom
+                textAlign={"center"}
                 fontWeight={"bold"}
-                className="text-center mt-2"
                 color={"primary"}
               >
-                EVENTS AND COURSES
+                SHIMITA DOUGLAS
               </Typography>
-              <EventsTablet />
+
+              <Typography
+                maxWidth={screenWidth > 1250 ? 300 : 250}
+                className="px-2"
+                textTransform={"capitalize"}
+                color={"text.secondary"}
+                variant="body2"
+              >
+                Software Engineer specialized in React, Nodejs, Python and
+                Android
+              </Typography>
+            </BoxAvatarContent>
+
+            <Box p={1} display={"flex"} flexDirection={"column"} gap={2}>
+              {/* following */}
+              <Box
+                display={"flex"}
+                alignItems={"center"}
+                justifyContent={"space-between"}
+              >
+                <Box alignItems={"center"} display={"flex"} gap={1}>
+                  <Tooltip title={"view"}>
+                    <IconButton size="small" className="border">
+                      <PersonAddRounded color="primary" />
+                    </IconButton>
+                  </Tooltip>
+                  <Typography variant="body2">Following</Typography>
+                </Box>
+
+                <Box>
+                  <Typography
+                    fontWeight={"bold"}
+                    color={"primary"}
+                    variant="body2"
+                  >
+                    100
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box>
+                {/* followers */}
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                >
+                  <Box alignItems={"center"} display={"flex"} gap={1}>
+                    <Tooltip title={"view"}>
+                      <IconButton size="small" className="border">
+                        <PeopleRounded color="primary" />
+                      </IconButton>
+                    </Tooltip>
+                    <Typography variant="body2">Followers</Typography>
+                  </Box>
+                  <Box>
+                    <Typography
+                      fontWeight={"bold"}
+                      color={"primary"}
+                      variant="body2"
+                    >
+                      1800
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
             </Box>
-          </>
-        )}
+          </Box>
+
+          <Box
+            bgcolor={"background.default"}
+            className="p-1 shadow rounded mt-3"
+          >
+            <Typography
+              alignItems={"center"}
+              display={"flex"}
+              justifyContent={"center"}
+              gap={2}
+              className=" mt-2"
+              fontWeight={"bold"}
+              textAlign={"center"}
+              color={"primary"}
+            >
+              <span className="pt-1">NAVIGATION MENU </span>{" "}
+              <NavigationRounded sx={{ width: 23, height: 23 }} />
+            </Typography>
+            <List>
+              <ListItemButton onClick={handleReturnHome}>
+                <ListItemIcon>
+                  <Home color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={<Typography variant="body2"> Homepage</Typography>}
+                />
+              </ListItemButton>
+
+              <ListItemButton
+                onClick={(e) => setOpenAccountMore(!openAccountMore)}
+              >
+                <ListItemIcon>
+                  <AccountBox color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={<Typography variant="body2">Account </Typography>}
+                />
+                {openAccountMore ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+
+              <Collapse
+                className=" border-top"
+                in={openAccountMore}
+                timeout="auto"
+                unmountOnExit
+              >
+                <List component="div" disablePadding>
+                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowMyPost}>
+                    <ListItemIcon>
+                      <PostAdd color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="body2">Posts</Typography>}
+                    />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowMyPeople}>
+                    <ListItemIcon>
+                      <People color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="body2">Friends</Typography>}
+                    />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowSettings}>
+                    <ListItemIcon>
+                      <Settings color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2">Settings</Typography>
+                      }
+                    />
+                  </ListItemButton>
+                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowPremium}>
+                    <ListItemIcon>
+                      <MonetizationOn color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="body2">Premium</Typography>}
+                    />
+                  </ListItemButton>
+                </List>
+              </Collapse>
+
+              <ListItemButton onClick={(e) => setOpenHelp(!openHelp)}>
+                <ListItemIcon>
+                  <Support color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2">Help Center </Typography>
+                  }
+                />
+                {openHelp ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+
+              <Collapse
+                className=" border-top"
+                in={openHelp}
+                timeout="auto"
+                unmountOnExit
+              >
+                <List component="div" disablePadding>
+                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowAboutPage}>
+                    <ListItemIcon>
+                      <Lightbulb color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="body2">About</Typography>}
+                    />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowReportUser}>
+                    <ListItemIcon>
+                      <Report color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="body2">Report</Typography>}
+                    />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowQuestions}>
+                    <ListItemIcon>
+                      <QuestionMark color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="body2">Q & A</Typography>}
+                    />
+                  </ListItemButton>
+
+                  <ListItemButton
+                    sx={{ pl: 8 }}
+                    onClick={handleShowEmailAssist}
+                  >
+                    <ListItemIcon>
+                      <Email color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="body2">Email</Typography>}
+                    />
+                  </ListItemButton>
+                </List>
+              </Collapse>
+
+              <ListItemButton onClick={(e) => setOpenMobileApp(!openMobileApp)}>
+                <ListItemIcon>
+                  <Smartphone color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2">Install App </Typography>
+                  }
+                />
+                {openMobileApp ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+
+              <Collapse
+                className=" border-top"
+                in={openMobileApp}
+                timeout="auto"
+                unmountOnExit
+              >
+                <List component="div" disablePadding>
+                  <ListItemButton sx={{ pl: 8 }}>
+                    <ListItemIcon>
+                      <Download color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2">Download</Typography>
+                      }
+                    />
+                  </ListItemButton>
+                </List>
+              </Collapse>
+
+              <ListItemButton
+                LinkComponent={"a"}
+                href="#home"
+                onClick={handleShowDarkMode}
+              >
+                <ListItemIcon>
+                  <DarkMode color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2">
+                      <Typography variant="body2">Change Theme</Typography>
+                    </Typography>
+                  }
+                />
+                <Switch
+                  checked={isDarkMode}
+                  onChange={(e) => setMode(mode === "light" ? "dark" : "light")}
+                />
+              </ListItemButton>
+              {/* show account level status */}
+              <Box mt={1}>
+                <AccountLevelStep />
+              </Box>
+            </List>
+          </Box>
+          {/* box for Events displayed for tablets only */}
+          {CustomDeviceTablet() && (
+            <>
+              <Box
+                bgcolor={"background.default"}
+                className="mt-3 shadow p-1 rounded"
+              >
+                <Typography
+                  gutterBottom
+                  alignItems={"center"}
+                  display={"flex"}
+                  gap={2}
+                  fontWeight={"bold"}
+                  justifyContent={"center"}
+                  color={"primary"}
+                >
+                  <span className="pt-1">LEARNING EVENTS </span>{" "}
+                  <SchoolRounded sx={{ width: 23, height: 23 }} />
+                </Typography>
+                <EventsTablet />
+              </Box>
+            </>
+          )}
+        </Box>
       </Box>
     </Box>
   );

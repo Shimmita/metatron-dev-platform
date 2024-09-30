@@ -2,7 +2,7 @@ import {
   FavoriteBorderOutlined,
   FavoriteRounded,
   LocationOnRounded,
-  StarsRounded
+  StarsRounded,
 } from "@mui/icons-material";
 import { Box, CardActionArea, Checkbox, Tooltip } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -64,11 +64,11 @@ export default function TopDailyPosts() {
                       alignItems={"center"}
                       gap={1}
                     >
-                      <LocationOnRounded
+                      <StarsRounded
                         color="primary"
-                        sx={{ width: 20, height: 20 }}
+                        sx={{ width: 18, height: 18 }}
                       />
-                      <span>Kakamega</span>
+                      <span>Machine Learning </span>{" "}
                     </Typography>
                   </Box>
                 }
@@ -80,11 +80,11 @@ export default function TopDailyPosts() {
                     alignItems={"center"}
                     gap={1}
                   >
-                    <StarsRounded
+                    <LocationOnRounded
                       color="primary"
-                      sx={{ width: 18, height: 18 }}
+                      sx={{ width: 20, height: 20 }}
                     />
-                    <span>Machine Learning </span>{" "}
+                    <span>Kakamega</span>
                   </Typography>
                 }
               />
@@ -132,11 +132,11 @@ export default function TopDailyPosts() {
                       alignItems={"center"}
                       gap={1}
                     >
-                      <LocationOnRounded
+                      <StarsRounded
                         color="primary"
-                        sx={{ width: 20, height: 20 }}
+                        sx={{ width: 18, height: 18 }}
                       />
-                      <span>Mombasa</span>
+                      <span>UI/UX Design </span>{" "}
                     </Typography>
                   </Box>
                 }
@@ -148,11 +148,11 @@ export default function TopDailyPosts() {
                     alignItems={"center"}
                     gap={1}
                   >
-                    <StarsRounded
+                    <LocationOnRounded
                       color="primary"
-                      sx={{ width: 18, height: 18 }}
+                      sx={{ width: 20, height: 20 }}
                     />
-                    <span>UI/UX Design </span>{" "}
+                    <span>Mombasa</span>
                   </Typography>
                 }
               />
@@ -200,11 +200,11 @@ export default function TopDailyPosts() {
                       alignItems={"center"}
                       gap={1}
                     >
-                      <LocationOnRounded
+                      <StarsRounded
                         color="primary"
-                        sx={{ width: 20, height: 20 }}
+                        sx={{ width: 18, height: 18 }}
                       />
-                      <span>Nairobi</span>
+                      <span>CyberSecurity </span>{" "}
                     </Typography>
                   </Box>
                 }
@@ -216,11 +216,11 @@ export default function TopDailyPosts() {
                     alignItems={"center"}
                     gap={1}
                   >
-                    <StarsRounded
+                    <LocationOnRounded
                       color="primary"
-                      sx={{ width: 18, height: 18 }}
+                      sx={{ width: 20, height: 20 }}
                     />
-                    <span>CyberSecurity </span>{" "}
+                    <span>Nairobi</span>
                   </Typography>
                 }
               />

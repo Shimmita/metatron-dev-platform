@@ -82,6 +82,7 @@ export default function Messaging() {
           <Box
             width={drawerSize()}
             p={2}
+            borderRadius={5}
             bgcolor={"background.default"}
             height={"100vh"}
           >

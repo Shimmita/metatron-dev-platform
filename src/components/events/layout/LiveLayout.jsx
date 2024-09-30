@@ -29,7 +29,7 @@ function LiveLayout() {
 
   // handle navigation to the live atttend
   const handleNavigateLiveAttend = () => {
-    navigate("/events/live-attend");
+    navigate("/events/live-attending");
   };
 
   return (
@@ -429,7 +429,7 @@ function LiveLayout() {
                 <Box display={"flex"} justifyContent={"center"} pt={3}>
                   <Button
                     disableElevation
-                    className="w-75 rounded-5 align-items-center fw-bold"
+                    className="w-75 align-items-center fw-bold"
                     type="submit"
                     variant="outlined"
                     size="small"
