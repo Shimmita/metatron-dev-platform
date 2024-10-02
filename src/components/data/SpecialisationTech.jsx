@@ -23,8 +23,6 @@ const SpecialisationTech = [
   "Desktop App Development",
   "WordPress Web Development",
   "Operating Systems (Linux/MacOS/Windows)",
-  "Zero None Of These (Other)",
 ].sort();
-
 
 export default SpecialisationTech;

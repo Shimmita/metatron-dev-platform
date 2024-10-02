@@ -1,12 +1,13 @@
 import {
   AccountBox,
   AddRounded,
+  AndroidRounded,
+  Apple,
   BookmarkRounded,
   CalendarMonthRounded,
   Close,
   DarkMode,
-  Download,
-  Email,
+  Diversity3Rounded,
   ExpandLess,
   ExpandMore,
   Lightbulb,
@@ -15,22 +16,18 @@ import {
   MonetizationOn,
   Notifications,
   People,
-  PeopleRounded,
-  PersonAddRounded,
   PostAdd,
-  QuestionMark,
-  Report,
   SchoolRounded,
   SearchRounded,
   Settings,
-  Smartphone,
-  Support
+  Smartphone
 } from "@mui/icons-material";
 import {
   AppBar,
   Avatar,
   Badge,
   Box,
+  CardActionArea,
   Collapse,
   Divider,
   Drawer,
@@ -64,7 +61,6 @@ const Navbar = ({ setMode, mode }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openAccountMore, setOpenAccountMore] = useState(false);
   const [openMobileApp, setOpenMobileApp] = useState(false);
-  const [openHelp, setOpenHelp] = useState(false);
   const [openEvents, setOpenEvents] = useState(false);
 
   // control opening of the events modal
@@ -151,24 +147,6 @@ const Navbar = ({ setMode, mode }) => {
   const handleShowDarkMode = () => {
     // alter the light/ dark mode
     dispatch(resetDarkMode());
-  };
-
-  // show frequent questions
-  const handleShowQuestions = () => {
-    navigate("/help/quiz");
-    handleCloseDrawer();
-  };
-
-  // handle show report user
-  const handleShowReportUser = () => {
-    navigate("/help/report");
-    handleCloseDrawer();
-  };
-
-  // handle show assistance email
-  const handleShowEmailAssist = () => {
-    navigate("/help/email");
-    handleCloseDrawer();
   };
 
   // handle show about page
@@ -439,58 +417,39 @@ const Navbar = ({ setMode, mode }) => {
                 flexDirection={"column"}
                 gap={2}
               >
-                {/* following */}
-                <Box
-                  display={"flex"}
-                  alignItems={"center"}
-                  justifyContent={"space-between"}
-                >
-                  <Box alignItems={"center"} display={"flex"} gap={1}>
-                    <Tooltip title={"view"}>
-                      <IconButton size="small" className="border">
-                        <PersonAddRounded color="primary" />
-                      </IconButton>
-                    </Tooltip>
-                    <Typography variant="body2">Following</Typography>
-                  </Box>
-
-                  <Box>
-                    <Typography
-                      fontWeight={"bold"}
-                      color={"primary"}
-                      variant="body2"
-                    >
-                      100
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box>
-                  {/* followers */}
+                {/* connections */}
+                <CardActionArea>
                   <Box
                     display={"flex"}
-                    justifyContent={"space-between"}
                     alignItems={"center"}
+                    className="px-2 mt-2"
+                    p={1}
+                    justifyContent={"space-between"}
                   >
-                    <Box alignItems={"center"} display={"flex"} gap={1}>
+                    <Box pl={1} alignItems={"center"} display={"flex"} gap={1}>
                       <Tooltip title={"view"}>
-                        <IconButton size="small" className="border">
-                          <PeopleRounded color="primary" />
-                        </IconButton>
+                        <Diversity3Rounded color="primary" />
                       </Tooltip>
-                      <Typography variant="body2">Followers</Typography>
+                      <Typography
+                        color={"text.secondary"}
+                        fontWeight={"bold"}
+                        variant="body2"
+                      >
+                        Connections
+                      </Typography>
                     </Box>
+
                     <Box>
                       <Typography
                         fontWeight={"bold"}
                         color={"primary"}
                         variant="body2"
                       >
-                        1800
+                        520
                       </Typography>
                     </Box>
                   </Box>
-                </Box>
+                </CardActionArea>
               </Box>
             </BoxAvatarContent>
 
@@ -512,7 +471,7 @@ const Navbar = ({ setMode, mode }) => {
                 </ListItemIcon>
                 <ListItemText
                   primary={
-                    <Typography variant="body2">Account Update</Typography>
+                    <Typography variant="body2">Account Status</Typography>
                   }
                 />
                 {openAccountMore ? <ExpandLess /> : <ExpandMore />}
@@ -642,75 +601,17 @@ const Navbar = ({ setMode, mode }) => {
                 </List>
               </Collapse>
 
-              <ListItemButton onClick={(e) => setOpenHelp(!openHelp)}>
+              {/* about */}
+              <ListItemButton onClick={handleShowAboutPage}>
                 <ListItemIcon>
-                  <Support color="primary" />
+                  <Lightbulb color="primary" />
                 </ListItemIcon>
                 <ListItemText
                   primary={
-                    <Typography variant="body2">Help Center Menu</Typography>
+                    <Typography variant="body2">About Metatron</Typography>
                   }
                 />
-                {openHelp ? <ExpandLess /> : <ExpandMore />}
               </ListItemButton>
-
-              <Collapse
-                className=" border-top"
-                in={openHelp}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="div" disablePadding>
-                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowAboutPage}>
-                    <ListItemIcon>
-                      <Lightbulb color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body2">About Us</Typography>
-                      }
-                    />
-                  </ListItemButton>
-
-                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowReportUser}>
-                    <ListItemIcon>
-                      <Report color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body2">Report User </Typography>
-                      }
-                    />
-                  </ListItemButton>
-
-                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowQuestions}>
-                    <ListItemIcon>
-                      <QuestionMark color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body2">Frequent Quizes</Typography>
-                      }
-                    />
-                  </ListItemButton>
-
-                  <ListItemButton
-                    sx={{ pl: 8 }}
-                    onClick={handleShowEmailAssist}
-                  >
-                    <ListItemIcon>
-                      <Email color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body2">
-                          Assistance Email
-                        </Typography>
-                      }
-                    />
-                  </ListItemButton>
-                </List>
-              </Collapse>
 
               <ListItemButton onClick={(e) => setOpenMobileApp(!openMobileApp)}>
                 <ListItemIcon>
@@ -718,7 +619,7 @@ const Navbar = ({ setMode, mode }) => {
                 </ListItemIcon>
                 <ListItemText
                   primary={
-                    <Typography variant="body2">Install App Menu</Typography>
+                    <Typography variant="body2">Download App </Typography>
                   }
                 />
                 {openMobileApp ? <ExpandLess /> : <ExpandMore />}
@@ -733,12 +634,19 @@ const Navbar = ({ setMode, mode }) => {
                 <List component="div" disablePadding>
                   <ListItemButton sx={{ pl: 8 }}>
                     <ListItemIcon>
-                      <Download color="primary" />
+                      <AndroidRounded color="primary" />
                     </ListItemIcon>
                     <ListItemText
-                      primary={
-                        <Typography variant="body2">Download</Typography>
-                      }
+                      primary={<Typography variant="body2">Android</Typography>}
+                    />
+                  </ListItemButton>
+
+                  <ListItemButton sx={{ pl: 8 }}>
+                    <ListItemIcon>
+                      <Apple color="primary" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={<Typography variant="body2">iOS</Typography>}
                     />
                   </ListItemButton>
                 </List>

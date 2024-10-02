@@ -1,34 +1,31 @@
 import {
   AccountBox,
+  AndroidRounded,
+  Apple,
   DarkMode,
-  Download,
-  Email,
+  Diversity3Rounded,
   ExpandLess,
   ExpandMore,
   Home,
   Lightbulb,
+  MenuRounded,
   MonetizationOn,
-  NavigationRounded,
   People,
-  PeopleRounded,
-  PersonAddRounded,
   PostAdd,
-  QuestionMark,
-  Report,
   SchoolRounded,
   Settings,
-  Smartphone,
-  Support,
+  Smartphone
 } from "@mui/icons-material";
 import {
   Avatar,
   Box,
+  CardActionArea,
   Collapse,
-  IconButton,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Skeleton,
   styled,
   Switch,
   Tooltip,
@@ -37,7 +34,7 @@ import {
 
 import { resetDarkMode } from "../../redux/AppUI";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
@@ -48,7 +45,6 @@ import "./Sidebar.css";
 const Sidebar = ({ setMode, mode }) => {
   const [openAccountMore, setOpenAccountMore] = useState(false);
   const [openMobileApp, setOpenMobileApp] = useState(false);
-  const [openHelp, setOpenHelp] = useState(false);
   const navigate = useNavigate();
 
   // screen width
@@ -97,21 +93,6 @@ const Sidebar = ({ setMode, mode }) => {
     dispatch(resetDarkMode());
   };
 
-  // show frequent questions
-  const handleShowQuestions = () => {
-    navigate("/help/quiz");
-  };
-
-  // handle show report user
-  const handleShowReportUser = () => {
-    navigate("/help/report");
-  };
-
-  // handle show assistance email
-  const handleShowEmailAssist = () => {
-    navigate("/help/email");
-  };
-
   // handle show about page
   const handleShowAboutPage = () => {
     navigate("/about");
@@ -137,6 +118,14 @@ const Sidebar = ({ setMode, mode }) => {
     return;
   };
 
+  // simulate loading of the request
+  const [isLoadingRequest, setIsLoadingRequest] = useState(true);
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoadingRequest(false);
+    }, 5000);
+  }, []);
+
   return (
     <Box
       mt={CustomDeviceTablet() && 1}
@@ -159,96 +148,98 @@ const Sidebar = ({ setMode, mode }) => {
       <Box position={"fixed"} width={correctWidthInPercentage()}>
         <Box>
           <Box bgcolor={"background.default"} className="shadow rounded mt-0">
-            <BoxAvatarContent>
-              <Box width={"100%"} className="profile-header rounded">
-                <Box
-                  display={"flex"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                  p={1}
-                >
-                  <Avatar
-                    alt={"user image"}
-                    src={devImage}
-                    sx={{ width: 70, height: 70, marginTop: 0 }}
-                  />
-                </Box>
-              </Box>
-
-              <Typography
-                textAlign={"center"}
-                fontWeight={"bold"}
-                color={"primary"}
-              >
-                SHIMITA DOUGLAS
-              </Typography>
-
-              <Typography
-                maxWidth={screenWidth > 1250 ? 300 : 250}
-                className="px-2"
-                textTransform={"capitalize"}
-                color={"text.secondary"}
-                variant="body2"
-              >
-                Software Engineer specialized in React, Nodejs, Python and
-                Android
-              </Typography>
-            </BoxAvatarContent>
-
-            <Box p={1} display={"flex"} flexDirection={"column"} gap={2}>
-              {/* following */}
-              <Box
-                display={"flex"}
-                alignItems={"center"}
-                justifyContent={"space-between"}
-              >
-                <Box alignItems={"center"} display={"flex"} gap={1}>
-                  <Tooltip title={"view"}>
-                    <IconButton size="small" className="border">
-                      <PersonAddRounded color="primary" />
-                    </IconButton>
-                  </Tooltip>
-                  <Typography variant="body2">Following</Typography>
-                </Box>
-
-                <Box>
-                  <Typography
-                    fontWeight={"bold"}
-                    color={"primary"}
-                    variant="body2"
-                  >
-                    100
-                  </Typography>
-                </Box>
-              </Box>
-
+            {isLoadingRequest ? (
               <Box>
-                {/* followers */}
-                <Box
-                  display={"flex"}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                >
-                  <Box alignItems={"center"} display={"flex"} gap={1}>
-                    <Tooltip title={"view"}>
-                      <IconButton size="small" className="border">
-                        <PeopleRounded color="primary" />
-                      </IconButton>
-                    </Tooltip>
-                    <Typography variant="body2">Followers</Typography>
-                  </Box>
-                  <Box>
-                    <Typography
-                      fontWeight={"bold"}
-                      color={"primary"}
-                      variant="body2"
-                    >
-                      1800
-                    </Typography>
-                  </Box>
+                <Box display={"flex"} justifyContent={"center"}>
+                  <Skeleton variant="circular" width={70} height={70} />
                 </Box>
+                <Skeleton
+                  variant="rectangular"
+                  width={screenWidth > 1250 ? 300 : 250}
+                  height={"20vh"}
+                />
               </Box>
-            </Box>
+            ) : (
+              <React.Fragment>
+                <BoxAvatarContent>
+                  <Box>
+                    <Box width={"100%"} className="profile-header rounded">
+                      <Box
+                        display={"flex"}
+                        justifyContent={"center"}
+                        alignItems={"center"}
+                        p={1}
+                      >
+                        <Avatar
+                          alt={"user image"}
+                          src={devImage}
+                          sx={{ width: 70, height: 70, marginTop: 0 }}
+                        />
+                      </Box>
+                    </Box>
+
+                    <Box>
+                      <Typography
+                        textAlign={"center"}
+                        fontWeight={"bold"}
+                        gutterBottom
+                        color={"primary"}
+                      >
+                        SHIMITA DOUGLAS
+                      </Typography>
+                    </Box>
+
+                    <Box>
+                      <Typography
+                        maxWidth={screenWidth > 1250 ? 300 : 250}
+                        className="px-2 navbar-text "
+                        textTransform={"capitalize"}
+                        textAlign={"center"}
+                        color={"text.secondary"}
+                        variant="body2"
+                      >
+                        Software Engineer specialized in React, Nodejs, Python
+                        and Android
+                      </Typography>
+                    </Box>
+                  </Box>
+                </BoxAvatarContent>
+
+                {/* connections */}
+                <CardActionArea>
+                  <Box
+                    display={"flex"}
+                    alignItems={"center"}
+                    className="px-2 mt-2"
+                    p={1}
+                    justifyContent={"space-between"}
+                  >
+                    <Box pl={1} alignItems={"center"} display={"flex"} gap={1}>
+                      <Tooltip title={"view"}>
+                        <Diversity3Rounded color="primary" />
+                      </Tooltip>
+                      <Typography
+                        color={"text.secondary"}
+                        fontWeight={"bold"}
+                        variant="body2"
+                      >
+                        Connections
+                      </Typography>
+                    </Box>
+
+                    <Box>
+                      <Typography
+                        fontWeight={"bold"}
+                        color={"primary"}
+                        variant="body2"
+                      >
+                        520
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardActionArea>
+              </React.Fragment>
+            )}
           </Box>
 
           <Box
@@ -266,193 +257,172 @@ const Sidebar = ({ setMode, mode }) => {
               color={"primary"}
             >
               <span className="pt-1">NAVIGATION MENU </span>{" "}
-              <NavigationRounded sx={{ width: 23, height: 23 }} />
+              <MenuRounded sx={{ width: 23, height: 23 }} />
             </Typography>
-            <List>
-              <ListItemButton onClick={handleReturnHome}>
-                <ListItemIcon>
-                  <Home color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={<Typography variant="body2"> Homepage</Typography>}
-                />
-              </ListItemButton>
 
-              <ListItemButton
-                onClick={(e) => setOpenAccountMore(!openAccountMore)}
-              >
-                <ListItemIcon>
-                  <AccountBox color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={<Typography variant="body2">Account </Typography>}
-                />
-                {openAccountMore ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
+            {isLoadingRequest ? (
+              <Skeleton variant="rectangular" width={"100%"} height={"35vh"} />
+            ) : (
+              <List>
+                <ListItemButton onClick={handleReturnHome}>
+                  <ListItemIcon>
+                    <Home color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={<Typography variant="body2"> Homepage</Typography>}
+                  />
+                </ListItemButton>
 
-              <Collapse
-                className=" border-top"
-                in={openAccountMore}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="div" disablePadding>
-                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowMyPost}>
-                    <ListItemIcon>
-                      <PostAdd color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<Typography variant="body2">Posts</Typography>}
-                    />
-                  </ListItemButton>
+                <ListItemButton
+                  onClick={(e) => setOpenAccountMore(!openAccountMore)}
+                >
+                  <ListItemIcon>
+                    <AccountBox color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2">Account Status </Typography>
+                    }
+                  />
+                  {openAccountMore ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
 
-                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowMyPeople}>
-                    <ListItemIcon>
-                      <People color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<Typography variant="body2">Friends</Typography>}
-                    />
-                  </ListItemButton>
+                <Collapse
+                  className=" border-top"
+                  in={openAccountMore}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <List component="div" disablePadding>
+                    <ListItemButton sx={{ pl: 8 }} onClick={handleShowMyPost}>
+                      <ListItemIcon>
+                        <PostAdd color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={<Typography variant="body2">Posts</Typography>}
+                      />
+                    </ListItemButton>
 
-                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowSettings}>
-                    <ListItemIcon>
-                      <Settings color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body2">Settings</Typography>
-                      }
-                    />
-                  </ListItemButton>
-                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowPremium}>
-                    <ListItemIcon>
-                      <MonetizationOn color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<Typography variant="body2">Premium</Typography>}
-                    />
-                  </ListItemButton>
-                </List>
-              </Collapse>
+                    <ListItemButton sx={{ pl: 8 }} onClick={handleShowMyPeople}>
+                      <ListItemIcon>
+                        <People color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2">Friends</Typography>
+                        }
+                      />
+                    </ListItemButton>
 
-              <ListItemButton onClick={(e) => setOpenHelp(!openHelp)}>
-                <ListItemIcon>
-                  <Support color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography variant="body2">Help Center </Typography>
-                  }
-                />
-                {openHelp ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
+                    <ListItemButton sx={{ pl: 8 }} onClick={handleShowSettings}>
+                      <ListItemIcon>
+                        <Settings color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2">Settings</Typography>
+                        }
+                      />
+                    </ListItemButton>
+                    <ListItemButton sx={{ pl: 8 }} onClick={handleShowPremium}>
+                      <ListItemIcon>
+                        <MonetizationOn color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2">Premium</Typography>
+                        }
+                      />
+                    </ListItemButton>
+                  </List>
+                </Collapse>
 
-              <Collapse
-                className=" border-top"
-                in={openHelp}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="div" disablePadding>
-                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowAboutPage}>
-                    <ListItemIcon>
-                      <Lightbulb color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<Typography variant="body2">About</Typography>}
-                    />
-                  </ListItemButton>
+                {/* about */}
+                <ListItemButton onClick={handleShowAboutPage}>
+                  <ListItemIcon>
+                    <Lightbulb color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2">About Metatron</Typography>
+                    }
+                  />
+                </ListItemButton>
 
-                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowReportUser}>
-                    <ListItemIcon>
-                      <Report color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<Typography variant="body2">Report</Typography>}
-                    />
-                  </ListItemButton>
+                {/* install app */}
 
-                  <ListItemButton sx={{ pl: 8 }} onClick={handleShowQuestions}>
-                    <ListItemIcon>
-                      <QuestionMark color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<Typography variant="body2">Q & A</Typography>}
-                    />
-                  </ListItemButton>
+                <ListItemButton
+                  onClick={(e) => setOpenMobileApp(!openMobileApp)}
+                >
+                  <ListItemIcon>
+                    <Smartphone color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2">Download App </Typography>
+                    }
+                  />
+                  {openMobileApp ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
 
-                  <ListItemButton
-                    sx={{ pl: 8 }}
-                    onClick={handleShowEmailAssist}
-                  >
-                    <ListItemIcon>
-                      <Email color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={<Typography variant="body2">Email</Typography>}
-                    />
-                  </ListItemButton>
-                </List>
-              </Collapse>
+                <Collapse
+                  className=" border-top"
+                  in={openMobileApp}
+                  timeout="auto"
+                  unmountOnExit
+                >
+                  <List component="div" disablePadding>
+                    <ListItemButton sx={{ pl: 8 }}>
+                      <ListItemIcon>
+                        <AndroidRounded color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2">Android</Typography>
+                        }
+                      />
+                    </ListItemButton>
 
-              <ListItemButton onClick={(e) => setOpenMobileApp(!openMobileApp)}>
-                <ListItemIcon>
-                  <Smartphone color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography variant="body2">Install App </Typography>
-                  }
-                />
-                {openMobileApp ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
+                    <ListItemButton sx={{ pl: 8 }}>
+                      <ListItemIcon>
+                        <Apple color="primary" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={<Typography variant="body2">iOS</Typography>}
+                      />
+                    </ListItemButton>
+                  </List>
+                </Collapse>
 
-              <Collapse
-                className=" border-top"
-                in={openMobileApp}
-                timeout="auto"
-                unmountOnExit
-              >
-                <List component="div" disablePadding>
-                  <ListItemButton sx={{ pl: 8 }}>
-                    <ListItemIcon>
-                      <Download color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body2">Download</Typography>
-                      }
-                    />
-                  </ListItemButton>
-                </List>
-              </Collapse>
-
-              <ListItemButton
-                LinkComponent={"a"}
-                href="#home"
-                onClick={handleShowDarkMode}
-              >
-                <ListItemIcon>
-                  <DarkMode color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={
-                    <Typography variant="body2">
-                      <Typography variant="body2">Change Theme</Typography>
-                    </Typography>
-                  }
-                />
-                <Switch
-                  checked={isDarkMode}
-                  onChange={(e) => setMode(mode === "light" ? "dark" : "light")}
-                />
-              </ListItemButton>
-              {/* show account level status */}
-              <Box mt={1}>
-                <AccountLevelStep />
-              </Box>
-            </List>
+                {/* change theme */}
+                <ListItemButton
+                  LinkComponent={"a"}
+                  href="#home"
+                  onClick={handleShowDarkMode}
+                >
+                  <ListItemIcon>
+                    <DarkMode color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2">
+                        <Typography variant="body2">Change Theme</Typography>
+                      </Typography>
+                    }
+                  />
+                  <Switch
+                    checked={isDarkMode}
+                    onChange={(e) =>
+                      setMode(mode === "light" ? "dark" : "light")
+                    }
+                  />
+                </ListItemButton>
+                {/* show account level status */}
+                <Box mt={1}>
+                  <AccountLevelStep />
+                </Box>
+              </List>
+            )}
           </Box>
           {/* box for Events displayed for tablets only */}
           {CustomDeviceTablet() && (
@@ -473,7 +443,16 @@ const Sidebar = ({ setMode, mode }) => {
                   <span className="pt-1">LEARNING EVENTS </span>{" "}
                   <SchoolRounded sx={{ width: 23, height: 23 }} />
                 </Typography>
-                <EventsTablet />
+
+                {isLoadingRequest ? (
+                  <Skeleton
+                    variant="rectangular"
+                    width={"100%"}
+                    height={"20vh"}
+                  />
+                ) : (
+                  <EventsTablet />
+                )}
               </Box>
             </>
           )}

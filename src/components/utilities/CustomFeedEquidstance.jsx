@@ -3,6 +3,10 @@ function CustomFeedEquidstance() {
   const screenWidth = window.screen.availWidth;
   //handle feed equidistant state
 
+  if (screenWidth >700 && screenWidth<=1030){
+    return '1.5%'
+  }
+
   if (screenWidth > 1250 && screenWidth <= 1400) {
     return "3.3%";
   }

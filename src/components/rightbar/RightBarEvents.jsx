@@ -34,19 +34,26 @@ export default function RightBarEvents() {
   };
   return (
     <>
-      <List sx={{ bgcolor: "background.paper" }}>
+      <List
+        className="px-4"
+        sx={{ bgcolor: "background.paper", width: "100%" }}
+      >
         <CardActionArea onClick={handleEventsLive}>
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
-            gap={1}
             mb={3}
+            width={"100%"}
           >
             <LiveTvRounded color={"error"} />
             <Typography variant="body2">Live Stream Events</Typography>
-            <Typography variant="body2" color={"text.secondary"}>
-              50
+            <Typography
+              fontWeight={"bold"}
+              variant="body2"
+              color={"text.secondary"}
+            >
+              125
             </Typography>
           </Box>
         </CardActionArea>
@@ -64,7 +71,11 @@ export default function RightBarEvents() {
               sx={{ width: 23, height: 23 }}
             />
             <Typography variant="body2">Explore Upcoming </Typography>
-            <Typography variant="body2" color={"text.secondary"}>
+            <Typography
+              fontWeight={"bold"}
+              variant="body2"
+              color={"text.secondary"}
+            >
               200
             </Typography>
           </Box>
@@ -83,7 +94,11 @@ export default function RightBarEvents() {
               sx={{ width: 23, height: 23 }}
             />
             <Typography variant="body2">My Event Bookmarks</Typography>
-            <Typography variant="body2" color={"text.secondary"}>
+            <Typography
+              fontWeight={"bold"}
+              variant="body2"
+              color={"text.secondary"}
+            >
               10
             </Typography>
           </Box>
@@ -98,7 +113,11 @@ export default function RightBarEvents() {
           >
             <AddRounded color={"primary"} sx={{ width: 23, height: 23 }} />
             <Typography variant="body2">Add New Event</Typography>
-            <Typography variant="body2" color={"text.secondary"}>
+            <Typography
+              fontWeight={"bold"}
+              variant="body2"
+              color={"text.secondary"}
+            >
               create
             </Typography>
           </Box>

@@ -3,7 +3,6 @@ import React, { lazy, Suspense } from "react";
 import { Puff } from "react-loader-spinner";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import AppLogo from "./images/logo_sm.png";
-
 const HomePageLazy = lazy(() => import("./components/account/HomePage"));
 const RecoverAuthLay = lazy(() => import("./components/auth/RecoverAuth"));
 const RegistrationAuthLazy = lazy(() =>

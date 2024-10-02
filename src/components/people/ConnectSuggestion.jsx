@@ -14,6 +14,7 @@ export default function ConnectSuggestion() {
             <Avatar>
               <Image width={36} src={devImage} />
             </Avatar>
+            
           </Box>
           <Typography className="text-center" variant="body2" component="div">
             <small>Albert Einstein</small>

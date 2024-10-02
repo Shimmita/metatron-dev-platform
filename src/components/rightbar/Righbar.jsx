@@ -1,20 +1,19 @@
-import {
-  PeopleRounded,
-  SchoolRounded,
-  WhatshotRounded,
-} from "@mui/icons-material";
-import { Backdrop, Box, Typography } from "@mui/material";
-import React from "react";
+import { SchoolRounded } from "@mui/icons-material";
+import { Backdrop, Box, Skeleton, Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import BasicSpeedDial from "../custom/SpeedDial";
 import useScrolledDown from "../hooks/useScrolledDown";
-import ConnectRequest from "./ConnectRequest";
+import CoursesContainer from "./CoursesContainer";
+import JobsContainer from "./JobsContainer";
+import RequestContainer from "./RequestContainer";
 import RightBarEvents from "./RightBarEvents";
-import TopDailyPosts from "./TopDailyPost";
+import RightBarStepper from "./RightBarStepper";
 
 const RightbarAll = ({ mode }) => {
   // backdrop state
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const [corouselCounter, setCorouselCounter] = React.useState(0);
 
   // redux states
   const { isScrolledDown, isSidebarRighbar } = useSelector(
@@ -23,6 +22,15 @@ const RightbarAll = ({ mode }) => {
 
   // run the listening component hook
   useScrolledDown();
+
+  // simulate loading of the request
+  const [isLoadingRequest, setIsLoadingRequest] = useState(true);
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoadingRequest(false);
+    }, 5000);
+  }, []);
+
 
   return (
     <Box
@@ -38,53 +46,41 @@ const RightbarAll = ({ mode }) => {
       }}
     >
       <Box position={"fixed"} color={"text.primary"} className="mt-0">
-        {/* connection requests */}
-        <Box
-          bgcolor={"background.default"}
-          className="shadow rounded pe-2 mb-3 "
-        >
-          <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
-            <Typography
-              display={"flex"}
-              gap={3}
-              fontWeight={"bold"}
-              gutterBottom
-              color={"primary"}
-            >
-              <span className="pt-1">CONNECT REQUEST</span>
-              <PeopleRounded />
-            </Typography>
-          </Box>
-
-          <Box display={"flex"} justifyContent={"center"}>
-            <ConnectRequest />
-          </Box>
-        </Box>
-        {/* trending post */}
+        {/* connect suggestion  */}
         <Box bgcolor={"background.default"} className="shadow rounded pe-2 ">
-          <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
-            <Typography
-              display={"flex"}
-              gap={4}
-              fontWeight={"bold"}
-              color={"primary"}
-            >
-              <span className="pt-1">TRENDING POSTS</span>
-              <WhatshotRounded />
-            </Typography>
+          <Box>
+            {/* jobs */}
+            <Box display={corouselCounter === 0 ? "block" : "none"}>
+              <JobsContainer />
+            </Box>
+
+            {/* popular courses */}
+            <Box display={corouselCounter === 1 ? "block" : "none"}>
+              <CoursesContainer />
+            </Box>
+
+            {/* connect request */}
+            <Box display={corouselCounter === 2 ? "block" : "none"}>
+              <RequestContainer />
+            </Box>
           </Box>
+          {/* stepper controller */}
           <Box display={"flex"} justifyContent={"center"}>
-            <TopDailyPosts />
+            <RightBarStepper
+              corouselCounter={corouselCounter}
+              setCorouselCounter={setCorouselCounter}
+            />
           </Box>
         </Box>
+
+
 
         {/* events */}
-
         <Box bgcolor={"background.default"} className="shadow mt-3 rounded ">
           <Box display={"flex"} justifyContent={"center"}>
             <Typography
               display={"flex"}
-              gap={3}
+              gap={5}
               fontWeight={"bold"}
               gutterBottom
               color={"primary"}
@@ -95,7 +91,11 @@ const RightbarAll = ({ mode }) => {
           </Box>
 
           <Box display={"flex"} justifyContent={"center"} mt={1}>
-            <RightBarEvents />
+            {isLoadingRequest ? (
+              <Skeleton variant="rectangular" width={"100%"} height={"30vh"} />
+            ) : (
+              <RightBarEvents />
+            )}
           </Box>
         </Box>
       </Box>
