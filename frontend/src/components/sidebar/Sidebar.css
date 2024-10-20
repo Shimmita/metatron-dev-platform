@@ -1,0 +1,5 @@
+.profile-header {
+  background: linear-gradient(to bottom left, #ffffff, #ffffff);
+  box-shadow: -10px 10px 50px inset #bdbdbd;
+  border-radius: 5px 5px 0px 0px;
+}
