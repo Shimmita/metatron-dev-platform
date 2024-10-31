@@ -4,31 +4,31 @@ import {
   AndroidRounded,
   Apple,
   BookmarkRounded,
+  BusinessRounded,
   CalendarMonthRounded,
   Diversity3Rounded,
   EventNoteRounded,
   ExpandLess,
   ExpandMore,
   Home,
-  InfoRounded,
   Lightbulb,
   LightModeOutlined,
   LightModeRounded,
   LiveTvRounded,
+  LogoutRounded,
   MonetizationOn,
   PostAdd,
   SchoolRounded,
   Settings,
   Smartphone,
+  StarRounded,
+  SupportAgentRounded,
 } from "@mui/icons-material";
 import {
   AppBar,
   Avatar,
   Box,
-  Button,
-  CardActionArea,
   Collapse,
-  Divider,
   Drawer,
   List,
   ListItem,
@@ -38,7 +38,6 @@ import {
   styled,
   Switch,
   Toolbar,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
@@ -48,8 +47,8 @@ import devImage from "../../images/dev.jpeg";
 import FlagLogo from "../../images/KE.png";
 import AppLogo from "../../images/logo_sm.png";
 import { resetDarkMode } from "../../redux/AppUI";
-import AccountLevelStep from "../level/AccountLevel";
 import SkillAvatars from "../sidebar/SkillAvatars";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const DrawerSmartphone = ({
   openDrawer,
@@ -149,6 +148,9 @@ const DrawerSmartphone = ({
     handleCloseDrawer();
   };
 
+  // simulate bs a/c and personal a/c transition
+  let businessAccount = true;
+
   return (
     <Drawer open={openDrawer} onClose={(e) => setOpenDrawer(false)}>
       <Box
@@ -157,16 +159,17 @@ const DrawerSmartphone = ({
         bgcolor={"background.default"}
         color={"text.primary"}
       >
-        <AppBar  position="sticky" elevation={0}>
+        <AppBar position="sticky" elevation={0}>
           <Toolbar
-          variant="dense"
+            variant="dense"
             sx={{
               display: "flex",
               justifyContent: "space-between",
               alignContent: "center",
             }}
           >
-            <Avatar alt="logo" src={AppLogo} sx={{ width: 35, height: 35 }} />
+            <Avatar alt="logo" src={AppLogo} sx={{ width: 36, height: 36 }} />
+            <Typography variant="body2">METATRON</Typography>
             <Typography variant="body2">FREE</Typography>
           </Toolbar>
         </AppBar>
@@ -190,42 +193,95 @@ const DrawerSmartphone = ({
                 />
               </Box>
               <Box
-                width={screenWidth > 1250 ? 300 : 250}
+                width={CustomLandscapeWidest() ? 300 : 250}
                 display={"flex"}
                 justifyContent={"center"}
                 mt={1}
                 pb={1}
               >
-                <SkillAvatars />
+                {!businessAccount ? (
+                  <>
+                    {/* shown for personal a/c */}
+                    <SkillAvatars />
+                  </>
+                ) : (
+                  <>
+                    {/* shown for businesss a/c */}
+                    <Box width={CustomLandscapeWidest() ? 260 : 250}>
+                      <Box>
+                        <Typography
+                          fontWeight={"bold"}
+                          textAlign={"center"}
+                          variant="body2"
+                          gutterBottom
+                          textTransform={"uppercase"}
+                          color={isDarkMode ? "black" : "primary"}
+                        >
+                          Elusium Incorporation
+                        </Typography>
+                        <Typography
+                          textAlign={"center"}
+                          variant="body2"
+                          display={"flex"}
+                          justifyContent={"space-between"}
+                          alignItems={"center"}
+                          gap={1}
+                          color={isDarkMode ? "black" : "text.secondary"}
+                        >
+                          <StarRounded sx={{ width: 12, height: 12 }} />
+                          Software and ML/AI Development Company
+                          <StarRounded sx={{ width: 12, height: 12 }} />
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </>
+                )}
               </Box>
             </Box>
           </Box>
         </BoxAvatarContent>
 
         {/* connections */}
-        <CardActionArea onClick={handleShowMyNetwork}>
-          <Box
-            display={"flex"}
-            mt={2}
-            alignItems={"center"}
-            className="px-2"
-            p={1}
-            justifyContent={"space-between"}
-          >
-            <Box pl={1} alignItems={"center"} display={"flex"} gap={1}>
-              <Tooltip title={"view"}>
-                <Diversity3Rounded color="primary" />
-              </Tooltip>
-              <Typography variant="body2">Network</Typography>
-            </Box>
+        <List>
+          <ListItemButton onClick={handleShowMyNetwork}>
+            <ListItemIcon>
+              <Diversity3Rounded
+                color="primary"
+                sx={{ width: 26, height: 26 }}
+              />{" "}
+            </ListItemIcon>
 
-            <Box>
-              <Typography fontWeight={"bold"} color={"primary"} variant="body2">
-                500
-              </Typography>
-            </Box>
-          </Box>
-        </CardActionArea>
+            {/* shown for personal */}
+            {!businessAccount ? (
+              <>
+                <ListItemText
+                  primary={<Typography variant="body2"> Network</Typography>}
+                />
+                <Typography
+                  fontWeight={"bold"}
+                  color={"primary"}
+                  variant="body2"
+                >
+                  500
+                </Typography>
+              </>
+            ) : (
+              <>
+                {/* shown for business a/c */}
+                <ListItemText
+                  primary={<Typography variant="body2"> Followers</Typography>}
+                />
+                <Typography
+                  fontWeight={"bold"}
+                  color={"primary"}
+                  variant="body2"
+                >
+                  500
+                </Typography>
+              </>
+            )}
+          </ListItemButton>
+        </List>
 
         <Typography
           fontWeight={"bold"}
@@ -421,64 +477,94 @@ const DrawerSmartphone = ({
             </List>
           </Collapse>
 
-          {/* change theme */}
-          <ListItem>
-            <ListItemIcon>
-              {isDarkMode ? (
-                <LightModeRounded color="primary" />
-              ) : (
-                <LightModeOutlined color="primary" />
-              )}
-            </ListItemIcon>
-            <ListItemText
-              primary={
-                <Typography variant="body2">
-                  <Typography variant="body2">Change Theme</Typography>
-                </Typography>
-              }
-            />
-            <Switch
-              size="small"
-              checked={isDarkMode}
-              onChange={handleShowDarkMode}
-            />
-          </ListItem>
-          <Divider component={"li"} className="mt-2" />
+          {/* more */}
 
-          {/* show account level status */}
-          <Box p={2} mt={1}>
-            <AccountLevelStep />
-          </Box>
-          {/* slogan */}
-          <Box p={2}>
-            <Box display={"flex"} alignItems={"center"}>
-              <Avatar src={FlagLogo} alt="flag" />
-              <Box
-                display={"flex"}
-                justifyContent={"space-between"}
-                flexDirection={"column"}
-                m={"0 auto"}
-              >
-                <Typography
-                  fontWeight={"bold"}
-                  color={"text.secondary"}
-                  className="w-100"
-                  textAlign={"center"}
-                  variant="body2"
-                >
-                  Best IT Platform
-                </Typography>
+          <Box bgcolor={"background.default"}>
+            <List>
+              {/* customer help */}
+              <ListItemButton onClick={handleReturnHome}>
+                <ListItemIcon>
+                  <SupportAgentRounded color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2">Technical Team</Typography>
+                  }
+                />
+              </ListItemButton>
 
-                <Button
-                  endIcon={<InfoRounded />}
-                  color="success"
-                  disableElevation
-                  sx={{ textTransform: "capitalize" }}
-                >
-                  Free Version
-                </Button>
-              </Box>
-            </Box>
+              {/* Logout */}
+              <ListItemButton>
+                <ListItemIcon>
+                  <LogoutRounded color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2">
+                      <Typography variant="body2">Account Logout</Typography>
+                    </Typography>
+                  }
+                />
+              </ListItemButton>
+
+              {/* change theme */}
+              <ListItemButton onClick={handleShowDarkMode}>
+                <ListItemIcon>
+                  {isDarkMode ? (
+                    <LightModeRounded color="primary" />
+                  ) : (
+                    <LightModeOutlined color="primary" />
+                  )}
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2">
+                      <Typography variant="body2">Dark Theme</Typography>
+                    </Typography>
+                  }
+                />
+                <Switch disableRipple size="small" checked={isDarkMode} />
+              </ListItemButton>
+
+              {/* slogan */}
+              <ListItem>
+                {!businessAccount ? (
+                  <>
+                    {/* personal a/c */}
+                    <ListItemIcon>
+                      <Avatar
+                        src={FlagLogo}
+                        sx={{ width: 26, height: 26 }}
+                        alt="flag"
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2">
+                          {" "}
+                          Kenya's Best IT Platform
+                        </Typography>
+                      }
+                    />
+                  </>
+                ) : (
+                  <>
+                    {/* business a/c */}
+                    <ListItemIcon>
+                      <BusinessRounded color="success" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2">
+                          {" "}
+                          Business Account
+                        </Typography>
+                      }
+                    />
+                  </>
+                )}
+              </ListItem>
+            </List>
           </Box>
         </List>
       </Box>

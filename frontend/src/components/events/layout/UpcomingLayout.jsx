@@ -235,9 +235,9 @@ function LiveLayout() {
                     variant="outlined"
                     sx={{ borderRadius: "20px" }}
                     size="small"
-                    endIcon={<ArrowForwardIosRounded />}
+                    endIcon={<BookmarkAddRounded />}
                   >
-                    Join Meeting Now
+                    Bookmark this Event
                   </Button>
                 </Box>
               </>

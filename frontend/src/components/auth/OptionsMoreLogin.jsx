@@ -2,7 +2,7 @@ import {
   BusinessRounded,
   InfoRounded,
   PersonRounded,
-  PolicyRounded
+  PolicyRounded,
 } from "@mui/icons-material";
 import { Box, Divider, ListItemText, MenuItem } from "@mui/material";
 import React from "react";
@@ -13,12 +13,17 @@ function OptionsMoreLogin({
   handleClose,
 }) {
   const navigate = useNavigate();
-  // navigate to the post details
-  const handlePostDetails = () => {
-    navigate("/account/posts/details");
+  // navigae to the registration personal
+  const handleRegisterPersonal = () => {
+    navigate("/auth/register/personal");
   };
-  // navigate to the edit mode of the specified post
 
+  // navigae to the registration business
+  const handleRegisterBusiness = () => {
+    navigate("/auth/register/business");
+  };
+
+  // navigate to the edit mode of the specified post
   const handlePostEdit = () => {
     navigate("/account/posts/edit");
   };
@@ -39,7 +44,7 @@ function OptionsMoreLogin({
 
   return (
     <Box>
-      <MenuItem onClick={handlePostDetails}>
+      <MenuItem onClick={handleRegisterPersonal}>
         <ListItemText>
           <PersonRounded color="primary" className="mx-2" />
         </ListItemText>
@@ -47,7 +52,7 @@ function OptionsMoreLogin({
       </MenuItem>
       <Divider component={"div"} />
 
-      <MenuItem onClick={handlePostEdit}>
+      <MenuItem onClick={handleRegisterBusiness}>
         <ListItemText>
           <BusinessRounded color="primary" className="mx-2" />
         </ListItemText>

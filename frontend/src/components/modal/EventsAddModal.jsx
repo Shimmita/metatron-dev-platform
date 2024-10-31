@@ -89,7 +89,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd }) => {
             : CustomDeviceTablet()
             ? "100%"
             : CustomLandscapeWidest()
-            ? "50%"
+            ? "70%"
             : "100%"
         }
         p={1}

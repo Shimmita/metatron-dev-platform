@@ -9,7 +9,7 @@ import FeaturedPostContainer from "./FeaturedPostContainer";
 
 const MobileTabCorousel = ({ mode }) => {
   // backdrop state
-  const [corouselCounter, setCorouselCounter] = React.useState(1);
+  const [corouselCounter, setCorouselCounter] = React.useState(0);
 
   // run the listening component hook
   useScrolledDown();

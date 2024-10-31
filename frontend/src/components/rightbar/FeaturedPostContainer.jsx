@@ -1,4 +1,4 @@
-import { DiamondRounded } from "@mui/icons-material";
+import { CodeRounded } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
 import List from "@mui/material/List";
 import React from "react";
@@ -28,16 +28,18 @@ export default function FeaturedPostContainer() {
   return (
     <>
       <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
-        <Typography
+        <Box
+          mb={2}
           display={"flex"}
-          gap={5}
-          pt={1}
-          fontWeight={"bold"}
-          color={"primary"}
+          alignItems={"center"}
+          justifyContent={"center"}
+          gap={2}
         >
-          <span>FEATURED POST</span>
-          <DiamondRounded />
-        </Typography>
+          <Typography fontWeight={"bold"} color={"primary"}>
+            FEATURED POST
+          </Typography>
+          <CodeRounded color="primary" />
+        </Box>
       </Box>
       <List
         className="rounded"

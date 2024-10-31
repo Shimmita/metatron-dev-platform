@@ -1,10 +1,14 @@
 import {
-  LightMode,
+  GitHub,
+  Google,
+  LightModeOutlined,
+  LightModeRounded,
+  Microsoft,
   PersonAddRounded,
   StarRounded,
   Visibility,
   VisibilityOff,
-  WbIncandescentRounded
+  WbIncandescentRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -21,16 +25,18 @@ import {
   Typography,
 } from "@mui/material";
 import React, { lazy, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
-import AccountLevelStep from "../level/AccountLevel";
+import { resetDarkMode } from "../../redux/AppUI";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import ModalPolicyTerms from "./ModalPolicyTerms";
 import OptionsMoreLogin from "./OptionsMoreLogin";
 const ModalAccountInfo = lazy(() => import("./ModalAccountInfo"));
 
-const LoginAuth = () => {
+const LoginAuth = ({ mode, setMode }) => {
   const [showPassword, setShowPassword] = React.useState(false);
+  const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
@@ -52,13 +58,16 @@ const LoginAuth = () => {
   const [openModalInfo, setOpenModalInfo] = useState(false);
   const [openModalTerms, setOpenModalTerms] = useState(false);
 
-  // navigae to the registration page
-  const handleRegister = () => {
-    navigate("/auth/register");
+  // UI theme dark light teaking effect
+  const handleShowDarkMode = () => {
+    // alter the light/ dark mode
+    setMode(mode === "light" ? "dark" : "light");
+    // update the redux theme boolean state
+    dispatch(resetDarkMode());
   };
 
-  // handle change of theme
-  const handleDarkMode = () => {};
+  // global dark mode state from redux
+  const { isDarkMode } = useSelector((state) => state.appUI);
 
   return (
     <Box
@@ -66,13 +75,14 @@ const LoginAuth = () => {
       justifyContent={"center"}
       alignItems={"center"}
       className=" container"
-      height={"99vh"}
+      height={"100vh"}
     >
       <Box
-        className=" shadow-lg rounded-4 px-2"
+        className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
         width={"100%"}
+        border={isDarkMode ? "1px solid gray" : "none"}
         sx={{
-          overflowX: "auto",
+          overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
             display: "none",
@@ -88,8 +98,15 @@ const LoginAuth = () => {
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box>
               <Tooltip arrow title={"dark"}>
-                <IconButton onClick={handleDarkMode}>
-                  <LightMode sx={{ width: 30, height: 30 }} />
+                <IconButton onClick={handleShowDarkMode}>
+                  {isDarkMode ? (
+                    <LightModeRounded
+                      color="warning"
+                      sx={{ width: 30, height: 30 }}
+                    />
+                  ) : (
+                    <LightModeOutlined sx={{ width: 30, height: 30 }} />
+                  )}
                 </IconButton>
               </Tooltip>
             </Box>
@@ -104,7 +121,7 @@ const LoginAuth = () => {
                   aria-haspopup="true"
                   aria-expanded={openMore ? "true" : undefined}
                 >
-                  <PersonAddRounded sx={{ width: 30, height: 30 }} />
+                  <PersonAddRounded sx={{ width: 28, height: 28 }} />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -190,22 +207,22 @@ const LoginAuth = () => {
             </Box>
           </Box>
           <Box>
-            <Box mb={3}>
+            <Box mb={4} display={"flex"} justifyContent={"center"}>
               <TextField
                 required
                 id="outlined-required"
-                label="Enter Email"
-                fullWidth
+                label="Email"
+                className="w-75"
                 value={email}
                 onChange={(e) => setEmail(e.target.value.toLowerCase())}
                 placeholder="username@gmail.com"
                 type="email"
               />
             </Box>
-            <Box mb={3}>
-              <FormControl fullWidth variant="outlined">
+            <Box mb={3} display={"flex"} justifyContent={"center"}>
+              <FormControl fullWidth variant="outlined" className="w-75">
                 <InputLabel htmlFor="outlined-adornment-password">
-                  Enter Password &nbsp;*
+                  Password &nbsp;*
                 </InputLabel>
                 <OutlinedInput
                   required
@@ -229,10 +246,6 @@ const LoginAuth = () => {
                 />
               </FormControl>
             </Box>
-            {/* show steps of included packages */}
-            <Box mb={2}>
-              <AccountLevelStep />
-            </Box>
 
             <Box display={"flex"} justifyContent={"center"} mb={2}>
               <Typography
@@ -242,14 +255,47 @@ const LoginAuth = () => {
                 gap={1}
                 alignItems={"center"}
               >
-                forgot password?
                 <Link
-                  to={"/auth/recover"}
-                  className="text-decoration-none fw-bold"
+                  to={"/auth/login/business"}
+                  className="text-decoration-none"
                 >
-                  reset
+                  <Typography
+                    variant="body2"
+                    sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
+                  >
+                    Business Account
+                  </Typography>
+                </Link>
+                |
+                <Link to={"/auth/recover"} className="text-decoration-none">
+                  <Typography
+                    variant="body2"
+                    sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
+                  >
+                    Password Reset
+                  </Typography>
                 </Link>
               </Typography>
+            </Box>
+
+            <Box display={"flex"} gap={1} justifyContent={"center"} mb={2}>
+              {/* microsoft signin */}
+              <Button
+                className="rounded-5"
+                size="small"
+                startIcon={<Microsoft />}
+              >
+                Microsoft
+              </Button>
+              {/* Google signin */}
+              <Button className="rounded-5" size="small" startIcon={<Google />}>
+                Google
+              </Button>
+
+              {/* github signin */}
+              <Button className="rounded-5" size="small" startIcon={<GitHub />}>
+                Github
+              </Button>
             </Box>
 
             <Box pb={1} display={"flex"} justifyContent={"center"}>

@@ -1,6 +1,6 @@
 import {
-  CopyAllRounded,
   DownloadForOfflineRounded,
+  EmailRounded,
   PersonAddRounded
 } from "@mui/icons-material";
 import { Box, ListItemText, MenuItem } from "@mui/material";
@@ -11,22 +11,21 @@ function CardFeedMore() {
       <Box borderRadius={5}>
         <MenuItem>
           <ListItemText>
-            <CopyAllRounded color="primary" className="mx-2" />
+            <EmailRounded color="primary" className="mx-2" />
           </ListItemText>
-          <ListItemText primary={<small>Copy Post Link </small>} />
+          <ListItemText primary={"Inbox Shimmita"} />
         </MenuItem>
-
         <MenuItem>
           <ListItemText>
             <PersonAddRounded color="primary" className="mx-2" />
           </ListItemText>
-          <ListItemText primary={<small>Follow Shimmita</small>} />
+          <ListItemText primary={"Follow Shimmita"} />
         </MenuItem>
         <MenuItem>
           <ListItemText>
             <DownloadForOfflineRounded color="success" className="mx-2" />
           </ListItemText>
-          <ListItemText primary={<small>Download Media</small>} />
+          <ListItemText primary={"Download Media"} />
         </MenuItem>
       </Box>
     </>

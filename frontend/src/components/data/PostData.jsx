@@ -4,9 +4,9 @@ const PostData = {
   image,
   county: "Nairobi",
   category: "Cloud Computing",
-  title: "AWS S3 Bucket Project",
+  title: "Amazon DynamoDB",
   details:
-    "This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add one cup of frozen peas along with the mussels.This impressive paella is a perfect party dish and a fun meal to cook. This is a great testing session.This impressive paella is a perfect party dish and a fun meal to cook together with your guests. Add one cup of frozen peas along with the mussels. This impressive paella is a perfect party dish and a fun meal to cook. This is a great testing session.",
+    "Amazon Web Services has been one the best cloud providers in the world and am excited to share with you various AWS tools or services that  I have interacted with in one of my recent projects. Lets kick start with Amazon DynamoDB: I would suggest it as the perfect alternative NoSQL for MongoDB, AWS provides free tier for exploration!",
 };
 
 export default PostData;

@@ -28,16 +28,18 @@ export default function RequestContainer() {
   return (
     <>
       <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
-        <Typography
+        <Box
+          mb={2}
           display={"flex"}
-          gap={5}
-          pt={1}
-          fontWeight={"bold"}
-          color={"primary"}
+          alignItems={"center"}
+          justifyContent={"center"}
+          gap={2}
         >
-          <span>CONNECT REQUEST</span>
-          <PeopleRounded />
-        </Typography>
+          <Typography fontWeight={"bold"} color={"primary"}>
+            CONNECT REQUEST
+          </Typography>
+          <PeopleRounded color="primary" />
+        </Box>
       </Box>
       <List
         className="rounded"

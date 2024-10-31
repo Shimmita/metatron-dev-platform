@@ -1,3 +1,3 @@
-const GenderData = ["Male", "Female", "Other"].sort();
+const GenderData = ["Male", "Female", "Other"];
 
 export default GenderData;

@@ -14,7 +14,7 @@ import RightBarStepper from "./RightBarStepper";
 const RightbarAll = () => {
   // backdrop state
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
-  const [corouselCounter, setCorouselCounter] = React.useState(1);
+  const [corouselCounter, setCorouselCounter] = React.useState(0);
 
   // redux states
   const { isScrolledDown, isSidebarRighbar } = useSelector(
@@ -81,16 +81,18 @@ const RightbarAll = () => {
         {/* events */}
         <Box bgcolor={"background.default"} className="shadow mt-3 rounded ">
           <Box display={"flex"} justifyContent={"center"}>
-            <Typography
+            <Box
+              mb={2}
               display={"flex"}
-              gap={5}
-              fontWeight={"bold"}
-              gutterBottom
-              color={"primary"}
+              alignItems={"center"}
+              justifyContent={"center"}
+              gap={2}
             >
-              <span className="pt-1">LEARNING EVENTS</span>{" "}
-              <SchoolRounded sx={{ width: 24, height: 24 }} />
-            </Typography>
+              <Typography fontWeight={"bold"} color={"primary"}>
+                LEARNING EVENTS
+              </Typography>
+              <SchoolRounded color="primary" sx={{ width: 24, height: 24 }} />
+            </Box>
           </Box>
 
           <Box display={"flex"} justifyContent={"center"} mt={1}>

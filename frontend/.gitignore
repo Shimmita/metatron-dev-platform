@@ -12,6 +12,9 @@ jspm_packages/
 logs
 *.log
 
+# video
+src/video.mp4
+
 # OS generated files
 .DS_Store
 Thumbs.db

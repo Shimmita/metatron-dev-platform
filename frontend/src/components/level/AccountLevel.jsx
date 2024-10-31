@@ -4,7 +4,7 @@ import StepLabel from "@mui/material/StepLabel";
 import Stepper from "@mui/material/Stepper";
 import * as React from "react";
 
-const steps = ['Learn','Post','Jobs'];
+const steps = ["Learn", "Post", "Jobs"];
 
 export default function AccountLevelStep() {
   return (

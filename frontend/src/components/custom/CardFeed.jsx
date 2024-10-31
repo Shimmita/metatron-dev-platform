@@ -70,7 +70,6 @@ const CardFeed = () => {
         style={{
           backgroundColor: openMenu && isDarkMode ? "#333" : undefined,
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
-          border: openMenu ? "1px solid grey" : undefined,
         }}
         elevation={0}
         className="w-100 shadow mb-4 p-2 rounded"
@@ -172,7 +171,7 @@ const CardFeed = () => {
                 <Typography variant="body2">
                   {window.screen.availWidth <= 350
                     ? "Software Dev"
-                    : "Fullstack Developer"}
+                    : "Software Engineer"}
                 </Typography>
                 <Typography variant="body2">React | Nodejs | Python</Typography>
               </Box>
@@ -215,8 +214,12 @@ const CardFeed = () => {
                       color: isDarkMode ? "yellow" : "orange",
                     }}
                   />
-                  <Typography variant="body2">{PostData.category}</Typography>
-                  <Typography variant="body2">{PostData.county}</Typography>
+                  <Typography fontWeight={'bold'} color={"text.secondary"} variant="body2">
+                    {PostData.category}
+                  </Typography>
+                  <Typography fontWeight={'bold'} color={"text.secondary"} variant="body2">
+                    {PostData.county}
+                  </Typography>
                   <WbIncandescentRounded
                     sx={{
                       width: 18,
@@ -226,7 +229,7 @@ const CardFeed = () => {
                   />
                 </Box>
               </Box>
-              <Typography variant={CustomDeviceIsSmall() ? "body2" : "body1"}>
+              <Typography variant={"body2"}>
                 {handleDetailsLength()}
                 {detailsLong && (
                   <Button

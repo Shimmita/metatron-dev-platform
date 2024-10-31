@@ -28,16 +28,18 @@ export default function JobsContainer() {
   return (
     <>
       <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
-        <Typography
+        <Box
+          mb={2}
           display={"flex"}
-          gap={5}
-          pt={1}
-          fontWeight={"bold"}
-          color={"primary"}
+          alignItems={"center"}
+          justifyContent={"center"}
+          gap={2}
         >
-          <span>FEATURED JOBS</span>
-          <WorkRounded sx={{ width: 20, height: 20 }} />
-        </Typography>
+          <Typography fontWeight={"bold"} color={"primary"}>
+            FEATURED JOBS
+          </Typography>
+          <WorkRounded color="primary" sx={{ width: 20, height: 20 }} />
+        </Box>
       </Box>
       <List
         className="rounded"

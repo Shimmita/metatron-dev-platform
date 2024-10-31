@@ -49,6 +49,7 @@ const SubsectionTech = {
     "Nuxt",
     "Remix",
     "Preact",
+    "Streamlit",
     "Alpine",
     "HTML/CSS",
     "Zero none of these (other)",

@@ -1,16 +1,31 @@
 import { Box } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import MessageLayout from "./layout/MessageLayout";
+import MessageDetailed from "./MessageDetailed";
 
-export default function MessageContainer() {
+export default function MessageContainer({ setMessageNotifClicked }) {
+  // hold the message clicked bool
+  const [messageClicked, setMessageClicked] = useState(false);
+
   // items array container
-  const messageItems = Array.from({ length: 20 });
+  const messageItems = Array.from({ length: 10 });
+
+  // handle message clicked
+  const handleMessageClicked = () => {
+    // show message details and hide all messages
+    setMessageClicked((prev) => !prev);
+
+    // hide the inbox and notif bars when message details is focused
+    // from the top most parent level
+    setMessageNotifClicked((prev) => !prev);
+  };
+
   return (
-    <Box height={"92vh"}>
+    <Box>
       <Box
-        height={"88vh"}
+        height={"92vh"}
         sx={{
-          overflowX: "auto",
+          overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
             display: "none",
@@ -20,8 +35,23 @@ export default function MessageContainer() {
           scrollbarWidth: "none",
         }}
       >
-        {messageItems.length > 0 &&
-          messageItems.map((_, index) => <MessageLayout key={index} />)}
+        {/* if message not clicked display all message summarily */}
+        {!messageClicked ? (
+          <Box pt={2} pb={2}>
+            {messageItems.length > 0 &&
+              messageItems.map((_, index) => (
+                <MessageLayout
+                  key={index}
+                  handleMessageClicked={handleMessageClicked}
+                />
+              ))}
+          </Box>
+        ) : (
+          // show message details and pass props for altering its state of visbility
+          <Box>
+            <MessageDetailed handleMessageClicked={handleMessageClicked} />
+          </Box>
+        )}
       </Box>
     </Box>
   );

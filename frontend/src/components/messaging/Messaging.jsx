@@ -1,13 +1,21 @@
-import { EmailRounded, NotificationsRounded } from "@mui/icons-material";
-import { Badge, styled, Tab, Tabs, Typography } from "@mui/material";
+import { AdsClickRounded, EmailRounded } from "@mui/icons-material";
+import {
+  AppBar,
+  Badge,
+  styled,
+  Tab,
+  Tabs,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
-import React from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { showMessagingDrawer } from "../../redux/AppUI";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import MessagesWindow from "./MessageContainer";
-import NotificationWindow from "./NotificationWindow";
+const MessageContainer = lazy(() => import("./MessageContainer"));
+const NotificationContainer = lazy(() => import("./NotificationContainer"));
 
 const StyledTabs = styled((props) => (
   <Tabs
@@ -42,6 +50,8 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
 
 export default function Messaging() {
   const [value, setValue] = React.useState(0);
+  // this will define display of inbox and notif bars appropriately
+  const [messageNotifClicked, setMessageNotifClicked] = useState(false);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -52,6 +62,9 @@ export default function Messaging() {
 
   const handleClose = () => {
     dispatch(showMessagingDrawer());
+
+    // restore message and notif states to default
+    setMessageNotifClicked((prev) => (prev === true ? false : false));
   };
 
   // return the appropriate size of the drawer
@@ -61,10 +74,10 @@ export default function Messaging() {
     if (screenSize <= 350) return 280;
 
     // medium device size
-    if (screenSize > 350 && screenSize < 600) return 300;
+    if (screenSize > 350 && screenSize < 600) return 330;
 
     // tablet size at portrait
-    if (CustomDeviceTablet()) return 380;
+    if (CustomDeviceTablet()) return 420;
 
     // very large screen for tablets at landscape size and laptops
     return 450;
@@ -76,61 +89,94 @@ export default function Messaging() {
         <Box
           width={drawerSize()}
           bgcolor={"background.default"}
+          height={"100vh"}
         >
-          <Box className="d-flex shadow-lg justify-content-center align-items-center">
-            <StyledTabs
-              value={value}
-              onChange={handleChange}
-              aria-label="styled tabs"
+          {/* display when message/notif item not clicked */}
+          {!messageNotifClicked ? (
+            <AppBar position="sticky" color="transparent">
+              <Toolbar
+                variant="dense"
+                sx={{ display: "flex", justifyContent: "center" }}
+              >
+                <Box
+                  display={"flex"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                >
+                  <StyledTabs
+                    value={value}
+                    onChange={handleChange}
+                    aria-label="styled tabs"
+                  >
+                    <StyledTab
+                      label={
+                        <Typography
+                          alignItems={"center"}
+                          gap={1}
+                          display={"flex"}
+                          sx={{ paddingRight: 10 }}
+                          variant="body2"
+                        >
+                          <span>
+                            <AdsClickRounded sx={{ height: 17, width: 17 }} />
+                          </span>
+                          <span style={{ fontWeight: "bold" }}>
+                            <Badge color="warning" variant="dot">
+                              Promoted
+                            </Badge>
+                          </span>
+                        </Typography>
+                      }
+                    />
+
+                    <StyledTab
+                      label={
+                        <Typography
+                          alignItems={"center"}
+                          gap={1}
+                          display={"flex"}
+                          variant="body2"
+                        >
+                          <span>
+                            <EmailRounded sx={{ height: 17, width: 17 }} />
+                          </span>
+                          <span style={{ fontWeight: "bold" }}>
+                            <Badge color="warning" variant="dot">
+                              Inbox
+                            </Badge>
+                          </span>
+                        </Typography>
+                      }
+                    />
+                  </StyledTabs>
+                </Box>
+              </Toolbar>
+            </AppBar>
+          ) : null}
+
+          <Box>
+            <Suspense
+              fallback={
+                <Box height={"90vh"}>
+                  <Box
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                  >
+                    loading...
+                  </Box>
+                </Box>
+              }
             >
-              <StyledTab
-                label={
-                  <Typography
-                    alignItems={"center"}
-                    gap={1}
-                    display={"flex"}
-                    sx={{ paddingRight: 10 }}
-                    variant="body2"
-                  >
-                    <span>
-                      <EmailRounded sx={{ height: 17, width: 17 }} />
-                    </span>
-                    <span style={{ fontWeight: "bold" }}>
-                      <Badge color="warning" variant="dot">
-                        Inbox
-                      </Badge>
-                    </span>
-                  </Typography>
-                }
-              />
-
-              <StyledTab
-                label={
-                  <Typography
-                    alignItems={"center"}
-                    gap={1}
-                    display={"flex"}
-                    variant="body2"
-                  >
-                    <span>
-                      <NotificationsRounded sx={{ height: 18, width: 18 }} />
-                    </span>
-                    <span className="pe-2" style={{ fontWeight: "bold" }}>
-                      <Badge color="warning" variant="dot">
-                        Notification
-                      </Badge>
-                    </span>
-                  </Typography>
-                }
-              />
-            </StyledTabs>
-          </Box>
-          <Box className={" mt-1"}>
-            {/* display messages content */}
-            {value === 0 && <MessagesWindow />}
-
-            {/* display notification */}
-            {value === 1 && <NotificationWindow />}
+              {/* display notification */}
+              {value === 0 && <NotificationContainer />}
+              {/* display messages content and passing props */}
+              {value === 1 && (
+                <MessageContainer
+                  setMessageNotifClicked={setMessageNotifClicked}
+                />
+              )}
+            </Suspense>
           </Box>
         </Box>
       </Drawer>

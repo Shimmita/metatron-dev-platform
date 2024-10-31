@@ -26,8 +26,8 @@ const BottomNav = () => {
   };
 
   // return learning page
-  const handleLearningContent = () => {
-    return;
+  const handleOpenCourses = () => {
+    navigate("/courses/paid");
   };
 
   // accessing the redux state values
@@ -74,7 +74,7 @@ const BottomNav = () => {
 
         <Tooltip title="courses" arrow>
           <BottomNavigationAction
-            onClick={handleLearningContent}
+            onClick={handleOpenCourses}
             label="Courses"
             icon={<SchoolRounded sx={{ width: 34, height: 34 }} />}
           />

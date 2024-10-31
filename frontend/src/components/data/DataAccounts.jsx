@@ -8,7 +8,6 @@ const DataAccounts = {
     "Ideal for tech individuals who are seeking employment oppotunities, learning and collaboration country wide.",
     "Post and showcase your project ideas backed with GitHub or Gitlab links for collaboration: a good strategy for showing your expertise in your field of specialisation. ",
     "Live stream and attend to various IT live events that are available on the platform freely on the click of a button.",
-    "We encourage and invite individuals who are from non Science, Technology, Engineering and Mathematics Degree or Diploma background and are yearning to embrace technology.",
     "Interact with various IT gurus from different parts of the country and increase your network of diverse people.",
     "Courses and Job opportunities offered include: Software Development, Machine Learning, Robotics, Computer Networks, CyberSecurity, Cloud Computing, DevOps etc.",
   ].sort(),
@@ -29,7 +28,7 @@ const DataAccounts = {
     "We are enthusiastic to welcome individuals or organisations who are willing to donate and sponsor the program.Your smallest or highest contribution will be highly appreciated.",
     "Organisations or individuals who successfully donate will be listed in the sponsorship program as way of appreciation and acknowlegding their undying love for Technology.",
     "We at Metatron believe Kenya has bright minds and a brighter technological advancement in future that could produce the next Elon Musk, Bill Gates, Mark Zuckerberg, Sandar Pichai or Satya Nadella.",
-    "We highly welcome the support and patnership from existing tech giant companies or organisating such as Microsoft, Google, AWS, IBM, Safaricom, Airtel, Telcom, Numeral IOT and ICT Authority of Kenya.",
+    "We highly welcome the support and patnership from existing tech giant companies or organisations such as Microsoft, Google, AWS, IBM, Safaricom, Airtel, Telcom, Numeral IOT and ICT Authority of Kenya.",
     "All other existing IT Personnel or Tech organisation be it Local, Foreign or NGO are highly welcomed for patnership and affiliate programs.",
   ].sort(),
 };

@@ -39,7 +39,7 @@ const AllSkills = [
   "OCaml",
   "Scala",
   "Clojure",
-  "Bash",
+  "Bash/Shell",
   "Powershell",
   "TCL",
   "Groovy",
@@ -398,9 +398,11 @@ const AllSkills = [
   "Web Scraping",
   "Automation",
   "Razor Pay",
+  "CI/CD",
   "Maxi Cash",
   "Crypto Wallet",
   "Secure Socket Layer (SSL)",
+  "Programming Logic Unit (PLU)",
 
 ].sort();
 

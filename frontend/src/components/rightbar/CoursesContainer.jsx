@@ -28,16 +28,18 @@ export default function CoursesContainer() {
   return (
     <>
       <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
-        <Typography
+        <Box
+          mb={2}
           display={"flex"}
-          gap={5}
-          pt={1}
-          fontWeight={"bold"}
-          color={"primary"}
+          alignItems={"center"}
+          justifyContent={"center"}
+          gap={2}
         >
-          <span>POPULAR COURSES</span>
-          <SchoolRounded />
-        </Typography>
+          <Typography fontWeight={"bold"} color={"primary"}>
+            POPULAR COURSES
+          </Typography>
+          <SchoolRounded color="primary" />
+        </Box>
       </Box>
       <List
         className="rounded"

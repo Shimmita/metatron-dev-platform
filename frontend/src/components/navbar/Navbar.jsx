@@ -12,7 +12,6 @@ import {
   Badge,
   Box,
   CircularProgress,
-  FormControl,
   IconButton,
   styled,
   Toolbar,
@@ -226,7 +225,6 @@ const Navbar = ({ setMode, mode }) => {
                     </IconButton>
                   </Box>
                 </form>
-                
               </Box>
             </SearchBar>
           )}

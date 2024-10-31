@@ -9,7 +9,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 const FeedDefaultContent = () => {
   // for follow/connect people people
-  const items = Array.from({ length: 10 });
+  const items = Array.from({ length: 20 });
 
   // redux states
   const dispatch = useDispatch();

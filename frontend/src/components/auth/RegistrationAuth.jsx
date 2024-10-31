@@ -1,4 +1,5 @@
 import {
+  ArrowBackIosNewRounded,
   StarRounded,
   Visibility,
   VisibilityOff,
@@ -19,29 +20,35 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
 import AllSkills from "../data/AllSkillsData";
 import CountiesInKenya from "../data/Counties";
 import EducationLevel from "../data/EducationLevel";
 import GenderData from "../data/GenderData";
-import SpecialisationGeneral from "../data/SpecialisationGenral";
+import SpecialisationJobs from "../data/SpecialisationJobs";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
+import RegisterAlertTitle from "./RegisterAlertTitle";
 
 const RegistrationAuth = () => {
   const [showPassword, setShowPassword] = React.useState(false);
-  const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [educationLevel, setEducationLevel] = useState("");
+  const [eduInstitution, setEduInstitution] = useState("");
   const [gender, setGender] = useState("");
-  const [specialisation, setSpecialisation] = useState("");
+  const [specialisationTitle, setSpecialisationTitle] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [county, setCounty] = useState("");
-  const [imagePath, setImagePath] = useState();
+
+  // control showing of the next and previous input detail
+  const [showNext, setShowNext] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -63,18 +70,34 @@ const RegistrationAuth = () => {
     );
   };
 
+  // global dark mode state from redux
+  const { isDarkMode } = useSelector((state) => state.appUI);
+
+  // handle showing next and prev inputs
+  const handleShowNext = () => {
+    setShowNext((prev) => !prev);
+  };
+
+  // will define showing of custo title or not
+  const [openAlert, setOpenAlert] = useState(false);
+
+  useEffect(() => {
+    if (specialisationTitle === "Zero Matched") setOpenAlert(true);
+  }, [specialisationTitle]);
+
   return (
     <Box
-      height={"99vh"}
+      height={"100vh"}
       className={"container"}
       display={"flex"}
       justifyContent={"center"}
       alignItems={"center"}
     >
       <Box
-        className=" shadow-lg rounded-4 px-3"
+        className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
+        border={isDarkMode ? "1px solid gray" : "none"}
         width={"100%"}
-        height={"90vh"}
+        height={CustomDeviceSmallest() ? "95vh" : undefined}
         sx={{
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
@@ -90,7 +113,7 @@ const RegistrationAuth = () => {
           <Box display={"flex"} justifyContent={"center"}>
             <Avatar alt={"logo"} sx={{ width: 70, height: 70 }} src={logo} />
           </Box>
-          <Box mb={2}>
+          <Box mb={3}>
             <Typography
               textAlign={"center"}
               fontWeight={"bold"}
@@ -144,230 +167,279 @@ const RegistrationAuth = () => {
             display={"flex"}
             flexDirection={"column"}
             justifyContent={"center"}
-            gap={2}
+            gap={3}
           >
-            <Box>
-              <Box display={"flex"} justifyContent={"center"}>
-                <Typography variant="body2" color={"text.secondary"}>
-                  profile image (optional)
-                </Typography>
-              </Box>
-              <div>
-                <input
-                  id="image-input"
-                  type="file"
-                  accept="image/*"
-                  className="form-control"
-                  onChange={(e) => {
-                    setImagePath(e.target.files[0]);
-                    console.log(imagePath);
-                  }}
-                />
-              </div>
-            </Box>
+            {/* first section */}
 
-            <Box>
-              <TextField
-                required
-                id="name"
-                label="Official Name"
-                fullWidth
-                onChange={(e) => setName(e.target.value.toLowerCase())}
-                value={name}
-                placeholder="Shirengo Michael"
-              />
-            </Box>
-
-            <Box>
-              <TextField
-                required
-                id="email"
-                label="Email Address"
-                fullWidth
-                value={email}
-                onChange={(e) => setEmail(e.target.value.toLowerCase())}
-                placeholder="username@gmail.com"
-                type="email"
-              />
-            </Box>
-            <Box>
-              <TextField
-                required
-                id="phone"
-                label="Phone Number"
-                fullWidth
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+254xyz"
-              />
-            </Box>
-
-            <Box>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel htmlFor="outlined-adornment-password">
-                  Set Password &nbsp;*
-                </InputLabel>
-                <OutlinedInput
-                  required
-                  value={password}
-                  id="outlined-adornment-password"
-                  onChange={(e) => setPassword(e.target.value)}
-                  type={showPassword ? "text" : "password"}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                        edge="end"
-                      >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                  label="Password"
-                />
-              </FormControl>
-            </Box>
-
-            <Box>
-              <TextField
-                required
-                select
-                id="gender"
-                value={gender}
-                label="Select Gender"
-                fullWidth
-                onChange={(e) => setGender(e.target.value)}
-              >
-                {GenderData &&
-                  GenderData.map((gender) => (
-                    <MenuItem key={gender} value={gender}>
-                      {gender}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </Box>
-
-            <Box>
-              <TextField
-                required
-                select
-                id="educationLevel"
-                value={educationLevel}
-                label="Education Level"
-                fullWidth
-                onChange={(e) => setEducationLevel(e.target.value)}
-              >
-                {EducationLevel &&
-                  EducationLevel.map((education_level) => (
-                    <MenuItem key={education_level} value={education_level}>
-                      {education_level}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </Box>
-
-            <Box>
-              <TextField
-                required
-                select
-                id="speciality"
-                value={specialisation}
-                label="Select Speciality"
-                fullWidth
-                onChange={(e) => setSpecialisation(e.target.value)}
-              >
-                {SpecialisationGeneral &&
-                  SpecialisationGeneral.map((specialisation) => (
-                    <MenuItem key={specialisation} value={specialisation}>
-                      {specialisation}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </Box>
-
-            <Box>
-              <Autocomplete
-                multiple
-                options={AllSkills}
-                value={selectedSkills}
-                onChange={handleChange}
-                disableCloseOnSelect
-                renderInput={(params) => (
+            {!showNext ? (
+              <>
+                <Box display={"flex"} justifyContent={"center"}>
                   <TextField
-                    {...params}
-                    variant="outlined"
-                    label="Preferred Skills *"
-                    placeholder="Skill"
+                    required
+                    id="name"
+                    label="Name"
+                    className="w-75"
+                    onChange={(e) => setName(e.target.value.toLowerCase())}
+                    value={name}
+                    placeholder="Shirengo Michael"
                   />
-                )}
-                renderTags={(value, getTagProps) =>
-                  value.map((skill, index) => (
-                    <Chip
-                      label={skill}
-                      {...getTagProps({ index })}
-                      onDelete={() => handleDelete(skill)}
-                    />
-                  ))
-                }
-              />
-              {selectedSkills.length >= 5 && (
-                <Box sx={{ marginTop: 1, color: "red" }}>
-                  You can select up to 5 skills only.
                 </Box>
-              )}
-            </Box>
 
-            <Box>
-              <TextField
-                required
-                select
-                id="county"
-                value={county}
-                label="Select County"
-                fullWidth
-                onChange={(e) => setCounty(e.target.value)}
-              >
-                {CountiesInKenya &&
-                  CountiesInKenya.map((county) => (
-                    <MenuItem key={county} value={county}>
-                      {county}
-                    </MenuItem>
-                  ))}
-              </TextField>
-            </Box>
+                <Box display={"flex"} justifyContent={"center"}>
+                  <TextField
+                    required
+                    id="email"
+                    label="Email"
+                    display={"flex"}
+                    justifyContent={"center"}
+                    className="w-75"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value.toLowerCase())}
+                    placeholder="username@gmail.com"
+                    type="email"
+                  />
+                </Box>
+                <Box display={"flex"} justifyContent={"center"}>
+                  <TextField
+                    required
+                    id="phone"
+                    label="Phone"
+                    className="w-75"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+254xyz"
+                  />
+                </Box>
+
+                <Box display={"flex"} justifyContent={"center"}>
+                  <TextField
+                    required
+                    select
+                    id="gender"
+                    value={gender}
+                    label="Gender"
+                    className="w-75"
+                    onChange={(e) => setGender(e.target.value)}
+                  >
+                    {GenderData &&
+                      GenderData.map((gender) => (
+                        <MenuItem key={gender} value={gender}>
+                          {gender}
+                        </MenuItem>
+                      ))}
+                  </TextField>
+                </Box>
+
+                <Box display={"flex"} justifyContent={"center"}>
+                  <FormControl fullWidth variant="outlined" className="w-75">
+                    <InputLabel htmlFor="outlined-adornment-password">
+                      Password &nbsp;*
+                    </InputLabel>
+                    <OutlinedInput
+                      required
+                      value={password}
+                      id="outlined-adornment-password"
+                      onChange={(e) => setPassword(e.target.value)}
+                      type={showPassword ? "text" : "password"}
+                      endAdornment={
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      }
+                      label="Password"
+                    />
+                  </FormControl>
+                </Box>
+              </>
+            ) : (
+              <>
+                {/* next section details */}
+
+                <Box display={"flex"} justifyContent={"center"}>
+                  <TextField
+                    required
+                    select
+                    id="educationLevel"
+                    value={educationLevel}
+                    label="Education"
+                    className="w-75"
+                    onChange={(e) => setEducationLevel(e.target.value)}
+                  >
+                    {EducationLevel &&
+                      EducationLevel.map((education_level) => (
+                        <MenuItem key={education_level} value={education_level}>
+                          {education_level}
+                        </MenuItem>
+                      ))}
+                  </TextField>
+                </Box>
+
+                <Box display={"flex"} justifyContent={"center"}>
+                  <TextField
+                    required
+                    id="edu-institution"
+                    value={eduInstitution}
+                    label="Institution"
+                    placeholder="University/Collage Name"
+                    className="w-75"
+                    onChange={(e) => setEduInstitution(e.target.value)}
+                  />
+                </Box>
+
+                <Box display={"flex"} justifyContent={"center"}>
+                  <TextField
+                    required
+                    select
+                    id="speciality"
+                    value={specialisationTitle}
+                    label="Title"
+                    className="w-75"
+                    onChange={(e) => setSpecialisationTitle(e.target.value)}
+                  >
+                    {SpecialisationJobs &&
+                      SpecialisationJobs.map((specialisation_title) => (
+                        <MenuItem
+                          key={specialisation_title}
+                          value={specialisation_title}
+                        >
+                          {specialisation_title}
+                        </MenuItem>
+                      ))}
+                  </TextField>
+                </Box>
+
+                <Box display={"flex"} justifyContent={"center"}>
+                  <Autocomplete
+                    multiple
+                    options={AllSkills}
+                    value={selectedSkills}
+                    onChange={handleChange}
+                    disableCloseOnSelect
+                    className="w-75"
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="outlined"
+                        label="Skills *"
+                        placeholder="Skill"
+                      />
+                    )}
+                    renderTags={(value, getTagProps) =>
+                      value.map((skill, index) => (
+                        <Chip
+                          label={skill}
+                          {...getTagProps({ index })}
+                          onDelete={() => handleDelete(skill)}
+                        />
+                      ))
+                    }
+                  />
+                </Box>
+
+                <Box display={"flex"} justifyContent={"center"}>
+                  <TextField
+                    required
+                    select
+                    id="county"
+                    value={county}
+                    label="County"
+                    className="w-75"
+                    onChange={(e) => setCounty(e.target.value)}
+                  >
+                    {CountiesInKenya &&
+                      CountiesInKenya.map((county) => (
+                        <MenuItem key={county} value={county}>
+                          {county}
+                        </MenuItem>
+                      ))}
+                  </TextField>
+                </Box>
+              </>
+            )}
 
             <Box display={"flex"} justifyContent={"center"}>
-              {" "}
-              <Typography variant="body2" color={"text.secondary"}>
-                have an account? &nbsp;
-                <Link
-                  to={"/auth/login"}
-                  className="text-decoration-none fw-bold"
+              <Box className={"w-75"}>
+                {/* prev content toggle */}
+                {showNext && (
+                  <Box>
+                    <IconButton size="small" onClick={handleShowNext}>
+                      <ArrowBackIosNewRounded
+                        color="primary"
+                        sx={{ width: 17, height: 17 }}
+                      />
+                    </IconButton>
+                  </Box>
+                )}
+
+                {/* back to login links */}
+                <Box
+                  display={"flex"}
+                  gap={1}
+                  width={"100%"}
+                  justifyContent={"center"}
                 >
-                  login
-                </Link>
-              </Typography>
+                  {" "}
+                  <Typography variant="body2" color={"text.secondary"}>
+                    have an account?
+                  </Typography>
+                  <Link to={"/auth/login"} className="text-decoration-none">
+                    <Typography
+                      variant="body2"
+                      sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
+                    >
+                      login
+                    </Typography>
+                  </Link>
+                </Box>
+              </Box>
             </Box>
 
             <Box pb={1} display={"flex"} justifyContent={"center"}>
-              <Button
-                variant="contained"
-                className="w-25"
-                sx={{ borderRadius: "20px" }}
-                disableElevation
-                onClick={(e) => {
-                  navigate("/");
-                }}
-                type="submit"
-              >
-                Signup
-              </Button>
+              {!showNext ? (
+                <React.Fragment>
+                  <Button
+                    variant="contained"
+                    className="w-25"
+                    sx={{ borderRadius: "20px" }}
+                    disableElevation
+                    onClick={handleShowNext}
+                    type="submit"
+                  >
+                    Next
+                  </Button>
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <Button
+                    variant="contained"
+                    className="w-25"
+                    sx={{ borderRadius: "20px" }}
+                    disableElevation
+                    onClick={(e) => navigate("/")}
+                    type="submit"
+                  >
+                    Signup
+                  </Button>
+                </React.Fragment>
+              )}
             </Box>
           </Box>
         </Box>
       </Box>
+
+      {/* show alert when zero selection is matched */}
+      <RegisterAlertTitle
+        openAlert={openAlert}
+        setOpenAlert={setOpenAlert}
+        setSpecialisationTitle={setSpecialisationTitle}
+      />
     </Box>
   );
 };

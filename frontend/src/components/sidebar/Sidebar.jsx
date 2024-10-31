@@ -2,28 +2,27 @@ import {
   AccountBox,
   AndroidRounded,
   Apple,
+  BusinessRounded,
   Diversity3Rounded,
   ExpandLess,
   ExpandMore,
   Home,
-  InfoRounded,
   Lightbulb,
   LightModeOutlined,
   LightModeRounded,
-  MenuRounded,
+  LogoutRounded,
   MonetizationOn,
   PostAdd,
   SchoolRounded,
   Settings,
   Smartphone,
+  StarRounded,
+  SupportAgentRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
   Box,
-  Button,
-  CardActionArea,
   Collapse,
-  Divider,
   List,
   ListItem,
   ListItemButton,
@@ -32,7 +31,6 @@ import {
   Skeleton,
   styled,
   Switch,
-  Tooltip,
   Typography,
 } from "@mui/material";
 
@@ -43,9 +41,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
 import FlagLogo from "../../images/KE.png";
+import LogoutAlert from "../alerts/LogoutAlert";
 import EventsTablet from "../events/EventsIsTablet";
-import AccountLevelStep from "../level/AccountLevel";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import SkillAvatars from "./SkillAvatars";
 import("./Sidebar.css");
 
@@ -55,6 +54,9 @@ const Sidebar = ({ setMode, mode }) => {
   const { isDarkMode, isSidebarRighbar, isTabSideBar } = useSelector(
     (state) => state.appUI
   );
+
+  // alert logout controls
+  const [openAlertLogout, setOpenAlertLogout] = useState(false);
 
   const navigate = useNavigate();
   // screen width
@@ -137,6 +139,13 @@ const Sidebar = ({ setMode, mode }) => {
     }, 5000);
   }, []);
 
+  // handle logout
+  const handleLogout = () => {
+    setOpenAlertLogout(true);
+  };
+
+  let businessAccount = true;
+
   return (
     <Box
       mt={CustomDeviceTablet() && 1}
@@ -157,7 +166,7 @@ const Sidebar = ({ setMode, mode }) => {
       }}
     >
       <Box position={"fixed"} width={correctWidthInPercentage()}>
-        <Box>
+        <Box width={CustomLandscapeWidest() ? 300 : undefined}>
           <Box bgcolor={"background.default"} className="shadow rounded mt-0">
             {isLoadingRequest ? (
               <Box width={"100%"}>
@@ -170,7 +179,7 @@ const Sidebar = ({ setMode, mode }) => {
               <React.Fragment>
                 <BoxAvatarContent>
                   <Box width={"100%"}>
-                    <Box className={"profile-header"}>
+                    <Box className={isDarkMode ? "profile-header" : ""}>
                       <Box
                         display={"flex"}
                         justifyContent={"center"}
@@ -184,50 +193,97 @@ const Sidebar = ({ setMode, mode }) => {
                         />
                       </Box>
                       <Box display={"flex"} justifyContent={"center"} pb={2}>
-                        <SkillAvatars />
+                        {!businessAccount ? (
+                          <>
+                            {/* shown for personal a/c */}
+                            <SkillAvatars />
+                          </>
+                        ) : (
+                          <>
+                            {/* shown for businesss a/c */}
+                            <Box
+                              p={1}
+                              width={CustomLandscapeWidest() ? 260 : 250}
+                            >
+                              <Box>
+                                <Typography
+                                  fontWeight={"bold"}
+                                  textAlign={"center"}
+                                  variant="body2"
+                                  gutterBottom
+                                  textTransform={"uppercase"}
+                                  color={isDarkMode ? "black" : "primary"}
+                                >
+                                  Metatron Foundation
+                                </Typography>
+                                <Typography
+                                  textAlign={"center"}
+                                  variant="body2"
+                                  display={"flex"}
+                                  alignItems={"center"}
+                                  gap={1}
+                                  color={
+                                    isDarkMode ? "black" : "text.secondary"
+                                  }
+                                >
+                                  <StarRounded sx={{ width: 12, height: 12 }} />
+                                  Software and Machine Learning Development Company
+                                  <StarRounded sx={{ width: 12, height: 12 }} />
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </>
+                        )}
                       </Box>
                     </Box>
                   </Box>
                 </BoxAvatarContent>
 
                 {/* connections */}
-                <CardActionArea onClick={handleShowMyNetwork}>
-                  <Box
-                    display={"flex"}
-                    mt={2}
-                    alignItems={"center"}
-                    className="px-2"
-                    p={1}
-                    justifyContent={"space-between"}
-                  >
-                    <Box pl={1} alignItems={"center"} display={"flex"} gap={1}>
-                      <Tooltip title={"view"}>
-                        <Diversity3Rounded
-                          color="primary"
-                          sx={{ width: 26, height: 26 }}
+                <List>
+                  <ListItemButton onClick={handleShowMyNetwork}>
+                    <ListItemIcon>
+                      <Diversity3Rounded
+                        color="primary"
+                        sx={{ width: 26, height: 26 }}
+                      />{" "}
+                    </ListItemIcon>
+
+                    {/* shown for personal */}
+                    {!businessAccount ? (
+                      <>
+                        <ListItemText
+                          primary={
+                            <Typography variant="body2"> Network</Typography>
+                          }
                         />
-                      </Tooltip>
-                      <Typography variant="body2">Network</Typography>
-                    </Box>
-
-                    <Box>
-                      <Typography
-                        fontWeight={"bold"}
-                        color={"primary"}
-                        variant="body2"
-                      >
-                        500
-                      </Typography>
-                    </Box>
-                  </Box>
-                </CardActionArea>
-
-                {/* divider */}
-                <Divider component={"div"} />
-                {/* show account level status */}
-                <Box mt={3} className="px-2 pb-2">
-                  <AccountLevelStep />
-                </Box>
+                        <Typography
+                          fontWeight={"bold"}
+                          color={"primary"}
+                          variant="body2"
+                        >
+                          500
+                        </Typography>
+                      </>
+                    ) : (
+                      <>
+                        {/* shown for business a/c */}
+                        <ListItemText
+                          primary={
+                            <Typography variant="body2"> Followers</Typography>
+                          }
+                        />
+                        <Typography
+                          fontWeight={"bold"}
+                          color={"primary"}
+                          variant="body2"
+                        >
+                          500
+                        </Typography>
+                      </>
+                    )}
+                  </ListItemButton>
+                </List>
               </React.Fragment>
             )}
           </Box>
@@ -236,19 +292,15 @@ const Sidebar = ({ setMode, mode }) => {
             bgcolor={"background.default"}
             className="p-1 shadow rounded mt-3"
           >
-            <Typography
-              alignItems={"center"}
+            <Box
               display={"flex"}
+              alignItems={"center"}
               justifyContent={"center"}
-              gap={2}
-              className=" mt-2"
-              fontWeight={"bold"}
-              textAlign={"center"}
-              color={"primary"}
             >
-              <span className="pt-1">NAVIGATION MENU </span>{" "}
-              <MenuRounded sx={{ width: 23, height: 23 }} />
-            </Typography>
+              <Typography fontWeight={"bold"} color={"primary"}>
+                NAVIGATION MENU
+              </Typography>
+            </Box>
 
             {isLoadingRequest ? (
               <Skeleton variant="rectangular" width={"100%"} height={"35vh"} />
@@ -372,29 +424,6 @@ const Sidebar = ({ setMode, mode }) => {
                     </ListItemButton>
                   </List>
                 </Collapse>
-
-                {/* change theme */}
-                <ListItem>
-                  <ListItemIcon>
-                    {isDarkMode ? (
-                      <LightModeRounded color="primary" />
-                    ) : (
-                      <LightModeOutlined color="primary" />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">
-                        <Typography variant="body2">Change Theme</Typography>
-                      </Typography>
-                    }
-                  />
-                  <Switch
-                    size="small"
-                    checked={isDarkMode}
-                    onChange={handleShowDarkMode}
-                  />
-                </ListItem>
               </List>
             )}
           </Box>
@@ -405,18 +434,20 @@ const Sidebar = ({ setMode, mode }) => {
                 bgcolor={"background.default"}
                 className="mt-3 shadow p-1 rounded"
               >
-                <Typography
-                  gutterBottom
-                  alignItems={"center"}
+                <Box
                   display={"flex"}
-                  gap={2}
-                  fontWeight={"bold"}
+                  alignItems={"center"}
                   justifyContent={"center"}
-                  color={"primary"}
+                  gap={2}
                 >
-                  <span className="pt-1">LEARNING EVENTS </span>{" "}
-                  <SchoolRounded sx={{ width: 23, height: 23 }} />
-                </Typography>
+                  <Typography fontWeight={"bold"} color={"primary"}>
+                    LEARNING EVENTS
+                  </Typography>
+                  <SchoolRounded
+                    color="primary"
+                    sx={{ width: 20, height: 20 }}
+                  />
+                </Box>
 
                 {isLoadingRequest ? (
                   <Skeleton
@@ -441,42 +472,101 @@ const Sidebar = ({ setMode, mode }) => {
               <Skeleton variant="rectangular" width={"100%"} height={"10vh"} />
             </Box>
           ) : (
-            <Box
-              bgcolor={"background.default"}
-              className="mt-3 shadow p-2 rounded"
-            >
-              <Box display={"flex"} alignItems={"center"}>
-                <Avatar src={FlagLogo} alt="flag" />
-                <Box
-                  display={"flex"}
-                  justifyContent={"space-between"}
-                  flexDirection={"column"}
-                  m={"0 auto"}
-                >
-                  <Typography
-                    fontWeight={"bold"}
-                    color={"text.secondary"}
-                    className="w-100"
-                    textAlign={"center"}
-                    variant="body2"
-                  >
-                    Best IT Platform
-                  </Typography>
+            <Box bgcolor={"background.default"} className="mt-3 shadow rounded">
+              <List>
+                <ListItem>
+                  {!businessAccount ? (
+                    <>
+                      {/* personal a/c */}
+                      <ListItemIcon>
+                        <Avatar
+                          src={FlagLogo}
+                          sx={{ width: 26, height: 26 }}
+                          alt="flag"
+                        />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2">
+                            {" "}
+                            Kenya's Best IT Platform
+                          </Typography>
+                        }
+                      />
+                    </>
+                  ) : (
+                    <>
+                      {/* business a/c */}
+                      <ListItemIcon>
+                        <BusinessRounded color="success" />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={
+                          <Typography variant="body2">
+                            {" "}
+                            Business Account
+                          </Typography>
+                        }
+                      />
+                    </>
+                  )}
+                </ListItem>
 
-                  <Button
-                    endIcon={<InfoRounded />}
-                    color="success"
-                    disableElevation
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    Free Version
-                  </Button>
-                </Box>
-              </Box>
+                {/* customer help */}
+                <ListItemButton onClick={handleReturnHome}>
+                  <ListItemIcon>
+                    <SupportAgentRounded color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2">Technical Team</Typography>
+                    }
+                  />
+                </ListItemButton>
+
+                {/* Logout */}
+                <ListItemButton onClick={handleLogout}>
+                  <ListItemIcon>
+                    <LogoutRounded color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2">
+                        <Typography variant="body2">Account Logout</Typography>
+                      </Typography>
+                    }
+                  />
+                </ListItemButton>
+
+                {/* change theme */}
+                <ListItemButton onClick={handleShowDarkMode}>
+                  <ListItemIcon>
+                    {isDarkMode ? (
+                      <LightModeRounded color="primary" />
+                    ) : (
+                      <LightModeOutlined color="primary" />
+                    )}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2">
+                        <Typography variant="body2">Dark Theme</Typography>
+                      </Typography>
+                    }
+                  />
+                  <Switch disableRipple size="small" checked={isDarkMode} />
+                </ListItemButton>
+              </List>
             </Box>
           )}
         </Box>
       </Box>
+
+      {/* logout alert */}
+      <LogoutAlert
+        openAlertLogout={openAlertLogout}
+        setOpenAlertLogout={setOpenAlertLogout}
+      />
     </Box>
   );
 };

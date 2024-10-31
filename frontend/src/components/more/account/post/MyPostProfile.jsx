@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import React, { lazy, Suspense, useEffect, useState } from "react";
+import React, { lazy, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import devImage from "../../../../images/dev.jpeg";
 import { handleScrolledDown } from "../../../../redux/AppUI";
@@ -78,7 +78,7 @@ export default function MyPostProfile() {
           variant="text"
           className="shadow"
           onClick={handleGoBack}
-          sx={{ borderRadius: "20px" }}
+          sx={{ borderRadius: "20px", mb: 1 }}
         >
           Back
         </Button>
@@ -198,10 +198,8 @@ export default function MyPostProfile() {
 
             {/* content of each tab goes here */}
             <Box>
-              <Suspense fallback={<div>loading...</div>}>
-                {value === 0 && <MyPostContainer />}
-                {value === 1 && <MyAbout />}
-              </Suspense>
+              {value === 0 && <MyPostContainer />}
+              {value === 1 && <MyAbout />}
             </Box>
           </Box>
         )}

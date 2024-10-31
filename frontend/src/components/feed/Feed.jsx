@@ -9,6 +9,9 @@ import BottomNav from "../custom/BottomNav";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
+const CoursePaidContainer = lazy(() =>
+  import("../courses/CoursePaidContainer")
+);
 const PageNotFound = lazy(() => import("../notfound/PageNotFound"));
 const MyPostCardEdit = lazy(() =>
   import("../more/account/post/MyPostCardEdit")
@@ -62,7 +65,7 @@ const Feed = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: "91vh",
+                  height: "95vh",
                 }}
               >
                 {/* loader be shown before actual loading of content */}
@@ -84,6 +87,7 @@ const Feed = () => {
               <Route path="/account/posts/edit" element={<MyPostCardEdit />} />
               <Route path="/account/people" element={<AccountFriends />} />
               <Route path="/account/premium" element={<AccountPremium />} />
+              <Route path="/courses/paid" element={<CoursePaidContainer />} />
 
               <Route path="/about" element={<AboutPage />} />
               <Route path="/jobs" element={<BottomJobs />} />
@@ -149,7 +153,7 @@ const Feed = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    height: "91vh",
+                    height: "95vh",
                   }}
                 >
                   {/* loader be shown before actual loading of content */}
@@ -174,6 +178,7 @@ const Feed = () => {
                 />
                 <Route path="/account/people" element={<AccountFriends />} />
                 <Route path="/account/premium" element={<AccountPremium />} />
+                <Route path="/courses/paid" element={<CoursePaidContainer />} />
 
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/jobs" element={<BottomJobs />} />

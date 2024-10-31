@@ -25,9 +25,8 @@ const SubsectionJob = {
     "No, I have Website for Job Application",
   ],
   Document_Support: [
-    "Certification or Recommendation REQUIRED",
-    "Certification or Recommendation OPTIONAL",
-    "No, I have Website Link for Job Application",
+    "Support Documents (Certs or Recommendation)",
+    "Support Documents (Optional)",
   ],
 
   SalaryKES: [

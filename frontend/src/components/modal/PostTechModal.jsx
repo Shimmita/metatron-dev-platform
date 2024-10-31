@@ -1,8 +1,8 @@
 import {
-  Add,
   AndroidRounded,
   Apple,
   Close,
+  CloudUploadRounded,
   CodeRounded,
   DrawRounded,
   EditRounded,
@@ -10,6 +10,7 @@ import {
   GradeRounded,
   Image,
   LaptopRounded,
+  LinkRounded,
   LocationOnRounded,
   Microsoft,
   PictureAsPdfRounded,
@@ -27,12 +28,10 @@ import {
   Modal,
   styled,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import LinuxLogo from "../../images/linux.jpeg";
 import AppLogo from "../../images/logo_sm.png";
@@ -52,75 +51,59 @@ const StyledModalPost = styled(Modal)({
   margin: "5px",
 });
 
+// styled input
+const StyledInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
+
 const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
-  const [post_category, setPostAbout] = useState("");
+  const [post_category, setPostCategory] = useState("");
   const [containerisation, setContainerisation] = useState("");
   const [game_dev, setGameDev] = useState("");
   const [desktop, setDesktop] = useState("");
   const [pro_language, setProgLanguage] = useState("");
   const [ios_dev, setIOSDev] = useState("");
+  const [android, setAndroid] = useState("");
   const [backend, setBackend] = useState("");
   const [frontend, setFrontend] = useState("");
   const [designTool, setDesignTool] = useState("");
   const [multiplatform, setMultiplatform] = useState("");
-  const [cloudComputing, setCloudComputing] = useState("");
   const [database, setDatabase] = useState("");
-  const [android, setAndroid] = useState("");
   const [devops_tool, setDevOpsTool] = useState("");
   const [gitHub, setGitHub] = useState("");
   const [county, setCounty] = useState("");
-  const [imagePathNet, setImagePathNet] = useState("");
-  const [imagePathFile, setImagePathFile] = useState(null);
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
+  const [fileUpload, setFileUpload] = useState(null);
+  const [fileLink, setFileLink] = useState("");
+  const [isFileLink, setIsFileLink] = useState(false);
 
   // redux states
   const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
 
-  // control showing of the the input of the file either URL or from filesystem
-  const [isURLFile, setIsUrlFile] = React.useState(true);
-
-  const [fileLink, setFileLink] = React.useState(0);
-  // handle showing follow, connect or event
-  const handleChange = (event, update) => {
-    setFileLink(update);
+  // handle full video when btn link clicked
+  const handleFileUploadLink = () => {
+    // clear file uploaded if any
+    setFileUpload(null);
+    // set true link video full
+    setIsFileLink(true);
   };
 
-  useEffect(() => {
-    // change the state of the IsUrl property
-    fileLink === 1 ? setIsUrlFile(true) : setIsUrlFile(false);
-  }, [fileLink]);
-
-  // file input toggle
-  const FileInputToggle = () => (
-    <Box>
-      <ToggleButtonGroup
-        value={fileLink}
-        exclusive
-        color="primary"
-        onChange={handleChange}
-      >
-        <ToggleButton value={0}>
-          <Typography
-            fontWeight={"bold"}
-            fontSize={"xx-small"}
-            variant="caption"
-          >
-            File
-          </Typography>
-        </ToggleButton>
-        <ToggleButton value={1}>
-          <Typography
-            fontWeight={"bold"}
-            fontSize={"xx-small"}
-            variant="caption"
-          >
-            Link
-          </Typography>
-        </ToggleButton>
-      </ToggleButtonGroup>
-    </Box>
-  );
+  // handle closing
+  const handleCloseFileUploadLink = () => {
+    // clear
+    setFileLink("");
+    // default showing of btn upload and link
+    setIsFileLink(false);
+  };
 
   return (
     <StyledModalPost
@@ -140,7 +123,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             : CustomDeviceTablet()
             ? "100%"
             : CustomLandscapeWidest()
-            ? "50%"
+            ? "70%"
             : "100%"
         }
         p={1}
@@ -170,13 +153,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
             {/*  button for posting */}
             <Button
-              startIcon={<Add />}
+              startIcon={<CodeRounded />}
               className="w-50 rounded-5 shadow-sm"
               variant="contained"
               disabled={!post_category.length > 0 || description.length > 1000}
               size="small"
             >
-              Post
+              Post Milestone
             </Button>
 
             {/*close icon */}
@@ -218,15 +201,16 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   color={"text.secondary"}
                 >
                   Provide a relevant title about this post so that users can
-                  bootstrap what your have been trying to achieve.
+                  bootstrap your objectives or motives on the fly.
                 </Typography>
 
                 <Box mt={4} className="w-100 mb-2">
                   <TextField
                     required
+                    error={title.length > 50}
                     value={title}
-                    label="provide title"
-                    placeholder="AWS S3 Bucket CRUD"
+                    label={`title ${50 - title.length}`}
+                    placeholder="React CheatSheet"
                     fullWidth
                     onChange={(e) => setTitle(e.target.value)}
                   />
@@ -236,6 +220,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               <Box display={"flex"} justifyContent={"center"}>
                 <GradeRounded color="primary" sx={{ width: 30, height: 30 }} />
               </Box>
+
               {/* post about */}
               <Typography
                 component={"li"}
@@ -254,7 +239,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   value={post_category}
                   label="post specialisation"
                   fullWidth
-                  onChange={(e) => setPostAbout(e.target.value)}
+                  onChange={(e) => setPostCategory(e.target.value)}
                 >
                   {SpecialisationTech &&
                     SpecialisationTech.filter((about) => about !== "None").map(
@@ -411,6 +396,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   </Box>
                 </Box>
               )}
+
               {/* programming Language */}
               {post_category === "Programming Languages" && (
                 <Box>
@@ -655,6 +641,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   </Box>
                 </Box>
               )}
+
               {/* Database */}
               {(post_category === "Database Administration (SQL/NoSQL)" ||
                 post_category === "Backend App Development" ||
@@ -730,9 +717,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     color={"text.secondary"}
                   >
                     Native Android application development stack is usually
-                    based on Java or Kotlin for the implementation of logic and
-                    the UI part consists of XML or JetpakCompose (Kotlin for
-                    UI+Logic).
+                    based on Java or Kotlin. The modern way of writing android
+                    application is by using JetpakCompose which is pure Kotlin.
                   </Typography>
                   <Box mt={4} className="w-100 mb-2 ">
                     <TextField
@@ -761,6 +747,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   </Box>
                 </Box>
               )}
+
               {/* IOS App */}
               {post_category === "Native IOS App Development" && (
                 <Box>
@@ -799,46 +786,6 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                               gap={"5px"}
                             >
                               <small style={{ fontSize: "small" }}>{ios}</small>
-                            </Box>
-                          </MenuItem>
-                        ))}
-                    </TextField>
-                  </Box>
-                </Box>
-              )}
-              {/* Cloud computing */}
-              {post_category === "Cloud Computing (AWS/GCP/Azure)" && (
-                <Box>
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    p={1}
-                  >
-                    Select a cloud provider option. Currently we support Amazon
-                    Web Services (AWS), Microsoft Azure and Google Cloud
-                    Platform as the main cloud providers.
-                  </Typography>
-                  <Box className="w-100 mb-2 ">
-                    <TextField
-                      required
-                      select
-                      value={cloudComputing}
-                      label="Select a cloud provider"
-                      fullWidth
-                      onChange={(e) => setCloudComputing(e.target.value)}
-                    >
-                      {SubsectionTech &&
-                        SubsectionTech.Cloud.map((cloud) => (
-                          <MenuItem key={cloud} value={cloud}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
-                              <small style={{ fontSize: "small" }}>
-                                {cloud}
-                              </small>
                             </Box>
                           </MenuItem>
                         ))}
@@ -953,13 +900,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 variant="body2"
                 color={"text.secondary"}
               >
-                Project GitHub/GitLab/SVN Link. Providing Version Control links
-                may further promote collaboraton and contributors to your
-                project.{" "}
-                <span className="fw-medium">
-                  Programming related posts/projects are recommended to have
-                  this link.
-                </span>
+                Provide version control link such as Github or Gitlab pointing
+                to your project repository. This may promote collaboraton and
+                contributors to your project by the interested techies.
               </Typography>
 
               <Box className="mb-2">
@@ -973,7 +916,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 />
               </Box>
 
-              {/* image  */}
+              {/* image and pdf for the post */}
               <Box display={"flex"} justifyContent={"center"} gap={1}>
                 <Image color="primary" sx={{ width: 30, height: 30 }} /> +
                 <PictureAsPdfRounded
@@ -983,68 +926,114 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               </Box>
               <Typography
                 component={"li"}
+                gutterBottom
                 variant="body2"
                 color={"text.secondary"}
               >
-                Provide an image or pdf file for the post for visual
-                presentation. Its
-                <span className="fw-medium">
-                  {" "}
-                  recommended to embed an image or pdf{" "}
-                </span>{" "}
-                in your post for it conveys thousands of information about your
-                post/project than mere words.
+                Attach an image or pdf file for this post. This could help many
+                users on the platform to comprehend your ideologies or proof of
+                concepts much efficiently.
               </Typography>
-              {/* Screenshot/Image Project Post */}
-              <Box className="mb-2 border rounded p-1">
+
+              <Typography
+                textAlign={"center"}
+                variant="body2"
+                gutterBottom
+                color={"text.secondary"}
+              >
+                Attach an image or pdf file
+              </Typography>
+
+              {fileUpload && (
+                <Typography
+                  gutterBottom
+                  textAlign={"center"}
+                  variant="body2"
+                  width={"100%"}
+                  color={"text.secondary"}
+                >
+                  {`${fileUpload.name}`.substring(0, 30)}...
+                  {`${fileUpload.name}.`.split(".")[1]}
+                </Typography>
+              )}
+
+              {!isFileLink ? (
                 <Box
                   display={"flex"}
-                  justifyContent={"space-between"}
+                  justifyContent={"space-around"}
                   alignItems={"center"}
-                  p={1}
+                  gap={1}
                 >
-                  {/* video from link is no limited to time  */}
-                  {isURLFile ? (
-                    <Typography variant="body2" color={"text.secondary"}>
-                      image | pdf link (optional)
-                    </Typography>
-                  ) : (
-                    <Typography variant="body2" color={"text.secondary"}>
-                      image | pdf (optional)
-                    </Typography>
-                  )}
+                  <Button
+                    component="label"
+                    role={undefined}
+                    variant="outlined"
+                    disableElevation
+                    tabIndex={-1}
+                    size="small"
+                    sx={{ textTransform: "lowercase", borderRadius: "20px" }}
+                    startIcon={<CloudUploadRounded />}
+                  >
+                    Upload File
+                    <StyledInput
+                      type="file"
+                      accept="image/*, .pdf"
+                      onChange={(event) => setFileUpload(event.target.files[0])}
+                      multiple
+                    />
+                  </Button>
 
-                  <Box>
-                    <FileInputToggle />
-                  </Box>
+                  <Button
+                    variant="outlined"
+                    disableElevation
+                    sx={{ textTransform: "lowercase", borderRadius: "20px" }}
+                    onClick={handleFileUploadLink}
+                    size="small"
+                    startIcon={<LinkRounded />}
+                  >
+                    External Link
+                  </Button>
                 </Box>
+              ) : (
+                <>
+                  <Typography
+                    component={"li"}
+                    variant="body2"
+                    mt={3}
+                    color={"text.secondary"}
+                  >
+                    Provide the link or url pointing to your image or pdf file
+                    stored in the cloud storage: (Google Drive, MegaDrive,
+                    OneDrive, etc).
+                  </Typography>
 
-                {/* show input from filesystem or URL */}
-                {isURLFile ? (
-                  <Box>
-                    <input
+                  <Box
+                    mt={4}
+                    className="w-100 mb-2"
+                    display={"flex"}
+                    alignItems={"center"}
+                    gap={1}
+                  >
+                    <TextField
                       required
                       type="url"
-                      value={imagePathNet}
-                      onChange={(e) => setImagePathNet(e.target.value)}
-                      placeholder="https://www.imageorpdflink.com"
-                      className="form-control rounded-0"
+                      value={fileLink}
+                      label={`Paste image or pdf link`}
+                      placeholder="https://...."
+                      fullWidth
+                      onChange={(e) => setFileLink(e.target.value)}
                     />
+                    {/* close button */}
+                    <IconButton onClick={handleCloseFileUploadLink}>
+                      <Tooltip title={"exit link"}>
+                        <Close />
+                      </Tooltip>
+                    </IconButton>
                   </Box>
-                ) : (
-                  <Box>
-                    <input
-                      type="file"
-                      onChange={(e) => setImagePathFile(e.target.files[0])}
-                      accept="image/*, .pdf"
-                      className="form-control"
-                    />
-                  </Box>
-                )}
-              </Box>
+                </>
+              )}
 
               {/* description */}
-
               <Box display={"flex"} justifyContent={"center"}>
                 <EditRounded color="primary" sx={{ width: 30, height: 30 }} />
               </Box>
@@ -1054,14 +1043,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 variant="body2"
                 color={"text.secondary"}
               >
-                Provide a captivating descripton about your project/post. Let
-                your audience know that you are such an incredible tech
-                enthusiast and scholar.{" "}
-                <span className="fw-bold">
-                  Don't back down even if its an amature project such as
-                  HTML/CSS only.
-                </span>{" "}
-                We all came from square one!
+                Provide a description about your post highlighting the technical
+                concepts you are excited to share with many individuals on the
+                platform. Let your description be concise and easier to
+                comprehend by many.
               </Typography>
 
               <Box mb={3}>

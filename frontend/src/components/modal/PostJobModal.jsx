@@ -1,4 +1,9 @@
-import { Add, Close } from "@mui/icons-material";
+import {
+  Close,
+  CloudUploadRounded,
+  LinkRounded,
+  Work,
+} from "@mui/icons-material";
 import {
   Autocomplete,
   Avatar,
@@ -10,12 +15,10 @@ import {
   Modal,
   styled,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import AllSkills from "../data/AllSkillsData";
@@ -36,11 +39,23 @@ const StyledModalJob = styled(Modal)({
   margin: "5px",
 });
 
+// styled input
+const StyledInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
+
 const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
   const [relevant_title, setRelevantTitle] = useState("");
   const [job_poster, setJobPoster] = useState("");
   const [county, setCounty] = useState("");
-  const [imagePath, setImagePath] = useState();
   const [job_main_doc, setJobMainDoc] = useState("");
   const [job_minor_doc, setJobMinorDoc] = useState("");
   const [job_main_skill, setJobMainSkill] = useState([]);
@@ -55,11 +70,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
   const [poster_email, setPosterEmail] = useState("");
   const [showCustomTitle, setShowCustomTitle] = useState(false);
   const [currency, setCurrency] = useState("Ksh");
-
-  // control showing of the the input of the file either URL or from filesystem
-  const [isURImageLogo, setIsUrlImageLogo] = React.useState(true);
-
-  const [fileLink, setFileLink] = React.useState(0);
+  const [fileUpload, setFileUpload] = useState(null);
+  const [fileLink, setFileLink] = useState("");
+  const [isFileLink, setIsFileLink] = useState(false);
 
   // redux states
   const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
@@ -95,54 +108,35 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
     setRelevantTitle("");
   }
 
-  const [selectedCurrency, setSelectedCurrency] = React.useState("a");
-
-  const handleChange = (event) => {
-    setSelectedCurrency(event.target.value);
+  // handle closing of custom title
+  const handleCloseCustomTitle = () => {
+    setShowCustomTitle(false);
+    // clear
+    setRelevantTitle("");
   };
 
-  useEffect(() => {
-    // change the state of the IsUrl property
-    fileLink === 1 ? setIsUrlImageLogo(true) : setIsUrlImageLogo(false);
-  }, [fileLink]);
+  // handle full video when btn link clicked
+  const handleFileUploadLink = () => {
+    // clear file uploaded if any
+    setFileUpload(null);
+    // set true link video full
+    setIsFileLink(true);
+  };
 
-  // file input toggle
-  const FileInputToggle = () => (
-    <Box>
-      <ToggleButtonGroup
-        value={fileLink}
-        exclusive
-        color="primary"
-        onChange={handleChange}
-      >
-        <ToggleButtonGroup value={0}>
-          <Typography
-            fontWeight={"bold"}
-            fontSize={"xx-small"}
-            variant="caption"
-          >
-            File
-          </Typography>
-        </ToggleButtonGroup>
-        <ToggleButton value={1}>
-          <Typography
-            fontWeight={"bold"}
-            fontSize={"xx-small"}
-            variant="caption"
-          >
-            Link
-          </Typography>
-        </ToggleButton>
-      </ToggleButtonGroup>
-    </Box>
-  );
+  // handle closing
+  const handleCloseFileUploadLink = () => {
+    // clear
+    setFileLink("");
+    // default showing of btn upload and link
+    setIsFileLink(false);
+  };
 
   return (
     <StyledModalJob
       keepMounted
       open={openModalJob}
       sx={{
-        marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
+        marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
       }}
       // onClose={(e) => setOpenPostModal(false)}
       aria-labelledby="modal-modal-title"
@@ -155,7 +149,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
             : CustomDeviceTablet()
             ? "100%"
             : CustomLandscapeWidest()
-            ? "50%"
+            ? "70%"
             : "100%"
         }
         p={1}
@@ -185,7 +179,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
             {/*  button for posting */}
             <Button
-              startIcon={<Add />}
+              startIcon={<Work />}
               className="w-50 rounded-5 shadow-sm"
               variant="contained"
               disabled={!(job_poster.length > 0 && relevant_title.length > 0)}
@@ -256,7 +250,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                       required
                       select
                       value={relevant_title}
-                      label="Select a Job Title"
+                      label="Select preferred job title"
                       fullWidth
                       onChange={(e) => setRelevantTitle(e.target.value)}
                     >
@@ -284,15 +278,24 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                     technology country wide.
                   </Typography>
                   {/* Job Title */}
-                  <Box className="mb-3 mt-2 ">
+                  <Box
+                    className="mb-3 mt-2 "
+                    display={"flex"}
+                    justifyContent={"space-between"}
+                    alignItems={"center"}
+                  >
                     <TextField
                       fullWidth
                       required
                       value={relevant_title}
                       onChange={(e) => setRelevantTitle(e.target.value)}
                       id="job_title"
-                      label={"Prefered Job Title "}
+                      label={"Prefered job title "}
                     />
+
+                    <IconButton onClick={handleCloseCustomTitle}>
+                      <Close />
+                    </IconButton>
                   </Box>
                 </>
               )}
@@ -354,8 +357,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                 What technical skills are{" "}
                 <span className="fw-medium"> not a must but nice to have</span>{" "}
                 during the application. These are the skills which an applicant
-                may posess as an added advantage to his/her side though they are
-                not 100% required in the job workplace.
+                may posess as a bonus.
               </Typography>
 
               {/* Nice to have Skills */}
@@ -398,11 +400,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                 variant="body2"
                 color={"text.secondary"}
               >
-                Select the <span className="fw-bold">mandatory documents</span>{" "}
-                applicants should provide during the application process. The
-                documents sent by the applicants will be in the format of (pdf
-                or docx). If You have a website or link where the application
-                for this role is to be conducted then, select option with (no)
+                Select the mandatory documents applicants should provide during
+                the application process. The documents sent by the applicants
+                will be in the format of (pdf or docx)
               </Typography>
 
               {/* Document Required */}
@@ -438,14 +438,15 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                     variant="body2"
                     color={"text.secondary"}
                   >
-                    What{" "}
-                    <span className="fw-medium">
-                      other additional documents
-                    </span>{" "}
-                    applicants should provide during the application process. If
-                    You have a website link where the application for this role
-                    is to be conducted then select (No, I have Website Link for
-                    Job Application)
+                    What other additional or support documents applicants should
+                    provide during the application process.This could be of help
+                    in validation of the applicants truth claims about who they
+                    are or what they have achieved in a CV. If support documents
+                    are required atleast one will be enquired from the
+                    applicants in order for their job application to be
+                    successful. When the optional field is selected, the
+                    applicants will have a choice of submitting support
+                    documents or not.
                   </Typography>
 
                   {/* Docs Support */}
@@ -487,9 +488,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                     application for this role should be conducted. mulfunctioned
                     links or fake job application links are prohibitted and will
                     be taken as serious offense when found or reported by the
-                    applicants. This could result in permanent termination of
-                    mutual relationship with Metatron. Bros in tech should be
-                    able to apply for the job not lies.
+                    applicants.
                   </Typography>
 
                   <Box className="w-100 mb-3">
@@ -665,7 +664,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                 </TextField>
               </Box>
 
-              {/* logo */}
+              {/* logo or image */}
               <Typography
                 component={"li"}
                 gutterBottom
@@ -678,52 +677,147 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                 and outstanding from others to the applicants in question. It's
                 recommended that you provide one though it is not a must.
               </Typography>
-              {/* Org Logo/Image */}
-              <Box className="mb-3 border rounded p-1">
+
+              <Typography
+                textAlign={"center"}
+                variant="body2"
+                gutterBottom
+                color={"text.secondary"}
+              >
+                organisation logo or image
+              </Typography>
+
+              {fileUpload && (
+                <Typography
+                  gutterBottom
+                  textAlign={"center"}
+                  variant="body2"
+                  width={"100%"}
+                  color={"text.secondary"}
+                >
+                  {`${fileUpload.name}`.substring(0, 30)}...
+                  {`${fileUpload.name}.`.split(".")[1]}
+                </Typography>
+              )}
+
+              {!isFileLink ? (
                 <Box
                   display={"flex"}
-                  justifyContent={"space-between"}
+                  justifyContent={"space-around"}
                   alignItems={"center"}
+                  gap={1}
                 >
-                  {/* Image/Logo from link from Internet */}
-                  {isURImageLogo ? (
-                    <Typography ml={1} variant="body2" color={"text.secondary"}>
-                      link (optional)
-                    </Typography>
-                  ) : (
-                    <Typography ml={1} variant="body2" color={"text.secondary"}>
-                      logo (optional)
-                    </Typography>
-                  )}
-
-                  <Box>
-                    <FileInputToggle />
-                  </Box>
-                </Box>
-
-                {/* show input from filesystem or URL */}
-                {isURImageLogo ? (
-                  <Box>
-                    <input
-                      required
-                      value={imagePath}
-                      type="url"
-                      onChange={(e) => setImagePath(e.target.value)}
-                      placeholder="https://www.my-org-logo-or-image-link-url"
-                      className="form-control rounded-0"
-                    />
-                  </Box>
-                ) : (
-                  <Box>
-                    <input
+                  <Button
+                    component="label"
+                    role={undefined}
+                    variant="outlined"
+                    disableElevation
+                    tabIndex={-1}
+                    size="small"
+                    sx={{ textTransform: "lowercase", borderRadius: "20px" }}
+                    startIcon={<CloudUploadRounded />}
+                  >
+                    Upload Logo
+                    <StyledInput
                       type="file"
-                      accept="image/*"
-                      className="form-control"
+                      accept="image/*,"
+                      onChange={(event) => setFileUpload(event.target.files[0])}
+                      multiple
                     />
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    disableElevation
+                    sx={{ textTransform: "lowercase", borderRadius: "20px" }}
+                    onClick={handleFileUploadLink}
+                    size="small"
+                    startIcon={<LinkRounded />}
+                  >
+                    External Link
+                  </Button>
+                </Box>
+              ) : (
+                <>
+                  <Typography
+                    component={"li"}
+                    variant="body2"
+                    mt={3}
+                    color={"text.secondary"}
+                  >
+                    Provide the link or url pointing to the logo or image of
+                    your organisation, that is stored in the cloud
+                    storage:(Google Drive, MegaDrive, DropBox or OneDrive etc).
+                  </Typography>
+
+                  <Box
+                    mt={4}
+                    className="w-100 mb-2"
+                    display={"flex"}
+                    alignItems={"center"}
+                    gap={1}
+                  >
+                    <TextField
+                      required
+                      type="url"
+                      value={fileLink}
+                      label={`Paste logo link`}
+                      placeholder="https://...."
+                      fullWidth
+                      onChange={(e) => setFileLink(e.target.value)}
+                    />
+                    {/* close button */}
+                    <IconButton onClick={handleCloseFileUploadLink}>
+                      <Tooltip title={"exit link"}>
+                        <Close />
+                      </Tooltip>
+                    </IconButton>
                   </Box>
-                )}
+                </>
+              )}
+
+              {/* Job verification and validation contacts  */}
+              <Typography
+                component={"li"}
+                variant="body2"
+                color={"text.secondary"}
+                gutterBottom
+              >
+                Note: This job post may be required to undergoe verification and
+                validation processes before getting approved and published on
+                the platform. Please provide contacts that will facilitate our
+                techinical support team reaching out.
+              </Typography>
+
+              {/* Email */}
+              <Box className="mb-3">
+                <TextField
+                  fullWidth
+                  required
+                  type="tel"
+                  value={poster_phone}
+                  onChange={(e) => setPosterPhone(e.target.value)}
+                  id="phone"
+                  label={"Phone Number"}
+                  placeholder="+254723679865"
+                />
               </Box>
 
+              {/* Email */}
+              <Box mb={3}>
+                <TextField
+                  fullWidth
+                  value={poster_email}
+                  onChange={(e) => setPosterEmail(e.target.value)}
+                  required
+                  type="email"
+                  id="email"
+                  label={"Provide Email"}
+                  placeholder="youremail@gmail.com"
+                />
+              </Box>
+
+              {/* About your Org */}
               <Typography
                 component={"li"}
                 variant="body2"
@@ -737,7 +831,6 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                 the end.
               </Typography>
 
-              {/* About your Org */}
               <Box className="mb-3">
                 <TextField
                   minRows={window.screen.availWidth <= 320 ? 5 : 10}
@@ -745,14 +838,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                   contentEditable={false}
                   error={poster_about.length > 500}
                   id="About-org-required"
-                  label={
-                    <p>
-                      {` About your organisation ${
-                        500 - poster_about.length + " Characters"
-                      }`}
-                      *
-                    </p>
-                  }
+                  label={`about your organisation ${500 - poster_about.length}`}
                   fullWidth
                   value={poster_about}
                   onChange={(e) => setPosterAbout(e.target.value)}
@@ -781,61 +867,15 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                   contentEditable={false}
                   error={job_description.length > 1000}
                   id="Descr-job-required"
-                  label={
-                    <p>
-                      {`Job decription core details ${
-                        1000 - job_description.length + " characters"
-                      }`}
-                      *
-                    </p>
-                  }
+                  label={`job description details ${
+                    1000 - job_description.length
+                  }`}
                   fullWidth
                   value={job_description}
                   onChange={(e) => setJobDescription(e.target.value)}
                   placeholder={
                     "- Writing testable and maintainable code \n- Deploying mobile apps to Play Store or Apple Store.\n- Checking bugs in the code base and fixing them.\n- Integrating ML/AI APIs into our Software Products."
                   }
-                />
-              </Box>
-
-              {/* Job verification and validation contacts  */}
-              <Typography
-                component={"li"}
-                variant="body2"
-                color={"text.secondary"}
-                gutterBottom
-              >
-                N/B: This Job post may have to undergoe verification and
-                validation process before getting approved and published on the
-                platform. Please provide contacts that will facilitate our
-                techinical support team to reach out.
-              </Typography>
-
-              {/* Email */}
-              <Box className="mb-3">
-                <TextField
-                  fullWidth
-                  required
-                  type="tel"
-                  value={poster_phone}
-                  onChange={(e) => setPosterPhone(e.target.value)}
-                  id="phone"
-                  label={"Phone Number"}
-                  placeholder="+254723679865"
-                />
-              </Box>
-
-              {/* Email */}
-              <Box mb={3}>
-                <TextField
-                  fullWidth
-                  value={poster_email}
-                  onChange={(e) => setPosterEmail(e.target.value)}
-                  required
-                  type="email"
-                  id="email"
-                  label={"Provide Your Email"}
-                  placeholder="youremail@gmail.com"
                 />
               </Box>
             </Box>

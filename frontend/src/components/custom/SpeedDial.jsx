@@ -5,12 +5,13 @@ import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import React, { lazy } from "react";
 
 import {
-  LaptopRounded,
+  CodeRounded,
   SchoolRounded,
   Videocam,
   Work,
 } from "@mui/icons-material";
 import { Typography } from "@mui/material";
+const PostCourseModal = lazy(() => import("../modal/PostCourseModal"));
 const PostTechModal = lazy(() => import("../modal/PostTechModal"));
 const PostJobModal = lazy(() => import("../modal/PostJobModal"));
 
@@ -21,15 +22,15 @@ const actions = [
   },
   {
     icon: <SchoolRounded color="primary" sx={{ width: 26, height: 26 }} />,
-    name: "Course Posting",
+    name: "Course Upload",
   },
   {
     icon: <Work color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Job Posting",
   },
   {
-    icon: <LaptopRounded color="primary" sx={{ width: 26, height: 26 }} />,
-    name: "Project Posting",
+    icon: <CodeRounded color="primary" sx={{ width: 28, height: 28 }} />,
+    name: "Milestone Posting",
   },
 ];
 
@@ -46,6 +47,7 @@ export default function BasicSpeedDial() {
   // control showing opening of the post modal
   const [openModalTech, setOpenModalTech] = React.useState(false);
   const [openModalJob, setOpenModalJob] = React.useState(false);
+  const [openModalCourse, setOpenModalCourse] = React.useState(false);
 
   return (
     <Box sx={{ transform: "translateZ(0px)", flexGrow: 1 }}>
@@ -63,11 +65,15 @@ export default function BasicSpeedDial() {
             icon={action.icon}
             className="shadow border"
             onClick={(e) => {
-              if (action.name === "Project Posting") {
+              if (action.name === "Milestone Posting") {
                 setOpenModalTech(true);
               }
               if (action.name === "Job Posting") {
                 setOpenModalJob(true);
+              }
+
+              if (action.name === "Course Upload") {
+                setOpenModalCourse(true);
               }
             }}
             tooltipTitle={
@@ -93,6 +99,11 @@ export default function BasicSpeedDial() {
         openModalJob={openModalJob}
         setOpenModalJob={setOpenModalJob}
       />{" "}
+      {/* open post modal */}
+      <PostCourseModal
+        openModalCourse={openModalCourse}
+        setOpenModalCourse={setOpenModalCourse}
+      />
     </Box>
   );
 }
