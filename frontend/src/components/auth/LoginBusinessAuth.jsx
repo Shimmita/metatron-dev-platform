@@ -298,7 +298,7 @@ const LoginBusinessAuth = ({ mode, setMode }) => {
                 sx={{ borderRadius: "20px" }}
                 disableElevation
                 onClick={(e) => {
-                  navigate("/business");
+                  navigate("/");
                 }}
                 type="submit"
               >

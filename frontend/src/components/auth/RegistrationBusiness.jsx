@@ -258,8 +258,8 @@ const RegistrationBusiness = () => {
                     required
                     id="designation-org"
                     value={specialisationTitle}
-                    label={`Designation ${40 - specialisationTitle.length}`}
-                    error={specialisationTitle.length > 40}
+                    label={`Designation ${60 - specialisationTitle.length}`}
+                    error={specialisationTitle.length > 60}
                     placeholder="Software Development Company"
                     className="w-75"
                     onChange={(e) => setSpecialisationTitle(e.target.value)}

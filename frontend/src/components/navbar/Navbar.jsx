@@ -98,7 +98,7 @@ const Navbar = ({ setMode, mode }) => {
 
   return (
     <React.Fragment>
-      <AppBar position="fixed" elevation={5} enableColorOnDark>
+      <AppBar position="fixed" elevation={5}>
         <MetatronToolBar variant="dense">
           {/* lg screen toolbar */}
           <LogoContent

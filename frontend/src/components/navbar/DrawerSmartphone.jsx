@@ -21,7 +21,6 @@ import {
   SchoolRounded,
   Settings,
   Smartphone,
-  StarRounded,
   SupportAgentRounded,
 } from "@mui/icons-material";
 import {
@@ -45,7 +44,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
 import FlagLogo from "../../images/KE.png";
-import AppLogo from "../../images/logo_sm.png";
+import {
+  default as AppLogo,
+  default as logoCompany,
+} from "../../images/logo_sm.png";
 import { resetDarkMode } from "../../redux/AppUI";
 import SkillAvatars from "../sidebar/SkillAvatars";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -61,8 +63,6 @@ const DrawerSmartphone = ({
   const [openAccountMore, setOpenAccountMore] = useState(false);
   const [openMobileApp, setOpenMobileApp] = useState(false);
   const [openEvents, setOpenEvents] = useState(false);
-  // screen width
-  const screenWidth = window.screen.availWidth;
 
   const navigate = useNavigate();
 
@@ -187,8 +187,8 @@ const DrawerSmartphone = ({
                 p={1}
               >
                 <Avatar
-                  alt={"user image"}
-                  src={devImage}
+                  alt={""}
+                  src={!businessAccount ? devImage : logoCompany}
                   sx={{ width: 70, height: 70, marginTop: 0 }}
                 />
               </Box>
@@ -217,20 +217,16 @@ const DrawerSmartphone = ({
                           textTransform={"uppercase"}
                           color={isDarkMode ? "black" : "primary"}
                         >
-                          Elusium Incorporation
+                          Metatron Foundation
                         </Typography>
                         <Typography
                           textAlign={"center"}
                           variant="body2"
-                          display={"flex"}
-                          justifyContent={"space-between"}
-                          alignItems={"center"}
                           gap={1}
                           color={isDarkMode ? "black" : "text.secondary"}
                         >
-                          <StarRounded sx={{ width: 12, height: 12 }} />
-                          Software and ML/AI Development Company
-                          <StarRounded sx={{ width: 12, height: 12 }} />
+                          Software and Machine Learning Development Company In
+                          Kenya
                         </Typography>
                       </Box>
                     </Box>
@@ -430,16 +426,6 @@ const DrawerSmartphone = ({
             </List>
           </Collapse>
 
-          {/* about */}
-          <ListItemButton onClick={handleShowAboutPage}>
-            <ListItemIcon>
-              <Lightbulb color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={<Typography variant="body2">About Metatron</Typography>}
-            />
-          </ListItemButton>
-
           <ListItemButton onClick={(e) => setOpenMobileApp(!openMobileApp)}>
             <ListItemIcon>
               <Smartphone color="primary" />
@@ -476,6 +462,16 @@ const DrawerSmartphone = ({
               </ListItemButton>
             </List>
           </Collapse>
+
+          {/* about */}
+          <ListItemButton onClick={handleShowAboutPage}>
+            <ListItemIcon>
+              <Lightbulb color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={<Typography variant="body2">About Metatron</Typography>}
+            />
+          </ListItemButton>
 
           {/* more */}
 

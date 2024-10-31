@@ -16,7 +16,6 @@ import {
   SchoolRounded,
   Settings,
   Smartphone,
-  StarRounded,
   SupportAgentRounded,
 } from "@mui/icons-material";
 import {
@@ -46,7 +45,8 @@ import EventsTablet from "../events/EventsIsTablet";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import SkillAvatars from "./SkillAvatars";
-import("./Sidebar.css");
+import "./Sidebar.css";
+import logoCompany from "../../images/logo_sm.png";
 
 const Sidebar = ({ setMode, mode }) => {
   const [openAccountMore, setOpenAccountMore] = useState(false);
@@ -188,8 +188,8 @@ const Sidebar = ({ setMode, mode }) => {
                       >
                         <Avatar
                           alt={"user image"}
-                          src={devImage}
-                          sx={{ width: 60, height: 60 }}
+                          src={!businessAccount ? devImage : logoCompany}
+                          sx={{ width: 70, height: 70 }}
                         />
                       </Box>
                       <Box display={"flex"} justifyContent={"center"} pb={2}>
@@ -219,16 +219,12 @@ const Sidebar = ({ setMode, mode }) => {
                                 <Typography
                                   textAlign={"center"}
                                   variant="body2"
-                                  display={"flex"}
-                                  alignItems={"center"}
-                                  gap={1}
                                   color={
                                     isDarkMode ? "black" : "text.secondary"
                                   }
                                 >
-                                  <StarRounded sx={{ width: 12, height: 12 }} />
-                                  Software and Machine Learning Development Company
-                                  <StarRounded sx={{ width: 12, height: 12 }} />
+                                  Software and Machine Learning Development
+                                  Company In Kenya
                                 </Typography>
                               </Box>
                             </Box>
