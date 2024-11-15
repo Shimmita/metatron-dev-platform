@@ -129,9 +129,9 @@ const RegistrationBusiness = () => {
               alignItems={"center"}
               justifyContent={"center"}
             >
-              <StarRounded sx={{ width: 18, height: 18 }} />
-              Kenya's Best IT Platform{" "}
-              <StarRounded sx={{ width: 18, height: 18 }} />
+              <StarRounded sx={{ width: 20, height: 20 }} />
+              The Best IT Platform{" "}
+              <StarRounded sx={{ width: 20, height: 20 }} />
             </Typography>
 
             <Box
@@ -146,7 +146,7 @@ const RegistrationBusiness = () => {
                 variant={CustomDeviceSmallest() ? "caption" : "body2"}
                 color={"text.secondary"}
               >
-                Business Account Creation
+                Business Account Signup
               </Typography>
               <PaidRounded color="success" sx={{ width: 18, height: 18 }} />
             </Box>

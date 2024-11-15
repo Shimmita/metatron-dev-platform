@@ -15,6 +15,7 @@ const SpecialisationTech = [
   "Frontend App Development",
   "Digital Forensics",
   "Platform Engineering",
+  "Ethical Hacking",
   "Arduino, Raspberry Pi and PLU",
   "Site Reliability Engineering",
   "Backend App Development",

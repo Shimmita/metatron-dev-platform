@@ -6,11 +6,10 @@ import {
   ThemeProvider,
   Typography,
 } from "@mui/material";
-import React, { lazy, Suspense, useState } from "react";
+import React, { lazy, Suspense } from "react";
+import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import AppLogo from "./images/logo_sm.png";
-
-
 const LoginBusinessAuth = lazy(() =>
   import("./components/auth/LoginBusinessAuth")
 );
@@ -27,16 +26,18 @@ const AuthCheckLazy = lazy(() => import("./components/account/AuthCheck"));
 const LoginAuthLazy = lazy(() => import("./components/auth/LoginAuth"));
 
 const App = () => {
-  // theme change
-  const [mode, setMode] = useState("light");
+  // global dark mode state from redux
+  const { currentMode } = useSelector((state) => state.appUI);
+
   const darkTheme = createTheme({
     palette: {
-      mode: mode,
+      mode: currentMode,
     },
   });
   return (
     <ThemeProvider theme={darkTheme}>
       <Box bgcolor={"background.default"} color={"text.primary"}>
+        {/* error boundary to catch errors from lazily loaded components */}
         <Suspense
           fallback={
             <Box color={"text.primary"} alignItems="center">
@@ -74,23 +75,14 @@ const App = () => {
               <Route
                 exact
                 path="/*"
-                element={
-                  <AuthCheckLazy>
-                    {<HomePageLazy mode={mode} setMode={setMode} />}
-                  </AuthCheckLazy>
-                }
+                element={<AuthCheckLazy>{<HomePageLazy />}</AuthCheckLazy>}
               />
 
-
-              <Route
-                exact
-                path={"/auth/login"}
-                element={<LoginAuthLazy mode={mode} setMode={setMode} />}
-              />
+              <Route exact path={"/auth/login"} element={<LoginAuthLazy />} />
               <Route
                 exact
                 path={"/auth/login/business"}
-                element={<LoginBusinessAuth mode={mode} setMode={setMode} />}
+                element={<LoginBusinessAuth />}
               />
               <Route
                 exact

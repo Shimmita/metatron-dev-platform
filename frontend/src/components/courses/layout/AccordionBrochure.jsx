@@ -1,10 +1,10 @@
 import {
   DownloadForOfflineRounded,
   MenuBookRounded,
-  PictureAsPdfRounded
+  PictureAsPdfRounded,
 } from "@mui/icons-material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { AccordionActions, Box, Button } from "@mui/material";
+import { AccordionActions, Box, Button, Fade } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -12,9 +12,39 @@ import Typography from "@mui/material/Typography";
 import React from "react";
 
 export default function AccordionBrochure({ brochure }) {
+  const [expanded, setExpanded] = React.useState(false);
+
+  const handleExpansion = () => {
+    setExpanded((prevExpanded) => !prevExpanded);
+  };
   return (
     <Box>
-      <Accordion elevation={0}>
+      <Accordion
+        elevation={0}
+        expanded={expanded}
+        onChange={handleExpansion}
+        slots={{ transition: Fade }}
+        slotProps={{ transition: { timeout: 1000 } }}
+        sx={[
+          expanded
+            ? {
+                "& .MuiAccordion-region": {
+                  height: "auto",
+                },
+                "& .MuiAccordionDetails-root": {
+                  display: "block",
+                },
+              }
+            : {
+                "& .MuiAccordion-region": {
+                  height: 0,
+                },
+                "& .MuiAccordionDetails-root": {
+                  display: "none",
+                },
+              },
+        ]}
+      >
         <AccordionSummary
           expandIcon={<ArrowDropDownIcon />}
           aria-controls="panel2-content"

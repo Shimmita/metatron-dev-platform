@@ -11,7 +11,6 @@ const SubsectionJob = {
     "Entry Level",
     "Intermediate Level",
     "Expert/Professional Level",
-    "Any Level (Entry/Intermediate/Expert)",
   ],
   Expert_Years: [
     "1-3 Years of Experience",
@@ -23,10 +22,6 @@ const SubsectionJob = {
     "CV + Cover Letter",
     "CV Only",
     "No, I have Website for Job Application",
-  ],
-  Document_Support: [
-    "Support Documents (Certs or Recommendation)",
-    "Support Documents (Optional)",
   ],
 
   SalaryKES: [

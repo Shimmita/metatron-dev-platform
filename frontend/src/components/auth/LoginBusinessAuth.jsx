@@ -9,6 +9,7 @@ import {
   StarRounded,
   Visibility,
   VisibilityOff,
+  WbIncandescentRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -33,12 +34,35 @@ import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import ModalPolicyTerms from "./ModalPolicyTerms";
 import OptionsMoreLogin from "./OptionsMoreLogin";
 const ModalAccountInfo = lazy(() => import("./ModalAccountInfo"));
+const LoginWithAlert = lazy(() => import("../alerts/LoginWithAlert"));
 
-const LoginBusinessAuth = ({ mode, setMode }) => {
+const loginOption = {
+  github: {
+    title: "GitHub  Signin?",
+    message: "Signin to Metatron Foundation Platform with your GitHub Account",
+    icon: <GitHub />,
+  },
+  google: {
+    title: "Google Signin?",
+    message: "Signin to Metatron Foundation Platform with your Google Account",
+    icon: <Google />,
+  },
+  microsoft: {
+    title: "Microsoft Signin?",
+    message:
+      "Signin to Metatron Foundation Platform with your Microsoft Account",
+    icon: <Microsoft />,
+  },
+};
+
+const LoginBusinessAuth = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
+  const [option, setOption] = useState("");
+  // control showing alert when login with ggle,ms and git clicked
+  const [openAlert, setOpenAlert] = useState(false);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,14 +84,40 @@ const LoginBusinessAuth = ({ mode, setMode }) => {
 
   // UI theme dark light teaking effect
   const handleShowDarkMode = () => {
-    // alter the light/ dark mode
-    setMode(mode === "light" ? "dark" : "light");
     // update the redux theme boolean state
     dispatch(resetDarkMode());
   };
 
   // global dark mode state from redux
   const { isDarkMode } = useSelector((state) => state.appUI);
+
+  // handle login with github
+  const handleLoginWithGithub = () => {
+    setOpenAlert(true);
+    setOption("git");
+  };
+
+  // handle login with google
+  const handleLoginWithGoogle = () => {
+    setOpenAlert(true);
+    setOption("goog");
+  };
+
+  // handle login with microsoft
+  const handleLoginWithMS = () => {
+    setOpenAlert(true);
+    setOption("ms");
+  };
+
+  const handleLoginInfoAlert = () => {
+    if (option === "git") {
+      return loginOption.github;
+    }
+    if (option === "goog") {
+      return loginOption.google;
+    }
+    return loginOption.microsoft;
+  };
 
   return (
     <Box
@@ -179,9 +229,9 @@ const LoginBusinessAuth = ({ mode, setMode }) => {
                 alignItems={"center"}
                 justifyContent={"center"}
               >
-                <StarRounded sx={{ width: 18, height: 18 }} />
-                Kenya's Best IT Platform{" "}
-                <StarRounded sx={{ width: 18, height: 18 }} />
+                <StarRounded sx={{ width: 20, height: 20 }} />
+                The Best IT Platform{" "}
+                <StarRounded sx={{ width: 20, height: 20 }} />
               </Typography>
 
               <Box
@@ -199,6 +249,27 @@ const LoginBusinessAuth = ({ mode, setMode }) => {
                   Business Account Login
                 </Typography>
                 <PaidRounded color="success" sx={{ width: 18, height: 18 }} />
+              </Box>
+
+              <Box
+                mb={2}
+                display={"flex"}
+                justifyContent={"center"}
+                gap={1}
+                alignItems={"center"}
+              >
+                <WbIncandescentRounded
+                  sx={{ width: 18, height: 18, color: "orange" }}
+                />
+                <Typography
+                  variant={CustomDeviceSmallest() ? "caption" : "body2"}
+                  color={"text.secondary"}
+                >
+                  Enlightening Technology Country Wide
+                  </Typography>
+                <WbIncandescentRounded
+                  sx={{ width: 18, height: 18, color: "orange" }}
+                />
               </Box>
             </Box>
           </Box>
@@ -276,18 +347,38 @@ const LoginBusinessAuth = ({ mode, setMode }) => {
               <Button
                 className="rounded-5"
                 size="small"
+                onClick={handleLoginWithMS}
                 startIcon={<Microsoft />}
+                sx={{ fontSize: "small" }}
               >
-                Microsoft
+                <Tooltip arrow title="signin microsoft">
+                  Microsoft
+                </Tooltip>
               </Button>
               {/* Google signin */}
-              <Button className="rounded-5" size="small" startIcon={<Google />}>
-                Google
+              <Button
+                className="rounded-5"
+                size="small"
+                onClick={handleLoginWithGoogle}
+                startIcon={<Google />}
+                sx={{ fontSize: "small" }}
+              >
+                <Tooltip arrow title="signin google">
+                  Google
+                </Tooltip>
               </Button>
 
               {/* github signin */}
-              <Button className="rounded-5" size="small" startIcon={<GitHub />}>
-                Github
+              <Button
+                className="rounded-5"
+                size="small"
+                onClick={handleLoginWithGithub}
+                startIcon={<GitHub />}
+                sx={{ fontSize: "small" }}
+              >
+                <Tooltip arrow title="signin github">
+                  Github
+                </Tooltip>
               </Button>
             </Box>
 
@@ -323,6 +414,14 @@ const LoginBusinessAuth = ({ mode, setMode }) => {
           setOpenModalTerms={setOpenModalTerms}
         />
       </Box>
+      {/* show alert login more options */}
+      <LoginWithAlert
+        openAlert={openAlert}
+        setOpenAlert={setOpenAlert}
+        title={handleLoginInfoAlert().title}
+        message={handleLoginInfoAlert().message}
+        icon={handleLoginInfoAlert().icon}
+      />
     </Box>
   );
 };

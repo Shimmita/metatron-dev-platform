@@ -1,4 +1,4 @@
-import { Box, Slide } from "@mui/material";
+import { Slide } from "@mui/material";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import * as React from "react";

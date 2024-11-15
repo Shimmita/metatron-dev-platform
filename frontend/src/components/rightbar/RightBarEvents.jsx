@@ -1,9 +1,8 @@
 import {
-  AddRounded,
   BookmarksRounded,
   CalendarMonthRounded,
   EventNoteRounded,
-  LiveTvRounded,
+  LiveTvRounded
 } from "@mui/icons-material";
 import { Box, CardActionArea } from "@mui/material";
 import List from "@mui/material/List";

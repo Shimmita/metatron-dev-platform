@@ -7,9 +7,11 @@ import App from "./App";
 import AppStore from "./redux/AppStore";
 import reportWebVitals from "./reportWebVitals";
 
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
+    {/* redux */}
     <Provider store={AppStore}>
       <Router>
         <App />

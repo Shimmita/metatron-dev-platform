@@ -9,6 +9,7 @@ import {
   Visibility,
   VisibilityOff,
   WbIncandescentRounded,
+  WorkRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -24,24 +25,70 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { lazy, useState } from "react";
+import {
+  GithubAuthProvider,
+  OAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+import React, { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
 import { resetDarkMode } from "../../redux/AppUI";
+import {
+  auth,
+  providerGithub,
+  providerGoogle,
+  providerMicrosoft,
+} from "../firebase/FirebaseConfig";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-import ModalPolicyTerms from "./ModalPolicyTerms";
 import OptionsMoreLogin from "./OptionsMoreLogin";
+const ModalPolicyTerms = lazy(() => import("./ModalPolicyTerms"));
+const AlertGeneral = lazy(() => import("../alerts/AlertGeneral"));
 const ModalAccountInfo = lazy(() => import("./ModalAccountInfo"));
+const LoginWithAlert = lazy(() => import("../alerts/LoginWithAlert"));
 
-const LoginAuth = ({ mode, setMode }) => {
+const loginOption = {
+  github: {
+    title: "GitHub  Signin?",
+    message: "Signin to Metatron Foundation Platform with your GitHub Account",
+    icon: <GitHub />,
+  },
+  google: {
+    title: "Google Signin?",
+    message: "Signin to Metatron Foundation Platform with your Google Account",
+    icon: <Google />,
+  },
+  microsoft: {
+    title: "Microsoft Signin?",
+    message:
+      "Signin to Metatron Foundation Platform with your Microsoft Account",
+    icon: <Microsoft />,
+  },
+};
+
+const LoginAuth = () => {
+  const [openModalInfo, setOpenModalInfo] = useState(false);
+  const [openModalTerms, setOpenModalTerms] = useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
-  const dispatch = useDispatch();
-
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userFirebaseToken, setUserFirebaseToken] = useState(null);
+
+  const [isMicrosoft, setisMicrosoft] = useState(false);
+  const [isGoogle, setIsGoogle] = useState(false);
+  const [isGitHub, setIsGitHub] = useState(false);
+
+  const [openAlertGenral, setOpenAlertGenral] = useState(false);
+  const [titleGenral, setTitleGenral] = useState("");
+  const [messageGenral, setMessageGenral] = useState("");
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [option, setOption] = useState("");
+  // control showing alert when login with ggle,ms and git clicked
+  const [openAlert, setOpenAlert] = useState(false);
+
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
@@ -55,19 +102,132 @@ const LoginAuth = ({ mode, setMode }) => {
     setAnchorEl(null);
   };
 
-  const [openModalInfo, setOpenModalInfo] = useState(false);
-  const [openModalTerms, setOpenModalTerms] = useState(false);
-
   // UI theme dark light teaking effect
   const handleShowDarkMode = () => {
-    // alter the light/ dark mode
-    setMode(mode === "light" ? "dark" : "light");
     // update the redux theme boolean state
     dispatch(resetDarkMode());
   };
 
   // global dark mode state from redux
   const { isDarkMode } = useSelector((state) => state.appUI);
+
+  // handle login with github
+  const handleLoginWithGithub = () => {
+    setOpenAlert(true);
+    setOption("git");
+  };
+
+  // handle login with google
+  const handleLoginWithGoogle = () => {
+    setOpenAlert(true);
+    setOption("goog");
+  };
+
+  // handle login with microsoft
+  const handleLoginWithMS = () => {
+    setOpenAlert(true);
+    setOption("ms");
+  };
+
+  const handleLoginInfoAlert = () => {
+    if (option === "git") {
+      return loginOption.github;
+    }
+    if (option === "goog") {
+      return loginOption.google;
+    }
+    return loginOption.microsoft;
+  };
+
+  useEffect(() => {
+    // google signin
+    if (isGoogle) {
+      // sign in with Google Auth
+      signInWithPopup(auth, providerGoogle)
+        .then((res) =>
+          res.user
+            .getIdToken()
+            .then((token) => console.log("token " + token))
+            .catch((error) => {
+              // error title
+              setTitleGenral("Signin Error");
+              // set message
+              setMessageGenral(
+                "We encountered an error while trying to process your Google identification details, please try again later\n" +
+                  error
+              );
+
+              // set opening of the genral alert
+              setOpenAlertGenral(true);
+
+              // false is google
+              setIsGoogle(false);
+            })
+        )
+        .catch((error) => {
+          // error title
+          setTitleGenral("Signin Error");
+          // set message
+          setMessageGenral(
+            "We encountered an error while trying to sign you in with Google, please try again later\n" +
+              error
+          );
+          // set opening of the genral alert
+          setOpenAlertGenral(true);
+
+          // false is google
+          setIsGoogle(false);
+        });
+    }
+
+    // signin with Github
+    if (isGitHub) {
+      signInWithPopup(auth, providerGithub)
+        .then((result) => {
+          // User is signed in
+          const user = result.user;
+          console.log("User Info:", user);
+
+          // GitHub-specific token and information (if you need it)
+          const credential = GithubAuthProvider.credentialFromResult(result);
+          const token = credential.accessToken;
+          console.log("GitHub Access Token:", token);
+        })
+        .catch((error) => {
+          // error title
+          setTitleGenral("Signin Error");
+          // set message
+          setMessageGenral(
+            "We encountered an error while trying to sign you in with GitHub, please try again later\n" +
+              error
+          );
+          // set opening of the genral alert
+          setOpenAlertGenral(true);
+
+          // false is Github
+          setIsGitHub(false);
+        });
+    }
+
+    // microsoft signing under development
+    if (isMicrosoft) {
+      // Sign in with popup
+      signInWithPopup(auth, providerMicrosoft)
+        .then((result) => {
+          // This gives you a Microsoft Access Token
+          const credential = OAuthProvider.credentialFromResult(result);
+          const accessToken = credential.accessToken;
+
+          // The signed-in user info
+          const user = result.user;
+          console.log("User info:", user);
+          console.log("Access Token:", accessToken);
+        })
+        .catch((error) => {
+          console.error("Error during Microsoft sign-in:", error);
+        });
+    }
+  }, [isGoogle, isMicrosoft, isGitHub]);
 
   return (
     <Box
@@ -97,7 +257,7 @@ const LoginAuth = ({ mode, setMode }) => {
         <Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box>
-              <Tooltip arrow title={"dark"}>
+              <Tooltip arrow title={isDarkMode ? "light" : "dark"}>
                 <IconButton onClick={handleShowDarkMode}>
                   {isDarkMode ? (
                     <LightModeRounded
@@ -179,9 +339,26 @@ const LoginAuth = ({ mode, setMode }) => {
                 alignItems={"center"}
                 justifyContent={"center"}
               >
-                <StarRounded sx={{ width: 18, height: 18 }} />
-                Kenya's Best IT Platform{" "}
-                <StarRounded sx={{ width: 18, height: 18 }} />
+                <StarRounded sx={{ width: 20, height: 20 }} />
+                The Best IT Platform{" "}
+                <StarRounded sx={{ width: 20, height: 20 }} />
+              </Typography>
+              <Typography
+                mb={2}
+                display={"flex"}
+                justifyContent={"center"}
+                gap={1}
+                color={"text.secondary"}
+                alignItems={"center"}
+              >
+                <WorkRounded color="inherit" sx={{ width: 15, height: 15 }} />
+                <Typography
+                  variant={CustomDeviceSmallest() ? "caption" : "body2"}
+                  color={"text.secondary"}
+                >
+                  Personal Account Login
+                </Typography>
+                <WorkRounded color="inherit" sx={{ width: 15, height: 15}} />
               </Typography>
 
               <Box
@@ -198,7 +375,7 @@ const LoginAuth = ({ mode, setMode }) => {
                   variant={CustomDeviceSmallest() ? "caption" : "body2"}
                   color={"text.secondary"}
                 >
-                  Enlighting Technology Country Wide
+                  Enlightening Technology Country Wide
                 </Typography>
                 <WbIncandescentRounded
                   sx={{ width: 18, height: 18, color: "orange" }}
@@ -247,7 +424,7 @@ const LoginAuth = ({ mode, setMode }) => {
               </FormControl>
             </Box>
 
-            <Box display={"flex"} justifyContent={"center"} mb={2}>
+            <Box display={"flex"} justifyContent={"center"} mb={1}>
               <Typography
                 variant="body2"
                 color={"text.secondary"}
@@ -283,18 +460,38 @@ const LoginAuth = ({ mode, setMode }) => {
               <Button
                 className="rounded-5"
                 size="small"
+                onClick={handleLoginWithMS}
                 startIcon={<Microsoft />}
+                sx={{ fontSize: "small" }}
               >
-                Microsoft
+                <Tooltip arrow title="signin microsoft">
+                  Microsoft
+                </Tooltip>
               </Button>
               {/* Google signin */}
-              <Button className="rounded-5" size="small" startIcon={<Google />}>
-                Google
+              <Button
+                className="rounded-5"
+                size="small"
+                onClick={handleLoginWithGoogle}
+                startIcon={<Google />}
+                sx={{ fontSize: "small" }}
+              >
+                <Tooltip arrow title="signin google">
+                  Google
+                </Tooltip>
               </Button>
 
               {/* github signin */}
-              <Button className="rounded-5" size="small" startIcon={<GitHub />}>
-                Github
+              <Button
+                className="rounded-5"
+                size="small"
+                onClick={handleLoginWithGithub}
+                startIcon={<GitHub />}
+                sx={{ fontSize: "small" }}
+              >
+                <Tooltip arrow title="signin github">
+                  Github
+                </Tooltip>
               </Button>
             </Box>
 
@@ -330,6 +527,26 @@ const LoginAuth = ({ mode, setMode }) => {
           setOpenModalTerms={setOpenModalTerms}
         />
       </Box>
+
+      {/* show alert login more options */}
+      <LoginWithAlert
+        openAlert={openAlert}
+        setOpenAlert={setOpenAlert}
+        title={handleLoginInfoAlert().title}
+        message={handleLoginInfoAlert().message}
+        icon={handleLoginInfoAlert().icon}
+        setisMicrosoft={setisMicrosoft}
+        setIsGitHub={setIsGitHub}
+        setIsGoogle={setIsGoogle}
+      />
+
+      {/* open alert genral */}
+      <AlertGeneral
+        openAlertGeneral={openAlertGenral}
+        setOpenAlertGenral={setOpenAlertGenral}
+        title={titleGenral}
+        message={messageGenral}
+      />
     </Box>
   );
 };

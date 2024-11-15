@@ -6,13 +6,12 @@ import {
   Tooltip,
 } from "@mui/material";
 import React from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import { useSelector } from "react-redux";
 
 const BottomNav = () => {
   const navigate = useNavigate();
-
   const [value, setValue] = React.useState(0);
 
   // return home or default card page

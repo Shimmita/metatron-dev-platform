@@ -67,7 +67,7 @@ const RecoverAuth = () => {
               variant={CustomDeviceSmallest() ? "caption" : "body2"}
               color={"text.secondary"}
             >
-              Enlighting Technology Country Wide
+              Enlightening Technology Country Wide
             </Typography>
             <WbIncandescentRounded
               sx={{ width: 18, height: 18, color: "orange" }}
@@ -93,19 +93,6 @@ const RecoverAuth = () => {
               onChange={(e) => setEmail(e.target.value.toLowerCase())}
               placeholder="username@gmail.com"
               type="email"
-            />
-          </Box>
-
-          <Box mb={3} mt={4} display={"flex"} justifyContent={"center"}>
-            <TextField
-              required
-              className="w-75"
-              id="outlined-required"
-              label="Phone"
-              value={email}
-              onChange={(e) => setEmail(e.target.value.toLowerCase())}
-              placeholder="+254...."
-              type="tel"
             />
           </Box>
 

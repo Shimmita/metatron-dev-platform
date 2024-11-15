@@ -5,7 +5,7 @@ import {
   SupportAgentRounded,
 } from "@mui/icons-material";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { Avatar, Box, Button } from "@mui/material";
+import { Avatar, Box, Button, Fade } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -14,9 +14,39 @@ import React from "react";
 import InstructorLogo from "../../../images/dev.jpeg";
 
 export default function AccordionInstructor({ instructor }) {
+  const [expanded, setExpanded] = React.useState(false);
+
+  const handleExpansion = () => {
+    setExpanded((prevExpanded) => !prevExpanded);
+  };
   return (
     <Box>
-      <Accordion elevation={0}>
+      <Accordion
+        elevation={0}
+        expanded={expanded}
+        onChange={handleExpansion}
+        slots={{ transition: Fade }}
+        slotProps={{ transition: { timeout: 1000 } }}
+        sx={[
+          expanded
+            ? {
+                "& .MuiAccordion-region": {
+                  height: "auto",
+                },
+                "& .MuiAccordionDetails-root": {
+                  display: "block",
+                },
+              }
+            : {
+                "& .MuiAccordion-region": {
+                  height: 0,
+                },
+                "& .MuiAccordionDetails-root": {
+                  display: "none",
+                },
+              },
+        ]}
+      >
         <AccordionSummary
           expandIcon={<ArrowDropDownIcon />}
           aria-controls="panel2-content"
@@ -36,7 +66,7 @@ export default function AccordionInstructor({ instructor }) {
               </Box>
 
               <Box display={"flex"} justifyContent={"center"}>
-                <Typography mt={1} variant="body2" >
+                <Typography mt={1} variant="body2">
                   {instructor}
                 </Typography>
               </Box>

@@ -10,7 +10,6 @@ import {
   EventNoteRounded,
   ExpandLess,
   ExpandMore,
-  Home,
   Lightbulb,
   LightModeOutlined,
   LightModeRounded,
@@ -39,7 +38,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
@@ -51,18 +50,19 @@ import {
 import { resetDarkMode } from "../../redux/AppUI";
 import SkillAvatars from "../sidebar/SkillAvatars";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
 const DrawerSmartphone = ({
   openDrawer,
   setOpenDrawer,
-  mode,
-  setMode,
   openModalEventAdd,
   setOpenModalEventAdd,
 }) => {
   const [openAccountMore, setOpenAccountMore] = useState(false);
   const [openMobileApp, setOpenMobileApp] = useState(false);
   const [openEvents, setOpenEvents] = useState(false);
+  // alert logout controls
+  const [openAlertLogout, setOpenAlertLogout] = useState(false);
 
   const navigate = useNavigate();
 
@@ -102,8 +102,6 @@ const DrawerSmartphone = ({
   };
   // UI theme dark light teaking effect
   const handleShowDarkMode = () => {
-    // alter the light/ dark mode
-    setMode(mode === "light" ? "dark" : "light");
     // update the redux theme boolean state
     dispatch(resetDarkMode());
   };
@@ -149,7 +147,12 @@ const DrawerSmartphone = ({
   };
 
   // simulate bs a/c and personal a/c transition
-  let businessAccount = true;
+  let businessAccount = false;
+
+  // handle logout
+  const handleLogout = () => {
+    setOpenAlertLogout(true);
+  };
 
   return (
     <Drawer open={openDrawer} onClose={(e) => setOpenDrawer(false)}>
@@ -289,15 +292,6 @@ const DrawerSmartphone = ({
         </Typography>
 
         <List>
-          <ListItemButton onClick={handleReturnHome}>
-            <ListItemIcon>
-              <Home color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={<Typography variant="body2"> Homepage</Typography>}
-            />
-          </ListItemButton>
-
           <ListItemButton onClick={(e) => setOpenAccountMore(!openAccountMore)}>
             <ListItemIcon>
               <AccountBox color="primary" />
@@ -490,7 +484,7 @@ const DrawerSmartphone = ({
               </ListItemButton>
 
               {/* Logout */}
-              <ListItemButton>
+              <ListItemButton onClick={handleLogout}>
                 <ListItemIcon>
                   <LogoutRounded color="primary" />
                 </ListItemIcon>
@@ -507,7 +501,7 @@ const DrawerSmartphone = ({
               <ListItemButton onClick={handleShowDarkMode}>
                 <ListItemIcon>
                   {isDarkMode ? (
-                    <LightModeRounded color="primary" />
+                    <LightModeRounded color="warning" />
                   ) : (
                     <LightModeOutlined color="primary" />
                   )}
@@ -564,6 +558,11 @@ const DrawerSmartphone = ({
           </Box>
         </List>
       </Box>
+      {/* logout alert */}
+      <LogoutAlert
+        openAlertLogout={openAlertLogout}
+        setOpenAlertLogout={setOpenAlertLogout}
+      />
     </Drawer>
   );
 };

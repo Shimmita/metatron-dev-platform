@@ -13,7 +13,6 @@ import {
   LogoutRounded,
   MonetizationOn,
   PostAdd,
-  SchoolRounded,
   Settings,
   Smartphone,
   SupportAgentRounded,
@@ -35,20 +34,20 @@ import {
 
 import { resetDarkMode } from "../../redux/AppUI";
 
-import React, { useEffect, useState } from "react";
+import React, { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
 import FlagLogo from "../../images/KE.png";
-import LogoutAlert from "../alerts/LogoutAlert";
+import logoCompany from "../../images/logo_sm.png";
 import EventsTablet from "../events/EventsIsTablet";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import SkillAvatars from "./SkillAvatars";
 import "./Sidebar.css";
-import logoCompany from "../../images/logo_sm.png";
+import SkillAvatars from "./SkillAvatars";
+const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
-const Sidebar = ({ setMode, mode }) => {
+const Sidebar = () => {
   const [openAccountMore, setOpenAccountMore] = useState(false);
   const [openMobileApp, setOpenMobileApp] = useState(false);
   const { isDarkMode, isSidebarRighbar, isTabSideBar } = useSelector(
@@ -100,8 +99,6 @@ const Sidebar = ({ setMode, mode }) => {
   };
   // UI theme dark light teaking effect
   const handleShowDarkMode = () => {
-    // alter the light/ dark mode
-    setMode(mode === "light" ? "dark" : "light");
     // update the redux theme boolean state
     dispatch(resetDarkMode());
   };
@@ -144,7 +141,7 @@ const Sidebar = ({ setMode, mode }) => {
     setOpenAlertLogout(true);
   };
 
-  let businessAccount = true;
+  let businessAccount = false;
 
   return (
     <Box
@@ -434,15 +431,10 @@ const Sidebar = ({ setMode, mode }) => {
                   display={"flex"}
                   alignItems={"center"}
                   justifyContent={"center"}
-                  gap={2}
                 >
                   <Typography fontWeight={"bold"} color={"primary"}>
                     LEARNING EVENTS
                   </Typography>
-                  <SchoolRounded
-                    color="primary"
-                    sx={{ width: 20, height: 20 }}
-                  />
                 </Box>
 
                 {isLoadingRequest ? (
@@ -477,15 +469,21 @@ const Sidebar = ({ setMode, mode }) => {
                       <ListItemIcon>
                         <Avatar
                           src={FlagLogo}
-                          sx={{ width: 26, height: 26 }}
+                          sx={{ width: 30, height: 30 }}
                           alt="flag"
                         />
                       </ListItemIcon>
                       <ListItemText
                         primary={
-                          <Typography variant="body2">
+                          <Typography
+                            width={175}
+                            fontWeight={"bold"}
+                            variant="body1"
+                            color={"primary"}
+                            sx={{ textTransform: "uppercase" }}
+                          >
                             {" "}
-                            Kenya's Best IT Platform
+                            Best IT Platform
                           </Typography>
                         }
                       />
@@ -538,7 +536,7 @@ const Sidebar = ({ setMode, mode }) => {
                 <ListItemButton onClick={handleShowDarkMode}>
                   <ListItemIcon>
                     {isDarkMode ? (
-                      <LightModeRounded color="primary" />
+                      <LightModeRounded color="warning" />
                     ) : (
                       <LightModeOutlined color="primary" />
                     )}

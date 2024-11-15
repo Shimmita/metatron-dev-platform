@@ -123,7 +123,7 @@ const SpecialisationJobs = [
   "F# Software Engineer",
   "Nuxtjs Develper",
   "Remix Developer",
-  "Apine Developer",
+  "Alpine Developer",
   "Preact Developer",
   "Erlang Developer",
   "Scala Developer",
@@ -157,7 +157,10 @@ const SpecialisationJobs = [
   "Spring Boot Developer",
   "Robotics Engineer",
   "Technical ICT/IT Support ",
-
+  "Prompt Engineer",
+  "Compiler Developer",
+  "Senior Android Engineer",
+  "Android Engineer",
   "Zero Matched",
 ].sort();
 

@@ -123,7 +123,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             : CustomDeviceTablet()
             ? "100%"
             : CustomLandscapeWidest()
-            ? "70%"
+            ? "50%"
             : "100%"
         }
         p={1}
@@ -982,6 +982,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       multiple
                     />
                   </Button>
+                  <Typography variant="body2" color={"text.secondary"}>
+                    or
+                  </Typography>
 
                   <Button
                     variant="outlined"

@@ -78,7 +78,7 @@ const CoursePaidContainer = () => {
   return (
     <Box>
       {/* courses bar */}
-      <AppBar position="sticky" elevation={0} enableColorOnDark>
+      <AppBar position="sticky" elevation={0} className="rounded-top">
         <Toolbar
           variant="dense"
           sx={{ display: "flex", justifyContent: "center" }}
@@ -89,7 +89,6 @@ const CoursePaidContainer = () => {
             justifyContent={"center"}
           >
             <Button
-              variant="contained"
               disableElevation
               endIcon={<ArrowDropDown />}
               size="small"
@@ -158,9 +157,17 @@ const CoursePaidContainer = () => {
           items.map((items, index) => (
             <>
               <CoursePaid key={index} />
-              {/* show divider when dark */}
-              {isDarkMode && (
-                <Divider component={"div"} className="mb-5 mx-2" />
+
+              {/* divider */}
+              {isDarkMode && !CustomDeviceIsSmall() && (
+                <Box display={"flex"} justifyContent={"center"} mb={5} mt={2}>
+                  <Divider component={"div"} className={"w-100"} />
+                </Box>
+              )}
+              {CustomDeviceIsSmall() && (
+                <Box display={"flex"} justifyContent={"center"} mb={3} mt={1}>
+                  <Divider component={"div"} className={"w-100"} />
+                </Box>
               )}
             </>
           ))}

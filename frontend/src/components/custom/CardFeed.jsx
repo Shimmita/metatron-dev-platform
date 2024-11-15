@@ -28,7 +28,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
 import PostData from "../data/PostData";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
 import CardFeedMore from "./CardFeedMore";
 

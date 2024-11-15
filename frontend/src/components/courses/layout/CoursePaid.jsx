@@ -16,6 +16,7 @@ import AccordionBrochure from "./AccordionBrochure";
 import AccordionDescription from "./AccordionDescription";
 import AccordionInstructor from "./AccordionInstructor";
 import AccordionLectures from "./AccordionLectures";
+import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 
 const labels = {
   0.5: "poor",
@@ -40,7 +41,7 @@ function CoursePaid() {
   };
 
   return (
-    <Box className="shadow rounded" mb={5}>
+    <Box className={!CustomDeviceIsSmall() ? "shadow rounded" : ""} mb={5}>
       <Box>
         <video
           className="rounded-2"
@@ -142,7 +143,7 @@ function CoursePaid() {
           startIcon={<CreditCardRounded />}
           variant="contained"
           size="small"
-          sx={{ fontWeight: "bold", }}
+          sx={{ fontWeight: "bold" }}
           disableElevation
         >
           Buy KES 2,000{" "}

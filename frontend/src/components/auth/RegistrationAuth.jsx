@@ -1,9 +1,10 @@
 import {
   ArrowBackIosNewRounded,
+  CheckCircle,
   StarRounded,
   Visibility,
   VisibilityOff,
-  WbIncandescentRounded,
+  WorkRounded,
 } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -20,42 +21,60 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { lazy, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
+import AlertCountry from "../alerts/AlertCountry";
 import AllSkills from "../data/AllSkillsData";
 import CountiesInKenya from "../data/Counties";
 import EducationLevel from "../data/EducationLevel";
 import GenderData from "../data/GenderData";
+import Institutions from "../data/Institution";
 import SpecialisationJobs from "../data/SpecialisationJobs";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-import RegisterAlertTitle from "./RegisterAlertTitle";
+const AlertGeneral = lazy(() => import("../alerts/AlertGeneral"));
+const AlertProfileCompletion = lazy(() =>
+  import("../alerts/AlertProfileCompletion")
+);
+const RegisterAlertTitle = lazy(() => import("./RegisterAlertTitle"));
 
 const RegistrationAuth = () => {
   const [showPassword, setShowPassword] = React.useState(false);
-
   const [name, setName] = useState("");
   const [educationLevel, setEducationLevel] = useState("");
-  const [eduInstitution, setEduInstitution] = useState("");
   const [gender, setGender] = useState("");
   const [specialisationTitle, setSpecialisationTitle] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [country, setCountry] = useState("");
   const [county, setCounty] = useState("");
+  const [missing_field_msg, setMissinFieldMsg] = useState("");
+  const [openAlertGenral, setOpenAlertGenral] = useState(false);
+  const [titleAlert, setTitleAlert] = useState();
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  // control edu institutions
+  const [eduInstitution, setEduInstitution] = useState("");
+  const [inputValue, setInputValue] = useState("");
+  const [options, setOptions] = useState(Institutions);
+
+  const [user, setUser] = useState({});
+
+  // alert profile pic
+  const [openAlertProfile, setOpenAlertProfile] = useState(false);
+  // alert country before proceed
+  const [openAlertCountry, setOpenAlertCountry] = useState(true);
+  // will define showing of custom title alert or not
+  const [openAlert, setOpenAlert] = useState(false);
 
   // control showing of the next and previous input detail
   const [showNext, setShowNext] = useState(false);
-
-  const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-
-  const [selectedSkills, setSelectedSkills] = useState([]);
 
   const handleChange = (event, newValue) => {
     if (newValue.length > 5) {
@@ -78,12 +97,124 @@ const RegistrationAuth = () => {
     setShowNext((prev) => !prev);
   };
 
-  // will define showing of custo title or not
-  const [openAlert, setOpenAlert] = useState(false);
+  const handleAddNew = () => {
+    if (inputValue && !options.includes(inputValue)) {
+      setOptions([...options, inputValue]);
+      setEduInstitution(inputValue);
+      setInputValue("");
+    }
+  };
+  // clear an institution
+  const handleDeleteInstitution = () => {
+    setEduInstitution(null);
+  };
 
+  // zero match
   useEffect(() => {
     if (specialisationTitle === "Zero Matched") setOpenAlert(true);
   }, [specialisationTitle]);
+
+  const handleMissingField = () => {
+    if (name.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your name is missing !"
+      );
+      setOpenAlertGenral(true);
+      return true;
+    }
+    if (email.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your email is missing !"
+      );
+      return true;
+    }
+    if (password.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your password is missing !"
+      );
+      return true;
+    }
+    if (educationLevel.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, field level of education is missing !"
+      );
+      return true;
+    }
+    if (eduInstitution.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your education institution is missing !"
+      );
+      return true;
+    }
+    if (phone.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your phone is missing !"
+      );
+      return true;
+    }
+    if (county.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your county or location is missing !"
+      );
+      return true;
+    }
+    if (gender.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your gender is missing !"
+      );
+      return true;
+    }
+
+    if (specialisationTitle.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your preferred title is missing !"
+      );
+      return true;
+    }
+    if (!selectedSkills.length > 0) {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your skills missing atleast provide one skill or at most five !"
+      );
+      return true;
+    }
+    return false;
+  };
+
+  // handle registration of user
+  const handleUserRegistration = () => {
+    // check any missing data and alert
+    if (handleMissingField()) {
+      setOpenAlertGenral(true);
+    } else {
+      const user = {
+        name,
+        email,
+        password,
+        educationLevel,
+        eduInstitution,
+        phone,
+        county,
+        gender,
+        specialisationTitle,
+        selectedSkills,
+      };
+      // set the user object
+      setUser(user);
+
+      // set open alertProfile where user will now pos data if necessary
+      setOpenAlertProfile(true);
+    }
+  };
 
   return (
     <Box
@@ -92,6 +223,7 @@ const RegistrationAuth = () => {
       display={"flex"}
       justifyContent={"center"}
       alignItems={"center"}
+      sx={{ opacity: openAlertProfile ? ".5" : undefined }}
     >
       <Box
         className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
@@ -136,9 +268,9 @@ const RegistrationAuth = () => {
               alignItems={"center"}
               justifyContent={"center"}
             >
-              <StarRounded sx={{ width: 18, height: 18 }} />
-              Kenya's Best IT Platform{" "}
-              <StarRounded sx={{ width: 18, height: 18 }} />
+              <StarRounded sx={{ width: 20, height: 20 }} />
+              The Best IT Platform{" "}
+              <StarRounded sx={{ width: 20, height: 20 }} />
             </Typography>
 
             <Box
@@ -148,18 +280,14 @@ const RegistrationAuth = () => {
               gap={1}
               alignItems={"center"}
             >
-              <WbIncandescentRounded
-                sx={{ width: 18, height: 18, color: "orange" }}
-              />
+              <WorkRounded color="primary" sx={{ width: 17, height: 17 }} />
               <Typography
                 variant={CustomDeviceSmallest() ? "caption" : "body2"}
                 color={"text.secondary"}
               >
-                Enlighting Technology Country Wide
+                Personal Account Signup
               </Typography>
-              <WbIncandescentRounded
-                sx={{ width: 18, height: 18, color: "orange" }}
-              />
+              <WorkRounded color="primary" sx={{ width: 17, height: 17 }} />
             </Box>
           </Box>
 
@@ -179,7 +307,7 @@ const RegistrationAuth = () => {
                     id="name"
                     label="Name"
                     className="w-75"
-                    onChange={(e) => setName(e.target.value.toLowerCase())}
+                    onChange={(e) => setName(e.target.value.toUpperCase())}
                     value={name}
                     placeholder="Shirengo Michael"
                   />
@@ -268,7 +396,7 @@ const RegistrationAuth = () => {
                     select
                     id="educationLevel"
                     value={educationLevel}
-                    label="Education"
+                    label="Education Level"
                     className="w-75"
                     onChange={(e) => setEducationLevel(e.target.value)}
                   >
@@ -281,25 +409,73 @@ const RegistrationAuth = () => {
                   </TextField>
                 </Box>
 
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    id="edu-institution"
-                    value={eduInstitution}
-                    label="Institution"
-                    placeholder="University/Collage Name"
-                    className="w-75"
-                    onChange={(e) => setEduInstitution(e.target.value)}
-                  />
-                </Box>
+                {/* show this if country includes kenya */}
+                {country.trim().toLowerCase().includes("kenya") ? (
+                  <Box display={"flex"} justifyContent={"center"}>
+                    <Autocomplete
+                      value={eduInstitution}
+                      className="w-75"
+                      onChange={(event, newValue) => {
+                        setEduInstitution(newValue);
+                      }}
+                      inputValue={inputValue}
+                      onInputChange={(event, newInputValue) => {
+                        setInputValue(newInputValue);
+                      }}
+                      options={options}
+                      freeSolo
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Institution"
+                          variant="outlined"
+                          fullWidth
+                        />
+                      )}
+                      renderOption={(props, option) => (
+                        <li {...props}>{option}</li>
+                      )}
+                      renderTags={() =>
+                        eduInstitution ? (
+                          <Chip
+                            label={eduInstitution}
+                            onDelete={handleDeleteInstitution}
+                            deleteIcon={<CheckCircle />}
+                          />
+                        ) : null
+                      }
+                      noOptionsText={
+                        <Chip
+                          label={`Add "${inputValue}"`}
+                          onClick={handleAddNew}
+                          icon={<CheckCircle />}
+                          color="primary"
+                          clickable
+                        />
+                      }
+                    />
+                  </Box>
+                ) : (
+                  <Box display={"flex"} justifyContent={"center"}>
+                    <TextField
+                      required
+                      id="county_other"
+                      label="Institution"
+                      className="w-75"
+                      value={eduInstitution}
+                      onChange={(e) => setEduInstitution(e.target.value)}
+                      placeholder="Education Instistution"
+                    />
+                  </Box>
+                )}
 
                 <Box display={"flex"} justifyContent={"center"}>
                   <TextField
                     required
                     select
-                    id="speciality"
+                    id="preferred title"
                     value={specialisationTitle}
-                    label="Title"
+                    label="Preferred Title"
                     className="w-75"
                     onChange={(e) => setSpecialisationTitle(e.target.value)}
                   >
@@ -327,7 +503,7 @@ const RegistrationAuth = () => {
                       <TextField
                         {...params}
                         variant="outlined"
-                        label="Skills *"
+                        label="Preferred Skills *"
                         placeholder="Skill"
                       />
                     )}
@@ -343,24 +519,39 @@ const RegistrationAuth = () => {
                   />
                 </Box>
 
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    select
-                    id="county"
-                    value={county}
-                    label="County"
-                    className="w-75"
-                    onChange={(e) => setCounty(e.target.value)}
-                  >
-                    {CountiesInKenya &&
-                      CountiesInKenya.map((county) => (
-                        <MenuItem key={county} value={county}>
-                          {county}
-                        </MenuItem>
-                      ))}
-                  </TextField>
-                </Box>
+                {/* show this if country is contains kenya */}
+                {country.trim().toLowerCase().includes("kenya") ? (
+                  <Box display={"flex"} justifyContent={"center"}>
+                    <TextField
+                      required
+                      select
+                      id="county"
+                      value={county}
+                      label="County"
+                      className="w-75"
+                      onChange={(e) => setCounty(e.target.value)}
+                    >
+                      {CountiesInKenya &&
+                        CountiesInKenya.map((county) => (
+                          <MenuItem key={county} value={county}>
+                            {county}
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Box>
+                ) : (
+                  <Box display={"flex"} justifyContent={"center"}>
+                    <TextField
+                      required
+                      id="county_other"
+                      label="City or State"
+                      className="w-75"
+                      value={county}
+                      onChange={(e) => setCounty(e.target.value)}
+                      placeholder="my city or state"
+                    />
+                  </Box>
+                )}
               </>
             )}
 
@@ -422,7 +613,8 @@ const RegistrationAuth = () => {
                     className="w-25"
                     sx={{ borderRadius: "20px" }}
                     disableElevation
-                    onClick={(e) => navigate("/")}
+                    disabled={openAlertProfile}
+                    onClick={handleUserRegistration}
                     type="submit"
                   >
                     Signup
@@ -439,6 +631,28 @@ const RegistrationAuth = () => {
         openAlert={openAlert}
         setOpenAlert={setOpenAlert}
         setSpecialisationTitle={setSpecialisationTitle}
+      />
+
+      {/* alert general */}
+      <AlertGeneral
+        openAlertGeneral={openAlertGenral}
+        setOpenAlertGenral={setOpenAlertGenral}
+        title={titleAlert}
+        message={missing_field_msg}
+      />
+
+      {/* alert profile picture completion */}
+      <AlertProfileCompletion
+        openAlertProfile={openAlertProfile}
+        setOpenAlertProfile={setOpenAlertProfile}
+        user={user}
+      />
+      {/* alert country of the user */}
+      <AlertCountry
+        openAlertCountry={openAlertCountry}
+        setOpenAlertCountry={setOpenAlertCountry}
+        country={country}
+        setCountry={setCountry}
       />
     </Box>
   );

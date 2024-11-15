@@ -9,6 +9,12 @@ import BottomNav from "../custom/BottomNav";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
+const AllApplicantsContainer = lazy(() =>
+  import("../jobs/AllApplicantsContainer")
+);
+const JobsAppliedContainer = lazy(() => import("../jobs/JobsAppliedContainer"));
+const AllJobsContainer = lazy(() => import("../jobs/AllJobsContainer"));
+
 const CoursePaidContainer = lazy(() =>
   import("../courses/CoursePaidContainer")
 );
@@ -31,7 +37,6 @@ const AccountSettingsTabs = lazy(() =>
 );
 
 const AboutPage = lazy(() => import("../more/about/About"));
-const BottomJobs = lazy(() => import("../more/bottom/BottomJobs"));
 const FeedDefaultContent = lazy(() => import("./FeedDefaultContent"));
 const EventsLive = lazy(() => import("../events/EventsLive"));
 const EventsUpcoming = lazy(() => import("../events/EventsUpcoming"));
@@ -90,7 +95,12 @@ const Feed = () => {
               <Route path="/courses/paid" element={<CoursePaidContainer />} />
 
               <Route path="/about" element={<AboutPage />} />
-              <Route path="/jobs" element={<BottomJobs />} />
+              <Route path="/jobs" element={<AllJobsContainer />} />
+              <Route path="/jobs/applied" element={<JobsAppliedContainer />} />
+              <Route
+                path="/jobs/applicants"
+                element={<AllApplicantsContainer />}
+              />
               <Route path="/events/live" element={<EventsLive />} />
               <Route path="/events/bookmarks" element={<EventsBookMarks />} />
               <Route path="/events/upcoming" element={<EventsUpcoming />} />
@@ -181,7 +191,16 @@ const Feed = () => {
                 <Route path="/courses/paid" element={<CoursePaidContainer />} />
 
                 <Route path="/about" element={<AboutPage />} />
-                <Route path="/jobs" element={<BottomJobs />} />
+                <Route path="/jobs" element={<AllJobsContainer />} />
+                <Route
+                  path="/jobs/applied"
+                  element={<JobsAppliedContainer />}
+                />
+                <Route
+                  path="/jobs/applicants"
+                  element={<AllApplicantsContainer />}
+                />
+
                 <Route path="/events/live" element={<EventsLive />} />
                 <Route path="/events/bookmarks" element={<EventsBookMarks />} />
                 <Route path="/events/upcoming" element={<EventsUpcoming />} />

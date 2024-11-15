@@ -30,7 +30,7 @@ const actions = [
   },
   {
     icon: <CodeRounded color="primary" sx={{ width: 28, height: 28 }} />,
-    name: "Milestone Posting",
+    name: "Tech Posting",
   },
 ];
 
@@ -65,7 +65,7 @@ export default function BasicSpeedDial() {
             icon={action.icon}
             className="shadow border"
             onClick={(e) => {
-              if (action.name === "Milestone Posting") {
+              if (action.name === "Tech Posting") {
                 setOpenModalTech(true);
               }
               if (action.name === "Job Posting") {

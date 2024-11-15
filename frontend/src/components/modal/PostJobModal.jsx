@@ -1,4 +1,5 @@
 import {
+  Add,
   Close,
   CloudUploadRounded,
   LinkRounded,
@@ -53,19 +54,16 @@ const StyledInput = styled("input")({
 });
 
 const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
-  const [relevant_title, setRelevantTitle] = useState("");
-  const [job_poster, setJobPoster] = useState("");
+  const [job_title, setJobTitle] = useState("");
+  const [organisation, setOrganisation] = useState("");
   const [county, setCounty] = useState("");
   const [job_main_doc, setJobMainDoc] = useState("");
-  const [job_minor_doc, setJobMinorDoc] = useState("");
   const [job_main_skill, setJobMainSkill] = useState([]);
-  const [job_minor_skill, setJobMinorSkill] = useState([]);
   const [job_salary, setJobSalary] = useState("");
   const [job_entry_type, setJobEntryType] = useState("");
   const [job_experience, setJobExperience] = useState("");
   const [webLink, setWebLink] = useState("");
   const [poster_about, setPosterAbout] = useState("");
-  const [job_description, setJobDescription] = useState("");
   const [poster_phone, setPosterPhone] = useState("");
   const [poster_email, setPosterEmail] = useState("");
   const [showCustomTitle, setShowCustomTitle] = useState(false);
@@ -73,6 +71,13 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
   const [fileUpload, setFileUpload] = useState(null);
   const [fileLink, setFileLink] = useState("");
   const [isFileLink, setIsFileLink] = useState(false);
+
+  const [req_text, setReqText] = useState(""); // To hold user input text for req
+  const [requirements, setRequirements] = useState([]); // To hold checked requirements as chips
+  const options_req = []; // Available options to display in the Autocomplete dropdown
+  const options_desc = []; // Available options to display in the Autocomplete dropdown
+  const [description, setDescription] = useState([]); // for descriptions
+  const [desc_text, setDescText] = useState(""); // To hold user input text for desc
 
   // redux states
   const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
@@ -89,30 +94,17 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
     );
   };
 
-  const handleChangeMinorSkills = (_, newValue) => {
-    if (newValue.length > 5) {
-      return; // Limit to 5 selections
-    }
-    setJobMinorSkill(newValue);
-  };
-
-  const handleDeleteMinorSkills = (skillToDelete) => {
-    setJobMinorSkill((prevSkills) =>
-      prevSkills.filter((skill) => skill !== skillToDelete)
-    );
-  };
-
   // handle showing of the custom title when selection is zero matched
-  if (relevant_title === "Zero Matched") {
+  if (job_title === "Zero Matched") {
     setShowCustomTitle(true);
-    setRelevantTitle("");
+    setJobTitle("");
   }
 
   // handle closing of custom title
   const handleCloseCustomTitle = () => {
     setShowCustomTitle(false);
     // clear
-    setRelevantTitle("");
+    setJobTitle("");
   };
 
   // handle full video when btn link clicked
@@ -129,6 +121,44 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
     setFileLink("");
     // default showing of btn upload and link
     setIsFileLink(false);
+  };
+
+  // Handle input change for req
+  const handleTextChangeReq = (e, value) => {
+    setReqText(value);
+  };
+
+  // Handle input change for desc
+  const handleTextChangeDesc = (e, value) => {
+    setDescText(value);
+  };
+
+  // Handle adding req
+  const handleAddRequirement = () => {
+    if (req_text.trim() !== "") {
+      // Add the inputText as a new requirement if it's not empty
+      setRequirements((prev) => [...prev, req_text.trim()]);
+      setReqText(""); // Clear the input field
+    }
+  };
+
+  // Handle adding desc
+  const handleAddDesc = () => {
+    if (desc_text.trim() !== "") {
+      // Add the inputText as a new desc if it's not empty
+      setDescription((prev) => [...prev, desc_text.trim()]);
+      setDescText(""); // Clear the input field
+    }
+  };
+
+  // Handle req removal
+  const handleDeleteReq = (req) => {
+    setRequirements((prev) => prev.filter((val) => val !== req));
+  };
+
+  // Handle desc removal
+  const handleDeleteDesc = (desc) => {
+    setDescription((prev) => prev.filter((val) => val !== desc));
   };
 
   return (
@@ -149,7 +179,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
             : CustomDeviceTablet()
             ? "100%"
             : CustomLandscapeWidest()
-            ? "70%"
+            ? "50%"
             : "100%"
         }
         p={1}
@@ -174,19 +204,18 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
           >
             {/* logo */}
             <Box>
-              <Avatar sx={{ width: 60, height: 60 }} src={AppLogo} alt="logo" />
+              <Avatar sx={{ width: 50, height: 50 }} src={AppLogo} alt="" />
             </Box>
 
-            {/*  button for posting */}
-            <Button
-              startIcon={<Work />}
-              className="w-50 rounded-5 shadow-sm"
-              variant="contained"
-              disabled={!(job_poster.length > 0 && relevant_title.length > 0)}
-              size="small"
+            {/* job title */}
+            <Typography
+              variant="body2"
+              width={"100%"}
+              fontWeight={"bold"}
+              textAlign={"center"}
             >
-              Post Job
-            </Button>
+              {job_title}
+            </Typography>
 
             {/*close icon */}
             <IconButton onClick={(e) => setOpenModalJob(false)}>
@@ -194,6 +223,18 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                 <Close />
               </Tooltip>
             </IconButton>
+          </Box>
+
+          {/* org name */}
+          <Box display={"flex"} justifyContent={"center"}>
+            <Typography
+              variant="body2"
+              width={"100%"}
+              textAlign={"center"}
+              color={"text.secondary"}
+            >
+              {organisation}
+            </Typography>{" "}
           </Box>
           <Box
             maxHeight={CustomModalHeight()}
@@ -209,28 +250,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
               scrollbarWidth: "none",
             }}
           >
-            <Box display={"flex"} flexDirection={"column"} gap={3} mt={2}>
-              {/* poster/organisation */}
-              <Typography
-                component={"li"}
-                gutterBottom
-                variant="body2"
-                color={"text.secondary"}
-              >
-                Businness or Organisation name
-              </Typography>
-              <Box className="mb-3 mt-2 ">
-                <TextField
-                  fullWidth
-                  value={job_poster}
-                  onChange={(e) => setJobPoster(e.target.value)}
-                  required
-                  id="poster_organisation"
-                  label={"Your organisation name"}
-                  placeholder="Intrasoft Solutions"
-                />
-              </Box>
-
+            <Box display={"flex"} flexDirection={"column"} gap={3} mt={3}>
+              {/* job title */}
               {!showCustomTitle ? (
                 <>
                   <Typography
@@ -249,10 +270,10 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                     <TextField
                       required
                       select
-                      value={relevant_title}
-                      label="Select preferred job title"
+                      value={job_title}
+                      label="Preferred job title"
                       fullWidth
-                      onChange={(e) => setRelevantTitle(e.target.value)}
+                      onChange={(e) => setJobTitle(e.target.value)}
                     >
                       {SpecialisationJobs &&
                         SpecialisationJobs.map((title, index) => (
@@ -287,8 +308,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                     <TextField
                       fullWidth
                       required
-                      value={relevant_title}
-                      onChange={(e) => setRelevantTitle(e.target.value)}
+                      value={job_title}
+                      onChange={(e) => setJobTitle(e.target.value)}
                       id="job_title"
                       label={"Prefered job title "}
                     />
@@ -299,6 +320,27 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                   </Box>
                 </>
               )}
+
+              {/* poster/organisation */}
+              <Typography
+                component={"li"}
+                gutterBottom
+                variant="body2"
+                color={"text.secondary"}
+              >
+                Businness or Organisation name
+              </Typography>
+              <Box className="mb-3 mt-2 ">
+                <TextField
+                  fullWidth
+                  value={organisation}
+                  onChange={(e) => setOrganisation(e.target.value)}
+                  required
+                  id="poster_organisation"
+                  label={"Your organisation name"}
+                  placeholder="Intrasoft Solutions"
+                />
+              </Box>
 
               <Typography
                 component={"li"}
@@ -316,12 +358,6 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
               {/* Mandatory/Must Have Skills */}
               <Box mb={3} mt={2}>
-                {job_main_skill.length >= 5 && (
-                  <Typography mb={1} color={"red"}>
-                    {" "}
-                    You can select up to 5 skills only.
-                  </Typography>
-                )}
                 <Autocomplete
                   multiple
                   options={AllSkills}
@@ -342,52 +378,6 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                         label={skill}
                         {...getTagProps({ index })}
                         onDelete={() => handleDeleteMainSkills(skill)}
-                      />
-                    ))
-                  }
-                />
-              </Box>
-
-              <Typography
-                component={"li"}
-                gutterBottom
-                variant="body2"
-                color={"text.secondary"}
-              >
-                What technical skills are{" "}
-                <span className="fw-medium"> not a must but nice to have</span>{" "}
-                during the application. These are the skills which an applicant
-                may posess as a bonus.
-              </Typography>
-
-              {/* Nice to have Skills */}
-              <Box mb={3} mt={2}>
-                {job_minor_skill.length >= 5 && (
-                  <Typography mb={1} color={"red"}>
-                    {" "}
-                    You can select up to 5 skills only.
-                  </Typography>
-                )}
-                <Autocomplete
-                  multiple
-                  options={AllSkills}
-                  value={job_minor_skill}
-                  onChange={handleChangeMinorSkills}
-                  disableCloseOnSelect
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      variant="outlined"
-                      label="Minor Skills 5 Max *"
-                      placeholder="Skill"
-                    />
-                  )}
-                  renderTags={(value, getTagProps) =>
-                    value.map((skill, index) => (
-                      <Chip
-                        label={skill}
-                        {...getTagProps({ index })}
-                        onDelete={() => handleDeleteMinorSkills(skill)}
                       />
                     ))
                   }
@@ -425,54 +415,6 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                     ))}
                 </TextField>
               </Box>
-
-              {/* display this if no option not selected */}
-              {!(
-                job_main_doc.toLowerCase().trim().includes("no") ||
-                !job_main_doc.toLowerCase().trim().includes(" ")
-              ) && (
-                <>
-                  <Typography
-                    component={"li"}
-                    gutterBottom
-                    variant="body2"
-                    color={"text.secondary"}
-                  >
-                    What other additional or support documents applicants should
-                    provide during the application process.This could be of help
-                    in validation of the applicants truth claims about who they
-                    are or what they have achieved in a CV. If support documents
-                    are required atleast one will be enquired from the
-                    applicants in order for their job application to be
-                    successful. When the optional field is selected, the
-                    applicants will have a choice of submitting support
-                    documents or not.
-                  </Typography>
-
-                  {/* Docs Support */}
-                  <Box className="w-100 mb-3">
-                    <TextField
-                      required
-                      select
-                      value={job_minor_doc}
-                      label="Other application documents"
-                      fullWidth
-                      onChange={(e) => setJobMinorDoc(e.target.value)}
-                    >
-                      {SubsectionJob &&
-                        SubsectionJob.Document_Support.map(
-                          (documents_support, index) => (
-                            <MenuItem key={index} value={documents_support}>
-                              <small style={{ fontSize: "small" }}>
-                                {documents_support}
-                              </small>
-                            </MenuItem>
-                          )
-                        )}
-                    </TextField>
-                  </Box>
-                </>
-              )}
 
               {/* display website url if no is selected */}
 
@@ -831,9 +773,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                 the end.
               </Typography>
 
-              <Box className="mb-3">
+              <Box mb={3}>
                 <TextField
-                  minRows={window.screen.availWidth <= 320 ? 5 : 10}
+                  minRows={window.screen.availWidth <= 320 ? 3 : 5}
                   multiline
                   contentEditable={false}
                   error={poster_about.length > 500}
@@ -846,37 +788,198 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                 />
               </Box>
 
+              {/* job req */}
+
               <Typography
                 component={"li"}
                 gutterBottom
                 variant="body2"
                 color={"text.secondary"}
               >
-                Provide your full job description highlighting the key details
-                of work an applicant will be entitled to perform in the field or
-                workplace arena suppose they got selected as being the ideal
-                candidate(s) for the role{" "}
-                <span className="fw-bold"> {relevant_title}</span>.
+                Provide job qualification requirements in the text field below.
+                Each qualification point will be added in the list of
+                requirements when you click the add qualification button.
               </Typography>
 
-              {/* Job Description */}
               <Box className="mb-3">
-                <TextField
-                  minRows={window.screen.availWidth <= 320 ? 5 : 10}
-                  multiline
-                  contentEditable={false}
-                  error={job_description.length > 1000}
-                  id="Descr-job-required"
-                  label={`job description details ${
-                    1000 - job_description.length
-                  }`}
-                  fullWidth
-                  value={job_description}
-                  onChange={(e) => setJobDescription(e.target.value)}
-                  placeholder={
-                    "- Writing testable and maintainable code \n- Deploying mobile apps to Play Store or Apple Store.\n- Checking bugs in the code base and fixing them.\n- Integrating ML/AI APIs into our Software Products."
-                  }
+                {/* Autocomplete Text Field */}
+                <Autocomplete
+                  freeSolo
+                  options={options_req} // Show available options when user types
+                  value={req_text}
+                  onInputChange={handleTextChangeReq}
+                  disableClearable
+                  inputValue={req_text}
+                  onChange={handleTextChangeReq}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="qualification requirement"
+                      variant="outlined"
+                      fullWidth
+                    />
+                  )}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter" && req_text.trim() !== "") {
+                      handleAddRequirement();
+                    }
+                  }}
                 />
+
+                <Box sx={{ marginTop: 2 }}>
+                  <Button
+                    disableElevation
+                    startIcon={<Add />}
+                    onClick={handleAddRequirement}
+                    variant="outlined"
+                    size="small"
+                    sx={{ borderRadius: "20px", textTransform: "none" }}
+                  >
+                    add to qualifications
+                  </Button>
+                </Box>
+
+                {/* Display the added requirements */}
+                {requirements.length > 0 && (
+                  <Box mt={2} mb={2}>
+                    <Typography
+                      variant="body1"
+                      color={"text.secondary"}
+                      gutterBottom
+                      className="w-100 text-center"
+                    >
+                      qualification requirements
+                    </Typography>
+                    <Box component={"ol"}>
+                      {requirements.map((requirement, index) => (
+                        <Box
+                          display={"flex"}
+                          gap={1}
+                          key={index}
+                          alignItems={"center"}
+                        >
+                          <Typography
+                            variant="body2"
+                            component={"li"}
+                            color="text.secondary"
+                          >
+                            {requirement}
+                          </Typography>
+                          {/* clear or delete icon */}
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteReq(requirement)}
+                          >
+                            <Close sx={{ width: 15, height: 15 }} />
+                          </IconButton>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+
+              {/* job desc */}
+              <Typography
+                mt={3}
+                component={"li"}
+                gutterBottom
+                variant="body2"
+                color={"text.secondary"}
+              >
+                Provide job description in the text field below. Each
+                description point will be added in the list of job description
+                details when you click the add description button.
+              </Typography>
+
+              <Box mb={5}>
+                <Autocomplete
+                  freeSolo
+                  options={options_desc} // Show available options when user types
+                  value={desc_text}
+                  onInputChange={handleTextChangeDesc}
+                  disableClearable
+                  inputValue={desc_text}
+                  onChange={handleTextChangeDesc}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="job description"
+                      variant="outlined"
+                      fullWidth
+                    />
+                  )}
+                  onKeyUp={(e) => {
+                    if (e.key === "Enter" && desc_text.trim() !== "") {
+                      handleAddRequirement();
+                    }
+                  }}
+                />
+
+                <Box sx={{ marginTop: 2 }}>
+                  <Button
+                    disableElevation
+                    startIcon={<Add />}
+                    onClick={handleAddDesc}
+                    variant="outlined"
+                    size="small"
+                    sx={{ borderRadius: "20px", textTransform: "none" }}
+                  >
+                    add to description
+                  </Button>
+                </Box>
+
+                {/* Display the added desc */}
+                {description.length > 0 && (
+                  <Box mt={2} mb={2}>
+                    <Typography
+                      variant="body1"
+                      color={"text.secondary"}
+                      gutterBottom
+                      className="w-100 text-center"
+                    >
+                      job description details
+                    </Typography>
+                    <Box component={"ol"}>
+                      {description.map((description, index) => (
+                        <Box
+                          display={"flex"}
+                          gap={1}
+                          key={index}
+                          alignItems={"center"}
+                        >
+                          <Typography
+                            variant="body2"
+                            component={"li"}
+                            color="text.secondary"
+                          >
+                            {description}
+                          </Typography>
+                          {/* clear or delete icon */}
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteDesc(description)}
+                          >
+                            <Close sx={{ width: 15, height: 15 }} />
+                          </IconButton>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+
+              {/*  button for posting */}
+              <Box mb={2} display={"flex"} justifyContent={"center"}>
+                <Button
+                  startIcon={<Work />}
+                  className="w-75 rounded-5 shadow-sm"
+                  variant="contained"
+                  disabled={!(organisation.length > 0 && job_title.length > 0)}
+                  size="small"
+                >
+                  Upload this Job
+                </Button>
               </Box>
             </Box>
           </Box>

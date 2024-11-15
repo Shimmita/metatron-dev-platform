@@ -14,6 +14,7 @@ const initialState = {
   isTabSideBar: true,
   // theme
   isDarkMode: false,
+  currentMode: "light",
 };
 
 const appUISliceReducerSlice = createSlice({
@@ -42,6 +43,7 @@ const appUISliceReducerSlice = createSlice({
       return {
         ...state,
         isDarkMode: !state.isDarkMode,
+        currentMode: state.currentMode === "light" ? "dark" : "light",
       };
     },
 
