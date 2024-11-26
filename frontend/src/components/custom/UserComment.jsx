@@ -3,7 +3,7 @@ import {
   StarRounded,
   ThumbDownAltRounded,
 } from "@mui/icons-material";
-import { Box, Checkbox, Divider, Tooltip, Typography } from "@mui/material";
+import { Box, Checkbox, Tooltip, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";

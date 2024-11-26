@@ -11,7 +11,7 @@ import {
 import Box from "@mui/material/Box";
 import React, { lazy, Suspense, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { handleScrolledDown } from "../../../redux/AppUI";
+import { resetDefaultBottomNav } from "../../../redux/AppUI";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomLandScape from "../../utilities/CustomLandscape";
 const FriendsContainer = lazy(() => import("./friends/FriendsContainer"));
@@ -67,7 +67,7 @@ export default function AccountFriends() {
   // use effect hook
   useEffect(() => {
     // track scrolled down
-    dispatch(handleScrolledDown(true));
+    dispatch(resetDefaultBottomNav(true));
   });
 
   return (

@@ -1,5 +1,5 @@
 import { CloseRounded, SendRounded } from "@mui/icons-material";
-import { IconButton, TextField, Tooltip } from "@mui/material";
+import { IconButton, TextField } from "@mui/material";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import * as React from "react";
@@ -12,10 +12,8 @@ const style = {
   left: CustomDeviceIsSmall() || CustomDeviceTablet() ? "50%" : "62%",
   transform: "translate(-50%, -50%)",
   width: CustomDeviceIsSmall() ? 350 : 500,
-  bgcolor: "background.paper",
   boxShadow: 24,
   borderRadius: 2,
-  p: 4,
 };
 
 export default function ModalSendMessage({ showModal, setShowModal }) {
@@ -30,48 +28,52 @@ export default function ModalSendMessage({ showModal, setShowModal }) {
   };
 
   return (
-    <Box>
-      <Modal
-        open={showModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Box
-            className="shadow-lg rounded bg-white"
-            display={"flex"}
-            alignItems={"center"}
-            p={1}
-            justifyContent={"space-between"}
-            gap={1}
-          >
-            {/* text input */}
-            <TextField
-              fullWidth
-              label={`message max ${messageMax - messageInput.length}`}
-              variant="standard"
-              color="success"
-              error={messageInput.length > messageMax}
-              onChange={(e) => setMessageInput(e.target.value)}
-              value={messageInput}
-              placeholder="write your message..."
-            />
+    <Modal
+      open={showModal}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+      style={{}}
+    >
+      <Box sx={style}>
+        <Box
+          className="shadow-lg rounded"
+          display={"flex"}
+          alignItems={"center"}
+          bgcolor={"backgrond.default"}
+          justifyContent={"space-between"}
+          gap={1}
+        >
+          {/* text input */}
+          <TextField
+            fullWidth
+            className="rounded-start"
+            sx={{
+              backgroundColor: "white",
+            }}
+            label={`max ${messageMax - messageInput.length}`}
+            variant="filled"
+            error={messageInput.length > messageMax}
+            onChange={(e) => setMessageInput(e.target.value)}
+            value={messageInput}
+            placeholder="comment..."
+          />
+          <Box display={"flex"} gap={1} pr={1} alignItems={"center"}>
             {/* icon send */}
-            <Tooltip arrow title="send">
-              <IconButton className="border">
-                <SendRounded color={"success"} sx={{ width: 24, height: 24 }} />
-              </IconButton>
-            </Tooltip>
+            <IconButton size="small" className="border">
+              <SendRounded sx={{ width: 24, height: 24 }} />
+            </IconButton>
 
             {/* close messages */}
-            <Tooltip arrow title="close">
-              <IconButton className="border" onClick={handleShowModal}>
-                <CloseRounded sx={{ width: 24, height: 24 }} />
-              </IconButton>
-            </Tooltip>
+            <IconButton
+              size="small"
+              className="border"
+              onClick={handleShowModal}
+            >
+              <CloseRounded sx={{ width: 24, height: 24 }} />
+            </IconButton>
           </Box>
         </Box>
-      </Modal>
-    </Box>
+      </Box>
+    </Modal>
   );
 }

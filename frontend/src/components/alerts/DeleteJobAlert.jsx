@@ -27,7 +27,6 @@ export default function DeleteJobAlert({
     setOpenAlert(false);
   };
 
-
   // redux states
   const { isTabSideBar } = useSelector((state) => state.appUI);
 
@@ -52,9 +51,14 @@ export default function DeleteJobAlert({
               : undefined,
         }}
       >
-        <DialogTitle display={"flex"} alignItems={"center"} gap={1}>
+        <DialogTitle
+          display={"flex"}
+          variant="body1"
+          alignItems={"center"}
+          gap={1}
+        >
           {/* delete icon */}
-          <DeleteRounded  />
+          <DeleteRounded />
           {/* title */}
           {title}
         </DialogTitle>

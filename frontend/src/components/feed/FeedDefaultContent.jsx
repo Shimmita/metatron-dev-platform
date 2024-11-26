@@ -1,7 +1,10 @@
 import { Box, Button } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { handleSidebarRightbar } from "../../redux/AppUI";
+import {
+  handleSidebarRightbar,
+  resetDefaultBottomNav,
+} from "../../redux/AppUI";
 import CardFeed from "../custom/CardFeed";
 import MobileTabCorousel from "../rightbar/MobileTabCorousel";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -16,10 +19,17 @@ const FeedDefaultContent = () => {
   // redux states access
   const { isSidebarRighbar } = useSelector((state) => state.appUI);
 
-  // always default sidebar and rightbar showing for larger screens
-  if (!isSidebarRighbar) {
-    dispatch(handleSidebarRightbar());
-  }
+  useState(() => {
+    // always default sidebar and rightbar showing for larger screens
+    if (!isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+  }, []);
+
+  // handle showing of default bottom nav
+  useState(() => {
+    dispatch(resetDefaultBottomNav());
+  });
 
   return (
     <Box>

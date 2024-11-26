@@ -46,7 +46,7 @@ function JobLayout({ isDarkMode }) {
           <Typography variant="body2">Intermidiate Position Level</Typography>
         </Box>
         <Box display={"flex"} gap={1} alignItems={"center"}>
-          <PaidRounded color="success" sx={{ width: 20, height: 20 }} />
+          <PaidRounded sx={{ width: 20, height: 20 }} />
           <Typography variant="body2">Ksh.150,000 - Ksh.200,000</Typography>
         </Box>
         <Box display={"flex"} gap={1} alignItems={"center"}>

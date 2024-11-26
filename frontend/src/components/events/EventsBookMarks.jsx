@@ -5,8 +5,11 @@ import { styled } from "@mui/material/styles";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import React, { lazy, useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { handleScrolledDown } from "../../redux/AppUI";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  handleSidebarRightbar,
+  resetDefaultBottomNav,
+} from "../../redux/AppUI";
 const CreatedContainer = lazy(() => import("./CreatedContainer"));
 const StyledTabs = styled((props) => (
   <Tabs
@@ -50,24 +53,29 @@ export default function EventsBookMarks() {
     setValue(newValue);
   };
 
-  // redux to stop showing of the speed dial
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(handleScrolledDown(true));
-  });
-  // handle going back using history
-  const handleGoBack = () => {
-    window.history.back();
-  };
-
   // simulate loading of requests
   const [isLoadingRequest, setIsLoadingRequest] = useState(true);
 
+  const dispatch = useDispatch();
+
+  const { isSidebarRighbar } = useSelector((state) => state.appUI);
+
   useEffect(() => {
+    // check the state of the  sidebar and rightbar false it if true
+    // show sidebar since can be hidden when user navigates to live event attend thus need restore
+    if (!isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+
     setTimeout(() => {
       setIsLoadingRequest(false);
     }, 5000);
   }, []);
+
+  // handle showing of default bottom nav
+  useState(() => {
+    dispatch(resetDefaultBottomNav());
+  });
   return (
     <Box height={"92vh"}>
       <Box

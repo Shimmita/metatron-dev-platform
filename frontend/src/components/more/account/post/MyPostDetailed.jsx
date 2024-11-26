@@ -26,7 +26,7 @@ import React, { lazy, useEffect, useState } from "react";
 import { Image } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import devImage from "../../../../images/dev.jpeg";
-import { handleScrolledDown } from "../../../../redux/AppUI";
+import { resetDefaultBottomNav } from "../../../../redux/AppUI";
 import PostData from "../../../data/PostData";
 import CustomDeviceIsSmall from "../../../utilities/CustomDeviceIsSmall";
 import CustomDeviceScreenSize from "../../../utilities/CustomDeviceScreenSize";
@@ -58,7 +58,7 @@ const MyPostDetailed = () => {
   // redux to stop showing of the speed dial
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(handleScrolledDown(true));
+    dispatch(resetDefaultBottomNav(true));
   });
 
   // handle going back using history

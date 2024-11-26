@@ -1,3 +1,4 @@
+import { Avatar } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -5,10 +6,15 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
+import { getAuth, signOut } from "firebase/auth";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import logoApp from "../../images/logo_sm.png";
+import { persistor } from "../../redux/AppStore";
+import { resetClearCurrentUserRedux } from "../../redux/CurrentUser";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -17,6 +23,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function LogoutAlert({ openAlertLogout, setOpenAlertLogout }) {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const handleClose = () => {
     // close alert
     setOpenAlertLogout(false);
@@ -26,11 +33,35 @@ export default function LogoutAlert({ openAlertLogout, setOpenAlertLogout }) {
   const { isTabSideBar } = useSelector((state) => state.appUI);
 
   // navigate to login page and close alert
-  const handleNavigateLoginPage = () => {
+  const handleNavigateLoginPage = async () => {
     // close the alert
     setOpenAlertLogout(false);
-    // navigate to login page
-    navigate("/auth/login");
+
+    // signOut the user and clear all the details, revert redux current
+    // user state to default
+
+    try {
+      const auth = getAuth();
+      const firebaseUser = auth.currentUser; // Check for Firebase authenticated user
+
+      // Sign out from Firebase only if a user is authenticated
+      if (firebaseUser) {
+        await signOut(auth);
+        console.log("User signed out from Firebase.");
+      } else {
+        console.log("No Firebase user found, skipping Firebase sign-out.");
+      }
+
+      // Clear persisted storage
+      await persistor.purge();
+
+      // Dispatch Redux action to reset user state
+      dispatch(resetClearCurrentUserRedux());
+
+      console.log("User logged out successfully!");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   return (
@@ -42,19 +73,25 @@ export default function LogoutAlert({ openAlertLogout, setOpenAlertLogout }) {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
         sx={{
-          marginLeft:
+          marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
+
+          width:
             CustomDeviceTablet() && isTabSideBar
-              ? "-72%"
+              ? "60%"
+              : CustomLandScape()
+              ? "92%"
               : CustomLandscapeWidest()
-              ? "-3%"
+              ? "97.5%"
               : undefined,
-          bottom: CustomDeviceTablet() && isTabSideBar ? "-62%" : undefined,
         }}
       >
-        <DialogTitle>{"Account Logout?"}</DialogTitle>
+        <DialogTitle display={"flex"} alignItems={"center"} gap={2}>
+          <Avatar src={logoApp}  alt="" />
+          {"Account Logout?"}
+        </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            You will be logged out
+            You will be logged out and required to login next time.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

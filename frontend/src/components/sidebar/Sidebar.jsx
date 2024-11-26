@@ -44,7 +44,7 @@ import EventsTablet from "../events/EventsIsTablet";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import "./Sidebar.css";
-import SkillAvatars from "./SkillAvatars";
+const SkillAvatars = lazy(() => import("./SkillAvatars"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
 const Sidebar = () => {

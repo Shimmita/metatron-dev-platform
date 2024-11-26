@@ -1,10 +1,9 @@
-import { Box, Divider, IconButton, Tooltip, Typography } from "@mui/material";
+import { Box, IconButton, Tooltip, Typography } from "@mui/material";
 import React from "react";
-import { useDispatch } from "react-redux";
-import { handleScrolledDown } from "../../../redux/AppUI";
 
 import {
   CallEndRounded,
+  MapsUgcRounded,
   MessageRounded,
   MicRounded,
   PanToolRounded,
@@ -26,10 +25,8 @@ function LaptopDesktop() {
   const [useAudio, setUseAudio] = React.useState(false);
   const [shareScreen, setShareScreen] = React.useState(false);
   const [raiseHand, setRaiseHand] = React.useState(false);
-  // redux to stop showing of the speed dial
-  const dispatch = useDispatch();
-
-  dispatch(handleScrolledDown(true));
+  // modal for adding comments
+  const [showModal, setShowModal] = React.useState(false);
 
   // function to toggle the showing of the sidebar
   const handleShowSidebar = () => {
@@ -72,10 +69,14 @@ function LaptopDesktop() {
     setRaiseHand(!raiseHand);
   };
 
+  // handle showing of comment model
+  const handleshowModalComment = () => {
+    setShowModal(true);
+  };
+
   return (
     <Box width={"100%"} height={"90vh"}>
-      <Box maxHeight={"70vh"}
-      >
+      <Box maxHeight={"70vh"}>
         <Box display={"flex"} gap={2}>
           {/* sidebar live */}
           <Box
@@ -129,12 +130,19 @@ function LaptopDesktop() {
                 textAlign={"center"}
                 textTransform={"uppercase"}
               >
-                {showPeople ? "Attendance Room (300)" : "Comment Room"}
+                {showPeople ? "Attendance Room (300)" : "Comment Room (20)"}
               </Typography>
 
               {/* sidebar  container */}
               <Box mt={1} className="rounded">
-                {showPeople ? <AttendantsContainer /> : <MessageContainer />}
+                {showPeople ? (
+                  <AttendantsContainer />
+                ) : (
+                  <MessageContainer
+                    showModal={showModal}
+                    setShowModal={setShowModal}
+                  />
+                )}
               </Box>
             </Box>
           </Box>
@@ -197,7 +205,7 @@ function LaptopDesktop() {
             >
               {/* toggle button when clicked hide sidebar */}
               <Box>
-                <Box>
+                <Box display={"flex"} gap={2}>
                   <Tooltip
                     title={showSidebar ? "close sidebar" : "show sidebar"}
                     arrow
@@ -208,6 +216,18 @@ function LaptopDesktop() {
                       />
                     </IconButton>
                   </Tooltip>
+
+                  {/* if messages/comnts shown display this component */}
+                  {showMessage && (
+                    <Tooltip title={"add comment"} arrow>
+                      <IconButton
+                        className="border"
+                        onClick={handleshowModalComment}
+                      >
+                        <MapsUgcRounded color="success" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </Box>
               </Box>
 

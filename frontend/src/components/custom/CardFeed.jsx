@@ -67,7 +67,7 @@ const CardFeed = () => {
       {isDarkMode && <Divider component="div" className="mb-3" />}
       <Card
         style={{
-          backgroundColor: openMenu && isDarkMode ? "#333" : undefined,
+          border: openMenu && isDarkMode ? "1px solid gray" : undefined,
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
         }}
         elevation={0}
@@ -97,15 +97,14 @@ const CardFeed = () => {
           }
           action={
             !isLoadingRequest && (
-              <Box className="d-flex flex-row">
-                <IconButton disableRipple>
-                  <Typography variant="body2">
-                    <small>2d</small>
-                  </Typography>
-                </IconButton>
+              <Box flexDirection={"row"} display={"flex"} alignItems={"center"}>
+                <Typography mr={1} variant="body2">
+                  2d
+                </Typography>
                 {isFriend && (
                   <Tooltip title="connect" arrow>
                     <Checkbox
+                      size="small"
                       onChange={() => setIsFriend(false)}
                       icon={
                         <PersonAddRounded
@@ -118,6 +117,7 @@ const CardFeed = () => {
                 )}
                 <Tooltip title="more" arrow>
                   <IconButton
+                    size="small"
                     aria-label="more"
                     onClick={handleClickMoreVertPost}
                   >
@@ -213,10 +213,16 @@ const CardFeed = () => {
                       color: isDarkMode ? "yellow" : "orange",
                     }}
                   />
-                  <Typography fontWeight={'bold'} color={"text.secondary"} variant="body2">
+                  <Typography
+                    fontWeight={"bold"}
+                    variant="caption"
+                  >
                     {PostData.category}
                   </Typography>
-                  <Typography fontWeight={'bold'} color={"text.secondary"} variant="body2">
+                  <Typography
+                    fontWeight={"bold"}
+                    variant="caption"
+                  >
                     {PostData.county}
                   </Typography>
                   <WbIncandescentRounded

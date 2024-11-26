@@ -10,6 +10,9 @@ import React, { lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import AppLogo from "./images/logo_sm.png";
+const RegPersonalCompletion = lazy(() =>
+  import("./components/auth/RegPersonalCompletion")
+);
 const LoginBusinessAuth = lazy(() =>
   import("./components/auth/LoginBusinessAuth")
 );
@@ -88,6 +91,12 @@ const App = () => {
                 exact
                 path={"/auth/register/personal"}
                 element={<RegistrationAuthLazy />}
+              />
+              {/* completion of reg for a user/ac signing with auth provider */}
+              <Route
+                exact
+                path={"/auth/register/personal/completion"}
+                element={<RegPersonalCompletion />}
               />
 
               <Route

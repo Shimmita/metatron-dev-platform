@@ -16,7 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Kotlin from "../../../images/Kotlin.png";
 import Dev from "../../../images/dev.jpeg";
@@ -26,7 +26,7 @@ function LiveLayout() {
   // redux states
   const { isDarkMode } = useSelector((state) => state.appUI);
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   // handle navigation to the live atttend
   const handleNavigateLiveAttend = () => {
     navigate("/events/live-attending");

@@ -3,10 +3,9 @@ import {
   CheckRounded,
   DeleteRounded,
   LocationCityRounded,
-  UpdateRounded,
   VisibilityOff,
 } from "@mui/icons-material";
-import { Box, Button, Divider, IconButton, Typography } from "@mui/material";
+import { Box, Divider, IconButton, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -15,15 +14,13 @@ import ListItemText from "@mui/material/ListItemText";
 import React, { lazy, useState } from "react";
 import { useSelector } from "react-redux";
 import aws from "../../././../images/aws.jpeg";
-import DeleteJobAlert from "../../alerts/DeleteJobAlert";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+const DeleteJobAlert = lazy(() => import("../../alerts/DeleteJobAlert"));
 const AccordionJobStats = lazy(() => import("./AccordionJobStats"));
 
 export default function JobsAppliedLayout() {
   const [openAlert, setOpenAlert] = useState(false);
-  // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
-  // redux states
+
   const isViewed = false;
   // handle showing of the alert dialog for deleting the job
   const handleDeleteWarn = () => {
@@ -34,8 +31,10 @@ export default function JobsAppliedLayout() {
   const title = "Delete Job Application?";
   // message for delete alert dialog
   const message =
-    "This job that you applied for the position machine learning engineer will be deleted from your history and recruters portal.";
+    "This job application for the position machine learning engineer will be deleted from the system.";
 
+  // redux states
+  const { isDarkMode } = useSelector((state) => state.appUI);
   return (
     <Box display={"flex"} justifyContent={"center"}>
       <Box
@@ -57,15 +56,9 @@ export default function JobsAppliedLayout() {
                 primary={
                   <>
                     {CustomDeviceIsSmall() ? (
-                      <Typography variant="body2">
-                        Machine Learning Engineer
-                      </Typography>
+                      <Typography>Machine Learning Engineer</Typography>
                     ) : (
-                      <Typography
-                        width={"100%"}
-                        textAlign={"center"}
-                        variant="body2"
-                      >
+                      <Typography width={"100%"} textAlign={"center"}>
                         Machine Learning Engineer
                       </Typography>
                     )}
@@ -130,7 +123,6 @@ export default function JobsAppliedLayout() {
             alignItems={"center"}
             justifyContent={"space-around"}
             className={"px-3"}
-            mb={2}
           >
             {isViewed ? (
               <>
@@ -150,41 +142,8 @@ export default function JobsAppliedLayout() {
               </>
             )}
           </Box>
-          <Box
-            display={"flex"}
-            gap={2}
-            alignItems={"center"}
-            justifyContent={"space-around"}
-            className={"px-3"}
-            mb={2}
-          >
-            <UpdateRounded sx={{ width: 22, height: 22 }} />
-
-            <Typography variant="body2" color={"text.secondary"}>
-              You can update your submitted documents as long as the recruiters
-              have not yet viewed your previous submission.
-            </Typography>
-          </Box>
-          <Box className="px-3" display={"flex"} mb={3} justifyContent={"center"}>
-            <Button
-              size="small"
-              className="w-75"
-              disableElevation
-              variant={isDarkMode ? "text" : "contained"}
-              startIcon={<UpdateRounded />}
-              sx={{ borderRadius: "20px" }}
-            >
-              Update Docs
-            </Button>
-          </Box>
-
-          {CustomDeviceIsSmall() && (
-            <Divider component={"li"} className="mt-3" />
-          )}
-          {/* divider in dark mode tabs++ */}
-          {!CustomDeviceIsSmall() && isDarkMode && (
-            <Divider component={"li"} className="mt-3" />
-          )}
+          {/* border at darkly */}
+          {isDarkMode && <Divider component={"div"} className="mt-5" />}
         </List>
       </Box>
 

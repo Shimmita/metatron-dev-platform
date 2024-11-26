@@ -1,10 +1,10 @@
 import {
+  BusinessRounded,
   GitHub,
   Google,
   LightModeOutlined,
   LightModeRounded,
   Microsoft,
-  PaidRounded,
   PersonAddRounded,
   StarRounded,
   Visibility,
@@ -34,26 +34,8 @@ import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import ModalPolicyTerms from "./ModalPolicyTerms";
 import OptionsMoreLogin from "./OptionsMoreLogin";
 const ModalAccountInfo = lazy(() => import("./ModalAccountInfo"));
-const LoginWithAlert = lazy(() => import("../alerts/LoginWithAlert"));
 
-const loginOption = {
-  github: {
-    title: "GitHub  Signin?",
-    message: "Signin to Metatron Foundation Platform with your GitHub Account",
-    icon: <GitHub />,
-  },
-  google: {
-    title: "Google Signin?",
-    message: "Signin to Metatron Foundation Platform with your Google Account",
-    icon: <Google />,
-  },
-  microsoft: {
-    title: "Microsoft Signin?",
-    message:
-      "Signin to Metatron Foundation Platform with your Microsoft Account",
-    icon: <Microsoft />,
-  },
-};
+
 
 const LoginBusinessAuth = () => {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -109,15 +91,6 @@ const LoginBusinessAuth = () => {
     setOption("ms");
   };
 
-  const handleLoginInfoAlert = () => {
-    if (option === "git") {
-      return loginOption.github;
-    }
-    if (option === "goog") {
-      return loginOption.google;
-    }
-    return loginOption.microsoft;
-  };
 
   return (
     <Box
@@ -241,14 +214,20 @@ const LoginBusinessAuth = () => {
                 gap={1}
                 alignItems={"center"}
               >
-                <PaidRounded color="success" sx={{ width: 18, height: 18 }} />
+                <BusinessRounded
+                  color="primary"
+                  sx={{ width: 18, height: 18 }}
+                />
                 <Typography
                   variant={CustomDeviceSmallest() ? "caption" : "body2"}
                   color={"text.secondary"}
                 >
                   Business Account Login
                 </Typography>
-                <PaidRounded color="success" sx={{ width: 18, height: 18 }} />
+                <BusinessRounded
+                  color="primary"
+                  sx={{ width: 18, height: 18 }}
+                />
               </Box>
 
               <Box
@@ -265,8 +244,8 @@ const LoginBusinessAuth = () => {
                   variant={CustomDeviceSmallest() ? "caption" : "body2"}
                   color={"text.secondary"}
                 >
-                  Enlightening Technology Country Wide
-                  </Typography>
+                  Enlightening Technology Globally
+                </Typography>
                 <WbIncandescentRounded
                   sx={{ width: 18, height: 18, color: "orange" }}
                 />
@@ -414,14 +393,6 @@ const LoginBusinessAuth = () => {
           setOpenModalTerms={setOpenModalTerms}
         />
       </Box>
-      {/* show alert login more options */}
-      <LoginWithAlert
-        openAlert={openAlert}
-        setOpenAlert={setOpenAlert}
-        title={handleLoginInfoAlert().title}
-        message={handleLoginInfoAlert().message}
-        icon={handleLoginInfoAlert().icon}
-      />
     </Box>
   );
 };

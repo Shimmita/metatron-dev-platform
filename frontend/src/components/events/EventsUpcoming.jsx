@@ -1,16 +1,30 @@
 import { CalendarMonthRounded } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
-import React, { lazy } from "react";
-import { useDispatch } from "react-redux";
-import { handleScrolledDown } from "../../redux/AppUI";
+import React, { lazy, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { handleSidebarRightbar, resetDefaultBottomNav } from "../../redux/AppUI";
 const UpcomingLayout = lazy(() => import("./layout/UpcomingLayout"));
 
 const EventsUpcoming = () => {
   // array for live events simulation
   const items = Array.from({ length: 20 }, (_, i) => i);
-  // redux to stop showing of the speed dial
+
   const dispatch = useDispatch();
-  dispatch(handleScrolledDown(true));
+
+  const { isSidebarRighbar } = useSelector((state) => state.appUI);
+
+  useState(() => {
+    // check the state of the  sidebar and rightbar false it if true
+    // show sidebar since can be hidden when user navigates to live event attend thus need restore
+    if (!isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+  }, []);
+
+  // handle showing of default bottom nav
+  useState(() => {
+    dispatch(resetDefaultBottomNav());
+  });
 
   return (
     <>

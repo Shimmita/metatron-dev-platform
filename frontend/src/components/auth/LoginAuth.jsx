@@ -1,9 +1,8 @@
 import {
-  GitHub,
+  Close,
   Google,
   LightModeOutlined,
   LightModeRounded,
-  Microsoft,
   PersonAddRounded,
   StarRounded,
   Visibility,
@@ -12,9 +11,12 @@ import {
   WorkRounded,
 } from "@mui/icons-material";
 import {
+  Alert,
   Avatar,
+  Backdrop,
   Box,
   Button,
+  Collapse,
   FormControl,
   IconButton,
   InputAdornment,
@@ -25,47 +27,21 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import {
-  GithubAuthProvider,
-  OAuthProvider,
-  signInWithPopup,
-} from "firebase/auth";
-import React, { lazy, useEffect, useState } from "react";
+import axios from "axios";
+import { signInWithPopup } from "firebase/auth";
+import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
 import { resetDarkMode } from "../../redux/AppUI";
-import {
-  auth,
-  providerGithub,
-  providerGoogle,
-  providerMicrosoft,
-} from "../firebase/FirebaseConfig";
+import { updateTempUserDetails } from "../../redux/CompleteSigning";
+import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
+import { auth, providerGoogle } from "../firebase/FirebaseConfig";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import OptionsMoreLogin from "./OptionsMoreLogin";
 const ModalPolicyTerms = lazy(() => import("./ModalPolicyTerms"));
-const AlertGeneral = lazy(() => import("../alerts/AlertGeneral"));
 const ModalAccountInfo = lazy(() => import("./ModalAccountInfo"));
-const LoginWithAlert = lazy(() => import("../alerts/LoginWithAlert"));
-
-const loginOption = {
-  github: {
-    title: "GitHub  Signin?",
-    message: "Signin to Metatron Foundation Platform with your GitHub Account",
-    icon: <GitHub />,
-  },
-  google: {
-    title: "Google Signin?",
-    message: "Signin to Metatron Foundation Platform with your Google Account",
-    icon: <Google />,
-  },
-  microsoft: {
-    title: "Microsoft Signin?",
-    message:
-      "Signin to Metatron Foundation Platform with your Microsoft Account",
-    icon: <Microsoft />,
-  },
-};
 
 const LoginAuth = () => {
   const [openModalInfo, setOpenModalInfo] = useState(false);
@@ -73,21 +49,14 @@ const LoginAuth = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userFirebaseToken, setUserFirebaseToken] = useState(null);
 
-  const [isMicrosoft, setisMicrosoft] = useState(false);
-  const [isGoogle, setIsGoogle] = useState(false);
-  const [isGitHub, setIsGitHub] = useState(false);
-
-  const [openAlertGenral, setOpenAlertGenral] = useState(false);
-  const [titleGenral, setTitleGenral] = useState("");
-  const [messageGenral, setMessageGenral] = useState("");
+  const [messageGeneral, setMessageGeneral] = useState("");
+  const [isLogin, setIsLogin] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [option, setOption] = useState("");
-  // control showing alert when login with ggle,ms and git clicked
-  const [openAlert, setOpenAlert] = useState(false);
+  // control showing of terms of service and privacy policy
+  const [isShowPrivacy, setShowPrivacy] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -111,123 +80,104 @@ const LoginAuth = () => {
   // global dark mode state from redux
   const { isDarkMode } = useSelector((state) => state.appUI);
 
-  // handle login with github
-  const handleLoginWithGithub = () => {
-    setOpenAlert(true);
-    setOption("git");
-  };
-
-  // handle login with google
+  // handle login  with google
   const handleLoginWithGoogle = () => {
-    setOpenAlert(true);
-    setOption("goog");
+    const googleFailedError =
+      "Google authentication failed, please try again later";
+
+    setIsLogin(true);
+    // creating empty form data since the backend parses JSON from  the
+    // body before processing
+    const emptyForm = new FormData();
+    const user = {};
+
+    emptyForm.append("user", JSON.stringify(user));
+    signInWithPopup(auth, providerGoogle)
+      .then((response) =>
+        //  getting the access token
+        response.user
+          .getIdToken()
+          .then((token) => {
+            // use axios to fecth user details and if they exist from msg resp
+            // else redirect them to complet reg page
+            axios
+              .post(
+                `http://localhost:5000/signup/personal/google/${token}`,
+                emptyForm
+              )
+              .then((res) => {
+                console.log(res);
+                // in the res messge can be true or false if user registered
+                if (res?.data?.message) {
+                  // user already registered redirect them home
+                  // update current user redux states + online status by passing payload
+                  // from response that's user object that was came from server firestore
+                  const user_payload = res?.data?.user;
+                  dispatch(updateUserCurrentUserRedux(user_payload));
+                  // home redirect
+                  navigate("/");
+                } else if (res?.data?.incomplete) {
+                  // not yet completed registration/signin/signup redirect complete page
+                  // update the name,email and avatar for temp user in the redux
+                  dispatch(
+                    updateTempUserDetails({
+                      username: response.user.displayName,
+                      email: response.user.email,
+                      avatar: response.user.photoURL,
+                      token: token,
+                    })
+                  );
+
+                  // navigate to personal account completion
+                  navigate("/auth/register/personal/completion");
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          })
+          .catch((error) => {
+            console.log(error);
+
+            // set error message
+            setMessageGeneral(googleFailedError);
+          })
+      )
+      .catch((err) => {
+        // set error message
+        setMessageGeneral(googleFailedError);
+      })
+      .finally(() => {
+        // set is login to false to close the progress
+        setIsLogin(false);
+      });
   };
 
-  // handle login with microsoft
-  const handleLoginWithMS = () => {
-    setOpenAlert(true);
-    setOption("ms");
+  const handleLogin = async () => {
+    const user = {
+      email,
+      password,
+    };
+    // login user without provider
+    setIsLogin(true);
+    axios
+      .post(`http://localhost:5000/signin/personal`, user)
+      .then((res) => {
+        console.log(res);
+        // populating the redux for the logged in user
+        dispatch(updateUserCurrentUserRedux(res.data.user));
+      })
+      .catch((err) => {
+        if (err?.code === "ERR_NETWORK") {
+          setMessageGeneral("Server Unreacheable");
+          return;
+        }
+        setMessageGeneral(err?.response?.data);
+      })
+      .finally(() => {
+        setIsLogin(false);
+      });
   };
-
-  const handleLoginInfoAlert = () => {
-    if (option === "git") {
-      return loginOption.github;
-    }
-    if (option === "goog") {
-      return loginOption.google;
-    }
-    return loginOption.microsoft;
-  };
-
-  useEffect(() => {
-    // google signin
-    if (isGoogle) {
-      // sign in with Google Auth
-      signInWithPopup(auth, providerGoogle)
-        .then((res) =>
-          res.user
-            .getIdToken()
-            .then((token) => console.log("token " + token))
-            .catch((error) => {
-              // error title
-              setTitleGenral("Signin Error");
-              // set message
-              setMessageGenral(
-                "We encountered an error while trying to process your Google identification details, please try again later\n" +
-                  error
-              );
-
-              // set opening of the genral alert
-              setOpenAlertGenral(true);
-
-              // false is google
-              setIsGoogle(false);
-            })
-        )
-        .catch((error) => {
-          // error title
-          setTitleGenral("Signin Error");
-          // set message
-          setMessageGenral(
-            "We encountered an error while trying to sign you in with Google, please try again later\n" +
-              error
-          );
-          // set opening of the genral alert
-          setOpenAlertGenral(true);
-
-          // false is google
-          setIsGoogle(false);
-        });
-    }
-
-    // signin with Github
-    if (isGitHub) {
-      signInWithPopup(auth, providerGithub)
-        .then((result) => {
-          // User is signed in
-          const user = result.user;
-          console.log("User Info:", user);
-
-          // GitHub-specific token and information (if you need it)
-          const credential = GithubAuthProvider.credentialFromResult(result);
-          const token = credential.accessToken;
-          console.log("GitHub Access Token:", token);
-        })
-        .catch((error) => {
-          // error title
-          setTitleGenral("Signin Error");
-          // set message
-          setMessageGenral(
-            "We encountered an error while trying to sign you in with GitHub, please try again later\n" +
-              error
-          );
-          // set opening of the genral alert
-          setOpenAlertGenral(true);
-
-          // false is Github
-          setIsGitHub(false);
-        });
-    }
-
-    // microsoft signing under development
-    if (isMicrosoft) {
-      // Sign in with popup
-      signInWithPopup(auth, providerMicrosoft)
-        .then((result) => {
-          // This gives you a Microsoft Access Token
-          const credential = OAuthProvider.credentialFromResult(result);
-          const accessToken = credential.accessToken;
-
-          // The signed-in user info
-          const user = result.user;
-          console.log("User info:", user);
-          console.log("Access Token:", accessToken);
-        })
-        .catch((error) => {
-          console.error("Error during Microsoft sign-in:", error);
-        });
-    }
-  }, [isGoogle, isMicrosoft, isGitHub]);
 
   return (
     <Box
@@ -307,6 +257,7 @@ const LoginAuth = () => {
               <OptionsMoreLogin
                 handleClose={handleClose}
                 setOpenModalInfo={setOpenModalInfo}
+                setShowPrivacy={setShowPrivacy}
                 setOpenModalTerms={setOpenModalTerms}
               />
             </Menu>
@@ -351,14 +302,14 @@ const LoginAuth = () => {
                 color={"text.secondary"}
                 alignItems={"center"}
               >
-                <WorkRounded color="inherit" sx={{ width: 15, height: 15 }} />
+                <WorkRounded color="primary" sx={{ width: 16, height: 16 }} />
                 <Typography
                   variant={CustomDeviceSmallest() ? "caption" : "body2"}
                   color={"text.secondary"}
                 >
                   Personal Account Login
                 </Typography>
-                <WorkRounded color="inherit" sx={{ width: 15, height: 15}} />
+                <WorkRounded color="primary" sx={{ width: 16, height: 16 }} />
               </Typography>
 
               <Box
@@ -375,7 +326,7 @@ const LoginAuth = () => {
                   variant={CustomDeviceSmallest() ? "caption" : "body2"}
                   color={"text.secondary"}
                 >
-                  Enlightening Technology Country Wide
+                  Enlightening Technology Globally
                 </Typography>
                 <WbIncandescentRounded
                   sx={{ width: 18, height: 18, color: "orange" }}
@@ -384,6 +335,30 @@ const LoginAuth = () => {
             </Box>
           </Box>
           <Box>
+            {/* displays error when login is unsuccessful */}
+            <Box display={"flex"} justifyContent={"center"}>
+              {messageGeneral && (
+                <Collapse in={messageGeneral || false}>
+                  <Alert
+                    severity="warning"
+                    onClick={() => setMessageGeneral("")}
+                    action={
+                      <IconButton
+                        aria-label="close"
+                        color="inherit"
+                        size="small"
+                      >
+                        <Close fontSize="inherit" />
+                      </IconButton>
+                    }
+                    sx={{ mb: 2 }}
+                  >
+                    {messageGeneral}
+                  </Alert>
+                </Collapse>
+              )}
+            </Box>
+
             <Box mb={4} display={"flex"} justifyContent={"center"}>
               <TextField
                 required
@@ -396,7 +371,8 @@ const LoginAuth = () => {
                 type="email"
               />
             </Box>
-            <Box mb={3} display={"flex"} justifyContent={"center"}>
+
+            <Box mb={4} display={"flex"} justifyContent={"center"}>
               <FormControl fullWidth variant="outlined" className="w-75">
                 <InputLabel htmlFor="outlined-adornment-password">
                   Password &nbsp;*
@@ -424,7 +400,7 @@ const LoginAuth = () => {
               </FormControl>
             </Box>
 
-            <Box display={"flex"} justifyContent={"center"} mb={1}>
+            <Box display={"flex"} justifyContent={"center"} mb={2}>
               <Typography
                 variant="body2"
                 color={"text.secondary"}
@@ -456,62 +432,42 @@ const LoginAuth = () => {
             </Box>
 
             <Box display={"flex"} gap={1} justifyContent={"center"} mb={2}>
-              {/* microsoft signin */}
-              <Button
-                className="rounded-5"
-                size="small"
-                onClick={handleLoginWithMS}
-                startIcon={<Microsoft />}
-                sx={{ fontSize: "small" }}
-              >
-                <Tooltip arrow title="signin microsoft">
-                  Microsoft
-                </Tooltip>
-              </Button>
               {/* Google signin */}
-              <Button
-                className="rounded-5"
-                size="small"
-                onClick={handleLoginWithGoogle}
-                startIcon={<Google />}
-                sx={{ fontSize: "small" }}
-              >
-                <Tooltip arrow title="signin google">
-                  Google
-                </Tooltip>
-              </Button>
-
-              {/* github signin */}
-              <Button
-                className="rounded-5"
-                size="small"
-                onClick={handleLoginWithGithub}
-                startIcon={<GitHub />}
-                sx={{ fontSize: "small" }}
-              >
-                <Tooltip arrow title="signin github">
-                  Github
-                </Tooltip>
-              </Button>
+              <Tooltip arrow title="signin with google">
+                <Button
+                  className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
+                  variant="outlined"
+                  disabled={isLogin || messageGeneral}
+                  startIcon={<Google />}
+                  onClick={handleLoginWithGoogle}
+                  sx={{ textTransform: "none", borderRadius: "20px" }}
+                >
+                  Google Signin
+                </Button>
+              </Tooltip>
             </Box>
 
-            <Box pb={1} display={"flex"} justifyContent={"center"}>
-              <Button
-                variant="contained"
-                className="w-25"
-                sx={{ borderRadius: "20px" }}
-                disableElevation
-                onClick={(e) => {
-                  navigate("/");
-                }}
-                type="submit"
-              >
-                Login
-              </Button>
+            <Box pb={2} display={"flex"} justifyContent={"center"}>
+              <Tooltip arrow title="signin with email and password">
+                <Button
+                  variant="contained"
+                  className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
+                  disabled={isLogin || messageGeneral || !(email && password)}
+                  sx={{ textTransform: "none", borderRadius: "20px" }}
+                  disableElevation
+                  onClick={handleLogin}
+                  type="submit"
+                >
+                  Login
+                </Button>
+              </Tooltip>{" "}
             </Box>
           </Box>
         </Box>
       </Box>
+
+      {/* show backdrop when is login */}
+      {isLogin && <Backdrop />}
 
       {/* show the account help info modal when toggled */}
       <Box>
@@ -525,28 +481,9 @@ const LoginAuth = () => {
         <ModalPolicyTerms
           openModalTerms={openModalTerms}
           setOpenModalTerms={setOpenModalTerms}
+          isShowPrivacy={isShowPrivacy}
         />
       </Box>
-
-      {/* show alert login more options */}
-      <LoginWithAlert
-        openAlert={openAlert}
-        setOpenAlert={setOpenAlert}
-        title={handleLoginInfoAlert().title}
-        message={handleLoginInfoAlert().message}
-        icon={handleLoginInfoAlert().icon}
-        setisMicrosoft={setisMicrosoft}
-        setIsGitHub={setIsGitHub}
-        setIsGoogle={setIsGoogle}
-      />
-
-      {/* open alert genral */}
-      <AlertGeneral
-        openAlertGeneral={openAlertGenral}
-        setOpenAlertGenral={setOpenAlertGenral}
-        title={titleGenral}
-        message={messageGenral}
-      />
     </Box>
   );
 };

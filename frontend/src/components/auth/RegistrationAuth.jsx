@@ -58,7 +58,7 @@ const RegistrationAuth = () => {
   const [eduInstitution, setEduInstitution] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState(Institutions);
-
+  // user object
   const [user, setUser] = useState({});
 
   // alert profile pic
@@ -203,6 +203,7 @@ const RegistrationAuth = () => {
         educationLevel,
         eduInstitution,
         phone,
+        country,
         county,
         gender,
         specialisationTitle,
@@ -410,7 +411,7 @@ const RegistrationAuth = () => {
                 </Box>
 
                 {/* show this if country includes kenya */}
-                {country.trim().toLowerCase().includes("kenya") ? (
+                {country?.trim().toLowerCase().includes("kenya") ? (
                   <Box display={"flex"} justifyContent={"center"}>
                     <Autocomplete
                       value={eduInstitution}
@@ -459,7 +460,7 @@ const RegistrationAuth = () => {
                   <Box display={"flex"} justifyContent={"center"}>
                     <TextField
                       required
-                      id="county_other"
+                      id="institution-other"
                       label="Institution"
                       className="w-75"
                       value={eduInstitution}
@@ -520,7 +521,7 @@ const RegistrationAuth = () => {
                 </Box>
 
                 {/* show this if country is contains kenya */}
-                {country.trim().toLowerCase().includes("kenya") ? (
+                {country?.trim().toLowerCase().includes("kenya") ? (
                   <Box display={"flex"} justifyContent={"center"}>
                     <TextField
                       required
@@ -626,7 +627,7 @@ const RegistrationAuth = () => {
         </Box>
       </Box>
 
-      {/* show alert when zero selection is matched */}
+      {/* show alert for custom title when zero selection is matched */}
       <RegisterAlertTitle
         openAlert={openAlert}
         setOpenAlert={setOpenAlert}

@@ -1,34 +1,28 @@
 const DataAccounts = {
   Personal: [
-    "Premium version of this account is valued at Ksh.200 (USD $2) monthly.",
-    "Currently this account is Applicable to Kenyans Only.",
-    "This account is meant for Learning, applying IT Jobs and also showcasing your IT project idealogies.",
-    "Access and Learn IT related courses offered on the platform as an Individual from a diverse group of experienced personnel.",
-    "Apply for IT job opportunities from a diverse pool of jobs offered on the platform and stand a chance to get employed.",
-    "Ideal for tech individuals who are seeking employment oppotunities, learning and collaboration country wide.",
-    "Post and showcase your project ideas backed with GitHub or Gitlab links for collaboration: a good strategy for showing your expertise in your field of specialisation. ",
-    "Live stream and attend to various IT live events that are available on the platform freely on the click of a button.",
-    "Interact with various IT gurus from different parts of the country and increase your network of diverse people.",
-    "Courses and Job opportunities offered include: Software Development, Machine Learning, Robotics, Computer Networks, CyberSecurity, Cloud Computing, DevOps etc.",
+    "The premium version of this account is valued at Ksh. 200 (USD $2) monthly.",
+    "Access certified tech-related courses offered on the platform, taught by experienced professionals. Earn accredited certificates of completion at little to no cost, helping you upgrade your skills affordably.",
+    "Apply for IT or tech-related job opportunities from a wide variety of sources available on the platform. Simplify your job application process and track application statuses with our intelligent analytical tools.",
+    "Ideal for tech enthusiasts seeking career mentorship, employment opportunities, learning, skill acquisition, and collaboration on both national and global scales.",
+    "Bookmark and live stream various IT events hosted on the platform, enhancing your learning experience and staying updated with new insights daily.",
+    "Receive mentorship from industry experts, including founders of renowned tech companies and employees of tech giants like Google, Microsoft, AWS, Meta, IBM, Safaricom, Airtel, Numeral IoT, and Metatron.",
+    "Network with IT professionals and tech companies globally, expanding your connections while learning new skills and staying informed about the latest technological trends and innovations.",
+    "Explore courses and job opportunities in areas such as Software Development, Machine Learning, Robotics, Computer Networks, Cybersecurity, Cloud Computing, DevOps, Containerization and Orchestration, UI/UX Design, Graphic Design, and more."
   ].sort(),
-  Bussiness: [
-    "Premium version of this account is valued at ksh.300 (USD $3) monthly for Kenyans and Ksh.500 (USD $5) monthly for Foreigners or Individuals with a nationality other than Kenya.",
-    "This account is available to both Kenyans and Foreign Individuals or Organisation.",
-    "Patner with Us and lets push forward the wheel of IT Industry in Kenya and realise a radical technological transformation and advancement.",
-    "Ideal for tech individuals or organisations who are seeking to provide IT services and get paid in return of the services rendered.",
-    "This account is meant for providing IT services and also earning from the services you are providing.",
-    "Post Job opportunities and be able to interact the ideal candidates suitable for the posted position.",
-    "Posted courses or Learning services should be limited to IT industry i.e: Machine Learning, Robotics, Cybersecurity, Cloud Computing, DevOps, Software Development, Computer Networks etc.",
-    "Provide insightful career mentorship programs to many IT users on the platform and market your organisation or yourself to be among the biggest tech influencers in the country.",
-    "Post your courses or learning services easily and charge for them at a considerable price. We recommend quoting a relatively affordable cost since we are aimed to enlighten technology to many bros within the country affordably.",
-    "Plan or create IT related events which could be live streamed on the platform and be able to influence many users who will be attending virtually. You may decide on the attendance fee which users are supposed to pay from ksh.50 to Ksh.200 per event. the shortest event possible lasts 30 minutes while the longest 2 hours.",
+  Business: [
+    "The premium version of this account is valued at Ksh. 500 (USD $4) monthly and is designed to support your IT business with tailored features to help you thrive and compete globally. Posts you make are algorithmically recommended to relevant target audiences.",
+    "Metatron Foundation welcomes global partnerships and affiliate programs with tech leaders, including individuals, organizations, and companies, to drive technological advancements locally and internationally.",
+    "Ideal for tech professionals or organizations focused on marketing IT services globally, recruiting the best candidates, offering tech mentorship programs, and earning revenue through rendered services.",
+    "Posts must be related to the IT industry, including but not limited to Machine Learning, Blockchain and Cryptocurrency, Robotics, Cybersecurity, Cloud Computing, DevOps, Software Development, Computer Networks, Containerization, and System Administration.",
+    "Offer IT-related services such as educational content, virtual classes, or learning resources. You can set pricing plans ranging from free (USD $0) to a maximum of Ksh. 5,000 (USD $40). Affordable pricing is encouraged to attract more users.",
+    "Create and host IT-related live-stream events on the platform to engage a global audience. Set attendance fees ranging from Ksh. 100 (USD $1) to Ksh. 200 (USD $2) per event. Events can last from 1 to 3 hours, depending on your content and goals."
   ].sort(),
   Donation: [
-    "We are enthusiastic to welcome individuals or organisations who are willing to donate and sponsor the program.Your smallest or highest contribution will be highly appreciated.",
-    "Organisations or individuals who successfully donate will be listed in the sponsorship program as way of appreciation and acknowlegding their undying love for Technology.",
-    "We highly welcome the support and patnership from existing tech giant companies or organisations such as Microsoft, Google, AWS, IBM, Safaricom, Airtel, Telcom, Numeral IOT and ICT Authority of Kenya.",
-    "All other existing IT Personnel or Tech organisation be it Local, Foreign or NGOs are highly welcomed for patnership and affiliate programs to foster the advancement of Technology country wide and globally.",
-  ].sort(),
+    "We enthusiastically welcome individuals and organizations willing to donate or sponsor our programs. Your contributions are greatly appreciated.",
+    "Organizations, companies, or individuals who successfully promote us will be recognized in our sponsorship program as a token of appreciation for their unwavering support for technology.",
+    "We highly welcome support and partnerships from tech giants and organizations such as Microsoft, Google, Meta, AWS, IBM, Safaricom, Airtel, Telkom, Numeral IoT, and the ICT Authority of Kenya.",
+    "All other IT professionals or tech organizations, whether local, foreign, or NGOs, are encouraged to partner with us and join our affiliate programs to advance technology locally and globally."
+  ].sort()
 };
 
 export default DataAccounts;

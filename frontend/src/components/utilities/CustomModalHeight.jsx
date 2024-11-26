@@ -7,10 +7,10 @@ function CustomModalHeight() {
   }
 
   if (screenWidth <= 500) {
-    return 550;
+    return 500;
   }
 
-  return 600;
+  return 450;
 }
 
 export default CustomModalHeight;

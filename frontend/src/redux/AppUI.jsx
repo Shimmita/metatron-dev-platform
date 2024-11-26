@@ -2,11 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 // initial state
 const initialState = {
-  // view state
   defaultState: true, // default
   isAccountSettings: false,
   isAbout: false,
-  isScrolledDown: false,
+  isDefaultBottomNav: true,
   isMobileRighBar: false,
   isSearchBar: true,
   isOpenMessageDrawer: false,
@@ -18,7 +17,7 @@ const initialState = {
 };
 
 const appUISliceReducerSlice = createSlice({
-  name: "AppUI",
+  name: "appUI",
   initialState,
   reducers: {
     showAccountSettings: (state) => {
@@ -47,9 +46,15 @@ const appUISliceReducerSlice = createSlice({
       };
     },
 
-    // manages user scrolling
-    handleScrolledDown: (state, action) => {
-      state.isScrolledDown = action.payload;
+    // manages the display of the default bottom nav
+    handleDefaultBottomNav: (state) => {
+      state.isDefaultBottomNav = false;
+    },
+
+    // reset the to default the showing of the default bottom nav
+
+    resetDefaultBottomNav: (state) => {
+      state.isDefaultBottomNav = true;
     },
 
     // manages right bar
@@ -92,7 +97,8 @@ export const {
   resetAll,
   resetDarkMode,
   showAbout,
-  handleScrolledDown,
+  handleDefaultBottomNav,
+  resetDefaultBottomNav,
   showMobileRighBar,
   showMessagingDrawer,
   showTabSideBar,

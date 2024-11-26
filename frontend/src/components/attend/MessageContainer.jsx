@@ -1,4 +1,4 @@
-import { AddCommentRounded } from "@mui/icons-material";
+import { MessageRounded } from "@mui/icons-material";
 import { Box, Fab } from "@mui/material";
 import React from "react";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -6,9 +6,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import MessageLayout from "./MessageLayout";
 import ModalSendMessage from "./ModalSendMessage";
 
-function MessageContainer() {
-  const [showModal, setShowModal] = React.useState(false);
-
+function MessageContainer({showModal,setShowModal}) {
   // array simulation of the messages
   const messages = Array.from({ length: 30 }, (_, i) => i);
 
@@ -43,18 +41,20 @@ function MessageContainer() {
             ))}
         </Box>
 
-        {/* fab/textInput modal container*/}
-        <Box
-          sx={{
-            position: "absolute",
-            right: "45%",
-            bottom: 5,
-          }}
-        >
-          <Fab onClick={handleShowingModal} size="medium" color="primary">
-            <AddCommentRounded />
-          </Fab>
-        </Box>
+        {/* fab/textInput modal container only on smaller devices*/}
+        {CustomDeviceIsSmall() && (
+          <Box
+            sx={{
+              position: "absolute",
+              right: "45%",
+              bottom: 5,
+            }}
+          >
+            <Fab onClick={handleShowingModal} size="medium" color="primary">
+              <MessageRounded />
+            </Fab>
+          </Box>
+        )}
       </Box>
 
       {/* show modal when fab is clicked */}

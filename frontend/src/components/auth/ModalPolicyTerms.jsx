@@ -1,8 +1,4 @@
-import {
-  Close,
-  PolicyRounded,
-  WbIncandescentRounded,
-} from "@mui/icons-material";
+import { Close, GavelRounded, SecurityRounded } from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -17,7 +13,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import DataTermsPolicy from "../data/DataTermsPolicy";
-import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -30,7 +25,11 @@ const StyledModalEvent = styled(Modal)({
   margin: "5px",
 });
 
-const ModalPolicyTerms = ({ openModalTerms, setOpenModalTerms }) => {
+const ModalPolicyTerms = ({
+  openModalTerms,
+  setOpenModalTerms,
+  isShowPrivacy,
+}) => {
   // redux states
   const { isDarkMode } = useSelector((state) => state.appUI);
 
@@ -75,7 +74,9 @@ const ModalPolicyTerms = ({ openModalTerms, setOpenModalTerms }) => {
             </Box>
 
             <Typography variant="body1" color={"primary"} fontWeight={"bold"}>
-              Read Terms of Service
+              {isShowPrivacy
+                ? " Read Our Privacy and Policy"
+                : " Read Terms of Service"}
             </Typography>
 
             {/*close icon */}
@@ -85,27 +86,7 @@ const ModalPolicyTerms = ({ openModalTerms, setOpenModalTerms }) => {
               </IconButton>
             </Tooltip>
           </Box>
-          <Box mb={1}>
-            <Box
-              display={"flex"}
-              justifyContent={"center"}
-              gap={1}
-              alignItems={"center"}
-            >
-              <WbIncandescentRounded
-                sx={{ width: 18, height: 18, color: "orange" }}
-              />
-              <Typography
-                variant={CustomDeviceSmallest() ? "caption" : "body2"}
-                color={"text.secondary"}
-              >
-                Enlighting Technology Country Wide
-              </Typography>
-              <WbIncandescentRounded
-                sx={{ width: 18, height: 18, color: "orange" }}
-              />
-            </Box>
-          </Box>
+
           {/* divider */}
           <Divider component={"div"} className="p-2 border-success" />
 
@@ -131,10 +112,17 @@ const ModalPolicyTerms = ({ openModalTerms, setOpenModalTerms }) => {
               {/* personal account */}
               <Box>
                 <Box mb={1} display={"flex"} justifyContent={"center"}>
-                  <PolicyRounded
-                    color="warning"
-                    sx={{ width: 40, height: 40 }}
-                  />
+                  {isShowPrivacy ? (
+                    <SecurityRounded
+                      color="primary"
+                      sx={{ width: 40, height: 40 }}
+                    />
+                  ) : (
+                    <GavelRounded
+                      color="secondary"
+                      sx={{ width: 40, height: 40 }}
+                    />
+                  )}
                 </Box>
                 <Box>
                   <Typography
@@ -144,23 +132,43 @@ const ModalPolicyTerms = ({ openModalTerms, setOpenModalTerms }) => {
                     mb={1}
                     textAlign={"center"}
                   >
-                    Terms of Service
+                    {isShowPrivacy ? "Privacy and Policy" : "Terms of Service"}
                   </Typography>
 
                   <ol>
-                    {DataTermsPolicy &&
-                      DataTermsPolicy.map((data, index) => (
-                        <Typography
-                          key={index}
-                          variant="body2"
-                          gutterBottom
-                          mb={1}
-                          component={"li"}
-                          color={"text.secondary"}
-                        >
-                          {data}
-                        </Typography>
-                      ))}
+                    {isShowPrivacy ? (
+                      <>
+                        {DataTermsPolicy &&
+                          DataTermsPolicy.privacy.map((data, index) => (
+                            <Typography
+                              key={index}
+                              variant="body2"
+                              gutterBottom
+                              mb={1}
+                              component={"li"}
+                              color={"text.secondary"}
+                            >
+                              {data}
+                            </Typography>
+                          ))}
+                      </>
+                    ) : (
+                      <>
+                        {DataTermsPolicy &&
+                          DataTermsPolicy.terms.map((data, index) => (
+                            <Typography
+                              key={index}
+                              variant="body2"
+                              gutterBottom
+                              mb={1}
+                              component={"li"}
+                              color={"text.secondary"}
+                            >
+                              {data}
+                            </Typography>
+                          ))}
+                      </>
+                    )}
                   </ol>
                 </Box>
               </Box>

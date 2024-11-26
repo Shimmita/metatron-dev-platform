@@ -532,7 +532,7 @@ const DrawerSmartphone = ({
                       primary={
                         <Typography variant="body2">
                           {" "}
-                          Kenya's Best IT Platform
+                          Best IT Platform
                         </Typography>
                       }
                     />

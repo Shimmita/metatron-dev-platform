@@ -1,8 +1,42 @@
-const DataTermsPolicy = [
-  "Suppose you registered an account as personal before and plans to upgrade to business account for rendering professional IT or Tech related services and get paid in return, It is easily upgradable by just merging or migrationg your personal account to business account type.",
-  "When posting jobs to the public adhere to the fact that fake jobs are concluded as a serious criminal offence under scamming and you will be categorised as a scammer. The repercusion is permanent deletion of your account with or without notified. ",
-  "You are allowed to use free accounts and may upgrade to premium version at your will. Premium accounts have more benefits and features unlocked fully but free accounts may be limited in accessing some features. Personal accounts costs ksh.200 monthly while business ksh.300 monthly.",
-  "Suppose one has upgraded to a premium version of their account(s) and are not able to renew their monthly costs such accounts shall fall-back to free version but will have access to more features than an account which barely upgraded before.",
-  "Posts made by any account (Personal/Business) should be specifically limited to IT or Technology oriented, our custom machine learning algorithm helps us in analysing all posts any defilement of this condition one may risk permanent loss of account with or without being consent.",
-].sort();
+const DataTermsPolicy = {
+  terms: [
+    "By accessing and using the Metatron platform, you agree to comply with and be bound by these Terms of Service.",
+    "Metatron is a platform specializing in IT and tech services, enabling users to learn, share projects, apply for jobs, and interact within the tech community.",
+    "All account registration information must be accurate and complete. Personal and business accounts are subject to verification.",
+    "If you registered a personal account and wish to upgrade to a business account for offering professional IT or tech-related services, you can seamlessly migrate your account through our upgrade process.",
+    "Free accounts are available for all users, but premium accounts unlock additional features. The premium subscription costs Ksh. 200 (USD $2) monthly for personal accounts and Ksh. 400 (USD $4) monthly for business accounts.",
+    "If a premium subscription is not renewed, the account will revert to the free version but retain some advanced features compared to accounts that have never been upgraded.",
+    "Posts made by any account must strictly relate to IT or technology topics. Content that violates this condition may result in account suspension or permanent deletion.",
+    "Job postings on the platform must be legitimate. Posting fake or misleading job listings is considered scamming and will lead to the permanent deletion of your account without prior notice.",
+    "Metatron reserves the right to moderate, edit, or remove content that violates community guidelines or these Terms of Service.",
+    "Users are responsible for ensuring the accuracy and legality of the content they share, including resumes, job listings, and projects.",
+    "All personal data collected by Metatron will be processed in accordance with our Privacy Policy to ensure user privacy and data security.",
+    "Premium subscriptions are billed as outlined and are subject to Metatron's refund and cancellation policies.",
+    "Accounts inactive for over 12 months may be deactivated or deleted at Metatron's discretion.",
+    "Users are prohibited from using the platform for illegal activities, unauthorized data collection, or spamming.",
+    "Users grant Metatron a non-exclusive license to display, host, and promote any content shared on the platform, while maintaining ownership rights.",
+    "Metatron is not responsible for third-party services, external links, or transactions initiated outside the platform.",
+    "All intellectual property, including trademarks, designs, and platform content, that is provided by users should not be someone else property.",
+    "Metatron reserves the right to modify or discontinue services, features, or pricing at any time, with or without notice.",
+  ].sort(),
+
+  privacy: [
+    "Metatron is committed to protecting your privacy and ensuring the security of your personal information.",
+    "We collect personal data such as name, email address, phone number, and payment details during account registration, profile creation, and transactions on the platform.",
+    "Metatron uses cookies and similar tracking technologies to enhance user experience, analyze site performance, and deliver personalized content.",
+    "Collected information is used to provide, improve, and personalize services, including account management, job applications, course recommendations, and targeted promotions.",
+    "Your personal data will not be sold, rented, or shared with third parties without your explicit consent, except as required by law or for service delivery.",
+    "We may share your information with trusted third-party partners, such as payment processors or analytics providers, solely for operational purposes.",
+    "All payment transactions are encrypted and processed through secure third-party gateways. Metatron does not store sensitive financial details such as credit card information.",
+    "Users have the right to access, update, or delete their personal information at any time by managing their account settings or contacting support.",
+    "Metatron uses industry-standard security measures, such as encryption and firewalls, to safeguard your data from unauthorized access, alteration, or disclosure.",
+    "The platform may include links to third-party websites. Metatron is not responsible for the privacy practices or content of these external sites.",
+    "We retain user data as long as necessary to fulfill service obligations, comply with legal requirements, and support account activities. Inactive accounts may be deleted after 12 months of inactivity.",
+    "Metatron complies with applicable data protection laws, including GDPR, CCPA, and other regional regulations, ensuring transparency and user rights.",
+    "We may collect non-personal data such as browser type, device information, and usage patterns to improve the platform's functionality and user experience.",
+    "This Privacy Policy may be updated periodically to reflect changes in services or legal requirements. Continued use of the platform implies acceptance of the updated terms.",
+    "By using the platform, you consent to the collection, storage, and processing of your information as outlined in this Privacy Policy.",
+  ].sort(),
+};
+
 export default DataTermsPolicy;

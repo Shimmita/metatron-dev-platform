@@ -45,7 +45,9 @@ function JobsAppliedContainer() {
               <React.Fragment>
                 {/* jobs posted by the current user as recruiter */}
                 {items.map((_, index) => (
-                  <JobsApplicantsLayout key={index} />
+                  <React.Fragment>
+                    <JobsApplicantsLayout key={index} />
+                  </React.Fragment>
                 ))}
               </React.Fragment>
             )}

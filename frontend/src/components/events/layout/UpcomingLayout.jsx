@@ -2,10 +2,9 @@ import {
   Add,
   AndroidRounded,
   Apple,
-  ArrowForwardIosRounded,
   BookmarkAddRounded,
   LinkRounded,
-  VerifiedRounded,
+  VerifiedRounded
 } from "@mui/icons-material";
 import {
   Avatar,

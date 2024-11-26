@@ -18,49 +18,57 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { lazy, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
-import AllCountries from "../data/AllCountries";
-import EmployeesRange from "../data/EmployeesRange";
+import CountiesInKenya from "../data/Counties";
+import GenderData from "../data/GenderData";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-import RegisterAlertTitle from "./RegisterAlertTitle";
+const AlertCountry = lazy(() => import("../alerts/AlertCountry"));
+const AlertGeneral = lazy(() => import("../alerts/AlertGeneral"));
+const AlertProfileCompletion = lazy(() =>
+  import("../alerts/AlertProfileCompletion")
+);
 
 const RegistrationBusiness = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [name, setName] = useState("");
   const [about_org, setAboutOrg] = useState("");
+  const [county, setCounty] = useState("");
   const [country, setCountry] = useState("");
-  const [specialisationTitle, setSpecialisationTitle] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [employees, setEmployees] = useState("");
+  const [size, setSize] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [apply, setApply] = useState("");
+  const [ownership, setOwnership] = useState("");
+  const [gender, setGender] = useState("");
+  const [owner, setOwner] = useState("");
+  const [permitted, setPermitted] = useState("");
+  const [terms, setTerms] = useState("");
+
+  // handle missing fields and alo showing of signup alert
+  const [titleAlert, setTitleAlert] = useState();
+  const [missing_field_msg, setMissinFieldMsg] = useState("");
+  const [openAlertGenral, setOpenAlertGenral] = useState(false);
+
+  // business object
+  const [business, setBusiness] = useState({});
+  // alert profile pic
+  const [openAlertProfile, setOpenAlertProfile] = useState(false);
+
+  // alert country before proceed
+  const [openAlertCountry, setOpenAlertCountry] = useState(true);
 
   // control showing of the next and previous input detail
   const [showNext, setShowNext] = useState(false);
 
-  const navigate = useNavigate();
-
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
-  };
-
-  const [selectedSkills, setSelectedSkills] = useState([]);
-
-  const handleChange = (event, newValue) => {
-    if (newValue.length > 5) {
-      return; // Limit to 5 selections
-    }
-    setSelectedSkills(newValue);
-  };
-
-  const handleDelete = (skillToDelete) => {
-    setSelectedSkills((prevSkills) =>
-      prevSkills.filter((skill) => skill !== skillToDelete)
-    );
   };
 
   // global dark mode state from redux
@@ -71,13 +79,85 @@ const RegistrationBusiness = () => {
     setShowNext((prev) => !prev);
   };
 
-  // will define showing of custo title or not
-  const [openAlert, setOpenAlert] = useState(false);
+  const handleMissingField = () => {
+    if (name.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your name is missing !"
+      );
+      setOpenAlertGenral(true);
+      return true;
+    }
+    if (email.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your email is missing !"
+      );
+      return true;
+    }
+    if (password.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your password is missing !"
+      );
+      return true;
+    }
 
-  useEffect(() => {
-    if (specialisationTitle === "Zero Matched") setOpenAlert(true);
-  }, [specialisationTitle]);
+    if (phone.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your phone is missing !"
+      );
+      return true;
+    }
+    if (county.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your city/state/county/location is missing !"
+      );
+      return true;
+    }
+    if (gender.trim() === "") {
+      setTitleAlert("Missing Field");
+      setMissinFieldMsg(
+        "Please fill all the missing fields, your gender is missing !"
+      );
+      return true;
+    }
 
+    return false;
+  };
+  // handle registration of user
+  const handleUserRegistration = () => {
+    // check any missing data and alert
+    if (handleMissingField()) {
+      setOpenAlertGenral(true);
+    } else {
+      const user = {
+        name,
+        email,
+        password,
+        designation,
+        employees,
+        owner,
+        ownership,
+        phone,
+        country,
+        county,
+        gender,
+        about_org,
+        size,
+        apply,
+        permitted,
+        terms,
+      };
+      // set the user object
+      setBusiness(user);
+
+      // set open alertProfile where user will now pos data if necessary
+      setOpenAlertProfile(true);
+    }
+  };
   return (
     <Box
       height={"100vh"}
@@ -166,7 +246,7 @@ const RegistrationBusiness = () => {
                   <TextField
                     required
                     id="name"
-                    label="Name"
+                    label="Business Name"
                     className="w-75"
                     onChange={(e) => setName(e.target.value.toLowerCase())}
                     value={name}
@@ -177,7 +257,7 @@ const RegistrationBusiness = () => {
                   <TextField
                     required
                     id="email"
-                    label="Email"
+                    label="Business Email"
                     display={"flex"}
                     justifyContent={"center"}
                     className="w-75"
@@ -191,7 +271,7 @@ const RegistrationBusiness = () => {
                   <TextField
                     required
                     id="phone"
-                    label="Phone"
+                    label="Business Phone"
                     className="w-75"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
@@ -199,27 +279,39 @@ const RegistrationBusiness = () => {
                   />
                 </Box>
 
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    select
-                    id="countries"
-                    value={country}
-                    label="Country"
-                    className="w-75"
-                    onChange={(e) => setCountry(e.target.value)}
-                  >
-                    {AllCountries &&
-                      AllCountries.map((country, index) => (
-                        <MenuItem
-                          key={index}
-                          value={`${country.label} (${country.code}) +${country.phone}`}
-                        >
-                          {`${country.label} (${country.code}) +${country.phone}`}{" "}
-                        </MenuItem>
-                      ))}
-                  </TextField>
-                </Box>
+                {/* show this if country is contains kenya */}
+                {country?.trim().toLowerCase().includes("kenya") ? (
+                  <Box display={"flex"} justifyContent={"center"}>
+                    <TextField
+                      required
+                      select
+                      id="county"
+                      value={county}
+                      label="County or Location"
+                      className="w-75"
+                      onChange={(e) => setCounty(e.target.value)}
+                    >
+                      {CountiesInKenya &&
+                        CountiesInKenya.map((county) => (
+                          <MenuItem key={county} value={county}>
+                            {county}
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Box>
+                ) : (
+                  <Box display={"flex"} justifyContent={"center"}>
+                    <TextField
+                      required
+                      id="county_other"
+                      label="City or State"
+                      className="w-75"
+                      value={county}
+                      onChange={(e) => setCounty(e.target.value)}
+                      placeholder="my city or state"
+                    />
+                  </Box>
+                )}
 
                 <Box display={"flex"} justifyContent={"center"}>
                   <FormControl fullWidth variant="outlined" className="w-75">
@@ -252,38 +344,42 @@ const RegistrationBusiness = () => {
             ) : (
               <>
                 {/* next section details */}
+                {/* displayed when apply jobs field is yes means user can apply gigs */}
 
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    id="designation-org"
-                    value={specialisationTitle}
-                    label={`Designation ${60 - specialisationTitle.length}`}
-                    error={specialisationTitle.length > 60}
-                    placeholder="Software Development Company"
-                    className="w-75"
-                    onChange={(e) => setSpecialisationTitle(e.target.value)}
-                  />
-                </Box>
+                {apply?.toLowerCase().includes("yes") && (
+                  <React.Fragment>
+                    <Box display={"flex"} justifyContent={"center"}>
+                      <TextField
+                        required
+                        id="owner"
+                        label="Owner's Name"
+                        className="w-75"
+                        onChange={(e) => setOwner(e.target.value.toLowerCase())}
+                        value={owner}
+                        placeholder="Your name"
+                      />
+                    </Box>
 
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    select
-                    id="employees"
-                    value={employees}
-                    label="Employees"
-                    className="w-75"
-                    onChange={(e) => setEmployees(e.target.value)}
-                  >
-                    {EmployeesRange &&
-                      EmployeesRange.map((county) => (
-                        <MenuItem key={county} value={county}>
-                          {county}
-                        </MenuItem>
-                      ))}
-                  </TextField>
-                </Box>
+                    <Box display={"flex"} justifyContent={"center"}>
+                      <TextField
+                        required
+                        select
+                        id="gender"
+                        value={gender}
+                        label="Your Gender"
+                        className="w-75"
+                        onChange={(e) => setGender(e.target.value)}
+                      >
+                        {GenderData &&
+                          GenderData.map((gender) => (
+                            <MenuItem key={gender} value={gender}>
+                              {gender}
+                            </MenuItem>
+                          ))}
+                      </TextField>
+                    </Box>
+                  </React.Fragment>
+                )}
 
                 <Box display={"flex"} justifyContent={"center"}>
                   <TextField
@@ -345,7 +441,10 @@ const RegistrationBusiness = () => {
                   <Button
                     variant="contained"
                     className="w-25"
-                    sx={{ borderRadius: "20px" }}
+                    sx={{
+                      borderRadius: "20px",
+                      visibility: openAlertCountry ? "hidden" : undefined,
+                    }}
                     disableElevation
                     onClick={handleShowNext}
                     type="submit"
@@ -360,8 +459,9 @@ const RegistrationBusiness = () => {
                     className="w-25"
                     sx={{ borderRadius: "20px" }}
                     disableElevation
-                    onClick={(e) => navigate("/")}
                     type="submit"
+                    disabled={openAlertProfile}
+                    onClick={handleUserRegistration}
                   >
                     Signup
                   </Button>
@@ -372,11 +472,42 @@ const RegistrationBusiness = () => {
         </Box>
       </Box>
 
-      {/* show alert when zero selection is matched */}
-      <RegisterAlertTitle
-        openAlert={openAlert}
-        setOpenAlert={setOpenAlert}
-        setSpecialisationTitle={setSpecialisationTitle}
+      {/* alert general */}
+      <AlertGeneral
+        openAlertGeneral={openAlertGenral}
+        setOpenAlertGenral={setOpenAlertGenral}
+        title={titleAlert}
+        message={missing_field_msg}
+      />
+
+      {/* alert profile picture completion */}
+      <AlertProfileCompletion
+        openAlertProfile={openAlertProfile}
+        setOpenAlertProfile={setOpenAlertProfile}
+        user={business}
+      />
+
+      {/* alert country of the user */}
+      <AlertCountry
+        openAlertCountry={openAlertCountry}
+        setOpenAlertCountry={setOpenAlertCountry}
+        country={country}
+        setCountry={setCountry}
+        isBusiness={true}
+        setEmployees={setEmployees}
+        setDesignation={setDesignation}
+        setApply={setApply}
+        setSize={setSize}
+        setOwnership={setOwnership}
+        employees={employees}
+        size={size}
+        designation={designation}
+        ownership={ownership}
+        apply={apply}
+        terms={terms}
+        permitted={permitted}
+        setTerms={setTerms}
+        setPermitted={setPermitted}
       />
     </Box>
   );

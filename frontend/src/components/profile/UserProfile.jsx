@@ -20,7 +20,7 @@ import Tabs from "@mui/material/Tabs";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import devImage from "../../images/dev.jpeg";
-import { handleScrolledDown } from "../../redux/AppUI";
+import { resetDefaultBottomNav } from "../../redux/AppUI";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 const UserPost = lazy(() => import("./UserPostContainer"));
 const UserAbout = lazy(() => import("./UserAbout"));
@@ -69,7 +69,7 @@ export default function UserProfile() {
   // redux to stop showing of the speed dial
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(handleScrolledDown(true));
+    dispatch(resetDefaultBottomNav(true));
   });
 
   // handle going back using history

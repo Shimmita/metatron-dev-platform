@@ -2,8 +2,7 @@ import {
   Business,
   Close,
   PaidRounded,
-  PersonRounded,
-  WbIncandescentRounded,
+  WorkRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -19,7 +18,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import DataAccounts from "../data/DataAccounts";
-import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -87,27 +85,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
               </IconButton>
             </Tooltip>
           </Box>
-          <Box mb={1}>
-            <Box
-              display={"flex"}
-              justifyContent={"center"}
-              gap={1}
-              alignItems={"center"}
-            >
-              <WbIncandescentRounded
-                sx={{ width: 18, height: 18, color: "orange" }}
-              />
-              <Typography
-                variant={CustomDeviceSmallest() ? "caption" : "body2"}
-                color={"text.secondary"}
-              >
-                Enlighting Technology Country Wide
-              </Typography>
-              <WbIncandescentRounded
-                sx={{ width: 18, height: 18, color: "orange" }}
-              />
-            </Box>
-          </Box>
+
           {/* divider */}
           <Divider component={"div"} className="p-2 border-success" />
 
@@ -133,10 +111,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
               {/* personal account */}
               <Box mb={1}>
                 <Box display={"flex"} justifyContent={"center"}>
-                  <PersonRounded
-                    color="primary"
-                    sx={{ width: 40, height: 40 }}
-                  />
+                  <WorkRounded color="primary" sx={{ width: 36, height: 36 }} />
                 </Box>
                 <Box>
                   <Typography
@@ -167,7 +142,6 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                 </Box>
               </Box>
 
-
               {/* Business account */}
               <Box>
                 <Box mb={1} display={"flex"} justifyContent={"center"}>
@@ -186,7 +160,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
 
                   <ol>
                     {DataAccounts &&
-                      DataAccounts.Bussiness.map((data, index) => (
+                      DataAccounts.Business.map((data, index) => (
                         <Typography
                           key={index}
                           variant="body2"
@@ -201,7 +175,6 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                   </ol>
                 </Box>
               </Box>
-
 
               {/* donation, affiliate programs */}
 

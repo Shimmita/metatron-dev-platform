@@ -3,7 +3,6 @@ import { Backdrop, Box, Skeleton, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import BasicSpeedDial from "../custom/SpeedDial";
-import useScrolledDown from "../hooks/useScrolledDown";
 import CoursesContainer from "./CoursesContainer";
 import FeaturedPostContainer from "./FeaturedPostContainer";
 import JobsContainer from "./JobsContainer";
@@ -20,9 +19,6 @@ const RightbarAll = () => {
   const { isScrolledDown, isSidebarRighbar } = useSelector(
     (state) => state.appUI
   );
-
-  // run the listening component hook
-  useScrolledDown();
 
   // simulate loading of the request
   const [isLoadingRequest, setIsLoadingRequest] = useState(true);

@@ -26,8 +26,14 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import axios from "axios";
+import { getAuth, signOut } from "firebase/auth";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import logo from "../../images/logo_sm.png";
+import { resetAllSigningStateDetails } from "../../redux/CompleteSigning";
 import EduSpecialisation from "../data/EduSpecialisation";
+import BrowserCompress from "../utilities/BrowserCompress";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -49,17 +55,25 @@ export default function AlertProfileCompletion({
   openAlertProfile,
   setOpenAlertProfile,
   user,
+  isBusiness = false,
 }) {
+  // redux to check when user signs with a provider
+  const { avatar, token } = useSelector((state) => state.signUser);
   const [showInputs, setShowInput] = useState(false);
-  const [avatar, setAvatar] = useState(null);
-  const [avatarPath, setAvatarPath] = useState();
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPath, setAvatarPath] = useState(avatar || "");
   const [error, setError] = useState("");
+  const [errorSpecialize, setErrorSpecialize] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [errorPosting, setErrorPosting] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   // control edu institutions
   const [specialize, setSpecialize] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState(EduSpecialisation);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleAddNewSpecialisation = () => {
     if (inputValue && !options.includes(inputValue)) {
@@ -83,77 +97,156 @@ export default function AlertProfileCompletion({
   //   handle click agree
   const handleClickAgree = () => {
     setErrorPosting("");
+    setErrorSpecialize("");
     setShowInput(true);
   };
 
   //   handle click back sets show input false
   const handleClickedBack = () => {
     setShowInput(false);
-    // clear avatar
-    setAvatar(null);
-    setAvatarPath();
+    // clear avatar loaded from the file storage
+    setAvatarFile(null);
+
+    // check if redux avatar is available since it comes from provider
+    // if exits set it else let the path be null for later update after signin
+    setAvatarPath(avatar || "");
     setError("");
   };
   //   handle file change
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files[0];
+
     // clear any error
     setError("");
     // check file size
     if (handleFileSize(file)) {
-      setError("File size should not exceed 2MB");
-    }
+      setError("File size should not exceed 5MB");
+    } else {
+      // compress the file using the custom utility created
+      const compressedFile = await BrowserCompress(file);
+      setAvatarFile(compressedFile);
 
-    setAvatar(file);
-    // create an object from URI of the image
-    setAvatarPath(URL.createObjectURL(file));
+      // create an object from URI of the image
+      setAvatarPath(URL.createObjectURL(compressedFile));
+    }
   };
 
   //   handle file size
   const handleFileSize = (file) => {
-    return file.size > 2 * 1024 * 1024;
+    return file.size > 5 * 1024 * 1024;
   };
 
   // handle click complete profile registration
   const handleCompleteRegistration = () => {
+    const formData = new FormData();
+    formData.append("image", avatarFile);
+    formData.append("user", JSON.stringify(user));
+
     // show progress user is registering
     setIsPosting(true);
     // add the avatar property on the user
     user.avatar = avatarPath;
     user.specialize = specialize;
     // post to the backend using axios
+
+    // post to the backend using axios for tokenized user using google providr
     axios
-      .post("http://localhost:5000/signup/personal", user)
-      .then((res) => console.log(res.data))
+      .post(
+        token
+          ? `http://localhost:5000/signup/personal/google/${token}`
+          : `http://localhost:5000/signup/personal/mongo`,
+        formData
+      )
+      .then((res) => {
+        // set success messge
+        setSuccessMsg(res?.data?.message);
+        // clear error msg
+        setErrorPosting("");
+      })
       .catch((error) => {
-        // posting off
-        setIsPosting(false);
+        if (error?.code === "ERR_NETWORK") {
+          setErrorPosting("Server is unreacheable, kindly try again later ");
+          return;
+        }
+
         // error post msg
         setErrorPosting(
-          `Dear ${user.name}, we encountered an error while trying to register your profile, kindly try again later.\n Error reference ${error}`
+          `Dear ${user.name}, we encountered an error while trying to register your profile, kindly try again later.\n Error reference ${error?.message}`
         );
-      });
+        console.log(error);
+      })
+      .finally(() =>
+        // set posting off
+        setIsPosting(false)
+      );
   };
 
   //   handle later register without avatar
   const handleSignupLater = () => {
-    // show progress user is registering
-    setIsPosting(true);
-    // add the avatar property on the user but empty
-    user.avatar = "";
-    user.specialize = "";
-    // post to the backend using axios
-    axios
-      .post("http://localhost:5000/signup/personal", user)
-      .then((res) => console.log(res.data))
-      .catch((error) => {
-        // posting off
-        setIsPosting(false);
-        // error post msg
-        setErrorPosting(
-          `Dear ${user.name}, we encountered an error while trying to register your profile, kindly try again later.\n Error reference ${error}`
-        );
-      });
+    // no image passed
+    const formData = new FormData();
+    formData.append("user", JSON.stringify(user));
+
+    if (!specialize) {
+      setErrorSpecialize("please provide area of specialisation");
+      setIsPosting(false);
+    } else {
+      // clear error posting empty
+      setErrorPosting("");
+      // clear error specialize
+      setErrorSpecialize("");
+      // show progress user is registering
+      setIsPosting(true);
+      // add the avatar property on the user but empty if one from redux is null that came from auth provider
+      user.avatar = avatar || "";
+      // sepcialisation property add
+      user.specialize = specialize;
+
+      // post to the backend using axios for tokenized user using google providr
+      axios
+        .post(
+          token
+            ? `http://localhost:5000/signup/personal/google/${token}`
+            : `http://localhost:5000/signup/personal/mongo`,
+          formData
+        )
+        .then((res) => {
+          // set success messge
+          setSuccessMsg(res?.data?.message);
+          // clear error msg
+          setErrorPosting("");
+        })
+        .catch((error) => {
+          if (error?.code === "ERR_NETWORK") {
+            setErrorPosting("Server is unreacheable, kindly try again later ");
+            return;
+          }
+
+          // error post msg
+          setErrorPosting(
+            `Dear ${user.name}, we encountered an error while trying to register your profile, kindly try again later. ${error?.response?.data}`
+          );
+          console.log(error);
+        })
+        .finally(() => {
+          // posting off
+          setIsPosting(false);
+        });
+    }
+  };
+
+  // handle login of the user
+  const handleLogin = async () => {
+    // sign out the user if used token
+    if (token) {
+      // reset the state of redux for temp user
+      dispatch(resetAllSigningStateDetails());
+      const auth = getAuth();
+      signOut(auth).then(() => navigate("/"));
+    } else {
+      // user did not use auth provider during signin
+      navigate("/");
+    }
   };
 
   return (
@@ -191,6 +284,11 @@ export default function AlertProfileCompletion({
                     />
                     Error
                   </>
+                ) : successMsg ? (
+                  <>
+                    <Avatar alt="" src={logo} />
+                    Signup Successful
+                  </>
                 ) : (
                   <>
                     <Avatar alt="" src={avatarPath} />
@@ -199,10 +297,21 @@ export default function AlertProfileCompletion({
                 )}
               </Box>
               {/* close btn */}
-              <IconButton onClick={handleClose}>
-                <Close sx={{ width: 20, height: 20 }} />
-              </IconButton>
+              {!successMsg && (
+                <IconButton onClick={handleClose}>
+                  <Close sx={{ width: 20, height: 20 }} />
+                </IconButton>
+              )}
             </DialogTitle>
+            {/* show error of specialisation if present */}
+            {errorSpecialize && (
+              <Box display={"flex"} justifyContent={"center"}>
+                <Typography variant="caption" color={"red"}>
+                  {" "}
+                  {errorSpecialize}{" "}
+                </Typography>
+              </Box>
+            )}
 
             <Divider component={"div"} />
             <DialogContent>
@@ -212,6 +321,8 @@ export default function AlertProfileCompletion({
                     <React.Fragment>
                       <DialogContentText>{errorPosting}</DialogContentText>
                     </React.Fragment>
+                  ) : successMsg ? (
+                    <DialogContentText>{successMsg}</DialogContentText>
                   ) : (
                     <React.Fragment>
                       <DialogContentText
@@ -220,7 +331,7 @@ export default function AlertProfileCompletion({
                       >
                         Choose your favourite avatar icon from your device local
                         storage. Avatar should not exceed the threshold size of
-                        2MB
+                        5MB
                       </DialogContentText>{" "}
                       {/* Display error message if file exceeds 2MB */}
                       {error && (
@@ -260,7 +371,7 @@ export default function AlertProfileCompletion({
                           variant="body2"
                           color={"text.secondary"}
                         >
-                          {avatar && `${avatar.name}`.substring(0, 8)}
+                          {avatarFile && `${avatarFile.name}`.substring(0, 8)}
                         </Typography>
 
                         {/* file size */}
@@ -269,13 +380,13 @@ export default function AlertProfileCompletion({
                           variant="body2"
                           color={"text.secondary"}
                         >
-                          {avatar &&
+                          {avatarFile &&
                             `${parseFloat(
-                              avatar.size / (1024 * 1024)
+                              avatarFile.size / (1024 * 1024)
                             ).toPrecision(1)}MB`}
                         </Typography>
                         {/* done tick */}
-                        {avatar && (
+                        {avatarFile && (
                           <React.Fragment>
                             {error ? (
                               <Close
@@ -291,61 +402,67 @@ export default function AlertProfileCompletion({
                           </React.Fragment>
                         )}
                       </Box>
-                      {/* course of study */}
-                      <Box mt={2}>
-                        <DialogContentText
-                          gutterBottom
-                          id="alert-dialog-slide-description"
-                        >
-                          What did you specialize in at {user.eduInstitution}{" "}
-                          for your {user.educationLevel} program.
-                        </DialogContentText>{" "}
-                        <Box display={"flex"} justifyContent={"center"}>
-                          <Autocomplete
-                            value={specialize}
-                            className="w-100"
-                            onChange={(event, newValue) => {
-                              setSpecialize(newValue);
-                            }}
-                            inputValue={inputValue}
-                            onInputChange={(event, newInputValue) => {
-                              setInputValue(newInputValue);
-                            }}
-                            options={options}
-                            freeSolo
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                label="Specialisation"
-                                variant="standard"
-                                fullWidth
-                                required
+                      {/* display this when not business account */}
+                      {!isBusiness && (
+                        <React.Fragment>
+                          {/* course of study */}
+                          <Box mt={2}>
+                            <DialogContentText
+                              gutterBottom
+                              id="alert-dialog-slide-description"
+                            >
+                              Provide your area of specialisation which you
+                              majored at {user.eduInstitution} for your{" "}
+                              {user.educationLevel} program.
+                            </DialogContentText>{" "}
+                            <Box display={"flex"} justifyContent={"center"}>
+                              <Autocomplete
+                                value={specialize}
+                                className="w-100"
+                                onChange={(event, newValue) => {
+                                  setSpecialize(newValue);
+                                }}
+                                inputValue={inputValue}
+                                onInputChange={(event, newInputValue) => {
+                                  setInputValue(newInputValue);
+                                }}
+                                options={options}
+                                freeSolo
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="specialisation"
+                                    variant="standard"
+                                    fullWidth
+                                    required
+                                  />
+                                )}
+                                renderOption={(props, option) => (
+                                  <li {...props}>{option}</li>
+                                )}
+                                renderTags={() =>
+                                  specialize ? (
+                                    <Chip
+                                      label={specialize}
+                                      onDelete={handleDeleteSpecialisation}
+                                      deleteIcon={<CheckCircle />}
+                                    />
+                                  ) : null
+                                }
+                                noOptionsText={
+                                  <Chip
+                                    label={`Add "${inputValue}"`}
+                                    onClick={handleAddNewSpecialisation}
+                                    icon={<CheckCircle />}
+                                    color="primary"
+                                    clickable
+                                  />
+                                }
                               />
-                            )}
-                            renderOption={(props, option) => (
-                              <li {...props}>{option}</li>
-                            )}
-                            renderTags={() =>
-                              specialize ? (
-                                <Chip
-                                  label={specialize}
-                                  onDelete={handleDeleteSpecialisation}
-                                  deleteIcon={<CheckCircle />}
-                                />
-                              ) : null
-                            }
-                            noOptionsText={
-                              <Chip
-                                label={`Add "${inputValue}"`}
-                                onClick={handleAddNewSpecialisation}
-                                icon={<CheckCircle />}
-                                color="primary"
-                                clickable
-                              />
-                            }
-                          />
-                        </Box>
-                      </Box>
+                            </Box>
+                          </Box>
+                        </React.Fragment>
+                      )}
                     </React.Fragment>
                   )}
                 </>
@@ -356,20 +473,16 @@ export default function AlertProfileCompletion({
                     <React.Fragment>
                       <DialogContentText>{errorPosting}</DialogContentText>
                     </React.Fragment>
+                  ) : successMsg ? (
+                    <DialogContentText>{successMsg}</DialogContentText>
                   ) : (
                     <React.Fragment>
                       <DialogContentText
                         gutterBottom
                         id="alert-dialog-slide-description"
                       >
-                        If you are interested in adding an avatar and area of
-                        specialisation in the tech industry to your profile
-                        click{" "}
-                        <strong>
-                          <u>sure</u>
-                        </strong>{" "}
-                        to continue. This is optional you can update it later
-                        after successfully signing up.
+                        Suppose you are Interested in updating your avatar or
+                        profile picture click update to continue.
                       </DialogContentText>
 
                       <DialogContentText
@@ -377,22 +490,80 @@ export default function AlertProfileCompletion({
                         mt={2}
                         id="alert-dialog-slide-description"
                       >
-                        Individuals without an IT related Degree or Diploma and
-                        are enthusiastic in embracing technology are{" "}
-                        <strong>
-                          <u>recommended</u>
-                        </strong>{" "}
-                        to select option
-                        <strong>
-                          {" "}
-                          <u>zero technical education</u>
-                        </strong>{" "}
-                        for specialisation.
+                        Individuals without Tech related background are{" "}
+                        recommended to select zero technical education under
+                        specialisation.
                       </DialogContentText>
+
+                      {/* display this when not business account */}
+                      {!isBusiness && (
+                        <React.Fragment>
+                          {/* course of study */}
+                          <Box mt={2}>
+                            <DialogContentText
+                              gutterBottom
+                              id="alert-dialog-slide-descri"
+                            >
+                              Provide your area of specialisation which you
+                              majored at {user.eduInstitution} for your{" "}
+                              {user.educationLevel} program.
+                            </DialogContentText>{" "}
+                            <Box
+                              mt={2}
+                              display={"flex"}
+                              justifyContent={"center"}
+                            >
+                              <Autocomplete
+                                value={specialize}
+                                className="w-100"
+                                onChange={(event, newValue) => {
+                                  setSpecialize(newValue);
+                                }}
+                                inputValue={inputValue}
+                                onInputChange={(event, newInputValue) => {
+                                  setInputValue(newInputValue);
+                                }}
+                                options={options}
+                                freeSolo
+                                renderInput={(params) => (
+                                  <TextField
+                                    {...params}
+                                    label="specialisation"
+                                    variant="standard"
+                                    fullWidth
+                                    required
+                                  />
+                                )}
+                                renderOption={(props, option) => (
+                                  <li {...props}>{option}</li>
+                                )}
+                                renderTags={() =>
+                                  specialize ? (
+                                    <Chip
+                                      label={specialize}
+                                      onDelete={handleDeleteSpecialisation}
+                                      deleteIcon={<CheckCircle />}
+                                    />
+                                  ) : null
+                                }
+                                noOptionsText={
+                                  <Chip
+                                    label={`Add "${inputValue}"`}
+                                    onClick={handleAddNewSpecialisation}
+                                    icon={<CheckCircle />}
+                                    color="primary"
+                                    clickable
+                                  />
+                                }
+                              />
+                            </Box>
+                          </Box>
+                        </React.Fragment>
+                      )}
 
                       <DialogContentText
                         textAlign={"center"}
-                        mt={2}
+                        mt={3}
                         variant="caption"
                         gutterBottom
                         display={"flex"}
@@ -404,7 +575,7 @@ export default function AlertProfileCompletion({
                         <WbIncandescentRounded
                           sx={{ width: 15, height: 15, color: "orange" }}
                         />{" "}
-                        Enlightening Technology Country Wide{" "}
+                        Enlightening Technology Globally{" "}
                         <WbIncandescentRounded
                           sx={{ width: 15, height: 15, color: "orange" }}
                         />
@@ -418,14 +589,38 @@ export default function AlertProfileCompletion({
               {!showInputs ? (
                 <>
                   {errorPosting ? (
+                    <React.Fragment>
+                      <Button
+                        sx={{
+                          textTransform: "capitalize",
+                          borderRadius: "20px",
+                        }}
+                        onClick={() => navigate("/")}
+                      >
+                        Home
+                      </Button>
+
+                      <Button
+                        sx={{
+                          textTransform: "capitalize",
+                          borderRadius: "20px",
+                        }}
+                        onClick={handleClickAgree}
+                      >
+                        Retry
+                      </Button>
+                    </React.Fragment>
+                  ) : successMsg ? (
                     <Button
+                      color="success"
+                      variant="outlined"
                       sx={{
                         textTransform: "capitalize",
                         borderRadius: "20px",
                       }}
-                      onClick={handleClickAgree}
+                      onClick={handleLogin}
                     >
-                      Try Again
+                      Login
                     </Button>
                   ) : (
                     <React.Fragment>
@@ -445,7 +640,7 @@ export default function AlertProfileCompletion({
                         }}
                         onClick={handleClickAgree}
                       >
-                        Sure
+                        Update
                       </Button>
                     </React.Fragment>
                   )}
@@ -453,14 +648,37 @@ export default function AlertProfileCompletion({
               ) : (
                 <>
                   {errorPosting ? (
+                    <React.Fragment>
+                      <Button
+                        sx={{
+                          textTransform: "capitalize",
+                          borderRadius: "20px",
+                        }}
+                        onClick={() => navigate("/")}
+                      >
+                        Home
+                      </Button>
+
+                      <Button
+                        sx={{
+                          textTransform: "capitalize",
+                          borderRadius: "20px",
+                        }}
+                        onClick={handleClickAgree}
+                      >
+                        Retry
+                      </Button>
+                    </React.Fragment>
+                  ) : successMsg ? (
                     <Button
+                      color="success"
                       sx={{
                         textTransform: "capitalize",
                         borderRadius: "20px",
                       }}
-                      onClick={handleClickAgree}
+                      onClick={handleLogin}
                     >
-                      Try Again
+                      Login
                     </Button>
                   ) : (
                     <React.Fragment>
@@ -480,7 +698,7 @@ export default function AlertProfileCompletion({
                         }}
                         onClick={handleCompleteRegistration}
                         disabled={
-                          avatar === null ||
+                          avatarFile === null ||
                           specialize === "" ||
                           error.trim() !== ""
                         }

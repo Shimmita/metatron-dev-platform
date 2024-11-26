@@ -1,18 +1,14 @@
 import { Box } from "@mui/material";
 import React from "react";
-import useScrolledDown from "../hooks/useScrolledDown";
 import CoursesContainer from "./CoursesContainer";
+import FeaturedPostContainer from "./FeaturedPostContainer";
 import JobsContainer from "./JobsContainer";
 import RequestContainer from "./RequestContainer";
 import RightBarStepper from "./RightBarStepper";
-import FeaturedPostContainer from "./FeaturedPostContainer";
 
 const MobileTabCorousel = ({ mode }) => {
   // backdrop state
   const [corouselCounter, setCorouselCounter] = React.useState(0);
-
-  // run the listening component hook
-  useScrolledDown();
 
   return (
     <Box color={"text.primary"}>

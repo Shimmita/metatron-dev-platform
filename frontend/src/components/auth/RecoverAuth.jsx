@@ -7,6 +7,7 @@ import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 
 const RecoverAuth = () => {
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -67,7 +68,7 @@ const RecoverAuth = () => {
               variant={CustomDeviceSmallest() ? "caption" : "body2"}
               color={"text.secondary"}
             >
-              Enlightening Technology Country Wide
+              Enlightening Technology Globally
             </Typography>
             <WbIncandescentRounded
               sx={{ width: 18, height: 18, color: "orange" }}
@@ -86,13 +87,26 @@ const RecoverAuth = () => {
           <Box mb={3} mt={4} display={"flex"} justifyContent={"center"}>
             <TextField
               required
-              id="outlined-required"
+              id="outlined-email"
               label="Email"
               className="w-75"
               value={email}
               onChange={(e) => setEmail(e.target.value.toLowerCase())}
               placeholder="username@gmail.com"
               type="email"
+            />
+          </Box>
+
+          <Box mb={3} mt={4} display={"flex"} justifyContent={"center"}>
+            <TextField
+              required
+              id="outlined-phone"
+              label="phone"
+              className="w-75"
+              value={email}
+              onChange={(e) => setEmail(e.target.value.toLowerCase())}
+              placeholder="+123..."
+              type="tel"
             />
           </Box>
 

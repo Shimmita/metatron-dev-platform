@@ -7,7 +7,7 @@ import Tabs from "@mui/material/Tabs";
 import React, { lazy, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import devImage from "../../../../images/dev.jpeg";
-import { handleScrolledDown } from "../../../../redux/AppUI";
+import { resetDefaultBottomNav } from "../../../../redux/AppUI";
 import CustomDeviceIsSmall from "../../../utilities/CustomDeviceIsSmall";
 const MyPostContainer = lazy(() => import("./MyPostContainer"));
 const MyAbout = lazy(() => import("./MyPostAbout"));
@@ -56,7 +56,7 @@ export default function MyPostProfile() {
   // redux to stop showing of the speed dial
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(handleScrolledDown(true));
+    dispatch(resetDefaultBottomNav(true));
   });
   // handle going back using history
   const handleGoBack = () => {

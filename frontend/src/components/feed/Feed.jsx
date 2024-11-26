@@ -3,7 +3,6 @@ import React, { lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import BasicSpeedDial from "../custom/SpeedDial";
-import useScrolledDown from "../hooks/useScrolledDown";
 
 import BottomNav from "../custom/BottomNav";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -43,17 +42,15 @@ const EventsUpcoming = lazy(() => import("../events/EventsUpcoming"));
 const EventsBookMarks = lazy(() => import("../events/EventsBookMarks"));
 
 const Feed = () => {
-  // backdrop state
-  const { isScrolledDown, isTabSideBar } = useSelector((state) => state.appUI);
-
-  // run the listening component hook
-  useScrolledDown();
+  // redux state to track scrolling events for showing tab bar and sidebar toggle
+  const { isTabSideBar, isDefaultBottomNav } = useSelector(
+    (state) => state.appUI
+  );
 
   return (
     <React.Fragment>
       {isTabSideBar ? (
         // displayed when sidebar is on when full screen toggle not clicked
-
         <Box
           marginRight={CustomFeedEquidstance()}
           flex={3}
@@ -115,26 +112,24 @@ const Feed = () => {
               <Route path="*" element={<PageNotFound />} />
             </Routes>
 
-            {/* if scrolled down dont show bottom nav */}
-            <Box>{!isScrolledDown && <BottomNav />}</Box>
+            {/* decide bottom nav is to be show or not */}
+            <Box>{isDefaultBottomNav && <BottomNav />}</Box>
 
             {/* display speed dial in feed section only for mobile and no landscape */}
             {window.screen.availWidth <= 900 && (
               <Box>
-                {/* show speed dial if not scrolling down */}
-                {!isScrolledDown && (
-                  <>
-                    <Box
-                      position={"fixed"}
-                      sx={{
-                        left: 0,
-                        right: window.screen.availWidth < 600 ? "40%" : "31%",
-                        bottom: 50,
-                      }}
-                    >
-                      <BasicSpeedDial />
-                    </Box>
-                  </>
+                {/* decide speed dial being shown or not */}
+                {isDefaultBottomNav && (
+                  <Box
+                    position={"fixed"}
+                    sx={{
+                      left: 0,
+                      right: window.screen.availWidth < 600 ? "40%" : "31%",
+                      bottom: 50,
+                    }}
+                  >
+                    <BasicSpeedDial />
+                  </Box>
                 )}
               </Box>
             )}
@@ -218,30 +213,24 @@ const Feed = () => {
                 <Route path="*" element={<PageNotFound />} />
               </Routes>
 
-              {/* if scrolled down dont show bottom nav */}
-              <Box>{!isScrolledDown && <BottomNav />}</Box>
+              {/* decide bottom nav is to be show or not */}
+              <Box>{isDefaultBottomNav && <BottomNav />}</Box>
 
               {/* display speed dial in feed section only for mobile and no landscape */}
               {window.screen.availWidth <= 900 && (
                 <Box>
-                  {/* show speed dial if not scrolling down */}
-                  {!isScrolledDown && (
-                    <>
-                      <Box
-                        position={"fixed"}
-                        sx={{
-                          left: 0,
-                          right: CustomDeviceIsSmall()
-                            ? "40%"
-                            : CustomDeviceTablet() && isTabSideBar
-                            ? "31%"
-                            : "45%",
-                          bottom: 50,
-                        }}
-                      >
-                        <BasicSpeedDial />
-                      </Box>
-                    </>
+                  {/* decide speed dial being shown or not */}
+                  {isDefaultBottomNav && (
+                    <Box
+                      position={"fixed"}
+                      sx={{
+                        left: 0,
+                        right: window.screen.availWidth < 600 ? "40%" : "31%",
+                        bottom: 50,
+                      }}
+                    >
+                      <BasicSpeedDial />
+                    </Box>
                   )}
                 </Box>
               )}

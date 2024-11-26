@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { handleScrolledDown, handleSidebarRightbar } from "../../redux/AppUI";
+import { resetDefaultBottomNav, handleSidebarRightbar } from "../../redux/AppUI";
 
 const PageNotFound = () => {
   // redux to stop showing of the speed dial
@@ -19,7 +19,7 @@ const PageNotFound = () => {
   }
 
   useEffect(() => {
-    dispatch(handleScrolledDown(true));
+    dispatch(resetDefaultBottomNav(true));
   });
   return (
     <Box

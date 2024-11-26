@@ -1,7 +1,5 @@
 import { Box, Divider, IconButton, Tooltip, Typography } from "@mui/material";
 import React from "react";
-import { useDispatch } from "react-redux";
-import { handleScrolledDown } from "../../../redux/AppUI";
 
 import {
   CallEndRounded,
@@ -26,10 +24,6 @@ function MobileTablet() {
   const [useAudio, setUseAudio] = React.useState(false);
   const [shareScreen, setShareScreen] = React.useState(false);
   const [raiseHand, setRaiseHand] = React.useState(false);
-  // redux to stop showing of the speed dial
-  const dispatch = useDispatch();
-
-  dispatch(handleScrolledDown(true));
 
   // handle showing of people
   const handleShowPeople = () => {

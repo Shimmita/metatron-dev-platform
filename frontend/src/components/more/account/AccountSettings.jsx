@@ -7,7 +7,7 @@ import Tabs from "@mui/material/Tabs";
 import React, { lazy, Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { handleScrolledDown } from "../../../redux/AppUI";
+import { resetDefaultBottomNav } from "../../../redux/AppUI";
 const ProfileSettingsTab = lazy(() => import("./settings/ProfileSettingsTab"));
 const StreamingSettings = lazy(() => import("./settings/StreamingSettings"));
 
@@ -52,7 +52,7 @@ export default function AccountSettingsTabs() {
   // redux to stop showing of the speed dial
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(handleScrolledDown(true));
+    dispatch(resetDefaultBottomNav(true));
   });
 
   // go back exact place on the home page
