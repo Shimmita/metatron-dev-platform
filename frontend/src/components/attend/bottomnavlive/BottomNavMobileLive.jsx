@@ -1,22 +1,26 @@
 import {
-    CallEndRounded,
-    MessageRounded,
-    PeopleRounded,
+  CallEndRounded,
+  MapsUgcRounded,
+  MessageRounded,
+  PeopleRounded,
 } from "@mui/icons-material";
 import {
-    BottomNavigation,
-    BottomNavigationAction,
-    Paper,
-    Tooltip,
+  BottomNavigation,
+  BottomNavigationAction,
+  Paper,
+  Tooltip,
 } from "@mui/material";
 import React from "react";
 
-const BottomNavMobileLive = ({ handleShowPeople, handleShowMessages }) => {
+const BottomNavMobileLive = ({
+  handleShowPeople,
+  handleShowMessages,
+  setShowModal,
+}) => {
   const [value, setValue] = React.useState(0);
 
-  // return learning page
-  const handleLearningContent = () => {
-    return;
+  const handleShowModalComment = () => {
+    setShowModal(true);
   };
 
   return (
@@ -49,10 +53,16 @@ const BottomNavMobileLive = ({ handleShowPeople, handleShowMessages }) => {
           label="comments"
           icon={<MessageRounded />}
         />
+        {/* display showing of add comment when message clicked */}
+        <BottomNavigationAction
+          onClick={handleShowModalComment}
+          label="add"
+          icon={<MapsUgcRounded />}
+        />
 
         <Tooltip title="courses" arrow>
           <BottomNavigationAction
-            onClick={handleLearningContent}
+            onClick={null}
             label="Leave"
             icon={<CallEndRounded color="error" />}
           />

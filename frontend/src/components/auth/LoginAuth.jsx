@@ -102,7 +102,7 @@ const LoginAuth = () => {
             // else redirect them to complet reg page
             axios
               .post(
-                `http://localhost:5000/signup/personal/google/${token}`,
+                `http://localhost:5000/metatron/api/v1/signup/personal/google/${token}`,
                 emptyForm
               )
               .then((res) => {
@@ -161,7 +161,7 @@ const LoginAuth = () => {
     // login user without provider
     setIsLogin(true);
     axios
-      .post(`http://localhost:5000/signin/personal`, user)
+      .post(`http://localhost:5000/metatron/api/v1/signin/personal`, user)
       .then((res) => {
         console.log(res);
         // populating the redux for the logged in user

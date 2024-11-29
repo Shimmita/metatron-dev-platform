@@ -11,18 +11,18 @@ import {
   Image,
   LaptopRounded,
   LinkRounded,
-  LocationOnRounded,
   Microsoft,
-  PictureAsPdfRounded,
   SettingsRounded,
   SportsEsportsRounded,
   StorageRounded,
   Title,
 } from "@mui/icons-material";
 import {
+  Alert,
   Avatar,
   Box,
   Button,
+  Collapse,
   IconButton,
   MenuItem,
   Modal,
@@ -31,13 +31,15 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import LinuxLogo from "../../images/linux.jpeg";
 import AppLogo from "../../images/logo_sm.png";
-import CountiesInKenya from "../data/Counties";
 import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionTech from "../data/SubsectionTech";
+import BrowserCompress from "../utilities/BrowserCompress";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -66,28 +68,27 @@ const StyledInput = styled("input")({
 
 const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [post_category, setPostCategory] = useState("");
-  const [containerisation, setContainerisation] = useState("");
-  const [game_dev, setGameDev] = useState("");
-  const [desktop, setDesktop] = useState("");
-  const [pro_language, setProgLanguage] = useState("");
-  const [ios_dev, setIOSDev] = useState("");
-  const [android, setAndroid] = useState("");
   const [backend, setBackend] = useState("");
   const [frontend, setFrontend] = useState("");
-  const [designTool, setDesignTool] = useState("");
-  const [multiplatform, setMultiplatform] = useState("");
   const [database, setDatabase] = useState("");
-  const [devops_tool, setDevOpsTool] = useState("");
   const [gitHub, setGitHub] = useState("");
-  const [county, setCounty] = useState("");
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   const [fileUpload, setFileUpload] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
   const [fileLink, setFileLink] = useState("");
   const [isFileLink, setIsFileLink] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // for category 1, 2 and 3
+  const [category1, setCategory1] = useState("");
+  const [category2, setCategory2] = useState("");
+  const [category3, setCategory3] = useState("");
 
   // redux states
   const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { user } = useSelector((state) => state.currentUser);
 
   // handle full video when btn link clicked
   const handleFileUploadLink = () => {
@@ -103,6 +104,157 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     setFileLink("");
     // default showing of btn upload and link
     setIsFileLink(false);
+  };
+
+  // extracting current logged in user details from the redux store
+  const userId = user._id;
+  const username = user.name;
+  const usertitle = user.specialisationTitle;
+  const userverified = user.premium;
+  const userskills = user.selectedSkills;
+  const useravatar = user.avatar;
+  const usercountry = user.country;
+  const userstate = user.county;
+
+  // extracting the location for the user from the redux
+  const country = user.country;
+  const county = user.county;
+
+  const post = {
+    post_owner: {
+      userId,
+      username,
+      usertitle,
+      userverified,
+      userskills,
+      useravatar,
+      usercountry,
+      userstate,
+    },
+    post_title: title,
+    post_url:
+      fileLink.trim() !== null || fileLink.trim() !== "" ? fileLink : "",
+    post_body: description,
+    post_category: {
+      category_main: post_category,
+      category_sub1: category1,
+      category_sub2: category2,
+      category_sub3: category3,
+    },
+    post_location: {
+      usercountry: country,
+      userstate: county,
+    },
+  };
+
+  // useEffect hook for upadating category values
+  useEffect(() => {
+    // handle the value fo backend
+    const updatePostCategoryValue = () => {
+      if (post_category.includes("Backend")) {
+        setCategory1(backend);
+        setCategory2(database);
+      }
+      if (post_category.includes("Database")) {
+        setCategory1(database);
+      }
+
+      if (post_category.includes("Fullstack")) {
+        setCategory1(frontend);
+        setCategory2(backend);
+        setCategory3(database);
+      }
+    };
+
+    updatePostCategoryValue();
+  }, [post_category, backend, database, frontend]);
+
+  //   handle file change and compress the image
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    // compress the file using the custom utility created
+    const compressedFile = await BrowserCompress(file);
+
+    setFileUpload(compressedFile);
+    // create an object from URI of the image for local preview
+    setFilePreview(URL.createObjectURL(compressedFile));
+  };
+
+  // handle core missing fields
+  const handleEmptyFields = () => {
+    if (title?.trim() === "") {
+      setErrorMessage("Title field is required");
+      return false;
+    }
+    if (description?.trim() === "") {
+      setErrorMessage("Description field is required");
+      return false;
+    }
+    if (post_category?.trim === "") {
+      setErrorMessage("specialisation field is required");
+      return false;
+    }
+    if (post_category?.includes("Backend") && category1.trim() === "") {
+      setErrorMessage("backend field is required");
+      return false;
+    }
+    if (post_category?.includes("Developer") && category1.trim() === "") {
+      setErrorMessage("DevOps Tool field is required");
+      return false;
+    }
+    if (post_category?.includes("Backend") && category2.trim() === "") {
+      setErrorMessage("Database field is required");
+      return false;
+    }
+    if (post_category?.includes("Machine") && category1.trim() === "") {
+      setErrorMessage("ML/AI area of focus is required");
+      return false;
+    }
+    if (post_category?.includes("Database") && category1.trim() === "") {
+      setErrorMessage("Database field is required");
+      return false;
+    }
+
+    if (
+      post_category?.includes("Fullstack") &&
+      (category1.trim() === "" ||
+        category2.trim() === "" ||
+        category3.trim() === "")
+    ) {
+      setErrorMessage("Frontend, Backend and Database field all required");
+      return false;
+    }
+
+    return true;
+  };
+
+  // handle posting of data to the backend
+  const handlePost = () => {
+    // core fields not empty
+    if (handleEmptyFields()) {
+      // create a form which will faciltate parsing of the file for upload to cloud
+      const formData = new FormData();
+      // append post body after stringify it due to form data
+      formData.append("post", JSON.stringify(post));
+
+      // check if file is present then upload append it for upload
+      if (fileUpload) {
+        formData.append("image", fileUpload);
+      }
+
+      // performing post request
+      axios
+        .post(`http://localhost:5000/metatron/api/v1/post/create`, post)
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+        .finally(() => {
+          setIsUploading(false);
+        });
+    }
   };
 
   return (
@@ -130,6 +282,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         borderRadius={5}
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
         color={"text.primary"}
+        display={"flex"}
+        justifyContent={"center"}
+        alignItems={"center"}
         sx={{
           border: isDarkMode && "1px solid gray",
           marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
@@ -151,23 +306,33 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               <Avatar sx={{ width: 60, height: 60 }} src={AppLogo} alt="logo" />
             </Box>
 
-            {/*  button for posting */}
-            <Button
-              startIcon={<CodeRounded />}
-              className="w-50 rounded-5 shadow-sm"
-              variant="contained"
-              disabled={!post_category.length > 0 || description.length > 1000}
-              size="small"
-            >
-              Post Milestone
-            </Button>
-
             {/*close icon */}
             <IconButton onClick={(e) => setOpenModalTech(false)}>
               <Tooltip title={"close"}>
                 <Close />
               </Tooltip>{" "}
             </IconButton>
+          </Box>
+
+          {/* display error of missing filed if any */}
+          <Box display={"flex"} justifyContent={"center"}>
+            {errorMessage && (
+              <Collapse in={errorMessage || false}>
+                <Alert
+                  severity="warning"
+                  className="rounded-5"
+                  onClick={() => setErrorMessage("")}
+                  action={
+                    <IconButton aria-label="close" color="inherit" size="small">
+                      <Close fontSize="inherit" />
+                    </IconButton>
+                  }
+                  sx={{ mb: 2 }}
+                >
+                  {errorMessage}
+                </Alert>
+              </Collapse>
+            )}
           </Box>
 
           <Box
@@ -185,7 +350,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             }}
           >
             <Box display={"flex"} flexDirection={"column"} gap={3}>
-              <Box mt={2}>
+              <Box>
                 {/* post title */}
                 <Box
                   className="my-2"
@@ -194,14 +359,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 >
                   <Title color="primary" sx={{ width: 30, height: 30 }} />
                 </Box>
-                <Typography
-                  component={"li"}
-                  variant="body2"
-                  mt={3}
-                  color={"text.secondary"}
-                >
+                <Typography variant="body2" mt={3} color={"text.secondary"}>
                   Provide a relevant title about this post so that users can
-                  bootstrap your objectives or motives on the fly.
+                  bootstrap your objectives or motives on the fly. Should be
+                  simple to comprehend at glance.
                 </Typography>
 
                 <Box mt={4} className="w-100 mb-2">
@@ -209,7 +370,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     required
                     error={title.length > 50}
                     value={title}
-                    label={`title ${50 - title.length}`}
+                    label={`Title ${50 - title.length}`}
                     placeholder="React CheatSheet"
                     fullWidth
                     onChange={(e) => setTitle(e.target.value)}
@@ -222,14 +383,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               </Box>
 
               {/* post about */}
-              <Typography
-                component={"li"}
-                variant="body2"
-                color={"text.secondary"}
-              >
-                Posting about which IT specialisation. This helps us to
-                customize and categorise tech-related content to all users
-                accordingly by the help of a pre-trained machine learning model.
+              <Typography variant="body2" color={"text.secondary"}>
+                Posting about which specialisation in the Tech/IT Industry. This
+                helps us to customize and categorise tech-related content to all
+                users accordingly by the help of a pre-trained machine learning
+                model.
               </Typography>
 
               <Box className="w-100 mb-2 mt-2 ">
@@ -237,7 +395,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   required
                   select
                   value={post_category}
-                  label="post specialisation"
+                  label="Specialisation"
                   fullWidth
                   onChange={(e) => setPostCategory(e.target.value)}
                 >
@@ -255,22 +413,17 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* Containerisation  */}
               {post_category === "Containerisation and Orchestration" && (
                 <Box>
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    p={1}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} p={1}>
                     Containerisation option
                   </Typography>
                   <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
-                      value={containerisation}
-                      label="select containerisation technology"
+                      value={category1}
+                      label="Containerisation technology"
                       fullWidth
-                      onChange={(e) => setContainerisation(e.target.value)}
+                      onChange={(e) => setCategory1(e.target.value)}
                     >
                       {SubsectionTech &&
                         SubsectionTech.Containerisation.map((container) => (
@@ -282,6 +435,42 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                             >
                               <small style={{ fontSize: "small" }}>
                                 {container}
+                              </small>
+                            </Box>
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Box>
+                </Box>
+              )}
+
+              {/* machine learning and artificial intelligence */}
+              {post_category ===
+                "Machine Learning and Artificial Intelligence" && (
+                <Box>
+                  <Typography variant="body2" color={"text.secondary"} p={1}>
+                    Select the area of focus in the field of machine learning
+                    and artificial intelligence for specificity.
+                  </Typography>
+                  <Box className="w-100 mb-2 ">
+                    <TextField
+                      required
+                      select
+                      value={category1}
+                      label="ML/AI area of focus"
+                      fullWidth
+                      onChange={(e) => setCategory1(e.target.value)}
+                    >
+                      {SubsectionTech &&
+                        SubsectionTech.MachineLearning.map((ml_ai) => (
+                          <MenuItem key={ml_ai} value={ml_ai}>
+                            <Box
+                              display={"flex"}
+                              alignItems={"center"}
+                              gap={"5px"}
+                            >
+                              <small style={{ fontSize: "small" }}>
+                                {ml_ai}
                               </small>
                             </Box>
                           </MenuItem>
@@ -305,12 +494,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <Microsoft color="primary" sx={{ width: 30, height: 30 }} />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select desktop development stack that runs on either Linux
                     OS, MacOS, Windows OS or both. Desktop apps usually runs on
                     high-end devices such as Laptops and PCs and should not be
@@ -322,10 +506,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
-                      value={desktop}
-                      label="select stack used"
+                      value={category1}
+                      label="Development stack"
                       fullWidth
-                      onChange={(e) => setDesktop(e.target.value)}
+                      onChange={(e) => setCategory1(e.target.value)}
                     >
                       {SubsectionTech &&
                         SubsectionTech.Desktop.map((desktop) => (
@@ -360,12 +544,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select a game application development technology in
                     particular.
                   </Typography>
@@ -373,10 +552,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
-                      value={game_dev}
-                      label="game development technology"
+                      value={category1}
+                      label="Game development technology"
                       fullWidth
-                      onChange={(e) => setGameDev(e.target.value)}
+                      onChange={(e) => setCategory1(e.target.value)}
                     >
                       {SubsectionTech &&
                         SubsectionTech.GameDev.map((game_dev) => (
@@ -411,12 +590,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Programming language to post about
                   </Typography>
 
@@ -424,10 +598,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
-                      value={pro_language}
+                      value={category1}
                       label="Select Programming Language"
                       fullWidth
-                      onChange={(e) => setProgLanguage(e.target.value)}
+                      onChange={(e) => setCategory1(e.target.value)}
                     >
                       {SubsectionTech &&
                         SubsectionTech.Language.map((language) => (
@@ -452,7 +626,6 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {post_category === "Developer Operations (DevOps+CI/CD)" && (
                 <Box>
                   <Typography
-                    component={"li"}
                     gutterBottom
                     variant="body2"
                     color={"text.secondary"}
@@ -464,10 +637,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
-                      value={devops_tool}
+                      value={category1}
                       label="DevOps platform/tool"
                       fullWidth
-                      onChange={(e) => setDevOpsTool(e.target.value)}
+                      onChange={(e) => setCategory1(e.target.value)}
                     >
                       {SubsectionTech &&
                         SubsectionTech.DevOps.map((devops_tool) => (
@@ -502,22 +675,17 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     UI/UX Design Tools option
                   </Typography>
                   <Box mt={4} className="w-100 mb-2 ">
                     <TextField
                       required
                       select
-                      value={designTool}
-                      label="design tool"
+                      value={category1}
+                      label="Design tool"
                       fullWidth
-                      onChange={(e) => setDesignTool(e.target.value)}
+                      onChange={(e) => setCategory1(e.target.value)}
                     >
                       {SubsectionTech &&
                         SubsectionTech.Design.map((design_tool) => (
@@ -550,12 +718,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    p={1}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} p={1}>
                     Which frontend technology are you intrested in? If your post
                     is based on a bare HTML/CSS version of a project, select the
                     option with (HTML/CSS).
@@ -604,12 +767,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Which backend technology are you intrested in? Suppose none
                     of the provided options matches your preference select
                     (other).
@@ -659,12 +817,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    mt={3}
-                    color={"text.secondary"}
-                  >
+                  <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Which database are you intrested in? Suppose none of the
                     provided options matches your preference select (other).
                   </Typography>
@@ -710,12 +863,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    mt={3}
-                    color={"text.secondary"}
-                  >
+                  <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Native Android application development stack is usually
                     based on Java or Kotlin. The modern way of writing android
                     application is by using JetpakCompose which is pure Kotlin.
@@ -724,10 +872,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
-                      value={android}
-                      label="Android app development stack"
+                      value={category1}
+                      label="Android app stack"
                       fullWidth
-                      onChange={(e) => setAndroid(e.target.value)}
+                      onChange={(e) => setCategory1(e.target.value)}
                     >
                       {SubsectionTech &&
                         SubsectionTech.Android.map((android) => (
@@ -759,12 +907,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <Apple color="primary" sx={{ width: 30, height: 30 }} />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    mt={3}
-                    color={"text.secondary"}
-                  >
+                  <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Select the stack used in the development of your Native IOS
                     Application project/post
                   </Typography>
@@ -772,10 +915,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
-                      value={ios_dev}
-                      label="IOS app development stack"
+                      value={category1}
+                      label="IOS app stack"
                       fullWidth
-                      onChange={(e) => setIOSDev(e.target.value)}
+                      onChange={(e) => setCategory1(e.target.value)}
                     >
                       {SubsectionTech &&
                         SubsectionTech.IOS.map((ios) => (
@@ -811,12 +954,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select a mobile multiplatform/cross-application development
                     technology that you are interested in. multiplatform
                     technology or frameworks allows writing of a single code
@@ -828,10 +966,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
-                      value={multiplatform}
-                      label="Select a multiplatform framework"
+                      value={category1}
+                      label="Mobile multiplatform Stack"
                       fullWidth
-                      onChange={(e) => setMultiplatform(e.target.value)}
+                      onChange={(e) => setCategory1(e.target.value)}
                     >
                       {SubsectionTech &&
                         SubsectionTech.Multiplatfotm.map((multiplatform) => (
@@ -852,57 +990,15 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 </Box>
               )}
 
-              {/* county */}
-              <Box display={"flex"} justifyContent={"center"}>
-                <LocationOnRounded
-                  color="primary"
-                  sx={{ width: 30, height: 30 }}
-                />
-              </Box>
-
-              <Typography
-                component={"li"}
-                variant="body2"
-                color={"text.secondary"}
-              >
-                Select your county. This helps in promoting your county and our
-                country <span className="fw-bold">KENYA</span> as a whole in
-                accordance to technological embracement countrywide based on
-                <span className="fw-bold ms-1">
-                  Enlighting Technology Country Wide{" "}
-                </span>
-                .
-              </Typography>
-              <Box className="mb-3">
-                <TextField
-                  select
-                  required
-                  value={county}
-                  label="county or location of residence"
-                  fullWidth
-                  onChange={(e) => setCounty(e.target.value)}
-                >
-                  {CountiesInKenya &&
-                    CountiesInKenya.map((county) => (
-                      <MenuItem key={county} value={county}>
-                        <small style={{ fontSize: "small" }}> {county}</small>
-                      </MenuItem>
-                    ))}
-                </TextField>
-              </Box>
-
               {/* Github link */}
               <Box display={"flex"} justifyContent={"center"}>
                 <GitHub color="primary" sx={{ width: 30, height: 30 }} />
               </Box>
-              <Typography
-                component={"li"}
-                variant="body2"
-                color={"text.secondary"}
-              >
+              <Typography variant="body2" color={"text.secondary"}>
                 Provide version control link such as Github or Gitlab pointing
-                to your project repository. This may promote collaboraton and
-                contributors to your project by the interested techies.
+                to your project repository. This may eventually help in
+                promoting collaboration from a diversity of Tech experts on the
+                platform who could be contributors to your project.
               </Typography>
 
               <Box className="mb-2">
@@ -911,50 +1007,35 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   value={gitHub}
                   onChange={(e) => setGitHub(e.target.value)}
                   id="github-gitlab"
-                  label={"version control link (optional)"}
+                  label={"Version control link (optional)"}
                   placeholder=" https://github.com/username/project-name.git"
                 />
               </Box>
 
               {/* image and pdf for the post */}
               <Box display={"flex"} justifyContent={"center"} gap={1}>
-                <Image color="primary" sx={{ width: 30, height: 30 }} /> +
-                <PictureAsPdfRounded
-                  color="primary"
-                  sx={{ width: 30, height: 30 }}
-                />
+                <Image color="primary" sx={{ width: 30, height: 30 }} />
               </Box>
-              <Typography
-                component={"li"}
-                gutterBottom
-                variant="body2"
-                color={"text.secondary"}
-              >
-                Attach an image or pdf file for this post. This could help many
-                users on the platform to comprehend your ideologies or proof of
-                concepts much efficiently.
+              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                Provide an image or screenshot attachment backing your post for
+                visual presentation. This may be used as a point of reference to
+                those interested users. Attaching the file could boost the
+                reliability of your post to the target audience on the platform
+                though its (Optional).
               </Typography>
 
-              <Typography
-                textAlign={"center"}
-                variant="body2"
-                gutterBottom
-                color={"text.secondary"}
-              >
-                Attach an image or pdf file
-              </Typography>
-
+              {/* preview the file uploaded from storage */}
               {fileUpload && (
-                <Typography
-                  gutterBottom
-                  textAlign={"center"}
-                  variant="body2"
-                  width={"100%"}
-                  color={"text.secondary"}
-                >
-                  {`${fileUpload.name}`.substring(0, 30)}...
-                  {`${fileUpload.name}.`.split(".")[1]}
-                </Typography>
+                <Box display={"flex"} justifyContent={"center"}>
+                  <img
+                    src={filePreview}
+                    alt=""
+                    className="rounded"
+                    style={{
+                      maxWidth: 300,
+                    }}
+                  />
+                </Box>
               )}
 
               {!isFileLink ? (
@@ -967,18 +1048,18 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   <Button
                     component="label"
                     role={undefined}
-                    variant="outlined"
+                    variant="text"
                     disableElevation
                     tabIndex={-1}
-                    size="small"
+                    id="upload_text_btn"
                     sx={{ textTransform: "lowercase", borderRadius: "20px" }}
                     startIcon={<CloudUploadRounded />}
                   >
-                    Upload File
+                    Upload Image
                     <StyledInput
                       type="file"
-                      accept="image/*, .pdf"
-                      onChange={(event) => setFileUpload(event.target.files[0])}
+                      accept="image/*"
+                      onChange={handleFileChange}
                       multiple
                     />
                   </Button>
@@ -987,11 +1068,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   </Typography>
 
                   <Button
-                    variant="outlined"
+                    variant="text"
                     disableElevation
+                    id="external_text_btn_link"
                     sx={{ textTransform: "lowercase", borderRadius: "20px" }}
                     onClick={handleFileUploadLink}
-                    size="small"
                     startIcon={<LinkRounded />}
                   >
                     External Link
@@ -999,19 +1080,21 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 </Box>
               ) : (
                 <>
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    mt={3}
-                    color={"text.secondary"}
-                  >
-                    Provide the link or url pointing to your image or pdf file
-                    stored in the cloud storage: (Google Drive, MegaDrive,
-                    OneDrive, etc).
-                  </Typography>
+                  {/* preview the file uploaded from storage */}
+                  {(fileLink?.trim() !== null || fileLink?.trim() !== "") && (
+                    <Box display={"flex"} justifyContent={"center"}>
+                      <img
+                        src={fileLink}
+                        alt=""
+                        className="rounded"
+                        style={{
+                          maxWidth: 300,
+                        }}
+                      />
+                    </Box>
+                  )}
 
                   <Box
-                    mt={4}
                     className="w-100 mb-2"
                     display={"flex"}
                     alignItems={"center"}
@@ -1019,9 +1102,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   >
                     <TextField
                       required
+                      id="image_link_external"
                       type="url"
+                      variant="standard"
                       value={fileLink}
-                      label={`Paste image or pdf link`}
+                      label={`Paste image link`}
                       placeholder="https://...."
                       fullWidth
                       onChange={(e) => setFileLink(e.target.value)}
@@ -1037,15 +1122,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* description */}
-              <Box display={"flex"} justifyContent={"center"}>
+              <Box display={"flex"} mt={2} justifyContent={"center"}>
                 <EditRounded color="primary" sx={{ width: 30, height: 30 }} />
               </Box>
 
-              <Typography
-                component={"li"}
-                variant="body2"
-                color={"text.secondary"}
-              >
+              <Typography variant="body2" color={"text.secondary"}>
                 Provide a description about your post highlighting the technical
                 concepts you are excited to share with many individuals on the
                 platform. Let your description be concise and easier to
@@ -1058,10 +1139,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   multiline
                   contentEditable={false}
                   error={description.length > 1000}
-                  id="descr-post"
+                  id="descr-body-post"
                   label={
                     <p>
-                      {`description  ${1000 - description.length} characters`} *
+                      {`Description  ${1000 - description.length} characters`} *
                     </p>
                   }
                   fullWidth
@@ -1069,6 +1150,24 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="whats on your mind..."
                 />
+              </Box>
+
+              {/*  button for posting */}
+              <Box display={"flex"} justifyContent={"center"} mb={2}>
+                <Button
+                  onClick={handlePost}
+                  startIcon={<CodeRounded />}
+                  className={
+                    CustomDeviceIsSmall() ? "w-75 rounded-5" : "w-50 rounded-5"
+                  }
+                  variant="contained"
+                  disabled={
+                    !post_category.length > 0 || description.length > 1000
+                  }
+                  size="small"
+                >
+                  Upload Your Post
+                </Button>
               </Box>
             </Box>
           </Box>

@@ -3,6 +3,7 @@ import { IconButton, TextField } from "@mui/material";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import * as React from "react";
+import { useSelector } from "react-redux";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
@@ -18,7 +19,7 @@ const style = {
 
 export default function ModalSendMessage({ showModal, setShowModal }) {
   // max size of message
-  const messageMax = 100;
+  const messageMax = 50;
   // control showing of fab and input text
   const [messageInput, setMessageInput] = React.useState("");
 
@@ -26,6 +27,8 @@ export default function ModalSendMessage({ showModal, setShowModal }) {
   const handleShowModal = () => {
     setShowModal(!showModal);
   };
+  // redux states access
+  const { isDarkMode } = useSelector((state) => state.appUI);
 
   return (
     <Modal
@@ -46,9 +49,9 @@ export default function ModalSendMessage({ showModal, setShowModal }) {
           {/* text input */}
           <TextField
             fullWidth
-            className="rounded-start"
+            className={"rounded-start"}
             sx={{
-              backgroundColor: "white",
+              backgroundColor: isDarkMode ? "black" : "white",
             }}
             label={`max ${messageMax - messageInput.length}`}
             variant="filled"

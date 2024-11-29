@@ -16,7 +16,7 @@ const RightbarAll = () => {
   const [corouselCounter, setCorouselCounter] = React.useState(0);
 
   // redux states
-  const { isScrolledDown, isSidebarRighbar } = useSelector(
+  const { isDefaultBottomNav, isSidebarRighbar } = useSelector(
     (state) => state.appUI
   );
 
@@ -105,7 +105,7 @@ const RightbarAll = () => {
       {window.screen.availWidth > 900 && (
         <Box>
           {/* show speed dial if not scrolling down */}
-          {!isScrolledDown && (
+          {isDefaultBottomNav && (
             <>
               <Backdrop open={openBackdrop} />
               <Box position={"fixed"} sx={{ left: 0, right: 1, bottom: 55 }}>

@@ -23,7 +23,6 @@ const SpecialisationTech = [
   "Fullstack App Development (Frontend+Backend)",
   "Database Administration (SQL/NoSQL)",
   "Programming Languages",
-  "Machine Learning Operations (MLOps)",
   "Robotics Engineering",
   "Multiplatform App Development (Android+IOS)",
   "Desktop App Development",

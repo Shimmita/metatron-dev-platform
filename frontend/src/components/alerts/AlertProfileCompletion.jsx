@@ -153,8 +153,8 @@ export default function AlertProfileCompletion({
     axios
       .post(
         token
-          ? `http://localhost:5000/signup/personal/google/${token}`
-          : `http://localhost:5000/signup/personal/mongo`,
+          ? `http://localhost:5000/metatron/api/v1/signup/personal/google/${token}`
+          : `http://localhost:5000/metatron/api/v1/signup/personal/mongo`,
         formData
       )
       .then((res) => {
@@ -206,8 +206,8 @@ export default function AlertProfileCompletion({
       axios
         .post(
           token
-            ? `http://localhost:5000/signup/personal/google/${token}`
-            : `http://localhost:5000/signup/personal/mongo`,
+            ? `http://localhost:5000/metatron/api/v1/signup/personal/google/${token}`
+            : `http://localhost:5000/metatron/api/v1/signup/personal/mongo`,
           formData
         )
         .then((res) => {

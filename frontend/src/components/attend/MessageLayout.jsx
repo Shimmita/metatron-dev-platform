@@ -28,7 +28,7 @@ function MessageLayout() {
               fontWeight={"bold"}
               color={"primary"}
             >
-              Jonathan
+              Kumar Krishna
             </Typography>
           }
           secondary={"Kindly redo on SQl Delight installation I'm stuck"}

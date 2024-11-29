@@ -1,4 +1,4 @@
-import { MessageRounded } from "@mui/icons-material";
+import { MapsUgcRounded } from "@mui/icons-material";
 import { Box, Fab } from "@mui/material";
 import React from "react";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -6,13 +6,13 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import MessageLayout from "./MessageLayout";
 import ModalSendMessage from "./ModalSendMessage";
 
-function MessageContainer({showModal,setShowModal}) {
+function MessageContainer({ showModal, setShowModal }) {
   // array simulation of the messages
   const messages = Array.from({ length: 30 }, (_, i) => i);
 
   // handle showing of modal when fab is clicked
   const handleShowingModal = () => {
-    setShowModal(!showModal);
+    setShowModal(true);
   };
   return (
     <Box
@@ -41,17 +41,17 @@ function MessageContainer({showModal,setShowModal}) {
             ))}
         </Box>
 
-        {/* fab/textInput modal container only on smaller devices*/}
-        {CustomDeviceIsSmall() && (
+        {/* fab trigger modal on tablets only*/}
+        {CustomDeviceTablet() && !showModal && (
           <Box
             sx={{
               position: "absolute",
               right: "45%",
-              bottom: 5,
+              bottom: 10,
             }}
           >
             <Fab onClick={handleShowingModal} size="medium" color="primary">
-              <MessageRounded />
+              <MapsUgcRounded />
             </Fab>
           </Box>
         )}

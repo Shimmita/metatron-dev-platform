@@ -24,20 +24,21 @@ function MobileTablet() {
   const [useAudio, setUseAudio] = React.useState(false);
   const [shareScreen, setShareScreen] = React.useState(false);
   const [raiseHand, setRaiseHand] = React.useState(false);
+  // modal for adding comments
+  const [showModal, setShowModal] = React.useState(false);
 
   // handle showing of people
   const handleShowPeople = () => {
-    setShowPeople(!showPeople);
-    // make show messages false
-    setShowMessage(!showMessage);
+    setShowPeople(true);
+    // show messaging false
+    setShowMessage(false);
   };
 
   // handle showing of messages
   const handleShowMessages = () => {
-    setShowMessage((prev) => !prev);
-
-    // make show people false
-    handleShowPeople();
+    setShowMessage(true);
+    // show people false
+    setShowPeople(false);
   };
 
   // handle use camera
@@ -62,7 +63,7 @@ function MobileTablet() {
   };
 
   return (
-    <Box width={"100%"} height={"90vh"} bgcolor={"background.default"}>
+    <Box width={"100%"} height={"93vh"} bgcolor={"background.default"}>
       {/* container */}
       <Box maxHeight={"70vh"}>
         <Box>
@@ -322,12 +323,19 @@ function MobileTablet() {
             textAlign={"center"}
             textTransform={"uppercase"}
           >
-            {showPeople ? "Attendance Room (300)" : "Comment Room"}
+            {showPeople ? "Attendance Room (300)" : "Comment Room (20)"}
           </Typography>
 
           {/* sidebar  container */}
           <Box mt={1} className="rounded">
-            {showPeople ? <AttendantsContainer /> : <MessageContainer />}
+            {showPeople ? (
+              <AttendantsContainer />
+            ) : (
+              <MessageContainer
+                showModal={showModal}
+                setShowModal={setShowModal}
+              />
+            )}
           </Box>
         </Box>
       </Box>
@@ -338,6 +346,7 @@ function MobileTablet() {
           <BottomNavMobileLive
             handleShowPeople={handleShowPeople}
             handleShowMessages={handleShowMessages}
+            setShowModal={setShowModal}
           />
         </Box>
       ) : null}
