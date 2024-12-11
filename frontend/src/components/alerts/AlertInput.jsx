@@ -7,16 +7,22 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import React, { useState } from "react";
-import SpecialisationJobs from "../data/SpecialisationJobs";
+import SubsectionTech from "../data/SubsectionTech";
+import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomLandScape from "../utilities/CustomLandscape";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import { useSelector } from "react-redux";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function RegisterAlertTitle({
+export default function AlertInput({
   openAlert,
   setOpenAlert,
-  setSpecialisationTitle,
+  setCustomArea,
+  body = "",
+  title = "",
 }) {
   const [customTitle, setCustomTitle] = useState("");
 
@@ -28,16 +34,22 @@ export default function RegisterAlertTitle({
   // handle info entered by the user before closing the modal
   const handleEnterInfo = () => {
     // update the array then set the value of the user before close
-    SpecialisationJobs && SpecialisationJobs.push(customTitle);
-    setSpecialisationTitle(customTitle);
-    handleClose();
+    if (SubsectionTech?.MachineLearning?.includes(customTitle)) {
+      return;
+    } else {
+      SubsectionTech.MachineLearning.push(customTitle);
+      setCustomArea(customTitle);
+      handleClose();
+    }
   };
 
   //   handle when user dismissed the dialog
   const handleDismiss = () => {
-    setSpecialisationTitle("");
+    setCustomArea("");
     handleClose();
   };
+  // redux states
+  const { isTabSideBar } = useSelector((state) => state.appUI);
 
   return (
     <React.Fragment>
@@ -45,22 +57,32 @@ export default function RegisterAlertTitle({
         open={openAlert}
         TransitionComponent={Transition}
         keepMounted
-        onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
+        sx={{
+          marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
+
+          width:
+            CustomDeviceTablet() && isTabSideBar
+              ? "60%"
+              : CustomLandScape()
+              ? "92%"
+              : CustomLandscapeWidest()
+              ? "97.5%"
+              : undefined,
+        }}
       >
-        <DialogTitle>Preferred Title</DialogTitle>
+        <DialogTitle variant="body1">{title}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            Please enter your preferred title relating to tech industry
+            {body}
           </DialogContentText>
 
           <TextField
             autoFocus
             required
             margin="dense"
-            id="custom-title"
-            name="custom-title"
-            label="custom title"
+            id="custom_area"
+            label={"preferred area"}
             fullWidth
             onChange={(e) => setCustomTitle(e.target.value)}
             variant="standard"
@@ -68,7 +90,12 @@ export default function RegisterAlertTitle({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDismiss}>Back</Button>
-          <Button onClick={handleEnterInfo}>Enter</Button>
+          <Button
+            disabled={customTitle.trim() === ""}
+            onClick={handleEnterInfo}
+          >
+            Enter
+          </Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>

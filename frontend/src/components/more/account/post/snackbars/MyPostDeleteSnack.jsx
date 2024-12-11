@@ -1,12 +1,13 @@
-import { Slide } from "@mui/material";
+import { Slide, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
-import * as React from "react";
+import React from "react";
+import CustomDeviceTablet from "../../../../utilities/CustomDeviceTablet";
 
-export default function MyPostSnackBar({
+export default function MyPostDeleteSnack({
   showSnackbar,
   setShowSnackbar,
-  setIsEditing,
+  handleBeginDeletingPost,
 }) {
   // handle closing of the snackbar without accepting
   const handleClose = (event, reason) => {
@@ -17,12 +18,9 @@ export default function MyPostSnackBar({
     setShowSnackbar(false);
   };
 
-  // handle showing of edit & close update and discard btn when yes
-  // of the snackbar is clicked
-
-  const handleEditUpdateDiscard = () => {
-    setIsEditing(true);
-    // general closing of the snackbar
+  const handleDelete = () => {
+    // delete post from the parent component
+    handleBeginDeletingPost();
     handleClose();
   };
 
@@ -30,11 +28,11 @@ export default function MyPostSnackBar({
     <React.Fragment>
       <Button
         variant="contained"
-        color="secondary"
         size="small"
+        color="warning"
         disableElevation
         sx={{ borderRadius: "10px" }}
-        onClick={handleEditUpdateDiscard}
+        onClick={handleDelete}
       >
         Yes
       </Button>
@@ -44,10 +42,17 @@ export default function MyPostSnackBar({
   return (
     <Snackbar
       open={showSnackbar}
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: CustomDeviceTablet() ? "right" : "center",
+      }}
       onClose={handleClose}
       autoHideDuration={2000}
-      message="changes made will be discarded"
+      message={
+        <Typography variant="body2">
+          post will be deleted permanently
+        </Typography>
+      }
       TransitionComponent={Slide}
       action={action}
     />

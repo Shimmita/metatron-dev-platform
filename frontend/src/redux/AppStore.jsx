@@ -6,7 +6,8 @@ import { combineReducers } from "redux";
 
 import appUISliceReducer from "./AppUI";
 import completeSigningReducer from "./CompleteSigning";
-import currentUserRedux from "./CurrentUser";
+import currentUserReducer from "./CurrentUser";
+import currentPostsReducer from "./CurrentPosts";
 
 // Configure persist settings
 const persistConfig = {
@@ -18,7 +19,8 @@ const persistConfig = {
 const rootReducer = combineReducers({
   appUI: appUISliceReducer,
   signUser: completeSigningReducer,
-  currentUser: currentUserRedux,
+  currentUser: currentUserReducer,
+  currentPosts: currentPostsReducer,
 });
 
 // Persist the root reducer

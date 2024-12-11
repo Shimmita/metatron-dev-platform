@@ -50,6 +50,9 @@ const LoginAuth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // axios defaults with credentials to true
+  axios.defaults.withCredentials=true
+
   const [messageGeneral, setMessageGeneral] = useState("");
   const [isLogin, setIsLogin] = useState(false);
 
@@ -161,15 +164,15 @@ const LoginAuth = () => {
     // login user without provider
     setIsLogin(true);
     axios
-      .post(`http://localhost:5000/metatron/api/v1/signin/personal`, user)
+      .post(`http://localhost:5000/metatron/api/v1/signin/personal`, user,)
       .then((res) => {
         console.log(res);
         // populating the redux for the logged in user
-        dispatch(updateUserCurrentUserRedux(res.data.user));
+        dispatch(updateUserCurrentUserRedux(res.data));
       })
       .catch((err) => {
         if (err?.code === "ERR_NETWORK") {
-          setMessageGeneral("Server Unreacheable");
+          setMessageGeneral("Server Unreachable");
           return;
         }
         setMessageGeneral(err?.response?.data);

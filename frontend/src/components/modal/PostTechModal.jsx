@@ -22,6 +22,7 @@ import {
   Avatar,
   Box,
   Button,
+  CircularProgress,
   Collapse,
   IconButton,
   MenuItem,
@@ -32,7 +33,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { lazy, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import LinuxLogo from "../../images/linux.jpeg";
 import AppLogo from "../../images/logo_sm.png";
@@ -44,6 +45,8 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CustomModalHeight from "../utilities/CustomModalHeight";
+const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
+const AlertInput = lazy(() => import("../alerts/AlertInput"));
 
 // styled modal
 const StyledModalPost = styled(Modal)({
@@ -85,10 +88,18 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [category1, setCategory1] = useState("");
   const [category2, setCategory2] = useState("");
   const [category3, setCategory3] = useState("");
+  // control opening and showing of the alert custom input
+  const [openAlert, setOpenAlert] = useState(false);
+
+  // control showing of logout user session expired
+  const [openAlertLogout, setOpenAlertLogout] = useState(false);
 
   // redux states
   const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
   const { user } = useSelector((state) => state.currentUser);
+
+  // axios default credentials
+  axios.defaults.withCredentials = true;
 
   // handle full video when btn link clicked
   const handleFileUploadLink = () => {
@@ -107,43 +118,40 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   };
 
   // extracting current logged in user details from the redux store
-  const userId = user._id;
-  const username = user.name;
-  const usertitle = user.specialisationTitle;
-  const userverified = user.premium;
-  const userskills = user.selectedSkills;
-  const useravatar = user.avatar;
-  const usercountry = user.country;
-  const userstate = user.county;
-
-  // extracting the location for the user from the redux
+  const ownerId = user._id;
+  const ownername = user.name;
+  const ownertitle = user.specialisationTitle;
+  const ownerverified = user.premium;
+  const ownerskills = user.selectedSkills;
+  const owneravatar = user.avatar;
   const country = user.country;
-  const county = user.county;
+  const state = user.county;
 
   const post = {
     post_owner: {
-      userId,
-      username,
-      usertitle,
-      userverified,
-      userskills,
-      useravatar,
-      usercountry,
-      userstate,
+      ownerId,
+      ownername,
+      ownertitle,
+      ownerverified,
+      ownerskills,
+      owneravatar,
     },
     post_title: title,
     post_url:
       fileLink.trim() !== null || fileLink.trim() !== "" ? fileLink : "",
     post_body: description,
     post_category: {
-      category_main: post_category,
-      category_sub1: category1,
-      category_sub2: category2,
-      category_sub3: category3,
+      main: post_category,
+      sub1: category1,
+      sub2: category2,
+      sub3: category3,
     },
     post_location: {
-      usercountry: country,
-      userstate: county,
+      country,
+      state,
+    },
+    post_github: {
+      link: gitHub.trim() !== "" ? gitHub : "",
     },
   };
 
@@ -210,8 +218,15 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       setErrorMessage("ML/AI area of focus is required");
       return false;
     }
-    if (post_category?.includes("Database") && category1.trim() === "") {
-      setErrorMessage("Database field is required");
+    if (post_category?.includes("Cybersecurity") && category1.trim() === "") {
+      setErrorMessage("Cybersecurity area field is required");
+      return false;
+    }
+    if (
+      post_category?.includes("Data Science and Analytics") &&
+      category1.trim() === ""
+    ) {
+      setErrorMessage("Data science area field is required");
       return false;
     }
 
@@ -230,8 +245,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
   // handle posting of data to the backend
   const handlePost = () => {
+    // clear any error message
+    setErrorMessage("");
     // core fields not empty
     if (handleEmptyFields()) {
+      // set is uploading true
+      setIsUploading(true);
       // create a form which will faciltate parsing of the file for upload to cloud
       const formData = new FormData();
       // append post body after stringify it due to form data
@@ -244,12 +263,24 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
       // performing post request
       axios
-        .post(`http://localhost:5000/metatron/api/v1/post/create`, post)
-        .then((res) => {
-          console.log(res.data);
+        .post(`http://localhost:5000/metatron/api/v1/posts/create`, formData, {
+          withCredentials: true,
         })
-        .catch((err) => {
-          console.log(err);
+        .then((res) => {
+          // reload the window
+          window.location.reload();
+        })
+        .catch(async (err) => {
+          //  user login session expired show logout alert
+          if (err?.response?.data.login) {
+            setOpenAlertLogout(true);
+          }
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage("Server Unreachable");
+            return;
+          }
+
+          setErrorMessage(err?.response.data);
         })
         .finally(() => {
           setIsUploading(false);
@@ -257,13 +288,23 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     }
   };
 
+  const title_ml_area = "Area of Focus";
+  const body_ml_are =
+    "provide preferred machine learning or artificial intelligence area of focus";
+
+  useEffect(() => {
+    if (category1?.trim() === "zero (none of the areas)") {
+      setOpenAlert(true);
+    }
+  }, [category1]);
+
   return (
     <StyledModalPost
       keepMounted
       sx={{
         marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
       }}
-      open={openModalTech}
+      open={openModalTech && !openAlertLogout}
       // onClose={(e) => setOpenPostModal(false)}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
@@ -307,7 +348,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             </Box>
 
             {/*close icon */}
-            <IconButton onClick={(e) => setOpenModalTech(false)}>
+            <IconButton
+              disabled={isUploading}
+              onClick={(e) => setOpenModalTech(false)}
+            >
               <Tooltip title={"close"}>
                 <Close />
               </Tooltip>{" "}
@@ -315,8 +359,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           </Box>
 
           {/* display error of missing filed if any */}
-          <Box display={"flex"} justifyContent={"center"}>
-            {errorMessage && (
+          <Box
+            display={"flex"}
+            justifyContent={"center"}
+            mb={isUploading || errorMessage ? 3 : undefined}
+          >
+            {errorMessage ? (
               <Collapse in={errorMessage || false}>
                 <Alert
                   severity="warning"
@@ -332,6 +380,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   {errorMessage}
                 </Alert>
               </Collapse>
+            ) : (
+              isUploading && (
+                <Box>
+                  <CircularProgress />
+                </Box>
+              )
             )}
           </Box>
 
@@ -347,6 +401,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               // Hide scrollbar for IE, Edge and Firefox
               msOverflowStyle: "none",
               scrollbarWidth: "none",
+              opacity: isUploading && ".3",
             }}
           >
             <Box display={"flex"} flexDirection={"column"} gap={3}>
@@ -368,6 +423,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 <Box mt={4} className="w-100 mb-2">
                   <TextField
                     required
+                    disabled={isUploading}
                     error={title.length > 50}
                     value={title}
                     label={`Title ${50 - title.length}`}
@@ -394,6 +450,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 <TextField
                   required
                   select
+                  disabled={isUploading}
                   value={post_category}
                   label="Specialisation"
                   fullWidth
@@ -420,6 +477,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={category1}
                       label="Containerisation technology"
                       fullWidth
@@ -445,8 +503,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* machine learning and artificial intelligence */}
-              {post_category ===
-                "Machine Learning and Artificial Intelligence" && (
+              {post_category === "Artificial Intelligence" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Select the area of focus in the field of machine learning
@@ -456,8 +513,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={category1}
-                      label="ML/AI area of focus"
+                      label="ML/AI area"
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
@@ -471,6 +529,78 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                             >
                               <small style={{ fontSize: "small" }}>
                                 {ml_ai}
+                              </small>
+                            </Box>
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Box>
+                </Box>
+              )}
+
+              {/* data science */}
+              {post_category === "Data Science and Analytics" && (
+                <Box>
+                  <Typography variant="body2" color={"text.secondary"} p={1}>
+                    Select the area of focus in the field of data science and
+                    analysis in particular.
+                  </Typography>
+                  <Box className="w-100 mb-2 ">
+                    <TextField
+                      required
+                      select
+                      disabled={isUploading}
+                      value={category1}
+                      label="Data science area"
+                      fullWidth
+                      onChange={(e) => setCategory1(e.target.value)}
+                    >
+                      {SubsectionTech &&
+                        SubsectionTech.DataScience.map((data_science) => (
+                          <MenuItem key={data_science} value={data_science}>
+                            <Box
+                              display={"flex"}
+                              alignItems={"center"}
+                              gap={"5px"}
+                            >
+                              <small style={{ fontSize: "small" }}>
+                                {data_science}
+                              </small>
+                            </Box>
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Box>
+                </Box>
+              )}
+
+              {/* cybersecurity */}
+              {post_category === "Cybersecurity Engineering" && (
+                <Box>
+                  <Typography variant="body2" color={"text.secondary"} p={1}>
+                    Select the area of focus in the field of cybersecurity
+                    engineering.
+                  </Typography>
+                  <Box className="w-100 mb-2 ">
+                    <TextField
+                      required
+                      disabled={isUploading}
+                      select
+                      value={category1}
+                      label="Cybersecurity area"
+                      fullWidth
+                      onChange={(e) => setCategory1(e.target.value)}
+                    >
+                      {SubsectionTech &&
+                        SubsectionTech.Cybersec.map((cybersec) => (
+                          <MenuItem key={cybersec} value={cybersec}>
+                            <Box
+                              display={"flex"}
+                              alignItems={"center"}
+                              gap={"5px"}
+                            >
+                              <small style={{ fontSize: "small" }}>
+                                {cybersec}
                               </small>
                             </Box>
                           </MenuItem>
@@ -506,6 +636,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={category1}
                       label="Development stack"
                       fullWidth
@@ -551,6 +682,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   <Box mt={4} className="w-100 mb-2 ">
                     <TextField
                       required
+                      disabled={isUploading}
                       select
                       value={category1}
                       label="Game development technology"
@@ -598,6 +730,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={category1}
                       label="Select Programming Language"
                       fullWidth
@@ -623,7 +756,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* DevOps */}
-              {post_category === "Developer Operations (DevOps+CI/CD)" && (
+              {post_category === "DevOps Engineering" && (
                 <Box>
                   <Typography
                     gutterBottom
@@ -637,6 +770,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={category1}
                       label="DevOps platform/tool"
                       fullWidth
@@ -662,7 +796,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* UI/UX  */}
-              {post_category === "UI/UX Design/Graphic Design" && (
+              {post_category === "UI/UX Design" && (
                 <Box>
                   <Box
                     className="my-2"
@@ -682,6 +816,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={category1}
                       label="Design tool"
                       fullWidth
@@ -708,8 +843,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
               {/* frontend */}
               {(post_category === "Frontend App Development" ||
-                post_category ===
-                  "Fullstack App Development (Frontend+Backend)") && (
+                post_category === "Fullstack Application Development") && (
                 <Box>
                   <Box mt={2} display={"flex"} justifyContent={"center"}>
                     <LaptopRounded
@@ -727,6 +861,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={frontend}
                       label="Frontend framework"
                       fullWidth
@@ -753,8 +888,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
               {/* backend */}
               {(post_category === "Backend App Development" ||
-                post_category ===
-                  "Fullstack App Development (Frontend+Backend)") && (
+                post_category === "Fullstack Application Development") && (
                 <Box>
                   <Box
                     className="my-2"
@@ -776,6 +910,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={backend}
                       label="Backend Framework"
                       fullWidth
@@ -801,10 +936,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* Database */}
-              {(post_category === "Database Administration (SQL/NoSQL)" ||
+              {(post_category === "Database Administration" ||
                 post_category === "Backend App Development" ||
-                post_category ===
-                  "Fullstack App Development (Frontend+Backend)") && (
+                post_category === "Fullstack Application Development") && (
                 <Box>
                   <Box
                     className="my-2"
@@ -825,6 +959,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={database}
                       label="Select Database"
                       fullWidth
@@ -872,6 +1007,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={category1}
                       label="Android app stack"
                       fullWidth
@@ -914,6 +1050,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   <Box mt={4} className="w-100 mb-2 ">
                     <TextField
                       required
+                      disabled={isUploading}
                       select
                       value={category1}
                       label="IOS app stack"
@@ -938,8 +1075,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* Multiplatform Android+IOS */}
-              {post_category ===
-                "Multiplatform App Development (Android+IOS)" && (
+              {post_category === "Multiplatform Mobile Development" && (
                 <Box>
                   <Box
                     display={"flex"}
@@ -966,6 +1102,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <TextField
                       required
                       select
+                      disabled={isUploading}
                       value={category1}
                       label="Mobile multiplatform Stack"
                       fullWidth
@@ -1004,6 +1141,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               <Box className="mb-2">
                 <TextField
                   fullWidth
+                  disabled={isUploading}
                   value={gitHub}
                   onChange={(e) => setGitHub(e.target.value)}
                   id="github-gitlab"
@@ -1050,6 +1188,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     role={undefined}
                     variant="text"
                     disableElevation
+                    disabled={isUploading}
                     tabIndex={-1}
                     id="upload_text_btn"
                     sx={{ textTransform: "lowercase", borderRadius: "20px" }}
@@ -1070,6 +1209,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   <Button
                     variant="text"
                     disableElevation
+                    disabled={isUploading}
                     id="external_text_btn_link"
                     sx={{ textTransform: "lowercase", borderRadius: "20px" }}
                     onClick={handleFileUploadLink}
@@ -1105,6 +1245,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       id="image_link_external"
                       type="url"
                       variant="standard"
+                      disabled={isUploading}
                       value={fileLink}
                       label={`Paste image link`}
                       placeholder="https://...."
@@ -1137,6 +1278,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 <TextField
                   minRows={window.screen.availWidth <= 320 ? 5 : 10}
                   multiline
+                  disabled={isUploading}
                   contentEditable={false}
                   error={description.length > 1000}
                   id="descr-body-post"
@@ -1161,9 +1303,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     CustomDeviceIsSmall() ? "w-75 rounded-5" : "w-50 rounded-5"
                   }
                   variant="contained"
-                  disabled={
-                    !post_category.length > 0 || description.length > 1000
-                  }
+                  disabled={isUploading}
                   size="small"
                 >
                   Upload Your Post
@@ -1172,6 +1312,23 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             </Box>
           </Box>
         </Box>
+
+        {/* alert for preferred machine learning area input */}
+        <AlertInput
+          openAlert={openAlert}
+          setOpenAlert={setOpenAlert}
+          setCustomArea={setCategory1}
+          title={title_ml_area}
+          body={body_ml_are}
+        />
+
+        {/* show logout session expired alert */}
+        <LogoutAlert
+          openAlertLogout={openAlertLogout}
+          setOpenAlertLogout={setOpenAlertLogout}
+          title="Session Expired"
+          body="Please login to complete your request,previous session has expired. We do this to deter unauthorised access on accounts that have not been logged out for a while."
+        />
       </Box>
     </StyledModalPost>
   );

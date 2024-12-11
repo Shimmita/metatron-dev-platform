@@ -26,7 +26,6 @@ import { useNavigate } from "react-router-dom";
 import ModalPolicyTerms from "../auth/ModalPolicyTerms";
 import AllCountries from "../data/AllCountries";
 import BusinessData from "../data/BusinessData";
-import { useSelector } from "react-redux";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;

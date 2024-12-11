@@ -1,46 +1,56 @@
+import { Close } from "@mui/icons-material";
 import {
-  CloseRounded,
-  EditRounded,
-  PublishedWithChangesRounded,
-  StarRounded,
-  VerifiedRounded,
-} from "@mui/icons-material";
-import {
-  Avatar,
+  Alert,
   Box,
   Button,
   Card,
   CardContent,
-  CardHeader,
-  Divider,
+  CircularProgress,
+  Collapse,
   IconButton,
   Skeleton,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { lazy, useEffect, useState } from "react";
 
+import axios from "axios";
 import { Image } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import devImage from "../../../../images/dev.jpeg";
+import { useNavigate, useParams } from "react-router-dom";
 import { resetDefaultBottomNav } from "../../../../redux/AppUI";
 import PostData from "../../../data/PostData";
 import CustomDeviceIsSmall from "../../../utilities/CustomDeviceIsSmall";
 import CustomDeviceScreenSize from "../../../utilities/CustomDeviceScreenSize";
-import MyPostSnackBar from "./MyPostSnackBar";
+const MyPostDiscardSnackBar = lazy(() =>
+  import("./snackbars/MyPostDiscardSnack")
+);
+const MyPostDeleteSnackBar = lazy(() =>
+  import("./snackbars/MyPostDeleteSnack")
+);
+const MyPostHomeSnackBar = lazy(() => import("./snackbars/MyPostHomeSnack"));
 
 const MyPostCardEdit = () => {
   const [isEditing, setIsEditing] = useState(true);
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [showDeleteSnack, setShowDeleteSnack] = useState(false);
+  const [showHomeSnack, setShowHomeSnack] = useState(false);
   const [editableText, setEditableText] = useState(
     PostData && PostData.details
   );
+  const [isUploading, setIsUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
-  // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
-  // screen width of the device
-  const screenWidth = window.screen.availWidth;
+  const navigate = useNavigate();
+  // extract the passed id using params hook
+  const { postID } = useParams();
+
+  // access the current details of the user from the redux
+  const { user } = useSelector((state) => state.currentUser);
+
+  // config axios defaults
+  axios.defaults.withCredentials = true;
 
   // simulate loading of requests
   const [isLoadingRequest, setIsLoadingRequest] = useState(true);
@@ -57,38 +67,75 @@ const MyPostCardEdit = () => {
     dispatch(resetDefaultBottomNav(true));
   });
 
-  // handle going back using history
-  const handleGoBack = () => {
-    window.history.back();
-  };
-
   // handle editing
   const handleEditing = () => {
     setIsEditing(false);
   };
 
   //   handle discard
-
   const handleDiscard = () => {
     setShowSnackbar(true);
   };
 
+  // handle updating of the post passing the editable text
+  const handleUpdatePost = () => {
+    setErrorMessage("");
+    setIsUploading(true);
+    // post using axios
+    axios
+      .patch(
+        `http://localhost:5000/metatron/api/v1/posts/edit/${2637623}`,
+        { editableText },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        setErrorMessage("");
+        // reload the window updated successfully
+        window.location.reload();
+        setSuccessMsg(res?.data);
+      })
+      .catch(async (err) => {
+        //  user login session expired show reload window it will be logged out
+        // when authentication failes
+        if (err?.response?.data.login) {
+          // reload the window
+          window.location.reload();
+        }
+        if (err?.code === "ERR_NETWORK") {
+          setSuccessMsg("");
+          setErrorMessage("Server Unreacheable");
+          return;
+        }
+        setSuccessMsg("");
+        setErrorMessage(err?.response.data);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
+  };
+
+  // handle the actual deleting process suppose the users accept after snack pop up
+  const handleBeginDeletingPost = () => {
+    const userID = user._id;
+  };
+
+  // handle delete snack
+  const handleDelete = () => {
+    setShowDeleteSnack(true);
+  };
+
+  // handle go home
+  const handleGoHome = () => {
+    setShowHomeSnack(true);
+  };
+
   return (
     <Box height={CustomDeviceIsSmall() ? "91.7vh" : "91vh"}>
-      <Box display={"flex"} justifyContent={"center"}>
-        <Button
-          variant="text"
-          className="shadow"
-          onClick={handleGoBack}
-          sx={{ borderRadius: "20px" }}
-        >
-          Back
-        </Button>
-      </Box>
-
       <Box
         height={"78vh"}
-        className="shadow rounded p-1"
+        className="shadow rounded "
         sx={{
           overflowX: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
@@ -100,164 +147,21 @@ const MyPostCardEdit = () => {
           scrollbarWidth: "none",
         }}
       >
-        <Card elevation={0} className="w-100 shadow rounded p-1">
-          <CardHeader
-            sx={{
-              padding: "0px",
-              margin: "0px",
-            }}
-            avatar={
-              <Box>
-                {isLoadingRequest ? (
-                  <Skeleton
-                    animation="wave"
-                    variant="circular"
-                    width={40}
-                    height={40}
-                  />
-                ) : (
-                  <Avatar
-                    src={devImage}
-                    sx={{ backgroundColor: "#1976D2", color: "white" }}
-                    alt="S"
-                    aria-label="avatar"
-                  />
-                )}
-              </Box>
-            }
-            action={
-              isLoadingRequest ? null : (
-                <Box className="d-flex flex-row ">
-                  <IconButton disableRipple>
-                    <Typography variant="body2">
-                      <small>2d</small>
-                    </Typography>
-                  </IconButton>
-                </Box>
-              )
-            }
-            title={
-              isLoadingRequest ? (
-                <Skeleton
-                  animation="wave"
-                  height={10}
-                  width="80%"
-                  style={{ marginBottom: 6 }}
-                />
-              ) : (
-                <Box display={"flex"} alignItems={"center"} gap={1}>
-                  <Typography fontWeight={"bold"} variant="body1">
-                    <Tooltip title="Shimmita Douglas" arrow>
-                      Shimmita
-                    </Tooltip>
-                  </Typography>
-                  <VerifiedRounded
-                    color="primary"
-                    sx={{ width: 20, height: 20 }}
-                  />
-                </Box>
-              )
-            }
-            subheader={
-              isLoadingRequest ? (
-                <Skeleton animation="wave" height={10} width="40%" />
-              ) : (
-                <Box>
-                  {/* smallest screen */}
-                  {screenWidth <= 350 ? (
-                    <Box>
-                      <Typography variant="body2">Software Dev </Typography>
-                      <Typography variant="body2">
-                        React|Nodejs|Python{" "}
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Box>
-                      {/* mediaum to larger screens */}
-                      <Typography variant="body2">
-                        Fullstack Developer{" "}
-                      </Typography>
-                      <Typography variant="body2">
-                        React | Nodejs | Python{" "}
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              )
-            }
-          />
-
+        <Card elevation={0} className="w-100 rounded p-1">
           {isLoadingRequest ? (
             <Skeleton
-              sx={{ height: "80vh", borderRadius: "10px" }}
+              sx={{ height: "70vh", borderRadius: "10px" }}
               animation="wave"
               variant="rectangular"
             />
           ) : (
             <Box>
+              <Box display={"flex"} justifyContent={"flex-end"}>
+                <IconButton onClick={handleGoHome}>
+                  <Close color="primary" sx={{ width: 18, height: 18 }} />
+                </IconButton>
+              </Box>
               <CardContent>
-                {isDarkMode ? (
-                  <Typography
-                    variant="body2"
-                    gutterBottom
-                    className="text-center w-100 pb-2"
-                  >
-                    <span className="d-flex justify-content-center align-items-center align-content-center gap-2">
-                      <StarRounded
-                        color="primary"
-                        sx={{ width: 20, height: 20 }}
-                      />
-                      <span style={{ fontWeight: "bold" }}>
-                        {PostData.category}
-                      </span>
-                      <StarRounded
-                        color="primary"
-                        sx={{ width: 20, height: 20 }}
-                      />
-                      <span style={{ fontWeight: "bold" }}>
-                        {PostData.county}
-                      </span>
-                    </span>
-
-                    <span className="d-flex mt-2 justify-content-center align-items-center align-content-center gap-2">
-                      <span style={{ fontWeight: "bold" }}>
-                        {PostData.title}
-                      </span>
-                    </span>
-                  </Typography>
-                ) : (
-                  <Typography
-                    variant="body2"
-                    gutterBottom
-                    className="text-center w-100 pb-2"
-                  >
-                    <Divider>
-                      <span className="d-flex justify-content-center align-items-center align-content-center gap-2">
-                        <StarRounded
-                          color="primary"
-                          sx={{ width: 20, height: 20 }}
-                        />
-                        <span style={{ fontWeight: "bold" }}>
-                          {PostData.category}
-                        </span>
-                        <StarRounded
-                          color="primary"
-                          sx={{ width: 20, height: 20 }}
-                        />
-                        <span style={{ fontWeight: "bold" }}>
-                          {PostData.county}
-                        </span>
-                      </span>
-                    </Divider>
-
-                    <span className="d-flex mt-2 justify-content-center align-items-center align-content-center gap-2">
-                      <span style={{ fontWeight: "bold" }}>
-                        {PostData.title}
-                      </span>
-                    </span>
-                  </Typography>
-                )}
-
                 <Box width={"100%"} p={0} m={0}>
                   {!isEditing ? (
                     <Box>
@@ -266,11 +170,12 @@ const MyPostCardEdit = () => {
                         label={
                           1000 - editableText.length + " characters remaining"
                         }
-                        color="success"
                         fullWidth
-                        variant="filled"
+                        variant="standard"
                         error={editableText.length > 1000}
                         multiline
+                        disabled={isUploading || errorMessage}
+                        focused
                         defaultValue={editableText}
                         onChange={(e) => setEditableText(e.target.value)}
                       />
@@ -282,12 +187,66 @@ const MyPostCardEdit = () => {
                         gutterBottom
                         variant={CustomDeviceIsSmall() ? "body2" : "body1"}
                       >
-                        <span>{PostData.details}</span>
+                        {PostData.details}
                       </Typography>
                     </Box>
                   )}
                 </Box>
               </CardContent>
+              {/* show error message */}
+              {errorMessage && (
+                <Collapse in={errorMessage || false}>
+                  <Alert
+                    severity="warning"
+                    onClick={() => setErrorMessage("")}
+                    action={
+                      <IconButton
+                        aria-label="close"
+                        color="inherit"
+                        size="small"
+                      >
+                        <Close fontSize="inherit" />
+                      </IconButton>
+                    }
+                    sx={{ mb: 2 }}
+                  >
+                    {errorMessage}
+                  </Alert>
+                </Collapse>
+              )}
+
+              {/* sow success message if any */}
+              {successMsg && (
+                <Collapse in={successMsg || false}>
+                  <Alert
+                    severity="success"
+                    onClick={() => {
+                      setSuccessMsg("");
+                      // go home
+                      navigate("/");
+                    }}
+                    action={
+                      <IconButton
+                        aria-label="close"
+                        color="inherit"
+                        size="small"
+                      >
+                        <Close fontSize="inherit" />
+                      </IconButton>
+                    }
+                    sx={{ mb: 2 }}
+                  >
+                    {errorMessage}
+                  </Alert>
+                </Collapse>
+              )}
+
+              {/* show uploading indicator */}
+              {isUploading && (
+                <Box display={"flex"} justifyContent={"center"} p={1} mb={1}>
+                  <CircularProgress size={30} />
+                </Box>
+              )}
 
               {/* media */}
               <Image
@@ -322,9 +281,8 @@ const MyPostCardEdit = () => {
             >
               <Button
                 disableElevation
-                startIcon={<EditRounded />}
                 onClick={handleEditing}
-                disabled={!isEditing}
+                disabled={!isEditing || isUploading}
                 sx={{
                   textTransform: "capitalize",
                   borderRadius: "20px",
@@ -335,8 +293,10 @@ const MyPostCardEdit = () => {
 
               <Button
                 disableElevation
-                disabled={isEditing || editableText.length > 1000}
-                startIcon={<PublishedWithChangesRounded />}
+                disabled={
+                  isEditing || isUploading || editableText.length > 1000
+                }
+                onClick={handleUpdatePost}
                 color="success"
                 sx={{
                   textTransform: "capitalize",
@@ -348,9 +308,8 @@ const MyPostCardEdit = () => {
 
               <Button
                 disableElevation
-                disabled={isEditing}
+                disabled={isEditing || isUploading}
                 onClick={handleDiscard}
-                startIcon={<CloseRounded />}
                 sx={{
                   textTransform: "capitalize",
                   borderRadius: "20px",
@@ -358,16 +317,44 @@ const MyPostCardEdit = () => {
               >
                 Discard
               </Button>
+
+              <Button
+                disableElevation
+                disabled={isUploading}
+                color="warning"
+                onClick={handleDelete}
+                sx={{
+                  textTransform: "capitalize",
+                  borderRadius: "20px",
+                }}
+              >
+                Delete
+              </Button>
             </Box>
           )}
         </Card>
       </Box>
-      {/* snackbar */}
+      {/* snackbar discard */}
       <Box>
-        <MyPostSnackBar
+        <MyPostDiscardSnackBar
           showSnackbar={showSnackbar}
           setShowSnackbar={setShowSnackbar}
           setIsEditing={setIsEditing}
+        />
+      </Box>
+      {/* snackbar delete */}
+      <Box>
+        <MyPostDeleteSnackBar
+          showSnackbar={showDeleteSnack}
+          setShowSnackbar={setShowDeleteSnack}
+          handleBeginDeletingPost={handleBeginDeletingPost}
+        />
+      </Box>
+      {/* snackbar home */}
+      <Box>
+        <MyPostHomeSnackBar
+          showSnackbar={showHomeSnack}
+          setShowSnackbar={setShowHomeSnack}
         />
       </Box>
     </Box>

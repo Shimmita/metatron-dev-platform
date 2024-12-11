@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import admin from "firebase-admin";
 import sharp from "sharp";
+import validator from "validator";
 import PersonalModel from "../model/personalModel.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 // msg sent to frontend after successful registration
@@ -65,7 +66,6 @@ const handleSignupPersonal = async (req, res) => {
       user.post = [];
 
       if (req.file) {
-        console.log("user has file");
         // user has an image file passed as request
         // Compress and convert the image to AVIF format
         const compressedImageBuffer = await sharp(req.file.buffer)
@@ -92,7 +92,6 @@ const handleSignupPersonal = async (req, res) => {
           message: successMsg,
         });
       } else {
-        console.log("user no file");
         // user has default avatar from the auth provider save them
         await userRef.set(user);
         // Respond with success message
@@ -131,6 +130,16 @@ const handleSignupPersonalMongo = async (req, res) => {
 
     // extracting password and email from the body request
     const { password, email } = user;
+
+    // check if the provided email is valid like acceptable email
+    if (!validator.isEmail(email)) {
+      throw new Error("Provided email is  malformed!");
+    }
+
+    // passwords must be aleast 6 characters
+    if (password.length < 6) {
+      throw new Error("Password too short must be 6 characters minimum!");
+    }
 
     // check if a user exists in the database based on email first which is unique
     const userFetch = await PersonalModel.findOne({ email });
@@ -191,19 +200,41 @@ const handleSigninPersonal = async (req, res) => {
   const { email, password } = req?.body;
 
   try {
-    const user= await PersonalModel.findOne({email})
+    // check if the provided email is valid like acceptable email
+    if (!validator.isEmail(email)) {
+      throw new Error("Provided email is malformed!");
+    }
+
+    // passwords must be aleast 6 characters
+    if (password.length < 6) {
+      throw new Error("Password too short must be 6 characters minimum!");
+    }
+    const user = await PersonalModel.findOne({ email });
     // user does not exist
     if (!user) {
-      throw new Error('incorrect login credentials')
+      throw new Error(
+        "User does not exist please create new account to access our services!"
+      );
+    }
+
+    // user exists lets check the password provided against the one in the database
+    if (await bcrypt.compare(password, user.password)) {
+      // add the session user isOnline to true
+      req.session.isOnline = true;
+      res.status(200).send(user);
+    } else {
+      // incorrect password
+      throw new Error("Incorrect login credentials!");
     }
   } catch (error) {
-    
+    // send the error to the frontend
+    res.status(400).send(error.message);
   }
-
 };
 
 export {
-  handleSignupPersonal,
-  handleSignupPersonalMongo,
   handleSigninPersonal,
+  handleSignupPersonal,
+  handleSignupPersonalMongo
 };
+

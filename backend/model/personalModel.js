@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
       trim: true,
+      default: "",
     },
     course: {
       type: String,
@@ -82,10 +83,11 @@ const userSchema = new mongoose.Schema(
     avatarID: {
       type: String,
       required: false,
+      default: "",
     },
     premium: { type: Boolean, default: false },
     premiumOnce: { type: Boolean, default: false },
-    
+
     network_count: { type: String, default: "0" },
     network: { type: [String], default: [] },
     post_count: { type: String, default: "0" },
@@ -95,5 +97,13 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Automatically exclude the password field when sending JSON
+userSchema.set("toJSON", {
+  transform: (doc, ret) => {
+    delete ret.password; // Remove the password field
+    return ret;
+  },
+});
 
 export default mongoose.model("personal", userSchema);

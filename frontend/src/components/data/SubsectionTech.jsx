@@ -1,5 +1,6 @@
 const SubsectionTech = {
   Language: [
+    "Introduction to Programming",
     "Java",
     "Javascript",
     "TypeScript",
@@ -54,7 +55,205 @@ const SubsectionTech = {
     "HTML/CSS",
     "Zero none of these (other)",
   ],
+  Cybersec: [
+    // Core Cybersecurity Concepts
+    "Introduction to Cybersecurity",
+    "Confidentiality, Integrity, and Availability (CIA Triad)",
+    "Authentication and Authorization",
+    "Access Control",
+    "Risk Management",
+    "Threat Modeling",
+    "Incident Response",
+    "Vulnerability Management",
+    "Vulnerability Analysis",
+    "Security Policies and Procedures",
+    "Information Gathering",
+    "Recannaissance (Recon)",
+    "Metasploit",
+
+    // Network Security
+    "Network Security",
+    "Firewalls and IDS/IPS",
+    "Virtual Private Networks (VPN)",
+    "Secure Network Architecture",
+    "Network Segmentation",
+    "Zero Trust Architecture",
+    "DNS Security",
+    "Wi-Fi Security",
+    "Port Scanning and Analysis",
+
+    // Cryptography
+    "Cryptography",
+    "Encryption and Decryption",
+    "Symmetric Encryption",
+    "Asymmetric Encryption",
+    "Public Key Infrastructure (PKI)",
+    "Hashing Algorithms",
+    "Digital Signatures",
+    "SSL/TLS",
+    "Quantum Cryptography",
+
+    // Application Security
+    "Secure Software Development Lifecycle (SDLC)",
+    "Secure Coding Practices",
+    "Web Application Security",
+    "OWASP Top 10 Vulnerabilities",
+    "Static and Dynamic Application Security Testing (SAST/DAST)",
+    "API Security",
+    "Server-Side Request Forgery (SSRF)",
+    "Reverse Engineering",
+
+    // Endpoint and System Security
+    "Endpoint and System Security",
+    "Endpoint Protection",
+    "Patch Management",
+    "Antivirus and EDR Solutions",
+    "Operating System Hardening",
+    "Virtualization Security",
+    "Container Security",
+    "Device and IoT Security",
+
+    // Identity
+    "Identity and Access Management (IAM)",
+    "Single Sign-On (SSO)",
+    "Multi-Factor Authentication (MFA)",
+    "Role-Based Access Control (RBAC)",
+    "Privilege Access Management (PAM)",
+    "Identity Federation",
+    "Biometric Authentication",
+
+    // Data Security
+    "Data Security",
+    "Data Encryption at Rest and in Transit",
+    "Data Loss Prevention (DLP)",
+    "Database Security",
+    "Cloud Data Security",
+    "Data Masking and Tokenization",
+    "Backup and Disaster Recovery",
+
+    // Threats and Attacks
+    "Threats and Attacks",
+    "Malware Analysis",
+    "Phishing Attacks",
+    "Snoofing and Spoofing Attacks",
+    "Trojan Horse",
+    "Piggyback",
+    "Ransomware",
+    "Denial-of-Service (DoS)",
+    "Distributed Denial-of-Service (DDoS)",
+    "Man-in-the-Middle (MITM) Attacks",
+    "SQL Injection",
+    "Cross-Site Scripting (XSS)",
+    "Social Engineering",
+    "Advanced Persistent Threats (APTs)",
+    "Wireless Attacks",
+    "Evil Twin Attack",
+    "Password Attacks",
+    "Exploitation Tools",
+    "Computer Virus",
+    "Post Exploitation",
+
+    // Cybersecurity Tools and Technologies
+    "Cybersecurity Tools",
+    "SIEM (Security Information and Event Management)",
+    "SOAR (Security Orchestration, Automation, and Response)",
+    "Penetration Testing Tools (e.g., Metasploit, Burp Suite)",
+    "Network Monitoring Tools",
+    "Vulnerability Scanners (e.g., Nessus, OpenVAS)",
+    "Log Analysis Tools",
+    "Forensics Tools",
+    "Cloud Security Solutions",
+
+    // Governance, Risk, and Compliance (GRC)
+    "Governance, Risk, and Compliance (GRC)",
+    "Regulatory Compliance (e.g., GDPR, CCPA, HIPAA)",
+    "Security Audits",
+    "Cybersecurity Frameworks (e.g., NIST, ISO 27001)",
+    "Business Continuity Planning",
+    "Third-Party Risk Management",
+
+    // Trends in Cybersecurity
+    "Trends in Cybersecurity",
+    "AI and ML in Cybersecurity",
+    "Zero Trust Security",
+    "Quantum-Safe Cryptography",
+    "Zero Day Attacks",
+    "Bug Bounty",
+    "Cyber Threat Intelligence (CTI)",
+    "Blockchain Security",
+    "Cybersecurity for Cloud Computing",
+    "DevSecOps",
+    "Cybersecurity for Critical Infrastructure",
+    "IoT and OT Security",
+    "Post-Quantum Cryptography",
+
+    // Career and Certification Paths
+    "Ethical Hacking",
+    "Digital Forensics",
+    "Cyber Threat Hunting",
+    "Security Operations Center (SOC) Analysis",
+    "Red Teaming and Blue Teaming",
+    "Cybersecurity Certification",
+    "Career Path in Cybersecurity",
+
+    // more
+    "Dark Web",
+  ].sort(),
+  DataScience: [
+    "Introduction to Data Science",
+    "Data Science Lifecycle",
+    "Data Collection",
+    "Data Cleaning and Preprocessing",
+    "Exploratory Data Analysis (EDA)",
+    "Feature Engineering",
+    "Data Wrangling",
+    "Data Quality Assessment",
+    "Data Ethics",
+    "Data Governance",
+
+    // Statistical Foundations
+    "Descriptive Statistics",
+    "Inferential Statistics",
+    "Probability Theory",
+    "Hypothesis Testing",
+    "Bayesian Statistics",
+    "Correlation and Causation",
+    "Probability Distributions",
+    "Statistical Sampling",
+    "ANOVA and MANOVA",
+
+    // Data Modeling
+    "Predictive Modeling",
+    "Regression Analysis",
+    "Clustering Analysis",
+    "Classification Analysis",
+    "Dimensionality Reduction",
+    "Time Series Analysis",
+    "Anomaly Detection in Data",
+    "Optimization Techniques",
+
+    // Data Visualization
+    "Extract Transform Load (ETL)",
+    "Exploratory Data Analysis (EDA)",
+    "Python for Data Science",
+    "R for Data Science",
+    "Tableau",
+    "Power BI",
+    "D3.js",
+    "Hadoop",
+    "Numpy for Data Science",
+    "Pandas for Data Science",
+    "Apache Spark",
+    "SQL for Data Analysis",
+    "Excel for Analysis",
+    "Data Visualisation",
+    "Principles of Data Visualization",
+    "Chart Selection and Design",
+    "Interactive Dashboards",
+    "Storytelling with Data",
+  ].sort(),
   MachineLearning: [
+    "Introduction to ML/AI",
     // Core AI and ML Concepts
     "Artificial Intelligence Overview",
     "Machine Learning Basics",
@@ -65,6 +264,15 @@ const SubsectionTech = {
     "Expert Systems",
     "Cognitive Computing",
     "Fuzzy Logic",
+    //  Control functions
+    "Relu Activation ",
+    "Adam Optimisation",
+    "Sochastic Gradient Descent",
+    "Sigmoid Activation ",
+    "Gradient Descent",
+    "Batch Gradient Descent",
+    "Mini-Batch Gradient Descent",
+    "Activation Functions",
 
     // Machine Learning Operations (MLOps)
     "Machine Learning Operations (MLOps)",
@@ -81,7 +289,11 @@ const SubsectionTech = {
     // Algorithms and Techniques
     "Regression Analysis",
     "Decision Trees",
+    "Logistic Regression",
+    "Linear Regression",
+    "Polynomial Regression",
     "Random Forest",
+    "Naive Bayes",
     "XGBoost",
     "Support Vector Machines (SVM)",
     "K-Nearest Neighbors (KNN)",
@@ -91,7 +303,7 @@ const SubsectionTech = {
     "Swarm Intelligence",
     "Bayesian Networks",
 
-    // Neural Networks
+    // Neural Networks and More Core Concepts
     "Neural Networks",
     "FeedForward Neural Networks (FNN)",
     "Convolutional Neural Networks (CNN)",
@@ -103,6 +315,11 @@ const SubsectionTech = {
     "Transformers Models",
     "Diffusion Models",
     "Diffusion Transformer Models (DiT)",
+    "Large Language Models (LLMs)",
+    "Large Language Models Operations (LLMOps)",
+    "Encoder-Decoder Networks",
+    "Tokenization",
+    "N-Grams",
 
     // Data Processing and Feature Engineering
     "Feature Engineering",
@@ -112,9 +329,10 @@ const SubsectionTech = {
     "t-SNE",
     "UMAP",
     "Extract Transform Load (ETL)",
-    "Exploratory Data Analysis (EDA)",
 
     // Tools and Frameworks
+    "Python For ML/AI",
+    "C++ for ML/AI",
     "TensorFlow",
     "PyTorch",
     "Keras",
@@ -135,16 +353,14 @@ const SubsectionTech = {
     // Advanced Topics and Applications
     "Transfer Learning",
     "Hyperparameter Tuning",
+    "Pre-training",
+    "Fine-Tuning",
     "Overfitting Concept",
     "Underfitting Concept",
     "Generative Models",
     "Ethics in AI",
     "Explainable AI (XAI)",
     "Autonomous Systems",
-    "AI in Healthcare",
-    "AI in Finance",
-    "AI in Climate Change",
-    "AI in Cybersecurity",
 
     // Evaluation and Metrics
     "Model Evaluation Metrics",
@@ -153,6 +369,7 @@ const SubsectionTech = {
     "ROC-AUC Curve",
     "Cross-Validation",
     "Bias-Variance Tradeoff",
+    "zero (none of the areas)",
   ].sort(),
   Backend: [
     // JavaScript/TypeScript

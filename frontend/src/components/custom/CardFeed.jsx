@@ -3,7 +3,6 @@ import {
   ForumRounded,
   GitHub,
   MoreVertRounded,
-  PersonAddRounded,
   VerifiedRounded,
   WbIncandescentRounded,
 } from "@mui/icons-material";
@@ -22,22 +21,26 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Image } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import devImage from "../../images/dev.jpeg";
 import PostData from "../data/PostData";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
+import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CardFeedMore from "./CardFeedMore";
+import CustomCountryName from "../utilities/CustomCountryName";
 
-const CardFeed = () => {
+const CardFeed = ({ post }) => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
   const openMenu = Boolean(anchorEl);
   const navigate = useNavigate();
-  const { isDarkMode } = useSelector((state) => state.appUI);
   const [isLoadingRequest, setIsLoadingRequest] = useState(true);
-  const [isFriend, setIsFriend] = useState(true);
+  // redux states
+  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { user } = useSelector((state) => state.currentUser);
 
   const details = PostData?.details || "";
   const detailsLong = details.length > 350;
@@ -62,6 +65,57 @@ const CardFeed = () => {
     </>
   );
 
+  // handle the length of owner title for smallest devices
+  const handleOccupation = () => {
+    const title = post.post_owner.ownertitle.split(" ");
+    const first = title[0];
+    var second = title[1];
+
+    if (second?.toLowerCase().includes("developer")) {
+      second = "Dev";
+    }
+    if (second?.toLowerCase().includes("engineer")) {
+      second = "Eng";
+    }
+
+    return first + " " + second;
+  };
+
+  // handle the length of owner title for smallest devices
+  const handleName = () => {
+    const title = post.post_owner.ownername.split(" ");
+    const first = title[0];
+    var second = title[1].substring(0, 1);
+
+    return first + " " + second;
+  };
+
+  // handle scenarios when no profile picture
+  const handleNoProfilePicture = () => {
+    const title = post.post_owner.ownername.split(" ");
+    const first = title[0].substring(0, 1);
+    var second = title[1].substring(0, 1);
+
+    return first + "" + second;
+  };
+
+  // check if the current userID matches the ownerID of the post
+  // means belongs to current user thus no need for options menu
+  useEffect(() => {
+    const handlePostBelongsCurrentUser = () => {
+      const postID = `${post.post_owner.ownerId}`;
+      const currentUserID = `${user._id}`;
+
+      if (postID === currentUserID) {
+        setPostBelongsCurrentUser(true);
+      } else {
+        setPostBelongsCurrentUser(false);
+      }
+    };
+
+    handlePostBelongsCurrentUser();
+  }, []);
+
   return (
     <>
       {isDarkMode && <Divider component="div" className="mb-3" />}
@@ -76,57 +130,60 @@ const CardFeed = () => {
         <CardHeader
           sx={{ padding: 0, margin: 0 }}
           avatar={
-            <Tooltip title="profile" arrow>
+            <React.Fragment>
               {isLoadingRequest ? (
                 <Skeleton
                   animation="wave"
-                  variant="circular"
+                  variant="rectangular"
                   width={40}
                   height={40}
                 />
               ) : (
                 <IconButton onClick={handleNavigate("users/profile")}>
                   <Avatar
-                    src={devImage}
-                    sx={{ backgroundColor: "#1976D2" }}
-                    alt="S"
-                  />
+                    src={post.post_owner.owneravatar}
+                    sx={{
+                      backgroundColor: isDarkMode ? "#99CEF9" : "#1976D2",
+                      width: 45,
+                      height: 45,
+                    }}
+                    alt=""
+                  >
+                    {handleNoProfilePicture()}
+                  </Avatar>
                 </IconButton>
               )}
-            </Tooltip>
+            </React.Fragment>
           }
           action={
             !isLoadingRequest && (
-              <Box flexDirection={"row"} display={"flex"} alignItems={"center"}>
-                <Typography mr={1} variant="body2">
+              <Box
+                flexDirection={"row"}
+                display={"flex"}
+                mt={1}
+                alignItems={"center"}
+              >
+                <Typography
+                  className={postBelongsCurrentUser && "me-3"}
+                  variant="body2"
+                >
                   2d
                 </Typography>
-                {isFriend && (
-                  <Tooltip title="connect" arrow>
-                    <Checkbox
+
+                {!postBelongsCurrentUser && (
+                  <Tooltip title="more" arrow>
+                    <IconButton
                       size="small"
-                      onChange={() => setIsFriend(false)}
-                      icon={
-                        <PersonAddRounded
-                          color="primary"
-                          sx={{ width: 20, height: 20 }}
-                        />
-                      }
-                    />
+                      aria-label="more"
+                      onClick={handleClickMoreVertPost}
+                    >
+                      <MoreVertRounded
+                        color="primary"
+                        sx={{ width: 20, height: 20 }}
+                      />
+                    </IconButton>
                   </Tooltip>
                 )}
-                <Tooltip title="more" arrow>
-                  <IconButton
-                    size="small"
-                    aria-label="more"
-                    onClick={handleClickMoreVertPost}
-                  >
-                    <MoreVertRounded
-                      color="primary"
-                      sx={{ width: 22, height: 22 }}
-                    />
-                  </IconButton>
-                </Tooltip>
                 <Menu
                   anchorEl={anchorEl}
                   open={openMenu}
@@ -135,7 +192,11 @@ const CardFeed = () => {
                   anchorOrigin={{ vertical: "top", horizontal: "right" }}
                   transformOrigin={{ vertical: "top", horizontal: "right" }}
                 >
-                  <CardFeedMore />
+                  <CardFeedMore
+                    ownerId={post.post_owner.ownerId}
+                    currentUserNetwork={user?.network}
+                    ownerName={post.post_owner.ownername}
+                  />
                 </Menu>
               </Box>
             )
@@ -149,15 +210,18 @@ const CardFeed = () => {
                 style={{ marginBottom: 6 }}
               />
             ) : (
-              <Box display="flex" alignItems="center" gap={1}>
-                <Tooltip title="Shimmita Douglas" arrow>
-                  <Typography fontWeight="bold" variant="body1">
-                    Shimmita
-                  </Typography>
-                </Tooltip>
+              <Box display="flex" alignItems="center" mt={1} gap={1}>
+                <Typography
+                  fontWeight="bold"
+                  variant={CustomDeviceIsSmall() ? "body2" : "body1"}
+                >
+                  {CustomDeviceSmallest()
+                    ? handleName()
+                    : `${post.post_owner.ownername}`}
+                </Typography>
                 <VerifiedRounded
                   color="primary"
-                  sx={{ width: 20, height: 20 }}
+                  sx={{ width: 18, height: 18 }}
                 />
               </Box>
             )
@@ -167,12 +231,24 @@ const CardFeed = () => {
               <Skeleton animation="wave" height={10} width="40%" />
             ) : (
               <Box>
+                {/*occupation title */}
                 <Typography variant="body2">
-                  {window.screen.availWidth <= 350
-                    ? "Software Dev"
-                    : "Software Engineer"}
+                  {CustomDeviceSmallest()
+                    ? handleOccupation()
+                    : `${post.post_owner.ownertitle}`}
                 </Typography>
-                <Typography variant="body2">React | Nodejs | Python</Typography>
+                {/* skills */}
+                <Typography variant="body2">
+                  {post.post_owner.ownerskills[0]} |{" "}
+                  {post.post_owner.ownerskills[1]} |{" "}
+                  {post.post_owner.ownerskills[2]}
+                </Typography>
+                {/* location */}
+                {/* <Typography variant="body2">
+                  {post.post_location.country.split(" ")[0]} |{" "}
+                  {CustomCountryName(post.post_location.country)} |{" "}
+                  {post.post_location.state}{" "}
+                </Typography> */}
               </Box>
             )
           }
@@ -191,12 +267,12 @@ const CardFeed = () => {
             <CardContent>
               <Box mb={2} width={"100%"}>
                 <Box mb={1}>
+                  {/* post specialisation */}
                   <Typography
-                    fontWeight={"bold"}
                     variant="body2"
                     textAlign={"center"}
                   >
-                    {PostData.title}
+                    {post.post_category.main}
                   </Typography>
                 </Box>
 
@@ -213,18 +289,11 @@ const CardFeed = () => {
                       color: isDarkMode ? "yellow" : "orange",
                     }}
                   />
-                  <Typography
-                    fontWeight={"bold"}
-                    variant="caption"
-                  >
-                    {PostData.category}
+                  {/* title of the post */}
+                  <Typography variant="body2">
+                    {post.post_title}
                   </Typography>
-                  <Typography
-                    fontWeight={"bold"}
-                    variant="caption"
-                  >
-                    {PostData.county}
-                  </Typography>
+
                   <WbIncandescentRounded
                     sx={{
                       width: 18,
