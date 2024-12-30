@@ -2,7 +2,7 @@ import {
   ArrowRightAlt,
   BarChartRounded,
   CheckRounded,
-  VisibilityOffRounded
+  VisibilityOffRounded,
 } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Box } from "@mui/material";
@@ -13,8 +13,8 @@ import Fade from "@mui/material/Fade";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 
-export default function AccordionJobStats({isViewed}) {
-  const [expanded, setExpanded] = React.useState(false);
+export default function AccordionJobStats({ isViewed }) {
+  const [expanded, setExpanded] = React.useState(true);
 
   const handleExpansion = () => {
     setExpanded((prevExpanded) => !prevExpanded);
@@ -63,7 +63,7 @@ export default function AccordionJobStats({isViewed}) {
             {/* charts Icon */}
             <BarChartRounded sx={{ width: 20, height: 20 }} />
             <Typography color={"text.secondary"} variant="body2">
-              View Job Application Statistics
+              View Application Statistics
             </Typography>
           </Box>
         </AccordionSummary>
@@ -75,7 +75,7 @@ export default function AccordionJobStats({isViewed}) {
             flexDirection={"column"}
             gap={2}
           >
-            {/* cover letter viewed */}
+            {/* documents viewed */}
             <Box
               display={"flex"}
               justifyContent={"space-between"}
@@ -83,24 +83,7 @@ export default function AccordionJobStats({isViewed}) {
               width={"100%"}
             >
               <Typography variant="body2" color={"text.secondary"}>
-                Cover Letter Viewed
-              </Typography>
-              {/* check if true and x when not */}
-              {isViewed ? (
-                <CheckRounded sx={{ width: 20, height: 20 }} color="success" />
-              ) : (
-                <VisibilityOffRounded sx={{ width: 20, height: 20 }} />
-              )}
-            </Box>
-            {/* cv stats */}
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              width={"100%"}
-            >
-              <Typography variant="body2" color={"text.secondary"}>
-                Curriculum Vitae Viewed
+                My Documents Viewed
               </Typography>
               {/* check if true and x when not */}
               {isViewed ? (
@@ -118,7 +101,7 @@ export default function AccordionJobStats({isViewed}) {
               width={"100%"}
             >
               <Typography variant="body2" color={"text.secondary"}>
-                Total Number of Applicants
+                Total Applicants History
               </Typography>
               {/* number of applicants */}
               <Typography variant="body2" color={"text.secondary"}>
@@ -136,7 +119,7 @@ export default function AccordionJobStats({isViewed}) {
               gap={2}
             >
               <Typography variant="body2" color={"text.secondary"}>
-                Total Male Applicants
+                Male Applicants
               </Typography>
               {/* number of applicants */}
               <Typography ml={2} variant="body2" color={"text.secondary"}>
@@ -158,7 +141,7 @@ export default function AccordionJobStats({isViewed}) {
               width={"100%"}
             >
               <Typography variant="body2" color={"text.secondary"}>
-                Total Female Applicants
+                Female Applicants
               </Typography>
               {/* number of applicants */}
               <Typography variant="body2" color={"text.secondary"}>
@@ -169,6 +152,28 @@ export default function AccordionJobStats({isViewed}) {
               {/* percentage */}
               <Typography variant="body2" color={"text.secondary"}>
                 40%
+              </Typography>
+            </Box>
+            {/* other applicants */}
+            <Box
+              display={"flex"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+              gap={2}
+              width={"100%"}
+            >
+              <Typography variant="body2" color={"text.secondary"}>
+                Other Applicants
+              </Typography>
+              {/* number of applicants */}
+              <Typography variant="body2" color={"text.secondary"}>
+                0
+              </Typography>
+              {/* arrow right */}
+              <ArrowRightAlt />
+              {/* percentage */}
+              <Typography variant="body2" color={"text.secondary"}>
+                0%
               </Typography>
             </Box>
           </Box>

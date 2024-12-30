@@ -33,8 +33,10 @@ import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
+import { persistor } from "../../redux/AppStore";
 import { resetDarkMode } from "../../redux/AppUI";
 import { updateTempUserDetails } from "../../redux/CompleteSigning";
+import { resetClearCurrentAuthMessage } from "../../redux/CurrentAuthMessages";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import { auth, providerGoogle } from "../firebase/FirebaseConfig";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -49,9 +51,12 @@ const LoginAuth = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // global  state from redux
+  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { authMessage } = useSelector((state) => state.currentAuthMessage);
 
   // axios defaults with credentials to true
-  axios.defaults.withCredentials=true
+  axios.defaults.withCredentials = true;
 
   const [messageGeneral, setMessageGeneral] = useState("");
   const [isLogin, setIsLogin] = useState(false);
@@ -79,9 +84,6 @@ const LoginAuth = () => {
     // update the redux theme boolean state
     dispatch(resetDarkMode());
   };
-
-  // global dark mode state from redux
-  const { isDarkMode } = useSelector((state) => state.appUI);
 
   // handle login  with google
   const handleLoginWithGoogle = () => {
@@ -164,7 +166,7 @@ const LoginAuth = () => {
     // login user without provider
     setIsLogin(true);
     axios
-      .post(`http://localhost:5000/metatron/api/v1/signin/personal`, user,)
+      .post(`http://localhost:5000/metatron/api/v1/signin/personal`, user)
       .then((res) => {
         console.log(res);
         // populating the redux for the logged in user
@@ -180,6 +182,20 @@ const LoginAuth = () => {
       .finally(() => {
         setIsLogin(false);
       });
+  };
+
+  // handle clearing of auth message from redux
+  const handleClearAuthMessage = async () => {
+    setMessageGeneral("");
+    // dispatch clear auth message
+    dispatch(resetClearCurrentAuthMessage());
+    // perge for complete clearance
+    try {
+      await persistor.purge();
+    } catch (error) {
+      // something went wrong during the purge process
+      console.log(error.message);
+    }
   };
 
   return (
@@ -297,6 +313,28 @@ const LoginAuth = () => {
                 The Best IT Platform{" "}
                 <StarRounded sx={{ width: 20, height: 20 }} />
               </Typography>
+
+              <Box
+                mb={2}
+                display={"flex"}
+                justifyContent={"center"}
+                gap={1}
+                alignItems={"center"}
+              >
+                <WbIncandescentRounded
+                  sx={{ width: 18, height: 18, color: "orange" }}
+                />
+                <Typography
+                  variant={CustomDeviceSmallest() ? "caption" : "body2"}
+                  color={"text.secondary"}
+                >
+                  Enlightening Technology
+                </Typography>
+                <WbIncandescentRounded
+                  sx={{ width: 18, height: 18, color: "orange" }}
+                />
+              </Box>
+
               <Typography
                 mb={2}
                 display={"flex"}
@@ -314,35 +352,15 @@ const LoginAuth = () => {
                 </Typography>
                 <WorkRounded color="primary" sx={{ width: 16, height: 16 }} />
               </Typography>
-
-              <Box
-                mb={2}
-                display={"flex"}
-                justifyContent={"center"}
-                gap={1}
-                alignItems={"center"}
-              >
-                <WbIncandescentRounded
-                  sx={{ width: 18, height: 18, color: "orange" }}
-                />
-                <Typography
-                  variant={CustomDeviceSmallest() ? "caption" : "body2"}
-                  color={"text.secondary"}
-                >
-                  Enlightening Technology Globally
-                </Typography>
-                <WbIncandescentRounded
-                  sx={{ width: 18, height: 18, color: "orange" }}
-                />
-              </Box>
             </Box>
           </Box>
           <Box>
             {/* displays error when login is unsuccessful */}
-            <Box display={"flex"} justifyContent={"center"}>
-              {messageGeneral && (
+            {messageGeneral && (
+              <Box display={"flex"} justifyContent={"center"}>
                 <Collapse in={messageGeneral || false}>
                   <Alert
+                    className="rounded-5"
                     severity="warning"
                     onClick={() => setMessageGeneral("")}
                     action={
@@ -359,8 +377,34 @@ const LoginAuth = () => {
                     {messageGeneral}
                   </Alert>
                 </Collapse>
-              )}
-            </Box>
+              </Box>
+            )}
+            {/* display when is server auth messages session and server maintainance */}
+            {authMessage && (
+              <Box display={"flex"} justifyContent={"center"}>
+                <Collapse in={authMessage || false}>
+                  <Alert
+                    className="rounded-5"
+                    severity={
+                      authMessage.includes("server") ? "warning" : "success"
+                    }
+                    onClick={handleClearAuthMessage}
+                    action={
+                      <IconButton
+                        aria-label="close"
+                        color="inherit"
+                        size="small"
+                      >
+                        <Close fontSize="inherit" />
+                      </IconButton>
+                    }
+                    sx={{ mb: 2 }}
+                  >
+                    {authMessage}
+                  </Alert>
+                </Collapse>
+              </Box>
+            )}
 
             <Box mb={4} display={"flex"} justifyContent={"center"}>
               <TextField
@@ -455,7 +499,12 @@ const LoginAuth = () => {
                 <Button
                   variant="contained"
                   className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
-                  disabled={isLogin || messageGeneral || !(email && password)}
+                  disabled={
+                    isLogin ||
+                    messageGeneral ||
+                    authMessage ||
+                    !(email && password)
+                  }
                   sx={{ textTransform: "none", borderRadius: "20px" }}
                   disableElevation
                   onClick={handleLogin}

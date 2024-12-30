@@ -25,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
 import AppLogo from "../../images/logo_sm.png";
 import { showMessagingDrawer, showTabSideBar } from "../../redux/AppUI";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
@@ -82,7 +83,11 @@ const Navbar = ({ setMode, mode }) => {
   });
 
   // home page
-  const handleHome = () => navigate("/");
+  const handleHome = () => {
+    // update the bottom nav counter
+    dispatch(updateCurrentBottomNav(0));
+    navigate("/");
+  };
 
   // show the messaing drawer bdy the help of redux toolkit
   const handleShowMessageDrawer = () => {

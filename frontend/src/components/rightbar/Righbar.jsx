@@ -1,6 +1,6 @@
 import { SchoolRounded } from "@mui/icons-material";
 import { Backdrop, Box, Skeleton, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import BasicSpeedDial from "../custom/SpeedDial";
 import CoursesContainer from "./CoursesContainer";
@@ -16,17 +16,11 @@ const RightbarAll = () => {
   const [corouselCounter, setCorouselCounter] = React.useState(0);
 
   // redux states
-  const { isDefaultBottomNav, isSidebarRighbar } = useSelector(
-    (state) => state.appUI
-  );
-
-  // simulate loading of the request
-  const [isLoadingRequest, setIsLoadingRequest] = useState(true);
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoadingRequest(false);
-    }, 5000);
-  }, []);
+  const {
+    isDefaultBottomNav,
+    isSidebarRighbar,
+    isLoadingPostLaunch: isLoadingRequest,
+  } = useSelector((state) => state.appUI);
 
   return (
     <Box
@@ -78,11 +72,12 @@ const RightbarAll = () => {
         <Box bgcolor={"background.default"} className="shadow mt-3 rounded ">
           <Box display={"flex"} justifyContent={"center"}>
             <Box
-              mb={2}
               display={"flex"}
               alignItems={"center"}
               justifyContent={"center"}
               gap={2}
+              pt={2}
+
             >
               <Typography fontWeight={"bold"} color={"primary"}>
                 LEARNING EVENTS

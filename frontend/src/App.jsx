@@ -78,7 +78,11 @@ const App = () => {
               <Route
                 exact
                 path="/*"
-                element={<AuthCheckLazy>{<HomePageLazy />}</AuthCheckLazy>}
+                element={
+                  <AuthCheckLazy>
+                    <HomePageLazy />
+                  </AuthCheckLazy>
+                }
               />
 
               <Route exact path={"/auth/login"} element={<LoginAuthLazy />} />

@@ -420,6 +420,8 @@ const AllSkills = [
   "Java/Kotlin Developer",
   "Powershell Developer",
   "Powershell Engineer",
+  "Bash Scripting Engineer",
+  "Shell Scripting Engineer",
   "Bash/Shell Scripting Engineer",
   "Cloud Engineer",
   "Cordova Developer",
@@ -434,7 +436,10 @@ const AllSkills = [
   "Game Developer (Unreal Engine C++)",
   "Game Developer (Unity C#)",
   "Cybersecurity Engineer",
-  "UI/UX Design/Graphic Design ",
+  "UI/UX Designer ",
+  "Graphics Designer",
+  "Graphics Engineer",
+  "Computer Graphics Engineer",
   "IoT Engineer ",
   "Site Reliability Engineer ",
   "Infrastructure Engineer ",
@@ -562,7 +567,9 @@ const AllSkills = [
   "Robotics Engineer",
   "Technical ICT/IT Support ",
   "Argo CI/CD",
-  "Machine Learning"
+  "Machine Learning",
+  "IoT",
+  "NoSQL",
 ].sort();
 
 export default AllSkills;

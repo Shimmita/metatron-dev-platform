@@ -1,9 +1,7 @@
 import {
   CalendarMonthRounded,
-  CheckRounded,
   DeleteRounded,
   LocationCityRounded,
-  VisibilityOff,
 } from "@mui/icons-material";
 import { Box, Divider, IconButton, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -26,6 +24,8 @@ export default function JobsAppliedLayout() {
   const handleDeleteWarn = () => {
     setOpenAlert(true);
   };
+  // redux states
+  const { isDarkMode } = useSelector((state) => state.appUI);
 
   // title alert
   const title = "Delete Job Application?";
@@ -33,8 +33,6 @@ export default function JobsAppliedLayout() {
   const message =
     "This job application for the position machine learning engineer will be deleted from the system.";
 
-  // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
   return (
     <Box display={"flex"} justifyContent={"center"}>
       <Box
@@ -116,34 +114,15 @@ export default function JobsAppliedLayout() {
             <AccordionJobStats isViewed={isViewed} />
           </Box>
 
-          {/* concise application hint */}
-          <Box
-            display={"flex"}
-            gap={2}
-            alignItems={"center"}
-            justifyContent={"space-around"}
-            className={"px-3"}
-          >
-            {isViewed ? (
-              <>
-                <CheckRounded color="success" sx={{ width: 20, height: 20 }} />
-                <Typography color={"text.secondary"} variant="body2">
-                  Congrats! your application documents have been viewed by the
-                  recruiter.
-                </Typography>
-              </>
-            ) : (
-              <>
-                <VisibilityOff sx={{ width: 22, height: 22 }} />
-                <Typography color={"text.secondary"} variant="body2">
-                  Your application documents have not yet been viewed by the
-                  recruter. once viewed this information will get updated.
-                </Typography>
-              </>
-            )}
-          </Box>
-          {/* border at darkly */}
-          {isDarkMode && <Divider component={"div"} className="mt-5" />}
+          {/* display divider in night mode for tabs and larger screens */}
+          {!CustomDeviceIsSmall() && isDarkMode && (
+            <Divider component={"div"} className="mt-5" />
+          )}
+
+          {/* small devices always display the divider */}
+          {CustomDeviceIsSmall() && (
+            <Divider component={"div"} className="mt-5" />
+          )}
         </List>
       </Box>
 

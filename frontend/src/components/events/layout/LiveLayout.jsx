@@ -4,7 +4,6 @@ import {
   Apple,
   ArrowForwardIosRounded,
   LinkRounded,
-  VerifiedRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -16,7 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Kotlin from "../../../images/Kotlin.png";
 import Dev from "../../../images/dev.jpeg";
@@ -26,7 +25,6 @@ function LiveLayout() {
   // redux states
   const { isDarkMode } = useSelector((state) => state.appUI);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   // handle navigation to the live atttend
   const handleNavigateLiveAttend = () => {
     navigate("/events/live-attending");
@@ -46,14 +44,9 @@ function LiveLayout() {
                 {/* DARK MODE */}
 
                 <Box className="container-live-header-night">
-                  <Box display={"flex"} justifyContent={"flex-end"}>
-                    <VerifiedRounded
-                      color="primary"
-                      sx={{ width: 20, height: 20 }}
-                    />
-                  </Box>
                   <Typography
                     gutterBottom
+                    mt={1}
                     variant="body1"
                     textAlign={"center"}
                     textTransform={"uppercase"}
@@ -90,7 +83,7 @@ function LiveLayout() {
                     textAlign={"center"}
                     sx={{ color: "text.secondary" }}
                   >
-                    500 Users Attending Now
+                    500 Users Livestreaming
                   </Typography>
                   {/* icon*/}
                   <Box
@@ -243,16 +236,6 @@ function LiveLayout() {
                 {/* LIGHT MODE */}
 
                 <Box className="container-live-header-light">
-                  <Box display={"flex"} justifyContent={"flex-end"}>
-                    <VerifiedRounded
-                      color="primary"
-                      sx={{
-                        width: 20,
-                        height: 20,
-                        padding: "2px",
-                      }}
-                    />
-                  </Box>
                   <Typography
                     gutterBottom
                     variant="body1"
@@ -291,7 +274,7 @@ function LiveLayout() {
                     textAlign={"center"}
                     sx={{ color: "text.secondary" }}
                   >
-                    500 Users Attending Now
+                    500 Users Livestreaming
                   </Typography>
                   {/* icon*/}
                   <Box

@@ -58,6 +58,24 @@ const userSchema = new mongoose.Schema(
       required: [true, "Phone number is required"],
       trim: true,
     },
+    portfolio: {
+      type: String,
+      required: false,
+      trim: true,
+      default: "",
+    },
+    gitHub: {
+      type: String,
+      required: false,
+      trim: true,
+      default: "",
+    },
+    linkedin: {
+      type: String,
+      required: false,
+      trim: true,
+      default: "",
+    },
     county: {
       type: String,
       required: [true, "County is required"],

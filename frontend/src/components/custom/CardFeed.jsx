@@ -21,16 +21,17 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image } from "react-bootstrap";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import PostData from "../data/PostData";
+import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CardFeedMore from "./CardFeedMore";
-import CustomCountryName from "../utilities/CustomCountryName";
+import dev from '../../images/dev.jpeg'
 
 const CardFeed = ({ post }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -103,7 +104,7 @@ const CardFeed = ({ post }) => {
   // means belongs to current user thus no need for options menu
   useEffect(() => {
     const handlePostBelongsCurrentUser = () => {
-      const postID = `${post.post_owner.ownerId}`;
+      const postID = `${post.post_owner?.ownerId}`;
       const currentUserID = `${user._id}`;
 
       if (postID === currentUserID) {
@@ -114,7 +115,7 @@ const CardFeed = ({ post }) => {
     };
 
     handlePostBelongsCurrentUser();
-  }, []);
+  }, [user._id,post.post_owner?.ownerId]);
 
   return (
     <>
@@ -141,11 +142,13 @@ const CardFeed = ({ post }) => {
               ) : (
                 <IconButton onClick={handleNavigate("users/profile")}>
                   <Avatar
-                    src={post.post_owner.owneravatar}
+                    // src={post.post_owner.owneravatar}
+                    src={dev}
+                    variant="rounded"
                     sx={{
                       backgroundColor: isDarkMode ? "#99CEF9" : "#1976D2",
-                      width: 45,
-                      height: 45,
+                      width: 50,
+                      height: 50,
                     }}
                     alt=""
                   >
@@ -193,7 +196,7 @@ const CardFeed = ({ post }) => {
                   transformOrigin={{ vertical: "top", horizontal: "right" }}
                 >
                   <CardFeedMore
-                    ownerId={post.post_owner.ownerId}
+                    ownerId={post.post_owner?.ownerId}
                     currentUserNetwork={user?.network}
                     ownerName={post.post_owner.ownername}
                   />
@@ -244,11 +247,10 @@ const CardFeed = ({ post }) => {
                   {post.post_owner.ownerskills[2]}
                 </Typography>
                 {/* location */}
-                {/* <Typography variant="body2">
-                  {post.post_location.country.split(" ")[0]} |{" "}
+                <Typography variant="body2">
                   {CustomCountryName(post.post_location.country)} |{" "}
                   {post.post_location.state}{" "}
-                </Typography> */}
+                </Typography>
               </Box>
             )
           }
@@ -271,6 +273,7 @@ const CardFeed = ({ post }) => {
                   <Typography
                     variant="body2"
                     textAlign={"center"}
+                    fontWeight={"bold"}
                   >
                     {post.post_category.main}
                   </Typography>
@@ -290,9 +293,7 @@ const CardFeed = ({ post }) => {
                     }}
                   />
                   {/* title of the post */}
-                  <Typography variant="body2">
-                    {post.post_title}
-                  </Typography>
+                  <Typography variant="body2">{post.post_title}</Typography>
 
                   <WbIncandescentRounded
                     sx={{

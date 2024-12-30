@@ -235,6 +235,5 @@ const handleSigninPersonal = async (req, res) => {
 export {
   handleSigninPersonal,
   handleSignupPersonal,
-  handleSignupPersonalMongo
+  handleSignupPersonalMongo,
 };
-

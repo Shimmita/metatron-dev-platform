@@ -1,9 +1,11 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import axios from "axios";
 import React, { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  handleLoadingPostLaunch,
   handleSidebarRightbar,
+  resetAll,
   resetDefaultBottomNav,
 } from "../../redux/AppUI";
 import { updateCurrentPosts } from "../../redux/CurrentPosts";
@@ -11,17 +13,16 @@ import CardFeed from "../custom/CardFeed";
 import MobileTabCorousel from "../rightbar/MobileTabCorousel";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-const AlertNoPosts = lazy(() => import("./AlertNoPosts"));
+const AlertNoPosts = lazy(() => import("../alerts/AlertNoPosts"));
 
 const FeedDefaultContent = () => {
-  // for follow/connect people people
-  const items = Array.from({ length: 20 });
   // axios default credentials
   axios.defaults.withCredentials = true;
   const [openAlertNoPosts, setOpenAlertNoPosts] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
-  const [isNetwork, setIsNetwork] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  // axios default credentials
+  axios.defaults.withCredentials = true;
 
   // redux states
   const dispatch = useDispatch();
@@ -34,17 +35,20 @@ const FeedDefaultContent = () => {
     if (!isSidebarRighbar) {
       dispatch(handleSidebarRightbar());
     }
-  }, []);
+  }, [isSidebarRighbar, dispatch]);
 
   // handle showing of default bottom nav
   useEffect(() => {
     dispatch(resetDefaultBottomNav());
-  }, []);
+  }, [dispatch]);
 
   // fetch posts from the backend
   useEffect(() => {
     // set is fetching to true
     setIsFetching(true);
+    // dispatch action for updating is loading in the redux
+    dispatch(handleLoadingPostLaunch(true));
+
     // performing post request
     axios
       .get(`http://localhost:5000/metatron/api/v1/posts/all`, {
@@ -66,7 +70,6 @@ const FeedDefaultContent = () => {
           window.location.reload();
         }
         if (err?.code === "ERR_NETWORK") {
-          setIsNetwork(true);
           setErrorMessage(
             "Server is unreachable please try again later to complete your request"
           );
@@ -77,19 +80,47 @@ const FeedDefaultContent = () => {
         setErrorMessage(err?.response.data);
       })
       .finally(() => {
+        // set is fetching to false
         setIsFetching(false);
+        // reset all the UI states to default which will update isloading in redux
+        dispatch(resetAll());
       });
-  }, []);
+  }, [dispatch]);
 
   // handle clearing of isNetwork and error message when the alert shown
   const handleClearing = () => {
-    setIsNetwork(false);
     setErrorMessage("");
   };
 
   return (
     <React.Fragment>
-      <Box>
+      <Box height={isFetching ? "91vh" : undefined}>
+        {/* show progress loader when is fetching true */}
+        {isFetching && (
+          <Box
+            height={"80vh"}
+            width={"100%"}
+            display={"flex"}
+            justifyContent={"center"}
+            alignItems={"center"}
+            className="shadow rounded"
+          >
+            <Box>
+              <Box display={"flex"} justifyContent={"center"}>
+                <CircularProgress size={"30px"} />
+              </Box>
+              <Typography
+                mt={2}
+                textAlign={"center"}
+                color={"text.secondary"}
+                variant="body2"
+              >
+                posts ...
+              </Typography>
+            </Box>
+          </Box>
+        )}
+        {/* map through the posts and display them to the user */}
         {posts &&
           posts.map((post, index) => {
             return (
@@ -135,7 +166,6 @@ const FeedDefaultContent = () => {
       <AlertNoPosts
         openAlert={openAlertNoPosts}
         setOpenAlert={setOpenAlertNoPosts}
-        isNetwork={isNetwork}
         errorMessage={errorMessage}
         handleClearing={handleClearing}
       />

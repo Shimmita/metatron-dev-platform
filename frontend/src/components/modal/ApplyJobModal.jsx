@@ -1,20 +1,30 @@
-import { Close, CloudUploadRounded, LinkRounded } from "@mui/icons-material";
 import {
+  BoltRounded,
+  Close,
+  CloudUploadRounded,
+  Done,
+  OpenInBrowserRounded,
+} from "@mui/icons-material";
+import {
+  Alert,
   Avatar,
   Box,
   Button,
+  CircularProgress,
+  Collapse,
+  Divider,
   IconButton,
   Modal,
   Stack,
   styled,
-  TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
-import DummyJobData from "../data/DummyJobData";
+import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
@@ -42,46 +52,97 @@ const StyledInput = styled("input")({
   width: 1,
 });
 
-const ApplyJobModal = ({ openApplyJobModal, setOpenApplyJobModal }) => {
+const ApplyJobModal = ({
+  openApplyJobModal,
+  setOpenApplyJobModal,
+  title,
+  organisation,
+  requirements,
+  websiteLink,
+  jobID,
+  jobaccesstype,
+}) => {
+  const [cvUpload, setCvUpload] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   // redux states
   const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
-  const [cvUpload, setCvUpload] = useState(null);
-  const [cvLink, setCvLink] = useState("");
-  const [isCvUpload, setIsCvUpload] = useState(false);
+  const { user } = useSelector((state) => state.currentUser);
+  const dispatch = useDispatch();
 
-  const [coverLetterUpload, setCoverLetterUpload] = useState(null);
-  const [coverLetterLink, setCoverLetterLink] = useState("");
-  const [isCoverLetterUpload, setIsCoverLetterUpload] = useState(false);
+  // axios default credentials
+  axios.defaults.withCredentials = true;
 
-  //   handle cv link from cloud sources
-  const handleCvLink = () => {
-    // clear local uploaded files if any
-    setCvUpload(null);
-
-    setIsCvUpload(true);
+  // handle cv file change
+  const handleCVFile = (event) => {
+    setCvUpload(event.target.files[0]);
   };
 
-  const handleCloseCvLink = () => {
-    // clear
-    setCvLink("");
-    // default showing of btn upload and link for cv full
-    setIsCvUpload(false);
+  // creating a jobItem object
+  const jobItem = {
+    jobID,
+    applicant: {
+      name: user.name,
+      ID: user._id,
+      gender: user.gender,
+      country: user.country,
+    },
   };
 
-  // handle cover letter link cloud sources
-  const handleCoverLetterLink = () => {
-    // clear local uploaded files if any
-    setCoverLetterUpload(null);
+  // handle uploading of the application document
+  const handleUploadDocuments = () => {
+    // clear any error message
+    setErrorMessage("");
 
-    setIsCoverLetterUpload(true);
+    // set is uploading true
+    setIsUploading(true);
+    // create a form which will faciltate parsing of the file for upload to cloud
+    const formData = new FormData();
+    // append post body after stringify it due to form data
+    formData.append("jobItem", JSON.stringify(jobItem));
+
+    //  check if document CV, Cover Letter or both presendt and append
+    if (cvUpload) {
+      formData.append("file", cvUpload);
+    }
+
+    // performing post request
+    axios
+      .post(
+        `http://localhost:5000/metatron/api/v1/jobs/application/apply`,
+        formData,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        // snackbar success message from the backend update redux state
+        dispatch(updateCurrentSnackBar(res.data));
+        // close the currently displayed modal
+        handleClosingModal();
+      })
+      .catch(async (err) => {
+        //  user login session expired show logout alert
+        if (err?.response?.data.login) {
+          // reload the window for it will be redirected to logout
+          window.location.reload();
+        }
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("Server Unreachable");
+          return;
+        }
+
+        setErrorMessage(err?.response.data);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
   };
 
-  // close cover letter link
-  const handleCloseCoverLetterLink = () => {
-    // clear
-    setCvLink("");
-    // default showing of btn upload and link for cv full
-    setIsCvUpload(false);
+  // handle the closing of the modal
+  const handleClosingModal = () => {
+    setOpenApplyJobModal(false);
   };
 
   return (
@@ -132,11 +193,14 @@ const ApplyJobModal = ({ openApplyJobModal, setOpenApplyJobModal }) => {
 
             {/*  title job application form */}
             <Typography variant="body1" gutterBottom fontWeight={"bold"}>
-              Machine Learning Engineer
+              {title}
             </Typography>
 
             {/*close icon */}
-            <IconButton onClick={(e) => setOpenApplyJobModal(false)}>
+            <IconButton
+              onClick={handleClosingModal}
+              disabled={isUploading || errorMessage}
+            >
               <Tooltip title={"close"}>
                 <Close />
               </Tooltip>
@@ -151,11 +215,61 @@ const ApplyJobModal = ({ openApplyJobModal, setOpenApplyJobModal }) => {
               color={"text.secondary"}
               fontWeight={"bold"}
             >
-              Amazon Web Services (AWS)
+              {organisation.name}
             </Typography>
           </Stack>
 
+          {/* job type and means of access if no error message */}
+          {!errorMessage && (
+            <Stack justifyContent={"center"} mt={1} alignItems={"center"}>
+              <Typography
+                variant="body2"
+                gutterBottom
+                display={"flex"}
+                gap={2}
+                color={"text.secondary"}
+              >
+                {jobaccesstype.type} | {jobaccesstype.access}
+              </Typography>
+            </Stack>
+          )}
+
+          {/* display error of missing filed if any */}
           <Box
+            mt={1}
+            display={"flex"}
+            justifyContent={"center"}
+            mb={isUploading || errorMessage ? 3 : undefined}
+          >
+            {errorMessage ? (
+              <Collapse in={errorMessage || false}>
+                <Alert
+                  severity="warning"
+                  onClick={() => setErrorMessage("")}
+                  className="rounded-5"
+                  action={
+                    <IconButton aria-label="close" color="inherit" size="small">
+                      <Close fontSize="inherit" />
+                    </IconButton>
+                  }
+                >
+                  {errorMessage}
+                </Alert>
+              </Collapse>
+            ) : (
+              isUploading && (
+                <Box>
+                  <CircularProgress size={"25px"} />
+                </Box>
+              )
+            )}
+          </Box>
+
+          {/* divider */}
+          <Divider component={"div"} />
+
+          <Box
+            mt={2}
             maxHeight={CustomModalHeight()}
             className={"px-3"}
             sx={{
@@ -182,10 +296,7 @@ const ApplyJobModal = ({ openApplyJobModal, setOpenApplyJobModal }) => {
                 </Typography>
                 {/* about text */}
                 <Typography p={1} variant="body2" color={"text.secondary"}>
-                  We are among the largest and leading cloud providers in
-                  the world. We focus on providing better solutions for storing
-                  data in the cloud to facilitate easier storing and retrieval
-                  of data.
+                  {organisation.about}
                 </Typography>
               </Stack>
 
@@ -201,7 +312,7 @@ const ApplyJobModal = ({ openApplyJobModal, setOpenApplyJobModal }) => {
                 </Typography>
                 {/* Qualification data */}
                 <ol>
-                  {DummyJobData.qualifications.map((data) => (
+                  {requirements.qualification.map((data) => (
                     <Typography
                       component={"li"}
                       variant="body2"
@@ -228,7 +339,7 @@ const ApplyJobModal = ({ openApplyJobModal, setOpenApplyJobModal }) => {
                 </Typography>
                 {/* Qualification data */}
                 <ol>
-                  {DummyJobData.description.map((data) => (
+                  {requirements.description.map((data) => (
                     <Typography
                       component={"li"}
                       variant="body2"
@@ -244,7 +355,8 @@ const ApplyJobModal = ({ openApplyJobModal, setOpenApplyJobModal }) => {
               </Stack>
 
               {/* application section */}
-              <Stack gap={1}>
+
+              <Stack gap={1} mb={2}>
                 <Typography
                   variant="body2"
                   p={1}
@@ -254,223 +366,113 @@ const ApplyJobModal = ({ openApplyJobModal, setOpenApplyJobModal }) => {
                   {" "}
                   Application Section
                 </Typography>
-                {/* cv upload */}
-                <Box mb={3}>
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    p={1}
-                    color={"text.secondary"}
-                  >
-                    {" "}
-                    Upload your Curriculum Vitae (CV) in PDF format. You are
-                    also allowed to provide a link to your CV stored in the
-                    Cloud Storage Sources such as OneDrive, MegaDrive or Google
-                    Drive.
-                  </Typography>
 
-                  {cvUpload && (
-                    <Typography
-                      gutterBottom
-                      textAlign={"center"}
-                      variant="body2"
-                      width={"100%"}
-                      color={"text.secondary"}
-                    >
-                      {`${cvUpload.name}`.substring(0, 30)}...
-                      {`${cvUpload.name}.`.split(".")[1]}
-                    </Typography>
-                  )}
-
-                  {!isCvUpload ? (
-                    <Box
-                      display={"flex"}
-                      justifyContent={"space-around"}
-                      alignItems={"center"}
-                      gap={1}
-                      mt={3}
-                    >
-                      <Button
-                        component="label"
-                        role={undefined}
-                        variant="outlined"
-                        disableElevation
-                        tabIndex={-1}
-                        size="medium"
-                        sx={{
-                          textTransform: "none",
-                          borderRadius: "20px",
-                        }}
-                        startIcon={<CloudUploadRounded />}
+                {websiteLink === "" ? (
+                  <React.Fragment>
+                    {/* curriculum vitae application */}
+                    <Box mb={3}>
+                      <Typography
+                        variant="body2"
+                        gutterBottom
+                        className="px-1"
+                        color={"text.secondary"}
                       >
-                        {CustomDeviceIsSmall()
-                          ? "Upload CV"
-                          : "Upload CV from Files"}
-                        <StyledInput
-                          type="file"
-                          accept="application/pdf"
-                          onChange={(event) =>
-                            setCvUpload(event.target.files[0])
-                          }
-                          multiple
-                        />
-                      </Button>
-                      <Typography variant="body2" color={"text.secondary"}>
-                        or
+                        {" "}
+                        Job recruiter demands that you upload your latest
+                        version of Curriculum Vitae (CV) in the format of PDF
+                        (.pdf) or Microsoft Document (.docx)
                       </Typography>
 
+                      {cvUpload && (
+                        <Typography
+                          gutterBottom
+                          variant="body2"
+                          width={"100%"}
+                          display={"flex"}
+                          gap={2}
+                          alignItems={"center"}
+                          justifyContent={"center"}
+                          fontWeight={"bold"}
+                          color={"text.secondary"}
+                        >
+                          {`${cvUpload.name}`.substring(0, 30)}...
+                          {`${cvUpload.name}.`.split(".")[1]}
+                          <Done
+                            color="success"
+                            sx={{ width: 17, height: 17 }}
+                          />
+                        </Typography>
+                      )}
+
+                      <Box mt={3}>
+                        <Button
+                          component="label"
+                          role={undefined}
+                          variant="text"
+                          color="success"
+                          disabled={errorMessage || isUploading}
+                          disableElevation
+                          tabIndex={-1}
+                          size="medium"
+                          sx={{
+                            textTransform: "none",
+                          }}
+                          startIcon={<CloudUploadRounded />}
+                        >
+                          Upload CV
+                          <StyledInput
+                            type="file"
+                            accept="application/pdf, .docx"
+                            onChange={handleCVFile}
+                            multiple
+                          />
+                        </Button>
+                      </Box>
+                    </Box>
+
+                    {/* application btn */}
+                    <Box mt={3} display={"flex"} justifyContent={"center"}>
                       <Button
-                        variant="outlined"
+                        variant="contained"
                         disableElevation
-                        sx={{
-                          textTransform: "none",
-                          borderRadius: "20px",
-                        }}
-                        onClick={handleCvLink}
-                        size="medium"
-                        startIcon={<LinkRounded />}
+                        disabled={!cvUpload || isUploading || errorMessage}
+                        size="small"
+                        onClick={handleUploadDocuments}
+                        endIcon={<BoltRounded />}
+                        sx={{ borderRadius: "20px" }}
+                        className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
+                        color="success"
                       >
-                        {CustomDeviceIsSmall()
-                          ? "CV Link"
-                          : "CV Cloud Storage Link"}
+                        Complete Application
                       </Button>
                     </Box>
-                  ) : (
-                    <>
-                      <Box
-                        className="w-100"
-                        display={"flex"}
-                        alignItems={"center"}
-                        gap={1}
-                        mt={3}
-                      >
-                        <TextField
-                          required
-                          type="url"
-                          value={cvLink}
-                          label={`CV cloud storage link`}
-                          placeholder="https://...."
-                          fullWidth
-                          onChange={(e) => setCvLink(e.target.value)}
-                        />
-                        {/* close button */}
-                        <IconButton onClick={handleCloseCvLink}>
-                          <Tooltip title={"exit link"}>
-                            <Close />
-                          </Tooltip>
-                        </IconButton>
-                      </Box>
-                    </>
-                  )}
-                </Box>
-
-                {/* cover letter upload */}
-                <Box mb={3}>
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    p={1}
-                    color={"text.secondary"}
-                  >
-                    {" "}
-                    Upload your Cover Letter in PDF format. You are also allowed
-                    to provide a link to your Cover Letter stored in the Cloud
-                    Storage Sources such as OneDrive, MegaDrive or Google Drive.
-                  </Typography>
-
-                  {coverLetterUpload && (
-                    <Typography
-                      gutterBottom
-                      textAlign={"center"}
-                      variant="body2"
-                      width={"100%"}
-                      color={"text.secondary"}
-                    >
-                      {`${cvUpload.name}`.substring(0, 30)}...
-                      {`${cvUpload.name}.`.split(".")[1]}
+                  </React.Fragment>
+                ) : (
+                  <React.Fragment>
+                    {/* job application is external */}
+                    <Typography variant="body2" p={1} color={"text.secondary"}>
+                      {" "}
+                      Job recruiter provided a website for conducting the
+                      application of this job. Click the continue button below
+                      for redirection to the recruiters webpage.
                     </Typography>
-                  )}
 
-                  {!isCoverLetterUpload ? (
-                    <Box
-                      display={"flex"}
-                      justifyContent={"space-around"}
-                      alignItems={"center"}
-                      gap={1}
-                      mt={3}
-                    >
+                    {/* application btn */}
+                    <Box mt={3} display={"flex"} justifyContent={"center"}>
                       <Button
-                        component="label"
-                        role={undefined}
-                        variant="outlined"
+                        variant="contained"
+                        endIcon={<OpenInBrowserRounded />}
                         disableElevation
-                        tabIndex={-1}
-                        size="medium"
-                        sx={{
-                          textTransform: "none",
-                          borderRadius: "20px",
-                        }}
-                        startIcon={<CloudUploadRounded />}
+                        size="small"
+                        sx={{ borderRadius: "20px" }}
+                        className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
+                        color="success"
                       >
-                        {CustomDeviceIsSmall()
-                          ? "Cover Letter"
-                          : "Upload Cover Letter "}
-                        <StyledInput
-                          type="file"
-                          accept="application/pdf"
-                          onChange={(event) =>
-                            setCoverLetterUpload(event.target.files[0])
-                          }
-                          multiple
-                        />
-                      </Button>
-                      <Typography variant="body2" color={"text.secondary"}>
-                        or
-                      </Typography>
-                      <Button
-                        variant="outlined"
-                        disableElevation
-                        sx={{
-                          textTransform: "none",
-                          borderRadius: "20px",
-                        }}
-                        onClick={handleCoverLetterLink}
-                        size="medium"
-                        startIcon={<LinkRounded />}
-                      >
-                        {CustomDeviceIsSmall()
-                          ? "Letter Link"
-                          : "Cover Letter Cloud Link"}
+                        Continue Application
                       </Button>
                     </Box>
-                  ) : (
-                    <>
-                      <Box
-                        className="w-100"
-                        display={"flex"}
-                        alignItems={"center"}
-                        gap={1}
-                        mt={3}
-                      >
-                        <TextField
-                          required
-                          type="url"
-                          value={coverLetterLink}
-                          label={`Cover Letter cloud link`}
-                          placeholder="https://...."
-                          fullWidth
-                          onChange={(e) => setCoverLetterLink(e.target.value)}
-                        />
-                        {/* close button */}
-                        <IconButton onClick={handleCloseCoverLetterLink}>
-                          <Tooltip title={"exit link"}>
-                            <Close />
-                          </Tooltip>
-                        </IconButton>
-                      </Box>
-                    </>
-                  )}
-                </Box>
+                  </React.Fragment>
+                )}
               </Stack>
             </Stack>
           </Box>

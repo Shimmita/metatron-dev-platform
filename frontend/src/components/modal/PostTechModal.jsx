@@ -34,7 +34,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import React, { lazy, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import LinuxLogo from "../../images/linux.jpeg";
 import AppLogo from "../../images/logo_sm.png";
 import SpecialisationTech from "../data/SpecialisationTech";
@@ -45,6 +45,10 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CustomModalHeight from "../utilities/CustomModalHeight";
+import { showPostModalRedux } from "../../redux/AppUI";
+import { updateCurrentSnackPostSuccess } from "../../redux/CurrentSnackBar";
+import { useNavigate } from "react-router-dom";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 const AlertInput = lazy(() => import("../alerts/AlertInput"));
 
@@ -97,6 +101,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   // redux states
   const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
   const { user } = useSelector((state) => state.currentUser);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // axios default credentials
   axios.defaults.withCredentials = true;
@@ -267,8 +273,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           withCredentials: true,
         })
         .then((res) => {
-          // reload the window
-          window.location.reload();
+          // show success post snack controlled by redux
+          dispatch(updateCurrentSnackPostSuccess(res.data));
+          // close the current modal
+          setOpenModalTech(false);
+          // navigate to home route by default
+          navigate("/");
+          // update tab bottom nav to 0
+          updateCurrentBottomNav(0);
         })
         .catch(async (err) => {
           //  user login session expired show logout alert
@@ -297,6 +309,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       setOpenAlert(true);
     }
   }, [category1]);
+
+  // handle closing of the modal
+  const handleClosingModal = () => {
+    setOpenModalTech(false);
+    // also redux reset for isPostModal Redux if true
+    dispatch(showPostModalRedux());
+  };
 
   return (
     <StyledModalPost
@@ -349,8 +368,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
             {/*close icon */}
             <IconButton
-              disabled={isUploading}
-              onClick={(e) => setOpenModalTech(false)}
+              disabled={isUploading || errorMessage}
+              onClick={handleClosingModal}
             >
               <Tooltip title={"close"}>
                 <Close />
@@ -383,7 +402,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             ) : (
               isUploading && (
                 <Box>
-                  <CircularProgress />
+                  <CircularProgress size={"25px"} />
                 </Box>
               )
             )}
@@ -1220,7 +1239,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 </Box>
               ) : (
                 <>
-                  {/* preview the file uploaded from storage */}
+                  {/* preview the file link */}
                   {(fileLink?.trim() !== null || fileLink?.trim() !== "") && (
                     <Box display={"flex"} justifyContent={"center"}>
                       <img
@@ -1303,7 +1322,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     CustomDeviceIsSmall() ? "w-75 rounded-5" : "w-50 rounded-5"
                   }
                   variant="contained"
-                  disabled={isUploading}
+                  disabled={isUploading || errorMessage}
                   size="small"
                 >
                   Upload Your Post

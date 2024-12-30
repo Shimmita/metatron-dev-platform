@@ -26,7 +26,7 @@ import {
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
 import React from "react";
-import cyber from "../../images/cyber_3.png";
+import cyber from "../../images/cybersecurity.jpeg";
 import docker from "../../images/docker.png";
 import linuxLogo from "../../images/linux.jpeg";
 

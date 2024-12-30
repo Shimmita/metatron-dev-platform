@@ -5,8 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import BasicSpeedDial from "../custom/SpeedDial";
 
 import BottomNav from "../custom/BottomNav";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import SnackBarPostSuccess from "../snackbar/SnackBarPostSuccess";
 import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
 const AllApplicantsContainer = lazy(() =>
   import("../jobs/AllApplicantsContainer")
@@ -42,9 +41,12 @@ const EventsUpcoming = lazy(() => import("../events/EventsUpcoming"));
 const EventsBookMarks = lazy(() => import("../events/EventsBookMarks"));
 
 const Feed = () => {
-  // redux state to track scrolling events for showing tab bar and sidebar toggle
-  const { isTabSideBar, isDefaultBottomNav } = useSelector(
+  // redux states
+  const { isTabSideBar, isDefaultBottomNav, isLoadingPostLaunch } = useSelector(
     (state) => state.appUI
+  );
+  const { messageSnackPostTech } = useSelector(
+    (state) => state.currentSnackBar
   );
 
   return (
@@ -54,7 +56,6 @@ const Feed = () => {
         <Box
           marginRight={CustomFeedEquidstance()}
           flex={3}
-          mt={1}
           p={1}
           color={"text.primary"}
         >
@@ -112,8 +113,17 @@ const Feed = () => {
               <Route path="*" element={<PageNotFound />} />
             </Routes>
 
+            {/* snack bar success shown when tech post uploaded  */}
+            {messageSnackPostTech && (
+              <SnackBarPostSuccess
+                messageSnackPostTech={messageSnackPostTech}
+              />
+            )}
+
             {/* decide bottom nav is to be show or not */}
-            <Box>{isDefaultBottomNav && <BottomNav />}</Box>
+            <Box>
+              {isDefaultBottomNav && !isLoadingPostLaunch && <BottomNav />}
+            </Box>
 
             {/* display speed dial in feed section only for mobile and no landscape */}
             {window.screen.availWidth <= 900 && (
@@ -213,8 +223,17 @@ const Feed = () => {
                 <Route path="*" element={<PageNotFound />} />
               </Routes>
 
+              {/* snack bar success shown when tech post uploaded  */}
+              {messageSnackPostTech && (
+                <SnackBarPostSuccess
+                  messageSnackPostTech={messageSnackPostTech}
+                />
+              )}
+
               {/* decide bottom nav is to be show or not */}
-              <Box>{isDefaultBottomNav && <BottomNav />}</Box>
+              <Box>
+                {isDefaultBottomNav && !isLoadingPostLaunch && <BottomNav />}
+              </Box>
 
               {/* display speed dial in feed section only for mobile and no landscape */}
               {window.screen.availWidth <= 900 && (

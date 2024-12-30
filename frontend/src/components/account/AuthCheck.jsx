@@ -3,6 +3,7 @@ import { getAuth, signOut } from "firebase/auth";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { persistor } from "../../redux/AppStore";
+import { updateCurrentAuthMessage } from "../../redux/CurrentAuthMessages";
 import { resetClearCurrentUserRedux } from "../../redux/CurrentUser";
 import LoginAuth from "../auth/LoginAuth";
 
@@ -34,8 +35,11 @@ const AuthCheck = ({ children }) => {
 
       // Clear persisted storage and redux
       await persistor.purge();
-      // reset user information
+      // reset user information for auto logout
       dispatch(resetClearCurrentUserRedux());
+
+      // update authMessage error in redux for display on auth pages
+      dispatch(updateCurrentAuthMessage(err?.response?.data));
     });
 
   // check login status before proceeding

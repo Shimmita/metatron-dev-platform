@@ -74,7 +74,7 @@ function CardFeedMore({ ownerId, ownerName, currentUserNetwork = [] }) {
               </ListItemText>
               <ListItemText
                 sx={{ textTransform: "lowercase" }}
-                primary={`Connect ${ownerName.split(" ")[0]}`}
+                primary={`add ${ownerName.split(" ")[0]}`}
               />
             </MenuItem>
 

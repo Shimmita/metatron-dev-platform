@@ -9,6 +9,7 @@ import session from "express-session";
 import mongoose from "mongoose";
 import { handleAuthMiddleware } from "./middlewares/auth_middleware.js";
 import authenticationRouter from "./routes/authentication_route.js";
+import { manageJobsRouter } from "./routes/manage_jobs_route.js";
 import { postManageRouter } from "./routes/manage_post_route.js";
 const mongoDBSession = connectMongoStore(session);
 const app = express();
@@ -50,7 +51,7 @@ app.use(
     name: process.env.SESSION_NAME,
     store,
     cookie: {
-      maxAge: 10000,
+      maxAge: 60 * 60 * 1000,
     },
   })
 );
@@ -60,6 +61,12 @@ app.use(`${BASE_ROUTE}/signup`, authenticationRouter);
 
 // signin users
 app.use(`${BASE_ROUTE}/signin`, authenticationRouter);
+
+// create post
+app.use(`${BASE_ROUTE}/posts`, handleAuthMiddleware, postManageRouter);
+
+//jobs route
+app.use(`${BASE_ROUTE}/jobs`, handleAuthMiddleware, manageJobsRouter);
 
 // signOut user
 app.use(`${BASE_ROUTE}/signout`, (req, res) => {
@@ -74,8 +81,14 @@ app.use(`${BASE_ROUTE}/signout`, (req, res) => {
   }
 });
 
-// create post when user is loggedin only
-app.use(`${BASE_ROUTE}/post`, handleAuthMiddleware, postManageRouter);
+// for checking user valid when frontend reloaded
+app.use(`${BASE_ROUTE}/valid`, (req, res) => {
+  if (req.session?.isOnline) {
+    res.status(200).send({ authorised: true });
+  } else {
+    res.status(400).send("session expired");
+  }
+});
 
 // not found route
 app.use("*", (req, res) => {

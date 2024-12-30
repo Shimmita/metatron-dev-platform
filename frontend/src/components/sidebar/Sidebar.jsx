@@ -34,25 +34,30 @@ import {
 
 import { resetDarkMode } from "../../redux/AppUI";
 
-import React, { lazy, useEffect, useState } from "react";
+import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
-import FlagLogo from "../../images/KE.png";
 import logoCompany from "../../images/logo_sm.png";
 import EventsTablet from "../events/EventsIsTablet";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import "./Sidebar.css";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 const SkillAvatars = lazy(() => import("./SkillAvatars"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
 const Sidebar = () => {
   const [openAccountMore, setOpenAccountMore] = useState(false);
   const [openMobileApp, setOpenMobileApp] = useState(false);
-  const { isDarkMode, isSidebarRighbar, isTabSideBar } = useSelector(
-    (state) => state.appUI
-  );
+
+  // redux sates
+  const {
+    isDarkMode,
+    isSidebarRighbar,
+    isTabSideBar,
+    isLoadingPostLaunch: isLoadingRequest,
+  } = useSelector((state) => state.appUI);
 
   // alert logout controls
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
@@ -75,6 +80,8 @@ const Sidebar = () => {
 
   // return home
   const handleReturnHome = () => {
+    // update the bottom nav counter
+    dispatch(updateCurrentBottomNav(0));
     navigate("/");
   };
 
@@ -128,14 +135,6 @@ const Sidebar = () => {
     return;
   };
 
-  // simulate loading of the request
-  const [isLoadingRequest, setIsLoadingRequest] = useState(true);
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoadingRequest(false);
-    }, 5000);
-  }, []);
-
   // handle logout
   const handleLogout = () => {
     setOpenAlertLogout(true);
@@ -145,7 +144,6 @@ const Sidebar = () => {
 
   return (
     <Box
-      mt={CustomDeviceTablet() && 1}
       flex={CustomDeviceTablet() ? 1 : 2}
       p={CustomDeviceTablet() ? 1 : 2}
       marginLeft={equidistantSidebar()}
@@ -176,7 +174,11 @@ const Sidebar = () => {
               <React.Fragment>
                 <BoxAvatarContent>
                   <Box width={"100%"}>
-                    <Box className={isDarkMode ? "profile-header" : ""}>
+                    <Box
+                      className={
+                        isDarkMode ? "profile-header" : "bg-dark rounded-top"
+                      }
+                    >
                       <Box
                         display={"flex"}
                         justifyContent={"center"}
@@ -185,7 +187,11 @@ const Sidebar = () => {
                       >
                         <Avatar
                           alt={"user image"}
-                          src={!businessAccount ? devImage : logoCompany}
+                          src={
+                            !businessAccount
+                              ? devImage || logoCompany
+                              : logoCompany || logoCompany
+                          }
                           sx={{ width: 70, height: 70 }}
                         />
                       </Box>
@@ -289,6 +295,7 @@ const Sidebar = () => {
               display={"flex"}
               alignItems={"center"}
               justifyContent={"center"}
+              pt={1}
             >
               <Typography fontWeight={"bold"} color={"primary"}>
                 NAVIGATION MENU
@@ -451,7 +458,6 @@ const Sidebar = () => {
           )}
 
           {/* slogan */}
-
           {isLoadingRequest ? (
             <Box
               bgcolor={"background.default"}
@@ -468,9 +474,9 @@ const Sidebar = () => {
                       {/* personal a/c */}
                       <ListItemIcon>
                         <Avatar
-                          src={FlagLogo}
-                          sx={{ width: 30, height: 30 }}
-                          alt="flag"
+                          src={logoCompany}
+                          sx={{ width: 32, height: 32 }}
+                          alt="logo"
                         />
                       </ListItemIcon>
                       <ListItemText
@@ -544,7 +550,7 @@ const Sidebar = () => {
                   <ListItemText
                     primary={
                       <Typography variant="body2">
-                        <Typography variant="body2">Dark Theme</Typography>
+                        <Typography variant="body2">Change Theme</Typography>
                       </Typography>
                     }
                   />

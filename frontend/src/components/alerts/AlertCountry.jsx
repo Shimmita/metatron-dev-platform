@@ -78,7 +78,7 @@ export default function AlertCountry({
       setInputValue("");
     }
   };
-  // clear an institution
+  // clear an country
   const handleDeleteCountry = () => {
     setCountry(null);
   };

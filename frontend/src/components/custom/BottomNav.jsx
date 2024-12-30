@@ -6,13 +6,16 @@ import {
   Tooltip,
 } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 const BottomNav = () => {
+  // redux states
+  const { position } = useSelector((state) => state.currentBottomNav);
   const navigate = useNavigate();
-  const [value, setValue] = React.useState(0);
+  const dispatch = useDispatch();
 
   // return home or default card page
   const handleReturnHome = () => {
@@ -46,9 +49,10 @@ const BottomNav = () => {
           msOverflowStyle: "none",
           scrollbarWidth: "none",
         }}
-        value={value}
+        value={position}
         onChange={(event, newValue) => {
-          setValue(newValue);
+          // update the redux state value
+          dispatch(updateCurrentBottomNav(newValue));
         }}
       >
         <Tooltip title="home" arrow>

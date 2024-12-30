@@ -11,6 +11,8 @@ const initialState = {
   isOpenMessageDrawer: false,
   isSidebarRighbar: true,
   isTabSideBar: true,
+  isPostModalRedux: false,
+  isLoadingPostLaunch: false,
   // theme
   isDarkMode: false,
   currentMode: "light",
@@ -20,6 +22,13 @@ const appUISliceReducerSlice = createSlice({
   name: "appUI",
   initialState,
   reducers: {
+    handleLoadingPostLaunch: (state, action) => {
+      state.isLoadingPostLaunch = action.payload;
+    },
+
+    showPostModalRedux: (state) => {
+      state.isPostModalRedux = !state.isPostModalRedux;
+    },
     showAccountSettings: (state) => {
       return {
         ...state,
@@ -33,8 +42,15 @@ const appUISliceReducerSlice = createSlice({
         ...state,
         defaultState: true,
         isAccountSettings: false,
-        isReportUser: false,
         isAbout: false,
+        isDefaultBottomNav: true,
+        isMobileRighBar: false,
+        isSearchBar: true,
+        isOpenMessageDrawer: false,
+        isSidebarRighbar: true,
+        isTabSideBar: true,
+        isPostModalRedux: false,
+        isLoadingPostLaunch: false,
       };
     },
 
@@ -103,6 +119,8 @@ export const {
   showMessagingDrawer,
   showTabSideBar,
   handleSidebarRightbar,
+  showPostModalRedux,
+  handleLoadingPostLaunch,
 } = appUISliceReducerSlice.actions;
 
 // export the appUISliceReducer for universal purposes

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialstate = {
-  posts: null,
+  posts: [],
 };
 
 const currentPosts = createSlice({
@@ -16,7 +16,7 @@ const currentPosts = createSlice({
 
     // nullify user and fale online
     resetClearCurrentPosts: (state) => {
-      state.posts = null;
+      state.posts = [];
     },
   },
 });

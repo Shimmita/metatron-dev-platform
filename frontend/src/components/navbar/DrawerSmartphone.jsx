@@ -23,7 +23,6 @@ import {
   SupportAgentRounded,
 } from "@mui/icons-material";
 import {
-  AppBar,
   Avatar,
   Box,
   Collapse,
@@ -35,18 +34,13 @@ import {
   ListItemText,
   styled,
   Switch,
-  Toolbar,
   Typography,
 } from "@mui/material";
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
-import FlagLogo from "../../images/KE.png";
-import {
-  default as AppLogo,
-  default as logoCompany,
-} from "../../images/logo_sm.png";
+import { default as logoCompany } from "../../images/logo_sm.png";
 import { resetDarkMode } from "../../redux/AppUI";
 import SkillAvatars from "../sidebar/SkillAvatars";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -156,43 +150,27 @@ const DrawerSmartphone = ({
 
   return (
     <Drawer open={openDrawer} onClose={(e) => setOpenDrawer(false)}>
-      <Box
-        maxWidth={300}
-        height={"100%"}
-        bgcolor={"background.default"}
-        color={"text.primary"}
-      >
-        <AppBar position="sticky" elevation={0}>
-          <Toolbar
-            variant="dense"
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignContent: "center",
-            }}
-          >
-            <Avatar alt="logo" src={AppLogo} sx={{ width: 36, height: 36 }} />
-            <Typography variant="body2">METATRON</Typography>
-            <Typography variant="body2">FREE</Typography>
-          </Toolbar>
-        </AppBar>
-
+      <Box maxWidth={300} height={"100%"} bgcolor={"background.default"}>
         <BoxAvatarContent>
           <Box>
             <Box
               width={"100%"}
-              className={isDarkMode ? "profile-header" : undefined}
+              className={isDarkMode ? "profile-header" : "bg-dark"}
             >
               <Box
                 display={"flex"}
                 justifyContent={"center"}
                 alignItems={"center"}
-                p={1}
+                className="p-1 pt-4"
               >
                 <Avatar
-                  alt={""}
-                  src={!businessAccount ? devImage : logoCompany}
-                  sx={{ width: 70, height: 70, marginTop: 0 }}
+                  alt={"user image"}
+                  src={
+                    !businessAccount
+                      ? devImage || logoCompany
+                      : logoCompany || logoCompany
+                  }
+                  sx={{ width: 70, height: 70 }}
                 />
               </Box>
               <Box
@@ -509,7 +487,7 @@ const DrawerSmartphone = ({
                 <ListItemText
                   primary={
                     <Typography variant="body2">
-                      <Typography variant="body2">Dark Theme</Typography>
+                      <Typography variant="body2">Change Theme</Typography>
                     </Typography>
                   }
                 />
@@ -523,8 +501,8 @@ const DrawerSmartphone = ({
                     {/* personal a/c */}
                     <ListItemIcon>
                       <Avatar
-                        src={FlagLogo}
-                        sx={{ width: 26, height: 26 }}
+                        src={logoCompany}
+                        sx={{ width: 34, height: 34 }}
                         alt="flag"
                       />
                     </ListItemIcon>

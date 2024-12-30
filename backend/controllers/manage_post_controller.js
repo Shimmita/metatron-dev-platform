@@ -1,5 +1,5 @@
 import sharp from "sharp";
-import TechPostModal from "../model/TechPostModal.js";
+import TechPostModal from "../model/TechPostModel.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 // creating of new post
 export const handleCreateNewPost = async (req, res) => {
@@ -32,6 +32,59 @@ export const handleCreateNewPost = async (req, res) => {
       res.status(200).send("post uploaded successfully");
     }
   } catch (error) {
-    res.status(400).send("something went wrong " + error.message);
+    var message = `${error.message}`;
+    if (message.toLowerCase().includes("cloudinary")) {
+      message = "please check your internet connection";
+    } else {
+      message = "something went wrong try again";
+    }
+    res.status(400).send(message);
   }
+};
+
+// get all posts
+export const handleGetAllTechiePost = async (req, res) => {
+  try {
+    const allPosts = await TechPostModal.find({})
+    // posts not made its empty
+    if (allPosts.length < 1) {
+      throw new Error("currently there are no posts");
+      return;
+    }
+
+    // posts are present
+    res.status(200).send(allPosts);
+  } catch (error) {
+    res.status(400).send("something went wrong. " + error.message);
+  }
+};
+
+// get specific post or one post
+const handleGetSpecificPost = async () => {
+  const id = req?.params.id;
+};
+
+// edit post
+export const handleUpdateUserPost = async (req, res) => {
+  // get the body
+  const body = req?.body;
+  // obtain id passed as params
+  const id = req.params.id;
+
+  try {
+    await TechPostModal.findByIdAndUpdate(
+      { _id: id },
+      { $set: { post_body: body } }
+    );
+
+    res.status(200).send("post updated successfully");
+  } catch (error) {
+    res.status(400).send("failed to update post " + error.message);
+  }
+};
+
+export const handleDeleteUserPost = async (req, res) => {
+  // get the req params value id of the post to be deleted
+  const id = req.params.id;
+  console.log(id);
 };

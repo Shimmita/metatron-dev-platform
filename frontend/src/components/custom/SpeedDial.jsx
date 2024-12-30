@@ -11,6 +11,7 @@ import {
   Work,
 } from "@mui/icons-material";
 import { Typography } from "@mui/material";
+import { useSelector } from "react-redux";
 const PostCourseModal = lazy(() => import("../modal/PostCourseModal"));
 const PostTechModal = lazy(() => import("../modal/PostTechModal"));
 const PostJobModal = lazy(() => import("../modal/PostJobModal"));
@@ -49,8 +50,19 @@ export default function BasicSpeedDial() {
   const [openModalJob, setOpenModalJob] = React.useState(false);
   const [openModalCourse, setOpenModalCourse] = React.useState(false);
 
+  // redux states access
+  const { isPostModalRedux, isLoadingPostLaunch } = useSelector(
+    (state) => state.appUI
+  );
+
   return (
-    <Box sx={{ transform: "translateZ(0px)", flexGrow: 1 }}>
+    <Box
+      sx={{
+        transform: "translateZ(0px)",
+        flexGrow: 1,
+        visibility: isLoadingPostLaunch ? "hidden" : "visible",
+      }}
+    >
       <SpeedDial
         ariaLabel="SpeedDial"
         sx={{ position: "absolute", bottom: 10, right: 10 }}
@@ -91,7 +103,7 @@ export default function BasicSpeedDial() {
       </SpeedDial>
       {/* Tech Field Modal */}
       <PostTechModal
-        openModalTech={openModalTech}
+        openModalTech={openModalTech || isPostModalRedux}
         setOpenModalTech={setOpenModalTech}
       />
       {/* Post Job Modal */}

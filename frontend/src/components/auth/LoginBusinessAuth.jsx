@@ -35,8 +35,6 @@ import ModalPolicyTerms from "./ModalPolicyTerms";
 import OptionsMoreLogin from "./OptionsMoreLogin";
 const ModalAccountInfo = lazy(() => import("./ModalAccountInfo"));
 
-
-
 const LoginBusinessAuth = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const dispatch = useDispatch();
@@ -90,7 +88,6 @@ const LoginBusinessAuth = () => {
     setOpenAlert(true);
     setOption("ms");
   };
-
 
   return (
     <Box
@@ -214,6 +211,27 @@ const LoginBusinessAuth = () => {
                 gap={1}
                 alignItems={"center"}
               >
+                <WbIncandescentRounded
+                  sx={{ width: 18, height: 18, color: "orange" }}
+                />
+                <Typography
+                  variant={CustomDeviceSmallest() ? "caption" : "body2"}
+                  color={"text.secondary"}
+                >
+                  Enlightening Technology
+                </Typography>
+                <WbIncandescentRounded
+                  sx={{ width: 18, height: 18, color: "orange" }}
+                />
+              </Box>
+
+              <Box
+                mb={2}
+                display={"flex"}
+                justifyContent={"center"}
+                gap={1}
+                alignItems={"center"}
+              >
                 <BusinessRounded
                   color="primary"
                   sx={{ width: 18, height: 18 }}
@@ -227,27 +245,6 @@ const LoginBusinessAuth = () => {
                 <BusinessRounded
                   color="primary"
                   sx={{ width: 18, height: 18 }}
-                />
-              </Box>
-
-              <Box
-                mb={2}
-                display={"flex"}
-                justifyContent={"center"}
-                gap={1}
-                alignItems={"center"}
-              >
-                <WbIncandescentRounded
-                  sx={{ width: 18, height: 18, color: "orange" }}
-                />
-                <Typography
-                  variant={CustomDeviceSmallest() ? "caption" : "body2"}
-                  color={"text.secondary"}
-                >
-                  Enlightening Technology Globally
-                </Typography>
-                <WbIncandescentRounded
-                  sx={{ width: 18, height: 18, color: "orange" }}
                 />
               </Box>
             </Box>

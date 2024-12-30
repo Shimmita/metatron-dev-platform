@@ -4,7 +4,7 @@ import List from "@mui/material/List";
 import React from "react";
 import FriendRequest from "./layouts/FriendRequest";
 
-export default function RequestContainer() {
+export default function RequestContainer({ isLoadingPostLaunch }) {
   const screenWidth = window.screen.availWidth;
   // simulation of the items in the list
   const items = Array.from(new Array(3));
@@ -29,11 +29,11 @@ export default function RequestContainer() {
     <>
       <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
         <Box
-          mb={2}
           display={"flex"}
           alignItems={"center"}
           justifyContent={"center"}
           gap={2}
+          pt={2}
         >
           <Typography fontWeight={"bold"} color={"primary"}>
             CONNECT REQUEST

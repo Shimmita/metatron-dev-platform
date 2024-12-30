@@ -2,136 +2,203 @@ import {
   AccessTimeRounded,
   BalanceRounded,
   BoltRounded,
+  LocationCityRounded,
   OpenInBrowserRounded,
   PaidRounded,
   PeopleRounded,
+  WbIncandescentRounded,
   WorkHistoryRounded,
-  WorkRounded,
 } from "@mui/icons-material";
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
 import React, { useState } from "react";
-import AwsLogo from "../../../images/aws.jpeg";
 import ApplyJobModal from "../../modal/ApplyJobModal";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+import { getImageMatch } from "../../utilities/getImageMatch";
 
-function JobLayout({ isDarkMode }) {
+function JobLayout({ isDarkMode, job }) {
   const [openModal, setOpenApplyJobModal] = useState(false);
-  const externalAppliation = false;
 
   const handleShowingApply = () => {
     setOpenApplyJobModal(true);
   };
-  const dummySkills = ["Python", "Tensorflow", "Flask", "FastAPI", "Scikit"];
+  // extracting contents in job
+  const mandatorySkills = [...job.skills];
+  const websiteLink = job.website?.trim();
+
+  // handle date display
+  const handleDateDisplay = () => {
+    const parent = job.createdAt?.split("T")[0]?.split("-");
+    return `${parent[parent.length - 1]}/${parent[parent.length - 2]}/${
+      parent[0]
+    }`;
+  };
+
+  // handle country length to only two names and code label
+  const handleCountryName = () => {
+    const parent = job.location.country.split(" ");
+    const countryCode = parent.pop();
+    const finalName =
+      parent.length > 2
+        ? `${parent[0]} ${parent[1]} ${countryCode}`
+        : job.location.country;
+
+    return finalName;
+  };
+
   return (
     <Stack
       justifyContent={"center"}
       alignItems={"center"}
-      className={!CustomDeviceIsSmall() ? "rounded shadow" : ""}
-      gap={2}
-      m={3}
+      className={!CustomDeviceIsSmall() ? "rounded shadow py-3 mb-3" : "py-3"}
+      gap={1}
     >
-      {/* logo */}
-      <Avatar alt="" src={AwsLogo} sx={{ height: 50, width: 50, mt: 1 }} />
+      <Avatar
+        alt=""
+        className="border"
+        sx={{ width: 40, height: 40 }}
+        src={getImageMatch(job.logo)}
+      />
+
       {/* job title */}
       <Stack textAlign={"center"} gap={1}>
-        <Box display={"flex"} gap={1} alignItems={"center"}>
-          <WorkRounded color="primary" sx={{ width: 20, height: 20 }} />
+        <Box display={"flex"} justifyContent={"center"}>
           <Typography variant="body1" color={"primary"} fontWeight={"bold"}>
+            {job.title}
+          </Typography>
+        </Box>
+
+        {/* hiring org */}
+        <Box textAlign={"center"}>
+          <Typography
+            gutterBottom
+            variant="body2"
+            fontWeight={"bold"}
+            textTransform={"capitalize"}
+            color={"text.secondary"}
+          >
             {" "}
-            Machine Learning Engineer
+            {job.organisation.name}
+          </Typography>
+        </Box>
+
+        {/* brief info */}
+        <Box display={"flex"} gap={1} alignItems={"center"}>
+          <LocationCityRounded sx={{ width: 22, height: 22 }} />
+          <Typography variant="body2">
+            {handleCountryName()} | {job.location.state}{" "}
           </Typography>
         </Box>
         <Box display={"flex"} gap={1} alignItems={"center"}>
-          <BalanceRounded sx={{ width: 22, height: 22 }} />
-          <Typography variant="body2">Intermidiate Position Level</Typography>
-        </Box>
-        <Box display={"flex"} gap={1} alignItems={"center"}>
           <PaidRounded sx={{ width: 20, height: 20 }} />
-          <Typography variant="body2">Ksh.150,000 - Ksh.200,000</Typography>
-        </Box>
-        <Box display={"flex"} gap={1} alignItems={"center"}>
-          <PeopleRounded sx={{ width: 20, height: 20 }} />
-          <Typography variant="body2">Total Applications Done 10</Typography>
-        </Box>
-        <Box display={"flex"} gap={1} alignItems={"center"}>
-          <AccessTimeRounded sx={{ width: 20, height: 20 }} />
-          <Typography variant="body2">Date Uploaded 10/11/2024</Typography>
+          <Typography variant="body2" textTransform={"uppercase"}>
+            {job.salary}
+          </Typography>
         </Box>
 
         <Box display={"flex"} gap={1} alignItems={"center"}>
+          <BalanceRounded sx={{ width: 22, height: 22 }} />
+          <Typography variant="body2" textTransform={"capitalize"}>
+            {job.entry.level?.split(" ")[0]} Position Level
+          </Typography>
+        </Box>
+        <Box display={"flex"} gap={1} alignItems={"center"}>
           <WorkHistoryRounded sx={{ width: 20, height: 20 }} />
+          <Typography variant="body2" textTransform={"capitalize"}>
+            {job.entry.years}
+          </Typography>
+        </Box>
+
+        <Box display={"flex"} gap={1} alignItems={"center"}>
+          <PeopleRounded sx={{ width: 20, height: 20 }} />
           <Typography variant="body2">
-            Years of Experience 1 - 2 yrs{" "}
+            Current Applications {job.applicants.total}/500
+          </Typography>
+        </Box>
+        <Box display={"flex"} gap={1} alignItems={"center"}>
+          <AccessTimeRounded sx={{ width: 20, height: 20 }} />
+          <Typography variant="body2">
+            Date Uploaded {handleDateDisplay()}
           </Typography>
         </Box>
       </Stack>
 
       {/* skills mandatory */}
-      <Box>
-        <Typography
-          gutterBottom
-          display={"flex"}
-          gap={1}
-          justifyContent={"center"}
-          alignItems={"center"}
-          textAlign={"center"}
-          variant="body2"
-          fontWeight={"bold"}
-        >
-          Mandatory Skills
-        </Typography>
-        <Box display="flex" justifyContent={"center"}>
-          <Box display={"flex"} gap={1} flexWrap={"wrap"}>
-            {dummySkills.map((val, index) => (
-              <>
-                <Typography key={index} gutterBottom variant="body2">
-                  {val}
-                </Typography>
-              </>
-            ))}
+      <Box mt={1}>
+        <Box display={"flex"} justifyContent={"center"}>
+          <Box display={"flex"} alignItems={"center"} gap={1}>
+            <WbIncandescentRounded
+              sx={{ width: 20, height: 20 }}
+              color="primary"
+            />
+            <Typography
+              gutterBottom
+              variant="body2"
+              textAlign={"center"}
+              color={"primary"}
+              fontWeight={"bold"}
+            >
+              Mandatory Skills
+            </Typography>
+            <WbIncandescentRounded
+              sx={{ width: 20, height: 20 }}
+              color="primary"
+            />
           </Box>
+        </Box>
+
+        <Box mt={1}>
+          {mandatorySkills.map((val, index) => (
+            <Typography
+              key={index}
+              gutterBottom
+              variant="body2"
+              component={"li"}
+            >
+              {val}
+            </Typography>
+          ))}
         </Box>
       </Box>
 
-      {/* hiring org */}
-      <Box textAlign={"center"}>
-        <Typography
-          gutterBottom
-          variant="body2"
-          fontWeight={"bold"}
-          color={"text.secondary"}
+      {/* application  btn */}
+      {websiteLink === "" ? (
+        <Button
+          variant={isDarkMode ? "outlined" : "contained"}
+          color="primary"
+          className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
+          size="small"
+          disableElevation
+          onClick={handleShowingApply}
+          endIcon={<BoltRounded />}
+          sx={{ borderRadius: "20px", mb: 3 }}
         >
-          Amazon Web Services (AWS)
-        </Typography>
-        <Typography
-          gutterBottom
-          fontWeight={"bold"}
-          variant="body2"
-          color={"text.secondary"}
+          View and Apply
+        </Button>
+      ) : (
+        <Button
+          variant={isDarkMode ? "outlined" : "contained"}
+          color="primary"
+          className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
+          size="small"
+          disableElevation
+          onClick={handleShowingApply}
+          endIcon={<OpenInBrowserRounded />}
+          sx={{ borderRadius: "20px", mb: 3 }}
         >
-          Germany | Remote | FullTime
-        </Typography>
-      </Box>
+          View and Apply
+        </Button>
+      )}
 
-      {/* application  */}
-      <Button
-        variant={isDarkMode ? "outlined" : "contained"}
-        color="primary"
-        className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
-        size="small"
-        disableElevation
-        onClick={handleShowingApply}
-        endIcon={
-          externalAppliation ? <OpenInBrowserRounded /> : <BoltRounded />
-        }
-        sx={{ borderRadius: "20px", mb: 3 }}
-      >
-        Apply Fast
-      </Button>
       {/* show modal apply jobs */}
       <ApplyJobModal
+        title={job.title}
+        organisation={job.organisation}
+        requirements={job.requirements}
+        websiteLink={websiteLink}
         openApplyJobModal={openModal}
         setOpenApplyJobModal={setOpenApplyJobModal}
+        jobID={job._id}
+        jobaccesstype={job.jobtypeaccess}
       />
     </Stack>
   );

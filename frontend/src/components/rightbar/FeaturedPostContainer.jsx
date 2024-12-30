@@ -29,11 +29,12 @@ export default function FeaturedPostContainer() {
     <>
       <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
         <Box
-          mb={2}
           display={"flex"}
           alignItems={"center"}
           justifyContent={"center"}
           gap={2}
+          pt={2}
+
         >
           <Typography fontWeight={"bold"} color={"primary"}>
             FEATURED POST

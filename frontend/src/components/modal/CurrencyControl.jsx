@@ -68,12 +68,12 @@ function BpRadio(props) {
   );
 }
 
-export default function CurrencyControl({ setCurrency }) {
+export default function CurrencyControl({ setCurrency, isDisabled = false }) {
   const handleCurrency = (e) => {
     setCurrency(e.target.value);
   };
   return (
-    <FormControl>
+    <FormControl disabled={isDisabled}>
       <RadioGroup
         row
         defaultValue="Ksh"
