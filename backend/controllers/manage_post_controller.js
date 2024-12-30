@@ -45,17 +45,21 @@ export const handleCreateNewPost = async (req, res) => {
 // get all posts
 export const handleGetAllTechiePost = async (req, res) => {
   try {
+    // retrieve all posts in order of latest first
     const allPosts = await TechPostModal.find({})
+      .sort({ createdAt: -1 })
+      .limit(20);
     // posts not made its empty
     if (allPosts.length < 1) {
-      throw new Error("currently there are no posts");
-      return;
+      throw new Error(
+        "currently there are no posts made by the users on the platform kindly try again later."
+      );
     }
 
     // posts are present
     res.status(200).send(allPosts);
   } catch (error) {
-    res.status(400).send("something went wrong. " + error.message);
+    res.status(400).send(error.message);
   }
 };
 

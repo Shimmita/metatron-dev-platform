@@ -22,8 +22,12 @@ app.use(
   })
 );
 
+// port for server
 const PORT = process.env.PORT || 5000;
+// base route
 const BASE_ROUTE = process.env.BASE_ROUTE;
+// defines if server is under maintainance
+const isUnderMaintaince = process.env.MAINTAINANCE === "1";
 
 // init mongoDB
 mongoose
@@ -81,12 +85,23 @@ app.use(`${BASE_ROUTE}/signout`, (req, res) => {
   }
 });
 
-// for checking user valid when frontend reloaded
+// for checking user valid when frontend reloaded. all routes use it
 app.use(`${BASE_ROUTE}/valid`, (req, res) => {
-  if (req.session?.isOnline) {
+  try {
+    const isOnline = req.session?.isOnline;
+    // session ended/expired or guest user
+    if (!isOnline) {
+      throw new Error("Hey there, welcome");
+    }
+
+    // server is under maintainance
+    if (isUnderMaintaince) {
+      throw new Error("server under maintainance try again later");
+    }
+
     res.status(200).send({ authorised: true });
-  } else {
-    res.status(400).send("session expired");
+  } catch (error) {
+    res.status(400).send(error.message);
   }
 });
 

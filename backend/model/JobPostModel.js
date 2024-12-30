@@ -20,6 +20,29 @@ const jobSchema = new mongoose.Schema(
       },
       _id: false,
     },
+
+    jobtypeaccess: {
+      type: {
+        type: String,
+        required: [true, "job type is required"],
+        enum: {
+          values: ["Contract", "Full-Time"],
+          message: "job type must be Contract, or Full-Time",
+        },
+      },
+
+      access: {
+        type: String,
+        required: [true, "job accessibilty is required"],
+        enum: {
+          values: ["Remote", "Hybrid", "Onsite"],
+          message: "job accessibilty must be Remote, Hybrid or Onsite",
+        },
+      },
+
+      _id: false,
+    },
+
     logo: {
       type: String,
       required: false,

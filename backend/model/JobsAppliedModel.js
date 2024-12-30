@@ -31,6 +31,7 @@ const jobAppliedSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     cvLink: {
       type: String,
       required: false,
@@ -42,6 +43,7 @@ const jobAppliedSchema = new mongoose.Schema(
       default: "",
     },
     viewed: {
+      required: false,
       type: Boolean,
       default: false,
     },
@@ -53,11 +55,11 @@ const jobAppliedSchema = new mongoose.Schema(
 
 // Automatically exclude the applicantID field when sending JSON
 // coz the current user in the frontend has this ID and also for security reasons,
-userSchema.set("toJSON", {
+jobAppliedSchema.set("toJSON", {
   transform: (doc, ret) => {
     delete ret.applicant.ID; // Remove the applicantID field
     return ret;
   },
 });
 
-export default mongoose.model("Jobs", jobAppliedSchema);
+export default mongoose.model("JobApp", jobAppliedSchema);

@@ -219,7 +219,7 @@ const handleSigninPersonal = async (req, res) => {
 
     // user exists lets check the password provided against the one in the database
     if (await bcrypt.compare(password, user.password)) {
-      // add the session user isOnline to true
+      // add the session user isOnline to true on every request that expires based on session time
       req.session.isOnline = true;
       res.status(200).send(user);
     } else {
