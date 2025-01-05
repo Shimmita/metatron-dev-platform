@@ -13,6 +13,7 @@ const initialState = {
   isTabSideBar: true,
   isPostModalRedux: false,
   isLoadingPostLaunch: false,
+  isSimilarCoursesModal: false,
   // theme
   isDarkMode: false,
   currentMode: "light",
@@ -29,6 +30,7 @@ const appUISliceReducerSlice = createSlice({
     showPostModalRedux: (state) => {
       state.isPostModalRedux = !state.isPostModalRedux;
     },
+
     showAccountSettings: (state) => {
       return {
         ...state,
@@ -36,7 +38,12 @@ const appUISliceReducerSlice = createSlice({
         isAccountSettings: true,
       };
     },
+    // controls the modal similar courses
+    resetSimilarCoursesModal: (state) => {
+      state.isSimilarCoursesModal = !state.isSimilarCoursesModal;
+    },
 
+    // reset all UI states to default
     resetAll: (state) => {
       return {
         ...state,
@@ -51,6 +58,7 @@ const appUISliceReducerSlice = createSlice({
         isTabSideBar: true,
         isPostModalRedux: false,
         isLoadingPostLaunch: false,
+        isSimilarCoursesModal: false,
       };
     },
 
@@ -121,6 +129,7 @@ export const {
   handleSidebarRightbar,
   showPostModalRedux,
   handleLoadingPostLaunch,
+  resetSimilarCoursesModal,
 } = appUISliceReducerSlice.actions;
 
 // export the appUISliceReducer for universal purposes

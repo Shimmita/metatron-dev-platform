@@ -570,6 +570,13 @@ const AllSkills = [
   "Machine Learning",
   "IoT",
   "NoSQL",
+  "Web Development",
+  "CSS",
+  "UI/UX",
+  "Containerisation",
+  "Adobe",
+  "Adobe PS",
+  "Adobe Illustrator",
 ].sort();
 
 export default AllSkills;

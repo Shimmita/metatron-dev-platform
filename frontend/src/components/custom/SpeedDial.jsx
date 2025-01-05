@@ -12,6 +12,8 @@ import {
 } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import { useSelector } from "react-redux";
+import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
+import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 const PostCourseModal = lazy(() => import("../modal/PostCourseModal"));
 const PostTechModal = lazy(() => import("../modal/PostTechModal"));
 const PostJobModal = lazy(() => import("../modal/PostJobModal"));
@@ -65,7 +67,11 @@ export default function BasicSpeedDial() {
     >
       <SpeedDial
         ariaLabel="SpeedDial"
-        sx={{ position: "absolute", bottom: 10, right: 10 }}
+        sx={{
+          position: "absolute",
+          bottom: 0,
+          right: CustomDeviceSmallest() ? 5 : CustomDeviceTablet() ? 7 : 12,
+        }}
         icon={<SpeedDialIcon />}
         onClose={handleClose}
         onOpen={handleOpen}

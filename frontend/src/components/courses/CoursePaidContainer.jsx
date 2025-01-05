@@ -1,4 +1,16 @@
-import { ArrowDropDown, TuneRounded } from "@mui/icons-material";
+import {
+  AccountBalanceWalletRounded,
+  AccountBoxRounded,
+  AppsRounded,
+  ArrowDropDown,
+  Close,
+  CloudCircleRounded,
+  DoneRounded,
+  FavoriteRounded,
+  HelpRounded,
+  SchoolRounded,
+  TuneRounded,
+} from "@mui/icons-material";
 import {
   AppBar,
   Box,
@@ -9,29 +21,42 @@ import {
   MenuItem,
   Stack,
   Toolbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { lazy, useState } from "react";
 import { useSelector } from "react-redux";
 import AllCourses from "../data/AllCourses";
+import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-import CourseIcon from "./CourseIcon";
-import SnackBarInfo from "./layout/SnackBarInfo";
+const WalletLayout = lazy(() => import("../custom/WalletLayout"));
+const HelpSupport = lazy(() => import("../custom/HelpSupport"));
+const SnackBarInfo = lazy(() => import("../snackbar/SnackBarInfo"));
+const SimilarCoursesModal = lazy(() => import("../modal/SimilarCoursesModal"));
+const AlertCourseSearch = lazy(() => import("../alerts/AlertCourseSearch"));
 const CoursePaid = lazy(() => import("./layout/CoursePaid"));
+// array for live events simulation
+const items = Array.from({ length: 10 }, (_, i) => i);
 
 const CoursePaidContainer = () => {
-  // array for live events simulation
-  const items = Array.from({ length: 10 }, (_, i) => i);
-
-  // dark mode
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const [openCourseAlert, setOpenCourseAlert] = useState(false);
+  const [counter, setCounter] = useState(0);
+  const [showManagement, setShowManagement] = useState(false);
+  const [isManagementSnack, setIsManagementSnack] = useState(false);
+  const [managementMSG, setManagementMSG] = useState("");
+  // redux states
+  const { isDarkMode, isSimilarCoursesModal } = useSelector(
+    (state) => state.appUI
+  );
 
   // all menu controls
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event) => {
+  const handleClickMain = (event) => {
     setAnchorEl(event.currentTarget);
+
+    setCounter(0);
   };
   const handleClose = () => {
     setAnchorEl(null);
@@ -43,12 +68,9 @@ const CoursePaidContainer = () => {
 
   const [openSnack, setOpenSnack] = React.useState(true);
 
-  // handle web option
-  const handleWeb = () => {
-    // show sanckbar
-    setOpenSnack(true);
-    // info snack
-    setSelectedOption("Web App Dev Courses");
+  // handle free courses
+  const handleFree = () => {
+    setCounter(1);
   };
 
   // handle machine option
@@ -56,15 +78,8 @@ const CoursePaidContainer = () => {
     // show sanckbar
     setOpenSnack(true);
     // info snack
-    setSelectedOption("Machine Learning Courses");
-  };
-
-  // handle android option
-  const handleAndroid = () => {
-    // show sanckbar
-    setOpenSnack(true);
-    // info snack
-    setSelectedOption("Android App Dev Courses");
+    setSelectedOption("Machine Learning/Robotics/AI");
+    setCounter(2);
   };
 
   // handle ios option
@@ -72,7 +87,72 @@ const CoursePaidContainer = () => {
     // show sanckbar
     setOpenSnack(true);
     // info snack
-    setSelectedOption("iOS App Dev Courses");
+    setSelectedOption("iOS App Development");
+    setCounter(3);
+  };
+
+  // handle android option
+  const handleAndroid = () => {
+    // show sanckbar
+    setOpenSnack(true);
+    // info snack
+    setSelectedOption("Android App Development");
+    setCounter(4);
+  };
+
+  // handle searching or filtering of courses
+  const handleCoursesFiltering = () => {
+    setOpenCourseAlert(true);
+    setCounter(5);
+  };
+
+  // handle codurse management
+  const handleCourseManager = () => {
+    setCounter(6);
+    setCounter(7);
+    // show course management menu
+    setShowManagement(true);
+  };
+
+  // handle closing course manager
+  const handleCloseCourseManager = () => {
+    setShowManagement(false);
+    setCounter(0);
+  };
+
+  // handle enrolled courses
+  const handleEnrolledCourses = () => {
+    setCounter(7);
+    setIsManagementSnack(true);
+    setManagementMSG("enrolled courses");
+  };
+
+  // handle favourite courses
+  const handleFavouriteCourses = () => {
+    setCounter(8);
+    setIsManagementSnack(true);
+    setManagementMSG("favourite courses");
+  };
+
+  // handle account wallet
+  const handleAccountWallet = () => {
+    setCounter(9);
+    setIsManagementSnack(true);
+    setManagementMSG("account wallet ");
+  };
+
+  // handle uploaded courses
+  const handleUploadedCourses = () => {
+    setCounter(10);
+    setIsManagementSnack(true);
+    setManagementMSG("uploaded courses");
+  };
+
+  // handle help
+  const handleHelpCenter = () => {
+    setCounter(11);
+    setIsManagementSnack(true);
+    setManagementMSG("technical support");
   };
 
   return (
@@ -84,93 +164,264 @@ const CoursePaidContainer = () => {
           sx={{ display: "flex", justifyContent: "center" }}
         >
           <Stack
+            width={"100%"}
             direction={"row"}
             alignItems={"center"}
             justifyContent={"center"}
           >
-            <Button
-              disableElevation
-              endIcon={<ArrowDropDown />}
-              size="small"
-              sx={{ color: "white", fontWeight: "bold" }}
-              aria-label="more"
-              id="long-button"
-              aria-controls={open ? "long-menu" : undefined}
-              aria-expanded={open ? "true" : undefined}
-              aria-haspopup="true"
-              onClick={handleClick}
-            >
-              All
-            </Button>
-
-            <Button
-              size="small"
-              sx={{ color: "white", fontWeight: "bold" }}
-              onClick={handleWeb}
-            >
-              Web
-            </Button>
-
-            <Button
-              size="small"
-              sx={{ color: "white", fontWeight: "bold" }}
-              onClick={handleMachine}
-            >
-              ML/AI
-            </Button>
-
-            {/* dont on smallest devices like i6 */}
-            {!CustomDeviceSmallest() && (
-              <Button
-                size="small"
-                sx={{ color: "white", fontWeight: "bold" }}
-                onClick={handleAndroid}
-              >
-                Android
-              </Button>
-            )}
-
-            {/* show this on tablet++ */}
-            {!CustomDeviceIsSmall() && (
-              <>
-                <Button
-                  size="small"
-                  sx={{ color: "white", fontWeight: "bold" }}
-                  onClick={handleios}
+            <React.Fragment>
+              {showManagement ? (
+                <Box
+                  width={"100%"}
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
                 >
-                  IOS
-                </Button>
-              </>
-            )}
+                  <Box
+                    width={"100%"}
+                    display={"flex"}
+                    alignItems={"center"}
+                    gap={CustomDeviceIsSmall() ? 1 : 2}
+                    justifyContent={"start"}
+                  >
+                    {/* enrolled */}
+                    <IconButton onClick={handleEnrolledCourses}>
+                      <Tooltip arrow title={"enrolled courses"}>
+                        <SchoolRounded
+                          className={counter === 7 && "border-bottom pb-1"}
+                          sx={{ color: "white", width: 30, height: 30 }}
+                        />
+                      </Tooltip>
+                    </IconButton>
 
-            {/* filter context: paid and free and search */}
-            <IconButton size="small" className="ms-2">
-              <TuneRounded sx={{ color: "white", width: 22, height: 22 }} />
-            </IconButton>
+                    {/* favourite */}
+                    <IconButton onClick={handleFavouriteCourses}>
+                      <Tooltip arrow title={"favorite courses"}>
+                        <FavoriteRounded
+                          sx={{ color: "white", width: 28, height: 28 }}
+                          className={counter === 8 && "border-bottom pb-1"}
+                        />
+                      </Tooltip>
+                    </IconButton>
+
+                    {/* uploaded courses */}
+                    <IconButton onClick={handleUploadedCourses}>
+                      <Tooltip arrow title={"uploaded courses"}>
+                        <CloudCircleRounded
+                          sx={{ color: "white", width: 28, height: 28 }}
+                          className={counter === 10 && "border-bottom pb-1"}
+                        />
+                      </Tooltip>
+                    </IconButton>
+
+                    {/* wallet */}
+                    <IconButton onClick={handleAccountWallet}>
+                      <Tooltip arrow title={"account wallet"}>
+                        <AccountBalanceWalletRounded
+                          sx={{ color: "white", width: 28, height: 28 }}
+                          className={counter === 9 && "border-bottom pb-1"}
+                        />
+                      </Tooltip>
+                    </IconButton>
+
+                    {/* technical support */}
+                    <IconButton onClick={handleHelpCenter}>
+                      <Tooltip arrow title={"technical support"}>
+                        <HelpRounded
+                          sx={{ color: "white", width: 28, height: 28 }}
+                          className={counter === 11 && "border-bottom pb-1"}
+                        />
+                      </Tooltip>
+                    </IconButton>
+                  </Box>
+
+                  <Box
+                    width={"100%"}
+                    display={"flex"}
+                    justifyContent={"flex-end"}
+                  >
+                    {/* close icon */}
+                    <IconButton onClick={handleCloseCourseManager}>
+                      <Tooltip arrow title={"close tab"}>
+                        <Close sx={{ width: 20, height: 20, color: "white" }} />
+                      </Tooltip>
+                    </IconButton>
+                  </Box>
+                </Box>
+              ) : (
+                <React.Fragment>
+                  <Button
+                    disableElevation
+                    startIcon={
+                      <ArrowDropDown
+                        sx={{
+                          rotate: open ? undefined : "-90deg",
+                          width: 22,
+                          height: 22,
+                        }}
+                      />
+                    }
+                    endIcon={
+                      selectedOption.includes("click") ? (
+                        <AppsRounded sx={{ width: 20, height: 20 }} />
+                      ) : (
+                        <CourseIcon option={selectedOption} />
+                      )
+                    }
+                    size="small"
+                    sx={{ color: "white", fontWeight: "bold" }}
+                    aria-label="more"
+                    id="long-button"
+                    className={counter === 0 && "border"}
+                    aria-controls={open ? "long-menu" : undefined}
+                    aria-expanded={open ? "true" : undefined}
+                    aria-haspopup="true"
+                    onClick={handleClickMain}
+                  />
+
+                  <Button
+                    disableElevation
+                    className={counter === 1 ? "border ms-2" : "ms-2"}
+                    size="small"
+                    sx={{ color: "white", fontWeight: "bold" }}
+                    onClick={handleFree}
+                  >
+                    Free
+                  </Button>
+
+                  {/* dont on smallest screens like iphone 6 */}
+                  {!CustomDeviceSmallest() && (
+                    <>
+                      <Button
+                        disableElevation
+                        className={counter === 2 && "border"}
+                        size="small"
+                        sx={{ color: "white", fontWeight: "bold" }}
+                        onClick={handleMachine}
+                      >
+                        ML/AI
+                      </Button>
+                    </>
+                  )}
+
+                  {/* show this on tablet++ */}
+                  {!CustomDeviceIsSmall() && (
+                    <>
+                      <Button
+                        disableElevation
+                        className={counter === 3 && "border"}
+                        size="small"
+                        sx={{ color: "white", fontWeight: "bold" }}
+                        onClick={handleios}
+                      >
+                        IOS
+                      </Button>
+                    </>
+                  )}
+
+                  {/* show this on tablet++ */}
+                  {!CustomDeviceIsSmall() && (
+                    <>
+                      <Button
+                        disableElevation
+                        className={counter === 4 && "border"}
+                        size="small"
+                        sx={{ color: "white", fontWeight: "bold" }}
+                        onClick={handleAndroid}
+                      >
+                        Android
+                      </Button>
+                    </>
+                  )}
+
+                  {/* filter context: paid and free and search */}
+                  <IconButton
+                    className={counter === 5 ? "border ms-3" : "ms-3"}
+                    size="small"
+                    onClick={handleCoursesFiltering}
+                  >
+                    <TuneRounded
+                      sx={{ color: "white", width: 22, height: 22 }}
+                    />
+                  </IconButton>
+
+                  {/* settings or manage icon */}
+                  <IconButton
+                    onClick={handleCourseManager}
+                    className={counter === 6 ? "border ms-3" : "ms-3"}
+                  >
+                    <AccountBoxRounded
+                      sx={{ color: "white", width: 22, height: 22 }}
+                    />
+                  </IconButton>
+                </React.Fragment>
+              )}
+            </React.Fragment>
           </Stack>
         </Toolbar>
       </AppBar>
 
-      {/* content */}
-      <Box mt={1}>
-        {items.length > 0 &&
-          items.map((items, index) => (
-            <>
-              <CoursePaid key={index} />
+      {/* divider */}
+      {isDarkMode && <Divider className="pb-2 p-1" component={"div"} />}
 
-              {/* divider */}
-              {isDarkMode && !CustomDeviceIsSmall() && (
-                <Box display={"flex"} justifyContent={"center"} mb={5} mt={2}>
-                  <Divider component={"div"} className={"w-100"} />
+      {/* content */}
+      <Box mt={1} p={1}>
+        {/* courses */}
+        {counter === 0 && (
+          <React.Fragment>
+            {items.length > 0 &&
+              items.map((items, index) => (
+                <Box mb={2}>
+                  <CoursePaid key={index} />
+
+                  {/* divider */}
+                  {isDarkMode && !CustomDeviceIsSmall() && (
+                    <Box
+                      display={"flex"}
+                      justifyContent={"center"}
+                      mb={5}
+                      mt={2}
+                    >
+                      <Divider component={"div"} className={"w-100"} />
+                    </Box>
+                  )}
+                  {CustomDeviceIsSmall() && (
+                    <Box
+                      display={"flex"}
+                      justifyContent={"center"}
+                      mb={2}
+                      mt={1}
+                    >
+                      <Divider component={"div"} className={"w-100"} />
+                    </Box>
+                  )}
                 </Box>
-              )}
-              {CustomDeviceIsSmall() && (
-                <Box display={"flex"} justifyContent={"center"} mb={3} mt={1}>
-                  <Divider component={"div"} className={"w-100"} />
-                </Box>
-              )}
-            </>
-          ))}
+              ))}
+          </React.Fragment>
+        )}
+
+        {/* account wallet */}
+        {counter === 9 && (
+          <Box height={"82vh"}>
+            <WalletLayout />
+          </Box>
+        )}
+
+        {/* uploaded courses */}
+        {counter === 10 && (
+          <Box height={"82vh"}>
+            <Typography variant="body2" textAlign={"center"}>
+              you have not uploaded any courses
+            </Typography>
+          </Box>
+        )}
+
+        {/* help and support */}
+        {counter === 11 && (
+          <Box height={"82vh"}>
+            <HelpSupport />
+          </Box>
+        )}
       </Box>
 
       {/* menu all */}
@@ -206,7 +457,6 @@ const CoursePaidContainer = () => {
                 key={option}
                 onClick={() => {
                   setSelectedOption(option);
-                  setSelectedOption(option);
                   setOpenSnack(true);
                   handleClose();
                 }}
@@ -223,6 +473,13 @@ const CoursePaidContainer = () => {
                   >
                     {option}
                   </Typography>
+
+                  {/* done icon if the option is the currently selected */}
+                  {option
+                    .toLowerCase()
+                    .includes(selectedOption.toLowerCase()) && (
+                    <DoneRounded color="success" />
+                  )}
                 </Box>
               </MenuItem>
               <Divider component={"div"} />
@@ -230,11 +487,21 @@ const CoursePaidContainer = () => {
           ))}
       </Menu>
 
+      {/* show alert search courses */}
+      <AlertCourseSearch
+        openSearchCourse={openCourseAlert}
+        setOpenSearchCourse={setOpenCourseAlert}
+      />
+      {/* show similar courses modal controlled by redux state */}
+      <SimilarCoursesModal openSimilarCourses={isSimilarCoursesModal} />
       {/* show snackbar */}
       <SnackBarInfo
         setOpenSnack={setOpenSnack}
         openSnack={openSnack}
         snackInfo={selectedOption}
+        managementMSG={managementMSG}
+        isManagementSnack={isManagementSnack}
+        setIsManagementSnack={setIsManagementSnack}
       />
     </Box>
   );

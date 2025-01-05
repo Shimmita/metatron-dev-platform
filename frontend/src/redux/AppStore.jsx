@@ -9,6 +9,7 @@ import completeSigningReducer from "./CompleteSigning";
 import currentAuthMessageReducer from "./CurrentAuthMessages";
 import currentBottomNavReducer from "./CurrentBottomNav";
 import currentJobsReducer from "./CurrentJobs";
+import currentJobsTopReducer from "./CurrentJobsTop";
 import currentJobSearchReducer from "./CurrentJobSearch";
 import currentPaginationReducer from "./CurrentPagination";
 import currentPostsReducer from "./CurrentPosts";
@@ -32,6 +33,7 @@ const rootReducer = combineReducers({
   currentUser: currentUserReducer,
   currentPosts: currentPostsReducer,
   currentJobs: currentJobsReducer,
+  currentJobsTop: currentJobsTopReducer,
   currentJobSearch: currentJobSearchReducer,
 });
 

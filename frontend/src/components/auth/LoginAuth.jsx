@@ -1,14 +1,15 @@
 import {
   Close,
+  CoffeeRounded,
   Google,
   LightModeOutlined,
   LightModeRounded,
   PersonAddRounded,
+  PersonRounded,
   StarRounded,
   Visibility,
   VisibilityOff,
   WbIncandescentRounded,
-  WorkRounded,
 } from "@mui/icons-material";
 import {
   Alert,
@@ -42,12 +43,14 @@ import { auth, providerGoogle } from "../firebase/FirebaseConfig";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import OptionsMoreLogin from "./OptionsMoreLogin";
+const AlertSponsorship = lazy(() => import("../alerts/AlertSponsorship"));
 const ModalPolicyTerms = lazy(() => import("./ModalPolicyTerms"));
 const ModalAccountInfo = lazy(() => import("./ModalAccountInfo"));
 
 const LoginAuth = () => {
   const [openModalInfo, setOpenModalInfo] = useState(false);
   const [openModalTerms, setOpenModalTerms] = useState(false);
+  const [openSponsorAlert, setOpenSponsorAlert] = useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -198,6 +201,11 @@ const LoginAuth = () => {
     }
   };
 
+  // handle showing of sponsorship alert
+  const handleSponsorAlert = () => {
+    setOpenSponsorAlert(true);
+  };
+
   return (
     <Box
       display={"flex"}
@@ -209,6 +217,7 @@ const LoginAuth = () => {
       <Box
         className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
         width={"100%"}
+        maxHeight={"98vh"}
         border={isDarkMode ? "1px solid gray" : "none"}
         sx={{
           overflow: "auto",
@@ -343,14 +352,14 @@ const LoginAuth = () => {
                 color={"text.secondary"}
                 alignItems={"center"}
               >
-                <WorkRounded color="primary" sx={{ width: 16, height: 16 }} />
+                <PersonRounded color="primary" sx={{ width: 16, height: 16 }} />
                 <Typography
                   variant={CustomDeviceSmallest() ? "caption" : "body2"}
                   color={"text.secondary"}
                 >
                   Personal Account Login
                 </Typography>
-                <WorkRounded color="primary" sx={{ width: 16, height: 16 }} />
+                <PersonRounded color="primary" sx={{ width: 16, height: 16 }} />
               </Typography>
             </Box>
           </Box>
@@ -489,12 +498,12 @@ const LoginAuth = () => {
                   onClick={handleLoginWithGoogle}
                   sx={{ textTransform: "none", borderRadius: "20px" }}
                 >
-                  Google Signin
+                  {CustomDeviceSmallest ? "Google" : "Google Signin"}
                 </Button>
               </Tooltip>
             </Box>
 
-            <Box pb={2} display={"flex"} justifyContent={"center"}>
+            <Box mb={2} display={"flex"} justifyContent={"center"}>
               <Tooltip arrow title="signin with email and password">
                 <Button
                   variant="contained"
@@ -514,6 +523,21 @@ const LoginAuth = () => {
                 </Button>
               </Tooltip>{" "}
             </Box>
+
+            {/* buy me coffe */}
+            <Box mb={2} display={"flex"} justifyContent={"center"}>
+              <Tooltip arrow title={"we value your contribution"}>
+                <Button
+                  onClick={handleSponsorAlert}
+                  variant="text"
+                  size="small"
+                  sx={{ textTransform: "lowercase", fontWeight: "bold" }}
+                  startIcon={<CoffeeRounded />}
+                >
+                  Sponsor Metatron
+                </Button>
+              </Tooltip>
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -521,6 +545,13 @@ const LoginAuth = () => {
       {/* show backdrop when is login */}
       {isLogin && <Backdrop />}
 
+      {/* show alert sponsorshio */}
+      <Box>
+        <AlertSponsorship
+          openSponsorAlert={openSponsorAlert}
+          setOpenSponsorAlert={setOpenSponsorAlert}
+        />
+      </Box>
       {/* show the account help info modal when toggled */}
       <Box>
         <ModalAccountInfo

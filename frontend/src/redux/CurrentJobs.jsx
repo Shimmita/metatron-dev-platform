@@ -9,12 +9,12 @@ const CurrentJobs = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadte  user and online status to true
+    // upadate the job by the feed from the payload
     updateCurrentJobs: (state, action) => {
       state.jobs = action.payload;
     },
 
-    // nullify user and fale online
+    // nullify job and 
     resetClearCurrentJobs: (state) => {
       state.jobs = null;
     },

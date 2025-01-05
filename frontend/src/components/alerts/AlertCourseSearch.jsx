@@ -2,7 +2,7 @@ import {
   Close,
   PageviewRounded,
   PreviewRounded,
-  WorkRounded,
+  TuneRounded,
 } from "@mui/icons-material";
 import {
   Alert,
@@ -11,7 +11,10 @@ import {
   Chip,
   CircularProgress,
   Collapse,
+  Divider,
   IconButton,
+  MenuItem,
+  Stack,
   TextField,
   Tooltip,
 } from "@mui/material";
@@ -27,7 +30,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateJobSearch } from "../../redux/CurrentJobSearch";
 import AllSkills from "../data/AllSkillsData";
-import AccordionSearchOptions from "../modal/AccordionSearchOptions";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -35,35 +37,27 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+const searchCreteria = ["Paid", "Free"];
 
-export default function AlertJobSearch({
-  openAlert,
-  setOpenAlert,
-  setValue,
-  isPreviousResults,
+export default function AlertCourseSearch({
+  openSearchCourse,
+  setOpenSearchCourse,
 }) {
   const [isFetching, setIsFetching] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [creteria, setCreteria] = useState("");
   const dispatch = useDispatch();
   // axios default credentials
   axios.defaults.withCredentials = true;
 
-  const [job_titles, setJobTile] = useState([]);
-  const [country, setCountry] = React.useState("");
-  const [entry, setJobEntry] = React.useState("");
-  const [datePosted, setDatePosted] = React.useState("");
+  const [course_titles, setJobTile] = useState([]);
 
   const handleCloseAlert = () => {
     // close alert
-    setOpenAlert(false);
+    setOpenSearchCourse(false);
     // clear messages
     handleClearing();
-    // if no previous results nav to index tab
-    if (!isPreviousResults) {
-      // close alert
-      setValue(0);
-    }
   };
 
   // redux states
@@ -86,10 +80,7 @@ export default function AlertJobSearch({
   const handleFetchingJobsSearch = () => {
     // create job search object that will be sent to the backend
     const jobSearch = {
-      job_titles,
-      country,
-      entry,
-      datePosted,
+      job_titles: course_titles,
     };
 
     // set is fetching to true
@@ -142,7 +133,7 @@ export default function AlertJobSearch({
 
   return (
     <Dialog
-      open={openAlert}
+      open={openSearchCourse}
       TransitionComponent={Transition}
       keepMounted
       aria-describedby="alert-dialog-slide-description"
@@ -165,10 +156,10 @@ export default function AlertJobSearch({
           width={"100%"}
         >
           <Box display={"flex"} gap={2} alignItems={"center"}>
-            {/*  icon */}
-            <WorkRounded />
+            {/* icon */}
+            <TuneRounded />
             {/* title */}
-            Job Search
+            Search Courses
           </Box>
           <Box>{isFetching && <CircularProgress size={"20px"} />}</Box>
         </DialogTitle>
@@ -227,50 +218,68 @@ export default function AlertJobSearch({
             </Collapse>
           </Box>
         )}
+
+        {/* divider */}
+        <Divider component={"div"} />
         <DialogContent>
-          <DialogContentText gutterBottom mb={2}>
-            provide the name(s) of the job and click on the search icon.
-          </DialogContentText>
-          <Autocomplete
-            multiple
-            options={AllSkills}
-            value={job_titles}
-            onChange={handleChangeTitles}
-            disableCloseOnSelect
-            disabled={isFetching || errorMessage || successMessage}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label={`Name(s)`}
-                placeholder="React Python Angular Laravel"
-                fullWidth
-                required
+          <Stack gap={4}>
+            {/* course name */}
+            <Box>
+              <DialogContentText>
+                provide course name and click on the search icon
+              </DialogContentText>
+              <Autocomplete
+                multiple
+                options={AllSkills}
+                value={course_titles}
+                onChange={handleChangeTitles}
+                disableCloseOnSelect
+                disabled={isFetching || errorMessage || successMessage}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={"course"}
+                    placeholder="Machine Learning Nodejs"
+                    fullWidth
+                    variant="standard"
+                    required
+                  />
+                )}
+                renderTags={(value, getTagProps) =>
+                  value.map((skill, index) => (
+                    <Chip
+                      label={skill}
+                      {...getTagProps({ index })}
+                      onDelete={() => handleDeleteTitle(skill)}
+                    />
+                  ))
+                }
               />
-            )}
-            renderTags={(value, getTagProps) =>
-              value.map((skill, index) => (
-                <Chip
-                  label={skill}
-                  {...getTagProps({ index })}
-                  onDelete={() => handleDeleteTitle(skill)}
-                />
-              ))
-            }
-          />
-          {/* more search options accordion */}
-          <Box mt={2}>
-            <AccordionSearchOptions
-              country={country}
-              setCountry={setCountry}
-              entry={entry}
-              setJobEntry={setJobEntry}
-              datePosted={datePosted}
-              setDatePosted={setDatePosted}
-              successMessage={successMessage}
-              errorMessage={errorMessage}
-              isFetching={isFetching}
-            />
-          </Box>
+            </Box>
+
+            {/* search creteria */}
+            <Box>
+              <DialogContentText>
+                provide search creteria (paid or free)
+              </DialogContentText>
+              <TextField
+                required
+                select
+                disabled={isFetching || errorMessage || successMessage}
+                value={creteria}
+                variant="standard"
+                label="creteria"
+                fullWidth
+                onChange={(e) => setCreteria(e.target.value)}
+              >
+                {searchCreteria.map((creteria, index) => (
+                  <MenuItem key={index} value={creteria}>
+                    <small style={{ fontSize: "small" }}>{creteria}</small>
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+          </Stack>
         </DialogContent>
 
         <DialogActions>

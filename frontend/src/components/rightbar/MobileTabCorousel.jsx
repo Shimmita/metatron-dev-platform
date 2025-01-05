@@ -6,7 +6,7 @@ import JobsContainer from "./JobsContainer";
 import RequestContainer from "./RequestContainer";
 import RightBarStepper from "./RightBarStepper";
 
-const MobileTabCorousel = ({ mode }) => {
+const MobileTabCorousel = () => {
   // backdrop state
   const [corouselCounter, setCorouselCounter] = React.useState(0);
 

@@ -7,6 +7,7 @@ import BasicSpeedDial from "../custom/SpeedDial";
 import BottomNav from "../custom/BottomNav";
 import SnackBarPostSuccess from "../snackbar/SnackBarPostSuccess";
 import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
+const CourseDetailed = lazy(() => import("../courses/layout/CourseDetailed"));
 const AllApplicantsContainer = lazy(() =>
   import("../jobs/AllApplicantsContainer")
 );
@@ -91,7 +92,10 @@ const Feed = () => {
               <Route path="/account/people" element={<AccountFriends />} />
               <Route path="/account/premium" element={<AccountPremium />} />
               <Route path="/courses/paid" element={<CoursePaidContainer />} />
-
+              <Route
+                path="/courses/paid/detailed"
+                element={<CourseDetailed />}
+              />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/jobs" element={<AllJobsContainer />} />
               <Route path="/jobs/applied" element={<JobsAppliedContainer />} />
@@ -194,6 +198,10 @@ const Feed = () => {
                 <Route path="/account/people" element={<AccountFriends />} />
                 <Route path="/account/premium" element={<AccountPremium />} />
                 <Route path="/courses/paid" element={<CoursePaidContainer />} />
+                <Route
+                  path="/courses/paid/detailed"
+                  element={<CourseDetailed />}
+                />
 
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/jobs" element={<AllJobsContainer />} />

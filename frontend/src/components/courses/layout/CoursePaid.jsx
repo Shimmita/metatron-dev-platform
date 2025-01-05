@@ -1,22 +1,33 @@
-import { CreditCardRounded, SchoolRounded } from "@mui/icons-material";
+import {
+  FavoriteBorderOutlined,
+  FavoriteRounded,
+  PaidRounded,
+  PersonAdd,
+  SchoolRounded,
+  TipsAndUpdatesOutlined,
+} from "@mui/icons-material";
 import {
   Avatar,
   Box,
   Button,
+  Checkbox,
   Divider,
   Rating,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { lazy, useState } from "react";
+import { useDispatch } from "react-redux";
 import django from "../../../images/django.png";
 import pythonLogo from "../../../images/python.jpeg";
+import { resetSimilarCoursesModal } from "../../../redux/AppUI";
 import video from "../../../video.mp4";
 import CourseData from "../../data/CourseData";
-import AccordionBrochure from "./AccordionBrochure";
-import AccordionDescription from "./AccordionDescription";
-import AccordionInstructor from "./AccordionInstructor";
-import AccordionLectures from "./AccordionLectures";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+const AccordionDescription = lazy(() => import("./AccordionDescription"));
+const AccordionInstructor = lazy(() => import("./AccordionInstructor"));
+const AccordionLectures = lazy(() => import("./AccordionLectures"));
+const AccordionRemarks = lazy(() => import("./AccordionComments"));
 
 const labels = {
   0.5: "poor",
@@ -34,14 +45,20 @@ const labels = {
 function CoursePaid() {
   // track video play state
   const [isPlay, setPlay] = useState(false);
+  const dispatch = useDispatch();
 
   // handle playing state
   const handlePlay = () => {
     setPlay(true);
   };
 
+  // handle showing of the similar courses modal
+  const handleShowingSimilarCourses = () => {
+    dispatch(resetSimilarCoursesModal());
+  };
+
   return (
-    <Box className={!CustomDeviceIsSmall() ? "shadow rounded" : ""} mb={5}>
+    <Box className={!CustomDeviceIsSmall() ? "shadow rounded" : ""} p={1}>
       <Box>
         <video
           className="rounded-2"
@@ -93,13 +110,13 @@ function CoursePaid() {
 
         {/* students */}
         <Box display={"flex"} gap={1} alignItems={"center"}>
-          <CreditCardRounded color="success" sx={{ width: 15, height: 15 }} />
+          <PersonAdd color="primary" sx={{ width: 16, height: 16 }} />
           <Typography
             variant="caption"
             color="text.secondary"
             fontWeight={"bold"}
           >
-            121 students
+            10,000 students
           </Typography>
         </Box>
 
@@ -124,30 +141,61 @@ function CoursePaid() {
       <Box>
         <AccordionLectures lectures={CourseData.leactures} />
       </Box>
-      <Divider component={"div"} className="p-1" />
+      <Divider component={"div"} />
       {/* description */}
       <Box>
         <AccordionDescription description={CourseData.description} />
       </Box>
       <Divider component={"div"} />
 
-      {/* brochure download */}
+      {/* student remarks */}
       <Box>
-        <AccordionBrochure />
+        <AccordionRemarks description={CourseData.description} />
+      </Box>
+
+      {/* similar or related courses */}
+      <Box justifyContent={"center"} display={"flex"} width={"100%"}>
+        <Button
+          className="rounded"
+          onClick={handleShowingSimilarCourses}
+          startIcon={<TipsAndUpdatesOutlined sx={{ width: 17, height: 17 }} />}
+          variant="text"
+          sx={{ textTransform: "lowercase" }}
+        >
+          {" "}
+          similar courses
+        </Button>
       </Box>
 
       {/* purchase */}
-      <Box p={1} width={"100%"} display={"flex"} justifyContent={"center"}>
-        <Button
-          className="w-100 rounded-5"
-          startIcon={<CreditCardRounded />}
-          variant="contained"
-          size="small"
-          sx={{ fontWeight: "bold" }}
-          disableElevation
-        >
-          Buy KES 2,000{" "}
-        </Button>
+      <Box
+        mt={1}
+        width={"100%"}
+        display={"flex"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+      >
+        {/* add to favourite button */}
+        <Tooltip arrow title="favorite">
+          <Checkbox
+            icon={<FavoriteBorderOutlined sx={{ width: 21, height: 21 }} />}
+            checkedIcon={
+              <FavoriteRounded color="primary" sx={{ width: 21, height: 21 }} />
+            }
+          />
+        </Tooltip>
+
+        {/* enroll course button contol */}
+        <Box mr={5} display={"flex"} justifyContent={"center"} width={"100%"}>
+          <Button
+            className="rounded-5"
+            startIcon={<PaidRounded />}
+            sx={{ fontWeight: "bold" }}
+            disableElevation
+          >
+            Enroll USD $20{" "}
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

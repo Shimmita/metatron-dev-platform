@@ -64,7 +64,28 @@ export const handleGetAllJobs = async (req, res) => {
   }
 };
 
-// get verified jobs only
+// get top 3 jobs that are lates
+export const handleGetAllJobsLatest = async (req, res) => {
+  try {
+    // sort them the latest first
+    const latestJobs = await JobPostModel.find({})
+      .sort({ createdAt: -1 })
+      .limit(3);
+    // no jobs posted
+    if (latestJobs.length < 1) {
+      throw new Error(
+        "currently there are no selected jobs please check on this page later."
+      );
+    }
+
+    // jobs present
+    res.status(200).send(latestJobs);
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+};
+
+// get verified jobs onlyd
 export const handleGetVerifiedJobs = async (req, res) => {
   try {
     const allJobs = await JobPostModel.find({

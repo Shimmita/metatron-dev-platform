@@ -5,6 +5,7 @@ import {
   handleCreateJob,
   handleDeleteJobPost,
   handleGetAllJobs,
+  handleGetAllJobsLatest,
   handleGetAllJobsSearch,
   handleGetNearbyJobs,
   handleGetSpecificJobPost,
@@ -27,6 +28,9 @@ manageJobsRouter.post(
 
 // handle searching of the jobs
 manageJobsRouter.post("/all/search", handleGetAllJobsSearch);
+
+// handle getting of the topJobs the latest 3 from the database
+manageJobsRouter.get('/all/top', handleGetAllJobsLatest)
 
 // get nearby jobs
 manageJobsRouter.post("/all/nearby", handleGetNearbyJobs);

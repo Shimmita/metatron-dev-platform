@@ -44,6 +44,7 @@ import { default as logoCompany } from "../../images/logo_sm.png";
 import { resetDarkMode } from "../../redux/AppUI";
 import SkillAvatars from "../sidebar/SkillAvatars";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+const AlertSupport = lazy(() => import("../alerts/AlertSupport"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
 const DrawerSmartphone = ({
@@ -57,6 +58,7 @@ const DrawerSmartphone = ({
   const [openEvents, setOpenEvents] = useState(false);
   // alert logout controls
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
+  const [openSupportAlert, setOpenAlertSupport] = useState(false);
 
   const navigate = useNavigate();
 
@@ -146,6 +148,10 @@ const DrawerSmartphone = ({
   // handle logout
   const handleLogout = () => {
     setOpenAlertLogout(true);
+  };
+  // handle showing of technical support
+  const handleTechnicalSupport = () => {
+    setOpenAlertSupport(true);
   };
 
   return (
@@ -450,7 +456,7 @@ const DrawerSmartphone = ({
           <Box bgcolor={"background.default"}>
             <List>
               {/* customer help */}
-              <ListItemButton onClick={handleReturnHome}>
+              <ListItemButton onClick={handleTechnicalSupport}>
                 <ListItemIcon>
                   <SupportAgentRounded color="primary" />
                 </ListItemIcon>
@@ -536,6 +542,13 @@ const DrawerSmartphone = ({
           </Box>
         </List>
       </Box>
+
+      {/* alert technical support */}
+      <AlertSupport
+        openSupportAlert={openSupportAlert}
+        setOpenAlertSupport={setOpenAlertSupport}
+      />
+
       {/* logout alert */}
       <LogoutAlert
         openAlertLogout={openAlertLogout}

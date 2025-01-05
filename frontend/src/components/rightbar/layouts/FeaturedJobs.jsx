@@ -13,16 +13,17 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import React from "react";
 import { useSelector } from "react-redux";
-import React_Logo from "../../../images/react.png";
+import { getImageMatch } from "../../utilities/getImageMatch";
 
-export default function FeaturedJobs() {
+export default function FeaturedJobs({ isLoading, jobTop }) {
   // redux states
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
     (state) => state.appUI
   );
+
   return (
     <React.Fragment>
-      {isLoadingRequest ? (
+      {isLoadingRequest || isLoading ? (
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
           <ListItem>
             <ListItemAvatar>
@@ -56,21 +57,19 @@ export default function FeaturedJobs() {
           <ListItem>
             <ListItemAvatar>
               <Avatar
-                src={React_Logo}
+                src={getImageMatch(jobTop.logo)}
                 sx={{
                   backgroundColor: "#1976D2",
-                  maxWidth: 36,
-                  maxHeight: 36,
                 }}
                 alt="S"
                 aria-label="avatar"
               />
             </ListItemAvatar>
             <ListItemText
-              primary={<Typography variant="body2">React Intern</Typography>}
+              primary={<Typography variant="body2">{jobTop.title}</Typography>}
               secondary={
                 <Typography variant="body2" color={"text.secondary"}>
-                  Elusium | Germany
+                  {jobTop?.organisation?.name}
                 </Typography>
               }
             />

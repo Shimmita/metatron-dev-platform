@@ -37,11 +37,7 @@ const jobAppliedSchema = new mongoose.Schema(
       required: false,
       default: "",
     },
-    letterLink: {
-      type: String,
-      required: false,
-      default: "",
-    },
+  
     viewed: {
       required: false,
       type: Boolean,

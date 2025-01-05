@@ -55,7 +55,7 @@ export default function EventsTablet() {
             <LiveTvRounded color="warning" />
           </ListItemIcon>
           <ListItemText
-            primary={<Typography variant="body2">Live</Typography>}
+            primary={<Typography variant="body2">Streaming</Typography>}
           />
         </ListItemButton>
         <Typography variant="body2">20</Typography>

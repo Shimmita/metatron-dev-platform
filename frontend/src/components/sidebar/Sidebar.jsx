@@ -2,10 +2,9 @@ import {
   AccountBox,
   AndroidRounded,
   Apple,
+  ArrowDropDown,
   BusinessRounded,
   Diversity3Rounded,
-  ExpandLess,
-  ExpandMore,
   Home,
   Lightbulb,
   LightModeOutlined,
@@ -21,6 +20,7 @@ import {
   Avatar,
   Box,
   Collapse,
+  Divider,
   List,
   ListItem,
   ListItemButton,
@@ -39,17 +39,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
 import logoCompany from "../../images/logo_sm.png";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import EventsTablet from "../events/EventsIsTablet";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import "./Sidebar.css";
-import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+const AlertSupport = lazy(() => import("../alerts/AlertSupport"));
 const SkillAvatars = lazy(() => import("./SkillAvatars"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
 const Sidebar = () => {
   const [openAccountMore, setOpenAccountMore] = useState(false);
   const [openMobileApp, setOpenMobileApp] = useState(false);
+  const [openSupportAlert, setOpenAlertSupport] = useState(false);
 
   // redux sates
   const {
@@ -140,10 +142,16 @@ const Sidebar = () => {
     setOpenAlertLogout(true);
   };
 
+  // handle showing of technical support
+  const handleTechnicalSupport = () => {
+    setOpenAlertSupport(true);
+  };
+
   let businessAccount = false;
 
   return (
     <Box
+      height={"100vh"}
       flex={CustomDeviceTablet() ? 1 : 2}
       p={CustomDeviceTablet() ? 1 : 2}
       marginLeft={equidistantSidebar()}
@@ -160,9 +168,24 @@ const Sidebar = () => {
         },
       }}
     >
-      <Box position={"fixed"} width={correctWidthInPercentage()}>
+      <Box
+        position={"fixed"}
+        className="shadow rounded"
+        width={correctWidthInPercentage()}
+        maxHeight={CustomDeviceTablet() ? "88vh" : "82vh"}
+        sx={{
+          overflow: "auto",
+          // Hide scrollbar for Chrome, Safari and Opera
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          // Hide scrollbar for IE, Edge and Firefox
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+        }}
+      >
         <Box width={CustomLandscapeWidest() ? 300 : undefined}>
-          <Box bgcolor={"background.default"} className="shadow rounded mt-0">
+          <Box bgcolor={"background.default"} className=" rounded mt-0">
             {isLoadingRequest ? (
               <Box width={"100%"}>
                 <Box mb={1} display={"flex"} justifyContent={"center"}>
@@ -178,6 +201,11 @@ const Sidebar = () => {
                       className={
                         isDarkMode ? "profile-header" : "bg-dark rounded-top"
                       }
+                      sx={{
+                        border: `1px solid ${
+                          isDarkMode ? "#43A5F5" : "#1876D2"
+                        }`,
+                      }}
                     >
                       <Box
                         display={"flex"}
@@ -286,11 +314,10 @@ const Sidebar = () => {
               </React.Fragment>
             )}
           </Box>
+          {/* divider */}
+          <Divider component={"div"} className="mb-2" />
 
-          <Box
-            bgcolor={"background.default"}
-            className="p-1 shadow rounded mt-3"
-          >
+          <Box bgcolor={"background.default"} className="p-1">
             <Box
               display={"flex"}
               alignItems={"center"}
@@ -326,7 +353,11 @@ const Sidebar = () => {
                       <Typography variant="body2">Account Status </Typography>
                     }
                   />
-                  {openAccountMore ? <ExpandLess /> : <ExpandMore />}
+                  {openAccountMore ? (
+                    <ArrowDropDown sx={{ rotate: "180deg" }} />
+                  ) : (
+                    <ArrowDropDown />
+                  )}
                 </ListItemButton>
 
                 <Collapse
@@ -393,7 +424,11 @@ const Sidebar = () => {
                       <Typography variant="body2">Download App </Typography>
                     }
                   />
-                  {openMobileApp ? <ExpandLess /> : <ExpandMore />}
+                  {openMobileApp ? (
+                    <ArrowDropDown sx={{ rotate: "180deg" }} />
+                  ) : (
+                    <ArrowDropDown />
+                  )}{" "}
                 </ListItemButton>
 
                 <Collapse
@@ -427,13 +462,14 @@ const Sidebar = () => {
               </List>
             )}
           </Box>
+
           {/* box for Events displayed for tablets only */}
           {CustomDeviceTablet() && (
             <>
-              <Box
-                bgcolor={"background.default"}
-                className="mt-3 shadow p-1 rounded"
-              >
+              {/* divider be shown on tablets */}
+              <Divider component={"div"} className="mb-2" />
+
+              <Box bgcolor={"background.default"} className="p-1">
                 <Box
                   display={"flex"}
                   alignItems={"center"}
@@ -457,16 +493,15 @@ const Sidebar = () => {
             </>
           )}
 
+          <Divider component={"div"} className="mt-1" />
+
           {/* slogan */}
           {isLoadingRequest ? (
-            <Box
-              bgcolor={"background.default"}
-              className="mt-3 shadow p-2 rounded"
-            >
+            <Box bgcolor={"background.default"} className="mt-3  p-2 rounded">
               <Skeleton variant="rectangular" width={"100%"} height={"10vh"} />
             </Box>
           ) : (
-            <Box bgcolor={"background.default"} className="mt-3 shadow rounded">
+            <Box bgcolor={"background.default"}>
               <List>
                 <ListItem>
                   {!businessAccount ? (
@@ -513,7 +548,7 @@ const Sidebar = () => {
                 </ListItem>
 
                 {/* customer help */}
-                <ListItemButton onClick={handleReturnHome}>
+                <ListItemButton onClick={handleTechnicalSupport}>
                   <ListItemIcon>
                     <SupportAgentRounded color="primary" />
                   </ListItemIcon>
@@ -561,6 +596,12 @@ const Sidebar = () => {
           )}
         </Box>
       </Box>
+
+      {/* alert technical support */}
+      <AlertSupport
+        openSupportAlert={openSupportAlert}
+        setOpenAlertSupport={setOpenAlertSupport}
+      />
 
       {/* logout alert */}
       <LogoutAlert

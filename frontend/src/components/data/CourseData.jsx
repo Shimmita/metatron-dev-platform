@@ -10,8 +10,6 @@ const CourseData = {
     "Gunicorn for ASGI",
     "Terraform CI/CD",
     "Hosting and Deployment (AWS)",
-    "Certificate of Completion",
-    "Internship links",
   ],
   brochure: "",
   bought: 121,

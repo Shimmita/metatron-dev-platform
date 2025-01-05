@@ -1,5 +1,5 @@
 import { SchoolRounded } from "@mui/icons-material";
-import { Backdrop, Box, Skeleton, Typography } from "@mui/material";
+import { Backdrop, Box, Divider, Skeleton, Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import BasicSpeedDial from "../custom/SpeedDial";
@@ -24,6 +24,7 @@ const RightbarAll = () => {
 
   return (
     <Box
+      height={"100vh"}
       flex={2}
       marginRight={window.screen.availWidth > 1200 ? "5%" : "0"}
       p={2}
@@ -35,9 +36,24 @@ const RightbarAll = () => {
         },
       }}
     >
-      <Box position={"fixed"} color={"text.primary"} className="mt-0">
+      <Box
+        position={"fixed"}
+        color={"text.primary"}
+        className="mt-0 shadow rounded"
+        maxHeight={"80vh"}
+        sx={{
+          overflow: "auto",
+          // Hide scrollbar for Chrome, Safari and Opera
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          // Hide scrollbar for IE, Edge and Firefox
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+        }}
+      >
         {/* connect suggestion  */}
-        <Box bgcolor={"background.default"} className="shadow rounded pe-2 ">
+        <Box bgcolor={"background.default"} className=" rounded pe-2 ">
           <Box>
             {/* jobs */}
             <Box display={corouselCounter === 0 ? "block" : "none"}>
@@ -68,8 +84,11 @@ const RightbarAll = () => {
           </Box>
         </Box>
 
+        {/* divider */}
+        <Divider className="mb-2" component={"div"} />
+
         {/* events */}
-        <Box bgcolor={"background.default"} className="shadow mt-3 rounded ">
+        <Box bgcolor={"background.default"} className="rounded ">
           <Box display={"flex"} justifyContent={"center"}>
             <Box
               display={"flex"}
@@ -77,7 +96,6 @@ const RightbarAll = () => {
               justifyContent={"center"}
               gap={2}
               pt={2}
-
             >
               <Typography fontWeight={"bold"} color={"primary"}>
                 LEARNING EVENTS
