@@ -101,7 +101,7 @@ export const handleGetVerifiedJobs = async (req, res) => {
   } catch (error) {
     res.status(400).send("something went wrong");
   }
-};
+}
 
 // handle getting of the nearby jobs=country of the user
 export const handleGetNearbyJobs = async (req, res) => {

@@ -1,0 +1,15 @@
+@keyframes MyIconRotate {
+  from {
+    scale: 1.3;
+  }
+
+  to {
+    scale: 1;
+  }
+}
+
+.item-scale {
+  animation-name: MyIconRotate;
+  animation-duration: 2s;
+  animation-iteration-count: 3;
+}

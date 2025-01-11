@@ -6,6 +6,7 @@ import {
   BookmarkRounded,
   BusinessRounded,
   CalendarMonthRounded,
+  CoffeeRounded,
   Diversity3Rounded,
   EventNoteRounded,
   ExpandLess,
@@ -26,6 +27,7 @@ import {
   Avatar,
   Box,
   Collapse,
+  Divider,
   Drawer,
   List,
   ListItem,
@@ -39,11 +41,14 @@ import {
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import MachineLogo from "../../images/Ai.png";
 import devImage from "../../images/dev.jpeg";
 import { default as logoCompany } from "../../images/logo_sm.png";
 import { resetDarkMode } from "../../redux/AppUI";
+import { handleShowChatBot } from "../../redux/CurrentChatBot";
 import SkillAvatars from "../sidebar/SkillAvatars";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+const AlertSponsorship = lazy(() => import("../alerts/AlertSponsorship"));
 const AlertSupport = lazy(() => import("../alerts/AlertSupport"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
@@ -59,6 +64,7 @@ const DrawerSmartphone = ({
   // alert logout controls
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
   const [openSupportAlert, setOpenAlertSupport] = useState(false);
+  const [openSponsorAlert, setOpenSponsorAlert] = useState(false);
 
   const navigate = useNavigate();
 
@@ -136,12 +142,6 @@ const DrawerSmartphone = ({
   };
   // navigate home
 
-  // return home
-  const handleReturnHome = () => {
-    navigate("/");
-    handleCloseDrawer();
-  };
-
   // simulate bs a/c and personal a/c transition
   let businessAccount = false;
 
@@ -152,6 +152,18 @@ const DrawerSmartphone = ({
   // handle showing of technical support
   const handleTechnicalSupport = () => {
     setOpenAlertSupport(true);
+  };
+
+  // handle showing of the sponsorship program
+  const handleShowingSponsorship = () => {
+    setOpenSponsorAlert(true);
+  };
+
+  // handle the display of the metatron ai assistant
+  const handleShowAiBot = () => {
+    // close the drawer
+    setOpenDrawer(false);
+    dispatch(handleShowChatBot());
   };
 
   return (
@@ -322,12 +334,75 @@ const DrawerSmartphone = ({
             </List>
           </Collapse>
 
+          <ListItemButton onClick={(e) => setOpenMobileApp(!openMobileApp)}>
+            <ListItemIcon>
+              <Smartphone color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={<Typography variant="body2">Download App </Typography>}
+            />
+            {openMobileApp ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+
+          <Collapse
+            className=" border-top"
+            in={openMobileApp}
+            timeout="auto"
+            unmountOnExit
+          >
+            <List component="div" disablePadding>
+              <ListItemButton sx={{ pl: 8 }}>
+                <ListItemIcon>
+                  <AndroidRounded color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={<Typography variant="body2">Android</Typography>}
+                />
+              </ListItemButton>
+
+              <ListItemButton sx={{ pl: 8 }}>
+                <ListItemIcon>
+                  <Apple color="primary" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={<Typography variant="body2">iOS</Typography>}
+                />
+              </ListItemButton>
+            </List>
+          </Collapse>
+
+          {/* about */}
+          <ListItemButton onClick={handleShowAboutPage}>
+            <ListItemIcon>
+              <Lightbulb color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={<Typography variant="body2">About Metatron</Typography>}
+            />
+          </ListItemButton>
+
+          {/* sponsor us */}
+          <ListItemButton onClick={handleShowingSponsorship}>
+            <ListItemIcon>
+              <CoffeeRounded color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <Typography variant="body2">
+                  <Typography variant="body2">Sponsor Platform</Typography>
+                </Typography>
+              }
+            />
+          </ListItemButton>
+
           <ListItemButton onClick={(e) => setOpenEvents(!openEvents)}>
             <ListItemIcon>
               <SchoolRounded color="primary" />
             </ListItemIcon>
             <ListItemText
-              primary={<Typography variant="body2">Learning Events</Typography>}
+              primary={
+                <Typography variant="body2">Great Tech Events</Typography>
+              }
             />
             {openEvents ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
@@ -404,57 +479,29 @@ const DrawerSmartphone = ({
             </List>
           </Collapse>
 
-          <ListItemButton onClick={(e) => setOpenMobileApp(!openMobileApp)}>
-            <ListItemIcon>
-              <Smartphone color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={<Typography variant="body2">Download App </Typography>}
-            />
-            {openMobileApp ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-
-          <Collapse
-            className=" border-top"
-            in={openMobileApp}
-            timeout="auto"
-            unmountOnExit
-          >
-            <List component="div" disablePadding>
-              <ListItemButton sx={{ pl: 8 }}>
-                <ListItemIcon>
-                  <AndroidRounded color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={<Typography variant="body2">Android</Typography>}
-                />
-              </ListItemButton>
-
-              <ListItemButton sx={{ pl: 8 }}>
-                <ListItemIcon>
-                  <Apple color="primary" />
-                </ListItemIcon>
-                <ListItemText
-                  primary={<Typography variant="body2">iOS</Typography>}
-                />
-              </ListItemButton>
-            </List>
-          </Collapse>
-
-          {/* about */}
-          <ListItemButton onClick={handleShowAboutPage}>
-            <ListItemIcon>
-              <Lightbulb color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary={<Typography variant="body2">About Metatron</Typography>}
-            />
-          </ListItemButton>
+          {/* divider */}
+          <Divider component={"div"} className="p-1" />
 
           {/* more */}
 
           <Box bgcolor={"background.default"}>
             <List>
+              {/* metatron ai chat */}
+              <ListItemButton onClick={handleShowAiBot}>
+                <ListItemIcon>
+                  <Avatar
+                    src={MachineLogo}
+                    alt=""
+                    sx={{ width: 25, height: 25 }}
+                  />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography variant="body2">Metatron Ai Bot</Typography>
+                  }
+                />
+              </ListItemButton>
+
               {/* customer help */}
               <ListItemButton onClick={handleTechnicalSupport}>
                 <ListItemIcon>
@@ -514,7 +561,7 @@ const DrawerSmartphone = ({
                     </ListItemIcon>
                     <ListItemText
                       primary={
-                        <Typography variant="body2">
+                        <Typography fontWeight={"bold"} variant="body2">
                           {" "}
                           Best IT Platform
                         </Typography>
@@ -542,6 +589,12 @@ const DrawerSmartphone = ({
           </Box>
         </List>
       </Box>
+
+      {/* control showing of sponsorship alert */}
+      <AlertSponsorship
+        openSponsorAlert={openSponsorAlert}
+        setOpenSponsorAlert={setOpenSponsorAlert}
+      />
 
       {/* alert technical support */}
       <AlertSupport

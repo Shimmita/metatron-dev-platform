@@ -48,7 +48,7 @@ export default function AccordionLectures({ lectures }) {
         >
           <Box display={"flex"} gap={2} alignItems={"center"}>
             <SchoolRounded sx={{ width: 23, height: 23 }} />{" "}
-            <Typography variant="body2">Topics Demystified</Typography>
+            <Typography variant="body2">Topics Debunked</Typography>
           </Box>
         </AccordionSummary>
         <AccordionDetails>

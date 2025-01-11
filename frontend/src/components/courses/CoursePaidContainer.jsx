@@ -35,7 +35,7 @@ const HelpSupport = lazy(() => import("../custom/HelpSupport"));
 const SnackBarInfo = lazy(() => import("../snackbar/SnackBarInfo"));
 const SimilarCoursesModal = lazy(() => import("../modal/SimilarCoursesModal"));
 const AlertCourseSearch = lazy(() => import("../alerts/AlertCourseSearch"));
-const CoursePaid = lazy(() => import("./layout/CoursePaid"));
+const CourseLayout = lazy(() => import("./layout/CourseLayout"));
 // array for live events simulation
 const items = Array.from({ length: 10 }, (_, i) => i);
 
@@ -372,7 +372,7 @@ const CoursePaidContainer = () => {
             {items.length > 0 &&
               items.map((items, index) => (
                 <Box mb={2}>
-                  <CoursePaid key={index} />
+                  <CourseLayout key={index} />
 
                   {/* divider */}
                   {isDarkMode && !CustomDeviceIsSmall() && (
@@ -410,9 +410,36 @@ const CoursePaidContainer = () => {
         {/* uploaded courses */}
         {counter === 10 && (
           <Box height={"82vh"}>
-            <Typography variant="body2" textAlign={"center"}>
-              you have not uploaded any courses
-            </Typography>
+            <React.Fragment>
+              {items.length > 0 &&
+                items.map((items, index) => (
+                  <Box mb={2}>
+                    <CourseLayout key={index} isUploadedRequest={true} />
+
+                    {/* divider */}
+                    {isDarkMode && !CustomDeviceIsSmall() && (
+                      <Box
+                        display={"flex"}
+                        justifyContent={"center"}
+                        mb={5}
+                        mt={2}
+                      >
+                        <Divider component={"div"} className={"w-100"} />
+                      </Box>
+                    )}
+                    {CustomDeviceIsSmall() && (
+                      <Box
+                        display={"flex"}
+                        justifyContent={"center"}
+                        mb={2}
+                        mt={1}
+                      >
+                        <Divider component={"div"} className={"w-100"} />
+                      </Box>
+                    )}
+                  </Box>
+                ))}
+            </React.Fragment>
           </Box>
         )}
 

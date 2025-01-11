@@ -8,9 +8,10 @@ import appUISliceReducer from "./AppUI";
 import completeSigningReducer from "./CompleteSigning";
 import currentAuthMessageReducer from "./CurrentAuthMessages";
 import currentBottomNavReducer from "./CurrentBottomNav";
+import currentChatBot from "./CurrentChatBot";
 import currentJobsReducer from "./CurrentJobs";
-import currentJobsTopReducer from "./CurrentJobsTop";
 import currentJobSearchReducer from "./CurrentJobSearch";
+import currentJobsTopReducer from "./CurrentJobsTop";
 import currentPaginationReducer from "./CurrentPagination";
 import currentPostsReducer from "./CurrentPosts";
 import currentSnackReducer from "./CurrentSnackBar";
@@ -35,6 +36,7 @@ const rootReducer = combineReducers({
   currentJobs: currentJobsReducer,
   currentJobsTop: currentJobsTopReducer,
   currentJobSearch: currentJobSearchReducer,
+  currentChatBot: currentChatBot,
 });
 
 // Persist the root reducer

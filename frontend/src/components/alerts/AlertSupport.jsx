@@ -51,13 +51,18 @@ export default function AlertSupport({
               : undefined,
         }}
       >
-        <DialogTitle display={"flex"} alignItems={"center"} gap={2}>
+        <DialogTitle
+          display={"flex"}
+          alignItems={"center"}
+          variant="body1"
+          gap={2}
+        >
           <SupportAgentRounded />
           {"Technical Support"}
         </DialogTitle>
         <DialogContent dividers>
           {/* render the support layout */}
-          <HelpSupport />
+          <HelpSupport setOpenAlertSupport={setOpenAlertSupport}/>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>close</Button>

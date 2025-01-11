@@ -35,10 +35,12 @@ import LinuxLogo from "../../images/linux.jpeg";
 import AppLogo from "../../images/logo_sm.png";
 import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionTech from "../data/SubsectionTech";
+import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CustomModalHeight from "../utilities/CustomModalHeight";
+import { getImageMatch } from "../utilities/getImageMatch";
 
 // styled modal
 const StyledModalPost = styled(Modal)({
@@ -60,6 +62,9 @@ const StyledInput = styled("input")({
   whiteSpace: "nowrap",
   width: 1,
 });
+
+// array for image names and values
+const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
 
 const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   const [title, setTitle] = useState("");
@@ -167,7 +172,6 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
             : "100%"
         }
         p={1}
-        
         borderRadius={5}
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
         color={"text.primary"}
@@ -229,14 +233,13 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                 <Typography
                   gutterBottom
                   mb={2}
+                  textAlign={"center"}
                   variant="body2"
                   fontWeight={"bold"}
                   color={"text.secondary"}
                 >
                   Note: The course you are posting should be yours and not
-                  someone's intellectual property! You are allowed to
-                  collaborate with other persons and come up with one course but
-                  you should be the main facilitator.
+                  someone's intellectual property!
                 </Typography>
 
                 {/* post title */}
@@ -248,14 +251,10 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   <Title color="primary" sx={{ width: 30, height: 30 }} />
                 </Box>
 
-                <Typography
-                  component={"li"}
-                  variant="body2"
-                  mt={3}
-                  color={"text.secondary"}
-                >
-                  Relevant course title that will be displayed to the potential
-                  students on the platform.
+                <Typography variant="body2" mt={3} color={"text.secondary"}>
+                  Provide a relevant course title that will be displayed to the
+                  potential students on the platform. Its recommended to use
+                  simple but captivating titles in this field.
                 </Typography>
 
                 <Box mt={4} className="w-100 mb-2">
@@ -276,14 +275,11 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               </Box>
 
               {/* post about */}
-              <Typography
-                component={"li"}
-                variant="body2"
-                color={"text.secondary"}
-              >
-                Select the specialisation in IT field for your course. Bare
-                programming language course should be under programming
-                languages for accessibility reasons.
+              <Typography variant="body2" color={"text.secondary"}>
+                Select the area of specialisation that you are interested in.
+                Suppose your course is focused on concepts and fundamentals of a
+                programming language, its recommended to select programming
+                languages option.
               </Typography>
 
               <Box className="w-100 mb-2 mt-2 ">
@@ -298,13 +294,27 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   {SpecialisationTech &&
                     SpecialisationTech.filter((about) => about !== "None").map(
                       (about, index) => (
-                        <MenuItem key={index} value={about}>
+                        <MenuItem
+                          key={index}
+                          value={about}
+                          sx={{ display: "flex", gap: 2, alignItems: "center" }}
+                        >
+                          {/* logo */}
+                          <CourseIcon option={about} />
+
+                          {/* name */}
                           <Typography variant="body2">{about}</Typography>
                         </MenuItem>
                       )
                     )}
                 </TextField>
               </Box>
+
+              {/* provide a logo for the course */}
+              <Typography variant="body2" color={"text.secondary"}>
+                Provide logo for the course. You can select the preferred version from the free kits already provided or upload from the 
+              </Typography>
+              <Box></Box>
 
               {/* programming Language */}
               {post_category === "Programming Languages" && (
@@ -320,12 +330,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select the programming language which your course will be
                     addressing in particualar.
                   </Typography>
@@ -362,12 +367,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    p={1}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} p={1}>
                     Which frontend technology will your course be covering in
                     particular.If it is based on a bare HTML/CSS version, select
                     the option with (HTML/CSS).
@@ -408,12 +408,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Which backend technology will your course be covering in
                     particular? Suppose none of the provided options matches
                     your preference select (other).
@@ -455,12 +450,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    mt={3}
-                    color={"text.secondary"}
-                  >
+                  <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Which database in particular will your course make
                     utilisation of to facilitate storage of data? Suppose none
                     of the provided options matches your preference select
@@ -500,12 +490,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     <Microsoft color="primary" sx={{ width: 30, height: 30 }} />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select desktop development technology that your course will
                     be based on such that the overal application runs on either
                     Linux OS, MacOS, Windows OS or both.
@@ -535,7 +520,6 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               {post_category === "Developer Operations (DevOps+CI/CD)" && (
                 <Box>
                   <Typography
-                    component={"li"}
                     gutterBottom
                     variant="body2"
                     color={"text.secondary"}
@@ -581,12 +565,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select a game application development technology in
                     particular.
                   </Typography>
@@ -624,12 +603,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select the UI/UX Design tool that you are covering in your
                     course.
                   </Typography>
@@ -669,12 +643,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    mt={3}
-                    color={"text.secondary"}
-                  >
+                  <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Native Android application development stack is usually
                     based on Java or Kotlin. Select the stack that your course
                     make use of.
@@ -710,12 +679,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     <Apple color="primary" sx={{ width: 30, height: 30 }} />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    mt={3}
-                    color={"text.secondary"}
-                  >
+                  <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Select the stack used in your course for the development of
                     Native IOS Application project/post
                   </Typography>
@@ -756,12 +720,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     />
                   </Box>
 
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    mt={3}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select a mobile multiplatform/cross-application development
                     technology that you are interested in. multiplatform
                     technology or frameworks allows writing of a single code
@@ -795,12 +754,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               {/* Containerisation  */}
               {post_category === "Containerisation and Orchestration" && (
                 <>
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    color={"text.secondary"}
-                    p={1}
-                  >
+                  <Typography variant="body2" color={"text.secondary"} p={1}>
                     Which containerisation technology will be handled in the
                     course of study.
                   </Typography>
@@ -837,12 +791,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   />{" "}
                 </Box>
 
-                <Typography
-                  component={"li"}
-                  variant="body2"
-                  mt={3}
-                  color={"text.secondary"}
-                >
+                <Typography variant="body2" mt={3} color={"text.secondary"}>
                   Provide price quotation for this course in (
                   <Typography component={"span"} variant="body2">
                     KES
@@ -896,7 +845,6 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                 </Box>
 
                 <Typography
-                  component={"li"}
                   gutterBottom
                   variant="body2"
                   mt={3}
@@ -961,8 +909,8 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       />
                     </Button>
                     <Typography variant="body2" color={"text.secondary"}>
-                        or
-                      </Typography>
+                      or
+                    </Typography>
 
                     <Button
                       variant="outlined"
@@ -977,12 +925,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   </Box>
                 ) : (
                   <>
-                    <Typography
-                      component={"li"}
-                      variant="body2"
-                      mt={3}
-                      color={"text.secondary"}
-                    >
+                    <Typography variant="body2" mt={3} color={"text.secondary"}>
                       Provide the link or url pointing to your video full
                       lecture that is stored in the cloud storage:(Google Drive,
                       MegaDrive, DropBox or OneDrive).
@@ -1018,7 +961,6 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               {/* intro video lecture */}
               <Box mb={3}>
                 <Typography
-                  component={"li"}
                   gutterBottom
                   variant="body2"
                   mb={3}
@@ -1081,8 +1023,8 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       />
                     </Button>
                     <Typography variant="body2" color={"text.secondary"}>
-                        or
-                      </Typography>
+                      or
+                    </Typography>
 
                     <Button
                       variant="outlined"
@@ -1097,12 +1039,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   </Box>
                 ) : (
                   <>
-                    <Typography
-                      component={"li"}
-                      variant="body2"
-                      mt={3}
-                      color={"text.secondary"}
-                    >
+                    <Typography variant="body2" mt={3} color={"text.secondary"}>
                       Provide the link or url pointing to your video
                       introduction lecture that is stored in the cloud
                       storage:(Google Drive, MegaDrive, DropBox or OneDrive).
@@ -1140,7 +1077,6 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               {/* video brochure */}
               <Box mb={3}>
                 <Typography
-                  component={"li"}
                   gutterBottom
                   variant="body2"
                   mb={3}
@@ -1206,8 +1142,8 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       />
                     </Button>
                     <Typography variant="body2" color={"text.secondary"}>
-                        or
-                      </Typography>
+                      or
+                    </Typography>
 
                     <Button
                       variant="outlined"
@@ -1222,12 +1158,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   </Box>
                 ) : (
                   <>
-                    <Typography
-                      component={"li"}
-                      variant="body2"
-                      mt={3}
-                      color={"text.secondary"}
-                    >
+                    <Typography variant="body2" mt={3} color={"text.secondary"}>
                       Provide the link or url pointing to the brochure of your
                       video lecture that is stored in the cloud storage:(Google
                       Drive, MegaDrive, DropBox or OneDrive). The brochure
@@ -1262,12 +1193,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               </Box>
 
               {/* course verification and validation contacts  */}
-              <Typography
-                component={"li"}
-                variant="body2"
-                color={"text.secondary"}
-                gutterBottom
-              >
+              <Typography variant="body2" color={"text.secondary"} gutterBottom>
                 Note: This course may be required to undergoe verification and
                 validation processes before getting approved and published on
                 the platform. Please provide contacts that will facilitate our
@@ -1311,11 +1237,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                 <EditRounded color="primary" sx={{ width: 30, height: 30 }} />{" "}
               </Box>
 
-              <Typography
-                component={"li"}
-                variant="body2"
-                color={"text.secondary"}
-              >
+              <Typography variant="body2" color={"text.secondary"}>
                 Describe your course in details; explaining the important areas
                 that your are going to tackle. Providing a good description
                 could convince many students to enrol into your course.

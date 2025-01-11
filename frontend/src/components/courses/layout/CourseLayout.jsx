@@ -1,10 +1,11 @@
 import {
+  AutoAwesomeRounded,
+  BarChartRounded,
   FavoriteBorderOutlined,
   FavoriteRounded,
   PaidRounded,
   PersonAdd,
-  SchoolRounded,
-  TipsAndUpdatesOutlined,
+  SchoolRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -24,6 +25,7 @@ import { resetSimilarCoursesModal } from "../../../redux/AppUI";
 import video from "../../../video.mp4";
 import CourseData from "../../data/CourseData";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+const CourseStatsEditAlert = lazy(() => import("../../alerts/CourseStatsEditAlert"));
 const AccordionDescription = lazy(() => import("./AccordionDescription"));
 const AccordionInstructor = lazy(() => import("./AccordionInstructor"));
 const AccordionLectures = lazy(() => import("./AccordionLectures"));
@@ -42,7 +44,8 @@ const labels = {
   5: "Excellent+",
 };
 
-function CoursePaid() {
+function CoursePaid({ isUploadedRequest }) {
+  const [openAlertCourseStats, setOpenAlertCourseStats] = useState(false);
   // track video play state
   const [isPlay, setPlay] = useState(false);
   const dispatch = useDispatch();
@@ -55,6 +58,11 @@ function CoursePaid() {
   // handle showing of the similar courses modal
   const handleShowingSimilarCourses = () => {
     dispatch(resetSimilarCoursesModal());
+  };
+
+  // handle showing of course Statistics
+  const handleShowingCourseStats = () => {
+    setOpenAlertCourseStats(true);
   };
 
   return (
@@ -153,50 +161,86 @@ function CoursePaid() {
         <AccordionRemarks description={CourseData.description} />
       </Box>
 
-      {/* similar or related courses */}
-      <Box justifyContent={"center"} display={"flex"} width={"100%"}>
-        <Button
-          className="rounded"
-          onClick={handleShowingSimilarCourses}
-          startIcon={<TipsAndUpdatesOutlined sx={{ width: 17, height: 17 }} />}
-          variant="text"
-          sx={{ textTransform: "lowercase" }}
-        >
-          {" "}
-          similar courses
-        </Button>
-      </Box>
+      {/* layout inquiry is an instructure checking their uploaded course */}
+      {isUploadedRequest ? (
+        <React.Fragment>
+          <Box display={"flex"} justifyContent={"center"} mb={1}>
+            <Button
+              size="small"
+              startIcon={<BarChartRounded />}
+              variant="outlined"
+              className="rounded-5"
+              onClick={handleShowingCourseStats}
+              sx={{ textTransform: "capitalize" }}
+            >
+              View Course Statistics
+            </Button>
+          </Box>
+        </React.Fragment>
+      ) : (
+        <React.Fragment>
+          {/* similar or related courses */}
+          <Box justifyContent={"center"} display={"flex"} width={"100%"}>
+            <Button
+              className="rounded"
+              onClick={handleShowingSimilarCourses}
+              startIcon={
+                <AutoAwesomeRounded sx={{ width: 17, height: 17 }} />
+              }
+              variant="text"
+              sx={{ textTransform: "lowercase" }}
+            >
+              {" "}
+              similar courses
+            </Button>
+          </Box>
 
-      {/* purchase */}
-      <Box
-        mt={1}
-        width={"100%"}
-        display={"flex"}
-        justifyContent={"space-between"}
-        alignItems={"center"}
-      >
-        {/* add to favourite button */}
-        <Tooltip arrow title="favorite">
-          <Checkbox
-            icon={<FavoriteBorderOutlined sx={{ width: 21, height: 21 }} />}
-            checkedIcon={
-              <FavoriteRounded color="primary" sx={{ width: 21, height: 21 }} />
-            }
-          />
-        </Tooltip>
-
-        {/* enroll course button contol */}
-        <Box mr={5} display={"flex"} justifyContent={"center"} width={"100%"}>
-          <Button
-            className="rounded-5"
-            startIcon={<PaidRounded />}
-            sx={{ fontWeight: "bold" }}
-            disableElevation
+          {/* purchase */}
+          <Box
+            mt={1}
+            width={"100%"}
+            display={"flex"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
           >
-            Enroll USD $20{" "}
-          </Button>
-        </Box>
-      </Box>
+            {/* add to favourite button */}
+            <Tooltip arrow title="favorite">
+              <Checkbox
+                icon={<FavoriteBorderOutlined sx={{ width: 22, height: 22 }} />}
+                checkedIcon={
+                  <FavoriteRounded
+                    color="primary"
+                    sx={{ width: 22, height: 22 }}
+                  />
+                }
+              />
+            </Tooltip>
+
+            {/* enroll course button contol */}
+            <Box
+              mr={5}
+              display={"flex"}
+              justifyContent={"center"}
+              width={"100%"}
+            >
+              <Button
+                className="rounded-5"
+                startIcon={<PaidRounded />}
+                sx={{ fontWeight: "bold" }}
+                disableElevation
+              >
+                Enroll USD $20{" "}
+              </Button>
+            </Box>
+          </Box>
+        </React.Fragment>
+      )}
+
+      {/* show all course statistics alert */}
+      <CourseStatsEditAlert
+        openAlertCourseStats={openAlertCourseStats}
+        setOpenAlertCourseStats={setOpenAlertCourseStats}
+      />
     </Box>
   );
 }

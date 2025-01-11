@@ -1,19 +1,30 @@
 import { Call, EmailRounded } from "@mui/icons-material";
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
 import React from "react";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import MachineLogo from "../../images/Ai.png";
+import { handleShowChatBot } from "../../redux/CurrentChatBot";
 import DevAccountConfig from "../config/DevAccountConfig";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 
-const HelpSupport = () => {
+const HelpSupport = ({ setOpenAlertSupport }) => {
   //   handle emailSupport
   const handleEmailSupport = () => {
     return;
   };
 
+  const dispatch = useDispatch();
+
+  // handle display of  metatron ai goverened by redux
+  const handleMetatronAi = () => {
+    // close the alert before firing the ai interface
+    setOpenAlertSupport(false);
+    dispatch(handleShowChatBot());
+  };
+
   return (
     <Box
-      className={!CustomDeviceIsSmall() ? "shadow rounded" : undefined}
       width={"100%"}
       p={CustomDeviceIsSmall() ? undefined : 2}
       maxHeight={"70vh"}
@@ -33,7 +44,7 @@ const HelpSupport = () => {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: 3,
+          gap: 2,
           width: "100%",
         }}
       >
@@ -83,8 +94,8 @@ const HelpSupport = () => {
         display={"flex"}
         justifyContent={"center"}
         width={"100%"}
-        mt={5}
-        mb={1}
+        mt={4}
+        mb={2}
       >
         <Divider component={"div"} className="w-75" />
       </Box>
@@ -108,13 +119,31 @@ const HelpSupport = () => {
           width={"100%"}
           gap={2}
         >
+          {/* ai agent not shown on smaller devices */}
+          {!CustomDeviceIsSmall() && (
+            <Button
+              startIcon={
+                <Avatar
+                  src={MachineLogo}
+                  alt=""
+                  sx={{ width: 25, height: 25 }}
+                />
+              }
+              variant="text"
+              onClick={handleMetatronAi}
+              size="large"
+              sx={{ textTransform: "capitalize", borderRadius: "20px" }}
+            >
+              Metatron Ai
+            </Button>
+          )}
           {/* call */}
           <Link to={`tel:${DevAccountConfig.dev_phone}`}>
             <Button
               startIcon={<Call />}
               variant="text"
               size="large"
-              sx={{ textTransform: "capitalize", borderRadius: "10px" }}
+              sx={{ textTransform: "capitalize", borderRadius: "20px" }}
             >
               call
             </Button>
@@ -129,7 +158,7 @@ const HelpSupport = () => {
               variant="text"
               onClick={handleEmailSupport}
               size="large"
-              sx={{ textTransform: "capitalize", borderRadius: "10px" }}
+              sx={{ textTransform: "capitalize", borderRadius: "20px" }}
             >
               email
             </Button>
@@ -178,16 +207,6 @@ const HelpSupport = () => {
           Our support team will reach out via registered email linked to your
           account or send a direct message to your Metatron application inbox
           section.
-        </Typography>
-
-        <Typography
-          variant="body2"
-          component={"li"}
-          color={"text.secondary"}
-          mt={1}
-        >
-          It's recommended that your request should be bound to Metatron's terms
-          of services for the support team to reach out and help.
         </Typography>
       </Box>
     </Box>

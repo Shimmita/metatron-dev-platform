@@ -352,14 +352,14 @@ const LoginAuth = () => {
                 color={"text.secondary"}
                 alignItems={"center"}
               >
-                <PersonRounded color="primary" sx={{ width: 16, height: 16 }} />
+                <PersonRounded color="primary" sx={{ width: 18, height: 18 }} />
                 <Typography
                   variant={CustomDeviceSmallest() ? "caption" : "body2"}
                   color={"text.secondary"}
                 >
                   Personal Account Login
                 </Typography>
-                <PersonRounded color="primary" sx={{ width: 16, height: 16 }} />
+                <PersonRounded color="primary" sx={{ width: 18, height: 18 }} />
               </Typography>
             </Box>
           </Box>

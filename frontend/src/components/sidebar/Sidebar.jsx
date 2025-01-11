@@ -4,6 +4,7 @@ import {
   Apple,
   ArrowDropDown,
   BusinessRounded,
+  CoffeeRounded,
   Diversity3Rounded,
   Home,
   Lightbulb,
@@ -44,6 +45,7 @@ import EventsTablet from "../events/EventsIsTablet";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import "./Sidebar.css";
+const AlertSponsorship = lazy(() => import("../alerts/AlertSponsorship"));
 const AlertSupport = lazy(() => import("../alerts/AlertSupport"));
 const SkillAvatars = lazy(() => import("./SkillAvatars"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
@@ -63,6 +65,7 @@ const Sidebar = () => {
 
   // alert logout controls
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
+  const [openSponsorAlert, setOpenSponsorAlert] = useState(false);
 
   const navigate = useNavigate();
   // screen width
@@ -149,6 +152,11 @@ const Sidebar = () => {
 
   let businessAccount = false;
 
+  // handle showing of the sponsorship program
+  const handleShowingSponsorship = () => {
+    setOpenSponsorAlert(true);
+  };
+
   return (
     <Box
       height={"100vh"}
@@ -225,10 +233,10 @@ const Sidebar = () => {
                       </Box>
                       <Box display={"flex"} justifyContent={"center"} pb={2}>
                         {!businessAccount ? (
-                          <>
+                          <React.Fragment>
                             {/* shown for personal a/c */}
                             <SkillAvatars />
-                          </>
+                          </React.Fragment>
                         ) : (
                           <>
                             {/* shown for businesss a/c */}
@@ -476,7 +484,7 @@ const Sidebar = () => {
                   justifyContent={"center"}
                 >
                   <Typography fontWeight={"bold"} color={"primary"}>
-                    LEARNING EVENTS
+                    GREAT TECH EVENTS
                   </Typography>
                 </Box>
 
@@ -573,6 +581,22 @@ const Sidebar = () => {
                   />
                 </ListItemButton>
 
+                {/* sponsor us */}
+                <ListItemButton onClick={handleShowingSponsorship}>
+                  <ListItemIcon>
+                    <CoffeeRounded color="primary" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2">
+                        <Typography variant="body2">
+                          Sponsor Platform
+                        </Typography>
+                      </Typography>
+                    }
+                  />
+                </ListItemButton>
+
                 {/* change theme */}
                 <ListItemButton onClick={handleShowDarkMode}>
                   <ListItemIcon>
@@ -596,6 +620,13 @@ const Sidebar = () => {
           )}
         </Box>
       </Box>
+
+      {/* control showing of sponsorship alert */}
+      <AlertSponsorship
+        openSponsorAlert={openSponsorAlert}
+        setOpenSponsorAlert={setOpenSponsorAlert}
+        isLaunchPage={true}
+      />
 
       {/* alert technical support */}
       <AlertSupport

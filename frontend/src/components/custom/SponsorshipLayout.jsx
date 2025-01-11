@@ -1,25 +1,25 @@
 import {
-    ArrowLeft,
-    ArrowRight,
-    Close,
-    FavoriteRounded,
-    GitHub,
-    PaidRounded,
-    WorkspacePremiumRounded,
+  ArrowLeft,
+  ArrowRight,
+  Close,
+  FavoriteRounded,
+  GitHub,
+  PaidRounded,
+  WorkspacePremiumRounded,
 } from "@mui/icons-material";
 import {
-    Alert,
-    Avatar,
-    Box,
-    Button,
-    Collapse,
-    Divider,
-    IconButton,
-    Stack,
-    TextField,
-    Typography,
+  Alert,
+  Avatar,
+  Box,
+  Button,
+  Collapse,
+  Divider,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { lazy, useState } from "react";
 import { Link } from "react-router-dom";
 import GoogleLogo from "../../images/google.png";
 import MpesaLogo from "../../images/mpesa.png";
@@ -30,9 +30,15 @@ import VisaCard from "../../images/visa.png";
 
 import { useSelector } from "react-redux";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-import SponsorTeamLayout from "./SponsorTeamLayout";
+const GithubTeamLayout = lazy(() => import("./GithubTeamLayout"));
+const SponsorTeamLayout = lazy(() => import("./SponsorTeamLayout"));
 
-const SponsorshipLayout = ({ isSponsorTeam, setIsSponsorTeam }) => {
+const SponsorshipLayout = ({
+  isSponsorTeam,
+  setIsSponsorTeam,
+  isGitTeam,
+  setIsGitTeam,
+}) => {
   const [isDonate, setIsDonate] = useState(false);
   // global  state from redux
   const { isDarkMode } = useSelector((state) => state.appUI);
@@ -47,17 +53,42 @@ const SponsorshipLayout = ({ isSponsorTeam, setIsSponsorTeam }) => {
     setIsSponsorTeam(true);
   };
 
+  // handle show of github team
+  const handleShowGitTeam = () => {
+    setIsGitTeam(true);
+  };
+
   const items = Array.from({ length: 20 });
 
   return (
     <Stack gap={2}>
-      {isSponsorTeam ? (
+      {isSponsorTeam || isGitTeam ? (
         <React.Fragment>
+          {/* title for sponsorship and GitHub team */}
           <Box>
-            <Typography variant="body2" color={"text.secondary"}>
-              The following are our esteemed sponsors.
-              <span className="text-success"> Congrats!</span>
-            </Typography>
+            {/* sponsorship */}
+            {isSponsorTeam && (
+              <Typography variant="body2" color={"text.secondary"}>
+                The following are our{" "}
+                <span style={{ textDecoration: "underline" }}>
+                  Esteemed Sponsors
+                </span>{" "}
+                who have shown their undying love for technology and promoted us
+                through donations.
+                <span className="text-success"> Congrats!</span>
+              </Typography>
+            )}
+
+            {/* github */}
+            {isGitTeam && (
+              <Typography variant="body2" color={"text.secondary"}>
+                The following are our esteemed{" "}
+                <span style={{ textDecoration: "underline" }}>GitHub Team</span>{" "}
+                of contributors.
+                <span className="text-success"> Congrats!</span> <br /> Click on
+                a user to view their profile and communication channels.
+              </Typography>
+            )}
           </Box>
           <Box height={"35vh"}>
             <Box
@@ -73,9 +104,23 @@ const SponsorshipLayout = ({ isSponsorTeam, setIsSponsorTeam }) => {
                 scrollbarWidth: "none",
               }}
             >
-              {items.map((val, index) => (
-                <SponsorTeamLayout key={index} />
-              ))}
+              {/* sponsorship layout show */}
+              {isSponsorTeam && (
+                <React.Fragment>
+                  {items.map((val, index) => (
+                    <SponsorTeamLayout key={index} />
+                  ))}
+                </React.Fragment>
+              )}
+
+              {/* github team layout show */}
+              {isGitTeam && (
+                <React.Fragment>
+                  {items.map((val, index) => (
+                    <GithubTeamLayout key={index} />
+                  ))}
+                </React.Fragment>
+              )}
             </Box>
           </Box>
         </React.Fragment>
@@ -308,7 +353,7 @@ const SponsorshipLayout = ({ isSponsorTeam, setIsSponsorTeam }) => {
                     color={"text.secondary"}
                     gutterBottom
                   >
-                    Developers are welcomed to contribute to our GitHub{" "}
+                    Sofware Engineers are all welcomed to contribute to our{" "}
                     <Link
                       to={""}
                       style={{
@@ -316,10 +361,10 @@ const SponsorshipLayout = ({ isSponsorTeam, setIsSponsorTeam }) => {
                         color: isDarkMode ? "  #87BDE9" : "  #1876D2",
                       }}
                     >
-                      repository
+                      GitHub Repository
                     </Link>
                     . When approved our technical team will reach out for
-                    appreciation and get you enlisted to our GitHub team program
+                    appreciation and get you enlisted to our GitHub Team program
                     for recognition.
                   </Typography>
                 </Box>
@@ -337,7 +382,7 @@ const SponsorshipLayout = ({ isSponsorTeam, setIsSponsorTeam }) => {
                       />
                     }
                     disableElevation
-                    onClick={handleShowSponsors}
+                    onClick={handleShowGitTeam}
                     variant="outlined"
                     sx={{
                       textTransform: "capitalize",

@@ -10,8 +10,10 @@ import {
   Videocam,
   Work,
 } from "@mui/icons-material";
-import { Typography } from "@mui/material";
-import { useSelector } from "react-redux";
+import { Avatar, Typography } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import MachineLogo from "../../images/Ai.png";
+import { handleShowChatBot } from "../../redux/CurrentChatBot";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 const PostCourseModal = lazy(() => import("../modal/PostCourseModal"));
@@ -19,6 +21,10 @@ const PostTechModal = lazy(() => import("../modal/PostTechModal"));
 const PostJobModal = lazy(() => import("../modal/PostJobModal"));
 
 const actions = [
+  {
+    icon: <Avatar src={MachineLogo} alt="" sx={{ width: 30, height: 30 }} />,
+    name: "Metatron AI",
+  },
   {
     icon: <Videocam color="warning" sx={{ width: 26, height: 26 }} />,
     name: "GoLive Now",
@@ -38,6 +44,7 @@ const actions = [
 ];
 
 export default function BasicSpeedDial() {
+  const dispatch = useDispatch();
   const [open, setOpen] = React.useState(false);
 
   const handleOpen = (prev) => {
@@ -92,6 +99,9 @@ export default function BasicSpeedDial() {
 
               if (action.name === "Course Upload") {
                 setOpenModalCourse(true);
+              }
+              if (action.name === "Metatron AI") {
+                dispatch(handleShowChatBot());
               }
             }}
             tooltipTitle={

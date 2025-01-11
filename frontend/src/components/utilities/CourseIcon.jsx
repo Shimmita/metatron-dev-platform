@@ -29,6 +29,7 @@ import { Avatar } from "@mui/material";
 import React from "react";
 import bitcoin from "../../images/bitcoin.png";
 import cyber from "../../images/cybersecurity.jpeg";
+import devops from "../../images/devOps.jpeg";
 import docker from "../../images/docker.png";
 import linuxLogo from "../../images/linux.jpeg";
 import wordpress from "../../images/wordpress.png";
@@ -64,15 +65,16 @@ function CourseIcon({ option = "" }) {
     return <CloudRounded sx={{ width: 22, height: 22 }} />;
   }
   if (option.toLowerCase().includes("block chain")) {
-    return (
-      <Avatar src={bitcoin} alt={"image"} sx={{ width: 22, height: 22 }} />
-    );
+    return <Avatar src={bitcoin} alt={""} sx={{ width: 22, height: 22 }} />;
   }
   if (option.toLowerCase().includes("networks")) {
     return <HubRounded sx={{ width: 20, height: 20 }} />;
   }
   if (option.toLowerCase().includes("containerisation")) {
     return <Avatar src={docker} alt="image" sx={{ width: 22, height: 22 }} />;
+  }
+  if (option.toLowerCase().includes("devops")) {
+    return <Avatar src={devops} alt="image" sx={{ width: 22, height: 22 }} />;
   }
   if (option.toLowerCase().includes("programming")) {
     return <CodeRounded sx={{ width: 22, height: 22 }} />;
@@ -83,7 +85,10 @@ function CourseIcon({ option = "" }) {
   if (option.toLowerCase().includes("cybersecurity")) {
     return <Avatar src={cyber} alt={"image"} sx={{ width: 22, height: 22 }} />;
   }
-  if (option.toLowerCase().includes("machine")) {
+  if (
+    option.toLowerCase().includes("machine") ||
+    option.toLowerCase().includes("artificial")
+  ) {
     return <PsychologyRounded sx={{ width: 22, height: 22 }} />;
   }
 
@@ -109,14 +114,10 @@ function CourseIcon({ option = "" }) {
     return <SmartphoneRounded sx={{ width: 22, height: 22 }} />;
   }
   if (option.toLowerCase().includes("system")) {
-    return (
-      <Avatar src={linuxLogo} alt="image" sx={{ width: 22, height: 22 }} />
-    );
+    return <Avatar src={linuxLogo} alt="" sx={{ width: 24, height: 24 }} />;
   }
   if (option.toLowerCase().includes("wordpres")) {
-    return (
-      <Avatar src={wordpress} alt={"image"} sx={{ width: 22, height: 22 }} />
-    );
+    return <Avatar src={wordpress} alt={""} sx={{ width: 22, height: 22 }} />;
   }
   if (option.toLowerCase().includes("web app")) {
     return <WebRounded sx={{ width: 22, height: 22 }} />;

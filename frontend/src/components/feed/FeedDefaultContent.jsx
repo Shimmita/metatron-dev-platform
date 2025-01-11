@@ -13,6 +13,7 @@ import CardFeed from "../custom/CardFeed";
 import MobileTabCorousel from "../rightbar/MobileTabCorousel";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+const AlertChatBot = lazy(() => import("../alerts/AlertChatBot"));
 const AlertNoPosts = lazy(() => import("../alerts/AlertNoPosts"));
 
 const FeedDefaultContent = () => {
@@ -162,6 +163,8 @@ const FeedDefaultContent = () => {
           })}
       </Box>
 
+      {/* display chat bot */}
+      <AlertChatBot />
       {/* alert no posts if true */}
       <AlertNoPosts
         openAlert={openAlertNoPosts}

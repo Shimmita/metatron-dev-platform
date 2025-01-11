@@ -203,15 +203,6 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
     }
   };
 
-  // Handle adding desc
-  const handleAddDesc = () => {
-    if (desc_text.trim() !== "") {
-      // Add the inputText as a new desc if it's not empty
-      setDescription((prev) => [...prev, desc_text.trim()]);
-      setDescText(""); // Clear the input field
-    }
-  };
-
   // Handle req removal
   const handleDeleteReq = (req) => {
     setRequirementsQual((prev) => prev.filter((val) => val !== req));
@@ -220,6 +211,15 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
   // Handle desc removal
   const handleDeleteDesc = (desc) => {
     setDescription((prev) => prev.filter((val) => val !== desc));
+  };
+
+   // Handle adding desc
+   const handleAddDesc = () => {
+    if (desc_text.trim() !== "") {
+      // Add the inputText as a new desc if it's not empty
+      setDescription((prev) => [...prev, desc_text.trim()]);
+      setDescText(""); // Clear the input field
+    }
   };
 
   //   handle file change and compress the image

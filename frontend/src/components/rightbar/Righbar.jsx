@@ -1,7 +1,19 @@
-import { SchoolRounded } from "@mui/icons-material";
-import { Backdrop, Box, Divider, Skeleton, Typography } from "@mui/material";
+import {
+  AutoAwesomeRounded,
+  SchoolRounded,
+  TouchAppRounded,
+} from "@mui/icons-material";
+import {
+  Backdrop,
+  Box,
+  Button,
+  Divider,
+  Skeleton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import BasicSpeedDial from "../custom/SpeedDial";
 import CoursesContainer from "./CoursesContainer";
 import FeaturedPostContainer from "./FeaturedPostContainer";
@@ -9,11 +21,19 @@ import JobsContainer from "./JobsContainer";
 import RequestContainer from "./RequestContainer";
 import RightBarEvents from "./RightBarEvents";
 import RightBarStepper from "./RightBarStepper";
+import "./Rightbar.css";
+import { handleShowChatBot } from "../../redux/CurrentChatBot";
 
 const RightbarAll = () => {
   // backdrop state
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const [corouselCounter, setCorouselCounter] = React.useState(0);
+  const dispatch = useDispatch();
+
+  // handle showing of the chat bot controlled by the redux state
+  const handleChatBot = () => {
+    dispatch(handleShowChatBot());
+  };
 
   // redux states
   const {
@@ -40,7 +60,7 @@ const RightbarAll = () => {
         position={"fixed"}
         color={"text.primary"}
         className="mt-0 shadow rounded"
-        maxHeight={"80vh"}
+        maxHeight={"82vh"}
         sx={{
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
@@ -88,20 +108,18 @@ const RightbarAll = () => {
         <Divider className="mb-2" component={"div"} />
 
         {/* events */}
-        <Box bgcolor={"background.default"} className="rounded ">
-          <Box display={"flex"} justifyContent={"center"}>
-            <Box
-              display={"flex"}
-              alignItems={"center"}
-              justifyContent={"center"}
-              gap={2}
-              pt={2}
-            >
-              <Typography fontWeight={"bold"} color={"primary"}>
-                LEARNING EVENTS
-              </Typography>
-              <SchoolRounded color="primary" sx={{ width: 24, height: 24 }} />
-            </Box>
+        <Box>
+          <Box
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            gap={2}
+            pt={2}
+          >
+            <Typography fontWeight={"bold"} color={"primary"}>
+              GREAT TECH EVENTS
+            </Typography>
+            <SchoolRounded color="primary" sx={{ width: 24, height: 24 }} />
           </Box>
 
           <Box display={"flex"} justifyContent={"center"} mt={1}>
@@ -112,6 +130,46 @@ const RightbarAll = () => {
             )}
           </Box>
         </Box>
+        {/* divider */}
+        <Divider className="mb-2" component={"div"} />
+        {/* Ai Chatbot */}
+        <Stack>
+          <Box
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            gap={2}
+            pt={2}
+          >
+            <Typography fontWeight={"bold"} color={"primary"}>
+              METATRON AI AGENT
+            </Typography>
+            <AutoAwesomeRounded
+              color="primary"
+              sx={{ width: 26, height: 26 }}
+            />
+          </Box>
+
+          <Box display={"flex"} justifyContent={"center"}>
+            {isLoadingRequest ? (
+              <Skeleton variant="rectangular" width={"100%"} height={"5vh"} />
+            ) : (
+              <Button
+                size="small"
+                className="item-scale"
+                startIcon={<TouchAppRounded />}
+                onClick={handleChatBot}
+                variant="text"
+                sx={{
+                  textTransform: "capitalize",
+                  fontWeight: "bold",
+                }}
+              >
+                Lets Chat
+              </Button>
+            )}
+          </Box>
+        </Stack>
       </Box>
 
       {/* display speed dial in feed section only for mobile and no landscape */}

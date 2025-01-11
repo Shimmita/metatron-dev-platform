@@ -21,12 +21,10 @@ const SpecialisationTech = [
   "Fullstack Application Development",
   "Database Administration",
   "Programming Languages",
-  "Robotics Engineering",
   "Multiplatform Mobile Development",
   "Desktop App Development",
   "WordPress Web Development",
   "System Administration",
-  "Quantum Computing",
 ].sort();
 
 export default SpecialisationTech;

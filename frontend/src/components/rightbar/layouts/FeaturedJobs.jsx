@@ -21,6 +21,8 @@ export default function FeaturedJobs({ isLoading, jobTop }) {
     (state) => state.appUI
   );
 
+  
+
   return (
     <React.Fragment>
       {isLoadingRequest || isLoading ? (

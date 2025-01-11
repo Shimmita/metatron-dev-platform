@@ -11,6 +11,7 @@ import { handleAuthMiddleware } from "./middlewares/auth_middleware.js";
 import authenticationRouter from "./routes/authentication_route.js";
 import { manageJobsRouter } from "./routes/manage_jobs_route.js";
 import { postManageRouter } from "./routes/manage_post_route.js";
+import manageChatAiRoute from "./routes/manage_chat_routejs";
 const mongoDBSession = connectMongoStore(session);
 const app = express();
 app.use(bodyParser.json());
@@ -71,6 +72,10 @@ app.use(`${BASE_ROUTE}/posts`, handleAuthMiddleware, postManageRouter);
 
 //jobs route
 app.use(`${BASE_ROUTE}/jobs`, handleAuthMiddleware, manageJobsRouter);
+
+// chat route
+app.use(`${BASE_ROUTE}/chats`, handleAuthMiddleware, manageChatAiRoute);
+
 
 // signOut user
 app.use(`${BASE_ROUTE}/signout`, (req, res) => {
