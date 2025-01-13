@@ -10,7 +10,7 @@ const ownerDetails = new mongoose.Schema({
   _id: false, //prevent id generation
 });
 
-// for github links and clicks
+// for indidual user info
 const commonUserInfoSchema = new mongoose.Schema({
   userId: { type: String, required: false, default: "" },
   name: { type: String, required: false, default: "" },

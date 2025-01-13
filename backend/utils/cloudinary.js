@@ -13,10 +13,12 @@ cloudinary.config({
  * @param {string} folder - The folder name in Cloudinary
  * @returns {Promise<Object>} - The Cloudinary upload result
  */
+
+// upload image to cloudinary
 export const uploadToCloudinary = (buffer, folder) => {
   return new Promise(async (resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: "image", public_id: `${Date.now()}` },
+      { folder, resource_type: "auto", public_id: `${Date.now()}` },
       (error, result) => {
         if (error) {
           return reject(error);
@@ -33,3 +35,5 @@ export const uploadToCloudinary = (buffer, folder) => {
     readableStream.pipe(stream);
   });
 };
+
+
