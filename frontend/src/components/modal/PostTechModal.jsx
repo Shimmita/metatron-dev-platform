@@ -92,6 +92,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [category1, setCategory1] = useState("");
   const [category2, setCategory2] = useState("");
   const [category3, setCategory3] = useState("");
+
   // control opening and showing of the alert custom input
   const [openAlert, setOpenAlert] = useState(false);
 
@@ -124,8 +125,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   };
 
   // extracting current logged in user details from the redux store
-  const ownerId = user._id;
-  const ownername = user.name;
+  const instructor_name = user.name;
   const ownertitle = user.specialisationTitle;
   const ownerverified = user.premium;
   const ownerskills = user.selectedSkills;
@@ -135,8 +135,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
   const post = {
     post_owner: {
-      ownerId,
-      ownername,
+      instructor_name,
       ownertitle,
       ownerverified,
       ownerskills,

@@ -9,8 +9,8 @@ import {
 import {
   Avatar,
   Box,
-  Button,
   Card,
+  CardActionArea,
   CardContent,
   CardHeader,
   Checkbox,
@@ -21,17 +21,26 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Image } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import dev from "../../images/dev.jpeg";
+import { updateCurrentPostDetails } from "../../redux/CurrentPosts";
 import PostData from "../data/PostData";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CardFeedMore from "./CardFeedMore";
-import dev from '../../images/dev.jpeg'
+
+const renderSkeleton = () => (
+  <>
+    <Skeleton animation="wave" height={10} style={{ marginBottom: 6 }} />
+    <Skeleton animation="wave" height={10} width="80%" />
+  </>
+);
 
 const CardFeed = ({ post }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -39,12 +48,56 @@ const CardFeed = ({ post }) => {
   const openMenu = Boolean(anchorEl);
   const navigate = useNavigate();
   const [isLoadingRequest, setIsLoadingRequest] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isFullDescription, setFullDiscription] = useState(false);
+
+  // axios default credentials
+  axios.defaults.withCredentials = true;
   // redux states
   const { isDarkMode } = useSelector((state) => state.appUI);
   const { user } = useSelector((state) => state.currentUser);
+  const dispatch = useDispatch();
+  // extract basic current user details
+  const {
+    _id,
+    avatar,
+    name,
+    specialisationTitle: title,
+    country,
+    county: state,
+  } = user || {};
+
+  // extract the likes and array of liked usersIDs of this post
+  const { clicks: post_clicks } = post.post_liked || {};
+
+  const post_likes = post_clicks;
+  const currentUserLiked = post.post_liked.clickers?.some(
+    (clickerId) => clickerId === _id
+  );
 
   const details = PostData?.details || "";
   const detailsLong = details.length > 350;
+
+  // handle country length to only two names 
+  const handleCountryName = (country) => {
+    const parent = country.split(" ");
+    const parentName =
+      parent.length < 4 ? parent[1] : `${parent[1]} ${parent[2]}`;
+
+    return parentName;
+  };
+  // current user info
+  const userInfo = {
+    userId: _id,
+    ownerId: post.post_owner.ownerId,
+    postId: post._id,
+    avatar,
+    name,
+    title,
+    country: handleCountryName(country),
+    state,
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoadingRequest(false), 5000);
@@ -58,13 +111,6 @@ const CardFeed = ({ post }) => {
 
   const handleDetailsLength = () =>
     detailsLong ? details.substring(0, 350) : details;
-
-  const renderSkeleton = () => (
-    <>
-      <Skeleton animation="wave" height={10} style={{ marginBottom: 6 }} />
-      <Skeleton animation="wave" height={10} width="80%" />
-    </>
-  );
 
   // handle the length of owner title for smallest devices
   const handleOccupation = () => {
@@ -115,7 +161,55 @@ const CardFeed = ({ post }) => {
     };
 
     handlePostBelongsCurrentUser();
-  }, [user._id,post.post_owner?.ownerId]);
+  }, [user._id, post.post_owner?.ownerId]);
+
+  // handle user clicking like button
+  const handlePostLikes = () => {
+    let message = "liked your post";
+    let minimessage = details.substring(0, 40) + " ...";
+
+    // add the above properties to the userInfo that is being sent to the backend
+    userInfo.message = message;
+    userInfo.minimessage = minimessage;
+    // add users to the liked clickers group and increment the value of clicks
+    setIsUploading(true);
+    // performing post request
+    axios
+      .put(
+        `http://localhost:5000/metatron/api/v1/posts/update/likes`,
+        userInfo,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        // update the returned post object to reflect in the global redux
+        if (res.data.reaction === "liked") {
+          dispatch(updateCurrentPostDetails(res.data.post));
+        }
+        if (res.data.reaction === "disliked") {
+          // update the returned post object to reflect in the global redux
+
+          dispatch(updateCurrentPostDetails(res.data.post));
+        }
+      })
+      .catch(async (err) => {
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("Server Unreachable");
+          return;
+        }
+
+        setErrorMessage(err?.response.data);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
+  };
+
+  // handle showing full post description
+  const handleFullDiscription = () => {
+    setFullDiscription((prev) => !prev);
+  };
 
   return (
     <>
@@ -304,22 +398,16 @@ const CardFeed = ({ post }) => {
                   />
                 </Box>
               </Box>
-              <Typography variant={"body2"}>
-                {handleDetailsLength()}
-                {detailsLong && (
-                  <Button
-                    onClick={handleNavigate("posts/details")}
-                    size="small"
-                    sx={{
-                      fontSize: "smaller",
-                      fontWeight: "bold",
-                      padding: 0,
-                    }}
-                  >
-                    more
-                  </Button>
-                )}
-              </Typography>
+              <CardActionArea
+                onClick={handleFullDiscription}
+                disabled={!detailsLong}
+              >
+                <Typography variant={"body2"}>
+                  {!isFullDescription && handleDetailsLength()}
+                  {detailsLong && !isFullDescription && " ..."}
+                  {isFullDescription && details}
+                </Typography>
+              </CardActionArea>
             </CardContent>
             <Image
               src={PostData.image}
@@ -347,9 +435,15 @@ const CardFeed = ({ post }) => {
           >
             {[
               {
-                icon: <FavoriteRounded sx={{ width: 23, height: 23 }} />,
-                count: "500k",
+                icon: (
+                  <FavoriteRounded
+                    sx={{ width: 23, height: 23 }}
+                    color={currentUserLiked ? "primary" : undefined}
+                  />
+                ),
+                count: post_likes,
                 title: "like",
+                onClick: handlePostLikes,
               },
               {
                 icon: <GitHub sx={{ width: 21, height: 21 }} />,
@@ -365,7 +459,12 @@ const CardFeed = ({ post }) => {
             ].map(({ icon, count, title, onClick }) => (
               <Box display="flex" alignItems="center" key={title}>
                 <Tooltip title={title} arrow>
-                  <Checkbox onChange={onClick} icon={icon} checkedIcon={icon} />
+                  <Checkbox
+                    onChange={onClick}
+                    icon={icon}
+                    checkedIcon={icon}
+                    disabled={isUploading}
+                  />
                 </Tooltip>
                 <Typography
                   fontWeight="bold"

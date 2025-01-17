@@ -145,8 +145,6 @@ const LoginAuth = () => {
               });
           })
           .catch((error) => {
-            console.log(error);
-
             // set error message
             setMessageGeneral(googleFailedError);
           })

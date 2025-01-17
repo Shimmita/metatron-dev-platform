@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 
+
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -18,7 +19,7 @@ cloudinary.config({
 export const uploadToCloudinary = (buffer, folder) => {
   return new Promise(async (resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: "auto", public_id: `${Date.now()}` },
+      { folder, resource_type: "image", public_id: `${Date.now()}` },
       (error, result) => {
         if (error) {
           return reject(error);

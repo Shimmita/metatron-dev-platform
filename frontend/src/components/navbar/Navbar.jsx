@@ -293,7 +293,7 @@ const Navbar = ({ setMode, mode }) => {
                     : 2
                 }
               >
-                <Badge variant="dot" color="warning">
+                <Badge badgeContent={1} color="warning">
                   <Tooltip arrow title={"notifications"}>
                     <IconButton
                       sx={{ padding: 0 }}

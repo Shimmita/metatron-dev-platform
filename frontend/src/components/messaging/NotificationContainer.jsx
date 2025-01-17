@@ -1,11 +1,14 @@
 import { Box } from "@mui/material";
 import React from "react";
-import NotifLayout from "./layout/NotifLayout";
+import { useSelector } from "react-redux";
+import SnackBarNotifications from "../snackbar/SnackBarNotifications";
+import NotifAccordionLayout from "./layout/NotifAccordionLayout";
 
 function NotificationContainer() {
-  const items = Array.from({ length: 10 });
+  // redux states access
+  const { messageNotification } = useSelector((state) => state.currentSnackBar);
   return (
-    <Box >
+    <Box>
       <Box
         height={"92vh"}
         sx={{
@@ -19,15 +22,13 @@ function NotificationContainer() {
           scrollbarWidth: "none",
         }}
       >
-        <Box >
-          {items &&
-            items.map((val, index) => (
-              <Box >
-                <NotifLayout key={index} />
-              </Box>
-            ))}
-        </Box>
+        <NotifAccordionLayout />
       </Box>
+
+      {/* show snackbar for notifications for info */}
+      {messageNotification && (
+        <SnackBarNotifications message={messageNotification} />
+      )}
     </Box>
   );
 }

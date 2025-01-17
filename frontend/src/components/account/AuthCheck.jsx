@@ -23,7 +23,6 @@ const AuthCheck = ({ children }) => {
       setIsAuthorised(res.data.authorised);
     })
     .catch(async (err) => {
-      console.log(err);
       setIsAuthorised(false);
       // logout if any firebase user
       // clear any firebase authentication details

@@ -15,6 +15,7 @@ const commonUserInfoSchema = new mongoose.Schema({
   userId: { type: String, required: false, default: "" },
   name: { type: String, required: false, default: "" },
   title: { type: String, required: false, default: "" },
+  avatar: { type: String, required: false, trim: true, default: "" },
   country: { type: String, required: true, trim: true, default: "" },
   state: { type: String, required: true, trim: true, default: "" },
   _id: false, //prevent id generation
@@ -68,7 +69,7 @@ const postSchema = new mongoose.Schema(
     post_edited: { type: Boolean, required: false, default: false },
     post_liked: {
       clicks: { type: Number, required: false, default: 0 },
-      clickers: [commonUserInfoSchema],
+      clickers: { type: [String], required: false, default: [], _id: false },
       _id: false,
     },
     post_github: {

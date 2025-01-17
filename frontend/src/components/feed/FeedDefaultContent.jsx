@@ -64,8 +64,7 @@ const FeedDefaultContent = () => {
           setOpenAlertNoPosts(true);
         }
       })
-      .catch(async (err) => {
-        console.log(err);
+      .catch((err) => {
         //  user login session expired show logout alert
         if (err?.response?.data.login) {
           window.location.reload();

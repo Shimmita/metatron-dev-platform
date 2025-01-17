@@ -5,7 +5,7 @@ import {
   FavoriteRounded,
   PaidRounded,
   PersonAdd,
-  SchoolRounded
+  SchoolRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -25,7 +25,9 @@ import { resetSimilarCoursesModal } from "../../../redux/AppUI";
 import video from "../../../video.mp4";
 import CourseData from "../../data/CourseData";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-const CourseStatsEditAlert = lazy(() => import("../../alerts/CourseStatsEditAlert"));
+const CourseStatsEditAlert = lazy(() =>
+  import("../../alerts/CourseStatsEditAlert")
+);
 const AccordionDescription = lazy(() => import("./AccordionDescription"));
 const AccordionInstructor = lazy(() => import("./AccordionInstructor"));
 const AccordionLectures = lazy(() => import("./AccordionLectures"));
@@ -184,9 +186,7 @@ function CoursePaid({ isUploadedRequest }) {
             <Button
               className="rounded"
               onClick={handleShowingSimilarCourses}
-              startIcon={
-                <AutoAwesomeRounded sx={{ width: 17, height: 17 }} />
-              }
+              startIcon={<AutoAwesomeRounded sx={{ width: 17, height: 17 }} />}
               variant="text"
               sx={{ textTransform: "lowercase" }}
             >

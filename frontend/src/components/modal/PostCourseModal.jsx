@@ -1,41 +1,40 @@
 import {
-  AndroidRounded,
-  Apple,
+  Add,
   Close,
   CloudUploadRounded,
-  CodeRounded,
-  DrawRounded,
-  EditRounded,
-  GradeRounded,
-  LaptopRounded,
-  LinkRounded,
-  Microsoft,
-  MonetizationOnRounded,
+  DiamondRounded,
   SchoolRounded,
-  SettingsRounded,
-  SportsEsportsRounded,
-  StorageRounded,
-  Title,
 } from "@mui/icons-material";
 import {
+  Alert,
+  Autocomplete,
   Avatar,
   Box,
   Button,
+  CircularProgress,
+  Collapse,
   IconButton,
   MenuItem,
   Modal,
+  Stack,
   styled,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import LinuxLogo from "../../images/linux.jpeg";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import AppLogo from "../../images/logo_sm.png";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import { updateCurrentSnackPostSuccess } from "../../redux/CurrentSnackBar";
 import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionTech from "../data/SubsectionTech";
+import BrowserCompress from "../utilities/BrowserCompress";
 import CourseIcon from "../utilities/CourseIcon";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -83,71 +82,267 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   const [devops_tool, setDevOpsTool] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-
   const [videoFullUpload, setVideoFullUpload] = useState(null);
-  const [videoFullLink, setVideoFullLink] = useState("");
-  const [videoIntroUpload, setVideoIntroUpload] = useState(null);
-  const [videoIntroLink, setVideoIntroLink] = useState("");
-  const [videoBrochureUpload, setVideoBrochureUpload] = useState(null);
-  const [videoBrochureLink, setVideoBrochureLink] = useState("");
-
-  const [isVideoFullLink, setIsVideoFullLink] = useState(false);
-  const [isVideoIntroLink, setIsVideoIntroLink] = useState(false);
-  const [isBrochureLink, setIsBrochureLink] = useState(false);
-
-  const [instructor_email, setInstructorEmail] = useState("");
-  const [instructor_phone, setInstructorPhone] = useState("");
+  const [instructor_github, setInstructorGitHub] = useState("");
+  const [instructor_website, setInstructorWebsite] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isFreeLogo, setIsFreeLogo] = useState(false);
+  const [freeLogo, setFreeLogo] = useState("");
+  const [fileUploadCustom, setFileUploadCustom] = useState(null);
+  const [previewCustomLogo, setPreviewCustomLogo] = useState(null);
+  const [topic_text, setTopicText] = useState(""); // To hold user input text for req
+  const [topicsArray, setTopicsArray] = useState([]);
 
   // redux states
   const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { user } = useSelector((state) => state.currentUser);
 
-  // handle full video when btn link clicked
-  const handleFullVideoLink = () => {
-    // clear video full upload if any
-    setVideoFullUpload(null);
-    // set true link video full
-    setIsVideoFullLink(true);
+  // for category 1, 2 and 3
+  const [category1, setCategory1] = useState("");
+  const [category2, setCategory2] = useState("");
+  const [category3, setCategory3] = useState("");
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // axios default credentials
+  axios.defaults.withCredentials = true;
+
+  // close freeLogo
+  const handleCloseFreeLogo = () => {
+    setFreeLogo("");
+    setIsFreeLogo(false);
   };
 
-  // handle close of video full link
-  const handleCloseVideoFullLink = () => {
-    // clear
-    setVideoFullLink("");
-    // default showing of btn upload and link for video full
-    setIsVideoFullLink(false);
+  //handle free logo
+  const handleFreeLogoPick = () => {
+    // free logo shown for picks
+    setIsFreeLogo(true);
+    // clear file upload
   };
 
-  // handle video intro when btn link clicked
-  const handleVideoIntroLink = () => {
-    // clear video upload if any
-    setVideoIntroUpload(null);
-
-    // set true link video intro
-    setIsVideoIntroLink(true);
+  //   handle file change and compress the image
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    // compress the file using the custom utility created
+    const compressedFile = await BrowserCompress(file);
+    setFileUploadCustom(compressedFile);
+    // create an object from URI of the image for local preview
+    setPreviewCustomLogo(URL.createObjectURL(compressedFile));
   };
 
-  // handle close of video intro link when close icon clicked
-  const handleCloseVideoIntroLink = () => {
-    // clear
-    setVideoIntroLink("");
-    // default showing of btns upload and link for video intro
-    setIsVideoIntroLink(false);
+  // handle video full
+  const handleFileChangeVideoFull = (event) => {
+    const file = event.target.files[0];
+    // update full video variable
+    setVideoFullUpload(file);
   };
 
-  // handle Brochure when btn link clicked
-  const handleBrochureLink = () => {
-    // clear brochure upload if any
-    setVideoBrochureUpload(null);
-    //set true link brochure
-    setIsBrochureLink(true);
+  // handle video preview full
+  const handleVideoFullPreview = () => {
+    return URL.createObjectURL(videoFullUpload);
   };
 
-  // handle close of brochure when close icon is clicked
-  const handleCloseBrochureLink = () => {
-    // clear link
-    setVideoBrochureLink("");
-    // default showing of btns upload and link for  brochure
-    setIsBrochureLink(false);
+  // Handle input change for req
+  const handleTextChangeTopic = (e, value) => {
+    setTopicText(value);
+  };
+
+  // Handle adding req
+  const handleAddUpdateTopic = () => {
+    // Add the inputText as a new requirement if it's not empty
+    if (topic_text.trim() !== "") {
+      // if the name of the topic does not extist add
+      if (!topicsArray.includes(topic_text.trim())) {
+        setTopicsArray((prev) => [...prev, topic_text.trim()]);
+        setTopicText(""); // Clear the input field
+      }
+    }
+  };
+
+  // Handle req removal
+  const handleDeleteUpdateTopic = (req) => {
+    setTopicsArray((prev) => prev.filter((val) => val !== req));
+  };
+
+  // handle core missing fields
+  const handleEmptyFields = () => {
+    if (title?.trim() === "") {
+      setErrorMessage("Title field is required");
+      return false;
+    }
+    if (description?.trim() === "") {
+      setErrorMessage("Description field is required");
+      return false;
+    }
+    if (post_category?.trim === "") {
+      setErrorMessage("specialisation field is required");
+      return false;
+    }
+    if (post_category?.includes("Backend") && category1.trim() === "") {
+      setErrorMessage("backend field is required");
+      return false;
+    }
+    if (post_category?.includes("Developer") && category1.trim() === "") {
+      setErrorMessage("DevOps Tool field is required");
+      return false;
+    }
+    if (post_category?.includes("Backend") && category2.trim() === "") {
+      setErrorMessage("Database field is required");
+      return false;
+    }
+    if (post_category?.includes("Machine") && category1.trim() === "") {
+      setErrorMessage("ML/AI area of focus is required");
+      return false;
+    }
+    if (post_category?.includes("Cybersecurity") && category1.trim() === "") {
+      setErrorMessage("Cybersecurity area field is required");
+      return false;
+    }
+    if (
+      post_category?.includes("Data Science and Analytics") &&
+      category1.trim() === ""
+    ) {
+      setErrorMessage("Data science area field is required");
+      return false;
+    }
+
+    if (
+      post_category?.includes("Fullstack") &&
+      (category1.trim() === "" ||
+        category2.trim() === "" ||
+        category3.trim() === "")
+    ) {
+      setErrorMessage("Frontend, Backend and Database field all required");
+      return false;
+    }
+    if (!fileUploadCustom) {
+      if (freeLogo?.trim() === " ") {
+        setErrorMessage("provide course logo");
+        return false;
+      }
+    }
+
+    if (topicsArray.length < 5) {
+      setErrorMessage("provide atleast 5 topics");
+      return false;
+    }
+
+    if (!videoFullUpload) {
+      setErrorMessage("provide course video");
+      return false;
+    }
+
+    return true;
+  };
+
+  // useEffect hook for upadating category values
+  useEffect(() => {
+    // handle the value fo backend
+    const updatePostCategoryValue = () => {
+      if (post_category.includes("Backend")) {
+        setCategory1(backend);
+        setCategory2(database);
+      }
+      if (post_category.includes("Database")) {
+        setCategory1(database);
+      }
+
+      if (post_category.includes("Fullstack")) {
+        setCategory1(frontend);
+        setCategory2(backend);
+        setCategory3(database);
+      }
+    };
+
+    updatePostCategoryValue();
+  }, [post_category, backend, database, frontend]);
+
+  // extracting current logged in user details from the redux store
+  const instructor_name = user.name;
+  const instructor_title = user.specialisationTitle;
+  const instructor_skills = user.selectedSkills;
+  const instructor_avatar = user.avatar;
+
+  const course = {
+    instructor: {
+      instructor_name,
+      instructor_title,
+      instructor_avatar,
+      instructor_skills,
+      instructor_website,
+      instructor_github,
+    },
+    course_title: title,
+    course_price: price,
+    course_description: description,
+    course_category: {
+      main: post_category,
+      sub1: category1,
+      sub2: category2,
+      sub3: category3,
+    },
+    course_topics: topicsArray,
+    course_logo_url: freeLogo,
+  };
+
+  // handle posting of data to the backend
+  const handleUploadCourse = () => {
+    // clear any error message
+    setErrorMessage("");
+    // core fields not empty
+    if (handleEmptyFields()) {
+      // set is uploading true
+      setIsUploading(true);
+      // create a form which will faciltate parsing of the file for upload to cloud
+      const formData = new FormData();
+      // append post body after stringify it due to form data
+      formData.append("course", JSON.stringify(course));
+
+      // check if video and fileCustom the logo file present then append for upload to backend
+      if (videoFullUpload) {
+        // append video file
+        formData.append("file", videoFullUpload);
+      }
+
+      // holds image logo
+      if (fileUploadCustom) {
+        // append image logo for the course
+        formData.append("file", fileUploadCustom);
+      }
+
+      // performing post request
+      axios
+        .post(
+          `http://localhost:5000/metatron/api/v1/courses/create`,
+          formData,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          // show success post snack controlled by redux
+          dispatch(updateCurrentSnackPostSuccess(res.data));
+          // close the current modal
+          setOpenModalCourse(false);
+          // navigate to home route by default
+          navigate("/");
+          // update tab bottom nav to 0
+          updateCurrentBottomNav(0);
+        })
+        .catch(async (err) => {
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage("Server Unreachable");
+            return;
+          }
+
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          setIsUploading(false);
+        });
+    }
   };
 
   return (
@@ -196,22 +391,43 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               <Avatar sx={{ width: 60, height: 60 }} src={AppLogo} alt="logo" />
             </Box>
 
-            {/*  button for posting */}
-            <Button
-              startIcon={<SchoolRounded />}
-              className="w-50 rounded-5 shadow-sm"
-              variant="contained"
-              size="small"
-            >
-              Upload Course
-            </Button>
-
             {/*close icon */}
             <IconButton onClick={(e) => setOpenModalCourse(false)}>
               <Tooltip title={"close"}>
                 <Close />
               </Tooltip>{" "}
             </IconButton>
+          </Box>
+
+          {/* display error of missing filed if any */}
+          <Box
+            display={"flex"}
+            justifyContent={"center"}
+            mb={isUploading || errorMessage ? 3 : undefined}
+          >
+            {errorMessage ? (
+              <Collapse in={errorMessage || false}>
+                <Alert
+                  severity="warning"
+                  className="rounded-5"
+                  onClick={() => setErrorMessage("")}
+                  action={
+                    <IconButton aria-label="close" color="inherit" size="small">
+                      <Close fontSize="inherit" />
+                    </IconButton>
+                  }
+                  sx={{ mb: 2 }}
+                >
+                  {errorMessage}
+                </Alert>
+              </Collapse>
+            ) : (
+              isUploading && (
+                <Box>
+                  <CircularProgress size={"25px"} />
+                </Box>
+              )
+            )}
           </Box>
 
           <Box
@@ -233,7 +449,6 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                 <Typography
                   gutterBottom
                   mb={2}
-                  textAlign={"center"}
                   variant="body2"
                   fontWeight={"bold"}
                   color={"text.secondary"}
@@ -241,15 +456,6 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   Note: The course you are posting should be yours and not
                   someone's intellectual property!
                 </Typography>
-
-                {/* post title */}
-                <Box
-                  className="my-2"
-                  display={"flex"}
-                  justifyContent={"center"}
-                >
-                  <Title color="primary" sx={{ width: 30, height: 30 }} />
-                </Box>
 
                 <Typography variant="body2" mt={3} color={"text.secondary"}>
                   Provide a relevant course title that will be displayed to the
@@ -268,10 +474,6 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     onChange={(e) => setTitle(e.target.value)}
                   />
                 </Box>
-              </Box>
-
-              <Box display={"flex"} justifyContent={"center"}>
-                <GradeRounded color="primary" sx={{ width: 30, height: 30 }} />
               </Box>
 
               {/* post about */}
@@ -310,32 +512,15 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                 </TextField>
               </Box>
 
-              {/* provide a logo for the course */}
-              <Typography variant="body2" color={"text.secondary"}>
-                Provide logo for the course. You can select the preferred version from the free kits already provided or upload from the 
-              </Typography>
-              <Box></Box>
-
               {/* programming Language */}
               {post_category === "Programming Languages" && (
-                <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <CodeRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
+                <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select the programming language which your course will be
                     addressing in particualar.
                   </Typography>
 
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
@@ -352,27 +537,20 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </Box>
+                </React.Fragment>
               )}
 
               {/* frontend */}
               {(post_category === "Frontend App Development" ||
                 post_category ===
                   "Fullstack App Development (Frontend+Backend)") && (
-                <Box>
-                  <Box mt={2} display={"flex"} justifyContent={"center"}>
-                    <LaptopRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
+                <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Which frontend technology will your course be covering in
                     particular.If it is based on a bare HTML/CSS version, select
                     the option with (HTML/CSS).
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
@@ -389,31 +567,20 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </Box>
+                </React.Fragment>
               )}
 
               {/* backend */}
               {(post_category === "Backend App Development" ||
                 post_category ===
                   "Fullstack App Development (Frontend+Backend)") && (
-                <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <SettingsRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
+                <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Which backend technology will your course be covering in
                     particular? Suppose none of the provided options matches
                     your preference select (other).
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
@@ -430,7 +597,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </Box>
+                </React.Fragment>
               )}
 
               {/* Database */}
@@ -438,25 +605,14 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                 post_category === "Backend App Development" ||
                 post_category ===
                   "Fullstack App Development (Frontend+Backend)") && (
-                <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <StorageRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
+                <React.Fragment>
                   <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Which database in particular will your course make
                     utilisation of to facilitate storage of data? Suppose none
                     of the provided options matches your preference select
                     (other).
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
@@ -473,30 +629,19 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </Box>
+                </React.Fragment>
               )}
 
               {/* Desktop App */}
               {post_category === "Desktop App Development" && (
-                <Box>
-                  <Box
-                    display={"flex"}
-                    justifyContent={"center"}
-                    gap={1}
-                    alignItems={"center"}
-                  >
-                    <Avatar alt="Linux" src={LinuxLogo} /> +
-                    <Apple color="primary" sx={{ width: 30, height: 30 }} />+
-                    <Microsoft color="primary" sx={{ width: 30, height: 30 }} />
-                  </Box>
-
+                <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select desktop development technology that your course will
                     be based on such that the overal application runs on either
                     Linux OS, MacOS, Windows OS or both.
                   </Typography>
 
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
@@ -513,7 +658,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </Box>
+                </React.Fragment>
               )}
 
               {/* DevOps */}
@@ -553,23 +698,12 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
 
               {/* Game dev */}
               {post_category === "Game App Development" && (
-                <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <SportsEsportsRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
+                <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select a game application development technology in
                     particular.
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
@@ -586,28 +720,17 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </Box>
+                </React.Fragment>
               )}
 
               {/* UI/UX  */}
               {post_category === "UI/UX Design/Graphic Design" && (
-                <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <DrawRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
+                <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select the UI/UX Design tool that you are covering in your
                     course.
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
@@ -626,29 +749,18 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </Box>
+                </React.Fragment>
               )}
 
               {/* Android App */}
               {post_category === "Native Android App Development" && (
-                <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <AndroidRounded
-                      color="success"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
+                <React.Fragment>
                   <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Native Android application development stack is usually
                     based on Java or Kotlin. Select the stack that your course
                     make use of.
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
@@ -665,25 +777,17 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </Box>
+                </React.Fragment>
               )}
 
               {/* IOS App */}
               {post_category === "Native IOS App Development" && (
-                <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <Apple color="primary" sx={{ width: 30, height: 30 }} />
-                  </Box>
-
+                <React.Fragment>
                   <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Select the stack used in your course for the development of
                     Native IOS Application project/post
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
@@ -700,26 +804,13 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </Box>
+                </React.Fragment>
               )}
 
               {/* Multiplatform Android+IOS */}
               {post_category ===
                 "Multiplatform App Development (Android+IOS)" && (
-                <Box>
-                  <Box
-                    display={"flex"}
-                    justifyContent={"center"}
-                    gap={1}
-                    alignItems={"center"}
-                  >
-                    <Apple color="inherit" sx={{ width: 30, height: 30 }} /> +
-                    <AndroidRounded
-                      color="success"
-                      sx={{ width: 34, height: 34 }}
-                    />
-                  </Box>
-
+                <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select a mobile multiplatform/cross-application development
                     technology that you are interested in. multiplatform
@@ -729,7 +820,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     (other).
                   </Typography>
 
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
@@ -748,12 +839,12 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </Box>
+                </React.Fragment>
               )}
 
               {/* Containerisation  */}
               {post_category === "Containerisation and Orchestration" && (
-                <>
+                <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Which containerisation technology will be handled in the
                     course of study.
@@ -775,75 +866,134 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         ))}
                     </TextField>
                   </Box>
-                </>
+                </React.Fragment>
               )}
 
-              <Box>
-                <Box
-                  display={"flex"}
-                  justifyContent={"center"}
-                  gap={1}
-                  alignItems={"center"}
-                >
-                  <MonetizationOnRounded
-                    color="success"
-                    sx={{ width: 32, height: 32 }}
-                  />{" "}
-                </Box>
+              <React.Fragment>
+                {/* free logos pick */}
+                {isFreeLogo && (
+                  <Box
+                    mt={1}
+                    className="w-100 mb-4"
+                    display={"flex"}
+                    alignItems={"center"}
+                    gap={1}
+                  >
+                    <TextField
+                      required
+                      disabled={isUploading || errorMessage}
+                      select
+                      value={freeLogo}
+                      variant="standard"
+                      label="Free logos"
+                      fullWidth
+                      onChange={(e) => setFreeLogo(e.target.value)}
+                    >
+                      {logoNamesOptions &&
+                        logoNamesOptions.map((name, index) => (
+                          <MenuItem
+                            key={index}
+                            value={name}
+                            sx={{ display: "flex", gap: 2 }}
+                          >
+                            {/* logo */}
+                            <Avatar
+                              src={logoValueOptions[index]}
+                              sx={{ width: 32, height: 32 }}
+                              alt=""
+                            />
+                            {/* name */}
+                            <Typography variant="body2">{name}</Typography>
+                          </MenuItem>
+                        ))}
+                    </TextField>
 
+                    {/* close button */}
+                    <IconButton onClick={handleCloseFreeLogo}>
+                      <Tooltip title={"exit link"}>
+                        <Close />
+                      </Tooltip>
+                    </IconButton>
+                  </Box>
+                )}
+
+                {/* preview the file uploaded from storage */}
+                {fileUploadCustom && (
+                  <Box display={"flex"} justifyContent={"center"}>
+                    <img
+                      src={previewCustomLogo}
+                      alt=""
+                      className="rounded"
+                      style={{
+                        maxWidth: 100,
+                      }}
+                    />
+                  </Box>
+                )}
+
+                {/* provide a logo for the course */}
+                <Typography variant="body2" color={"text.secondary"}>
+                  Provide logo for the course. You can select the preferred logo
+                  from the free kits that have been provided or uploading the
+                  custom version from your local storage.
+                </Typography>
+                <Box display={"flex"} justifyContent={"flex-end"} gap={1}>
+                  <Button
+                    variant="text"
+                    disableElevation
+                    disabled={isUploading}
+                    sx={{ textTransform: "none", borderRadius: "20px" }}
+                    onClick={handleFreeLogoPick}
+                    size="medium"
+                    startIcon={<DiamondRounded />}
+                  >
+                    Free
+                  </Button>
+
+                  <Button
+                    component="label"
+                    role={undefined}
+                    variant="text"
+                    disableElevation
+                    tabIndex={-1}
+                    size="medium"
+                    disabled={isUploading}
+                    sx={{ textTransform: "none", borderRadius: "20px" }}
+                    startIcon={<CloudUploadRounded />}
+                  >
+                    Upload
+                    <StyledInput
+                      type="file"
+                      accept="image/*,"
+                      onChange={handleFileChange}
+                      multiple
+                    />
+                  </Button>
+                </Box>
+              </React.Fragment>
+
+              <React.Fragment>
                 <Typography variant="body2" mt={3} color={"text.secondary"}>
-                  Provide price quotation for this course in (
-                  <Typography component={"span"} variant="body2">
-                    KES
-                  </Typography>
-                  ). The price should lie between 1k to 5k. Metatron Charges 40%
-                  of the total price for video lectures uploaded directly on the
-                  platform from your local storage due to additional upload cost
-                  of 10% including the certificate of completion. Video lectures
-                  from external link sources such as MegaDrive, OneDrive or
-                  GoogleDrive are charged at 30% because the upload cost is cut
-                  by 10%. Currently, Acceptable external link sources for videos
-                  are: MegaDrive, OneDrive, DropBox and GoogleDrive only. Share
-                  the link of the recorded video lecture from the aforementioned
-                  sites for better user interaction curated for these sites
-                  only. N/B Certificate of completion is awarded to video
-                  lectures from local storage upload and the acceptable external
-                  sources only.
+                  Provide course price in dollars (USD). Metatron charges 40%
+                  fee of the total price that includes taxes, hosting fee,
+                  advertisement and recommendation to the potential students.
                 </Typography>
 
-                <Box mt={4} className="w-100 mb-2">
+                <Box className="w-100 mb-2">
                   <TextField
                     required
                     value={price}
-                    error={
-                      price.length > 4 ||
-                      (price.length < 4 && price.length !== 0) ||
-                      parseInt(price[0]) > 5
-                    }
-                    label={`Price in KES (1k-5k)`}
-                    placeholder="2500"
+                    label={"Price (USD)"}
+                    placeholder="30"
+                    type="number"
                     fullWidth
                     onChange={(e) => setPrice(e.target.value)}
                   />
                 </Box>
-              </Box>
+              </React.Fragment>
 
               {/* full video lecture */}
-              <Box mb={3}>
-                <Box
-                  className="my-2"
-                  display={"flex"}
-                  gap={3}
-                  justifyContent={"center"}
-                >
-                  <CloudUploadRounded
-                    color="primary"
-                    sx={{ width: 30, height: 30 }}
-                  />{" "}
-                  or
-                  <LinkRounded color="primary" sx={{ width: 30, height: 30 }} />
-                </Box>
-
+              <React.Fragment>
                 <Typography
                   gutterBottom
                   variant="body2"
@@ -851,394 +1001,231 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   mb={3}
                   color={"text.secondary"}
                 >
-                  Upload full video lecture from local storage or provide a
-                  video lecture link from an external source which should be
-                  from the recommended sources only: Megadrive, OneDrive,
-                  DropBox or GoogleDrive. Videos from local storage will cost
-                  40% of the total price due to added upload cost of 10% while
-                  those from external link sources 30%.
-                </Typography>
-
-                <Typography
-                  textAlign={"center"}
-                  variant="body2"
-                  gutterBottom
-                  color={"text.secondary"}
-                >
-                  Full video lecture
+                  Upload the full video lecture for the course. Its recommended
+                  that your video should not exceed 2GB and the quality should
+                  be standardised to 720p as the mininum.
                 </Typography>
 
                 {videoFullUpload && (
-                  <Typography
-                    gutterBottom
-                    textAlign={"center"}
-                    variant="body2"
-                    width={"100%"}
-                    color={"text.secondary"}
-                  >
-                    {`${videoFullUpload.name}`.substring(0, 30)}...
-                    {`${videoFullUpload.name}.`.split(".")[1]}
-                  </Typography>
-                )}
-
-                {!isVideoFullLink ? (
-                  <Box
-                    display={"flex"}
-                    justifyContent={"space-around"}
-                    alignItems={"center"}
-                    gap={1}
-                  >
-                    <Button
-                      component="label"
-                      role={undefined}
-                      variant="outlined"
-                      disableElevation
-                      tabIndex={-1}
-                      size="small"
-                      sx={{ textTransform: "lowercase", borderRadius: "20px" }}
-                      startIcon={<CloudUploadRounded />}
-                    >
-                      Upload File
-                      <StyledInput
-                        type="file"
-                        accept=".mp4, .mkv, .webp"
-                        onChange={(event) =>
-                          setVideoFullUpload(event.target.files[0])
-                        }
-                        multiple
-                      />
-                    </Button>
-                    <Typography variant="body2" color={"text.secondary"}>
-                      or
-                    </Typography>
-
-                    <Button
-                      variant="outlined"
-                      disableElevation
-                      sx={{ textTransform: "lowercase", borderRadius: "20px" }}
-                      onClick={handleFullVideoLink}
-                      size="small"
-                      startIcon={<LinkRounded />}
-                    >
-                      External Link
-                    </Button>
-                  </Box>
-                ) : (
-                  <>
-                    <Typography variant="body2" mt={3} color={"text.secondary"}>
-                      Provide the link or url pointing to your video full
-                      lecture that is stored in the cloud storage:(Google Drive,
-                      MegaDrive, DropBox or OneDrive).
-                    </Typography>
-
+                  <React.Fragment>
+                    {/* video box */}
                     <Box
-                      mt={4}
-                      className="w-100 mb-2"
                       display={"flex"}
-                      alignItems={"center"}
-                      gap={1}
+                      justifyContent={"center"}
+                      width={"100%"}
                     >
-                      <TextField
-                        required
-                        type="url"
-                        value={videoFullLink}
-                        label={`Paste full video link`}
-                        placeholder="https://...."
-                        fullWidth
-                        onChange={(e) => setVideoFullLink(e.target.value)}
-                      />
-                      {/* close button */}
-                      <IconButton onClick={handleCloseVideoFullLink}>
-                        <Tooltip title={"exit link"}>
-                          <Close />
-                        </Tooltip>
-                      </IconButton>
+                      <video
+                        controls
+                        className="rounded"
+                        muted
+                        autoFocus
+                        src={handleVideoFullPreview()}
+                        style={{ width: "95%" }}
+                        height={280}
+                        poster={previewCustomLogo}
+                      >
+                        <Typography
+                          textAlign={"center"}
+                          variant="body2"
+                          color={"error"}
+                        >
+                          video not supported
+                        </Typography>
+                      </video>
                     </Box>
-                  </>
-                )}
-              </Box>
-
-              {/* intro video lecture */}
-              <Box mb={3}>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  mb={3}
-                  color={"text.secondary"}
-                >
-                  Upload an introduction video which students can watch for free
-                  before deciding to buy the full course. The video lecture
-                  should be of length one minute maximum. Make it more
-                  encompassing to convince your audience that this course is
-                  what they have been looking for.
-                </Typography>
-
-                <Typography
-                  textAlign={"center"}
-                  variant="body2"
-                  gutterBottom
-                  color={"text.secondary"}
-                >
-                  Introduction video lecture
-                </Typography>
-
-                {videoIntroUpload && (
-                  <Typography
-                    gutterBottom
-                    textAlign={"center"}
-                    variant="body2"
-                    width={"100%"}
-                    color={"text.secondary"}
-                  >
-                    {`${videoIntroUpload.name}`.substring(0, 30)}...
-                    {`${videoIntroUpload.name}.`.split(".")[1]}
-                  </Typography>
-                )}
-
-                {!isVideoIntroLink ? (
-                  <Box
-                    display={"flex"}
-                    justifyContent={"space-around"}
-                    alignItems={"center"}
-                    gap={1}
-                  >
-                    <Button
-                      component="label"
-                      role={undefined}
-                      variant="outlined"
-                      disableElevation
-                      tabIndex={-1}
-                      size="small"
-                      sx={{ textTransform: "lowercase", borderRadius: "20px" }}
-                      startIcon={<CloudUploadRounded />}
-                    >
-                      Upload File
-                      <StyledInput
-                        type="file"
-                        accept=".mp4, .mkv, .webp"
-                        onChange={(event) =>
-                          setVideoIntroUpload(event.target.files[0])
-                        }
-                        multiple
-                      />
-                    </Button>
-                    <Typography variant="body2" color={"text.secondary"}>
-                      or
-                    </Typography>
-
-                    <Button
-                      variant="outlined"
-                      disableElevation
-                      sx={{ textTransform: "lowercase", borderRadius: "20px" }}
-                      onClick={handleVideoIntroLink}
-                      size="small"
-                      startIcon={<LinkRounded />}
-                    >
-                      External Link
-                    </Button>
-                  </Box>
-                ) : (
-                  <>
-                    <Typography variant="body2" mt={3} color={"text.secondary"}>
-                      Provide the link or url pointing to your video
-                      introduction lecture that is stored in the cloud
-                      storage:(Google Drive, MegaDrive, DropBox or OneDrive).
-                      Note: The intro video should be two minutes maximum
-                      length.
-                    </Typography>
-
-                    <Box
-                      mt={4}
-                      className="w-100 mb-2"
-                      display={"flex"}
-                      alignItems={"center"}
-                      gap={1}
-                    >
-                      <TextField
-                        required
-                        type="url"
-                        value={videoIntroLink}
-                        label={`Paste video intro link`}
-                        placeholder="https://...."
-                        fullWidth
-                        onChange={(e) => setVideoIntroLink(e.target.value)}
-                      />
-                      {/* close button */}
-                      <IconButton onClick={handleCloseVideoIntroLink}>
-                        <Tooltip title={"exit link"}>
-                          <Close />
-                        </Tooltip>
-                      </IconButton>
+                    {/* video name */}
+                    <Box display={"flex"} justifyContent={"center"}>
+                      <Typography variant="caption" color={"text.secondary"}>
+                        {videoFullUpload.name.split(".")[0].substring(0, 20)}
+                      </Typography>
                     </Box>
-                  </>
+                  </React.Fragment>
                 )}
-              </Box>
 
-              {/* video brochure */}
-              <Box mb={3}>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  mb={3}
-                  color={"text.secondary"}
-                >
-                  Upload an image or pdf brochure for this course which can be
-                  downloaded by any student freely. It should be a summarisation
-                  of the overal lecture including: Topics covered, practical
-                  projects done and lecture requirements if any. A good
-                  captivating brochure could convince many target group of
-                  individuals to buy your full course. Upload it from local
-                  storage or from an external link: OneDrive, GoogleDrive,
-                  MegaDrive or Dropbox
-                </Typography>
-
-                <Typography
-                  gutterBottom
-                  textAlign={"center"}
-                  variant="body2"
-                  color={"text.secondary"}
-                >
-                  Brochure for the lecture
-                </Typography>
-
-                {videoBrochureUpload && (
-                  <Typography
-                    gutterBottom
-                    textAlign={"center"}
-                    variant="body2"
-                    color={"text.secondary"}
+                <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+                  <Button
+                    component="label"
+                    role={undefined}
+                    variant="outlined"
+                    disableElevation
+                    tabIndex={-1}
+                    size="small"
+                    sx={{
+                      textTransform: "lowercase",
+                      borderRadius: "20px",
+                      width: CustomDeviceIsSmall()
+                        ? "75%"
+                        : CustomDeviceSmallest()
+                        ? "100%"
+                        : "50%",
+                    }}
+                    startIcon={<CloudUploadRounded />}
                   >
-                    {`${videoBrochureUpload.name}`.substring(0, 30)}...
-                    {`${videoBrochureUpload.name}.`.split(".")[1]}
-                  </Typography>
-                )}
+                    Select Course Video
+                    <StyledInput
+                      type="file"
+                      accept="video/*"
+                      onChange={handleFileChangeVideoFull}
+                      multiple
+                    />
+                  </Button>
+                </Box>
+              </React.Fragment>
 
-                {/* show when not brochure link button clicked */}
-                {!isBrochureLink ? (
-                  <Box
-                    display={"flex"}
-                    justifyContent={"space-around"}
-                    alignItems={"center"}
-                    gap={1}
-                  >
-                    <Button
-                      component="label"
-                      role={undefined}
-                      variant="outlined"
-                      disableElevation
-                      tabIndex={-1}
-                      size="small"
-                      sx={{ textTransform: "lowercase", borderRadius: "20px" }}
-                      startIcon={<CloudUploadRounded />}
-                    >
-                      Upload File
-                      <StyledInput
-                        type="file"
-                        accept="image/*, .pdf"
-                        onChange={(event) =>
-                          setVideoBrochureUpload(event.target.files[0])
-                        }
-                        multiple
-                      />
-                    </Button>
-                    <Typography variant="body2" color={"text.secondary"}>
-                      or
-                    </Typography>
-
-                    <Button
-                      variant="outlined"
-                      disableElevation
-                      sx={{ textTransform: "lowercase", borderRadius: "20px" }}
-                      onClick={handleBrochureLink}
-                      size="small"
-                      startIcon={<LinkRounded />}
-                    >
-                      External Link
-                    </Button>
-                  </Box>
-                ) : (
-                  <>
-                    <Typography variant="body2" mt={3} color={"text.secondary"}>
-                      Provide the link or url pointing to the brochure of your
-                      video lecture that is stored in the cloud storage:(Google
-                      Drive, MegaDrive, DropBox or OneDrive). The brochure
-                      should be an Image or PDF.
-                    </Typography>
-
-                    <Box
-                      mt={4}
-                      className="w-100 mb-2"
-                      display={"flex"}
-                      alignItems={"center"}
-                      gap={1}
-                    >
-                      <TextField
-                        required
-                        type="url"
-                        value={videoBrochureLink}
-                        label={`Paste brochure link`}
-                        placeholder="https://...."
-                        fullWidth
-                        onChange={(e) => setVideoBrochureLink(e.target.value)}
-                      />
-                      {/* close button */}
-                      <IconButton onClick={handleCloseBrochureLink}>
-                        <Tooltip title={"exit link"}>
-                          <Close />
-                        </Tooltip>
-                      </IconButton>
-                    </Box>
-                  </>
-                )}
-              </Box>
-
-              {/* course verification and validation contacts  */}
-              <Typography variant="body2" color={"text.secondary"} gutterBottom>
-                Note: This course may be required to undergoe verification and
-                validation processes before getting approved and published on
-                the platform. Please provide contacts that will facilitate our
-                techinical support team reaching out.
+              <Typography variant="body2" color={"text.secondary"}>
+                Provide the required link to your website or social media
+                platform which users or potential students to your course could
+                learn more about you.
               </Typography>
-
               {/* Email */}
               <Box className="mb-3">
                 <TextField
                   fullWidth
                   required
                   type="tel"
-                  value={instructor_phone}
-                  onChange={(e) => setInstructorPhone(e.target.value)}
-                  id="phone"
-                  label={"course chief instructor's phone"}
-                  placeholder="+254723679865"
+                  value={instructor_website}
+                  onChange={(e) => setInstructorWebsite(e.target.value)}
+                  id="website_instructor"
+                  label={"website"}
+                  placeholder="https://mywebsite.com"
                 />
               </Box>
+
+              <Typography variant="body2" color={"text.secondary"}>
+                Provide the required link to your GitHub profile which could
+                provide helpful information about your other worked on projects.
+              </Typography>
 
               {/* Email */}
               <Box mb={3}>
                 <TextField
                   fullWidth
-                  value={instructor_email}
-                  onChange={(e) => setInstructorEmail(e.target.value)}
+                  value={instructor_github}
+                  onChange={(e) => setInstructorGitHub(e.target.value)}
                   required
-                  type="email"
-                  id="email"
-                  label={"Course chief instructor's email"}
-                  placeholder="youremail@gmail.com"
+                  type="url"
+                  id="github_instructor"
+                  label={"GitHub"}
+                  placeholder="https://github/instructor.com"
                 />
               </Box>
 
-              <Box
-                className="my-3"
-                display={"flex"}
-                gap={3}
-                justifyContent={"center"}
-              >
-                <EditRounded color="primary" sx={{ width: 30, height: 30 }} />{" "}
-              </Box>
+              {/* topics covered */}
+              <React.Fragment>
+                <Stack mt={2} gap={1}>
+                  <Typography variant="body2" color={"text.secondary"}>
+                    Provide the topics or lectures that your course is aimed to
+                    debunk during the session. providing concise topics helps
+                    the students to anticipate the general flow of the course
+                    and could influence their preference of selection.
+                  </Typography>
+                  <Box
+                    display={"flex"}
+                    alignItems={"center"}
+                    width={"100%"}
+                    gap={1}
+                  >
+                    {/* topics added autocomplete */}
+                    <Autocomplete
+                      freeSolo
+                      className="w-100"
+                      options={topicsArray} // Show available options when user types
+                      value={topic_text}
+                      onInputChange={handleTextChangeTopic}
+                      disableClearable
+                      inputValue={topic_text}
+                      disabled={isUploading}
+                      onChange={handleTextChangeTopic}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Topic name"
+                          variant={
+                            CustomDeviceIsSmall() ? "standard" : "outlined"
+                          }
+                          placeholder="Introduction To React"
+                          fullWidth
+                        />
+                      )}
+                      onKeyUp={(e) => {
+                        if (e.key === "Enter" && topic_text?.trim() !== "") {
+                          handleAddUpdateTopic();
+                        }
+                      }}
+                    />
+
+                    {/* add button */}
+                    <IconButton
+                      className="border"
+                      onClick={handleAddUpdateTopic}
+                      disabled={!topic_text || isUploading}
+                    >
+                      <Add color="primary" sx={{ width: 16, height: 16 }} />
+                    </IconButton>
+                  </Box>
+                </Stack>
+
+                {/* display  latest previous topics or lectures */}
+                <Box mb={1}>
+                  {topicsArray.length > 0 && (
+                    <Box mt={2} mb={2}>
+                      <Box
+                        component={"ol"}
+                        bgcolor={isDarkMode ? undefined : "#f1f1f1"}
+                        className={isDarkMode ? "border" : "rounded"}
+                      >
+                        {/* available topics */}
+                        <Box
+                          display={"flex"}
+                          justifyContent={"center"}
+                          mb={1}
+                          width={"100%"}
+                        >
+                          <Typography
+                            width={"100%"}
+                            variant="caption"
+                            textTransform={"capitalize"}
+                            fontWeight={"bold"}
+                            sx={{
+                              textDecoration: "underline",
+                            }}
+                            color={"text.secondary"}
+                          >
+                            available course lectures or topics
+                          </Typography>
+                        </Box>
+                        {topicsArray.map((topic, index) => (
+                          <Box
+                            display={"flex"}
+                            gap={1}
+                            key={index}
+                            alignItems={"center"}
+                          >
+                            <Typography
+                              component={"li"}
+                              variant="caption"
+                              fontWeight={"bold"}
+                              color="text.secondary"
+                            >
+                              {topic}
+                            </Typography>
+                            {/* clear or delete icon */}
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeleteUpdateTopic(topic)}
+                            >
+                              <Close sx={{ width: 15, height: 15 }} />
+                            </IconButton>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
+              </React.Fragment>
 
               <Typography variant="body2" color={"text.secondary"}>
-                Describe your course in details; explaining the important areas
+                Describe your course in details explaining the important areas
                 that your are going to tackle. Providing a good description
                 could convince many students to enrol into your course.
               </Typography>
@@ -1248,11 +1235,11 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   minRows={window.screen.availWidth <= 320 ? 5 : 10}
                   multiline
                   contentEditable={false}
-                  error={description.length > 2000}
+                  error={description.length > 1000}
                   id="descr-course"
                   label={
                     <p>
-                      {`description  ${2000 - description.length} characters`} *
+                      {`Description  ${1000 - description.length} characters`} *
                     </p>
                   }
                   fullWidth
@@ -1260,6 +1247,22 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="whats on your mind..."
                 />
+              </Box>
+
+              {/*  button for posting */}
+              <Box display={"flex"} justifyContent={"center"} mb={2}>
+                <Button
+                  onClick={handleUploadCourse}
+                  startIcon={<SchoolRounded />}
+                  className={
+                    CustomDeviceIsSmall() ? "w-75 rounded-5" : "w-50 rounded-5"
+                  }
+                  variant="contained"
+                  disabled={isUploading || errorMessage}
+                  size="small"
+                >
+                  Upload Your Course
+                </Button>
               </Box>
             </Box>
           </Box>

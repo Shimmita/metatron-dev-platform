@@ -13,6 +13,17 @@ const currentPosts = createSlice({
     updateCurrentPosts: (state, action) => {
       state.posts = action.payload;
     },
+    // update specific post i.e likes,comments etc
+    updateCurrentPostDetails: (state, action) => {
+      const updatedPost = action.payload;
+      const index = state.posts.findIndex(
+        (post) => post._id === updatedPost._id
+      );
+      // post present
+      if (index !== -1) {
+        state.posts[index] = { ...state.posts[index], ...updatedPost };
+      }
+    },
 
     // nullify user and fale online
     resetClearCurrentPosts: (state) => {
@@ -22,8 +33,11 @@ const currentPosts = createSlice({
 });
 
 // exporting actions
-export const { updateCurrentPosts, resetClearCurrentPosts } =
-  currentPosts.actions;
+export const {
+  updateCurrentPosts,
+  resetClearCurrentPosts,
+  updateCurrentPostDetails,
+} = currentPosts.actions;
 
 // exporting the main fun reducer
 export default currentPosts.reducer;

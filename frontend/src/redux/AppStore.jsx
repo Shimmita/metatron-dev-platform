@@ -16,6 +16,7 @@ import currentPaginationReducer from "./CurrentPagination";
 import currentPostsReducer from "./CurrentPosts";
 import currentSnackReducer from "./CurrentSnackBar";
 import currentUserReducer from "./CurrentUser";
+import currentPostReactionsReducer from "./CurrentPostReactions";
 
 // Configure persist settings
 const persistConfig = {
@@ -37,6 +38,7 @@ const rootReducer = combineReducers({
   currentJobsTop: currentJobsTopReducer,
   currentJobSearch: currentJobSearchReducer,
   currentChatBot: currentChatBot,
+  currentPostReactions: currentPostReactionsReducer,
 });
 
 // Persist the root reducer

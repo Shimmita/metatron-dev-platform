@@ -213,8 +213,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
     setDescription((prev) => prev.filter((val) => val !== desc));
   };
 
-   // Handle adding desc
-   const handleAddDesc = () => {
+  // Handle adding desc
+  const handleAddDesc = () => {
     if (desc_text.trim() !== "") {
       // Add the inputText as a new desc if it's not empty
       setDescription((prev) => [...prev, desc_text.trim()]);
@@ -317,8 +317,6 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
     return true;
   };
-
-
 
   // create job object
   const job = {

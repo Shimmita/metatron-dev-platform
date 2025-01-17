@@ -634,7 +634,7 @@ const SubsectionTech = {
     "ARCore",
     "Flutter",
   ].sort(),
-  Containerisation: ["Docker", "Kubernetes"].sort(),
+  Containerisation: ["Docker", "Kubernetes", "Helm"].sort(),
   Desktop: [
     "Qt",
     "wxWidgets (C++)",

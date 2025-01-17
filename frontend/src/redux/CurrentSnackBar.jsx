@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialstate = {
   messageSnackPostTech: "",
   messageSnack: "",
+  messageNotification: null,
 };
 
 const CurrentSnackBar = createSlice({
@@ -18,10 +19,16 @@ const CurrentSnackBar = createSlice({
       state.messageSnack = action.payload;
     },
 
+    // update notif message for notifications sections only
+    updateNotificationSnackBar: (state, action) => {
+      state.messageNotification = action.payload;
+    },
+
     // nullify user and fale online
     resetClearCurrentSnack: (state) => {
       state.messageSnack = "";
       state.messageSnackPostTech = "";
+      state.messageNotification = null;
     },
   },
 });
@@ -30,6 +37,7 @@ const CurrentSnackBar = createSlice({
 export const {
   updateCurrentSnackBar,
   updateCurrentSnackPostSuccess,
+  updateNotificationSnackBar,
   resetClearCurrentSnack,
 } = CurrentSnackBar.actions;
 

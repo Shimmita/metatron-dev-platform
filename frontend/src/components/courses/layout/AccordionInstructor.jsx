@@ -114,17 +114,7 @@ export default function AccordionInstructor({ instructor }) {
             </Box>
           </Box>
 
-          <Typography
-            gutterBottom
-            mt={2}
-            variant="body2"
-            color={"text.secondary"}
-          >
-            {" "}
-            Active Contacts
-          </Typography>
-
-          <Box display={"flex"} justifyContent={"center"}>
+          <Box display={"flex"} justifyContent={"center"} mt={2}>
             <Box
               display={"flex"}
               width={"100%"}
