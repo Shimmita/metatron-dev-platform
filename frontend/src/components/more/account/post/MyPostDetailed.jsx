@@ -30,7 +30,7 @@ import { resetDefaultBottomNav } from "../../../../redux/AppUI";
 import PostData from "../../../data/PostData";
 import CustomDeviceIsSmall from "../../../utilities/CustomDeviceIsSmall";
 import CustomDeviceScreenSize from "../../../utilities/CustomDeviceScreenSize";
-const CommentContainer = lazy(() => import("../../../custom/CommentContainer"));
+const CommentContainer = lazy(() => import("../../../post/CommentContainer"));
 
 const MyPostDetailed = () => {
   const [showComment, setShowComment] = useState(false);

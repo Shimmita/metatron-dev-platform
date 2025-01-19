@@ -1,27 +1,32 @@
 import {
   Diversity3Rounded,
+  GradeRounded,
   LaptopRounded,
+  LocationOnRounded,
   Message,
   PersonAdd,
-  StarRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
+  AvatarGroup,
   Button,
   Divider,
   Skeleton,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
+import axios from "axios";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
 import { resetDefaultBottomNav } from "../../redux/AppUI";
+import PostDetailsContainer from "../post/PostDetailsContiner";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import { getImageMatch } from "../utilities/getImageMatch";
 const UserPost = lazy(() => import("./UserPostContainer"));
 const UserAbout = lazy(() => import("./UserAbout"));
 const StyledTabs = styled((props) => (
@@ -60,10 +65,18 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
 );
 
 export default function UserProfile() {
-  const [value, setValue] = React.useState(0);
+  const [isFetching, setIsFetching] = useState(true);
+  const [profileData, setProfileData] = useState();
+  const [erroMessage, setErrorMesssage] = useState("");
+  // for full post details rendering
+  const [postDetailedData, setPostDetailedData] = useState();
+  // controls the tab to be displayed
+  const [profileSection, setProfileSection] = React.useState(0);
+  // extracting the id from request prams
+  const { id: userId } = useParams();
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setProfileSection(newValue);
   };
 
   // redux to stop showing of the speed dial
@@ -72,39 +85,52 @@ export default function UserProfile() {
     dispatch(resetDefaultBottomNav(true));
   });
 
-  // handle going back using history
-  const handleGoBack = () => {
-    window.history.back();
-  };
-
-  // simulate loading of requests
-  const [isLoadingRequest, setIsLoadingRequest] = useState(true);
-
+  // axios default credentials
+  axios.defaults.withCredentials = true;
   useEffect(() => {
-    setTimeout(() => {
-      setIsLoadingRequest(false);
-    }, 5000);
-  }, []);
+    // fetch details of the liked or reacted user based on their id
+    axios
+      .get(`http://localhost:5000/metatron/api/v1/users/all/${userId}`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        if (res?.data) {
+          setProfileData(res.data);
+        }
+      })
+      .catch((err) => {
+        // there is an error
+        if (err?.code === "ERR_NETWORK") {
+          // update the snackbar notification of the error of connection
+          setErrorMesssage("Network Error");
+          return;
+        }
+        // update the snackbar notification of error from the server
+        setErrorMesssage(err?.response.data);
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  }, [userId, dispatch]);
+
+  // handle country length to only two names
+  const handleCountryName = (country) => {
+    const parent = country?.split(" ");
+    const parentName =
+      parent?.length < 4 ? parent[1] : `${parent[1]} ${parent[2]}`;
+
+    return parentName;
+  };
 
   return (
     <Box
       height={CustomDeviceIsSmall() ? "91.7vh" : "91vh"}
       color={"text.primary"}
     >
-      <Box display={"flex"} justifyContent={"center"}>
-        <Button
-          className="shadow"
-          variant="text"
-          onClick={handleGoBack}
-          sx={{ borderRadius: "20px" }}
-        >
-          Back
-        </Button>
-      </Box>
-
       <Box
-        height={"78vh"}
-        className="shadow rounded p-1"
+        height={"80vh"}
+        className={!CustomDeviceIsSmall() && "shadow rounded p-2"}
         sx={{
           overflowX: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
@@ -116,170 +142,241 @@ export default function UserProfile() {
           "scrollbar-width": "none",
         }}
       >
-        {isLoadingRequest ? (
-          <Box width={"100%"}>
-            <Box display={"flex"} justifyContent={"center"} mb={1}>
-              <Skeleton
-                animation="wave"
-                variant="circular"
-                width={60}
-                height={60}
-              />
-            </Box>
-
-            <Box>
-              <Skeleton
-                animation="wave"
-                variant="rectangular"
-                height={"70vh"}
-              />
-            </Box>
+        {/* displayed for full post details when data is present */}
+        {postDetailedData ? (
+          <Box>
+            <PostDetailsContainer
+              postDetailedData={postDetailedData}
+              setPostDetailedData={setPostDetailedData}
+            />
           </Box>
         ) : (
-          <Box>
-            <Box>
-              <Box display={"flex"} mt={1} justifyContent={"center"}>
-                <Avatar
-                  src={devImage}
-                  alt="user-image"
-                  sx={{ width: 100, height: 100 }}
-                />
-              </Box>
+          <React.Fragment>
+            {/* shown when fetching is on progress */}
+            {isFetching && (
+              <Box width={"100%"}>
+                <Box display={"flex"} justifyContent={"center"} mb={1}>
+                  <Skeleton
+                    animation="wave"
+                    variant="circular"
+                    width={60}
+                    height={60}
+                  />
+                </Box>
 
-              <Box display={"flex"} justifyContent={"center"} mb={1}>
-                <Typography fontWeight={"bold"} mt={1} variant="body1">
-                  Shimmita Douglas
-                </Typography>
+                <Box>
+                  <Skeleton
+                    animation="wave"
+                    variant="rectangular"
+                    height={"70vh"}
+                  />
+                </Box>
               </Box>
-
+            )}
+            {/* shown when there is an error */}
+            {erroMessage && (
               <Box
                 display={"flex"}
                 justifyContent={"center"}
-                mb={2}
-                gap={1}
-                alignItems={"center"}
+                width={"100%"}
+                flexDirection={"column"}
+                height={"50vh"}
               >
-                <LaptopRounded sx={{ width: 17, height: 17 }} />
-                <Typography color={"text.secondary"} variant="body2">
-                  Software Engineer
-                </Typography>
+                <Box display={"flex"} justifyContent={"center"}>
+                  <Typography variant="body2" color={"text.secondary"}>
+                    {erroMessage}
+                  </Typography>
+                </Box>
               </Box>
+            )}
+            {/* shown when there is profile info */}
+            {profileData && (
+              <Box>
+                <Box>
+                  <Box display={"flex"} mt={1} justifyContent={"center"}>
+                    <Avatar
+                      src={devImage}
+                      alt="user-image"
+                      sx={{ width: 80, height: 80 }}
+                    />
+                  </Box>
+                  {/* name of the user */}
+                  <Box display={"flex"} justifyContent={"center"} mb={1}>
+                    <Typography
+                      fontWeight={"bold"}
+                      mt={1}
+                      variant="body1"
+                      textTransform={"uppercase"}
+                    >
+                      {profileData?.name}
+                    </Typography>
+                  </Box>
+                  {/* specialisation */}
+                  <Box
+                    display={"flex"}
+                    justifyContent={"center"}
+                    mb={1}
+                    gap={1}
+                    alignItems={"center"}
+                  >
+                    <LaptopRounded sx={{ width: 17, height: 17 }} />
+                    <Typography color={"text.secondary"} variant="body2">
+                      {profileData?.specialisationTitle}
+                    </Typography>
+                  </Box>
+                  {/* location of the user */}
+                  <Box>
+                    <Typography
+                      color={"text.secondary"}
+                      variant="body2"
+                      display={"flex"}
+                      gap={1}
+                      alignItems={"center"}
+                      justifyContent={"center"}
+                      mb={2}
+                    >
+                      <LocationOnRounded sx={{ width: 15, height: 15 }} />
+                      {/* call this if only miniprofile data present */}
+                      {profileData &&
+                        handleCountryName(profileData?.country)} |{" "}
+                      {profileData?.county} | 12,000
+                      <Diversity3Rounded sx={{ width: 17, height: 17 }} />
+                    </Typography>
+                  </Box>
+                  <Divider component={"div"} />
 
-              <Box
-                display={"flex"}
-                justifyContent={"center"}
-                mb={2}
-                gap={1}
-                alignItems={"center"}
-              >
-                <StarRounded sx={{ width: 20, height: 20 }} />
-                <Typography color={"text.secondary"} variant="body2">
-                  Nodejs | Python | React | Android
-                </Typography>
+                  <Box
+                    display={"flex"}
+                    justifyContent={"center"}
+                    mb={1}
+                    mt={1}
+                    gap={1}
+                    alignItems={"center"}
+                  >
+                    <GradeRounded
+                      sx={{ width: 20, height: 20 }}
+                      color="warning"
+                    />
+                    {/* skills avatars */}
+                    <Box display={"flex"} justifyContent={"center"}>
+                      <AvatarGroup max={profileData?.selectedSkills?.length}>
+                        {/* loop through the skills and their images matched using custim fn */}
+                        {profileData?.selectedSkills?.map((skill, index) => (
+                          <Avatar
+                            key={index}
+                            alt={skill}
+                            src={getImageMatch(skill)}
+                            sx={{ width: 34, height: 34 }}
+                            className="border"
+                          />
+                        ))}
+                      </AvatarGroup>
+                    </Box>
+                  </Box>
+                  <Divider component={"div"} />
+                  <Box
+                    display={"flex"}
+                    justifyContent={"space-around"}
+                    alignItems={"center"}
+                    m={2}
+                  >
+                    <Button
+                      variant="contained"
+                      disableElevation
+                      startIcon={<PersonAdd />}
+                      sx={{ borderRadius: 5, fontWeight: "bold" }}
+                    >
+                      <Typography variant="body2">
+                        <small
+                          style={{
+                            fontSize: "small",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          Follow
+                        </small>
+                      </Typography>
+                    </Button>
+
+                    <Button
+                      variant="contained"
+                      disableElevation
+                      startIcon={<Message />}
+                      sx={{ borderRadius: 5, fontWeight: "bold" }}
+                    >
+                      <Typography variant="body2">
+                        <small
+                          style={{
+                            fontSize: "small",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          Message
+                        </small>
+                      </Typography>
+                    </Button>
+                  </Box>
+                </Box>
+
+                <Divider component={"div"} />
+
+                <Box className="mt-2 d-flex justify-content-center align-items-center">
+                  <StyledTabs
+                    value={profileSection}
+                    onChange={handleChange}
+                    aria-label="styled tabs"
+                  >
+                    {/* posts made by the user */}
+                    <StyledTab
+                      className="pe-5"
+                      label={
+                        <Typography className=" fw-bold" variant="body2">
+                          Post
+                        </Typography>
+                      }
+                    />
+
+                    {/* user's connections of people */}
+                    <StyledTab
+                      className="pe-3 ps-3"
+                      label={
+                        <Typography className="fw-bold" variant="body2">
+                          Network
+                        </Typography>
+                      }
+                    />
+
+                    {/* info more about the user */}
+                    <StyledTab
+                      label={
+                        <Typography className="ps-5 fw-bold" variant="body2">
+                          About
+                        </Typography>
+                      }
+                    />
+                  </StyledTabs>
+                </Box>
+
+                {/* content of each tab goes here */}
+                <Box>
+                  <Suspense fallback={<div>loading...</div>}>
+                    {/* posts made by the user */}
+                    {profileSection === 0 && (
+                      <UserPost
+                        userId={userId}
+                        setPostDetailedData={setPostDetailedData}
+                      />
+                    )}
+                    {/* user network of people */}
+                    {/* about view */}
+                    {profileSection === 2 && (
+                      <UserAbout profileData={profileData} />
+                    )}
+                  </Suspense>
+                </Box>
               </Box>
-
-              <Divider component={"div"} />
-
-              <Box
-                display={"flex"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-                m={2}
-              >
-                <Tooltip arrow title={"connect"}>
-                  <Button
-                    disableElevation
-                    startIcon={<PersonAdd />}
-                    sx={{ borderRadius: 5, fontWeight: "bold" }}
-                  >
-                    <Typography variant="body2">
-                      <small
-                        style={{
-                          fontSize: "small",
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        connect
-                      </small>
-                    </Typography>
-                  </Button>
-                </Tooltip>
-
-                <Tooltip arrow title={"network"}>
-                  <Button
-                    disableElevation
-                    startIcon={<Diversity3Rounded />}
-                    sx={{ borderRadius: 5, fontWeight: "bold" }}
-                  >
-                    <Typography variant="body2">
-                      <small
-                        style={{
-                          fontSize: "small",
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        300
-                      </small>
-                    </Typography>
-                  </Button>
-                </Tooltip>
-
-                <Tooltip arrow title={"send message"}>
-                  <Button
-                    disableElevation
-                    startIcon={<Message />}
-                    sx={{ borderRadius: 5, fontWeight: "bold" }}
-                  >
-                    <Typography variant="body2">
-                      <small
-                        style={{
-                          fontSize: "small",
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        Message
-                      </small>
-                    </Typography>
-                  </Button>
-                </Tooltip>
-              </Box>
-            </Box>
-
-            <Divider component={"div"} />
-
-            <Box className="mt-2 d-flex justify-content-center align-items-center">
-              <StyledTabs
-                value={value}
-                onChange={handleChange}
-                aria-label="styled tabs"
-              >
-                <StyledTab
-                  className="pe-3"
-                  label={
-                    <Typography className="pe-5 fw-bold" variant="body2">
-                      Post
-                    </Typography>
-                  }
-                />
-                <StyledTab
-                  className="ps-3"
-                  label={
-                    <Typography className="ps-5 fw-bold" variant="body2">
-                      About
-                    </Typography>
-                  }
-                />
-              </StyledTabs>
-            </Box>
-
-            {/* content of each tab goes here */}
-            <Box>
-              <Suspense fallback={<div>loading...</div>}>
-                {value === 0 && <UserPost />}
-                {value === 1 && <UserAbout />}
-              </Suspense>
-            </Box>
-          </Box>
+            )}
+          </React.Fragment>
         )}
       </Box>
     </Box>

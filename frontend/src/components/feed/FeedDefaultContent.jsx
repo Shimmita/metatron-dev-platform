@@ -10,6 +10,7 @@ import {
 } from "../../redux/AppUI";
 import { updateCurrentPosts } from "../../redux/CurrentPosts";
 import CardFeed from "../custom/CardFeed";
+import PostDetailsContainer from "../post/PostDetailsContiner";
 import MobileTabCorousel from "../rightbar/MobileTabCorousel";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
@@ -22,6 +23,9 @@ const FeedDefaultContent = () => {
   const [openAlertNoPosts, setOpenAlertNoPosts] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // will be used when the post is focused for full details
+  const [postDetailedData, setPostDetailedData] = useState();
   // axios default credentials
   axios.defaults.withCredentials = true;
 
@@ -94,73 +98,102 @@ const FeedDefaultContent = () => {
 
   return (
     <React.Fragment>
-      <Box height={isFetching ? "91vh" : undefined}>
-        {/* show progress loader when is fetching true */}
-        {isFetching && (
+      {/* render the post is focused for full viewing and that post detailed
+      data is no null */}
+      {postDetailedData && postDetailedData ? (
+        <Box height={CustomDeviceIsSmall() ? "91.7vh" : "91vh"}>
           <Box
             height={"80vh"}
-            width={"100%"}
-            display={"flex"}
-            justifyContent={"center"}
-            alignItems={"center"}
-            className="shadow rounded"
+            className={!CustomDeviceIsSmall() && "shadow rounded p-2"}
+            sx={{
+              overflowX: "auto",
+              // Hide scrollbar for Chrome, Safari and Opera
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+              // Hide scrollbar for IE, Edge and Firefox
+              "-ms-overflow-style": "none",
+              "scrollbar-width": "none",
+            }}
           >
-            <Box>
-              <Box display={"flex"} justifyContent={"center"}>
-                <CircularProgress size={"30px"} />
-              </Box>
-              <Typography
-                mt={2}
-                textAlign={"center"}
-                color={"text.secondary"}
-                variant="body2"
-              >
-                posts ...
-              </Typography>
-            </Box>
+            <PostDetailsContainer
+              postDetailedData={postDetailedData}
+              setPostDetailedData={setPostDetailedData}
+            />
           </Box>
-        )}
-        {/* map through the posts and display them to the user */}
-        {posts &&
-          posts.map((post, index) => {
-            return (
-              <Box key={index}>
-                <Box className="mb-3">
-                  {/* corousel of top pics */}
-                  {(CustomDeviceIsSmall() || CustomDeviceTablet()) &&
-                  index === 0 ? (
-                    <MobileTabCorousel />
-                  ) : null}
+        </Box>
+      ) : (
+        <Box height={isFetching ? "91vh" : undefined}>
+          {/* show progress loader when is fetching true */}
+          {isFetching && (
+            <Box
+              height={"80vh"}
+              width={"100%"}
+              display={"flex"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              className="shadow rounded"
+            >
+              <Box>
+                <Box display={"flex"} justifyContent={"center"}>
+                  <CircularProgress size={"30px"} />
                 </Box>
-
-                <Box>
-                  {/* feed card detailed post */}
-                  <CardFeed post={post} />
-                  {/* show refresh button when the item is last */}
-                  {index === posts.length - 1 && (
-                    <Box
-                      display={"flex"}
-                      justifyContent={"center"}
-                      m={2}
-                      mb={
-                        CustomDeviceTablet() || CustomDeviceIsSmall() ? 16 : 8
-                      }
-                    >
-                      <Button
-                        className="rounded-5"
-                        size="medium"
-                        sx={{ textTransform: "capitalize" }}
-                        variant="contained"
-                      >
-                        Browse
-                      </Button>
-                    </Box>
-                  )}
-                </Box>
+                <Typography
+                  mt={2}
+                  textAlign={"center"}
+                  color={"text.secondary"}
+                  variant="body2"
+                >
+                  posts ...
+                </Typography>
               </Box>
-            );
-          })}
-      </Box>
+            </Box>
+          )}
+          {/* map through the posts and display them to the user */}
+          {posts &&
+            posts.map((post, index) => {
+              return (
+                <Box key={index}>
+                  <Box className="mb-3">
+                    {/* corousel of top pics */}
+                    {(CustomDeviceIsSmall() || CustomDeviceTablet()) &&
+                    index === 0 ? (
+                      <MobileTabCorousel />
+                    ) : null}
+                  </Box>
+
+                  <Box>
+                    {/* feed card detailed post */}
+                    <CardFeed
+                      post={post}
+                      setPostDetailedData={setPostDetailedData}
+                    />
+                    {/* show refresh button when the item is last */}
+                    {index === posts.length - 1 && (
+                      <Box
+                        display={"flex"}
+                        justifyContent={"center"}
+                        m={2}
+                        mb={
+                          CustomDeviceTablet() || CustomDeviceIsSmall() ? 16 : 8
+                        }
+                      >
+                        <Button
+                          className="rounded-5"
+                          size="medium"
+                          sx={{ textTransform: "capitalize" }}
+                          variant="contained"
+                        >
+                          Browse
+                        </Button>
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+              );
+            })}
+        </Box>
+      )}
 
       {/* display chat bot */}
       <AlertChatBot />

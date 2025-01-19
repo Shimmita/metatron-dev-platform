@@ -1,5 +1,5 @@
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
-import { Box } from "@mui/material";
+import { Avatar, Box } from "@mui/material";
 import MuiAccordion from "@mui/material/Accordion";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import MuiAccordionSummary, {
@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentPostReactions } from "../../../redux/CurrentPostReactions";
 import PostReaction from "./PostReaction";
+import logoApp from "../../../images/logo_sm.png";
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
@@ -99,16 +100,19 @@ export default function NotifAccordionLayout() {
   }, [dispatch, _id]);
 
   return (
-    <div>
+    <Box>
       {/* accordion post reactions notif */}
       <Accordion
         expanded={expanded === "panel1"}
         onChange={handleChange("panel1")}
       >
         <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
-          <Typography component="span" variant="body2" fontWeight={"bold"}>
-            Post Reactions
-          </Typography>
+          <Box display={"flex"} alignItems={"center"} gap={1}>
+            <Avatar src={logoApp} alt="" />
+            <Typography component="span" variant="body2" fontWeight={"bold"}>
+              Post Reactions
+            </Typography>
+          </Box>
         </AccordionSummary>
         <AccordionDetails>
           <Box
@@ -134,6 +138,6 @@ export default function NotifAccordionLayout() {
       {/* accordion metatron notifications */}
 
       {/* accordion advertisement */}
-    </div>
+    </Box>
   );
 }

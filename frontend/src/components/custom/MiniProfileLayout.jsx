@@ -1,4 +1,4 @@
-import { Close } from "@mui/icons-material";
+import { Close, Diversity3Rounded } from "@mui/icons-material";
 import {
   Alert,
   Avatar,
@@ -15,8 +15,8 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
-import { getImageMatch } from "../../utilities/getImageMatch";
+import { updateNotificationSnackBar } from "../../redux/CurrentSnackBar";
+import { getImageMatch } from "../utilities/getImageMatch";
 
 export default function MiniProfileLayout({
   handleShowMiniProfile,
@@ -28,6 +28,8 @@ export default function MiniProfileLayout({
   const [miniProfileData, setMiniProfileData] = useState();
   const [errorPresent, setErrorPresent] = useState(false);
   const dispatch = useDispatch();
+  // axios default credentials
+  axios.defaults.withCredentials = true;
 
   useEffect(() => {
     // fetch details of the liked or reacted user based on their id
@@ -59,9 +61,9 @@ export default function MiniProfileLayout({
 
   // handle country length to only two names
   const handleCountryName = (country) => {
-    const parent = country.split(" ");
+    const parent = country?.split(" ");
     const parentName =
-      parent.length < 4 ? parent[1] : `${parent[1]} ${parent[2]}`;
+      parent?.length < 4 ? parent[1] : `${parent[1]} ${parent[2]}`;
 
     return parentName;
   };
@@ -141,11 +143,24 @@ export default function MiniProfileLayout({
               <Box display={"flex"} justifyContent={"center"} gap={1}>
                 {/* country */}
                 <Typography variant="body2" color={"text.secondary"}>
-                  {handleCountryName(miniProfileData?.country)}
+                  {/* call this if only miniprofile data present */}
+                  {miniProfileData &&
+                    handleCountryName(miniProfileData?.country)}
                 </Typography>
                 |{/* state or county */}
                 <Typography variant="body2" color={"text.secondary"}>
                   {miniProfileData?.county}
+                </Typography>
+                |
+                <Typography
+                  variant="body2"
+                  color={"text.secondary"}
+                  display={"flex"}
+                  alignItems={"center"}
+                  gap={1}
+                >
+                  12,000
+                  <Diversity3Rounded sx={{ width: 20, height: 20 }} />
                 </Typography>
               </Box>
 
@@ -172,17 +187,33 @@ export default function MiniProfileLayout({
                 >
                   Message
                 </Button>
+                {/* add friends */}
+                <Button
+                  variant="contained"
+                  disableElevation
+                  size="small"
+                  sx={{ textTransform: "capitalize", borderRadius: "20px" }}
+                >
+                  Follow
+                </Button>
               </Box>
 
               {/* divider */}
               <Divider className="p-1" component={"div"} />
               {/* skills avatars */}
-              <AvatarGroup max={miniProfileData?.selectedSkills?.length}>
-                {/* loop through the skills and their images matched using custim fn */}
-                {miniProfileData?.selectedSkills?.map((skill, index) => (
-                  <Avatar key={index} alt={skill} src={getImageMatch(skill)} />
-                ))}
-              </AvatarGroup>
+              <Box display={"flex"} justifyContent={"center"}>
+                <AvatarGroup max={miniProfileData?.selectedSkills?.length}>
+                  {/* loop through the skills and their images matched using custim fn */}
+                  {miniProfileData?.selectedSkills?.map((skill, index) => (
+                    <Avatar
+                      key={index}
+                      alt={skill}
+                      className="border"
+                      src={getImageMatch(skill)}
+                    />
+                  ))}
+                </AvatarGroup>
+              </Box>
 
               {/* divider */}
               <Divider className="p-1" component={"div"} />

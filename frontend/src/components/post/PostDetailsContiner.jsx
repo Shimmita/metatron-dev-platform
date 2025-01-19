@@ -1,379 +1,188 @@
 import {
-  Avatar,
+  Alert,
   Badge,
   Box,
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Checkbox,
+  CircularProgress,
+  Collapse,
   IconButton,
   InputBase,
-  Skeleton,
-  Tooltip,
-  Typography,
+  Stack,
 } from "@mui/material";
 
-import {
-  FavoriteRounded,
-  ForumRounded,
-  GitHub,
-  SendOutlined,
-  VerifiedRounded,
-  WbIncandescentRounded,
-} from "@mui/icons-material";
+import { Close, SendOutlined } from "@mui/icons-material";
 
-import React, { lazy, useEffect, useState } from "react";
-import { Image } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import devImage from "../../images/dev.jpeg";
-import { resetDefaultBottomNav } from "../../redux/AppUI";
-import PostData from "../data/PostData";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
+import axios from "axios";
+import React, { lazy, useState } from "react";
+import { useSelector } from "react-redux";
+import PostDetailsFeed from "./PostDetailsFeed";
+import CustomCountryName from "../utilities/CustomCountryName";
 
-const CommentContainer = lazy(() => import("../custom/CommentContainer"));
-function PostDetailsContainer() {
-  // redux to stop showing of the speed dial
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(resetDefaultBottomNav(true));
-  });
+const CommentContainer = lazy(() => import("./CommentContainer"));
+function PostDetailsContainer({ postDetailedData, setPostDetailedData }) {
+  // hold temporarily the post param, could mutate its values
+  const [isUploading, setIsUploading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // handle going back using history
-  const handleGoBack = () => {
-    window.history.back();
-  };
-
-  const [showComment, setShowComment] = useState(false);
   const [comment, setComment] = useState("");
 
-  // show reply in the post details page
-  const handleReplyPost = () => {
-    setShowComment((prev) => !prev);
+  // axios default credentials
+  axios.defaults.withCredentials = true;
+  // redux states
+  const { user } = useSelector((state) => state.currentUser);
+  // extract basic current user details
+  const {
+    _id,
+    avatar,
+    name,
+    specialisationTitle: title,
+  } = user || {};
+
+    const country = CustomCountryName(postDetailedData?.post_location?.country);
+  
+  // current user info
+  const reactingUserInfo = {
+    userId: _id,
+    ownerId: postDetailedData.post_owner.ownerId,
+    postId: postDetailedData._id,
+    avatar,
+    name,
+    country,
+    title,
   };
 
-  // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
-  // screen width of the device
-  const screenWidth = window.screen.availWidth;
+  // complete sendin of the comment to the backend
+  const handleSendCommentNow = () => {
+    // sending the post tile embed in message and will split for separation backend
+    let message = `commented on your post.${postDetailedData?.post_title?.substring(0,25)}`;
+    // add the above properties to the userInfo that is being sent to the backend
+    reactingUserInfo.message = message;
+    reactingUserInfo.minimessage = comment;
+    // add users to the liked clickers group and increment the value of clicks
+    setIsUploading(true);
+    // performing post request
+    axios
+      .put(
+        `http://localhost:5000/metatron/api/v1/posts/update/comments`,
+        reactingUserInfo,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        // update passedPost with the returned post object
+        setPostDetailedData(res.data);
+      })
+      .catch(async (err) => {
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("Server Unreachable");
+          return;
+        }
 
-  // simulate loading of requests
-  const [isLoadingRequest, setIsLoadingRequest] = useState(true);
+        setErrorMessage(err?.response.data);
+      })
+      .finally(() => {
+        setIsUploading(false);
+        // set comment to empty
+        setComment("");
+      });
+  };
 
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoadingRequest(false);
-    }, 5000);
-  }, []);
+  // handle clearing of the post data so that the userprofile defaults
+  const handleClearPostDetailedData = () => {
+    setPostDetailedData();
+  };
 
   return (
-    <Box height={CustomDeviceIsSmall() ? "91.7vh" : "91vh"}>
-      <Box mb={1} display={"flex"} justifyContent={"center"}>
-        <Button
-          variant="text"
-          className="shadow"
-          onClick={handleGoBack}
-          sx={{ borderRadius: "20px" }}
-        >
-          Back
-        </Button>
+    <Stack gap={1}>
+      {/* close button */}
+      <Box display={"flex"} justifyContent={"flex-end"}>
+        <IconButton onClick={handleClearPostDetailedData}>
+          <Close sx={{ width: 15, height: 15 }} color="primary" />
+        </IconButton>
       </Box>
 
-      <Box
-        className="shadow p-1 rounded"
-        height={"78vh"}
-        sx={{
-          overflow: "auto",
-          // Hide scrollbar for Chrome, Safari and Opera
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          // Hide scrollbar for IE, Edge and Firefox
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
-        }}
-      >
-        <Card elevation={0} className="w-100 p-1">
-          <CardHeader
-            sx={{
-              padding: "0px",
-              margin: "0px",
-            }}
-            avatar={
-              <Box>
-                {isLoadingRequest ? (
-                  <Skeleton
-                    animation="wave"
-                    variant="circular"
-                    width={40}
-                    height={40}
-                    sx={{mb:2}}
-                  />
-                ) : (
-                  <Avatar
-                    src={devImage}
-                    sx={{ backgroundColor: "#1976D2", color: "white" }}
-                    alt="S"
-                    aria-label="avatar"
-                  />
-                )}
-              </Box>
-            }
-            action={
-              isLoadingRequest ? null : (
-                <Box className="d-flex flex-row ">
-                  <IconButton disableRipple>
-                    <Typography variant="body2">
-                      <small>2d</small>
-                    </Typography>
-                  </IconButton>
-                </Box>
-              )
-            }
-            title={
-              isLoadingRequest ? (
-                <Skeleton
-                  animation="wave"
-                  height={10}
-                  width="80%"
-                  style={{ marginBottom: 6 }}
-                />
-              ) : (
-                <Box display={"flex"} alignItems={"center"} gap={1}>
-                  <Tooltip title="Shimmita Douglas" arrow>
-                    <Typography fontWeight={"bold"} variant="body1">
-                      Shimmita
-                    </Typography>
-                  </Tooltip>
-                  <VerifiedRounded
-                    color="primary"
-                    sx={{ width: 20, height: 20 }}
-                  />
-                </Box>
-              )
-            }
-            subheader={
-              isLoadingRequest ? (
-                <Skeleton animation="wave" height={10} width="40%" />
-              ) : (
-                <Box>
-                  {/* smallest screen */}
-                  {screenWidth <= 350 ? (
-                    <Box>
-                      <Typography variant="body2">Software Dev </Typography>
-                      <Typography variant="body2">
-                        React|Nodejs|Python{" "}
-                      </Typography>
-                    </Box>
-                  ) : (
-                    <Box>
-                      {/* mediaum to larger screens */}
-                      <Typography variant="body2">
-                        Fullstack Developer{" "}
-                      </Typography>
-                      <Typography variant="body2">
-                        React | Nodejs | Python{" "}
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              )
-            }
-          />
-
-          {isLoadingRequest ? (
-            <Skeleton
-              sx={{ height: "80vh", borderRadius: "10px" }}
-              animation="wave"
-              variant="rectangular"
-            />
-          ) : (
-            <Box>
-              <CardContent>
-                <Box mb={2} width={"100%"}>
-                  <Box mb={1}>
-                    <Typography
-                      fontWeight={"bold"}
-                      variant="body2"
-                      textAlign={"center"}
-                    >
-                      {PostData.title}
-                    </Typography>
-                  </Box>
-
-                  <Box
-                    display={"flex"}
-                    justifyContent={"center"}
-                    alignItems={"center"}
-                    gap={2}
-                  >
-                    <WbIncandescentRounded
-                      sx={{
-                        width: 18,
-                        height: 18,
-                        color: isDarkMode ? "yellow" : "orange",
-                      }}
-                    />
-                    <Typography variant="body2">{PostData.category}</Typography>
-                    <Typography variant="body2">{PostData.county}</Typography>
-                    <WbIncandescentRounded
-                      sx={{
-                        width: 18,
-                        height: 18,
-                        color: isDarkMode ? "yellow" : "orange",
-                      }}
-                    />
-                  </Box>
-                </Box>
-                <Typography variant={CustomDeviceIsSmall() ? "body2" : "body1"}>
-                  {PostData.details}
-                </Typography>
-              </CardContent>
-
-              {/* media */}
-              <Image
-                src={PostData.image}
-                alt={"image"}
-                style={{
-                  width: "100%",
-                  maxHeight: CustomDeviceScreenSize(),
-                  objectFit: "fill",
-                  padding: window.screen.availWidth > 1300 && "5px",
-                  borderRadius: "10px",
-                  display: showComment ? "none" : "block",
-                }}
-              />
-            </Box>
-          )}
-
-          {isLoadingRequest ? (
-            <React.Fragment>
-              <Skeleton
-                animation="wave"
-                height={10}
-                style={{ marginBottom: 6 }}
-              />
-              <Skeleton animation="wave" height={10} width="80%" />
-            </React.Fragment>
-          ) : (
-            <Box
-              display={"flex "}
-              p={1}
-              justifyContent={"space-around"}
-              alignItems={"center"}
+      {/* display error */}
+      {errorMessage && (
+        <Box p={1} display={"flex"} justifyContent={"center"}>
+          <Collapse in={errorMessage || false}>
+            <Alert
+              severity="warning"
+              className="rounded-5"
+              onClick={() => setErrorMessage("")}
+              action={
+                <IconButton aria-label="close" color="inherit" size="small">
+                  <Close fontSize="inherit" />
+                </IconButton>
+              }
+              sx={{ mb: 2 }}
             >
-              <Box display={"flex"} alignItems={"center"}>
-                <Tooltip title="like" arrow>
-                  <Checkbox
-                    icon={<FavoriteRounded sx={{ width: 23, height: 23 }} />}
-                    checkedIcon={
-                      <FavoriteRounded
-                        color="inherit"
-                        sx={{ width: 23, height: 23 }}
-                      />
-                    }
-                  />
-                </Tooltip>
-                <span>
-                  <Typography
-                    fontWeight={"bold"}
-                    variant="body2"
-                    color={"text.secondary"}
-                  >
-                    500k
-                  </Typography>
-                </span>
-              </Box>
+              {errorMessage}
+            </Alert>
+          </Collapse>
+        </Box>
+      )}
 
-              <Box display={"flex"} alignItems={"center"}>
-                <Tooltip arrow title="Github">
-                  <Checkbox
-                    icon={<GitHub sx={{ width: 21, height: 21 }} />}
-                    checkedIcon={<GitHub sx={{ width: 21, height: 21 }} />}
-                  />
-                </Tooltip>
-                <span>
-                  <Typography
-                    fontWeight={"bold"}
-                    variant="body2"
-                    color={"text.secondary"}
-                  >
-                    50k
-                  </Typography>
-                </span>
-              </Box>
+      {/* card container */}
+      <Box p={2}>
+        {/* render post details feed here */}
+        <PostDetailsFeed
+          postDetailedData={postDetailedData}
+          setPostDetailedData={setPostDetailedData}
+        />
 
-              <Box display={"flex"} alignItems={"center"} className="ps-3">
-                <Tooltip title={"comment"} arrow>
-                  <Checkbox
-                    onChange={handleReplyPost}
-                    checkedIcon={
-                      <ForumRounded sx={{ width: 21, height: 21 }} />
-                    }
-                    icon={<ForumRounded sx={{ width: 21, height: 21 }} />}
-                  />
-                </Tooltip>
-                <span>
-                  <Typography
-                    variant="body2"
-                    fontWeight={"bold"}
-                    color={"text.secondary"}
-                  >
-                    300
-                  </Typography>
-                </span>
-              </Box>
-            </Box>
-          )}
-
-          {/* show comments when message clicked */}
-          {showComment ? (
-            <Box>
-              <CommentContainer />
-            </Box>
-          ) : null}
-        </Card>
+        {/* all user comments container pass the comments of the post */}
+        <Box>
+          <CommentContainer
+            post_comments={postDetailedData?.post_comments.comments}
+          />
+        </Box>
       </Box>
-      {/* comment to a text  */}
-      {showComment ? (
-        <Box
-          display={"flex"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
-          className={"shadow rounded"}
-          width={"100%"}
-          p={1}
-          mt={1}
-          bgcolor={"background.default"}
-        >
-          <Box width={"100%"}>
-            <InputBase
-              multiline
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              maxRows={2}
-              className="w-100"
-              placeholder="comment here..."
-              sx={{
-                fontSize: "small",
-              }}
-            />
-          </Box>
 
-          <Box className=" t rounded ms-1" alignContent={"center"}>
+      {/* comment input text  */}
+      <Box
+        display={"flex"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        width={"100%"}
+        p={2}
+        bgcolor={"background.default"}
+      >
+        {/* input for comment */}
+        <Box width={"100%"}>
+          <InputBase
+            multiline
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            maxRows={2}
+            disabled={isUploading}
+            className="w-100"
+            placeholder="comment here..."
+            sx={{
+              fontSize: "small",
+            }}
+          />
+        </Box>
+
+        {/* send comment button icon */}
+        <Box className=" t rounded ms-1" alignContent={"center"}>
+          {isUploading ? (
+            <CircularProgress size={17} />
+          ) : (
             <Badge badgeContent={`${100 - comment.length}`}>
-              <IconButton disabled={comment.length > 100}>
+              <IconButton
+                disabled={comment.length > 100}
+                onClick={handleSendCommentNow}
+              >
                 <SendOutlined
                   color={comment.length <= 100 ? "primary" : "inherit"}
                   sx={{ width: 18, height: 18 }}
                 />
               </IconButton>
             </Badge>
-          </Box>
+          )}
         </Box>
-      ) : null}
-    </Box>
+      </Box>
+    </Stack>
   );
 }
 

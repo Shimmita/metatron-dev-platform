@@ -73,8 +73,8 @@ function CardFeedMore({ ownerId, ownerName, currentUserNetwork = [] }) {
                 <PersonAddRounded color="primary" className="mx-2" />
               </ListItemText>
               <ListItemText
-                sx={{ textTransform: "lowercase" }}
-                primary={`add ${ownerName.split(" ")[0]}`}
+                sx={{ textTransform: "capitalize" }}
+                primary={ownerName.split(" ")[0]}
               />
             </MenuItem>
 
@@ -85,18 +85,8 @@ function CardFeedMore({ ownerId, ownerName, currentUserNetwork = [] }) {
                 <DownloadRounded color="primary" className="mx-2" />
               </ListItemText>
               <ListItemText
-                sx={{ textTransform: "lowercase" }}
-                primary={"save content"}
-              />
-            </MenuItem>
-            <Divider component={"li"} />
-            <MenuItem>
-              <ListItemText>
-                <StarRounded color="secondary" className="mx-2" />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "lowercase" }}
-                primary={"add favourite"}
+                sx={{ textTransform: "capitalize" }}
+                primary={"Download"}
               />
             </MenuItem>
             <Divider component={"li"} />
@@ -105,8 +95,8 @@ function CardFeedMore({ ownerId, ownerName, currentUserNetwork = [] }) {
                 <WarningRounded color="warning" className="mx-2" />
               </ListItemText>
               <ListItemText
-                sx={{ textTransform: "lowercase" }}
-                primary={"Report Content"}
+                sx={{ textTransform: "capitalize" }}
+                primary={"Reporting"}
               />
             </MenuItem>
           </React.Fragment>

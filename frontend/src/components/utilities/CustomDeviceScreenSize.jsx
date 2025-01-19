@@ -1,22 +1,23 @@
+import CustomDeviceIsSmall from "./CustomDeviceIsSmall";
 import CustomDeviceTablet from "./CustomDeviceTablet";
 
 const CustomDeviceScreenSize = () => {
   let screen = window.screen.availWidth;
   // tablet portrait
   if (CustomDeviceTablet()) {
-    return "450px";
+    return "370px";
   }
-  // smartphone portrait
-  if (screen < 600) {
-    return "350px";
+  // typical smartphone portrait
+  if (CustomDeviceIsSmall()) {
+    return "260px";
   }
   // tablet landscape
   if (screen > 1000 && screen <= 1300) {
-    return "350px";
+    return "330px";
   }
   // large screens
   if (screen > 1300) {
-    return "455px";
+    return "350px";
   }
 
   return;

@@ -222,6 +222,16 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
     }
   };
 
+  // handle when free logos is selected or changed
+  const handleFreeLogoPicked = (event) => {
+    // clear file preview
+    setFilePreview(null);
+    // update free logo value
+    setFreeLogo(event.target.value);
+    // update file preview for free logo
+    setFilePreview(getImageMatch(event.target.value));
+  };
+
   //   handle file change and compress the image
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -700,7 +710,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
               </Typography>
 
               {/* preview the file uploaded from storage */}
-              {fileUpload && (
+              {(fileUpload || freeLogo) && (
                 <Box display={"flex"} justifyContent={"center"}>
                   <img
                     src={filePreview}
@@ -730,7 +740,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                     variant="standard"
                     label="Free logos"
                     fullWidth
-                    onChange={(e) => setFreeLogo(e.target.value)}
+                    onChange={handleFreeLogoPicked}
                   >
                     {logoNamesOptions &&
                       logoNamesOptions.map((name, index) => (

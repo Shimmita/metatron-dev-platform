@@ -4,13 +4,13 @@ import {
   Close,
   CloudUploadRounded,
   CodeRounded,
+  DiamondRounded,
   DrawRounded,
   EditRounded,
   GitHub,
   GradeRounded,
   Image,
   LaptopRounded,
-  LinkRounded,
   Microsoft,
   SettingsRounded,
   SportsEsportsRounded,
@@ -35,8 +35,12 @@ import {
 import axios from "axios";
 import React, { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import LinuxLogo from "../../images/linux.jpeg";
 import AppLogo from "../../images/logo_sm.png";
+import { showPostModalRedux } from "../../redux/AppUI";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import { updateCurrentSnackPostSuccess } from "../../redux/CurrentSnackBar";
 import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionTech from "../data/SubsectionTech";
 import BrowserCompress from "../utilities/BrowserCompress";
@@ -45,10 +49,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CustomModalHeight from "../utilities/CustomModalHeight";
-import { showPostModalRedux } from "../../redux/AppUI";
-import { updateCurrentSnackPostSuccess } from "../../redux/CurrentSnackBar";
-import { useNavigate } from "react-router-dom";
-import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import { getImageMatch } from "../utilities/getImageMatch";
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 const AlertInput = lazy(() => import("../alerts/AlertInput"));
 
@@ -73,6 +74,9 @@ const StyledInput = styled("input")({
   width: 1,
 });
 
+// array for image names and values
+const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
+
 const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [post_category, setPostCategory] = useState("");
   const [backend, setBackend] = useState("");
@@ -83,8 +87,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [title, setTitle] = useState("");
   const [fileUpload, setFileUpload] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
-  const [fileLink, setFileLink] = useState("");
-  const [isFileLink, setIsFileLink] = useState(false);
+  const [freeLogo, setFreeLogo] = useState("");
+  const [isFreeLogo, setIsFreeLogo] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -108,24 +112,25 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   // axios default credentials
   axios.defaults.withCredentials = true;
 
-  // handle full video when btn link clicked
-  const handleFileUploadLink = () => {
+  // handle showing free logo menu
+  const handleShowFreeLogo = () => {
     // clear file uploaded if any
     setFileUpload(null);
     // set true link video full
-    setIsFileLink(true);
+    setIsFreeLogo(true);
   };
 
-  // handle closing
-  const handleCloseFileUploadLink = () => {
+  // handle closing free logo
+  const handleCloseFreeLogo = () => {
     // clear
-    setFileLink("");
+    setFreeLogo("");
     // default showing of btn upload and link
-    setIsFileLink(false);
+    setIsFreeLogo(false);
   };
 
   // extracting current logged in user details from the redux store
-  const instructor_name = user.name;
+  const ownerId = user._id;
+  const ownername = user.name;
   const ownertitle = user.specialisationTitle;
   const ownerverified = user.premium;
   const ownerskills = user.selectedSkills;
@@ -135,15 +140,15 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
   const post = {
     post_owner: {
-      instructor_name,
+      ownerId,
+      ownername,
       ownertitle,
       ownerverified,
       ownerskills,
       owneravatar,
     },
     post_title: title,
-    post_url:
-      fileLink.trim() !== null || fileLink.trim() !== "" ? fileLink : "",
+    post_url: freeLogo && freeLogo,
     post_body: description,
     post_category: {
       main: post_category,
@@ -181,6 +186,16 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
     updatePostCategoryValue();
   }, [post_category, backend, database, frontend]);
+
+  // handle when free logos is selected or changed
+  const handleFreeLogoPicked = (event) => {
+    // clear file preview
+    setFilePreview(null);
+    // update free logo value
+    setFreeLogo(event.target.value);
+    // update file preview for free logo
+    setFilePreview(getImageMatch(event.target.value));
+  };
 
   //   handle file change and compress the image
   const handleFileChange = async (event) => {
@@ -242,6 +257,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         category3.trim() === "")
     ) {
       setErrorMessage("Frontend, Backend and Database field all required");
+      return false;
+    }
+
+    if (!freeLogo && !fileUpload) {
+      setErrorMessage("provide image for this post");
       return false;
     }
 
@@ -1173,34 +1193,48 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 <Image color="primary" sx={{ width: 30, height: 30 }} />
               </Box>
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Provide an image or screenshot attachment backing your post for
-                visual presentation. This may be used as a point of reference to
-                those interested users. Attaching the file could boost the
-                reliability of your post to the target audience on the platform
-                though its (Optional).
+                Provide an image file backing your post for visual presentation.
+                You can use free images that have been already provided by
+                default.This part is optional.
               </Typography>
 
               {/* preview the file uploaded from storage */}
-              {fileUpload && (
+              {(fileUpload || freeLogo) && (
                 <Box display={"flex"} justifyContent={"center"}>
                   <img
                     src={filePreview}
                     alt=""
                     className="rounded"
                     style={{
-                      maxWidth: 300,
+                      maxWidth: 100,
                     }}
                   />
                 </Box>
               )}
 
-              {!isFileLink ? (
+              {!isFreeLogo ? (
                 <Box
                   display={"flex"}
-                  justifyContent={"space-around"}
+                  justifyContent={"flex-end"}
                   alignItems={"center"}
                   gap={1}
                 >
+                  <Button
+                    variant="text"
+                    disableElevation
+                    disabled={isUploading}
+                    id="external_text_btn_link"
+                    sx={{
+                      textTransform: "capitalize",
+                      borderRadius: "20px",
+                      fontWeight: "bold",
+                    }}
+                    onClick={handleShowFreeLogo}
+                    startIcon={<DiamondRounded sx={{ rotate: "180deg" }} />}
+                  >
+                    Free
+                  </Button>
+
                   <Button
                     component="label"
                     role={undefined}
@@ -1209,10 +1243,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     disabled={isUploading}
                     tabIndex={-1}
                     id="upload_text_btn"
-                    sx={{ textTransform: "lowercase", borderRadius: "20px" }}
+                    sx={{
+                      textTransform: "capitalize",
+                      borderRadius: "20px",
+                      fontWeight: "bold",
+                    }}
                     startIcon={<CloudUploadRounded />}
                   >
-                    Upload Image
+                    Upload
                     <StyledInput
                       type="file"
                       accept="image/*"
@@ -1220,64 +1258,51 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       multiple
                     />
                   </Button>
-                  <Typography variant="body2" color={"text.secondary"}>
-                    or
-                  </Typography>
-
-                  <Button
-                    variant="text"
-                    disableElevation
-                    disabled={isUploading}
-                    id="external_text_btn_link"
-                    sx={{ textTransform: "lowercase", borderRadius: "20px" }}
-                    onClick={handleFileUploadLink}
-                    startIcon={<LinkRounded />}
-                  >
-                    External Link
-                  </Button>
                 </Box>
               ) : (
-                <>
-                  {/* preview the file link */}
-                  {(fileLink?.trim() !== null || fileLink?.trim() !== "") && (
-                    <Box display={"flex"} justifyContent={"center"}>
-                      <img
-                        src={fileLink}
-                        alt=""
-                        className="rounded"
-                        style={{
-                          maxWidth: 300,
-                        }}
-                      />
-                    </Box>
-                  )}
-
-                  <Box
-                    className="w-100 mb-2"
-                    display={"flex"}
-                    alignItems={"center"}
-                    gap={1}
+                <Box
+                  mt={1}
+                  className="w-100 mb-4"
+                  display={"flex"}
+                  alignItems={"center"}
+                  gap={1}
+                >
+                  <TextField
+                    required
+                    disabled={isUploading || errorMessage}
+                    select
+                    value={freeLogo}
+                    variant="standard"
+                    label="Free logos"
+                    fullWidth
+                    onChange={handleFreeLogoPicked}
                   >
-                    <TextField
-                      required
-                      id="image_link_external"
-                      type="url"
-                      variant="standard"
-                      disabled={isUploading}
-                      value={fileLink}
-                      label={`Paste image link`}
-                      placeholder="https://...."
-                      fullWidth
-                      onChange={(e) => setFileLink(e.target.value)}
-                    />
-                    {/* close button */}
-                    <IconButton onClick={handleCloseFileUploadLink}>
-                      <Tooltip title={"exit link"}>
-                        <Close />
-                      </Tooltip>
-                    </IconButton>
-                  </Box>
-                </>
+                    {logoNamesOptions &&
+                      logoNamesOptions.map((name, index) => (
+                        <MenuItem
+                          key={index}
+                          value={name}
+                          sx={{ display: "flex", gap: 2 }}
+                        >
+                          {/* logo */}
+                          <Avatar
+                            src={logoValueOptions[index]}
+                            sx={{ width: 32, height: 32 }}
+                            alt=""
+                          />
+                          {/* name */}
+                          <Typography variant="body2">{name}</Typography>
+                        </MenuItem>
+                      ))}
+                  </TextField>
+
+                  {/* close button */}
+                  <IconButton onClick={handleCloseFreeLogo}>
+                    <Tooltip title={"exit link"}>
+                      <Close />
+                    </Tooltip>
+                  </IconButton>
+                </Box>
               )}
 
               {/* description */}

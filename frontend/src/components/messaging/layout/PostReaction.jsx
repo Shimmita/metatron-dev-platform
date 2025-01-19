@@ -1,4 +1,10 @@
-import { Close, FavoriteRounded, SendRounded } from "@mui/icons-material";
+import {
+  Close,
+  FavoriteRounded,
+  ForumRounded,
+  GitHub,
+  SendRounded,
+} from "@mui/icons-material";
 import {
   Box,
   CardActionArea,
@@ -18,7 +24,8 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { deleteCurrentPostReaction } from "../../../redux/CurrentPostReactions";
 import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
-import MiniProfileLayout from "./MiniProfileLayout";
+import MiniProfileLayout from "../../custom/MiniProfileLayout";
+import { getElapsedTime } from "../../utilities/getElapsedTime";
 
 export default function PostReaction({ reaction }) {
   const [isFetching, setIsFetching] = useState(false);
@@ -114,11 +121,17 @@ export default function PostReaction({ reaction }) {
                   variant="standard"
                   fullWidth
                   value={userMessage}
-                  label={max_message_count - userMessage.length}
+                  label={
+                    <React.Fragment>
+                      <Typography variant="caption" className="ms-2">
+                        message {max_message_count - userMessage.length}
+                      </Typography>
+                    </React.Fragment>
+                  }
                   className="w-100"
                   onChange={(e) => setUserMessage(e.target.value)}
-                  error={userMessage.length > max_message_count.length}
-                  placeholder="message..."
+                  error={userMessage.length > max_message_count}
+                  placeholder="..."
                 />
                 {/* send button */}
                 {userMessage && (
@@ -136,7 +149,11 @@ export default function PostReaction({ reaction }) {
         >
           <ListItem alignItems="flex-start">
             <ListItemAvatar onClick={handleShowMiniProfile}>
-              <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
+              <Avatar
+                alt="Remy Sharp"
+                src="/static/images/avatar/1.jpg"
+                className="border"
+              />
             </ListItemAvatar>
             <ListItemText
               primary={
@@ -158,9 +175,16 @@ export default function PostReaction({ reaction }) {
                   {isFetching ? (
                     <CircularProgress size={"10px"} />
                   ) : (
-                    <IconButton size="small" onClick={handleDeleteReaction}>
-                      <Close sx={{ width: 15, height: 15 }} />
-                    </IconButton>
+                    <Box display={"flex"} gap={"3px"} alignItems={"center"}>
+                      {/* time elapsed since post created */}
+                      <Typography variant="caption">
+                        {getElapsedTime(reaction?.createdAt)}
+                      </Typography>
+                      {/* delete reaction */}
+                      <IconButton size="small" onClick={handleDeleteReaction}>
+                        <Close sx={{ width: 15, height: 15 }} />
+                      </IconButton>
+                    </Box>
                   )}
                 </Box>
               }
@@ -177,13 +201,71 @@ export default function PostReaction({ reaction }) {
                       }}
                     >
                       {reaction?.title} <br />
-                      <FavoriteRounded
-                        sx={{ width: 13, height: 13 }}
-                        color="primary"
-                      />{" "}
+                      {reaction?.message?.toLowerCase().includes("liked") && (
+                        <FavoriteRounded
+                          sx={{ width: 14, height: 14 }}
+                          color="primary"
+                          className="me-1"
+                        />
+                      )}
+                      {reaction?.message?.toLowerCase().includes("github") && (
+                        <GitHub
+                          sx={{ width: 14, height: 14 }}
+                          color="primary"
+                          className="me-1"
+                        />
+                      )}
+                      {reaction?.message
+                        ?.toLowerCase()
+                        .includes("commented") && (
+                        <ForumRounded
+                          sx={{ width: 14, height: 14 }}
+                          color="primary"
+                          className="me-1"
+                        />
+                      )}
+                      {/* message  */}
                       {reaction?.message}
+                      {/* minimessage of post section */}
                     </Typography>
                     {` — ${reaction?.minimessage}`}
+
+                    {/* post counters */}
+                    <Box display={"flex"} justifyContent={"flex-end"}>
+                      <Box
+                        sx={{
+                          pe: 1,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          border: "1px solid",
+                          borderColor: "divider",
+                          borderRadius: 2,
+                          bgcolor: "background.paper",
+                          color: "text.secondary",
+                          "& svg": {
+                            m: 1,
+                          },
+                        }}
+                      >
+                        {/* likes count */}
+                        <FavoriteRounded sx={{ width: 14, height: 14 }} />
+                        <Typography variant="caption">
+                          {reaction?.likes}
+                        </Typography>
+
+                        {/* github counts */}
+                        <GitHub sx={{ width: 14, height: 14 }} />
+                        <Typography variant="caption">
+                          {reaction?.github}
+                        </Typography>
+
+                        {/* comments count */}
+                        <ForumRounded sx={{ width: 14, height: 14 }} />
+                        <Typography variant="caption" className="pe-1">
+                          {reaction?.comments}
+                        </Typography>
+                      </Box>
+                    </Box>
                   </React.Fragment>
                 </CardActionArea>
               }

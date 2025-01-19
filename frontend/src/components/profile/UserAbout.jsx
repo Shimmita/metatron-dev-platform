@@ -8,7 +8,16 @@ import {
 import { Box, Divider, Typography } from "@mui/material";
 import React from "react";
 
-function UserAbout() {
+function UserAbout({ profileData }) {
+  // handle country length to only two names
+  const handleCountryName = (country) => {
+    const parent = country?.split(" ");
+    const parentName =
+      parent?.length < 4 ? parent[1] : `${parent[1]} ${parent[2]}`;
+
+    return parentName;
+  };
+
   return (
     <Box p={2}>
       <Box mt={2} display={"flex"} justifyContent={"space-between"}>
@@ -21,7 +30,10 @@ function UserAbout() {
           {" "}
           <LaptopRounded sx={{ width: 20, height: 20 }} /> Specialty
         </Typography>
-        <Typography variant="body2">Software Engineer</Typography>
+        <Typography variant="body2">
+          {" "}
+          {profileData?.specialisationTitle}
+        </Typography>
       </Box>
 
       <Divider component={"div"} className="p-2" />
@@ -36,7 +48,10 @@ function UserAbout() {
           {" "}
           <LocationOnRounded sx={{ width: 20, height: 20 }} /> Location
         </Typography>
-        <Typography variant="body2">Nairobi,&nbsp;KE</Typography>
+        <Typography variant="body2">
+          {profileData && handleCountryName(profileData?.country)},
+          {profileData?.county}
+        </Typography>
       </Box>
       <Divider component={"div"} className="p-2" />
 
@@ -50,7 +65,7 @@ function UserAbout() {
           {" "}
           <PhoneRounded sx={{ width: 20, height: 20 }} /> Phone
         </Typography>
-        <Typography variant="body2">0123456789</Typography>
+        <Typography variant="body2">{profileData?.phone}</Typography>
       </Box>
       <Divider component={"div"} className="p-2" />
       <Box mt={2} display={"flex"} justifyContent={"space-between"}>
@@ -63,7 +78,9 @@ function UserAbout() {
           <CalendarMonthRounded sx={{ width: 20, height: 20 }} />
           Joined
         </Typography>
-        <Typography variant="body2">12/01/2024</Typography>
+        <Typography variant="body2">
+          {profileData?.createdAt?.split("T")[0]}
+        </Typography>
       </Box>
 
       <Divider component={"div"} className="p-2" />
@@ -77,7 +94,7 @@ function UserAbout() {
           <EmailRounded sx={{ width: 20, height: 20 }} />
           Email
         </Typography>
-        <Typography variant="body2">username@gmail.com</Typography>
+        <Typography variant="body2">{profileData?.email}</Typography>
       </Box>
     </Box>
   );

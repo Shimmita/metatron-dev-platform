@@ -90,7 +90,7 @@ const Feed = () => {
               />
               <Route path="/account/posts/edit" element={<MyPostCardEdit />} />
               <Route path="/account/people" element={<AccountFriends />} />
-              <Route path="/account/premium" element={<AccountPremium />} />
+              {/* <Route path="/account/premium" element={<AccountPremium />} /> */}
               <Route path="/courses/paid" element={<CoursePaidContainer />} />
               <Route
                 path="/courses/paid/detailed"
@@ -108,7 +108,7 @@ const Feed = () => {
               <Route path="/events/upcoming" element={<EventsUpcoming />} />
               <Route path="/events/live-attending" element={<LiveAttend />} />
               <Route path="/posts/details" element={<PostDetailsContainer />} />
-              <Route path="/users/profile" element={<UserProfile />} />
+              <Route path="/users/profile/:id" element={<UserProfile />} />
               <Route
                 path="/users/profile/posts/details"
                 element={<PostDetailsContainer />}
@@ -222,7 +222,7 @@ const Feed = () => {
                   path="/posts/details"
                   element={<PostDetailsContainer />}
                 />
-                <Route path="/users/profile" element={<UserProfile />} />
+                <Route path="/users/profile/:id" element={<UserProfile />} />
                 <Route
                   path="/users/profile/posts/details"
                   element={<PostDetailsContainer />}
