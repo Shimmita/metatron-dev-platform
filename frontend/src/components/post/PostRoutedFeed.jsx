@@ -14,15 +14,16 @@ import { Close, SendOutlined } from "@mui/icons-material";
 import axios from "axios";
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import PostDetailsFeed from "./PostDetailsFeed";
-import CustomCountryName from "../utilities/CustomCountryName";
+import { useNavigate } from "react-router-dom";
 import { handleShowingSpeedDial } from "../../redux/AppUI";
+import CustomCountryName from "../utilities/CustomCountryName";
+import PostDetailsFeed from "./PostDetailsFeed";
 
 const CommentContainer = lazy(() => import("./CommentContainer"));
-function PostDetailsContainer({ postDetailedData, setPostDetailedData }) {
-  // hold temporarily the post param, could mutate its values
+function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const [comment, setComment] = useState("");
 
@@ -46,7 +47,6 @@ function PostDetailsContainer({ postDetailedData, setPostDetailedData }) {
     country,
     title,
   };
-
   // complete sendin of the comment to the backend
   const handleSendCommentNow = () => {
     // sending the post tile embed in message and will split for separation backend
@@ -90,9 +90,10 @@ function PostDetailsContainer({ postDetailedData, setPostDetailedData }) {
   // handle clearing of the post data so that the userprofile defaults also restore the speed dial
   const handleClearPostDetailedData = () => {
     setPostDetailedData();
-
     // restore the speed dial
     dispatch(handleShowingSpeedDial(true));
+    // navigate home and show the drawer again where the user was
+    navigate("/");
   };
 
   return (
@@ -106,7 +107,7 @@ function PostDetailsContainer({ postDetailedData, setPostDetailedData }) {
 
       {/* display error */}
       {errorMessage && (
-        <Box p={1} display={"flex"} justifyContent={"center"}>
+        <Box p={1} display={"flex"} justifyContent={"center"} gap={2}>
           <Collapse in={errorMessage || false}>
             <Alert
               severity="warning"
@@ -189,4 +190,4 @@ function PostDetailsContainer({ postDetailedData, setPostDetailedData }) {
   );
 }
 
-export default PostDetailsContainer;
+export default PostRoutedFeed;

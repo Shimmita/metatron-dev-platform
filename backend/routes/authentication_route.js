@@ -23,6 +23,7 @@ authenticationRouter.post(
   handleSignupPersonalMongo
 );
 
+
 // signin users without provider
 authenticationRouter.post("/personal", handleSigninPersonal);
 

@@ -182,6 +182,8 @@ const Sidebar = () => {
         width={correctWidthInPercentage()}
         maxHeight={CustomDeviceTablet() ? "88vh" : "82vh"}
         sx={{
+          border: isDarkMode && "1px solid",
+          borderColor: isDarkMode && "divider",
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {

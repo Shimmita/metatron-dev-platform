@@ -1,12 +1,14 @@
 import { Box, CircularProgress } from "@mui/material";
-import React, { lazy, Suspense } from "react";
-import { useSelector } from "react-redux";
+import React, { lazy, Suspense, useLayoutEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import BasicSpeedDial from "../custom/SpeedDial";
 
+import { handleShowingSpeedDial } from "../../redux/AppUI";
 import BottomNav from "../custom/BottomNav";
 import SnackBarPostSuccess from "../snackbar/SnackBarPostSuccess";
 import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
+const PostDetailsRouted = lazy(() => import("../post/PostDetailsRouted"));
 const CourseDetailed = lazy(() => import("../courses/layout/CourseDetailed"));
 const AllApplicantsContainer = lazy(() =>
   import("../jobs/AllApplicantsContainer")
@@ -43,12 +45,23 @@ const EventsBookMarks = lazy(() => import("../events/EventsBookMarks"));
 
 const Feed = () => {
   // redux states
-  const { isTabSideBar, isDefaultBottomNav, isLoadingPostLaunch } = useSelector(
-    (state) => state.appUI
-  );
+  const {
+    isTabSideBar,
+    isDefaultBottomNav,
+    isDefaultSpeedDial,
+    isLoadingPostLaunch,
+  } = useSelector((state) => state.appUI);
   const { messageSnackPostTech } = useSelector(
     (state) => state.currentSnackBar
   );
+
+  const dispatch = useDispatch();
+
+  // restore default states which couldve been bypassed unnecessarily
+  useLayoutEffect(() => {
+    // restore speed dial it could have been not closed in previous histories
+    dispatch(handleShowingSpeedDial(true));
+  }, [dispatch]);
 
   return (
     <React.Fragment>
@@ -107,7 +120,10 @@ const Feed = () => {
               <Route path="/events/bookmarks" element={<EventsBookMarks />} />
               <Route path="/events/upcoming" element={<EventsUpcoming />} />
               <Route path="/events/live-attending" element={<LiveAttend />} />
-              <Route path="/posts/details" element={<PostDetailsContainer />} />
+              <Route
+                path="/posts/details/:id"
+                element={<PostDetailsRouted />}
+              />
               <Route path="/users/profile/:id" element={<UserProfile />} />
               <Route
                 path="/users/profile/posts/details"
@@ -133,7 +149,7 @@ const Feed = () => {
             {window.screen.availWidth <= 900 && (
               <Box>
                 {/* decide speed dial being shown or not */}
-                {isDefaultBottomNav && (
+                {isDefaultBottomNav && isDefaultSpeedDial && (
                   <Box
                     position={"fixed"}
                     sx={{
@@ -219,8 +235,8 @@ const Feed = () => {
                 <Route path="/events/upcoming" element={<EventsUpcoming />} />
                 <Route path="/events/live-attending" element={<LiveAttend />} />
                 <Route
-                  path="/posts/details"
-                  element={<PostDetailsContainer />}
+                  path="/posts/details/:id"
+                  element={<PostDetailsRouted />}
                 />
                 <Route path="/users/profile/:id" element={<UserProfile />} />
                 <Route
@@ -247,7 +263,7 @@ const Feed = () => {
               {window.screen.availWidth <= 900 && (
                 <Box>
                   {/* decide speed dial being shown or not */}
-                  {isDefaultBottomNav && (
+                  {isDefaultBottomNav && isDefaultSpeedDial && (
                     <Box
                       position={"fixed"}
                       sx={{

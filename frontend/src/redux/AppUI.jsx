@@ -6,6 +6,7 @@ const initialState = {
   isAccountSettings: false,
   isAbout: false,
   isDefaultBottomNav: true,
+  isDefaultSpeedDial: true,
   isMobileRighBar: false,
   isSearchBar: true,
   isOpenMessageDrawer: false,
@@ -59,6 +60,7 @@ const appUISliceReducerSlice = createSlice({
         isPostModalRedux: false,
         isLoadingPostLaunch: false,
         isSimilarCoursesModal: false,
+        isDefaultSpeedDial: true,
       };
     },
 
@@ -73,6 +75,11 @@ const appUISliceReducerSlice = createSlice({
     // manages the display of the default bottom nav
     handleDefaultBottomNav: (state) => {
       state.isDefaultBottomNav = false;
+    },
+
+    // handle showing of the speed dial
+    handleShowingSpeedDial: (state, action) => {
+      state.isDefaultSpeedDial = action.payload;
     },
 
     // reset the to default the showing of the default bottom nav
@@ -130,6 +137,7 @@ export const {
   showPostModalRedux,
   handleLoadingPostLaunch,
   resetSimilarCoursesModal,
+  handleShowingSpeedDial,
 } = appUISliceReducerSlice.actions;
 
 // export the appUISliceReducer for universal purposes

@@ -5,14 +5,14 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
-export default function SnackBarInfo({
+const SnackBarInfo = ({
   snackInfo,
   openSnack = true,
   setOpenSnack,
   isManagementSnack = false,
   setIsManagementSnack,
   managementMSG = "",
-}) {
+}) => {
   // redux states
   const { isTabSideBar } = useSelector((state) => state.appUI);
 
@@ -134,4 +134,6 @@ export default function SnackBarInfo({
       )}
     </React.Fragment>
   );
-}
+};
+
+export default React.memo(SnackBarInfo);

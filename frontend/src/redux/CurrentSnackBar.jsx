@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialstate = {
-  messageSnackPostTech: "",
-  messageSnack: "",
+  messageSnackPostTech: null,
+  messageSnack: null,
   messageNotification: null,
+  messageConnectRequestSent: null,
 };
 
 const CurrentSnackBar = createSlice({
@@ -24,11 +25,17 @@ const CurrentSnackBar = createSlice({
       state.messageNotification = action.payload;
     },
 
+    // update message connect request sent
+    updateMessageConnectRequest: (state, action) => {
+      state.messageConnectRequestSent = action.payload;
+    },
+
     // nullify user and fale online
     resetClearCurrentSnack: (state) => {
-      state.messageSnack = "";
-      state.messageSnackPostTech = "";
+      state.messageSnack = null;
+      state.messageSnackPostTech = null;
       state.messageNotification = null;
+      state.messageConnectRequestSent = null;
     },
   },
 });
@@ -39,6 +46,7 @@ export const {
   updateCurrentSnackPostSuccess,
   updateNotificationSnackBar,
   resetClearCurrentSnack,
+  updateMessageConnectRequest,
 } = CurrentSnackBar.actions;
 
 // exporting the main fun reducer

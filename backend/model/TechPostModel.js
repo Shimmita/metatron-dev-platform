@@ -10,40 +10,17 @@ const ownerDetails = new mongoose.Schema({
   _id: false, //prevent id generation
 });
 
-// for indidual user info
-const commonUserInfoSchema = new mongoose.Schema({
-  userId: { type: String, required: false, default: "" },
-  name: { type: String, required: false, default: "" },
-  title: { type: String, required: false, default: "" },
-  avatar: { type: String, required: false, trim: true, default: "" },
-  country: { type: String, required: true, trim: true, default: "" },
-  state: { type: String, required: true, trim: true, default: "" },
-  _id: false, //prevent id generation
-});
-
 // comment for the post
 const commentSchema = new mongoose.Schema({
-  commentor: commonUserInfoSchema,
-  date: { type: Date, default: Date.now },
-  body: { type: String, required: false, trim: true, default: "" },
-  liked: {
-    clicks: { type: Number, required: false, default: 0 },
-    clickers: {
-      type: [commonUserInfoSchema],
-      default: [],
-      _id: false,
-    },
-    _id: false,
-  },
-  disliked: {
-    clicks: { type: Number, required: false, default: 0 },
-    clickers: {
-      type: [commonUserInfoSchema],
-      default: [],
-      _id: false,
-    },
-    _id: false,
-  },
+  createdAt: { type: Date, default: Date.now },
+  name: { type: String, required: true },
+  userId: { type: String, required: true },
+  title: { type: String, required: true },
+  country: { type: String, required: true },
+  avatar: { type: String, required: false, default: "" },
+  minimessage: { type: String, required: true },
+
+  _id: false,
 });
 
 // main schema
@@ -75,7 +52,7 @@ const postSchema = new mongoose.Schema(
     post_github: {
       link: { type: String, required: false, trim: true, default: "" },
       clicks: { type: Number, required: false, default: 0 },
-      clickers: [commonUserInfoSchema],
+      clickers: { type: [String], required: false, default: [], _id: false },
       _id: false,
     },
     post_comments: {

@@ -5,7 +5,11 @@ import {
   handleDeletePostReaction,
   handleDeleteUserPost,
   handleGetAllPostsReactions,
+  handleGetAllPostsUserSpecific,
   handleGetAllTechiePost,
+  handleGetSpecificPostDetails,
+  handleGithubIncremental,
+  handlePostCommentsCreate,
   handlePostLiking,
   handleUpdateUserPost,
 } from "../controllers/manage_post_controller.js";
@@ -24,10 +28,11 @@ postManageRouter.post(
 // getAllPost
 postManageRouter.get("/all", handleGetAllTechiePost);
 
-// get specific job
-postManageRouter.get("/all/:id", (req, res) => {
-  res.status(200).send("working get spefic job");
-});
+// get specific post
+postManageRouter.get("/all/:id", handleGetSpecificPostDetails);
+
+// get all user specific posts
+postManageRouter.get("/users/all/:id", handleGetAllPostsUserSpecific);
 
 // edit post
 postManageRouter.patch("/edit/:id", handleUpdateUserPost);
@@ -37,6 +42,12 @@ postManageRouter.delete("/delete/:id", handleDeleteUserPost);
 
 // update post likes
 postManageRouter.put("/update/likes", handlePostLiking);
+
+// update the github cliks
+postManageRouter.put("/update/github", handleGithubIncremental);
+
+// update post comments, post entangeld and notification deleteable
+postManageRouter.put("/update/comments", handlePostCommentsCreate);
 
 // get all post reactions if they match passedID for it's belongs them as notfication
 postManageRouter.get("/reactions/all/:id", handleGetAllPostsReactions);

@@ -11,20 +11,21 @@ function SlideTransition(props) {
   return <Slide {...props} direction="up" />;
 }
 
-const SnackBarPostSuccess = ({ messageSnackPostTech }) => {
+const SnackbarConnect = ({ message, isWarning = false }) => {
   // redux states
-  const { isTabSideBar } = useSelector((state) => state.appUI);
-
   const dispatch = useDispatch();
+  const { messageConnectRequestSent } = useSelector(
+    (state) => state.currentSnackBar
+  );
 
   const [state, setState] = React.useState({
-    open: true,
+    open: message || messageConnectRequestSent ? true : false,
     Transition: Fade,
   });
 
-  const handleClick = (Transition) => () => {
+  const handleOpenSnackbar = (Transition) => () => {
     setState({
-      open: messageSnackPostTech && true,
+      open: true,
       Transition,
     });
   };
@@ -34,31 +35,36 @@ const SnackBarPostSuccess = ({ messageSnackPostTech }) => {
       ...state,
       open: false,
     });
-    // clear the snack bar messages in the redux
+
+    // reset the redux state for snackbar which will reset snack info
     dispatch(resetClearCurrentSnack());
   };
 
-  //call the fun to activate the snack
-  handleClick(SlideTransition);
+  //   call the open fun
+  handleOpenSnackbar(SlideTransition());
 
   return (
     <Box>
       <Snackbar
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: CustomDeviceTablet() && isTabSideBar ? "right" : "center",
-        }}
         open={state.open}
         onClose={handleClose}
         TransitionComponent={state.Transition}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: CustomDeviceTablet ? "right" : "center",
+        }}
         key={state.Transition.name}
       >
-        <Alert onClose={handleClose} severity="success" variant="filled">
-          {messageSnackPostTech}
+        <Alert
+          onClose={handleClose}
+          className="rounded"
+          severity={isWarning ? "warning" : "info"}
+        >
+          {message}
         </Alert>
       </Snackbar>
     </Box>
   );
 };
 
-export default React.memo(SnackBarPostSuccess);
+export default React.memo(SnackbarConnect);

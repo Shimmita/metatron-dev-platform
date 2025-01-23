@@ -32,7 +32,7 @@ const FeedDefaultContent = () => {
   // redux states
   const dispatch = useDispatch();
   // redux states access
-  const { isSidebarRighbar } = useSelector((state) => state.appUI);
+  const { isSidebarRighbar, isDarkMode } = useSelector((state) => state.appUI);
   const { posts } = useSelector((state) => state.currentPosts);
 
   useEffect(() => {
@@ -103,7 +103,7 @@ const FeedDefaultContent = () => {
       {postDetailedData && postDetailedData ? (
         <Box height={CustomDeviceIsSmall() ? "91.7vh" : "91vh"}>
           <Box
-            height={"80vh"}
+            height={"85vh"}
             className={!CustomDeviceIsSmall() && "shadow rounded p-2"}
             sx={{
               overflowX: "auto",
@@ -149,19 +149,27 @@ const FeedDefaultContent = () => {
               </Box>
             </Box>
           )}
+
+          {/* display the overview posts on tablets(portratit) and mobiles only */}
+
+          {(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
+            <Box
+              className="mb-3 rounded p-1"
+              sx={{
+                border: isDarkMode && "1px solid",
+                borderColor: isDarkMode && "divider",
+              }}
+            >
+              {" "}
+              <MobileTabCorousel />
+            </Box>
+          )}
+
           {/* map through the posts and display them to the user */}
           {posts &&
             posts.map((post, index) => {
               return (
                 <Box key={index}>
-                  <Box className="mb-3">
-                    {/* corousel of top pics */}
-                    {(CustomDeviceIsSmall() || CustomDeviceTablet()) &&
-                    index === 0 ? (
-                      <MobileTabCorousel />
-                    ) : null}
-                  </Box>
-
                   <Box>
                     {/* feed card detailed post */}
                     <CardFeed
@@ -173,18 +181,23 @@ const FeedDefaultContent = () => {
                       <Box
                         display={"flex"}
                         justifyContent={"center"}
-                        m={2}
+                        sx={{ border: "1px solid", borderColor: "divider" }}
+                        className={"shadow rounded"}
+                        p={1}
+                        mt={2}
                         mb={
-                          CustomDeviceTablet() || CustomDeviceIsSmall() ? 16 : 8
+                          CustomDeviceTablet() || CustomDeviceIsSmall() ? 14 : 8
                         }
                       >
                         <Button
                           className="rounded-5"
                           size="medium"
-                          sx={{ textTransform: "capitalize" }}
-                          variant="contained"
+                          sx={{
+                            textTransform: "capitalize",
+                            fontWeight: "bold",
+                          }}
                         >
-                          Browse
+                          Continue Browsing
                         </Button>
                       </Box>
                     )}

@@ -58,8 +58,12 @@ const PostDetailsFeed = ({ postDetailedData, setPostDetailedData }) => {
 
   // extract the likes and array of liked usersIDs of this post
   const { clicks: post_clicks } = postDetailedData?.post_liked || {};
+
   //   extract the counts of comments
   const { count: post_comment_count } = postDetailedData?.post_comments || {};
+
+  // extract the counts of github clicks
+  const { clicks: post_github_clicks } = postDetailedData.post_github || {};
 
   const post_likes = post_clicks;
 
@@ -213,8 +217,9 @@ const PostDetailsFeed = ({ postDetailedData, setPostDetailedData }) => {
     // the user possibly uploaded the image to cloud thus return the url incorporated
     return postDetailedData?.post_url;
   };
+
   return (
-    <>
+    <React.Fragment>
       <Card
         style={{
           border: openMenu && isDarkMode ? "1px solid gray" : undefined,
@@ -444,7 +449,7 @@ const PostDetailsFeed = ({ postDetailedData, setPostDetailedData }) => {
             },
             {
               icon: <GitHub sx={{ width: 21, height: 21 }} />,
-              count: "50k",
+              count: post_github_clicks,
               title: "Github",
             },
             {
@@ -485,7 +490,7 @@ const PostDetailsFeed = ({ postDetailedData, setPostDetailedData }) => {
         setOpenAlert={setOpenMiniProfileAlert}
         userId={postDetailedData.post_owner.ownerId}
       />
-    </>
+    </React.Fragment>
   );
 };
 

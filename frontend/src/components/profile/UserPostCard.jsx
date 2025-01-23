@@ -6,12 +6,18 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import { getImageMatch } from "../utilities/getImageMatch";
+import { useDispatch } from "react-redux";
+import { handleShowingSpeedDial } from "../../redux/AppUI";
 
 export default function UserPostCard({ post, setPostDetailedData }) {
+  const dispatch = useDispatch();
   //  update the postdetailed data with the current iterated post
   // will lift-up the state and make the data available to root parent
   const handlePostDetails = async () => {
     await setPostDetailedData(post);
+
+    // false showing of the speed dial for tabs and small devices
+    dispatch(handleShowingSpeedDial(false));
   };
 
   // handle the image incorporated in the post for some is free logo

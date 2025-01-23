@@ -169,7 +169,6 @@ const LoginAuth = () => {
     axios
       .post(`http://localhost:5000/metatron/api/v1/signin/personal`, user)
       .then((res) => {
-        console.log(res);
         // populating the redux for the logged in user
         dispatch(updateUserCurrentUserRedux(res.data));
       })
@@ -216,8 +215,9 @@ const LoginAuth = () => {
         className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
         width={"100%"}
         maxHeight={"98vh"}
-        border={isDarkMode ? "1px solid gray" : "none"}
         sx={{
+          border: isDarkMode && "1px solid",
+          borderColor: isDarkMode && "divider",
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {

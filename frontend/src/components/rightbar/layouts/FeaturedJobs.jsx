@@ -13,16 +13,15 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import React from "react";
 import { useSelector } from "react-redux";
+import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
-export default function FeaturedJobs({ isLoading, jobTop }) {
+function FeaturedJobs({ isLoading, jobTop }) {
   // redux states
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
     (state) => state.appUI
   );
-
-  
-
   return (
     <React.Fragment>
       {isLoadingRequest || isLoading ? (
@@ -68,20 +67,77 @@ export default function FeaturedJobs({ isLoading, jobTop }) {
               />
             </ListItemAvatar>
             <ListItemText
-              primary={<Typography variant="body2">{jobTop.title}</Typography>}
-              secondary={
-                <Typography variant="body2" color={"text.secondary"}>
-                  {jobTop?.organisation?.name}
+              primary={
+                <Typography fontWeight={"bold"} variant="body2">
+                  {jobTop.title}
                 </Typography>
+              }
+              secondary={
+                <Box>
+                  {/* poster */}
+                  <Typography variant="body2" color={"text.secondary"}>
+                    {jobTop?.organisation?.name}
+                  </Typography>
+
+                  {/* skills */}
+                  <Box display={"flex"} gap={1} alignItems={"center"}>
+                    {jobTop?.skills
+                      .slice(0, CustomDeviceIsSmall() ? 2 : 3)
+                      .map((skill, index) => (
+                        <React.Fragment>
+                          <Typography
+                            key={index}
+                            variant="caption"
+                            color={"text.secondary"}
+                          >
+                            {skill}
+                          </Typography>
+                          {/* show this on small devices for last index */}
+                          {index === 1 && CustomDeviceIsSmall() && (
+                            <Typography
+                              variant="caption"
+                              color={"text.secondary"}
+                            >
+                              +{jobTop?.skills?.length - 2} more
+                            </Typography>
+                          )}
+                          {/* show this for tablet devices at last index */}
+                          {index === 2 && CustomDeviceTablet() && (
+                            <Typography
+                              variant="caption"
+                              color={"text.secondary"}
+                            >
+                              +{jobTop?.skills?.length - 3} more
+                            </Typography>
+                          )}
+                          {/* show this for largest screen */}
+                          {index === 2 &&
+                            !(
+                              CustomDeviceTablet() || CustomDeviceIsSmall()
+                            ) && (
+                              <Typography
+                                variant="caption"
+                                color={"text.secondary"}
+                              >
+                                +{jobTop?.skills?.length - 3}
+                              </Typography>
+                            )}
+                        </React.Fragment>
+                      ))}
+                  </Box>
+                </Box>
               }
             />
 
-            <Box ml={3}>
+            <Box>
               <Button
                 disableElevation
                 size="small"
                 variant="contained"
-                sx={{ textTransform: "capitalize", borderRadius: "20px" }}
+                sx={{
+                  textTransform: "capitalize",
+                  borderRadius: "20px",
+                }}
               >
                 Apply
               </Button>
@@ -93,3 +149,5 @@ export default function FeaturedJobs({ isLoading, jobTop }) {
     </React.Fragment>
   );
 }
+
+export default React.memo(FeaturedJobs);

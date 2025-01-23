@@ -70,12 +70,47 @@ export const handleGetAllTechiePost = async (req, res) => {
   }
 };
 
-// get specific post or one post
-const handleGetSpecificPost = async () => {
-  const id = req?.params.id;
+// get all tech posts of a user based on their ID
+export const handleGetAllPostsUserSpecific = async (req, res) => {
+  try {
+    const userId = req?.params.id;
+    // fetch first 20 posts from the database, latest first
+    const posts = await TechPostModel.find({
+      "post_owner.ownerId": userId,
+    })
+      .sort({ createdAt: -1 })
+      .limit(20);
+
+    // send the results to the frontend
+    res.status(200).send(posts);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).send("something went wrong");
+  }
 };
 
-// edit post
+// get a specific post regardless of the owner
+export const handleGetSpecificPostDetails = async (req, res) => {
+  try {
+    //extract post id from request params
+    const { id: postId } = req?.params;
+    console.log(postId)
+
+    // fetch the post from the database
+    const post = await TechPostModel.findById({ _id: postId });
+    if (!post) {
+      throw new Error("post not found!");
+    }
+    console.log(post)
+    // send the response to the frontend
+    res.status(200).send(post);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).send('something went wrong');
+  }
+};
+
+// edit tech post
 export const handleUpdateUserPost = async (req, res) => {
   // get the body
   const body = req?.body;
@@ -94,20 +129,20 @@ export const handleUpdateUserPost = async (req, res) => {
   }
 };
 
-// delete post
+// delete tech post
 export const handleDeleteUserPost = async (req, res) => {
   // get the req params value id of the post to be deleted
   const id = req.params.id;
   console.log(id);
 };
 
-// increment like
+// increment likes of a tech post
 export const handlePostLiking = async (req, res) => {
   try {
     const data = req?.body;
     const post = await TechPostModel.findById({ _id: data.postId });
 
-    // will save the id user currently liking the post in clickers
+    // will save the id user currently liking the post in clickers of likes
     const userId = data.userId;
 
     // saved in the notification collection
@@ -117,13 +152,16 @@ export const handlePostLiking = async (req, res) => {
       userId: data.userId,
       name: data.name,
       title: data.title,
+      comments: 0,
+      likes: 0,
+      github: 0,
       avatar: data.avatar,
       message: data.message,
       minimessage: data.minimessage,
     };
 
     if (!post) {
-      throw new Error("something went wrong");
+      throw new Error("post not found!");
     }
     // if userId not present in the clickers, increment clicks else reverse
     if (
@@ -135,11 +173,21 @@ export const handlePostLiking = async (req, res) => {
       // add userId to the clikers array
       post.post_liked.clickers.push(userId);
 
-      // save the updated post
+      // save the updated tech post
       await post.save();
 
-      // save the details of the user liking the post in the reaction section
-      await PostReactionModal.create(notificationPostData);
+      // extract the github, likes and comments of the saved post
+      const { clicks: likes } = post.post_liked;
+      const { clicks: github } = post.post_github;
+      const { count: comments } = post.post_comments;
+
+      // save the details of the user liking the  tech post in the reaction section
+      await PostReactionModal.create({
+        ...notificationPostData,
+        likes,
+        github,
+        comments,
+      });
 
       const results = {
         post: post,
@@ -148,7 +196,7 @@ export const handlePostLiking = async (req, res) => {
       // send the response to the frontend
       res.status(200).send(results);
     } else {
-      // decrement post likes and remove the user details from the clickers array
+      // decrement tech post likes and remove the user details from the clickers array
       post.post_liked.clicks =
         post.post_liked.clicks > 0 ? post.post_liked.clicks - 1 : 0;
       // remove the userId from clickers array
@@ -170,14 +218,148 @@ export const handlePostLiking = async (req, res) => {
       res.status(200).send(results);
     }
 
-    // resave the post with the latest updates
+    // resave the tech post with the latest updates
+  } catch (error) {
+    res.status(400).send("something went wrong");
+  }
+};
+
+// increment github clicks once for all when visited
+export const handleGithubIncremental = async (req, res) => {
+  try {
+    const data = req?.body;
+    const post = await TechPostModel.findById({ _id: data.postId });
+    // will save the id user currently liking the post in clickers of github
+    const userId = data.userId;
+
+    // saved in the notification collection
+    const notificationPostData = {
+      postId: data.postId,
+      ownerId: data.ownerId,
+      userId: data.userId,
+      name: data.name,
+      comments: 0,
+      likes: 0,
+      github: 0,
+      title: data.title,
+      avatar: data.avatar,
+      message: data.message,
+      minimessage: data.minimessage,
+    };
+
+    if (!post) {
+      throw new Error("post not found!");
+    }
+    // if userId not present in the clickers of github, increment clicks
+    if (
+      !post.post_github.clickers.some((clickerId) => clickerId === data.userId)
+    ) {
+      // increment post likes
+      post.post_github.clicks = post.post_github.clicks + 1;
+
+      // add userId to the clikers array of github
+      post.post_github.clickers.push(userId);
+
+      // save the updated tech post
+      await post.save();
+
+      // extract the github, likes and comments of the saved post
+      const { clicks: likes } = post.post_liked;
+      const { clicks: github } = post.post_github;
+      const { count: comments } = post.post_comments;
+
+      // save the details of the user clicking the github  in the reaction section
+      await PostReactionModal.create({
+        ...notificationPostData,
+        likes,
+        github,
+        comments,
+      });
+    }
+
+    // send the response of the non mutated tech post object to the frontend
+    res.status(200).send(post);
+  } catch (error) {
+    res.status(400).send("something went wrong");
+  }
+};
+
+// update post comment on the post and also reflect on notification
+export const handlePostCommentsCreate = async (req, res) => {
+  try {
+    const data = req?.body;
+    console.log(data);
+    // searching for post best on the postID passed
+    const post = await TechPostModel.findById({ _id: data.postId });
+
+    // saved in the post itself user comments, contains full comment
+    const commentToSave = {
+      userId: data.userId,
+      name: data.name,
+      title: data.title,
+      avatar: data.avatar,
+      minimessage: data.minimessage,
+      country: data.country,
+    };
+
+    // saved in the notification collection, contains truncate comment
+    // message has two fields separeted by comma, the message and post tiltle
+    const notificationPostData = {
+      postId: data.postId,
+      ownerId: data.ownerId,
+      userId: data.userId,
+      name: data.name,
+      comments: 0,
+      likes: 0,
+      github: 0,
+      title: data.title,
+      avatar: data.avatar,
+      message: data.message?.split(".")[0],
+      minimessage: `${
+        data.message?.split(".")[1]
+      } — " ${data.minimessage?.substring(0, 25)}..."`,
+    };
+
+    if (!post) {
+      throw new Error("post not found!");
+    }
+
+    // increment comment counts
+    post.post_comments.count = post.post_comments.count + 1;
+
+    // add comment to the comments array
+    post.post_comments.comments = [
+      commentToSave,
+      ...post.post_comments.comments,
+    ];
+
+    // save the updated tech post
+    await post.save();
+
+    // extract the github, likes and comments of the saved post
+    const { clicks: likes } = post.post_liked;
+    const { clicks: github } = post.post_github;
+    const { count: comments } = post.post_comments;
+
+    // save the details of the user making the comment in the reaction database
+    await PostReactionModal.create({
+      ...notificationPostData,
+      likes,
+      github,
+      comments,
+    });
+
+    // send the response to the frontend the objecte mutated
+    res.status(200).send(post);
+
+    // resave the tech post with the latest updates
   } catch (error) {
     res.status(400).send("something went wrong");
     console.log(error.message);
   }
 };
 
-// get all posts reactions from the backend
+// get all tech posts reactions from the backend
 export const handleGetAllPostsReactions = async (req, res) => {
   try {
     // use the userID against ownersIDs in the notif if match result response
@@ -198,7 +380,7 @@ export const handleGetAllPostsReactions = async (req, res) => {
   }
 };
 
-// handle the deleteion of the reaction of a given post posted by the current user.
+// handle the deleteion of the reaction of a given  tech post posted by the current user.
 export const handleDeletePostReaction = async (req, res) => {
   const post_reactionID = req?.params.id;
 

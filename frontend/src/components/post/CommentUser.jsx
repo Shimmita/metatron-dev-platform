@@ -50,7 +50,11 @@ export default function CommentUser({ comment: commentor }) {
               </Box>
 
               <Box>
-                <Typography variant={"body2"} color={"text.secondary"}>
+                <Typography
+                  variant={"body2"}
+                  color={"text.secondary"}
+                  sx={{ color: "text.primary" }}
+                >
                   {commentor?.minimessage}
                 </Typography>
               </Box>

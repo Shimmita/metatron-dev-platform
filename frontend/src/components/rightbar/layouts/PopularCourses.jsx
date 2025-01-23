@@ -4,7 +4,7 @@ import {
   CardActionArea,
   Divider,
   Skeleton,
-  Typography
+  Typography,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
@@ -15,11 +15,12 @@ import React from "react";
 import { useSelector } from "react-redux";
 import Python from "../../../images/python.jpeg";
 
-export default function PopularCouses() {
+function PopularCouses() {
   // redux states
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
     (state) => state.appUI
   );
+
   return (
     <React.Fragment>
       {isLoadingRequest ? (
@@ -93,3 +94,5 @@ export default function PopularCouses() {
     </React.Fragment>
   );
 }
+
+export default React.memo(PopularCouses);

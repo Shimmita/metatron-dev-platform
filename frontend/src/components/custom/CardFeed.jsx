@@ -14,7 +14,6 @@ import {
   CardContent,
   CardHeader,
   Checkbox,
-  Divider,
   IconButton,
   Menu,
   Skeleton,
@@ -26,6 +25,7 @@ import React, { lazy, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch, useSelector } from "react-redux";
 import dev from "../../images/dev.jpeg";
+import { handleShowingSpeedDial } from "../../redux/AppUI";
 import { updateCurrentPostDetails } from "../../redux/CurrentPosts";
 import PostData from "../data/PostData";
 import CustomCountryName from "../utilities/CustomCountryName";
@@ -276,331 +276,340 @@ const CardFeed = ({ post, setPostDetailedData }) => {
   // handle showing post comments layout like full post details plus comments
   const handleShowFullPostComments = () => {
     setPostDetailedData(post);
+
+    // false showing of the speed dial for tabs and small devices
+    dispatch(handleShowingSpeedDial(false));
   };
 
   return (
-    <>
-      {isDarkMode && <Divider component="div" className="mb-3" />}
-      <Card
-        style={{
-          border: openMenu && isDarkMode ? "1px solid gray" : undefined,
+    <React.Fragment>
+      <Box
+        mb={2}
+        sx={{
+          border: isDarkMode && "1px solid",
+          borderColor: isDarkMode && "divider",
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
         }}
-        elevation={0}
-        className="w-100 shadow mb-4 p-2 rounded"
+        className="w-100 shadow p-2 rounded"
       >
-        <CardHeader
-          sx={{ padding: 0, margin: 0 }}
-          avatar={
-            <React.Fragment>
-              {isLoadingRequest ? (
+        <Card elevation={0}>
+          <CardHeader
+            sx={{ padding: 0, margin: 0 }}
+            avatar={
+              <React.Fragment>
+                {isLoadingRequest ? (
+                  <Skeleton
+                    animation="wave"
+                    variant="rectangular"
+                    width={40}
+                    height={40}
+                  />
+                ) : (
+                  <IconButton onClick={() => setOpenMiniProfileAlert(true)}>
+                    <Avatar
+                      // src={post.post_owner.owneravatar}
+                      src={dev}
+                      variant="rounded"
+                      sx={{
+                        backgroundColor: isDarkMode ? "#99CEF9" : "#1976D2",
+                        width: 50,
+                        height: 50,
+                      }}
+                      alt=""
+                    >
+                      {handleNoProfilePicture()}
+                    </Avatar>
+                  </IconButton>
+                )}
+              </React.Fragment>
+            }
+            action={
+              !isLoadingRequest && (
+                <Box
+                  flexDirection={"row"}
+                  display={"flex"}
+                  mt={1}
+                  alignItems={"center"}
+                >
+                  <Typography
+                    className={postBelongsCurrentUser && "me-3"}
+                    variant="body2"
+                  >
+                    {getElapsedTime(post?.createdAt)}
+                  </Typography>
+
+                  {!postBelongsCurrentUser && (
+                    <Tooltip title="more" arrow>
+                      <IconButton
+                        size="small"
+                        aria-label="more"
+                        onClick={handleClickMoreVertPost}
+                      >
+                        <MoreVertRounded
+                          color="primary"
+                          sx={{ width: 20, height: 20 }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={openMenu}
+                    onClose={handleCloseMenu}
+                    MenuListProps={{ "aria-labelledby": "more-button" }}
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                    transformOrigin={{ vertical: "top", horizontal: "right" }}
+                  >
+                    <CardFeedMore
+                      ownerId={post.post_owner?.ownerId}
+                      currentUserNetwork={user?.network}
+                      ownerName={post.post_owner.ownername}
+                    />
+                  </Menu>
+                </Box>
+              )
+            }
+            title={
+              isLoadingRequest ? (
                 <Skeleton
                   animation="wave"
-                  variant="rectangular"
-                  width={40}
-                  height={40}
+                  height={10}
+                  width="80%"
+                  style={{ marginBottom: 6 }}
                 />
               ) : (
-                <IconButton onClick={() => setOpenMiniProfileAlert(true)}>
-                  <Avatar
-                    // src={post.post_owner.owneravatar}
-                    src={dev}
-                    variant="rounded"
-                    sx={{
-                      backgroundColor: isDarkMode ? "#99CEF9" : "#1976D2",
-                      width: 50,
-                      height: 50,
-                    }}
-                    alt=""
+                <Box display="flex" alignItems="center" mt={1} gap={1}>
+                  <Typography
+                    fontWeight="bold"
+                    variant={CustomDeviceIsSmall() ? "body2" : "body1"}
                   >
-                    {handleNoProfilePicture()}
-                  </Avatar>
-                </IconButton>
-              )}
-            </React.Fragment>
-          }
-          action={
-            !isLoadingRequest && (
-              <Box
-                flexDirection={"row"}
-                display={"flex"}
-                mt={1}
-                alignItems={"center"}
-              >
-                <Typography
-                  className={postBelongsCurrentUser && "me-3"}
-                  variant="body2"
-                >
-                  {getElapsedTime(post?.createdAt)}
-                </Typography>
-
-                {!postBelongsCurrentUser && (
-                  <Tooltip title="more" arrow>
-                    <IconButton
-                      size="small"
-                      aria-label="more"
-                      onClick={handleClickMoreVertPost}
-                    >
-                      <MoreVertRounded
-                        color="primary"
-                        sx={{ width: 20, height: 20 }}
-                      />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                <Menu
-                  anchorEl={anchorEl}
-                  open={openMenu}
-                  onClose={handleCloseMenu}
-                  MenuListProps={{ "aria-labelledby": "more-button" }}
-                  anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                  transformOrigin={{ vertical: "top", horizontal: "right" }}
-                >
-                  <CardFeedMore
-                    ownerId={post.post_owner?.ownerId}
-                    currentUserNetwork={user?.network}
-                    ownerName={post.post_owner.ownername}
+                    {CustomDeviceSmallest()
+                      ? handleName()
+                      : `${post.post_owner.ownername}`}
+                  </Typography>
+                  <VerifiedRounded
+                    color="primary"
+                    sx={{ width: 18, height: 18 }}
                   />
-                </Menu>
-              </Box>
-            )
-          }
-          title={
-            isLoadingRequest ? (
+                </Box>
+              )
+            }
+            subheader={
+              isLoadingRequest ? (
+                <Skeleton animation="wave" height={10} width="40%" />
+              ) : (
+                <Box>
+                  {/*occupation title */}
+                  <Typography variant="body2">
+                    {CustomDeviceSmallest()
+                      ? handleOccupation()
+                      : `${post.post_owner.ownertitle}`}
+                  </Typography>
+                  {/* skills */}
+                  <Typography variant="body2">
+                    {post.post_owner.ownerskills[0]} |{" "}
+                    {post.post_owner.ownerskills[1]} |{" "}
+                    {post.post_owner.ownerskills[2]}
+                  </Typography>
+                  {/* location */}
+                  <Typography variant="body2">
+                    {CustomCountryName(post.post_location.country)} |{" "}
+                    {post.post_location.state}{" "}
+                  </Typography>
+                </Box>
+              )
+            }
+          />
+
+          {isLoadingRequest ? (
+            <Box mt={1}>
               <Skeleton
+                sx={{ height: 350, borderRadius: "10px" }}
                 animation="wave"
-                height={10}
-                width="80%"
-                style={{ marginBottom: 6 }}
+                variant="rectangular"
               />
-            ) : (
-              <Box display="flex" alignItems="center" mt={1} gap={1}>
-                <Typography
-                  fontWeight="bold"
-                  variant={CustomDeviceIsSmall() ? "body2" : "body1"}
-                >
-                  {CustomDeviceSmallest()
-                    ? handleName()
-                    : `${post.post_owner.ownername}`}
-                </Typography>
-                <VerifiedRounded
-                  color="primary"
-                  sx={{ width: 18, height: 18 }}
-                />
-              </Box>
-            )
-          }
-          subheader={
-            isLoadingRequest ? (
-              <Skeleton animation="wave" height={10} width="40%" />
-            ) : (
-              <Box>
-                {/*occupation title */}
-                <Typography variant="body2">
-                  {CustomDeviceSmallest()
-                    ? handleOccupation()
-                    : `${post.post_owner.ownertitle}`}
-                </Typography>
-                {/* skills */}
-                <Typography variant="body2">
-                  {post.post_owner.ownerskills[0]} |{" "}
-                  {post.post_owner.ownerskills[1]} |{" "}
-                  {post.post_owner.ownerskills[2]}
-                </Typography>
-                {/* location */}
-                <Typography variant="body2">
-                  {CustomCountryName(post.post_location.country)} |{" "}
-                  {post.post_location.state}{" "}
-                </Typography>
-              </Box>
-            )
-          }
-        />
+            </Box>
+          ) : (
+            <Box>
+              <CardContent>
+                <Box mb={2} width={"100%"}>
+                  <Box mb={1}>
+                    {/* post specialisation */}
+                    <Typography
+                      variant="body2"
+                      textAlign={"center"}
+                      fontWeight={"bold"}
+                    >
+                      {post.post_category.main}
+                    </Typography>
+                  </Box>
 
-        {isLoadingRequest ? (
-          <Box mt={1}>
-            <Skeleton
-              sx={{ height: 350, borderRadius: "10px" }}
-              animation="wave"
-              variant="rectangular"
-            />
-          </Box>
-        ) : (
-          <Box>
-            <CardContent>
-              <Box mb={2} width={"100%"}>
-                <Box mb={1}>
-                  {/* post specialisation */}
-                  <Typography
-                    variant="body2"
-                    textAlign={"center"}
-                    fontWeight={"bold"}
+                  <Box
+                    display={"flex"}
+                    justifyContent={"center"}
+                    alignItems={"center"}
+                    gap={2}
                   >
-                    {post.post_category.main}
-                  </Typography>
-                </Box>
+                    <WbIncandescentRounded
+                      sx={{
+                        width: 18,
+                        height: 18,
+                        color: isDarkMode ? "yellow" : "orange",
+                      }}
+                    />
+                    {/* title of the post */}
+                    <Typography
+                      variant="body2"
+                      color={"text.secondary"}
+                      fontWeight={"bold"}
+                    >
+                      {post.post_title}
+                    </Typography>
 
+                    <WbIncandescentRounded
+                      sx={{
+                        width: 18,
+                        height: 18,
+                        color: isDarkMode ? "yellow" : "orange",
+                      }}
+                    />
+                  </Box>
+                </Box>
+                <CardActionArea
+                  onClick={handleFullDiscription}
+                  disabled={!detailsLong}
+                >
+                  <Box
+                    display={"flex"}
+                    justifyContent={"center"}
+                    width={"100%"}
+                  >
+                    <Typography
+                      variant={"body2"}
+                      maxWidth={
+                        CustomLandscapeWidest()
+                          ? "90%"
+                          : CustomDeviceTablet()
+                          ? "95%"
+                          : CustomLandScape()
+                          ? "93%"
+                          : "98%"
+                      }
+                    >
+                      {!isFullDescription && handleDetailsLength()}
+                      {detailsLong && !isFullDescription && (
+                        <Typography
+                          variant="body2"
+                          component={"span"}
+                          fontWeight={"bold"}
+                          color={"primary"}
+                        >
+                          &nbsp; more
+                        </Typography>
+                      )}
+                      {isFullDescription && details}
+                    </Typography>
+                  </Box>
+                </CardActionArea>
+              </CardContent>
+              <Box display={"flex"} justifyContent={"center"} width={"100%"}>
                 <Box
-                  display={"flex"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                  gap={2}
+                  sx={{
+                    width: "92%",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
                 >
-                  <WbIncandescentRounded
-                    sx={{
-                      width: 18,
-                      height: 18,
-                      color: isDarkMode ? "yellow" : "orange",
-                    }}
-                  />
-                  {/* title of the post */}
-                  <Typography
-                    variant="body2"
-                    color={"text.secondary"}
-                    fontWeight={"bold"}
-                  >
-                    {post.post_title}
-                  </Typography>
-
-                  <WbIncandescentRounded
-                    sx={{
-                      width: 18,
-                      height: 18,
-                      color: isDarkMode ? "yellow" : "orange",
-                    }}
-                  />
-                </Box>
-              </Box>
-              <CardActionArea
-                onClick={handleFullDiscription}
-                disabled={!detailsLong}
-              >
-                <Box display={"flex"} justifyContent={"center"} width={"100%"}>
-                  <Typography
-                    variant={"body2"}
-                    maxWidth={
-                      CustomLandscapeWidest()
-                        ? "90%"
+                  {/* smart 300,350 */}
+                  <LazyLoadImage
+                    src={handlePostImagePresent()}
+                    alt=""
+                    height={CustomDeviceScreenSize()}
+                    width={
+                      CustomDeviceIsSmall()
+                        ? "95%"
                         : CustomDeviceTablet()
                         ? "95%"
-                        : CustomLandScape()
-                        ? "93%"
-                        : "98%"
+                        : "92%"
                     }
-                  >
-                    {!isFullDescription && handleDetailsLength()}
-                    {detailsLong && !isFullDescription && (
-                      <Typography
-                        variant="body2"
-                        component={"span"}
-                        fontWeight={"bold"}
-                        color={"primary"}
-                      >
-                        &nbsp; more
-                      </Typography>
-                    )}
-                    {isFullDescription && details}
-                  </Typography>
+                    style={{
+                      objectFit: "fill",
+                      borderRadius: 10,
+                      border: "1px solid",
+                      borderColor: "grey",
+                    }}
+                  />
                 </Box>
-              </CardActionArea>
-            </CardContent>
-            <Box display={"flex"} justifyContent={"center"} width={"100%"}>
-              <Box
-                sx={{
-                  width: "92%",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                {/* smart 300,350 */}
-                <LazyLoadImage
-                  src={handlePostImagePresent()}
-                  alt=""
-                  height={CustomDeviceScreenSize()}
-                  width={
-                    CustomDeviceIsSmall()
-                      ? "95%"
-                      : CustomDeviceTablet()
-                      ? "95%"
-                      : "92%"
-                  }
-                  style={{
-                    objectFit: "fill",
-                    borderRadius: 10,
-                    border: "1px solid",
-                    borderColor: "grey",
-                  }}
-                />
               </Box>
             </Box>
-          </Box>
-        )}
+          )}
 
-        {isLoadingRequest ? (
-          renderSkeleton()
-        ) : (
-          <Box
-            display="flex"
-            p={1}
-            justifyContent="space-around"
-            alignItems="center"
-          >
-            {[
-              {
-                icon: (
-                  <FavoriteRounded
-                    sx={{ width: 23, height: 23 }}
-                    color={currentUserLiked ? "primary" : undefined}
-                  />
-                ),
-                count: post_likes,
-                title: "like",
-                onClick: handlePostLikes,
-              },
-              {
-                icon: (
-                  <GitHub
-                    sx={{ width: 21, height: 21 }}
-                    color={currentUserClickedGithub ? "primary" : undefined}
-                  />
-                ),
-                count: post_github_clicks,
-                title: "Github",
-                onClick: handleGithubClicks,
-              },
-              {
-                icon: (
-                  <ForumRounded
-                    sx={{ width: 21, height: 21 }}
-                    color={currentUserCommentented ? "primary" : undefined}
-                  />
-                ),
-                count: post_comment_count,
-                title: "comment",
-                onClick: handleShowFullPostComments,
-              },
-            ].map(({ icon, count, title, onClick }) => (
-              <Box display="flex" alignItems="center" key={title}>
-                <Tooltip title={title} arrow>
-                  <Checkbox
-                    onChange={onClick}
-                    icon={icon}
-                    checkedIcon={icon}
-                    disabled={isUploading}
-                  />
-                </Tooltip>
-                <Typography
-                  fontWeight="bold"
-                  variant="body2"
-                  color="text.secondary"
-                >
-                  {count}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        )}
-      </Card>
+          {isLoadingRequest ? (
+            renderSkeleton()
+          ) : (
+            <Box
+              display="flex"
+              p={1}
+              justifyContent="space-around"
+              alignItems="center"
+            >
+              {[
+                {
+                  icon: (
+                    <FavoriteRounded
+                      sx={{ width: 23, height: 23 }}
+                      color={currentUserLiked ? "primary" : undefined}
+                    />
+                  ),
+                  count: post_likes,
+                  title: "like",
+                  onClick: handlePostLikes,
+                },
+                {
+                  icon: (
+                    <GitHub
+                      sx={{ width: 21, height: 21 }}
+                      color={currentUserClickedGithub ? "primary" : undefined}
+                    />
+                  ),
+                  count: post_github_clicks,
+                  title: "Github",
+                  onClick: handleGithubClicks,
+                },
+                {
+                  icon: (
+                    <ForumRounded
+                      sx={{ width: 21, height: 21 }}
+                      color={currentUserCommentented ? "primary" : undefined}
+                    />
+                  ),
+                  count: post_comment_count,
+                  title: "comment",
+                  onClick: handleShowFullPostComments,
+                },
+              ].map(({ icon, count, title, onClick }) => (
+                <Box display="flex" alignItems="center" key={title}>
+                  <Tooltip title={title} arrow>
+                    <Checkbox
+                      onChange={onClick}
+                      icon={icon}
+                      checkedIcon={icon}
+                      disabled={isUploading}
+                    />
+                  </Tooltip>
+                  <Typography
+                    fontWeight="bold"
+                    variant="body2"
+                    color="text.secondary"
+                  >
+                    {count}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Card>
+      </Box>
 
       {/* alert for showing user miniprofile details by passing the post ownerID */}
       <AlertMiniProfileView
@@ -608,7 +617,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
         setOpenAlert={setOpenMiniProfileAlert}
         userId={post.post_owner.ownerId}
       />
-    </>
+    </React.Fragment>
   );
 };
 

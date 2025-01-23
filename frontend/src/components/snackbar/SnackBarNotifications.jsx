@@ -10,7 +10,7 @@ function SlideTransition(props) {
   return <Slide {...props} direction="up" />;
 }
 
-export default function SnackBarNotifications({ message, isWarning = false }) {
+const SnackBarNotifications = ({ message, isWarning = false }) => {
   // redux states
   const dispatch = useDispatch();
   const [state, setState] = React.useState({
@@ -60,4 +60,6 @@ export default function SnackBarNotifications({ message, isWarning = false }) {
       </Snackbar>
     </Box>
   );
-}
+};
+
+export default React.memo(SnackBarNotifications);

@@ -24,7 +24,6 @@ const PostReactionModal = new mongoose.Schema(
       type: String,
       required: [true, "name is required"],
       trim: true,
-      unique: true,
     },
     avatar: {
       type: String,
@@ -50,18 +49,28 @@ const PostReactionModal = new mongoose.Schema(
       required: [true, "overview message is required"],
       trim: true,
     },
+
+    likes: {
+      type: Number,
+      required: [true, "likes count is required"],
+      trim: true,
+    },
+
+    comments: {
+      type: Number,
+      required: [true, "comment count is required"],
+      trim: true,
+    },
+
+    github: {
+      type: Number,
+      required: [true, "github count is required"],
+      trim: true,
+    },
   },
   {
     timestamps: true,
   }
 );
-
-// Automatically exclude the password field when sending JSON
-PostReactionModal.set("toJSON", {
-  transform: (doc, ret) => {
-    delete ret.password; // Remove the password field
-    return ret;
-  },
-});
 
 export default mongoose.model("post_reaction", PostReactionModal);

@@ -1,4 +1,5 @@
 import {
+  BarChartRounded,
   Close,
   FavoriteRounded,
   ForumRounded,
@@ -22,6 +23,8 @@ import Typography from "@mui/material/Typography";
 import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { showMessagingDrawer } from "../../../redux/AppUI";
 import { deleteCurrentPostReaction } from "../../../redux/CurrentPostReactions";
 import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
 import MiniProfileLayout from "../../custom/MiniProfileLayout";
@@ -32,6 +35,7 @@ export default function PostReaction({ reaction }) {
   const [isMiniProfile, setIsMiniProfile] = useState(false);
   const [userMessage, setUserMessage] = useState("");
   const [showMessageInput, setShowMessageInput] = useState(false);
+  const navigate = useNavigate();
   const max_message_count = 50;
 
   // dispatch for redux functionalities
@@ -83,6 +87,15 @@ export default function PostReaction({ reaction }) {
   const handleShowMiniProfile = () => {
     // show user miniprofile view instead of their post reaction
     setIsMiniProfile((prev) => !prev);
+  };
+
+  // navigate to post details routed page, alse close the drawer notification
+  const handleNavigatePostDetailsRoute = () => {
+    // close drawer messageing by updating the redux state
+    dispatch(showMessagingDrawer());
+
+    // navigate
+    navigate("posts/details/" + reaction?.postId);
   };
 
   return (
@@ -189,7 +202,7 @@ export default function PostReaction({ reaction }) {
                 </Box>
               }
               secondary={
-                <CardActionArea>
+                <CardActionArea onClick={handleNavigatePostDetailsRoute}>
                   <React.Fragment>
                     <Typography
                       component="span"
@@ -231,7 +244,17 @@ export default function PostReaction({ reaction }) {
                     {` — ${reaction?.minimessage}`}
 
                     {/* post counters */}
-                    <Box display={"flex"} justifyContent={"flex-end"}>
+                    <Box
+                      display={"flex"}
+                      justifyContent={"flex-end"}
+                      alignItems={"center"}
+                      mt={1}
+                      gap={1}
+                    >
+                      {/* stats svg */}
+                      <Box>
+                        <BarChartRounded sx={{ width: 16, height: 16 }} />
+                      </Box>
                       <Box
                         sx={{
                           pe: 1,

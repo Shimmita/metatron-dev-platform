@@ -11,7 +11,7 @@ function SlideTransition(props) {
   return <Slide {...props} direction="up" />;
 }
 
-export default function SnackBarSuccess({ message }) {
+const SnackBarSuccess = ({ message }) => {
   // redux states
   const { isTabSideBar } = useSelector((state) => state.appUI);
   const dispatch = useDispatch();
@@ -58,4 +58,6 @@ export default function SnackBarSuccess({ message }) {
       </Snackbar>
     </Box>
   );
-}
+};
+
+export default React.memo(SnackBarSuccess);

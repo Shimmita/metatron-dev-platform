@@ -9,14 +9,16 @@ import completeSigningReducer from "./CompleteSigning";
 import currentAuthMessageReducer from "./CurrentAuthMessages";
 import currentBottomNavReducer from "./CurrentBottomNav";
 import currentChatBot from "./CurrentChatBot";
+import currentConnectRequestReducer from "./CurrentConnect";
+import currentConnectNotifReducer from "./CurrentConnectNotif";
 import currentJobsReducer from "./CurrentJobs";
 import currentJobSearchReducer from "./CurrentJobSearch";
 import currentJobsTopReducer from "./CurrentJobsTop";
 import currentPaginationReducer from "./CurrentPagination";
+import currentPostReactionsReducer from "./CurrentPostReactions";
 import currentPostsReducer from "./CurrentPosts";
 import currentSnackReducer from "./CurrentSnackBar";
 import currentUserReducer from "./CurrentUser";
-import currentPostReactionsReducer from "./CurrentPostReactions";
 
 // Configure persist settings
 const persistConfig = {
@@ -39,6 +41,8 @@ const rootReducer = combineReducers({
   currentJobSearch: currentJobSearchReducer,
   currentChatBot: currentChatBot,
   currentPostReactions: currentPostReactionsReducer,
+  currentConnectRequest: currentConnectRequestReducer,
+  currentConnectNotif: currentConnectNotifReducer,
 });
 
 // Persist the root reducer

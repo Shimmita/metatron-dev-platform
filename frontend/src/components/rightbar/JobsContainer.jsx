@@ -4,9 +4,8 @@ import List from "@mui/material/List";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import FeaturedJobs from "./layouts/FeaturedJobs";
-import { resetAll } from "../../redux/AppUI";
 import { updateCurrentJobsTop } from "../../redux/CurrentJobsTop";
+import FeaturedJobs from "./layouts/FeaturedJobs";
 
 export default function JobsContainer() {
   // screen width of the device
@@ -15,12 +14,17 @@ export default function JobsContainer() {
   const { jobsTop } = useSelector((state) => state.currentJobsTop);
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  
   const dispatch = useDispatch();
   // axios default credentials
   axios.defaults.withCredentials = true;
 
   // fetch posts from the backend
   useEffect(() => {
+    // check if there is no jobs then fetch else dont api calls
+    if (jobsTop) {
+      return;
+    }
     // set is fetching to true
     setIsFetching(true);
 
@@ -37,10 +41,7 @@ export default function JobsContainer() {
       })
       .catch(async (err) => {
         console.log(err);
-        //  user login session expired show logout alert
-        if (err?.response?.data.login) {
-          window.location.reload();
-        }
+
         if (err?.code === "ERR_NETWORK") {
           setErrorMessage(
             "Server is unreachable check your internet connection"
@@ -52,15 +53,9 @@ export default function JobsContainer() {
       .finally(() => {
         // set is fetching to false
         setIsFetching(false);
-        // reset all the UI states to default which will update isloading in redux
-        dispatch(resetAll());
       });
-  }, [dispatch]);
+  }, [dispatch, jobsTop]);
 
-  // handle clearing of isNetwork and error message when the alert shown
-  const handleClearing = () => {
-    setErrorMessage("");
-  };
 
   // get the rightbar expanded appropritately
   const rightBarExpaned = () => {
@@ -79,7 +74,7 @@ export default function JobsContainer() {
   };
 
   return (
-    <>
+    <React.Fragment>
       <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
         <Box
           display={"flex"}
@@ -109,6 +104,6 @@ export default function JobsContainer() {
           ))}
         </Box>
       </List>
-    </>
+    </React.Fragment>
   );
 }

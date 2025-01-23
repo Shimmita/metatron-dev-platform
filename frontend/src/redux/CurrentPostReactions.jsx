@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialstate = {
-  post_reactions: [],
+  post_reactions: null,
 };
 
 const CurrentPostReactions = createSlice({

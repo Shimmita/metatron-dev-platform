@@ -1,11 +1,14 @@
 import { MoodBadRounded } from "@mui/icons-material";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Collapse, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { resetDefaultBottomNav, handleSidebarRightbar } from "../../redux/AppUI";
+import {
+  resetDefaultBottomNav,
+  handleSidebarRightbar,
+} from "../../redux/AppUI";
 
-const PageNotFound = () => {
+const PageNotFound = ({ mesage = "" }) => {
   // redux to stop showing of the speed dial
   const dispatch = useDispatch();
 
@@ -47,6 +50,13 @@ const PageNotFound = () => {
           <Box>
             <Typography textAlign={"center"} variant="h5">
               Page Not Found !
+            </Typography>
+          </Box>
+
+          {/* display error message here */}
+          <Box display={"flex"} justifyContent={"center"}>
+            <Typography variant="body2" color={"text.secondary"}>
+              {mesage}
             </Typography>
           </Box>
           <hr />
