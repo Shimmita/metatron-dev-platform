@@ -9,12 +9,13 @@ import session from "express-session";
 import mongoose from "mongoose";
 import { handleAuthMiddleware } from "./middlewares/auth_middleware.js";
 import authenticationRouter from "./routes/authentication_route.js";
+import manageChatAiRoute from "./routes/manage_chat_route.js";
+import manageConnectRequestRoute from "./routes/manage_connect_route.js";
+import manageConversationsRoute from "./routes/manage_converse_route.js";
+import { coursesManageRouter } from "./routes/manage_courses_route.js";
 import { manageJobsRouter } from "./routes/manage_jobs_route.js";
 import { postManageRouter } from "./routes/manage_post_route.js";
-import manageChatAiRoute from "./routes/manage_chat_route.js";
-import { coursesManageRouter } from "./routes/manage_courses_route.js";
 import manageUsersRoute from "./routes/manage_users_route.js";
-import manageConnectRequestRoute from "./routes/manage_connect_route.js";
 const mongoDBSession = connectMongoStore(session);
 const app = express();
 app.use(bodyParser.json());
@@ -92,6 +93,12 @@ app.use(`${BASE_ROUTE}/courses`, handleAuthMiddleware, coursesManageRouter);
 //users route
 app.use(`${BASE_ROUTE}/users`, handleAuthMiddleware, manageUsersRoute);
 
+app.use(
+  `${BASE_ROUTE}/conversations`,
+  handleAuthMiddleware,
+  manageConversationsRoute
+);
+
 // signOut user
 app.use(`${BASE_ROUTE}/signout`, (req, res) => {
   try {
@@ -127,5 +134,5 @@ app.use(`${BASE_ROUTE}/valid`, (req, res) => {
 
 // not found route
 app.use("*", (req, res) => {
-  res.status(404).send("Resource you are looking for is not found!");
+  res.status(404).send("resource not accessible!");
 });

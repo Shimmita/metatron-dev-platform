@@ -44,6 +44,7 @@ const postSchema = new mongoose.Schema(
       _id: false,
     },
     post_edited: { type: Boolean, required: false, default: false },
+    report_count: { type: Number, required: false, default: 0 },
     post_liked: {
       clicks: { type: Number, required: false, default: 0 },
       clickers: { type: [String], required: false, default: [], _id: false },

@@ -1,4 +1,3 @@
-import { AdsClickRounded, EmailRounded } from "@mui/icons-material";
 import {
   AppBar,
   Badge,
@@ -13,8 +12,10 @@ import Drawer from "@mui/material/Drawer";
 import React, { lazy, Suspense, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { showMessagingDrawer } from "../../redux/AppUI";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-const MessageContainer = lazy(() => import("./MessageContainer"));
+const ConversationContainer = lazy(() => import("./ConversationsContainer"));
 const NotificationContainer = lazy(() => import("./NotificationContainer"));
 
 const StyledTabs = styled((props) => (
@@ -48,7 +49,7 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
   })
 );
 
-export default function Messaging() {
+export default function ParentContainer() {
   const [value, setValue] = React.useState(0);
   // this will define display of inbox and notif bars appropriately
   const [messageNotifClicked, setMessageNotifClicked] = useState(false);
@@ -67,33 +68,25 @@ export default function Messaging() {
     setMessageNotifClicked((prev) => (prev === true ? false : false));
   };
 
-  // return the appropriate size of the drawer
-  const drawerSize = () => {
-    let screenSize = window.screen.availWidth;
-    // smallest device size
-    if (screenSize <= 350) return 280;
-
-    // medium device size
-    if (screenSize > 350 && screenSize < 600) return 330;
-
-    // tablet size at portrait
-    if (CustomDeviceTablet()) return 420;
-
-    // very large screen for tablets at landscape size and laptops
-    return 450;
-  };
-
   return (
     <React.Fragment>
       <Drawer anchor={"right"} open={isOpenMessageDrawer} onClose={handleClose}>
         <Box
-          width={drawerSize()}
+          width={
+            CustomDeviceSmallest()
+              ? 270
+              : CustomDeviceIsSmall()
+              ? 330
+              : CustomDeviceTablet()
+              ? 420
+              : 450
+          }
           bgcolor={"background.default"}
           height={"100vh"}
         >
           {/* display when message/notif item not clicked */}
           {!messageNotifClicked ? (
-            <AppBar position="sticky" color="transparent">
+            <AppBar position="sticky">
               <Toolbar
                 variant="dense"
                 sx={{ display: "flex", justifyContent: "center" }}
@@ -110,42 +103,31 @@ export default function Messaging() {
                   >
                     <StyledTab
                       label={
-                        <Typography
-                          alignItems={"center"}
-                          gap={1}
-                          display={"flex"}
-                          sx={{ paddingRight: 10 }}
-                          variant="body2"
-                        >
-                          <span>
-                            <AdsClickRounded sx={{ height: 17, width: 17 }} />
-                          </span>
-                          <span style={{ fontWeight: "bold" }}>
-                            <Badge color="warning" variant="dot">
-                              Promoted
-                            </Badge>
-                          </span>
-                        </Typography>
+                        <Badge color="warning" variant="dot" className="me-5">
+                          <Typography
+                            fontWeight={"bold"}
+                            className={value === 0 && "border-bottom pb-1"}
+                            variant="body2"
+                            sx={{ color: "white" }}
+                          >
+                            Notification
+                          </Typography>
+                        </Badge>
                       }
                     />
 
                     <StyledTab
                       label={
-                        <Typography
-                          alignItems={"center"}
-                          gap={1}
-                          display={"flex"}
-                          variant="body2"
-                        >
-                          <span>
-                            <EmailRounded sx={{ height: 17, width: 17 }} />
-                          </span>
-                          <span style={{ fontWeight: "bold" }}>
-                            <Badge color="warning" variant="dot">
-                              Inbox
-                            </Badge>
-                          </span>
-                        </Typography>
+                        <Badge color="warning" variant="dot" className="ms-3">
+                          <Typography
+                            fontWeight={"bold"}
+                            className={value === 1 && "border-bottom pb-1"}
+                            variant="body2"
+                            sx={{ color: "white" }}
+                          >
+                            Messages
+                          </Typography>
+                        </Badge>
                       }
                     />
                   </StyledTabs>
@@ -172,7 +154,7 @@ export default function Messaging() {
               {value === 0 && <NotificationContainer />}
               {/* display messages content and passing props */}
               {value === 1 && (
-                <MessageContainer
+                <ConversationContainer
                   setMessageNotifClicked={setMessageNotifClicked}
                 />
               )}

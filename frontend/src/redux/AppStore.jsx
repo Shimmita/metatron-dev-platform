@@ -16,6 +16,7 @@ import currentJobSearchReducer from "./CurrentJobSearch";
 import currentJobsTopReducer from "./CurrentJobsTop";
 import currentPaginationReducer from "./CurrentPagination";
 import currentPostReactionsReducer from "./CurrentPostReactions";
+import currentReportedPostReducer from "./CurrentPostReported";
 import currentPostsReducer from "./CurrentPosts";
 import currentSnackReducer from "./CurrentSnackBar";
 import currentUserReducer from "./CurrentUser";
@@ -43,6 +44,7 @@ const rootReducer = combineReducers({
   currentPostReactions: currentPostReactionsReducer,
   currentConnectRequest: currentConnectRequestReducer,
   currentConnectNotif: currentConnectNotifReducer,
+  currentReportedPost: currentReportedPostReducer,
 });
 
 // Persist the root reducer

@@ -57,6 +57,7 @@ function FeaturedPost() {
           <ListItem>
             <ListItemAvatar>
               <Avatar
+                variant="rounded"
                 src={DevLogo}
                 sx={{
                   backgroundColor: "#1976D2",

@@ -31,7 +31,7 @@ import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 const EventsAddModal = lazy(() => import("../modal/EventsAddModal"));
-const Messaging = lazy(() => import("../messaging/Messaging"));
+const ParentNotifMessageContainer = lazy(() => import("../messaging/ParentContainer"));
 const DrawerSmartphone = lazy(() => import("./DrawerSmartphone"));
 
 //fix the appbar contents not showing full when set fixed
@@ -343,7 +343,7 @@ const Navbar = ({ setMode, mode }) => {
           />
 
           {/* notif and messaging to the left for large screens and right on tabs and top on small devices */}
-          <Messaging />
+          <ParentNotifMessageContainer />
 
           {/* EventsAdd Modal to be displayed if toggled */}
           <EventsAddModal

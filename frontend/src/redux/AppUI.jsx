@@ -15,6 +15,7 @@ const initialState = {
   isPostModalRedux: false,
   isLoadingPostLaunch: false,
   isSimilarCoursesModal: false,
+
   // theme
   isDarkMode: false,
   currentMode: "light",

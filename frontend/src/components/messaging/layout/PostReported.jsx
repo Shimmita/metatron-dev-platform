@@ -1,10 +1,8 @@
 import {
   BarChartRounded,
   Close,
-  FavoriteRounded,
   Flag,
-  ForumRounded,
-  GitHub,
+  FlagRounded,
   SendRounded,
 } from "@mui/icons-material";
 import {
@@ -31,7 +29,7 @@ import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
 import MiniProfileLayout from "../../custom/MiniProfileLayout";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
 
-export default function PostReaction({ reaction, isLastItem }) {
+export default function PostReported({ report, isLastItem }) {
   const [isFetching, setIsFetching] = useState(false);
   const [isMiniProfile, setIsMiniProfile] = useState(false);
   const [userMessage, setUserMessage] = useState("");
@@ -46,7 +44,7 @@ export default function PostReaction({ reaction, isLastItem }) {
   axios.defaults.withCredentials = true;
 
   // getting the current reactionID
-  const { _id } = reaction;
+  const { _id } = report;
 
   // handle deletion of the current notification post_reaction
   const handleDeleteReaction = () => {
@@ -64,7 +62,7 @@ export default function PostReaction({ reaction, isLastItem }) {
       .then((res) => {
         if (res?.data) {
           // update the redux of of reactions to reflect the current changes
-          dispatch(deleteCurrentPostReaction(reaction));
+          dispatch(deleteCurrentPostReaction(report));
           // update the snackbar notification message in the redux
           dispatch(updateNotificationSnackBar(res.data));
         }
@@ -96,7 +94,7 @@ export default function PostReaction({ reaction, isLastItem }) {
     dispatch(showMessagingDrawer());
 
     // navigate
-    navigate("posts/details/" + reaction?.postId);
+    navigate("posts/details/" + report?.postId);
   };
 
   return (
@@ -104,16 +102,14 @@ export default function PostReaction({ reaction, isLastItem }) {
       {isMiniProfile ? (
         <React.Fragment>
           {/* user miniprofile */}
-          <Box
-            className={showMessageInput ? " mb-1" : " mb-2"}
+          <Box  className={showMessageInput ? " mb-1" : " mb-2"}
             sx={{
               border: "1px solid",
               borderColor: "divider",
-            }}
-          >
+            }}>
             <MiniProfileLayout
               handleShowMiniProfile={handleShowMiniProfile}
-              userId={reaction?.userId}
+              userId={report?.reporterId}
               showMessageInput={showMessageInput}
               setShowMessageInput={setShowMessageInput}
             />
@@ -175,7 +171,7 @@ export default function PostReaction({ reaction, isLastItem }) {
                   textTransform={"uppercase"}
                   fontWeight={"bold"}
                 >
-                  {reaction?.name[0]}
+                  {report?.reporter_name[0]}
                 </Typography>
               </Avatar>
             </ListItemAvatar>
@@ -187,13 +183,13 @@ export default function PostReaction({ reaction, isLastItem }) {
                   alignItems={"center"}
                   width={"100%"}
                 >
-                  {/* user name */}
+                  {/* reporter name */}
                   <Typography
                     fontWeight={"bold"}
                     variant="body2"
                     width={"100%"}
                   >
-                    {reaction?.name}
+                    {report?.reporter_name}
                   </Typography>
                   {/*delete button +progress if is fetch */}
                   {isFetching ? (
@@ -202,7 +198,7 @@ export default function PostReaction({ reaction, isLastItem }) {
                     <Box display={"flex"} gap={"3px"} alignItems={"center"}>
                       {/* time elapsed since post created */}
                       <Typography variant="caption">
-                        {getElapsedTime(reaction?.createdAt)}
+                        {getElapsedTime(report?.createdAt)}
                       </Typography>
                       {/* delete reaction */}
                       <IconButton size="small" onClick={handleDeleteReaction}>
@@ -224,37 +220,24 @@ export default function PostReaction({ reaction, isLastItem }) {
                         alignItems: "center",
                       }}
                     >
-                      {reaction?.title} <br />
-                      {reaction?.message?.toLowerCase().includes("liked") && (
-                        <FavoriteRounded
-                          sx={{ width: 14, height: 14 }}
-                          color="primary"
-                          className="me-1"
-                        />
-                      )}
-                      {reaction?.message?.toLowerCase().includes("github") && (
-                        <GitHub
-                          sx={{ width: 14, height: 14 }}
-                          color="primary"
-                          className="me-1"
-                        />
-                      )}
-                      {reaction?.message
-                        ?.toLowerCase()
-                        .includes("commented") && (
-                        <ForumRounded
-                          sx={{ width: 14, height: 14 }}
-                          color="primary"
-                          className="me-1"
-                        />
-                      )}
+                      {/* reporter speciality */}
+                      <Typography variant="body2" gutterBottom>
+                        {report?.reporter_speciality}
+                      </Typography>{" "}
+                      {/* post title */} " {report?.post_title} " <br />
+                      {/* report about */}
+                      <FlagRounded
+                        sx={{ width: 16, height: 16 }}
+                        color="info"
+                        className="me-1"
+                      />
                       {/* message  */}
-                      {reaction?.message}
+                      {report?.report_title}
                       {/* minimessage of post section */}
                     </Typography>
-                    {` — ${reaction?.minimessage}`}
+                    {` — ${report?.report_message}`}
 
-                    {/* post counters */}
+                    {/* box telling stats of report cases or count times */}
                     <Box
                       display={"flex"}
                       justifyContent={"flex-end"}
@@ -281,54 +264,9 @@ export default function PostReaction({ reaction, isLastItem }) {
                         }}
                       >
                         {/* likes count */}
-                        <FavoriteRounded sx={{ width: 14, height: 14 }} />
-                        <Typography variant="caption">
-                          {reaction?.likes}
-                        </Typography>
-
-                        {/* divider */}
-                        <Divider
-                          orientation="vertical"
-                          variant="middle"
-                          flexItem
-                          className="px-1"
-                          component={"div"}
-                        />
-
-                        {/* github counts */}
-                        <GitHub sx={{ width: 14, height: 14 }} />
-                        <Typography variant="caption">
-                          {reaction?.github}
-                        </Typography>
-
-                        {/* divider */}
-                        <Divider
-                          orientation="vertical"
-                          variant="middle"
-                          flexItem
-                          className="px-1"
-                          component={"div"}
-                        />
-
-                        {/* comments count */}
-                        <ForumRounded sx={{ width: 14, height: 14 }} />
-                        <Typography variant="caption" className="pe-1">
-                          {reaction?.comments}
-                        </Typography>
-
-                        {/* divider */}
-                        <Divider
-                          orientation="vertical"
-                          variant="middle"
-                          flexItem
-                          className="px-1"
-                          component={"div"}
-                        />
-
-                        {/* flags or number reports */}
                         <Flag sx={{ width: 14, height: 14 }} />
-                        <Typography variant="caption" className="pe-1">
-                          {reaction?.report_count}
+                        <Typography variant="caption" className="px-1">
+                          post reported {report?.report_count} times
                         </Typography>
                       </Box>
                     </Box>

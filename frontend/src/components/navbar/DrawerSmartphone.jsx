@@ -4,7 +4,6 @@ import {
   AndroidRounded,
   Apple,
   BookmarkRounded,
-  BusinessRounded,
   CalendarMonthRounded,
   CoffeeRounded,
   Diversity3Rounded,
@@ -21,22 +20,22 @@ import {
   SchoolRounded,
   Settings,
   Smartphone,
-  SupportAgentRounded,
+  SupportAgentRounded
 } from "@mui/icons-material";
 import {
   Avatar,
+  Badge,
   Box,
   Collapse,
   Divider,
   Drawer,
   List,
-  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   styled,
   Switch,
-  Typography,
+  Typography
 } from "@mui/material";
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -51,6 +50,35 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 const AlertSponsorship = lazy(() => import("../alerts/AlertSponsorship"));
 const AlertSupport = lazy(() => import("../alerts/AlertSupport"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    backgroundColor: "#44b700",
+    color: "#44b700",
+    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+    "&::after": {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      borderRadius: "50%",
+      animation: "ripple 1.2s infinite ease-in-out",
+      border: "1px solid currentColor",
+      content: '""',
+    },
+  },
+  "@keyframes ripple": {
+    "0%": {
+      transform: "scale(.8)",
+      opacity: 1,
+    },
+    "100%": {
+      transform: "scale(2.4)",
+      opacity: 0,
+    },
+  },
+}));
 
 const DrawerSmartphone = ({
   openDrawer,
@@ -70,6 +98,8 @@ const DrawerSmartphone = ({
 
   // redux states
   const { isDarkMode } = useSelector((state) => state.appUI);
+  const { user } = useSelector((state) => state.currentUser);
+
   const dispatch = useDispatch();
 
   const BoxAvatarContent = styled(Box)({
@@ -181,15 +211,24 @@ const DrawerSmartphone = ({
                 alignItems={"center"}
                 className="p-1 pt-4"
               >
-                <Avatar
-                  alt={"user image"}
-                  src={
-                    !businessAccount
-                      ? devImage || logoCompany
-                      : logoCompany || logoCompany
-                  }
-                  sx={{ width: 70, height: 70 }}
-                />
+                <StyledBadge
+                  overlap="circular"
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                  variant="dot"
+                >
+                  <Avatar
+                    alt={"user image"}
+                    src={
+                      !businessAccount
+                        ? devImage || logoCompany
+                        : logoCompany || logoCompany
+                    }
+                    sx={{ width: 70, height: 70 }}
+                  />
+                </StyledBadge>
               </Box>
               <Box
                 width={CustomLandscapeWidest() ? 300 : 250}
@@ -201,7 +240,7 @@ const DrawerSmartphone = ({
                 {!businessAccount ? (
                   <>
                     {/* shown for personal a/c */}
-                    <SkillAvatars />
+                    <SkillAvatars isDarkMode={isDarkMode} user={user} />
                   </>
                 ) : (
                   <>
@@ -257,7 +296,7 @@ const DrawerSmartphone = ({
                   color={"primary"}
                   variant="body2"
                 >
-                  500
+                  {user?.network_count}
                 </Typography>
               </>
             ) : (
@@ -271,7 +310,7 @@ const DrawerSmartphone = ({
                   color={"primary"}
                   variant="body2"
                 >
-                  500
+                  {user?.network_count}
                 </Typography>
               </>
             )}
@@ -546,45 +585,6 @@ const DrawerSmartphone = ({
                 />
                 <Switch disableRipple size="small" checked={isDarkMode} />
               </ListItemButton>
-
-              {/* slogan */}
-              <ListItem>
-                {!businessAccount ? (
-                  <>
-                    {/* personal a/c */}
-                    <ListItemIcon>
-                      <Avatar
-                        src={logoCompany}
-                        sx={{ width: 34, height: 34 }}
-                        alt="flag"
-                      />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography fontWeight={"bold"} variant="body2">
-                          {" "}
-                          Best IT Platform
-                        </Typography>
-                      }
-                    />
-                  </>
-                ) : (
-                  <>
-                    {/* business a/c */}
-                    <ListItemIcon>
-                      <BusinessRounded color="success" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body2">
-                          {" "}
-                          Business Account
-                        </Typography>
-                      }
-                    />
-                  </>
-                )}
-              </ListItem>
             </List>
           </Box>
         </List>

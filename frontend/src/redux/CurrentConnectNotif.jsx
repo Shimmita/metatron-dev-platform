@@ -15,10 +15,10 @@ const CurrentConnect = createSlice({
     },
     // update the recent change in either of connect
     updateCurrentConnectNotifID: (state, action) => {
-      const userIdRemove = action.payload;
+      const connectRequestID = action.payload;
       state.connectNotifications = state.connectNotifications.filter(
         (connect) => {
-          return connect._id !== userIdRemove;
+          return connect._id !== connectRequestID;
         }
       );
     },

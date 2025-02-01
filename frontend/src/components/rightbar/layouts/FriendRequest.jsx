@@ -1,4 +1,4 @@
-import { Add, Remove } from "@mui/icons-material";
+import { Add, Close } from "@mui/icons-material";
 import {
   Box,
   CardActionArea,
@@ -19,7 +19,9 @@ import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import devImage from "../../../images/dev.jpeg";
 import { updateCurrentConnectID } from "../../../redux/CurrentConnect";
+import { updateCurrentConnectNotifID } from "../../../redux/CurrentConnectNotif";
 import { updateMessageConnectRequest } from "../../../redux/CurrentSnackBar";
+import { updateUserCurrentUserRedux } from "../../../redux/CurrentUser";
 import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 import SnackbarConnect from "../../snackbar/SnackbarConnect";
 import CustomCountryName from "../../utilities/CustomCountryName";
@@ -29,9 +31,11 @@ function FriendRequest({
   isLoadingRequest = false,
   connect_request,
   isAcceptFriends = false,
+  isLastItem = false,
 }) {
   const [showMiniProfile, setShowMiniProfile] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+
   const dispatch = useDispatch();
   // axios default credentials
   axios.defaults.withCredentials = true;
@@ -41,8 +45,6 @@ function FriendRequest({
   const { messageConnectRequestSent } = useSelector(
     (state) => state.currentSnackBar
   );
-  // id of the user requesting connect
-  const { _id: targetID } = connect_request || {};
 
   const {
     _id: currentUserId,
@@ -53,8 +55,11 @@ function FriendRequest({
     specialisationTitle: title,
   } = user || {};
 
-  // handle the connect request
+  // handle creating of the connect request
   const handleSendConnectRequest = () => {
+    // id of the target user requesting connect. its still the id of the connect request object
+    const { _id: targetID } = connect_request || {};
+
     const dataUserAcknowLedging = {
       senderId: currentUserId,
       targetId: targetID,
@@ -65,16 +70,106 @@ function FriendRequest({
       title,
       message: "requesting to connect",
     };
+
     // set is fetching to true
     setIsFetching(true);
 
     // performing post request and passing
     axios
       .post(
-        isAcceptFriends
-          ? `http://localhost:5000/metatron/api/v1/connections/connection/accept/${currentUserId}/${targetID}`
-          : `http://localhost:5000/metatron/api/v1/connections/connection/create`,
+        `http://localhost:5000/metatron/api/v1/connections/connection/create`,
         dataUserAcknowLedging
+      )
+      .then((res) => {
+        // update the redux of current post
+        if (res?.data && res.data) {
+          
+          dispatch(updateMessageConnectRequest(res.data));
+
+          // update redux by remove the user from request friend list by passing the ID
+          // of the connect suggestion object.
+          dispatch(updateCurrentConnectID(targetID));
+        }
+      })
+      .catch(async (err) => {
+        if (err?.code === "ERR_NETWORK") {
+          dispatch(
+            updateMessageConnectRequest(
+              "server is unreachable check your internet"
+            )
+          );
+          return;
+        }
+        dispatch(updateMessageConnectRequest(err?.response?.data));
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  };
+
+  // handle showing of the user profile
+  const handleShowMiniProfile = useCallback(() => {
+    setShowMiniProfile(true);
+  }, []);
+
+  // handle accept friend request from senders which came in notif section
+  // handle the connect request
+  const handleAcceptConnectRequestFriends = () => {
+    // accept option, the current user should add the senderid in their network
+    // connect request is for validation that the request exists in the db and updating db connectRequests
+    const { _id: connectRequestID, senderId } = connect_request || {};
+
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request and passing
+    axios
+      .post(
+        `http://localhost:5000/metatron/api/v1/connections/connection/accept/${connectRequestID}/${senderId}/${currentUserId}`
+      )
+      .then((res) => {
+        // update the redux of current post
+        if (res?.data && res.data) {
+          // update the current logged in user redux since their network count changed
+          dispatch(updateUserCurrentUserRedux(res.data.targetUser));
+
+          // update message of snackbar in redux
+          dispatch(updateMessageConnectRequest(res.data.message));
+
+          // update redux by remove the user from request friend list.
+          dispatch(updateCurrentConnectNotifID(connectRequestID));
+        }
+      })
+      .catch(async (err) => {
+        if (err?.code === "ERR_NETWORK") {
+          dispatch(
+            updateMessageConnectRequest(
+              "server is unreachable check your internet"
+            )
+          );
+          return;
+        }
+
+        dispatch(updateMessageConnectRequest(err?.response?.data));
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  };
+
+  // handle rejecting the user from acceting the connect request
+  const handleRejectConnectRequest = () => {
+    // id of the user requesting connect since its accepting opton the object prop has targetID
+    const { _id: connectRequestID, targetId: targetID } = connect_request || {};
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request and passing
+    axios
+      .post(
+        `http://localhost:5000/metatron/api/v1/connections/connection/reject/${connectRequestID}`
       )
       .then((res) => {
         // update the redux of current post
@@ -107,11 +202,6 @@ function FriendRequest({
       });
   };
 
-  // handle showing of the user profile
-  const handleShowMiniProfile = useCallback(() => {
-    setShowMiniProfile(true);
-  }, []);
-
   return (
     <React.Fragment>
       {isLoadingRequest ? (
@@ -142,18 +232,30 @@ function FriendRequest({
         <List sx={{ width: "100%", bgcolor: "background.paper" }}>
           <ListItem>
             <ListItemAvatar onClick={handleShowMiniProfile}>
-              <Avatar
-                src={devImage}
-                variant="rounded"
-                sx={{
-                  backgroundColor: "#1976D2",
-                  color: "white",
-                  width: 40,
-                  height: 40,
-                }}
-                alt={connect_request?.name?.split(" ")[0]}
-                aria-label="avatar"
-              />
+              {isAcceptFriends ? (
+                <Avatar
+                  src={devImage}
+                  sx={{
+                    backgroundColor: "#1976D2",
+                    color: "white",
+                  }}
+                  alt={connect_request?.name?.split(" ")[0]}
+                  aria-label="avatar"
+                />
+              ) : (
+                <Avatar
+                  src={devImage}
+                  variant="rounded"
+                  sx={{
+                    backgroundColor: "#1976D2",
+                    color: "white",
+                    width: 40,
+                    height: 40,
+                  }}
+                  alt={connect_request?.name?.split(" ")[0]}
+                  aria-label="avatar"
+                />
+              )}
             </ListItemAvatar>
             <ListItemText
               primary={
@@ -177,7 +279,11 @@ function FriendRequest({
                       <Typography variant="body2" color={"text.secondary"}>
                         {connect_request?.title}
                       </Typography>
-                      <Typography variant="caption" color={"text.secondary"}>
+                      <Typography
+                        variant="caption"
+                        color={"text.secondary"}
+                        fontWeight={"bold"}
+                      >
                         - is {connect_request?.message} -
                       </Typography>
                     </React.Fragment>
@@ -192,6 +298,33 @@ function FriendRequest({
                       <Typography variant="body2" color={"text.secondary"}>
                         {connect_request?.specialisationTitle}
                       </Typography>
+
+                      {/* skills of the user */}
+                      <Stack direction={"row"} gap={1} alignItems={"center"}>
+                        {connect_request?.selectedSkills
+                          ?.slice(0, 3)
+                          .map((skill, index) => (
+                            <React.Fragment>
+                              <Typography
+                                variant="caption"
+                                color={"text.secondary"}
+                                key={index}
+                              >
+                                {skill}
+                              </Typography>
+
+                              {/* divider if no last item */}
+                              {index !== 2 && (
+                                <Divider
+                                  component={"li"}
+                                  orientation="vertical"
+                                  variant="middle"
+                                  className="p-1"
+                                />
+                              )}
+                            </React.Fragment>
+                          ))}
+                      </Stack>
                     </React.Fragment>
                   )}
                 </Box>
@@ -216,27 +349,32 @@ function FriendRequest({
                         </Typography>
                       </Box>
 
-                      {/* action bitn */}
-                      <Stack direction={"row"} gap={'3px'} alignItems={"center"}>
+                      {/* action bitn accepting request */}
+                      <Stack
+                        direction={"row"}
+                        gap={"3px"}
+                        alignItems={"center"}
+                      >
                         <IconButton
                           size="small"
                           color="primary"
-                          onClick={handleSendConnectRequest}
+                          onClick={handleAcceptConnectRequestFriends}
                         >
                           <Add sx={{ width: 15, height: 15 }} />
                         </IconButton>
 
+                        {/* action btn rejecting request */}
                         <IconButton
                           size="small"
-                          onClick={handleSendConnectRequest}
+                          onClick={handleRejectConnectRequest}
                         >
-                          <Remove sx={{ width: 14, height: 14 }} />
+                          <Close sx={{ width: 14, height: 14 }} />
                         </IconButton>
                       </Stack>
                     </Stack>
                   ) : (
                     <React.Fragment>
-                      {/* action btn */}
+                      {/* action btn initiating lets connect to the target user */}
                       <IconButton
                         size="small"
                         color="primary"
@@ -251,14 +389,17 @@ function FriendRequest({
               )}
             </Box>
           </ListItem>
-          <Divider variant="inset" component="li" />
+          {/* show divider is is not last item */}
+          {!isLastItem && <Divider variant="inset" component="li" />}{" "}
         </List>
       )}
 
       {/* will display miniprofile if state is true */}
       <AlertMiniProfileView
         openAlert={showMiniProfile}
-        userId={targetID}
+        userId={
+          !isAcceptFriends ? connect_request._id : connect_request.senderId
+        }
         setOpenAlert={setShowMiniProfile}
       />
 

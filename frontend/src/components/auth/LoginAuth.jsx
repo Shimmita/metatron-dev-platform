@@ -381,7 +381,7 @@ const LoginAuth = () => {
                     }
                     sx={{ mb: 2 }}
                   >
-                    {messageGeneral}
+                    {messageGeneral.toString()}
                   </Alert>
                 </Collapse>
               </Box>
@@ -393,7 +393,7 @@ const LoginAuth = () => {
                   <Alert
                     className="rounded-5"
                     severity={
-                      authMessage.includes("server") ? "warning" : "success"
+                      authMessage?.includes("server") ? "warning" : "success"
                     }
                     onClick={handleClearAuthMessage}
                     action={
@@ -407,7 +407,7 @@ const LoginAuth = () => {
                     }
                     sx={{ mb: 2 }}
                   >
-                    {authMessage}
+                    {authMessage.toString()}
                   </Alert>
                 </Collapse>
               </Box>

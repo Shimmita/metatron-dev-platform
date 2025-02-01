@@ -49,6 +49,9 @@ const FeedDefaultContent = () => {
 
   // fetch posts from the backend
   useEffect(() => {
+    // if there are posts on refresh don't network request
+    if (posts?.length > 0) {
+    }
     // set is fetching to true
     setIsFetching(true);
     // dispatch action for updating is loading in the redux
@@ -178,28 +181,48 @@ const FeedDefaultContent = () => {
                     />
                     {/* show refresh button when the item is last */}
                     {index === posts.length - 1 && (
-                      <Box
-                        display={"flex"}
-                        justifyContent={"center"}
-                        sx={{ border: "1px solid", borderColor: "divider" }}
-                        className={"shadow rounded"}
-                        p={1}
-                        mt={2}
-                        mb={
-                          CustomDeviceTablet() || CustomDeviceIsSmall() ? 14 : 8
-                        }
-                      >
-                        <Button
-                          className="rounded-5"
-                          size="medium"
-                          sx={{
-                            textTransform: "capitalize",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          Continue Browsing
-                        </Button>
-                      </Box>
+                      <React.Fragment>
+                        {CustomDeviceIsSmall() || CustomDeviceTablet() ? (
+                          <Box
+                            display={"flex"}
+                            justifyContent={"center"}
+                            sx={{ border: "1px solid", borderColor: "divider" }}
+                            className={"shadow rounded"}
+                            p={1}
+                            mt={2}
+                            mb={14}
+                          >
+                            <Button
+                              className="rounded-5"
+                              size="medium"
+                              sx={{
+                                textTransform: "capitalize",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Continue Browsing
+                            </Button>
+                          </Box>
+                        ) : (
+                          <Box
+                            display={"flex"}
+                            justifyContent={"center"}
+                            p={1}
+                            mt={2}
+                            mb={8}
+                          >
+                            <Button
+                              size="medium"
+                              sx={{
+                                textTransform: "capitalize",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Continue Browsing
+                            </Button>
+                          </Box>
+                        )}
+                      </React.Fragment>
                     )}
                   </Box>
                 </Box>

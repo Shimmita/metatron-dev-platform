@@ -206,14 +206,14 @@ const handleSigninPersonal = async (req, res) => {
     }
 
     // passwords must be aleast 6 characters
-    if (password.length < 6) {
-      throw new Error("Password too short must be 6 characters minimum!");
+    if (password.length < 8) {
+      throw new Error("password too short must be 8 characters minimum!");
     }
     const user = await PersonalModel.findOne({ email });
     // user does not exist
     if (!user) {
       throw new Error(
-        "User does not exist please create new account to access our services!"
+        "user does not found create new account to access our services!"
       );
     }
 
@@ -221,10 +221,12 @@ const handleSigninPersonal = async (req, res) => {
     if (await bcrypt.compare(password, user.password)) {
       // add the session user isOnline to true on every request that expires based on session time
       req.session.isOnline = true;
+      // add the userId in the session will be used to check if they online or not based on session data
+      req.session.userID = user._id;
       res.status(200).send(user);
     } else {
       // incorrect password
-      throw new Error("Incorrect login credentials!");
+      throw new Error("incorrect login credentials!");
     }
   } catch (error) {
     // send the error to the frontend

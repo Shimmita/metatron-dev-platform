@@ -3,6 +3,8 @@ import { Backdrop, Box, Divider, Skeleton, Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import BasicSpeedDial from "../custom/SpeedDial";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CoursesContainer from "./CoursesContainer";
 import FeaturedPostContainer from "./FeaturedPostContainer";
 import JobsContainer from "./JobsContainer";
@@ -40,12 +42,20 @@ const RightbarAll = () => {
     >
       <Box
         position={"fixed"}
-        color={"text.primary"}
-        className="mt-0 shadow rounded"
-        maxHeight={"82vh"}
+        className={
+          CustomDeviceIsSmall() ||
+          (CustomDeviceTablet() ? "shadow rounded" : "rounded")
+        }
+        maxHeight={CustomDeviceTablet() ? "88vh" : "84vh"}
         sx={{
-          border: isDarkMode && "1px solid",
-          borderColor: isDarkMode && "divider",
+          border:
+            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
+              ? "1px solid"
+              : "1px solid",
+          borderColor:
+            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
+              ? "divider"
+              : "divider",
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {

@@ -1,8 +1,10 @@
 import sharp from "sharp";
+import personalModel from "../model/personalModel.js";
 import {
   default as PostReactionModal,
   default as PostReactionModel,
 } from "../model/PostReactionModel.js";
+import ReportPostModal from "../model/ReportPostModal.js";
 import {
   default as TechPostModal,
   default as TechPostModel,
@@ -94,19 +96,19 @@ export const handleGetSpecificPostDetails = async (req, res) => {
   try {
     //extract post id from request params
     const { id: postId } = req?.params;
-    console.log(postId)
+    console.log(postId);
 
     // fetch the post from the database
     const post = await TechPostModel.findById({ _id: postId });
     if (!post) {
       throw new Error("post not found!");
     }
-    console.log(post)
+    console.log(post);
     // send the response to the frontend
     res.status(200).send(post);
   } catch (error) {
     console.log(error.message);
-    res.status(400).send('something went wrong');
+    res.status(400).send("something went wrong");
   }
 };
 
@@ -180,6 +182,7 @@ export const handlePostLiking = async (req, res) => {
       const { clicks: likes } = post.post_liked;
       const { clicks: github } = post.post_github;
       const { count: comments } = post.post_comments;
+      const report_count = post.report_count;
 
       // save the details of the user liking the  tech post in the reaction section
       await PostReactionModal.create({
@@ -187,6 +190,7 @@ export const handlePostLiking = async (req, res) => {
         likes,
         github,
         comments,
+        report_count,
       });
 
       const results = {
@@ -267,6 +271,7 @@ export const handleGithubIncremental = async (req, res) => {
       const { clicks: likes } = post.post_liked;
       const { clicks: github } = post.post_github;
       const { count: comments } = post.post_comments;
+      const report_count = post.report_count;
 
       // save the details of the user clicking the github  in the reaction section
       await PostReactionModal.create({
@@ -274,6 +279,7 @@ export const handleGithubIncremental = async (req, res) => {
         likes,
         github,
         comments,
+        report_count,
       });
     }
 
@@ -336,10 +342,11 @@ export const handlePostCommentsCreate = async (req, res) => {
     // save the updated tech post
     await post.save();
 
-    // extract the github, likes and comments of the saved post
+    // extract the reports, github, likes and comments of the saved post
     const { clicks: likes } = post.post_liked;
     const { clicks: github } = post.post_github;
     const { count: comments } = post.post_comments;
+    const report_count = post.report_count;
 
     // save the details of the user making the comment in the reaction database
     await PostReactionModal.create({
@@ -347,6 +354,7 @@ export const handlePostCommentsCreate = async (req, res) => {
       likes,
       github,
       comments,
+      report_count,
     });
 
     // send the response to the frontend the objecte mutated
@@ -365,14 +373,14 @@ export const handleGetAllPostsReactions = async (req, res) => {
     // use the userID against ownersIDs in the notif if match result response
     const currentUserId = req?.params?.id;
 
-    // fetch all matching likes collection
-    const postLikes = await PostReactionModel.find({
+    // fetch all matching post reaction collection
+    const post_reaction = await PostReactionModel.find({
       ownerId: currentUserId,
     }).sort({ createdAt: -1 });
     // fetch all matching comments collection etc
 
     // send response to the frontend
-    res.status(200).send(postLikes);
+    res.status(200).send(post_reaction);
   } catch (error) {
     res
       .status(400)
@@ -389,5 +397,89 @@ export const handleDeletePostReaction = async (req, res) => {
     res.status(200).send("Deleted Successfully");
   } catch (error) {
     res.status(400).send("Something Went Wrong " + error.message);
+  }
+};
+
+// handle creation of a report about a given post due to its content being sensored
+export const handleReportPostContent = async (req, res) => {
+  try {
+    const dataReport = req?.body;
+
+    // check if post and also the user reporting exist in the database
+    const postId = dataReport.postId;
+    const reporterId = dataReport.reporterId;
+    const postOwnerId = dataReport.postOwnerId;
+
+    // check if the post in the tech post collection is exists
+    const post = await TechPostModal.findById({ _id: postId });
+    // checks if owner exists
+    const reporterUserr = await personalModel.findById({ _id: reporterId });
+    // checks if owner exists
+    const postOwner = await personalModel.findById({ _id: postOwnerId });
+
+    // post does not exist
+    if (!post) {
+      throw new Error("post being reported not found!");
+    }
+    // reporting user does not exist
+    if (!reporterUserr) {
+      throw new Error("reporting user does not exist!");
+    }
+
+    if (!postOwner) {
+      throw new Error("owner of the post does not exist!");
+    }
+
+    // update the report_post counter variable of the post in the tech post collection
+    post.report_count = post.report_count + 1;
+
+    //updating the report count value
+    dataReport.report_count = post.report_count;
+
+    // save the post with the updated counter
+    await post.save();
+
+    // everything fine lets save the new record of report to the database
+    await ReportPostModal.create(dataReport);
+
+    // send response to the frontend
+    res.status(200).send("submitted successfully");
+  } catch (error) {
+    // debug
+    console.log(error.message);
+    // send the error message to the frontend
+    res
+      .status(400)
+      .send(
+        error.message?.includes("duplicate")
+          ? "report already saved"
+          : error.message
+      );
+  }
+};
+
+// handle fetching of all the posts targeting the id passed of user
+export const handleGetAllPostReportUser = async (req, res) => {
+  try {
+    // get id passed as req params
+    const ownerId = req?.params.ownerId;
+    // check if the owner exists
+    const postOwner = await personalModel.findById({ _id: ownerId });
+
+    if (!postOwner) {
+      throw new Error("post owner does not exist!");
+    }
+
+    // fetch all post reports where owner is contains the ownerId and filter what
+    // is returned: postId, post_title, report_about, report_desc, ownerViewed.
+    const postReports = await ReportPostModal.find({ postOwnerId: ownerId });
+
+    // return the results to the frontend
+    res.status(200).send(postReports);
+  } catch (error) {
+    // debug
+    console.log(error.message);
+    // send error response to the frontend
+    res.status(400).send(error.message);
   }
 };

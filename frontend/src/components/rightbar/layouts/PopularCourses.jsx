@@ -57,6 +57,7 @@ function PopularCouses() {
           <ListItem>
             <ListItemAvatar>
               <Avatar
+                variant="rounded"
                 src={Python}
                 sx={{
                   backgroundColor: "#1976D2",

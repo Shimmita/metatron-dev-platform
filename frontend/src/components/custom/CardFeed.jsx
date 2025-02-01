@@ -15,19 +15,22 @@ import {
   CardHeader,
   Checkbox,
   IconButton,
+  ListItemAvatar,
   Menu,
   Skeleton,
   Tooltip,
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import React, { lazy, useEffect, useState } from "react";
+import React, { lazy, useCallback, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch, useSelector } from "react-redux";
 import dev from "../../images/dev.jpeg";
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import { updateCurrentPostDetails } from "../../redux/CurrentPosts";
+import AlertReportPost from "../alerts/AlertReportPost";
 import PostData from "../data/PostData";
+import SnackbarConnect from "../snackbar/SnackbarConnect";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
@@ -51,13 +54,19 @@ const renderSkeleton = () => (
 
 const CardFeed = ({ post, setPostDetailedData }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
   const openMenu = Boolean(anchorEl);
+  const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
   const [isLoadingRequest, setIsLoadingRequest] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isFullDescription, setFullDiscription] = useState(false);
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
+  const [messageMore, setMessageMore] = useState("");
+  const [openAlertReport, setOpenAlertReport] = useState(false);
+  const [postWholeReport, setPostWholeReport] = useState("");
+  // control more option
+  const handleClickMoreVertPost = (event) => setAnchorEl(event.currentTarget);
+  const handleCloseMenu = () => setAnchorEl(null);
 
   // axios default credentials
   axios.defaults.withCredentials = true;
@@ -117,9 +126,6 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     const timer = setTimeout(() => setIsLoadingRequest(false), 100);
     return () => clearTimeout(timer);
   }, []);
-
-  const handleClickMoreVertPost = (event) => setAnchorEl(event.currentTarget);
-  const handleCloseMenu = () => setAnchorEl(null);
 
   const handleDetailsLength = () =>
     detailsLong ? details.substring(0, max_description) : details;
@@ -281,20 +287,35 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     dispatch(handleShowingSpeedDial(false));
   };
 
+  // handle display of miniprofile
+  const handleMiniProfileView = useCallback(() => {
+    setOpenMiniProfileAlert(true);
+  }, []);
+
   return (
     <React.Fragment>
       <Box
         mb={2}
         sx={{
-          border: isDarkMode && "1px solid",
-          borderColor: isDarkMode && "divider",
+          border:
+            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
+              ? "1px solid"
+              : "1px solid",
+          borderColor:
+            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
+              ? "divider"
+              : "divider",
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
         }}
-        className="w-100 shadow p-2 rounded"
+        className={
+          CustomDeviceTablet() || CustomDeviceIsSmall()
+            ? "shadow p-2 rounded"
+            : "rounded p-1"
+        }
       >
         <Card elevation={0}>
           <CardHeader
-            sx={{ padding: 0, margin: 0 }}
+            sx={{ ml: 1, p: 0 }}
             avatar={
               <React.Fragment>
                 {isLoadingRequest ? (
@@ -305,7 +326,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                     height={40}
                   />
                 ) : (
-                  <IconButton onClick={() => setOpenMiniProfileAlert(true)}>
+                  <ListItemAvatar onClick={handleMiniProfileView}>
                     <Avatar
                       // src={post.post_owner.owneravatar}
                       src={dev}
@@ -319,7 +340,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                     >
                       {handleNoProfilePicture()}
                     </Avatar>
-                  </IconButton>
+                  </ListItemAvatar>
                 )}
               </React.Fragment>
             }
@@ -361,9 +382,14 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                     transformOrigin={{ vertical: "top", horizontal: "right" }}
                   >
                     <CardFeedMore
-                      ownerId={post.post_owner?.ownerId}
+                      ownerId={post?.post_owner?.ownerId}
                       currentUserNetwork={user?.network}
-                      ownerName={post.post_owner.ownername}
+                      ownerName={post?.post_owner?.ownername}
+                      setMessageMore={setMessageMore}
+                      handleCloseMenu={handleCloseMenu}
+                      setOpenAlertReport={setOpenAlertReport}
+                      post={post}
+                      setPostWhole={setPostWholeReport}
                     />
                   </Menu>
                 </Box>
@@ -385,7 +411,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                   >
                     {CustomDeviceSmallest()
                       ? handleName()
-                      : `${post.post_owner.ownername}`}
+                      : `${post?.post_owner.ownername}`}
                   </Typography>
                   <VerifiedRounded
                     color="primary"
@@ -403,18 +429,26 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                   <Typography variant="body2">
                     {CustomDeviceSmallest()
                       ? handleOccupation()
-                      : `${post.post_owner.ownertitle}`}
+                      : `${post?.post_owner.ownertitle}`}
                   </Typography>
                   {/* skills */}
-                  <Typography variant="body2">
-                    {post.post_owner.ownerskills[0]} |{" "}
-                    {post.post_owner.ownerskills[1]} |{" "}
-                    {post.post_owner.ownerskills[2]}
+                  <Typography
+                    variant="body2"
+                    display={"flex"}
+                    alignItems={"center"}
+                  >
+                    {post?.post_owner.ownerskills[0]} |{" "}
+                    {post?.post_owner.ownerskills[1]} |{" "}
+                    {post?.post_owner.ownerskills[2]}
                   </Typography>
                   {/* location */}
-                  <Typography variant="body2">
-                    {CustomCountryName(post.post_location.country)} |{" "}
-                    {post.post_location.state}{" "}
+                  <Typography
+                    variant="body2"
+                    display={"flex"}
+                    alignItems={"center"}
+                  >
+                    {CustomCountryName(post?.post_location.country)} |{" "}
+                    {post?.post_location.state}{" "}
                   </Typography>
                 </Box>
               )
@@ -440,7 +474,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                       textAlign={"center"}
                       fontWeight={"bold"}
                     >
-                      {post.post_category.main}
+                      {post?.post_category.main}
                     </Typography>
                   </Box>
 
@@ -463,7 +497,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                       color={"text.secondary"}
                       fontWeight={"bold"}
                     >
-                      {post.post_title}
+                      {post?.post_title}
                     </Typography>
 
                     <WbIncandescentRounded
@@ -610,6 +644,19 @@ const CardFeed = ({ post, setPostDetailedData }) => {
           )}
         </Card>
       </Box>
+
+      {/* show alert report a post  */}
+      {openAlertReport && (
+        <AlertReportPost
+          openAlertReport={openAlertReport}
+          setOpenAlertReport={setOpenAlertReport}
+          post={postWholeReport}
+          currentUser={user}
+        />
+      )}
+
+      {/* snackbar showing results, specially cardfeed more response */}
+      {messageMore && <SnackbarConnect message={messageMore} />}
 
       {/* alert for showing user miniprofile details by passing the post ownerID */}
       <AlertMiniProfileView

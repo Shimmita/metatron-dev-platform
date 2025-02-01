@@ -67,6 +67,11 @@ const PostReactionModal = new mongoose.Schema(
       required: [true, "github count is required"],
       trim: true,
     },
+    report_count: {
+      type: Number,
+      required: [true, "report count of the post is required"],
+      trim: true,
+    },
   },
   {
     timestamps: true,

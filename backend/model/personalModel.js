@@ -105,9 +105,11 @@ const userSchema = new mongoose.Schema(
     },
     premium: { type: Boolean, default: false },
     premiumOnce: { type: Boolean, default: false },
+    isOnline: { type: Boolean, default: false },
 
-    network_count: { type: Number, default: "0" },
-    post_count: { type: String, default: "0" },
+    network: { type: [mongoose.Types.ObjectId], default: [] },
+    network_count: { type: Number, default: 0 },
+    post_count: { type: Number, default: 0 },
   },
   {
     timestamps: true,

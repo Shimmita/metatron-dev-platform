@@ -7,8 +7,9 @@ import NotifAccordionLayout from "./layout/NotifAccordionLayout";
 function NotificationContainer() {
   // redux states access
   const { messageNotification } = useSelector((state) => state.currentSnackBar);
+
   return (
-    <Box>
+    <React.Fragment>
       <Box
         height={"92vh"}
         sx={{
@@ -29,7 +30,7 @@ function NotificationContainer() {
       {messageNotification && (
         <SnackBarNotifications message={messageNotification} />
       )}
-    </Box>
+    </React.Fragment>
   );
 }
 

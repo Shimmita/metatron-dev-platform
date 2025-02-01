@@ -5,10 +5,10 @@ import {
   handleCreateJob,
   handleDeleteJobPost,
   handleGetAllJobs,
-  handleGetAllJobsLatest,
   handleGetAllJobsSearch,
   handleGetNearbyJobs,
   handleGetSpecificJobPost,
+  handleGetTopJobs,
   handleGetVerifiedJobs,
   handleJobApplication,
 } from "../controllers/manage_jobs_controller.js";
@@ -30,7 +30,7 @@ manageJobsRouter.post(
 manageJobsRouter.post("/all/search", handleGetAllJobsSearch);
 
 // handle getting of the topJobs the latest 3 from the database
-manageJobsRouter.get('/all/top', handleGetAllJobsLatest)
+manageJobsRouter.get("/all/top", handleGetTopJobs);
 
 // get nearby jobs
 manageJobsRouter.post("/all/nearby", handleGetNearbyJobs);

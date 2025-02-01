@@ -13,11 +13,11 @@ const CurrentConnect = createSlice({
     updateCurrentConnectTop: (state, action) => {
       state.connectTop = action.payload;
     },
-    // update the recent change in either of connect
+    // update the recent change in either of connect suggestion based on the ID
     updateCurrentConnectID: (state, action) => {
-      const userIdRemove = action.payload;
+      const connectSuggestionID = action.payload;
       state.connectTop = state.connectTop.filter((connect) => {
-        return connect._id !== userIdRemove;
+        return connect._id !== connectSuggestionID;
       });
     },
 

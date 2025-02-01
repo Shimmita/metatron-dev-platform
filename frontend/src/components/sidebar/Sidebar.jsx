@@ -19,6 +19,7 @@ import {
 } from "@mui/icons-material";
 import {
   Avatar,
+  Badge,
   Box,
   Collapse,
   Divider,
@@ -42,6 +43,7 @@ import devImage from "../../images/dev.jpeg";
 import logoCompany from "../../images/logo_sm.png";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import EventsTablet from "../events/EventsIsTablet";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import "./Sidebar.css";
@@ -49,6 +51,35 @@ const AlertSponsorship = lazy(() => import("../alerts/AlertSponsorship"));
 const AlertSupport = lazy(() => import("../alerts/AlertSupport"));
 const SkillAvatars = lazy(() => import("./SkillAvatars"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    backgroundColor: "#44b700",
+    color: "#44b700",
+    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+    "&::after": {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      borderRadius: "50%",
+      animation: "ripple 1.2s infinite ease-in-out",
+      border: "1px solid currentColor",
+      content: '""',
+    },
+  },
+  "@keyframes ripple": {
+    "0%": {
+      transform: "scale(.8)",
+      opacity: 1,
+    },
+    "100%": {
+      transform: "scale(2.4)",
+      opacity: 0,
+    },
+  },
+}));
 
 const Sidebar = () => {
   const [openAccountMore, setOpenAccountMore] = useState(false);
@@ -63,6 +94,8 @@ const Sidebar = () => {
     isLoadingPostLaunch: isLoadingRequest,
   } = useSelector((state) => state.appUI);
 
+  const { user } = useSelector((state) => state.currentUser);
+
   // alert logout controls
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
   const [openSponsorAlert, setOpenSponsorAlert] = useState(false);
@@ -70,8 +103,6 @@ const Sidebar = () => {
   const navigate = useNavigate();
   // screen width
   const screenWidth = window.screen.availWidth;
-
-  // redux states
 
   const dispatch = useDispatch();
 
@@ -178,12 +209,21 @@ const Sidebar = () => {
     >
       <Box
         position={"fixed"}
-        className="shadow rounded"
+        className={
+          CustomDeviceIsSmall() ||
+          (CustomDeviceTablet() ? "shadow rounded" : "rounded")
+        }
         width={correctWidthInPercentage()}
-        maxHeight={CustomDeviceTablet() ? "88vh" : "82vh"}
+        maxHeight={CustomDeviceTablet() ? "88vh" : "84vh"}
         sx={{
-          border: isDarkMode && "1px solid",
-          borderColor: isDarkMode && "divider",
+          border:
+            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
+              ? "1px solid"
+              : "1px solid",
+          borderColor:
+            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
+              ? "divider"
+              : "divider",
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -211,11 +251,6 @@ const Sidebar = () => {
                       className={
                         isDarkMode ? "profile-header" : "bg-dark rounded-top"
                       }
-                      sx={{
-                        border: `1px solid ${
-                          isDarkMode ? "#43A5F5" : "#1876D2"
-                        }`,
-                      }}
                     >
                       <Box
                         display={"flex"}
@@ -223,21 +258,30 @@ const Sidebar = () => {
                         alignItems={"center"}
                         p={1}
                       >
-                        <Avatar
-                          alt={"user image"}
-                          src={
-                            !businessAccount
-                              ? devImage || logoCompany
-                              : logoCompany || logoCompany
-                          }
-                          sx={{ width: 70, height: 70 }}
-                        />
+                        <StyledBadge
+                          overlap="circular"
+                          anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "right",
+                          }}
+                          variant="dot"
+                        >
+                          <Avatar
+                            alt={"user image"}
+                            src={
+                              !businessAccount
+                                ? devImage || logoCompany
+                                : logoCompany || logoCompany
+                            }
+                            sx={{ width: 70, height: 70 }}
+                          />
+                        </StyledBadge>
                       </Box>
                       <Box display={"flex"} justifyContent={"center"} pb={2}>
                         {!businessAccount ? (
                           <React.Fragment>
                             {/* shown for personal a/c */}
-                            <SkillAvatars />
+                            <SkillAvatars user={user} isDarkMode={isDarkMode} />
                           </React.Fragment>
                         ) : (
                           <>
@@ -299,7 +343,7 @@ const Sidebar = () => {
                           color={"primary"}
                           variant="body2"
                         >
-                          500
+                          {user?.network_count}
                         </Typography>
                       </>
                     ) : (
@@ -315,7 +359,7 @@ const Sidebar = () => {
                           color={"primary"}
                           variant="body2"
                         >
-                          500
+                          {user?.network_count}
                         </Typography>
                       </>
                     )}

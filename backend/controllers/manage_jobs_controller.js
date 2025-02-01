@@ -49,7 +49,9 @@ export const handleCreateJob = async (req, res) => {
 export const handleGetAllJobs = async (req, res) => {
   try {
     // sort them the latest first
-    const allJobs = await JobPostModel.find({}).sort({ createdAt: -1 }).limit(20);
+    const allJobs = await JobPostModel.find({})
+      .sort({ createdAt: -1 })
+      .limit(20);
     // no jobs posted
     if (allJobs.length < 1) {
       throw new Error(
@@ -65,12 +67,19 @@ export const handleGetAllJobs = async (req, res) => {
 };
 
 // get top 3 jobs that are lates
-export const handleGetAllJobsLatest = async (req, res) => {
+export const handleGetTopJobs = async (req, res) => {
   try {
     // sort them the latest first
     const latestJobs = await JobPostModel.find(
       {},
-      { title: 1, organisation: 1, logo: 1, skills: 1 }
+      {
+        title: 1,
+        organisation: 1,
+        logo: 1,
+        skills: 1,
+        location: 1,
+        applicants: 1,
+      }
     )
       .sort({ createdAt: -1 })
       .limit(3);
@@ -80,7 +89,6 @@ export const handleGetAllJobsLatest = async (req, res) => {
         "currently there are no selected jobs please check on this page later."
       );
     }
-
 
     // jobs present
     res.status(200).send(latestJobs);

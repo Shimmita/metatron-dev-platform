@@ -5,6 +5,7 @@ import {
   Divider,
   IconButton,
   Skeleton,
+  Stack,
   Typography,
 } from "@mui/material";
 import List from "@mui/material/List";
@@ -22,6 +23,15 @@ function FeaturedJobs({ isLoading, jobTop }) {
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
     (state) => state.appUI
   );
+
+  const handleCountryName = (job) => {
+    const parent = job.location.country.split(" ");
+    const finalName =
+      parent.length > 2 ? `${parent[0]} ${parent[1]}` : parent[0];
+
+    return finalName;
+  };
+
   return (
     <React.Fragment>
       {isLoadingRequest || isLoading ? (
@@ -58,18 +68,19 @@ function FeaturedJobs({ isLoading, jobTop }) {
           <ListItem>
             <ListItemAvatar>
               <Avatar
+                variant="rounded"
                 src={getImageMatch(jobTop.logo)}
                 sx={{
                   backgroundColor: "#1976D2",
                 }}
-                alt="S"
+                alt={jobTop?.title[0]}
                 aria-label="avatar"
               />
             </ListItemAvatar>
             <ListItemText
               primary={
                 <Typography fontWeight={"bold"} variant="body2">
-                  {jobTop.title}
+                  {jobTop?.title}
                 </Typography>
               }
               secondary={
@@ -78,6 +89,29 @@ function FeaturedJobs({ isLoading, jobTop }) {
                   <Typography variant="body2" color={"text.secondary"}>
                     {jobTop?.organisation?.name}
                   </Typography>
+
+                  {/* location, state, access */}
+                  <Box display={"flex"} alignItems={"center"}>
+                    {/* country */}
+                    <Typography variant="caption" color={"text.secondary"}>
+                      {handleCountryName(jobTop && jobTop)}
+                    </Typography>
+                    {/* divider */}
+                    <Divider
+                      component={"li"}
+                      orientation="vertical"
+                      variant="middle"
+                      className="p-1"
+                    />
+                    {/* state */}
+                    <Typography
+                      ml={1}
+                      variant="caption"
+                      color={"text.secondary"}
+                    >
+                      {jobTop?.location?.state}
+                    </Typography>
+                  </Box>
 
                   {/* skills */}
                   <Box display={"flex"} gap={1} alignItems={"center"}>
@@ -129,7 +163,15 @@ function FeaturedJobs({ isLoading, jobTop }) {
               }
             />
 
-            <Box>
+            <Stack gap={1} alignItems={"center"} justifyContent={"flex-end"}>
+              {/* applicants counter */}
+              <Box>
+                <Typography variant="caption" color={"text.secondary"}>
+                  {jobTop?.applicants?.total}/500
+                </Typography>
+              </Box>
+
+              {/* button apply */}
               <Button
                 disableElevation
                 size="small"
@@ -141,7 +183,7 @@ function FeaturedJobs({ isLoading, jobTop }) {
               >
                 Apply
               </Button>
-            </Box>
+            </Stack>
           </ListItem>
           <Divider variant="inset" component="li" />
         </List>

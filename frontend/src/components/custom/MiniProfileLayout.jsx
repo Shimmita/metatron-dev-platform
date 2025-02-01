@@ -10,6 +10,7 @@ import {
   IconButton,
   Skeleton,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import axios from "axios";
@@ -159,7 +160,7 @@ export default function MiniProfileLayout({
                   alignItems={"center"}
                   gap={1}
                 >
-                  12,000
+                  {miniProfileData?.network_count}
                   <Diversity3Rounded sx={{ width: 20, height: 20 }} />
                 </Typography>
               </Box>
@@ -205,12 +206,15 @@ export default function MiniProfileLayout({
                 <AvatarGroup max={miniProfileData?.selectedSkills?.length}>
                   {/* loop through the skills and their images matched using custim fn */}
                   {miniProfileData?.selectedSkills?.map((skill, index) => (
-                    <Avatar
-                      key={index}
-                      alt={skill}
-                      className="border"
-                      src={getImageMatch(skill)}
-                    />
+                    <Tooltip title={skill} arrow>
+                      <Avatar
+                        key={index}
+                        alt={skill}
+                        className="border"
+                        sx={{ width: 34, height: 34 }}
+                        src={getImageMatch(skill)}
+                      />
+                    </Tooltip>
                   ))}
                 </AvatarGroup>
               </Box>

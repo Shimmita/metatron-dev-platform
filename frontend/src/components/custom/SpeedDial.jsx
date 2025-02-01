@@ -4,12 +4,7 @@ import SpeedDialAction from "@mui/material/SpeedDialAction";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import React, { lazy } from "react";
 
-import {
-  CodeRounded,
-  SchoolRounded,
-  Videocam,
-  Work,
-} from "@mui/icons-material";
+import { CodeRounded, SchoolRounded, Work } from "@mui/icons-material";
 import { Avatar, Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import MachineLogo from "../../images/Ai.png";
@@ -21,14 +16,6 @@ const PostTechModal = lazy(() => import("../modal/PostTechModal"));
 const PostJobModal = lazy(() => import("../modal/PostJobModal"));
 
 const actions = [
-  {
-    icon: <Avatar src={MachineLogo} alt="" sx={{ width: 30, height: 30 }} />,
-    name: "Metatron AI",
-  },
-  {
-    icon: <Videocam color="warning" sx={{ width: 26, height: 26 }} />,
-    name: "GoLive Now",
-  },
   {
     icon: <SchoolRounded color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Course Upload",
@@ -99,9 +86,6 @@ export default function BasicSpeedDial() {
 
               if (action.name === "Course Upload") {
                 setOpenModalCourse(true);
-              }
-              if (action.name === "Metatron AI") {
-                dispatch(handleShowChatBot());
               }
             }}
             tooltipTitle={
