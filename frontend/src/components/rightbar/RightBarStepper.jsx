@@ -26,7 +26,7 @@ export default function RightBarStepper({
       steps={maxStep}
       position="static"
       activeStep={corouselCounter}
-      sx={{ maxWidth: 150, flexGrow: 1 }}
+      sx={{ maxWidth: 150, flexGrow: 1, p:0,m:0 }}
       nextButton={
         <IconButton onClick={handleNext} disabled={corouselCounter === maxStep - 1}>
           <KeyboardArrowRightRounded

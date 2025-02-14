@@ -1,7 +1,7 @@
 import {
   EmojiEmotionsRounded,
   PeopleRounded,
-  WarningRounded
+  WarningRounded,
 } from "@mui/icons-material";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import { Box, Stack } from "@mui/material";
@@ -59,14 +59,17 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   borderTop: "1px solid rgba(0, 0, 0, .125)",
 }));
 
-
-
-export default function NotifAccordionLayout() {
+export default function NotifAccordionLayout({
+  reportedPost,
+  connectNotifications,
+  post_reactions,
+}) {
   // accordion controllers
   const [openReaction, setOpenReaction] = useState(true);
   const [openConnect, setOpenConnect] = useState(true);
   const [openReported, setOpenReported] = useState(true);
-
+  // dispatch
+  const dispatch = useDispatch();
   // api request monitors
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -74,27 +77,14 @@ export default function NotifAccordionLayout() {
   // get redux states
   const { user } = useSelector((state) => state.currentUser);
 
-  const { post_reactions } = useSelector((state) => state.currentPostReactions);
-  const { connectNotifications } = useSelector(
-    (state) => state.currentConnectNotif
-  );
-  const { reportedPost } = useSelector((state) => state.currentReportedPost);
-
   // extracting current user ID
   const { _id } = user;
-
-  // dispatch
-  const dispatch = useDispatch();
 
   // axios default credentials
   axios.defaults.withCredentials = true;
 
   // get all possoble post reaction notifications based on current userID
   useLayoutEffect(() => {
-    if (post_reactions?.length > 1) {
-      return;
-    }
-
     // set is fetching to true
     setIsFetching(true);
 
@@ -122,14 +112,10 @@ export default function NotifAccordionLayout() {
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [dispatch, _id, post_reactions]);
+  }, [dispatch, _id]);
 
   // get all connect requests sent by users to the current user as being target
   useLayoutEffect(() => {
-    if (connectNotifications?.length > 1) {
-      return;
-    }
-
     // set is fetching to true
     setIsFetching(true);
 
@@ -158,13 +144,10 @@ export default function NotifAccordionLayout() {
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [dispatch, connectNotifications, _id]);
+  }, [dispatch, _id]);
 
   // get all posts reports that targets this currently logged in user
   useLayoutEffect(() => {
-    if (reportedPost?.length > 1) {
-      return;
-    }
     // set is fetching to true
     setIsFetching(true);
 
@@ -190,7 +173,7 @@ export default function NotifAccordionLayout() {
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [dispatch, reportedPost, _id]);
+  }, [dispatch, _id]);
 
   return (
     <Stack gap={2}>

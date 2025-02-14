@@ -15,22 +15,46 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  showMessagingDrawer,
+  showProfileDrawerMessageInput,
+  showUserProfileDrawer,
+} from "../../redux/AppUI";
 import { updateNotificationSnackBar } from "../../redux/CurrentSnackBar";
+import {
+  updateTempUserIDRedux,
+  updateUserCurrentUserRedux,
+} from "../../redux/CurrentUser";
+import CustomCountryName from "../utilities/CustomCountryName";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../utilities/getImageMatch";
 
-export default function MiniProfileLayout({
-  handleShowMiniProfile,
-  userId,
-  showMessageInput,
-  setShowMessageInput,
-}) {
+export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
   const [isFetching, setIsFetching] = useState(true);
   const [miniProfileData, setMiniProfileData] = useState();
   const [errorPresent, setErrorPresent] = useState(false);
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   // axios default credentials
   axios.defaults.withCredentials = true;
+
+  // redux states
+  const { user } = useSelector((state) => state.currentUser);
+  const {
+    _id: currentUserId,
+    name,
+    avatar,
+    country,
+    county,
+    specialisationTitle: title,
+  } = user || {};
+
+  // checks for if current user is friends
+  const isFriends =
+    miniProfileData && miniProfileData?.network?.includes(currentUserId);
 
   useEffect(() => {
     // fetch details of the liked or reacted user based on their id
@@ -68,9 +92,165 @@ export default function MiniProfileLayout({
 
     return parentName;
   };
+
+  const handleViewFullProfile = () => {
+    if (CustomDeviceIsSmall()) {
+      // close the messaging drawer since this view is displayed on it
+      dispatch(showMessagingDrawer());
+
+      // navigate to the new window for smaller devices
+      navigate("users/profile/" + userId);
+    } else {
+      // update the temp user state in redux with the userID passed
+      dispatch(updateTempUserIDRedux(userId));
+
+      // close the messaging drawer since this view is displayed on it
+      dispatch(showMessagingDrawer());
+
+      // open the profile drawer for larger views like tabs ++
+      dispatch(showUserProfileDrawer());
+    }
+  };
+
+  // handle when user clicks adds user btn
+  const handleRequestConnecting = () => {
+    const dataUserAcknowLedging = {
+      senderId: currentUserId,
+      targetId: userId,
+      country: CustomCountryName(country),
+      state: county,
+      name,
+      avatar,
+      title,
+      message: "requesting to connect",
+    };
+
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request and passing
+    axios
+      .post(
+        `http://localhost:5000/metatron/api/v1/connections/connection/create`,
+        dataUserAcknowLedging
+      )
+      .then((res) => {
+        // update the message state
+        if (res?.data && res.data) {
+          setMessage(res.data);
+        }
+      })
+      .catch(async (err) => {
+        if (err?.code === "ERR_NETWORK") {
+          setMessage("server is unreachable check your internet");
+          return;
+        }
+        setMessage(err?.response?.data);
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  };
+
+  // handle unfriending a user
+  const handleRequestUnfriend = () => {
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing delete request and passing id of the currenly user and that of miniprofile user being
+    // viewed
+    axios
+      .delete(
+        `http://localhost:5000/metatron/api/v1/connections/connection/unfriend/${currentUserId}/${userId}`
+      )
+      .then((res) => {
+        // update the message state
+        if (res?.data && res.data) {
+          // update the message
+          setMessage(res.data.message);
+
+          // update the miniprofile of  user who is target info from backend
+          setMiniProfileData(res.data.targetUser);
+
+          // update the redux state of the currently logged in user from backend who is sender user
+          dispatch(updateUserCurrentUserRedux(res.data.senderUser));
+        }
+      })
+      .catch(async (err) => {
+        if (err?.code === "ERR_NETWORK") {
+          setMessage("server is unreachable check your internet");
+          return;
+        }
+        // error message
+        setMessage(err?.response?.data);
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  };
+
+  // handle sending of the message
+  const handleSendMessage = () => {
+    if (CustomDeviceIsSmall()) {
+      // navigate user profile specially smalller devices + mesaging true
+      // update the message shown input when drawer is opened
+      dispatch(showProfileDrawerMessageInput(true));
+      navigate("users/profile/" + userId);
+    } else {
+      // update the temp user state in redux with the userID passed
+      dispatch(updateTempUserIDRedux(userId));
+
+      // update the message shown input when drawer is opened
+      dispatch(showProfileDrawerMessageInput(true));
+
+      // open the profile drawer for larger views like tabs ++
+      dispatch(showUserProfileDrawer());
+    }
+
+    // close the alert
+    handleClose();
+  };
+
+  const handleClose = () => {
+    // clear any messages info
+    setMessage("");
+  };
+
+  // handle clearing of the message
+  const handleClearMessage = () => {
+    setMessage("");
+  };
+
   return (
     <React.Fragment>
-      {/* error present display this */}
+      {/* message from backend of connect request */}
+      {message && (
+        <React.Fragment>
+          <Collapse in={message || false}>
+            <Alert
+              severity="info"
+              onClose={handleClose}
+              className="rounded"
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={handleClearMessage}
+                >
+                  <Close fontSize="inherit" sx={{ width: 15, height: 15 }} />
+                </IconButton>
+              }
+            >
+              {message}
+            </Alert>
+          </Collapse>
+        </React.Fragment>
+      )}
+
+      {/* error present of fetching user details */}
       {errorPresent && (
         <React.Fragment>
           <Collapse in={errorPresent || false}>
@@ -83,7 +263,7 @@ export default function MiniProfileLayout({
               }}
               action={
                 <IconButton aria-label="close" color="inherit" size="small">
-                  <Close fontSize="inherit" />
+                  <Close fontSize="inherit" sx={{ width: 15, height: 15 }} />
                 </IconButton>
               }
             >
@@ -168,35 +348,59 @@ export default function MiniProfileLayout({
               {/* contact buttons */}
               <Box display={"flex"} justifyContent={"center"} gap={2}>
                 {/* button view profile */}
-                <Button
-                  variant="contained"
-                  disableElevation
-                  size="small"
-                  sx={{ textTransform: "capitalize", borderRadius: "20px" }}
-                >
-                  Profile
-                </Button>
+                <Tooltip title={"profile"} arrow>
+                  <Button
+                    variant="contained"
+                    disableElevation
+                    onClick={handleViewFullProfile}
+                    disabled={isFetching || message}
+                    size="small"
+                    sx={{ textTransform: "capitalize", borderRadius: "20px" }}
+                  >
+                    Profile
+                  </Button>
+                </Tooltip>
 
                 {/* button send message */}
-                <Button
-                  variant="contained"
-                  disableElevation
-                  disabled={showMessageInput}
-                  onClick={() => setShowMessageInput(true)}
-                  size="small"
-                  sx={{ textTransform: "capitalize", borderRadius: "20px" }}
-                >
-                  Message
-                </Button>
-                {/* add friends */}
-                <Button
-                  variant="contained"
-                  disableElevation
-                  size="small"
-                  sx={{ textTransform: "capitalize", borderRadius: "20px" }}
-                >
-                  Follow
-                </Button>
+                <Tooltip title={"message"} arrow>
+                  <Button
+                    variant="contained"
+                    disableElevation
+                    size="small"
+                    onClick={handleSendMessage}
+                    sx={{ textTransform: "capitalize", borderRadius: "20px" }}
+                  >
+                    Message
+                  </Button>
+                </Tooltip>
+
+                {/* add friends if not friends */}
+                <Tooltip title={isFriends ? "connect" : "disconnect"} arrow>
+                  {isFriends ? (
+                    <Button
+                      variant="contained"
+                      disableElevation
+                      disabled={message || isFetching}
+                      onClick={handleRequestUnfriend}
+                      size="small"
+                      color="warning"
+                      sx={{ textTransform: "capitalize", borderRadius: "20px" }}
+                    >
+                      disconnect
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      disableElevation
+                      disabled={message || isFetching}
+                      onClick={handleRequestConnecting}
+                      size="small"
+                      sx={{ textTransform: "capitalize", borderRadius: "20px" }}
+                    >
+                      connect
+                    </Button>
+                  )}
+                </Tooltip>
               </Box>
 
               {/* divider */}

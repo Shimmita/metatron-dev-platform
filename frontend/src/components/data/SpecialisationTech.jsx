@@ -1,12 +1,11 @@
 const SpecialisationTech = [
-  "Internet of Things",
+  "Internet of Things (IoT)",
   "Artificial Intelligence",
   "DevOps Engineering",
   "Computer Networks",
   "Block Chain and Web3",
   "Data Science and Analytics",
   "UI/UX Design",
-  "Web Hosting and Deployment",
   "Cybersecurity Engineering",
   "Cloud Computing",
   "Game App Development",
@@ -23,7 +22,6 @@ const SpecialisationTech = [
   "Programming Languages",
   "Multiplatform Mobile Development",
   "Desktop App Development",
-  "WordPress Web Development",
   "System Administration",
 ].sort();
 

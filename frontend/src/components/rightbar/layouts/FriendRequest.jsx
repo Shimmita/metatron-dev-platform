@@ -1,5 +1,6 @@
 import { Add, Close } from "@mui/icons-material";
 import {
+  AvatarGroup,
   Box,
   CardActionArea,
   CircularProgress,
@@ -7,6 +8,7 @@ import {
   IconButton,
   Skeleton,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -26,6 +28,7 @@ import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 import SnackbarConnect from "../../snackbar/SnackbarConnect";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
+import { getImageMatch } from "../../utilities/getImageMatch";
 
 function FriendRequest({
   isLoadingRequest = false,
@@ -74,7 +77,7 @@ function FriendRequest({
     // set is fetching to true
     setIsFetching(true);
 
-    // performing post request and passing
+    // performing post request and passing data for body request
     axios
       .post(
         `http://localhost:5000/metatron/api/v1/connections/connection/create`,
@@ -83,7 +86,6 @@ function FriendRequest({
       .then((res) => {
         // update the redux of current post
         if (res?.data && res.data) {
-          
           dispatch(updateMessageConnectRequest(res.data));
 
           // update redux by remove the user from request friend list by passing the ID
@@ -160,9 +162,11 @@ function FriendRequest({
   };
 
   // handle rejecting the user from acceting the connect request
+
+  // id of the connect request object
+  const { _id: connectRequestID } = connect_request || {};
+
   const handleRejectConnectRequest = () => {
-    // id of the user requesting connect since its accepting opton the object prop has targetID
-    const { _id: connectRequestID, targetId: targetID } = connect_request || {};
     // set is fetching to true
     setIsFetching(true);
 
@@ -177,7 +181,7 @@ function FriendRequest({
           dispatch(updateMessageConnectRequest(res.data));
 
           // update redux by remove the user from request friend list.
-          dispatch(updateCurrentConnectID(targetID));
+          dispatch(updateCurrentConnectNotifID(connectRequestID));
         }
       })
       .catch(async (err) => {
@@ -202,6 +206,8 @@ function FriendRequest({
       });
   };
 
+  // check if the user is the current user
+  const isCurrentUser = connectRequestID == currentUserId;
   return (
     <React.Fragment>
       {isLoadingRequest ? (
@@ -300,31 +306,26 @@ function FriendRequest({
                       </Typography>
 
                       {/* skills of the user */}
-                      <Stack direction={"row"} gap={1} alignItems={"center"}>
-                        {connect_request?.selectedSkills
-                          ?.slice(0, 3)
-                          .map((skill, index) => (
-                            <React.Fragment>
-                              <Typography
-                                variant="caption"
-                                color={"text.secondary"}
-                                key={index}
-                              >
-                                {skill}
-                              </Typography>
-
-                              {/* divider if no last item */}
-                              {index !== 2 && (
-                                <Divider
-                                  component={"li"}
-                                  orientation="vertical"
-                                  variant="middle"
-                                  className="p-1"
+                      <Box display={"flex"} mt={"2px"}>
+                        <AvatarGroup
+                          max={connect_request?.selectedSkills?.length}
+                        >
+                          {/* loop through the skills and their images matched using custim fn */}
+                          {connect_request?.selectedSkills?.map(
+                            (skill, index) => (
+                              <Tooltip title={skill} arrow>
+                                <Avatar
+                                  key={index}
+                                  alt={skill}
+                                  className="border"
+                                  sx={{ width: 28, height: 28 }}
+                                  src={getImageMatch(skill)}
                                 />
-                              )}
-                            </React.Fragment>
-                          ))}
-                      </Stack>
+                              </Tooltip>
+                            )
+                          )}
+                        </AvatarGroup>
+                      </Box>
                     </React.Fragment>
                   )}
                 </Box>
@@ -355,34 +356,51 @@ function FriendRequest({
                         gap={"3px"}
                         alignItems={"center"}
                       >
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={handleAcceptConnectRequestFriends}
-                        >
-                          <Add sx={{ width: 15, height: 15 }} />
-                        </IconButton>
+                        <Tooltip arrow title={"connect"}>
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={handleAcceptConnectRequestFriends}
+                          >
+                            <Add sx={{ width: 15, height: 15 }} />
+                          </IconButton>
+                        </Tooltip>
 
                         {/* action btn rejecting request */}
-                        <IconButton
-                          size="small"
-                          onClick={handleRejectConnectRequest}
-                        >
-                          <Close sx={{ width: 14, height: 14 }} />
-                        </IconButton>
+                        <Tooltip arrow title={"dismiss"}>
+                          <IconButton
+                            size="small"
+                            onClick={handleRejectConnectRequest}
+                          >
+                            <Close sx={{ width: 14, height: 14 }} />
+                          </IconButton>
+                        </Tooltip>
                       </Stack>
                     </Stack>
                   ) : (
                     <React.Fragment>
                       {/* action btn initiating lets connect to the target user */}
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        className="border"
-                        onClick={handleSendConnectRequest}
-                      >
-                        <Add sx={{ width: 17, height: 17 }} />
-                      </IconButton>
+                      {isCurrentUser ? (
+                        <Box display={"flex"} justifyContent={"center"}>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                          >
+                            You
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Tooltip arrow title={"connect"}>
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            className="border"
+                            onClick={handleSendConnectRequest}
+                          >
+                            <Add sx={{ width: 17, height: 17 }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
                     </React.Fragment>
                   )}
                 </React.Fragment>

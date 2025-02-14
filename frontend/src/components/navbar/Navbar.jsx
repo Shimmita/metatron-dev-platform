@@ -1,5 +1,6 @@
 import {
   Close,
+  Diversity3Rounded,
   FullscreenExitRounded,
   FullscreenRounded,
   MenuRounded,
@@ -20,78 +21,127 @@ import {
 } from "@mui/material";
 import React, { lazy, Suspense, useState } from "react";
 
-import { useDispatch } from "react-redux";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
 import AppLogo from "../../images/logo_sm.png";
-import { showMessagingDrawer, showTabSideBar } from "../../redux/AppUI";
+import {
+  handleShowingSpeedDial,
+  handleSidebarRightbar,
+  showMessagingDrawer,
+  showTabSideBar,
+  showUserProfileDrawer,
+} from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import {
+  resetClearCurrentGlobalSearch,
+  updateCurrentGlobalSearchResults,
+} from "../../redux/CurrentGlobalSearch";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+const PeopleModal = lazy(() => import("../modal/PeopleModal"));
+const AlertGlobalSearch = lazy(() => import("../alerts/AlertGlobalSearch"));
+const ProfileDrawer = lazy(() => import("../profile/drawer/ProfileDrawer"));
 const EventsAddModal = lazy(() => import("../modal/EventsAddModal"));
-const ParentNotifMessageContainer = lazy(() => import("../messaging/ParentContainer"));
+const ParentNotifMessageContainer = lazy(() =>
+  import("../messaging/ParentContainer")
+);
 const DrawerSmartphone = lazy(() => import("./DrawerSmartphone"));
 
 //fix the appbar contents not showing full when set fixed
 const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
+const MetatronToolBar = styled(Toolbar)({
+  display: "flex",
+  justifyContent: "space-between",
+});
+
+const SearchBar = styled("div")(({ theme }) => ({
+  paddingBottom: "2px",
+  paddingTop: "2px",
+  paddingLeft: "8px",
+}));
+
+const IconsContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-evenly",
+  gap: "10px",
+  [theme.breakpoints.up("sm")]: {
+    gap: "30px",
+  },
+}));
+
+const LogoContent = styled(Box)({
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+});
+
 const Navbar = ({ setMode, mode }) => {
+  const [isFetching, setIsFetching] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [responseMessage, setResponseMessage] = useState("");
+  const [openAlertResults, setOpenAlertResults] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
-
+  // axios default credentials
+  axios.defaults.withCredentials = true;
   // control opening of the events modal
   const [openModalEventAdd, setOpenModalEventAdd] = useState(false);
 
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
+  const navigate = useNavigate();
+
   // redux states
   const dispatch = useDispatch();
-
-  const navigate = useNavigate();
+  // get redux states
+  const { user } = useSelector((state) => state.currentUser);
+  const { isPeopleModal, peopleData } = useSelector(
+    (state) => state.currentModal
+  );
 
   const handleShowMobileSearch = () => {
     setShowMobileSearch((prev) => !prev);
+    // clear search term
+    setSearchTerm("");
   };
 
-  const MetatronToolBar = styled(Toolbar)({
-    display: "flex",
-    justifyContent: "space-between",
-  });
-
-  const SearchBar = styled("div")(({ theme }) => ({
-    paddingBottom: "2px",
-    paddingTop: "2px",
-    paddingLeft: "8px",
-  }));
-
-  const IconsContainer = styled(Box)(({ theme }) => ({
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-    gap: "10px",
-    [theme.breakpoints.up("sm")]: {
-      gap: "30px",
-    },
-  }));
-
-  const LogoContent = styled(Box)({
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  });
+  // redux state UI
+  const { isSidebarRighbar, isDefaultSpeedDial } = useSelector(
+    (state) => state.appUI
+  );
 
   // home page
   const handleHome = () => {
+    // update the sidbar to be shown always
+    // always default sidebar and rightbar showing for larger screens
+    if (!isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+
+    // show speed dial if aint visible
+    if (!isDefaultSpeedDial) {
+      dispatch(handleShowingSpeedDial(true));
+    }
+
     // update the bottom nav counter
     dispatch(updateCurrentBottomNav(0));
+    // navigate home page
     navigate("/");
   };
 
-  // show the messaing drawer bdy the help of redux toolkit
+  // show the notificationa and messaing triggered by redux
   const handleShowMessageDrawer = () => {
     dispatch(showMessagingDrawer());
+  };
+
+  const handleShowingProfileDrawer = () => {
+    dispatch(showUserProfileDrawer());
   };
 
   // handle full screen by collapsing side bar and showing menu on nav
@@ -99,6 +149,60 @@ const Navbar = ({ setMode, mode }) => {
     setFullScreen((prev) => !prev);
     // alter display of sidebar from the redux
     dispatch(showTabSideBar());
+  };
+
+  // handle search global
+  const handleSubmitGlobalSearch = (event) => {
+    // prevent default form submission
+    event.preventDefault();
+
+    // clear any redux states of global search if present
+    dispatch(resetClearCurrentGlobalSearch());
+
+    // activate fetching
+    setIsFetching(true);
+
+    // start the put request axios
+    axios
+      .get(
+        `http://localhost:5000/metatron/api/v1/global/search/${searchTerm}`,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        if (res?.data) {
+          // set response message to total number of results
+          setResponseMessage(
+            `${
+              res.data.users.count + res.data.posts.count + res.data.jobs.count
+            } results found`
+          );
+
+          // update current user redux
+          dispatch(updateCurrentGlobalSearchResults(res.data));
+
+          // set open alert results true
+          setOpenAlertResults(true);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        // open alert results with the error message
+        setOpenAlertResults(true);
+        // there is an error
+        if (err?.code === "ERR_NETWORK") {
+          // update the snackbar notification of the error of connection
+          setResponseMessage("failed to search network error");
+          return;
+        }
+        // update the snackbar notification of error from the server
+        setResponseMessage(err?.response.data);
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
   };
 
   return (
@@ -136,7 +240,7 @@ const Navbar = ({ setMode, mode }) => {
             >
               {/* show menu on small devices only not tab+laps+desk */}
               {!CustomDeviceTablet() ? (
-                <>
+                <React.Fragment>
                   <IconButton onClick={(e) => setOpenDrawer(!openDrawer)}>
                     <MenuRounded style={{ color: "white" }} />
                   </IconButton>
@@ -149,7 +253,7 @@ const Navbar = ({ setMode, mode }) => {
                       METATRON
                     </Typography>
                   </IconButton>
-                </>
+                </React.Fragment>
               ) : (
                 <Box display={"flex"} ml={0} alignItems={"center"} gap={1}>
                   {/* tablet show app logo not on smaller Devices */}
@@ -213,21 +317,34 @@ const Navbar = ({ setMode, mode }) => {
                   alignItems: "center",
                 }}
               >
-                <form className="d-flex">
+                <form className="d-flex" onSubmit={handleSubmitGlobalSearch}>
                   <Box>
                     <input
                       type="text"
+                      disabled={isFetching}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder={"search..."}
                       className="form-control w-100 border-0 text-secondary rounded-5"
                     />
                   </Box>
 
                   <Box>
-                    <IconButton type="submit">
-                      <SearchRounded
-                        sx={{ width: 20, height: 20, color: "white" }}
+                    {isFetching ? (
+                      <CircularProgress
+                        size={18}
+                        sx={{ color: "white", ml: 1 }}
                       />
-                    </IconButton>
+                    ) : (
+                      <IconButton
+                        type="submit"
+                        disabled={searchTerm?.length < 2}
+                      >
+                        <SearchRounded
+                          sx={{ width: 20, height: 20, color: "white" }}
+                        />
+                      </IconButton>
+                    )}
                   </Box>
                 </form>
               </Box>
@@ -244,21 +361,34 @@ const Navbar = ({ setMode, mode }) => {
                   alignItems: "center",
                 }}
               >
-                <form className="d-flex gap-1 ps-5">
+                <form
+                  className="d-flex gap-1 ps-5"
+                  onSubmit={handleSubmitGlobalSearch}
+                >
                   <Box>
                     <input
                       type="text"
+                      disabled={isFetching}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder={"search..."}
                       className="form-control w-100 border-0 text-secondary"
                     />
                   </Box>
 
                   <Box>
-                    <IconButton type="submit">
-                      <SearchRounded
-                        sx={{ width: 20, height: 20, color: "white" }}
-                      />
-                    </IconButton>
+                    {isFetching ? (
+                      <CircularProgress size={18} sx={{ color: "white" }} />
+                    ) : (
+                      <IconButton
+                        type="submit"
+                        disabled={searchTerm?.length < 2}
+                      >
+                        <SearchRounded
+                          sx={{ width: 20, height: 20, color: "white" }}
+                        />
+                      </IconButton>
+                    )}
                   </Box>
                 </form>
 
@@ -279,6 +409,31 @@ const Navbar = ({ setMode, mode }) => {
                   </IconButton>
                 )}
               </Box>
+            )}
+
+            {/* display connection count for largets screens only */}
+            {!(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
+              <Tooltip arrow title={"connection"}>
+                <Box
+                  display={"flex"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  gap={1}
+                >
+                  <IconButton onClick={null}>
+                    <Diversity3Rounded sx={{ color: "white" }} />
+                  </IconButton>
+                  <Box>
+                    <Typography
+                      variant="caption"
+                      fontWeight={"bold"}
+                      color="white"
+                    >
+                      {user?.network_count}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Tooltip>
             )}
             {/* display when search not clicked */}
             {!showMobileSearch && (
@@ -306,7 +461,7 @@ const Navbar = ({ setMode, mode }) => {
                   </Tooltip>
                 </Badge>
                 <Tooltip arrow title={"profile"}>
-                  <IconButton>
+                  <IconButton onClick={handleShowingProfileDrawer}>
                     <Avatar
                       sx={{ width: 28, height: 28 }}
                       src={devImage}
@@ -318,6 +473,22 @@ const Navbar = ({ setMode, mode }) => {
             )}
           </IconsContainer>
         </MetatronToolBar>
+
+        {/* show modal connect with people or people search results */}
+        <PeopleModal
+          openPeopleModal={isPeopleModal}
+          PeopleConnect={peopleData}
+        />
+
+        {/* show alert search results global */}
+        <AlertGlobalSearch
+          openAlert={openAlertResults}
+          setOpenAlert={setOpenAlertResults}
+          message={responseMessage}
+          setMessage={setResponseMessage}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+        />
 
         {/* use suspense to cover lazy loading as fallback error boundary */}
         <Suspense
@@ -342,8 +513,11 @@ const Navbar = ({ setMode, mode }) => {
             setOpenModalEventAdd={setOpenModalEventAdd}
           />
 
-          {/* notif and messaging to the left for large screens and right on tabs and top on small devices */}
+          {/* holds the notification and messaging drawe */}
           <ParentNotifMessageContainer />
+
+          {/* holds the profile drawer which contains user account info */}
+          <ProfileDrawer />
 
           {/* EventsAdd Modal to be displayed if toggled */}
           <EventsAddModal

@@ -105,10 +105,10 @@ export default function AlertChatBot() {
               <Typography
                 gutterBottom
                 fontWeight={"bold"}
-                variant="body2"
+                variant="body1"
                 textTransform={"capitalize"}
               >
-                Metatron Ai
+                Dynamo Doll
               </Typography>
               <Typography variant="body2" color={"text.secondary"}>
                 AI Agent

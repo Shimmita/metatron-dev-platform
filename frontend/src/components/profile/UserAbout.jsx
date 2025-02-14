@@ -18,6 +18,8 @@ function UserAbout({ profileData }) {
     return parentName;
   };
 
+  console.log(profileData)
+
   return (
     <Box p={2}>
       <Box mt={2} display={"flex"} justifyContent={"space-between"}>

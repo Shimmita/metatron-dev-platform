@@ -6,6 +6,8 @@ import {
   handleSidebarRightbar,
   resetDefaultBottomNav,
 } from "../../redux/AppUI";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 const LiveLayout = lazy(() => import("./layout/LiveLayout"));
 
 const EventsLive = () => {
@@ -23,25 +25,43 @@ const EventsLive = () => {
     }
   }, []);
 
-  // hide showing of the default bottom nav 
+  // hide showing of the default bottom nav
   useState(() => {
     dispatch(resetDefaultBottomNav());
   });
   return (
-    <>
-      <Box bgcolor={"background.default"} height={"92vh"}>
+    <React.Fragment>
+      <Box bgcolor={"background.default"} height={"90vh"}>
         <Box
-          mb={2}
+          width={"100%"}
           display={"flex"}
-          alignItems={"center"}
           justifyContent={"center"}
-          gap={2}
-          position={"sticky"}
+          bgcolor={"background.default"}
         >
-          <Typography fontWeight={"bold"} color={"primary"} className="pt-1">
-            LIVE EVENTS
-          </Typography>
-          <LiveTvRounded color="warning" sx={{ width: 23, height: 23 }} />
+          <Box
+            mb={1}
+            display={"flex"}
+            alignItems={"center"}
+            justifyContent={"center"}
+            width={CustomDeviceTablet() ? "89%" : "100%"}
+            flexDirection={"column"}
+            className={
+              CustomDeviceTablet() || CustomDeviceIsSmall()
+                ? "shadow p-2 rounded"
+                : "p-2"
+            }
+            position={"sticky"}
+          >
+            <Typography fontWeight={"bold"} color={"primary"}>
+              DEV SPACE EVENTS
+            </Typography>
+            <Box display={"flex"} alignItems={"center"} gap={1}>
+              <LiveTvRounded color="warning" sx={{ width: 18, height: 18 }} />
+              <Typography fontWeight={"bold"} color={"text.secondary"}>
+                Live Events
+              </Typography>
+            </Box>
+          </Box>
         </Box>
 
         <Box
@@ -67,7 +87,7 @@ const EventsLive = () => {
           </Box>
         </Box>
       </Box>
-    </>
+    </React.Fragment>
   );
 };
 

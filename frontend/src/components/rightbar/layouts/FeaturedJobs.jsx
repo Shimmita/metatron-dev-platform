@@ -1,24 +1,26 @@
 import {
   Avatar,
+  AvatarGroup,
   Box,
   Button,
   Divider,
   IconButton,
   Skeleton,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
+import ApplyJobModal from "../../modal/ApplyJobModal";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
 function FeaturedJobs({ isLoading, jobTop }) {
+  const [openApplyJobModal, setOpenApplyJobModal] = useState();
   // redux states
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
     (state) => state.appUI
@@ -30,6 +32,11 @@ function FeaturedJobs({ isLoading, jobTop }) {
       parent.length > 2 ? `${parent[0]} ${parent[1]}` : parent[0];
 
     return finalName;
+  };
+
+  // handle opening of apply job modal
+  const handleOpeningApplyJob = () => {
+    setOpenApplyJobModal(true);
   };
 
   return (
@@ -113,51 +120,22 @@ function FeaturedJobs({ isLoading, jobTop }) {
                     </Typography>
                   </Box>
 
-                  {/* skills */}
-                  <Box display={"flex"} gap={1} alignItems={"center"}>
-                    {jobTop?.skills
-                      .slice(0, CustomDeviceIsSmall() ? 2 : 3)
-                      .map((skill, index) => (
-                        <React.Fragment>
-                          <Typography
+                  {/* job skills */}
+                  <Box display={"flex"} mt={"2px"}>
+                    <AvatarGroup max={jobTop?.skills?.length}>
+                      {/* loop through the skills and their images matched using custim fn */}
+                      {jobTop?.skills?.map((skill, index) => (
+                        <Tooltip title={skill} arrow>
+                          <Avatar
                             key={index}
-                            variant="caption"
-                            color={"text.secondary"}
-                          >
-                            {skill}
-                          </Typography>
-                          {/* show this on small devices for last index */}
-                          {index === 1 && CustomDeviceIsSmall() && (
-                            <Typography
-                              variant="caption"
-                              color={"text.secondary"}
-                            >
-                              +{jobTop?.skills?.length - 2} more
-                            </Typography>
-                          )}
-                          {/* show this for tablet devices at last index */}
-                          {index === 2 && CustomDeviceTablet() && (
-                            <Typography
-                              variant="caption"
-                              color={"text.secondary"}
-                            >
-                              +{jobTop?.skills?.length - 3} more
-                            </Typography>
-                          )}
-                          {/* show this for largest screen */}
-                          {index === 2 &&
-                            !(
-                              CustomDeviceTablet() || CustomDeviceIsSmall()
-                            ) && (
-                              <Typography
-                                variant="caption"
-                                color={"text.secondary"}
-                              >
-                                +{jobTop?.skills?.length - 3}
-                              </Typography>
-                            )}
-                        </React.Fragment>
+                            alt={skill}
+                            className="border"
+                            sx={{ width: 27, height: 27 }}
+                            src={getImageMatch(skill)}
+                          />
+                        </Tooltip>
                       ))}
+                    </AvatarGroup>
                   </Box>
                 </Box>
               }
@@ -166,8 +144,8 @@ function FeaturedJobs({ isLoading, jobTop }) {
             <Stack gap={1} alignItems={"center"} justifyContent={"flex-end"}>
               {/* applicants counter */}
               <Box>
-                <Typography variant="caption" color={"text.secondary"}>
-                  {jobTop?.applicants?.total}/500
+                <Typography variant="caption" color={"text.secondary"} fontWeight={'bold'}>
+                  {jobTop?.applicants?.total}/1000
                 </Typography>
               </Box>
 
@@ -175,6 +153,7 @@ function FeaturedJobs({ isLoading, jobTop }) {
               <Button
                 disableElevation
                 size="small"
+                onClick={handleOpeningApplyJob}
                 variant="contained"
                 sx={{
                   textTransform: "capitalize",
@@ -188,6 +167,20 @@ function FeaturedJobs({ isLoading, jobTop }) {
           <Divider variant="inset" component="li" />
         </List>
       )}
+      {/* show modal apply jobs */}
+      <ApplyJobModal
+        title={jobTop?.title}
+        organisation={jobTop?.organisation}
+        requirements={jobTop?.requirements}
+        websiteLink={jobTop?.website}
+        openApplyJobModal={openApplyJobModal}
+        setOpenApplyJobModal={setOpenApplyJobModal}
+        jobID={jobTop?._id}
+        jobaccesstype={jobTop?.jobtypeaccess}
+        salary={jobTop?.salary}
+        skills={jobTop?.skills}
+        location={jobTop?.location}
+      />{" "}
     </React.Fragment>
   );
 }

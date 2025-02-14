@@ -3,9 +3,8 @@ import {
   ArrowRight,
   Close,
   FavoriteRounded,
-  GitHub,
   PaidRounded,
-  WorkspacePremiumRounded,
+  VisibilityRounded,
 } from "@mui/icons-material";
 import {
   Alert,
@@ -13,14 +12,12 @@ import {
   Box,
   Button,
   Collapse,
-  Divider,
   IconButton,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import React, { lazy, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import GoogleLogo from "../../images/google.png";
 import MpesaLogo from "../../images/mpesa.png";
 import PaypalLogo from "../../images/paypal2.png";
@@ -28,20 +25,11 @@ import PayTm from "../../images/paytm.png";
 import StripeLogo from "../../images/stripe.jpeg";
 import VisaCard from "../../images/visa.png";
 
-import { useSelector } from "react-redux";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-const GithubTeamLayout = lazy(() => import("./GithubTeamLayout"));
-const SponsorTeamLayout = lazy(() => import("./SponsorTeamLayout"));
+import SponsorTeamLayout from "./SponsorTeamLayout";
 
-const SponsorshipLayout = ({
-  isSponsorTeam,
-  setIsSponsorTeam,
-  isGitTeam,
-  setIsGitTeam,
-}) => {
+const SponsorshipLayout = ({ isSponsorTeam, setIsSponsorTeam }) => {
   const [isDonate, setIsDonate] = useState(false);
-  // global  state from redux
-  const { isDarkMode } = useSelector((state) => state.appUI);
 
   // handle when user clicks donate button
   const handleShowDonate = () => {
@@ -53,46 +41,29 @@ const SponsorshipLayout = ({
     setIsSponsorTeam(true);
   };
 
-  // handle show of github team
-  const handleShowGitTeam = () => {
-    setIsGitTeam(true);
-  };
-
-  const items = Array.from({ length: 20 });
+  const items = Array.from({ length: 10 });
 
   return (
     <Stack gap={2}>
-      {isSponsorTeam || isGitTeam ? (
+      {isSponsorTeam ? (
         <React.Fragment>
           {/* title for sponsorship and GitHub team */}
-          <Box>
+          <Box mb={1}>
             {/* sponsorship */}
             {isSponsorTeam && (
               <Typography variant="body2" color={"text.secondary"}>
-                The following are our{" "}
+                Following are our recent{" "}
                 <span style={{ textDecoration: "underline" }}>
                   Esteemed Sponsors
                 </span>{" "}
-                who have shown their undying love for technology and promoted us
-                through donations.
+                with undying love of promoting technology.{" "}
                 <span className="text-success"> Congrats!</span>
               </Typography>
             )}
-
-            {/* github */}
-            {isGitTeam && (
-              <Typography variant="body2" color={"text.secondary"}>
-                The following are our esteemed{" "}
-                <span style={{ textDecoration: "underline" }}>GitHub Team</span>{" "}
-                of contributors.
-                <span className="text-success"> Congrats!</span> <br /> Click on
-                a user to view their profile and communication channels.
-              </Typography>
-            )}
           </Box>
-          <Box height={"35vh"}>
+          <Box height={"20vh"}>
             <Box
-              maxHeight={"35vh"}
+              maxHeight={"20vh"}
               sx={{
                 overflow: "auto",
                 // Hide scrollbar for Chrome, Safari and Opera
@@ -109,15 +80,6 @@ const SponsorshipLayout = ({
                 <React.Fragment>
                   {items.map((val, index) => (
                     <SponsorTeamLayout key={index} />
-                  ))}
-                </React.Fragment>
-              )}
-
-              {/* github team layout show */}
-              {isGitTeam && (
-                <React.Fragment>
-                  {items.map((val, index) => (
-                    <GithubTeamLayout key={index} />
                   ))}
                 </React.Fragment>
               )}
@@ -330,74 +292,6 @@ const SponsorshipLayout = ({
             </React.Fragment>
           ) : (
             <React.Fragment>
-              {/* github contribution */}
-              <Stack gap={1}>
-                <Box display={"flex"} justifyContent={"center"}>
-                  <Box
-                    display={"flex"}
-                    justifyContent={"center"}
-                    gap={2}
-                    alignItems={"center"}
-                  >
-                    <GitHub sx={{ width: 18, height: 18 }} />{" "}
-                    <Typography variant="body2" fontWeight={"bold"}>
-                      GitHub Contribution
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* details of github contribution */}
-                <Box>
-                  <Typography
-                    variant="body2"
-                    color={"text.secondary"}
-                    gutterBottom
-                  >
-                    Sofware Engineers are all welcomed to contribute to our{" "}
-                    <Link
-                      to={""}
-                      style={{
-                        textDecoration: "none",
-                        color: isDarkMode ? "  #87BDE9" : "  #1876D2",
-                      }}
-                    >
-                      GitHub Repository
-                    </Link>
-                    . When approved our technical team will reach out for
-                    appreciation and get you enlisted to our GitHub Team program
-                    for recognition.
-                  </Typography>
-                </Box>
-
-                {/* check our sponsorship */}
-                <Box>
-                  <Button
-                    size="small"
-                    startIcon={
-                      <WorkspacePremiumRounded sx={{ width: 18, height: 18 }} />
-                    }
-                    endIcon={
-                      <WorkspacePremiumRounded
-                        ssx={{ width: 15, height: 15 }}
-                      />
-                    }
-                    disableElevation
-                    onClick={handleShowGitTeam}
-                    variant="outlined"
-                    sx={{
-                      textTransform: "capitalize",
-
-                      borderRadius: "20px",
-                    }}
-                  >
-                    Our GitHub Team
-                  </Button>
-                </Box>
-              </Stack>
-
-              {/* divider */}
-              <Divider component={"div"} className="p-1" />
-
               {/* funding */}
               <Stack gap={1}>
                 <Box display={"flex"} justifyContent={"center"}>
@@ -420,8 +314,7 @@ const SponsorshipLayout = ({
                     You can promote us in our affiliate program through
                     donation. When your donation is successful you will be
                     enlisted in the affiliate program for appreciation from as
-                    little as $1 US Dollar contribution. All are welcomed
-                    globally.
+                    little as $1 US Dollar contribution.
                     <Button
                       size="small"
                       onClick={handleShowDonate}
@@ -451,20 +344,19 @@ const SponsorshipLayout = ({
                 <Box mt={1}>
                   <Button
                     size="small"
-                    startIcon={
-                      <FavoriteRounded sx={{ width: 15, height: 15 }} />
-                    }
-                    endIcon={<FavoriteRounded sx={{ width: 15, height: 15 }} />}
                     disableElevation
                     onClick={handleShowSponsors}
-                    variant="outlined"
+                    startIcon={
+                      <VisibilityRounded sx={{ width: 15, height: 15 }} />
+                    }
+                    variant="text"
                     sx={{
                       textTransform: "capitalize",
 
                       borderRadius: "20px",
                     }}
                   >
-                    sponsorship team
+                    Sponsorship Team
                   </Button>
                 </Box>
               </Stack>

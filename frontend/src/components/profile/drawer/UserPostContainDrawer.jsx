@@ -11,21 +11,24 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { resetClearCurrentPosts } from "../../../redux/CurrentPosts";
+import { updateMessageConnectRequest } from "../../../redux/CurrentSnackBar";
+import SnackbarConnect from "../../snackbar/SnackbarConnect";
+import "../UserPost.css";
+import UserPostCardDrawer from "./UserPostCardDrawer";
 
-import { resetClearCurrentPosts } from "../../redux/CurrentPosts";
-import { updateMessageConnectRequest } from "../../redux/CurrentSnackBar";
-import SnackbarConnect from "../snackbar/SnackbarConnect";
-import "./UserPost.css";
-import UserPostCard from "./UserPostCard";
-
-function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
+function UserPostContainDrawer({
+  userId,
+  setPostDetailedData,
+  setIsPostEditMode,
+}) {
   const [isFetching, setIsFetching] = useState(true);
   const [postsData, setPostsData] = useState();
   const [erroMessage, setErrorMesssage] = useState("");
-
   const [showDeleteALert, setShowDeleteAlert] = useState(false);
   const [deletePostID, setDeletePostID] = useState();
   const [isDeleting, setIsDeleting] = useState(false);
+
 
   // redux states
   const { user } = useSelector((state) => state.currentUser);
@@ -39,6 +42,11 @@ function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
   // axios default credentials
   axios.defaults.withCredentials = true;
   useEffect(() => {
+    // if there is data return
+    if (postsData?.length > 0) {
+      return;
+    }
+
     // fetch details of the liked or reacted user based on their id
     axios
       .get(`http://localhost:5000/metatron/api/v1/posts/users/all/${userId}`, {
@@ -63,7 +71,16 @@ function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [userId]);
+  }, [userId, postsData]);
+
+  // handle close aler delete
+  const handleClose = () => {
+    // close alert
+    setShowDeleteAlert(false);
+
+    // clear postID
+    setDeletePostID();
+  };
 
   // complete post deletion, user agreed
   const handleCompletePostDelete = () => {
@@ -108,14 +125,6 @@ function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
 
         setShowDeleteAlert(false);
       });
-  };
-
-  // handle close aler delete
-  const handleClose = () => {
-    // close alert
-    setShowDeleteAlert(false);
-    // clear postID
-    setDeletePostID();
   };
 
   return (
@@ -171,7 +180,6 @@ function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
           </Collapse>
         )}
       </Box>
-
       <Box className="post-card-container">
         {/* displayed when there is an error of request */}
         {erroMessage && (
@@ -187,6 +195,7 @@ function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
             </Typography>
           </Box>
         )}
+
         {/* displayed when fetching process is ongoing */}
         {isFetching && (
           <Box width={"100%"}>
@@ -210,7 +219,7 @@ function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
         {postsData &&
           postsData?.map((post, index) => (
             <Box key={index}>
-              <UserPostCard
+              <UserPostCardDrawer
                 post={post}
                 setPostDetailedData={setPostDetailedData}
                 setDeletePostID={setDeletePostID}
@@ -245,4 +254,4 @@ function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
   );
 }
 
-export default UserPostContainer;
+export default UserPostContainDrawer;

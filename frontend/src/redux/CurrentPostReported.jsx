@@ -19,9 +19,9 @@ const CurrentPostReported = createSlice({
     and cant be deleted by the targeted or post owner for  official references */
 
     updateCurrentReportID: (state, action) => {
-      const connectRequestID = action.payload;
-      state.reportedPost = state.reportedPost.filter((connect) => {
-        return connect._id !== connectRequestID;
+      const reportId = action.payload;
+      state.reportedPost = state.reportedPost.filter((report) => {
+        return report._id !== reportId;
       });
     },
 

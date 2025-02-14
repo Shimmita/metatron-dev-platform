@@ -12,11 +12,12 @@ import Drawer from "@mui/material/Drawer";
 import React, { lazy, Suspense, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { showMessagingDrawer } from "../../redux/AppUI";
+import SnackBarNotifications from "../snackbar/SnackBarNotifications";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import NotifAccordionLayout from "./layout/NotifAccordionLayout";
 const ConversationContainer = lazy(() => import("./ConversationsContainer"));
-const NotificationContainer = lazy(() => import("./NotificationContainer"));
 
 const StyledTabs = styled((props) => (
   <Tabs
@@ -50,7 +51,7 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
 );
 
 export default function ParentContainer() {
-  const [value, setValue] = React.useState(0);
+  const [value, setValue] = useState(0);
   // this will define display of inbox and notif bars appropriately
   const [messageNotifClicked, setMessageNotifClicked] = useState(false);
 
@@ -59,6 +60,14 @@ export default function ParentContainer() {
   };
   // redux states
   const { isOpenMessageDrawer } = useSelector((state) => state.appUI);
+  const { messageNotification } = useSelector((state) => state.currentSnackBar);
+
+  const { post_reactions } = useSelector((state) => state.currentPostReactions);
+  const { connectNotifications } = useSelector(
+    (state) => state.currentConnectNotif
+  );
+  const { reportedPost } = useSelector((state) => state.currentReportedPost);
+
   const dispatch = useDispatch();
 
   const handleClose = () => {
@@ -85,7 +94,7 @@ export default function ParentContainer() {
           height={"100vh"}
         >
           {/* display when message/notif item not clicked */}
-          {!messageNotifClicked ? (
+          {!messageNotifClicked && (
             <AppBar position="sticky">
               <Toolbar
                 variant="dense"
@@ -134,7 +143,7 @@ export default function ParentContainer() {
                 </Box>
               </Toolbar>
             </AppBar>
-          ) : null}
+          )}
 
           <Box>
             <Suspense
@@ -151,7 +160,27 @@ export default function ParentContainer() {
               }
             >
               {/* display notification */}
-              {value === 0 && <NotificationContainer />}
+              {value === 0 && (
+                <Box
+                  height={"92vh"}
+                  sx={{
+                    overflow: "auto",
+                    // Hide scrollbar for Chrome, Safari and Opera
+                    "&::-webkit-scrollbar": {
+                      display: "none",
+                    },
+                    // Hide scrollbar for IE, Edge and Firefox
+                    msOverflowStyle: "none",
+                    scrollbarWidth: "none",
+                  }}
+                >
+                  <NotifAccordionLayout
+                    post_reactions={post_reactions}
+                    reportedPost={reportedPost}
+                    connectNotifications={connectNotifications}
+                  />
+                </Box>
+              )}
               {/* display messages content and passing props */}
               {value === 1 && (
                 <ConversationContainer
@@ -162,6 +191,11 @@ export default function ParentContainer() {
           </Box>
         </Box>
       </Drawer>
+
+      {/* show snackbar for notifications for info */}
+      {messageNotification && (
+        <SnackBarNotifications message={messageNotification} />
+      )}
     </React.Fragment>
   );
 }

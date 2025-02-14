@@ -1,14 +1,17 @@
-import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import axios from "axios";
 import React, { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   handleLoadingPostLaunch,
-  handleSidebarRightbar,
+  handleShowingSpeedDial,
   resetAll,
   resetDefaultBottomNav,
 } from "../../redux/AppUI";
-import { updateCurrentPosts } from "../../redux/CurrentPosts";
+import {
+  resetClearCurrentPosts,
+  updateCurrentPosts,
+} from "../../redux/CurrentPosts";
 import CardFeed from "../custom/CardFeed";
 import PostDetailsContainer from "../post/PostDetailsContiner";
 import MobileTabCorousel from "../rightbar/MobileTabCorousel";
@@ -32,25 +35,32 @@ const FeedDefaultContent = () => {
   // redux states
   const dispatch = useDispatch();
   // redux states access
-  const { isSidebarRighbar, isDarkMode } = useSelector((state) => state.appUI);
   const { posts } = useSelector((state) => state.currentPosts);
 
-  useEffect(() => {
-    // always default sidebar and rightbar showing for larger screens
-    if (!isSidebarRighbar) {
-      dispatch(handleSidebarRightbar());
-    }
-  }, [isSidebarRighbar, dispatch]);
+  const { isDarkMode, isDefaultSpeedDial } = useSelector(
+    (state) => state.appUI
+  );
+
+  // show speed dial if aint visible
+  if (!isDefaultSpeedDial) {
+    dispatch(handleShowingSpeedDial(true));
+  }
 
   // handle showing of default bottom nav
   useEffect(() => {
     dispatch(resetDefaultBottomNav());
   }, [dispatch]);
 
+  // reset clear any previous posts results specailly from search
+  useEffect(() => {
+    dispatch(resetClearCurrentPosts());
+  }, [dispatch]);
+
   // fetch posts from the backend
   useEffect(() => {
     // if there are posts on refresh don't network request
     if (posts?.length > 0) {
+      return;
     }
     // set is fetching to true
     setIsFetching(true);
@@ -92,7 +102,7 @@ const FeedDefaultContent = () => {
         // reset all the UI states to default which will update isloading in redux
         dispatch(resetAll());
       });
-  }, [dispatch]);
+  }, [dispatch, posts]);
 
   // handle clearing of isNetwork and error message when the alert shown
   const handleClearing = () => {
@@ -100,33 +110,46 @@ const FeedDefaultContent = () => {
   };
 
   return (
-    <React.Fragment>
+    <Box
+      height={
+        CustomDeviceTablet()
+          ? "92.5vh"
+          : CustomDeviceIsSmall()
+          ? "91.7vh"
+          : "91vh"
+      }
+    >
       {/* render the post is focused for full viewing and that post detailed
       data is no null */}
       {postDetailedData && postDetailedData ? (
-        <Box height={CustomDeviceIsSmall() ? "91.7vh" : "91vh"}>
-          <Box
-            height={"85vh"}
-            className={!CustomDeviceIsSmall() && "shadow rounded p-2"}
-            sx={{
-              overflowX: "auto",
-              // Hide scrollbar for Chrome, Safari and Opera
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
-              // Hide scrollbar for IE, Edge and Firefox
-              "-ms-overflow-style": "none",
-              "scrollbar-width": "none",
-            }}
-          >
-            <PostDetailsContainer
-              postDetailedData={postDetailedData}
-              setPostDetailedData={setPostDetailedData}
-            />
-          </Box>
+        <Box
+          height={"85vh"}
+          className={
+            CustomDeviceTablet() ? "shadow rounded p-2" : "rounded p-2"
+          }
+          sx={{
+            border:
+              !CustomDeviceIsSmall() && isDarkMode ? "1px solid" : "1px solid",
+            borderColor:
+              !CustomDeviceIsSmall() && isDarkMode ? "divider" : "divider",
+
+            overflowX: "auto",
+            // Hide scrollbar for Chrome, Safari and Opera
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+            // Hide scrollbar for IE, Edge and Firefox
+            "-ms-overflow-style": "none",
+            "scrollbar-width": "none",
+          }}
+        >
+          <PostDetailsContainer
+            postDetailedData={postDetailedData}
+            setPostDetailedData={setPostDetailedData}
+          />
         </Box>
       ) : (
-        <Box height={isFetching ? "91vh" : undefined}>
+        <Box height={isFetching ? "99vh" : undefined}>
           {/* show progress loader when is fetching true */}
           {isFetching && (
             <Box
@@ -153,81 +176,54 @@ const FeedDefaultContent = () => {
             </Box>
           )}
 
-          {/* display the overview posts on tablets(portratit) and mobiles only */}
-
-          {(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
-            <Box
-              className="mb-3 rounded p-1"
-              sx={{
-                border: isDarkMode && "1px solid",
-                borderColor: isDarkMode && "divider",
-              }}
-            >
-              {" "}
-              <MobileTabCorousel />
-            </Box>
-          )}
-
-          {/* map through the posts and display them to the user */}
-          {posts &&
-            posts.map((post, index) => {
-              return (
-                <Box key={index}>
-                  <Box>
-                    {/* feed card detailed post */}
-                    <CardFeed
-                      post={post}
-                      setPostDetailedData={setPostDetailedData}
-                    />
-                    {/* show refresh button when the item is last */}
-                    {index === posts.length - 1 && (
-                      <React.Fragment>
-                        {CustomDeviceIsSmall() || CustomDeviceTablet() ? (
-                          <Box
-                            display={"flex"}
-                            justifyContent={"center"}
-                            sx={{ border: "1px solid", borderColor: "divider" }}
-                            className={"shadow rounded"}
-                            p={1}
-                            mt={2}
-                            mb={14}
-                          >
-                            <Button
-                              className="rounded-5"
-                              size="medium"
-                              sx={{
-                                textTransform: "capitalize",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Continue Browsing
-                            </Button>
-                          </Box>
-                        ) : (
-                          <Box
-                            display={"flex"}
-                            justifyContent={"center"}
-                            p={1}
-                            mt={2}
-                            mb={8}
-                          >
-                            <Button
-                              size="medium"
-                              sx={{
-                                textTransform: "capitalize",
-                                fontWeight: "bold",
-                              }}
-                            >
-                              Continue Browsing
-                            </Button>
-                          </Box>
-                        )}
-                      </React.Fragment>
-                    )}
+          {/* scrollable container for the content */}
+          <Box
+            height={CustomDeviceIsSmall() ? "80vh" : "83vh"}
+            sx={{
+              overflowX: "auto",
+              // Hide scrollbar for Chrome, Safari and Opera
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+              // Hide scrollbar for IE, Edge and Firefox
+              "-ms-overflow-style": "none",
+              "scrollbar-width": "none",
+            }}
+          >
+            {/* display the overview posts on tablets(portratit) and mobiles only */}
+            {!isFetching && (
+              <React.Fragment>
+                {(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
+                  <Box
+                    className="mb-3 rounded p-1"
+                    sx={{
+                      border: isDarkMode && "1px solid",
+                      borderColor: isDarkMode && "divider",
+                    }}
+                  >
+                    {" "}
+                    <MobileTabCorousel />
                   </Box>
-                </Box>
-              );
-            })}
+                )}
+              </React.Fragment>
+            )}
+
+            {/* map through the posts and display them to the user */}
+            {posts &&
+              posts.map((post, index) => {
+                return (
+                  <Box key={index}>
+                    <Box>
+                      {/* feed card detailed post */}
+                      <CardFeed
+                        post={post}
+                        setPostDetailedData={setPostDetailedData}
+                      />
+                    </Box>
+                  </Box>
+                );
+              })}
+          </Box>
         </Box>
       )}
 
@@ -240,7 +236,7 @@ const FeedDefaultContent = () => {
         errorMessage={errorMessage}
         handleClearing={handleClearing}
       />
-    </React.Fragment>
+    </Box>
   );
 };
 

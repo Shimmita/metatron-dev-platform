@@ -3,7 +3,6 @@ import {
   Close,
   CloudUploadRounded,
   Done,
-  OpenInBrowserRounded,
 } from "@mui/icons-material";
 import {
   Alert,
@@ -12,7 +11,6 @@ import {
   Button,
   CircularProgress,
   Collapse,
-  Divider,
   IconButton,
   Modal,
   Stack,
@@ -29,14 +27,13 @@ import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import CustomModalHeight from "../utilities/CustomModalHeight";
+import { getImageMatch } from "../utilities/getImageMatch";
 
 // styled modal
 const StyledModalJob = styled(Modal)({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  margin: "5px",
 });
 
 // styled input
@@ -61,6 +58,10 @@ const ApplyJobModal = ({
   websiteLink,
   jobID,
   jobaccesstype,
+  salary,
+  skills,
+  location,
+  isFullView = false,
 }) => {
   const [cvUpload, setCvUpload] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -145,12 +146,29 @@ const ApplyJobModal = ({
     setOpenApplyJobModal(false);
   };
 
+  // handle country length to only two names and code label
+  const handleCountryName = () => {
+    const parent = location.country.split(" ");
+    const countryCode = parent.pop();
+    const finalName =
+      parent.length > 2
+        ? `${parent[0]} ${parent[1]} ${countryCode}`
+        : location.country;
+
+    return finalName;
+  };
+
   return (
     <StyledModalJob
       keepMounted
       open={openApplyJobModal}
       sx={{
-        marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
+        marginLeft:
+          CustomDeviceTablet() && isTabSideBar
+            ? !isFullView
+              ? "34%"
+              : "10%"
+            : undefined,
       }}
       // onClose={(e) => setOpenPostModal(false)}
       aria-labelledby="modal-modal-title"
@@ -161,9 +179,13 @@ const ApplyJobModal = ({
           CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
             ? "90%"
             : CustomDeviceTablet()
-            ? "100%"
+            ? isFullView
+              ? "80%"
+              : "100%"
             : CustomLandscapeWidest()
-            ? "50%"
+            ? isFullView
+              ? "40%"
+              : "35%"
             : "100%"
         }
         p={1}
@@ -208,28 +230,54 @@ const ApplyJobModal = ({
           </Box>
 
           {/* org name */}
-          <Stack justifyContent={"center"} alignItems={"center"}>
-            <Typography
-              variant="body2"
-              gutterBottom
-              color={"text.secondary"}
-              fontWeight={"bold"}
-            >
-              {organisation.name}
-            </Typography>
-          </Stack>
+          <Typography
+            variant="body1"
+            color={"text.secondary"}
+            fontWeight={"bold"}
+            textAlign={"center"}
+            gutterBottom
+          >
+            {organisation.name}
+          </Typography>
 
           {/* job type and means of access if no error message */}
           {!errorMessage && (
-            <Stack justifyContent={"center"} mt={1} alignItems={"center"}>
+            <Stack
+              justifyContent={"center"}
+              mt={1}
+              mb={1}
+              alignItems={"center"}
+            >
               <Typography
                 variant="body2"
-                gutterBottom
                 display={"flex"}
                 gap={2}
+                fontWeight={"bold"}
+                gutterBottom
                 color={"text.secondary"}
               >
-                {jobaccesstype.type} | {jobaccesstype.access}
+                {jobaccesstype?.type} | {jobaccesstype?.access}
+              </Typography>
+              {/* salary */}
+              <Typography
+                variant="body2"
+                display={"flex"}
+                gutterBottom
+                fontWeight={"bold"}
+                color={"text.secondary"}
+              >
+                {salary}
+              </Typography>
+
+              {/* location of the job */}
+              <Typography
+                variant="body2"
+                display={"flex"}
+                fontWeight={"bold"}
+                gutterBottom
+                color={"text.secondary"}
+              >
+                {handleCountryName()} | {location.state}{" "}
               </Typography>
             </Stack>
           )}
@@ -265,12 +313,9 @@ const ApplyJobModal = ({
             )}
           </Box>
 
-          {/* divider */}
-          <Divider component={"div"} />
-
           <Box
-            mt={2}
-            maxHeight={CustomModalHeight()}
+            mt={1}
+            maxHeight={"70vh"}
             className={"px-3"}
             sx={{
               overflow: "auto",
@@ -283,9 +328,9 @@ const ApplyJobModal = ({
               scrollbarWidth: "none",
             }}
           >
-            <Stack gap={3}>
+            <Stack gap={2}>
               {/* about org */}
-              <Stack gap={1}>
+              <Stack>
                 <Typography
                   variant="body2"
                   fontWeight={"bold"}
@@ -300,10 +345,46 @@ const ApplyJobModal = ({
                 </Typography>
               </Stack>
 
+              {/* skills */}
+              <Stack gap={1}>
+                <Typography
+                  variant="body2"
+                  fontWeight={"bold"}
+                  color={"text.secondary"}
+                >
+                  {" "}
+                  Skills
+                </Typography>
+                {/* skills text */}
+                {skills?.map((skill, index) => (
+                  <Typography
+                    component={"li"}
+                    display={"flex"}
+                    gap={2}
+                    alignItems={"center"}
+                    variant="body2"
+                    key={index}
+                    gutterBottom
+                    color={"text.secondary"}
+                  >
+                    <Avatar
+                      key={index}
+                      alt={skill}
+                      className="border"
+                      sx={{ width: 30, height: 30 }}
+                      src={getImageMatch(skill)}
+                    />
+                    {skill}
+                  </Typography>
+                ))}
+              </Stack>
+
               {/* qualifications */}
               <Stack gap={1}>
                 <Typography
                   variant="body2"
+                  textAlign={"center"}
+                  gutterBottom
                   fontWeight={"bold"}
                   color={"text.secondary"}
                 >
@@ -311,26 +392,25 @@ const ApplyJobModal = ({
                   Qualification
                 </Typography>
                 {/* Qualification data */}
-                <ol>
-                  {requirements.qualification.map((data) => (
-                    <Typography
-                      component={"li"}
-                      variant="body2"
-                      key={data}
-                      gutterBottom
-                      p={1}
-                      color={"text.secondary"}
-                    >
-                      {data}
-                    </Typography>
-                  ))}
-                </ol>
+                {requirements?.qualification.map((data) => (
+                  <Typography
+                    component={"li"}
+                    variant="body2"
+                    key={data}
+                    gutterBottom
+                    color={"text.secondary"}
+                  >
+                    {data}
+                  </Typography>
+                ))}
               </Stack>
 
               {/* Mandatory Skills */}
               <Stack gap={1}>
                 <Typography
                   variant="body2"
+                  textAlign={"center"}
+                  gutterBottom
                   fontWeight={"bold"}
                   color={"text.secondary"}
                 >
@@ -338,39 +418,26 @@ const ApplyJobModal = ({
                   Job Description
                 </Typography>
                 {/* Qualification data */}
-                <ol>
-                  {requirements.description.map((data) => (
-                    <Typography
-                      component={"li"}
-                      variant="body2"
-                      key={data}
-                      gutterBottom
-                      p={1}
-                      color={"text.secondary"}
-                    >
-                      {data}
-                    </Typography>
-                  ))}
-                </ol>
+                {requirements?.description.map((data) => (
+                  <Typography
+                    component={"li"}
+                    variant="body2"
+                    key={data}
+                    gutterBottom
+                    color={"text.secondary"}
+                  >
+                    {data}
+                  </Typography>
+                ))}
               </Stack>
 
               {/* application section */}
 
               <Stack gap={1} mb={2}>
-                <Typography
-                  variant="body2"
-                  p={1}
-                  fontWeight={"bold"}
-                  color={"text.secondary"}
-                >
-                  {" "}
-                  Application Section
-                </Typography>
-
                 {websiteLink === "" ? (
                   <React.Fragment>
                     {/* curriculum vitae application */}
-                    <Box mb={3}>
+                    <Box mb={1} mt={2}>
                       <Typography
                         variant="body2"
                         gutterBottom
@@ -378,9 +445,8 @@ const ApplyJobModal = ({
                         color={"text.secondary"}
                       >
                         {" "}
-                        Job recruiter demands that you upload your latest
-                        version of Curriculum Vitae (CV) in the format of PDF
-                        (.pdf) or Microsoft Document (.docx)
+                        Upload your latest version of Curriculum Vitae (CV) in
+                        the format of PDF (.pdf) or Microsoft Document (.docx)
                       </Typography>
 
                       {cvUpload && (
@@ -404,18 +470,19 @@ const ApplyJobModal = ({
                         </Typography>
                       )}
 
-                      <Box mt={3}>
+                      <Box mt={1}>
                         <Button
                           component="label"
                           role={undefined}
                           variant="text"
-                          color="success"
                           disabled={errorMessage || isUploading}
                           disableElevation
                           tabIndex={-1}
+                          color="success"
                           size="medium"
                           sx={{
                             textTransform: "none",
+                            fontWeight: "bold",
                           }}
                           startIcon={<CloudUploadRounded />}
                         >
@@ -431,17 +498,17 @@ const ApplyJobModal = ({
                     </Box>
 
                     {/* application btn */}
-                    <Box mt={3} display={"flex"} justifyContent={"center"}>
+                    <Box mt={1} display={"flex"} justifyContent={"center"}>
                       <Button
                         variant="contained"
                         disableElevation
                         disabled={!cvUpload || isUploading || errorMessage}
                         size="small"
+                        color="success"
                         onClick={handleUploadDocuments}
                         endIcon={<BoltRounded />}
                         sx={{ borderRadius: "20px" }}
                         className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
-                        color="success"
                       >
                         Complete Application
                       </Button>
@@ -450,23 +517,24 @@ const ApplyJobModal = ({
                 ) : (
                   <React.Fragment>
                     {/* job application is external */}
-                    <Typography variant="body2" p={1} color={"text.secondary"}>
+                    <Typography
+                      variant="body2"
+                      className="px-1"
+                      color={"text.secondary"}
+                    >
                       {" "}
-                      Job recruiter provided a website for conducting the
-                      application of this job. Click the continue button below
-                      for redirection to the recruiters webpage.
+                      Click the continue button below for redirection to the
+                      recruiters webpage.
                     </Typography>
 
                     {/* application btn */}
-                    <Box mt={3} display={"flex"} justifyContent={"center"}>
+                    <Box mt={1} display={"flex"} justifyContent={"center"}>
                       <Button
                         variant="contained"
-                        endIcon={<OpenInBrowserRounded />}
                         disableElevation
                         size="small"
                         sx={{ borderRadius: "20px" }}
                         className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
-                        color="success"
                       >
                         Continue Application
                       </Button>

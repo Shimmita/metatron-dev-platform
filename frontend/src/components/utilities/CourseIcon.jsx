@@ -74,7 +74,7 @@ function CourseIcon({ option = "" }) {
     return <Avatar src={docker} alt="image" sx={{ width: 22, height: 22 }} />;
   }
   if (option.toLowerCase().includes("devops")) {
-    return <Avatar src={devops} alt="image" sx={{ width: 22, height: 22 }} />;
+    return <Avatar src={devops} alt="image" sx={{ width: 24, height: 24 }} />;
   }
   if (option.toLowerCase().includes("programming")) {
     return <CodeRounded sx={{ width: 22, height: 22 }} />;

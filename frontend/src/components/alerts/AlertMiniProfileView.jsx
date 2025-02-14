@@ -28,10 +28,19 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
+import {
+  showProfileDrawerMessageInput,
+  showUserProfileDrawer,
+} from "../../redux/AppUI";
+import {
+  updateTempUserIDRedux,
+  updateUserCurrentUserRedux,
+} from "../../redux/CurrentUser";
 import CustomCountryName from "../utilities/CustomCountryName";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../utilities/getImageMatch";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -260,8 +269,42 @@ export default function AlertMiniProfileView({
   };
 
   // navigate to full proile using the current userId
+
+  /*   open drawer to display full user profile if user temp display it firs else 
+small devices display on separate window. big devices just drawer it.
+*/
   const handleViewFullProfile = () => {
-    navigate("users/profile/" + userId);
+    if (CustomDeviceIsSmall()) {
+      navigate("users/profile/" + userId);
+    } else {
+      // update the temp user state in redux with the userID passed
+      dispatch(updateTempUserIDRedux(userId));
+
+      // open the profile drawer for larger views like tabs ++
+      dispatch(showUserProfileDrawer());
+    }
+    // close the alert
+    handleClose();
+  };
+
+  // handle sending of the message
+  const handleSendMessage = () => {
+    if (CustomDeviceIsSmall()) {
+      // navigate user profile specially smalller devices + mesaging true
+      // update the message shown input when drawer is opened
+      dispatch(showProfileDrawerMessageInput(true));
+      navigate("users/profile/" + userId);
+    } else {
+      // update the temp user state in redux with the userID passed
+      dispatch(updateTempUserIDRedux(userId));
+
+      // update the message shown input when drawer is opened
+      dispatch(showProfileDrawerMessageInput(true));
+
+      // open the profile drawer for larger views like tabs ++
+      dispatch(showUserProfileDrawer());
+    }
+
     // close the alert
     handleClose();
   };
@@ -276,7 +319,12 @@ export default function AlertMiniProfileView({
         keepMounted
         aria-describedby="alert-dialog-slide-alering"
         sx={{
-          marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
+          marginLeft:
+            CustomDeviceTablet() && isTabSideBar
+              ? "36%"
+              : CustomLandscapeWidest()
+              ? "-3%"
+              : undefined,
         }}
       >
         <DialogContent dividers>
@@ -444,46 +492,26 @@ export default function AlertMiniProfileView({
                 {/* contact buttons */}
                 <Box display={"flex"} justifyContent={"space-between"} gap={5}>
                   {/* button view profile */}
-                  <IconButton
-                    disabled={message}
-                    onClick={handleViewFullProfile}
-                    sx={{ border: "1px solid", borderColor: "divider" }}
-                  >
-                    <AccountBoxRounded
-                      color={message ? "inherit" : "primary"}
-                    />
-                  </IconButton>
+                  <Tooltip title={"profile"} arrow>
+                    <IconButton
+                      disabled={message}
+                      onClick={handleViewFullProfile}
+                      sx={{ border: "1px solid", borderColor: "divider" }}
+                    >
+                      <AccountBoxRounded
+                        color={message ? "inherit" : "primary"}
+                      />
+                    </IconButton>
+                  </Tooltip>
 
                   {/* button send message */}
-                  <IconButton
-                    disabled={userId === currentUserId || message}
-                    sx={{ border: "1px solid", borderColor: "divider" }}
-                  >
-                    <MessageRounded
-                      color={
-                        userId === currentUserId || message
-                          ? "inherit"
-                          : "primary"
-                      }
-                    />
-                  </IconButton>
-
-                  {/* add friends if */}
-                  {message?.trim().toLowerCase() === "you already friends!" ? (
+                  <Tooltip title={"message"} arrow>
                     <IconButton
-                      disabled={userId === currentUserId}
-                      onClick={handleRequestUnfriend}
-                      sx={{ border: "1px solid", borderColor: "divider" }}
-                    >
-                      <PersonRemoveRounded color={"warning"} />
-                    </IconButton>
-                  ) : (
-                    <IconButton
+                      onClick={handleSendMessage}
                       disabled={userId === currentUserId || message}
-                      onClick={handleRequestConnecting}
                       sx={{ border: "1px solid", borderColor: "divider" }}
                     >
-                      <PersonAdd
+                      <MessageRounded
                         color={
                           userId === currentUserId || message
                             ? "inherit"
@@ -491,6 +519,35 @@ export default function AlertMiniProfileView({
                         }
                       />
                     </IconButton>
+                  </Tooltip>
+
+                  {/* add friends if */}
+                  {message?.trim().toLowerCase() === "you already friends!" ? (
+                    <Tooltip title={"disconnect"} arrow>
+                      <IconButton
+                        disabled={userId === currentUserId}
+                        onClick={handleRequestUnfriend}
+                        sx={{ border: "1px solid", borderColor: "divider" }}
+                      >
+                        <PersonRemoveRounded color={"warning"} />
+                      </IconButton>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title={"connect"} arrow>
+                      <IconButton
+                        disabled={userId === currentUserId || message}
+                        onClick={handleRequestConnecting}
+                        sx={{ border: "1px solid", borderColor: "divider" }}
+                      >
+                        <PersonAdd
+                          color={
+                            userId === currentUserId || message
+                              ? "inherit"
+                              : "primary"
+                          }
+                        />
+                      </IconButton>
+                    </Tooltip>
                   )}
                 </Box>
                 {/* divider */}
@@ -514,6 +571,18 @@ export default function AlertMiniProfileView({
                 </Box>
 
                 {/* divider */}
+                <Divider className="p-1" component={"div"} />
+                {/* user about */}
+                <Box display={"flex"} justifyContent={"center"}>
+                  <Typography
+                    variant="caption"
+                    maxWidth={300}
+                    color="text.secondary"
+                  >
+                    {miniProfileData?.about || "** No About**"}
+                  </Typography>
+                </Box>
+
                 <Divider className="p-1" component={"div"} />
 
                 {/* caption joined date */}

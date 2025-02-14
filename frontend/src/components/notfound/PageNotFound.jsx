@@ -1,12 +1,14 @@
 import { MoodBadRounded } from "@mui/icons-material";
-import { Alert, Box, Collapse, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import {
-  resetDefaultBottomNav,
   handleSidebarRightbar,
+  resetDefaultBottomNav,
 } from "../../redux/AppUI";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 const PageNotFound = ({ mesage = "" }) => {
   // redux to stop showing of the speed dial
@@ -14,21 +16,23 @@ const PageNotFound = ({ mesage = "" }) => {
 
   // redux states access
   const { isSidebarRighbar } = useSelector((state) => state.appUI);
+  const { user } = useSelector((state) => state.currentUser);
 
   // check the state of the  sidebar and rightbar false it if true
   // be no showing due to limited space and UI spreading fitness
-  if (isSidebarRighbar) {
-    dispatch(handleSidebarRightbar());
-  }
 
   useEffect(() => {
-    dispatch(resetDefaultBottomNav(true));
+    if (user && !isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+      dispatch(resetDefaultBottomNav(true));
+    }
+    return;
   });
   return (
     <Box
       bgcolor={"background.default"}
       color={"text.primary"}
-      height={"91vh"}
+      height={"90vh"}
       style={{
         display: "flex",
         justifyContent: "center",
@@ -41,7 +45,8 @@ const PageNotFound = ({ mesage = "" }) => {
         display={"flex"}
         justifyContent={"center"}
         alignItems={"center"}
-        className="rounded-2 w-75 shadow-lg"
+        sx={{ border: "1px solid", borderColor: "divider" }}
+        className={(CustomDeviceIsSmall()|| CustomDeviceTablet()) && "shadow"}
       >
         <Box>
           <Box mb={1} display={"flex"} justifyContent={"center"}>

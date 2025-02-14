@@ -5,10 +5,8 @@ import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import React, { lazy } from "react";
 
 import { CodeRounded, SchoolRounded, Work } from "@mui/icons-material";
-import { Avatar, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import MachineLogo from "../../images/Ai.png";
-import { handleShowChatBot } from "../../redux/CurrentChatBot";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 const PostCourseModal = lazy(() => import("../modal/PostCourseModal"));

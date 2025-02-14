@@ -39,7 +39,6 @@ import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import CustomModalHeight from "../utilities/CustomModalHeight";
 import { getImageMatch } from "../utilities/getImageMatch";
 const CurrencyControl = lazy(() => import("./CurrencyControl"));
 const LocationControl = lazy(() => import("./LocationControl"));
@@ -50,7 +49,6 @@ const StyledModalJob = styled(Modal)({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  margin: "5px",
 });
 
 // styled input
@@ -88,8 +86,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
   const [job_experience, setJobExperience] = useState("");
   const [webLink, setWebLink] = useState("");
   const [poster_about, setPosterAbout] = useState("");
-  const [poster_phone, setPosterPhone] = useState("");
-  const [poster_email, setPosterEmail] = useState("");
+  const [poster_data_email, setPosterDataEmail] = useState("");
   const [showCustomTitle, setShowCustomTitle] = useState(false);
   const [currency, setCurrency] = useState("Ksh");
   const [fileUpload, setFileUpload] = useState(null);
@@ -110,6 +107,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
   // control showing of logout user session expired
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
+
+  // get redux states
+  const { user } = useSelector((state) => state.currentUser);
 
   // axios default credentials
   axios.defaults.withCredentials = true;
@@ -297,13 +297,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
       return false;
     }
 
-    if (poster_email?.trim() === "") {
-      setErrorMessage("missing phone contact");
-      return false;
-    }
-
-    if (poster_email?.trim() === "") {
-      setErrorMessage("missing email contact");
+    if (poster_data_email?.trim() === "") {
+      setErrorMessage("missing email for job application");
       return false;
     }
 
@@ -363,10 +358,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
       country: location === "KE" ? "Kenya (KE)" : country,
       state: county,
     },
-    contacts: {
-      email: poster_email,
-      phone: poster_phone,
-    },
+    data_email: poster_data_email,
+    my_email: user?.email,
+    my_phone: user?.phone,
   };
 
   // handle posting of data to the backend
@@ -450,7 +444,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
             : CustomDeviceTablet()
             ? "100%"
             : CustomLandscapeWidest()
-            ? "50%"
+            ? "35%"
             : "100%"
         }
         p={1}
@@ -542,7 +536,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
           </Box>
 
           <Box
-            maxHeight={CustomModalHeight()}
+            maxHeight={"78vh"}
             className={"px-3"}
             sx={{
               overflow: "auto",
@@ -564,9 +558,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                     variant="body2"
                     color={"text.secondary"}
                   >
-                    Provide a relevant job title from the enlisted choices below
-                    which will be the most appropriate for the role. If none
-                    matches then select option zero.
+                    Select relevant job title from the options provided.If none
+                    matches select option (Zero Matched) to provide your
+                    preferred title for the role.
                   </Typography>
 
                   {/* preset job titles */}
@@ -597,10 +591,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                     variant="body2"
                     color={"text.secondary"}
                   >
-                    Provide a preferred or custom job title that will be seen by
-                    the applicants. All jobs should belong or relate to the Tech
-                    or IT Industry since this is our main concern in enlighting
-                    technology country wide.
+                    Provide preferred job title that matches your requirements
+                    for the role which will target your potential applicants on
+                    the platform.
                   </Typography>
                   {/* Job Title */}
                   <Box
@@ -629,7 +622,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
               {/* poster/organisation */}
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
                 Provide the name of your businness, organisation or comapany
-                which will be seen by the interested job applicants.
+                which will be seen by the potential job applicants on the
+                platform.
               </Typography>
               <Box className="mb-3 mt-2 ">
                 <TextField
@@ -646,10 +640,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
               {/* job type */}
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Provide the type of this job in reference to it being contract
-                or full-time. Contract roles are aimed to have a limited period
-                and once an objective met they end unless renewed while
-                Full-Time have indifinite time of ending.
+                Provide the type of this job or role in reference to it being
+                contract or full-time position based on your organisation
+                requirements.
               </Typography>
               <Box className="mb-3 mt-2 ">
                 <TextField
@@ -675,9 +668,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
               {/* job accessibility */}
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Provide the job accessibility preference in reference to it
-                being remote, hybrid or onsite. This could help the applicants
-                to evaluate if they are qualified to apply for this job or not.
+                Provide job accessibility preference in reference to it being
+                remote, hybrid or onsite to help the potential applicants
+                analyze their commuting capacity.
               </Typography>
               <Box className="mb-3 mt-2 ">
                 <TextField
@@ -703,10 +696,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
               {/* logo or image */}
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Provide your organisation logo or job logo: You can use the
-                freely provided Tech logos or upload your custom preferred logo
-                from your device storage or provide an external link (url)
-                pointing to your logo.
+                Provide organisation logo or job logo for visibility. you may
+                use the freely provided images or upload your custom image from
+                local storage or link from cloud source.
               </Typography>
 
               {/* preview the file uploaded from storage */}
@@ -876,15 +868,13 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
                 What technical skills are{" "}
-                <span className="fw-bold">a must have </span>
-                during the application. These are the mandatory core skills one
-                should posess before considering to make an application and
-                without them the applicant's request will be declined or
-                rejected.
+                <span className="fw-bold">a must have </span> by the potential
+                applicants before instinctive considerations of making an
+                application request for the role.
               </Typography>
 
               {/* Mandatory/Must Have Skills */}
-              <Box mb={3} mt={2}>
+              <Box mb={3}>
                 <Autocomplete
                   multiple
                   disabled={isUploading}
@@ -951,9 +941,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                   >
                     Please, provide an active website link where the application
                     for this role will be conducted. Mulfunctioned links or fake
-                    job application website links are prohibitted and treated as
-                    fraud. Consequences are permanent deletion of account with
-                    or without notification.
+                    job application website links are prohibitted.
                   </Typography>
 
                   <Box className="w-100 mb-3">
@@ -973,8 +961,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
                 Select the level of entry for this job: This helps the
-                applicants with a glimpse of analysing their current position
-                and deciding conclusively if they are fit for the role.
+                applicants to evaluate their current position and deciding
+                conclusively if they are fit for the role or not.
               </Typography>
 
               {/* Job Entry Level */}
@@ -1000,9 +988,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
               </Box>
 
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Select the minimum range for years of experience.Years of
-                experience is a good factor in determining the level of exposure
-                and expertise of the applicant to the role or such related role.
+                Select the minimum years of experience, years of experience is a
+                factor of determining the level of exposure and expertise the
+                applicant has to the role or such related role.
               </Typography>
               {/* Experience Years */}
               <Box className="w-100 mb-3">
@@ -1029,10 +1017,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
               </Box>
 
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Select your monthly budget salary range for this role. The
-                default salary provided is in Kenyan Shillings (KES). Suppose
-                your organisation makes payment in Dollars then switch to
-                Dollars.
+                Select your monthly budget salary for this role, default salary
+                provided is in Kenyan Shillings (KES) and can be switched to
+                Dollars as the currency of payment.
               </Typography>
 
               {/* Salary */}
@@ -1088,10 +1075,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
               {/* Location  */}
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Where is your organisation workplace based. The default location
-                is Kenya and the enlisted states or counties are those available
-                in Kenya. Suppose you organisation is based in onother country
-                select other.
+                Where is your organisation workplace based, default location is
+                Kenya and can be swithed to another location supposed you are
+                based in a different country.
               </Typography>
 
               <Box className="mb-3">
@@ -1144,7 +1130,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                         <TextField
                           {...params}
                           label="Select Country"
-                          variant="standard"
+                          variant="outlined"
                           required
                           fullWidth
                         />
@@ -1215,41 +1201,25 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                 )}
               </Box>
 
-              {/* Job verification and validation contacts  */}
+              {/* job application email */}
               <Typography variant="body2" color={"text.secondary"} gutterBottom>
-                This job post may be required to undergoe verification and
-                validation processes before getting approved and published on
-                the platform. Please provide contacts that will facilitate our
-                techinical support team reaching out.
+                Metatron currently does not support storing applicants
+                documents, please provide an email where these documents will be
+                sent to upon successful application.
               </Typography>
-
-              {/* Email */}
-              <Box className="mb-3">
-                <TextField
-                  fullWidth
-                  required
-                  disabled={isUploading}
-                  type="tel"
-                  value={poster_phone}
-                  onChange={(e) => setPosterPhone(e.target.value)}
-                  id="phone"
-                  label={"Phone Number"}
-                  placeholder="+254723679865"
-                />
-              </Box>
 
               {/* Email */}
               <Box mb={3}>
                 <TextField
                   fullWidth
-                  value={poster_email}
-                  onChange={(e) => setPosterEmail(e.target.value)}
+                  value={poster_data_email}
+                  onChange={(e) => setPosterDataEmail(e.target.value)}
                   required
                   disabled={isUploading}
                   type="email"
                   id="email"
                   label={"Provide Email"}
-                  placeholder="youremail@gmail.com"
+                  placeholder="yourjobapplicationsemail@gmail.com"
                 />
               </Box>
 
@@ -1448,7 +1418,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                         )}
                         onKeyUp={(e) => {
                           if (e.key === "Enter" && desc_text.trim() !== "") {
-                            handleAddRequirement();
+                            handleAddDesc();
                           }
                         }}
                       />

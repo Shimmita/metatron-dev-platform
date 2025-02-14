@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import PageNotFound from "../notfound/PageNotFound";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import PostRoutedFeed from "./PostRoutedFeed";
 
 function PostDetailsRouted() {
@@ -50,7 +51,7 @@ function PostDetailsRouted() {
         // set is fetching to false
         setIsUploading(false);
       });
-  }, [postId]);
+  }, [postId, dispatch]);
 
   return (
     <Box
@@ -59,8 +60,16 @@ function PostDetailsRouted() {
     >
       <Box
         height={"85vh"}
-        className={!CustomDeviceIsSmall() && "shadow rounded p-2"}
+        className={
+          CustomDeviceIsSmall() || CustomDeviceTablet()
+            ? "shadow rounded p-2"
+            : "rounded"
+        }
         sx={{
+          border:
+            !(CustomDeviceIsSmall() || CustomDeviceTablet()) && "1px solid",
+          borderColor:
+            !(CustomDeviceIsSmall() || CustomDeviceTablet()) && "divider",
           overflowX: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -73,7 +82,7 @@ function PostDetailsRouted() {
       >
         {/* displayed when fetching */}
         {isUploading && (
-          <Box display={"flex"} justifyContent={"center"} height={"50vh"}>
+          <Box display={"flex"} justifyContent={"center"} height={"30vh"}>
             <Box display={"flex"} justifyContent={"center"}>
               <CircularProgress size={20} />
             </Box>

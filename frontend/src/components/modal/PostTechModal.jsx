@@ -1,21 +1,8 @@
 import {
-  AndroidRounded,
-  Apple,
   Close,
   CloudUploadRounded,
-  CodeRounded,
   DiamondRounded,
-  DrawRounded,
-  EditRounded,
-  GitHub,
-  GradeRounded,
-  Image,
-  LaptopRounded,
-  Microsoft,
-  SettingsRounded,
-  SportsEsportsRounded,
-  StorageRounded,
-  Title,
+  UploadRounded,
 } from "@mui/icons-material";
 import {
   Alert,
@@ -36,19 +23,19 @@ import axios from "axios";
 import React, { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import LinuxLogo from "../../images/linux.jpeg";
 import AppLogo from "../../images/logo_sm.png";
 import { showPostModalRedux } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import { resetClearCurrentPosts } from "../../redux/CurrentPosts";
 import { updateCurrentSnackPostSuccess } from "../../redux/CurrentSnackBar";
 import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionTech from "../data/SubsectionTech";
 import BrowserCompress from "../utilities/BrowserCompress";
+import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import CustomModalHeight from "../utilities/CustomModalHeight";
 import { getImageMatch } from "../utilities/getImageMatch";
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 const AlertInput = lazy(() => import("../alerts/AlertInput"));
@@ -58,7 +45,6 @@ const StyledModalPost = styled(Modal)({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  margin: "5px",
 });
 
 // styled input
@@ -300,6 +286,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           navigate("/");
           // update tab bottom nav to 0
           updateCurrentBottomNav(0);
+          // update the redux of current posts suppose the post is present
+          // in the feed.
+          dispatch(resetClearCurrentPosts());
         })
         .catch(async (err) => {
           //  user login session expired show logout alert
@@ -354,7 +343,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             : CustomDeviceTablet()
             ? "100%"
             : CustomLandscapeWidest()
-            ? "50%"
+            ? "35%"
             : "100%"
         }
         p={1}
@@ -405,12 +394,15 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             {errorMessage ? (
               <Collapse in={errorMessage || false}>
                 <Alert
-                  severity="warning"
-                  className="rounded-5"
+                  severity="info"
+                  className="rounded"
                   onClick={() => setErrorMessage("")}
                   action={
                     <IconButton aria-label="close" color="inherit" size="small">
-                      <Close fontSize="inherit" />
+                      <Close
+                        fontSize="inherit"
+                        sx={{ width: 15, height: 15 }}
+                      />
                     </IconButton>
                   }
                   sx={{ mb: 2 }}
@@ -428,7 +420,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           </Box>
 
           <Box
-            maxHeight={CustomModalHeight()}
+            maxHeight={"78vh"}
             className="px-3"
             sx={{
               overflow: "auto",
@@ -444,18 +436,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           >
             <Box display={"flex"} flexDirection={"column"} gap={3}>
               <Box>
-                {/* post title */}
-                <Box
-                  className="my-2"
-                  display={"flex"}
-                  justifyContent={"center"}
-                >
-                  <Title color="primary" sx={{ width: 30, height: 30 }} />
-                </Box>
                 <Typography variant="body2" mt={3} color={"text.secondary"}>
-                  Provide a relevant title about this post so that users can
-                  bootstrap your objectives or motives on the fly. Should be
-                  simple to comprehend at glance.
+                  Provide relevant title for this post to help target users on
+                  the platform to bootstrap your objectives or motives at
+                  glance.
                 </Typography>
 
                 <Box mt={4} className="w-100 mb-2">
@@ -472,19 +456,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 </Box>
               </Box>
 
-              <Box display={"flex"} justifyContent={"center"}>
-                <GradeRounded color="primary" sx={{ width: 30, height: 30 }} />
-              </Box>
-
               {/* post about */}
               <Typography variant="body2" color={"text.secondary"}>
-                Posting about which specialisation in the Tech/IT Industry. This
-                helps us to customize and categorise tech-related content to all
-                users accordingly by the help of a pre-trained machine learning
-                model.
+                Provide area of specialisation in the Tech or IT Industry where
+                your post is aimed to address in particular.
               </Typography>
 
-              <Box className="w-100 mb-2 mt-2 ">
+              <Box className="w-100 mt-2 mb-2 ">
                 <TextField
                   required
                   select
@@ -497,7 +475,18 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   {SpecialisationTech &&
                     SpecialisationTech.filter((about) => about !== "None").map(
                       (about, index) => (
-                        <MenuItem key={index} value={about}>
+                        <MenuItem
+                          key={index}
+                          value={about}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                          }}
+                        >
+                          {/* icon */}
+                          <CourseIcon option={about} />
+                          {/* name */}
                           <small style={{ fontSize: "small" }}>{about}</small>
                         </MenuItem>
                       )
@@ -509,7 +498,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {post_category === "Containerisation and Orchestration" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
-                    Containerisation option
+                    Containerisation and Orchestration option that your post
+                    aims to enlighten to other potential users on the platform.
                   </Typography>
                   <Box className="w-100 mb-2 ">
                     <TextField
@@ -524,11 +514,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.Containerisation.map((container) => (
                           <MenuItem key={container} value={container}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                            <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(container)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>
                                 {container}
                               </small>
@@ -544,8 +537,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {post_category === "Artificial Intelligence" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
-                    Select the area of focus in the field of machine learning
-                    and artificial intelligence for specificity.
+                    Provide specific area of focus in the field of Machine
+                    Learning and Artificial Intelligence, select option zero if
+                    none matches to privide your preference.
                   </Typography>
                   <Box className="w-100 mb-2 ">
                     <TextField
@@ -617,7 +611,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Select the area of focus in the field of cybersecurity
-                    engineering.
+                    engineering.This prevents being too general in broader
+                    fields.
                   </Typography>
                   <Box className="w-100 mb-2 ">
                     <TextField
@@ -651,23 +646,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* Desktop App */}
               {post_category === "Desktop App Development" && (
                 <Box>
-                  <Box
-                    display={"flex"}
-                    justifyContent={"center"}
-                    gap={1}
-                    alignItems={"center"}
-                  >
-                    <Avatar alt="Linux" src={LinuxLogo} /> +
-                    <Apple color="primary" sx={{ width: 30, height: 30 }} />+
-                    <Microsoft color="primary" sx={{ width: 30, height: 30 }} />
-                  </Box>
-
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
-                    Select desktop development stack that runs on either Linux
-                    OS, MacOS, Windows OS or both. Desktop apps usually runs on
-                    high-end devices such as Laptops and PCs and should not be
-                    mistaken for Android or IOS operating system which powers
-                    smartphones, tablets and ipads.
+                    Desktop development stack used in your project. Desktop
+                    applications usually runs on high-end devices such as
+                    Laptops and PCs.
                   </Typography>
 
                   <Box mt={4} className="w-100 mb-2 ">
@@ -702,20 +684,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* Game dev */}
               {post_category === "Game App Development" && (
                 <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <SportsEsportsRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
-                  <Typography variant="body2" color={"text.secondary"} mt={3}>
-                    Select a game application development technology in
-                    particular.
+                  <Typography variant="body2" color={"text.secondary"}>
+                    Provide game application development technology that your
+                    post is aimed to address in particular from the provided
+                    options.
                   </Typography>
                   <Box mt={4} className="w-100 mb-2 ">
                     <TextField
@@ -730,11 +702,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.GameDev.map((game_dev) => (
                           <MenuItem key={game_dev} value={game_dev}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                           <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(game_dev)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>
                                 {game_dev}
                               </small>
@@ -749,19 +724,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* programming Language */}
               {post_category === "Programming Languages" && (
                 <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <CodeRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
-                  <Typography variant="body2" color={"text.secondary"} mt={3}>
-                    Programming language to post about
+                  <Typography variant="body2" color={"text.secondary"}>
+                    Select programming language that you are interested to post
+                    about from the options provided below.
                   </Typography>
 
                   <Box mt={4} className="w-100 mb-2 ">
@@ -777,13 +742,54 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.Language.map((language) => (
                           <MenuItem key={language} value={language}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                            <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(language)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>
                                 {language}
+                              </small>
+                            </Box>
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Box>
+                </Box>
+              )}
+
+              {/* cloud computing */}
+              {/* DevOps */}
+              {post_category === "Cloud Computing" && (
+                <Box>
+                  <Typography
+                    gutterBottom
+                    variant="body2"
+                    color={"text.secondary"}
+                    p={1}
+                  >
+                    Select cloud provider in particualar that you are interested
+                    to address in your post.
+                  </Typography>
+                  <Box className="w-100 mb-3 ">
+                    <TextField
+                      required
+                      select
+                      disabled={isUploading}
+                      value={category1}
+                      label="Cloud provider"
+                      fullWidth
+                      onChange={(e) => setCategory1(e.target.value)}
+                    >
+                      {SubsectionTech &&
+                        SubsectionTech.Cloud.map((cloud_provider) => (
+                          <MenuItem key={cloud_provider} value={cloud_provider}>
+                            <Box display={"flex"} gap={2}>
+                              <small style={{ fontSize: "small" }}>
+                                {cloud_provider}
                               </small>
                             </Box>
                           </MenuItem>
@@ -802,7 +808,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     color={"text.secondary"}
                     p={1}
                   >
-                    Select a DevOps Platform/Tool
+                    Select DevOps engineering platform or tool that was used as
+                    reference for your post.
                   </Typography>
                   <Box className="w-100 mb-3 ">
                     <TextField
@@ -817,11 +824,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.DevOps.map((devops_tool) => (
                           <MenuItem key={devops_tool} value={devops_tool}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                            <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(devops_tool)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>
                                 {devops_tool}
                               </small>
@@ -836,19 +846,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* UI/UX  */}
               {post_category === "UI/UX Design" && (
                 <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <DrawRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
-                  <Typography variant="body2" color={"text.secondary"} mt={3}>
-                    UI/UX Design Tools option
+                  <Typography variant="body2" color={"text.secondary"}>
+                    Provide UI/UX design tool which your post covers and aims to
+                    enlighten potential target users on the platform.
                   </Typography>
                   <Box mt={4} className="w-100 mb-2 ">
                     <TextField
@@ -863,11 +863,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.Design.map((design_tool) => (
                           <MenuItem key={design_tool} value={design_tool}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                            <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(design_tool)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>
                                 {design_tool}
                               </small>
@@ -883,19 +886,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {(post_category === "Frontend App Development" ||
                 post_category === "Fullstack Application Development") && (
                 <Box>
-                  <Box mt={2} display={"flex"} justifyContent={"center"}>
-                    <LaptopRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
-                  <Typography variant="body2" color={"text.secondary"} p={1}>
+                  <Typography variant="body2" color={"text.secondary"}>
                     Which frontend technology are you intrested in? If your post
-                    is based on a bare HTML/CSS version of a project, select the
-                    option with (HTML/CSS).
+                    is based on a bare HTML/CSS/Js version of a project, select
+                    the option with (HTML).
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box mt={4} className="w-100">
                     <TextField
                       required
                       select
@@ -908,11 +904,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.Frontend.map((frontend) => (
                           <MenuItem key={frontend} value={frontend}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                            <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(frontend)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>
                                 {frontend}
                               </small>
@@ -928,23 +927,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {(post_category === "Backend App Development" ||
                 post_category === "Fullstack Application Development") && (
                 <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <SettingsRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Which backend technology are you intrested in? Suppose none
                     of the provided options matches your preference select
                     (other).
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box mt={4} className="w-100">
                     <TextField
                       required
                       select
@@ -957,11 +945,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.Backend.map((backend) => (
                           <MenuItem key={backend} value={backend}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                            <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(backend)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>
                                 {backend}
                               </small>
@@ -978,22 +969,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 post_category === "Backend App Development" ||
                 post_category === "Fullstack Application Development") && (
                 <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <StorageRounded
-                      color="primary"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
                   <Typography variant="body2" mt={3} color={"text.secondary"}>
-                    Which database are you intrested in? Suppose none of the
-                    provided options matches your preference select (other).
+                    Which database did you link it with {backend} for this post.
+                    suppose none of the provided options matches your preference
+                    select (other).
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box mt={4} className="w-100 ">
                     <TextField
                       required
                       select
@@ -1006,11 +987,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.Database.map((database) => (
                           <MenuItem key={database} value={database}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                            <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(database)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>
                                 {database}
                               </small>
@@ -1025,21 +1009,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* Android App */}
               {post_category === "Native Android App Development" && (
                 <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <AndroidRounded
-                      color="success"
-                      sx={{ width: 30, height: 30 }}
-                    />
-                  </Box>
-
-                  <Typography variant="body2" mt={3} color={"text.secondary"}>
+                  <Typography variant="body2" color={"text.secondary"}>
                     Native Android application development stack is usually
-                    based on Java or Kotlin. The modern way of writing android
-                    application is by using JetpakCompose which is pure Kotlin.
+                    based on Java or Kotlin. The recommended modern way of
+                    writing android applications is by using Kotlin.
                   </Typography>
                   <Box mt={4} className="w-100 mb-2 ">
                     <TextField
@@ -1054,11 +1027,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.Android.map((android) => (
                           <MenuItem key={android} value={android}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                            <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(android)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>
                                 {android}
                               </small>
@@ -1073,17 +1049,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* IOS App */}
               {post_category === "Native IOS App Development" && (
                 <Box>
-                  <Box
-                    className="my-2"
-                    display={"flex"}
-                    justifyContent={"center"}
-                  >
-                    <Apple color="primary" sx={{ width: 30, height: 30 }} />
-                  </Box>
-
-                  <Typography variant="body2" mt={3} color={"text.secondary"}>
-                    Select the stack used in the development of your Native IOS
-                    Application project/post
+                  <Typography variant="body2" color={"text.secondary"}>
+                    Provide the stack used in the developement of your native
+                    IOS application which your post is aimed to address.
                   </Typography>
                   <Box mt={4} className="w-100 mb-2 ">
                     <TextField
@@ -1098,11 +1066,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.IOS.map((ios) => (
                           <MenuItem key={ios} value={ios}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                            <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(ios)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>{ios}</small>
                             </Box>
                           </MenuItem>
@@ -1115,28 +1086,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* Multiplatform Android+IOS */}
               {post_category === "Multiplatform Mobile Development" && (
                 <Box>
-                  <Box
-                    display={"flex"}
-                    justifyContent={"center"}
-                    gap={1}
-                    alignItems={"center"}
-                  >
-                    <Apple color="inherit" sx={{ width: 30, height: 30 }} /> +
-                    <AndroidRounded
-                      color="success"
-                      sx={{ width: 34, height: 34 }}
-                    />
-                  </Box>
-
-                  <Typography variant="body2" color={"text.secondary"} mt={3}>
-                    Select a mobile multiplatform/cross-application development
-                    technology that you are interested in. multiplatform
-                    technology or frameworks allows writing of a single code
-                    base that runs on both Android and IOS devices. Suppose none
-                    of the provided options matches your preference select
-                    (other).
+                  <Typography variant="body2" color={"text.secondary"}>
+                    Provide multiplatform or cross-platform development
+                    technology that you are interested in. Allows writing of a
+                    single code base that runs on both Android and IOS devices.
                   </Typography>
-                  <Box mt={4} className="w-100 mb-2 ">
+                  <Box mt={4} className="w-100">
                     <TextField
                       required
                       select
@@ -1149,11 +1104,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       {SubsectionTech &&
                         SubsectionTech.Multiplatfotm.map((multiplatform) => (
                           <MenuItem key={multiplatform} value={multiplatform}>
-                            <Box
-                              display={"flex"}
-                              alignItems={"center"}
-                              gap={"5px"}
-                            >
+                            <Box display={"flex"} gap={2}>
+                              {/* image */}
+                              <Avatar
+                                src={getImageMatch(multiplatform)}
+                                sx={{ width: 32, height: 32 }}
+                                alt=""
+                              />{" "}
+                              {/* name */}
                               <small style={{ fontSize: "small" }}>
                                 {multiplatform}
                               </small>
@@ -1166,14 +1124,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* Github link */}
-              <Box display={"flex"} justifyContent={"center"}>
-                <GitHub color="primary" sx={{ width: 30, height: 30 }} />
-              </Box>
+
               <Typography variant="body2" color={"text.secondary"}>
-                Provide version control link such as Github or Gitlab pointing
-                to your project repository. This may eventually help in
-                promoting collaboration from a diversity of Tech experts on the
-                platform who could be contributors to your project.
+                Suppose your post is about a particular project you worked on
+                and aiming to display your technicalities, please provide GiHub
+                or Gitlab link to promote your project.
               </Typography>
 
               <Box className="mb-2">
@@ -1189,13 +1144,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               </Box>
 
               {/* image and pdf for the post */}
-              <Box display={"flex"} justifyContent={"center"} gap={1}>
-                <Image color="primary" sx={{ width: 30, height: 30 }} />
-              </Box>
+
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Provide an image file backing your post for visual presentation.
-                You can use free images that have been already provided by
-                default.This part is optional.
+                Visual representation of your post to the target users is highly
+                encouraged thus recommeded attachment of an image or pdf file
+                for referential purposes.
               </Typography>
 
               {/* preview the file uploaded from storage */}
@@ -1306,15 +1259,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* description */}
-              <Box display={"flex"} mt={2} justifyContent={"center"}>
-                <EditRounded color="primary" sx={{ width: 30, height: 30 }} />
-              </Box>
 
               <Typography variant="body2" color={"text.secondary"}>
-                Provide a description about your post highlighting the technical
-                concepts you are excited to share with many individuals on the
-                platform. Let your description be concise and easier to
-                comprehend by many.
+                Description about your post highlighting the technical concepts
+                you are excited to share with many users platform. Let your
+                audience visualize your concepts.
               </Typography>
 
               <Box mb={3}>
@@ -1341,13 +1290,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               <Box display={"flex"} justifyContent={"center"} mb={2}>
                 <Button
                   onClick={handlePost}
-                  startIcon={<CodeRounded />}
+                  startIcon={<UploadRounded />}
+                  sx={{ fontWeight: "bold" }}
                   className={
                     CustomDeviceIsSmall() ? "w-75 rounded-5" : "w-50 rounded-5"
                   }
-                  variant="contained"
                   disabled={isUploading || errorMessage}
-                  size="small"
                 >
                   Upload Your Post
                 </Button>

@@ -9,7 +9,11 @@ const SponsorTeamLayout = () => {
         {/* fav icon */}
         <FavoriteRounded sx={{ width: 18, height: 18 }} color="primary" />
         {/* name of the sponsor */}
-        <Typography variant="body2" color={"text.secondary"}>
+        <Typography
+          variant="body2"
+          fontWeight={"bold"}
+          color={"text.secondary"}
+        >
           Google Ads
         </Typography>
       </Box>

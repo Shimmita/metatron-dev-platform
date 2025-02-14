@@ -222,12 +222,10 @@ export default function AlertCountry({
                   gutterBottom
                   id="alert-dialog-slide-description"
                 >
-                  Provide your country of residence. All{" "}
-                  {!isBusiness
-                    ? "Individuals"
-                    : "IT related business organisations,companies or individual startups"}{" "}
-                  across the globe are invited to join and partner with us.
+                  Please select or provide your country of residence from the
+                  drop-down options below.
                 </DialogContentText>
+
                 <Autocomplete
                   value={country}
                   onChange={(event, newValue) => {
@@ -242,7 +240,7 @@ export default function AlertCountry({
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="select country"
+                      label="country"
                       variant="standard"
                       fullWidth
                     />

@@ -35,6 +35,8 @@ const ConversationDetailed = ({
 }) => {
   const [replyContent, setReplyContent] = useState("");
   const [conversationMessges, setConversationMessages] = useState([]);
+  const [isEditingMessge, setIsEditingMessage] = useState(false);
+  const [messageFocused, setMessageFocused] = useState();
 
   // api request monitors
   const [isFetching, setIsFetching] = useState(false);
@@ -69,7 +71,6 @@ const ConversationDetailed = ({
   // fetch or get all conversations done by the current user
   useEffect(() => {
     if (conversationMessges?.length > 0) {
-      console.log("returning");
       return;
     }
     // set is fetching to true
@@ -78,7 +79,7 @@ const ConversationDetailed = ({
     // performing get request for all mesages with coversationId.
     axios
       .get(
-        `http://localhost:5000/metatron/api/v1/conversations/users/message/${focusedConveration._id}`,
+        `http://localhost:5000/metatron/api/v1/conversations/users/message/${focusedConveration?._id}`,
         {
           withCredentials: true,
         }
@@ -143,6 +144,64 @@ const ConversationDetailed = ({
     }
   };
 
+  // handle updating or editing of the message content
+  const handleUpdateMessageContent = async () => {
+    // call api request to post data to the backed
+    try {
+      // set is fetching to true
+      setIsFetching(true);
+
+      // api request
+      const response = await axios.put(
+        `http://localhost:5000/metatron/api/v1/conversations/users/message/update/${messageFocused._id}`,
+        { content: replyContent }
+      );
+      // if response data means sent message thus back to conversation page
+      if (response.data) {
+        // set conversation messages to [] this will re-render the ui and request the server data of messages
+        setConversationMessages([]);
+
+        // clear the reply
+        setReplyContent("");
+      }
+    } catch (err) {
+      // error occured during fetch query
+      console.error(err);
+    } finally {
+      // close is fetching
+      setIsFetching(false);
+    }
+  };
+
+  // handle deletion of the message based on its ID
+  const handleDeletingOfMessage = async () => {
+    // call api request to post data to the backed
+    try {
+      // set is fetching to true
+      setIsFetching(true);
+
+      // api request
+      const response = await axios.delete(
+        `http://localhost:5000/metatron/api/v1/conversations/users/message/delete/${messageFocused._id}`,
+        { content: replyContent }
+      );
+      // if response data means sent message thus back to conversation page
+      if (response.data) {
+        // set conversation messages to [] this will re-render the ui and request the server data of messages
+        setConversationMessages([]);
+      }
+    } catch (err) {
+      // error occured during fetch query
+      console.error(err);
+    } finally {
+      // close is fetching
+      setIsFetching(false);
+    }
+  };
+
+
+    
+
   return (
     <Box bgcolor={"background.default"} height={"99vh"}>
       {/* toolbar like */}
@@ -190,7 +249,7 @@ const ConversationDetailed = ({
               <Stack key={index} gap={2}>
                 {/* current user message styling */}
                 {message.senderId === currentUserID ? (
-                  <Box display={"flex"} justifyContent={"flex-start"}>
+                  <Box>
                     <Box
                       sx={{
                         border: "1px solid",
@@ -198,7 +257,7 @@ const ConversationDetailed = ({
                         p: 1,
                         m: 1,
                         borderRadius: 1,
-                        bgcolor: "lightblue",
+                        bgcolor: isDarkMode ? "gray" : "lightblue",
                       }}
                     >
                       {/* message content */}
@@ -207,15 +266,66 @@ const ConversationDetailed = ({
                         <Box display={"flex"} justifyContent={"flex-end"}>
                           <IconButton
                             size="small"
-                            onClick={handleClickMoreMessage}
                             aria-label="more"
+                            onClick={(event) => {
+                              // call show more function
+                              handleClickMoreMessage(event);
+
+                              // set message passed to the current nessage
+                              setMessageFocused(message);
+                            }}
                           >
                             <MoreVertRounded sx={{ width: 12, height: 12 }} />
                           </IconButton>
                         </Box>
-                        <Typography variant="body2" fontWeight={"bold"}>
-                          {message?.content}
-                        </Typography>
+                        <Box>
+                          <Typography variant="body2" fontWeight={"bold"}>
+                            {message?.content}
+                          </Typography>
+                        </Box>
+                        {/* caption  owner ref edited and time */}
+                        <Box
+                          mt={1}
+                          mr={1}
+                          display={"flex"}
+                          gap={1}
+                          alignItems={"center"}
+                        >
+                          {/*owner reference */}
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                              fontSize: "x-small",
+                            }}
+                          >
+                            {"( You )"}
+                          </Typography>
+
+                          {/* edited or not */}
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                              fontSize: "x-small",
+                            }}
+                          >
+                            {message?.isEdited && "edited"}
+                          </Typography>
+
+                          {/* caption time */}
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{
+                              fontSize: "x-small",
+                            }}
+                          >
+                            {" "}
+                            {handleDateDisplay(message?.createdAt)}{" "}
+                            {message?.createdAt?.split(".")[0]?.split("T")[1]}{" "}
+                          </Typography>
+                        </Box>
 
                         {/* more message options, delete and update */}
                         <Menu
@@ -232,32 +342,19 @@ const ConversationDetailed = ({
                             horizontal: "right",
                           }}
                         >
-                          <MoreMessageLayout />
+                          <MoreMessageLayout
+                            setIsEditingMessage={setIsEditingMessage}
+                            handleCloseMenu={handleCloseMenu}
+                            messagePassed={messageFocused}
+                            setReplyContent={setReplyContent}
+                            handleDeletingOfMessage={handleDeletingOfMessage}
+                          />
                         </Menu>
-                      </Box>
-
-                      {/* caption */}
-                      <Box
-                        mt={"2px"}
-                        display={"flex"}
-                        justifyContent={"flex-end"}
-                      >
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{
-                            fontSize: "x-small",
-                          }}
-                        >
-                          {" "}
-                          {handleDateDisplay(message?.createdAt)}{" "}
-                          {message?.createdAt?.split(".")[0]?.split("T")[1]}{" "}
-                        </Typography>
                       </Box>
                     </Box>
                   </Box>
                 ) : (
-                  <Box display={"flex"} justifyContent={"flex-end"}>
+                  <Box>
                     <Box
                       sx={{
                         p: 1,
@@ -265,7 +362,7 @@ const ConversationDetailed = ({
                         border: "1px solid",
                         borderColor: "divider",
                         borderRadius: 1,
-                        bgcolor: "whitesmoke",
+                        bgcolor: !isDarkMode ? "whitesmoke" : "black",
                       }}
                     >
                       {/* message content */}
@@ -273,18 +370,49 @@ const ConversationDetailed = ({
                         <Typography
                           variant="body2"
                           fontWeight={"bold"}
-                          color={"text.secondary"}
+                          color={isDarkMode ? "text.primary" : "text.secondary"}
                         >
                           {message?.content}
                         </Typography>
                       </Box>
 
-                      {/* caption */}
+                      {/* caption owner ref edited and time */}
                       <Box
-                        mt={"2px"}
+                        mt={1}
+                        mr={1}
                         display={"flex"}
                         justifyContent={"flex-end"}
+                        alignItems={"center"}
+                        gap={1}
                       >
+                        {/*owner reference */}
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{
+                            fontSize: "x-small",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {`( ${
+                            focusedConveration?.targetName
+                              ?.toLowerCase()
+                              ?.split(" ")[0]
+                          } )`}
+                        </Typography>
+
+                        {/* edited or not */}
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{
+                            fontSize: "x-small",
+                          }}
+                        >
+                          {message?.isEdited && "edited"}
+                        </Typography>
+
+                        {/* caption time */}
                         <Typography
                           variant="caption"
                           color="text.secondary"
@@ -318,30 +446,68 @@ const ConversationDetailed = ({
           />
           <Box display={"flex"} justifyContent={"flex-end"} mr={1}>
             <Box display={"flex"} gap={1} alignItems={"center"}>
-              <Button
-                variant="outlined"
-                disabled={isFetching}
-                size="small"
-                sx={{ borderRadius: "20px", fontSize: "10px" }}
-              >
-                AI
-              </Button>
+              {isEditingMessge ? (
+                <React.Fragment>
+                  <Button
+                    variant="outlined"
+                    disabled={isFetching}
+                    onClick={() => {
+                      // false message editing
+                      setIsEditingMessage(false);
 
-              <Button
-                variant="outlined"
-                size="small"
-                disabled={replyContent?.length < 1 || isFetching}
-                onClick={handleSendReplyMessage}
-                color="success"
-                sx={{
-                  textTransform: "capitalize",
-                  borderRadius: "20px",
-                  fontSize: "10px",
-                  fontWeight: "bold",
-                }}
-              >
-                Send
-              </Button>
+                      // clear the reply content
+                      setReplyContent("");
+                    }}
+                    size="small"
+                    sx={{ borderRadius: "20px", fontSize: "10px" }}
+                  >
+                    close
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    disabled={replyContent?.length < 1 || isFetching}
+                    onClick={handleUpdateMessageContent}
+                    color="success"
+                    sx={{
+                      textTransform: "capitalize",
+                      borderRadius: "20px",
+                      fontSize: "10px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    update
+                  </Button>
+                </React.Fragment>
+              ) : (
+                <React.Fragment>
+                  <Button
+                    variant="outlined"
+                    disabled={isFetching}
+                    size="small"
+                    sx={{ borderRadius: "20px", fontSize: "10px" }}
+                  >
+                    AI
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    disabled={replyContent?.length < 1 || isFetching}
+                    onClick={handleSendReplyMessage}
+                    color="success"
+                    sx={{
+                      textTransform: "capitalize",
+                      borderRadius: "20px",
+                      fontSize: "10px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Send
+                  </Button>
+                </React.Fragment>
+              )}
             </Box>
           </Box>
         </Box>

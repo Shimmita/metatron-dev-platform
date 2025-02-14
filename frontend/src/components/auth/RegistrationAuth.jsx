@@ -115,6 +115,16 @@ const RegistrationAuth = () => {
   }, [specialisationTitle]);
 
   const handleMissingField = () => {
+    if (
+      name.trim().split(" ").length < 1 ||
+      name.trim().split(" ").length > 2
+    ) {
+      setTitleAlert("Name Field");
+      setMissinFieldMsg("Please provide two names");
+      setOpenAlertGenral(true);
+      return true;
+    }
+
     if (name.trim() === "") {
       setTitleAlert("Missing Field");
       setMissinFieldMsg(
@@ -212,7 +222,7 @@ const RegistrationAuth = () => {
       // set the user object
       setUser(user);
 
-      // set open alertProfile where user will now pos data if necessary
+      // set open alertProfile where user will now post data if necessary
       setOpenAlertProfile(true);
     }
   };
@@ -310,7 +320,7 @@ const RegistrationAuth = () => {
                     className="w-75"
                     onChange={(e) => setName(e.target.value.toUpperCase())}
                     value={name}
-                    placeholder="Shirengo Michael"
+                    placeholder="Firstname Lastname"
                   />
                 </Box>
 
@@ -391,13 +401,37 @@ const RegistrationAuth = () => {
               <>
                 {/* next section details */}
 
+                {/* specialisation title */}
+                <Box display={"flex"} justifyContent={"center"}>
+                  <TextField
+                    required
+                    select
+                    id="preferred-title"
+                    value={specialisationTitle}
+                    label="Specialisation"
+                    className="w-75"
+                    onChange={(e) => setSpecialisationTitle(e.target.value)}
+                  >
+                    {SpecialisationJobs &&
+                      SpecialisationJobs.map((specialisation_title) => (
+                        <MenuItem
+                          key={specialisation_title}
+                          value={specialisation_title}
+                        >
+                          {specialisation_title}
+                        </MenuItem>
+                      ))}
+                  </TextField>
+                </Box>
+
+                {/* education */}
                 <Box display={"flex"} justifyContent={"center"}>
                   <TextField
                     required
                     select
                     id="educationLevel"
                     value={educationLevel}
-                    label="Education Level"
+                    label="Education"
                     className="w-75"
                     onChange={(e) => setEducationLevel(e.target.value)}
                   >
@@ -470,28 +504,7 @@ const RegistrationAuth = () => {
                   </Box>
                 )}
 
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    select
-                    id="preferred title"
-                    value={specialisationTitle}
-                    label="Preferred Title"
-                    className="w-75"
-                    onChange={(e) => setSpecialisationTitle(e.target.value)}
-                  >
-                    {SpecialisationJobs &&
-                      SpecialisationJobs.map((specialisation_title) => (
-                        <MenuItem
-                          key={specialisation_title}
-                          value={specialisation_title}
-                        >
-                          {specialisation_title}
-                        </MenuItem>
-                      ))}
-                  </TextField>
-                </Box>
-
+                {/* skills */}
                 <Box display={"flex"} justifyContent={"center"}>
                   <Autocomplete
                     multiple
@@ -504,7 +517,7 @@ const RegistrationAuth = () => {
                       <TextField
                         {...params}
                         variant="outlined"
-                        label="Preferred Skills *"
+                        label="Skills *"
                         placeholder="Skill"
                       />
                     )}

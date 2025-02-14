@@ -2,8 +2,8 @@ import {
   Add,
   AndroidRounded,
   Apple,
-  ArrowForwardIosRounded,
   LinkRounded,
+  LiveTvRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -11,7 +11,6 @@ import {
   Button,
   Card,
   CardContent,
-  Divider,
   Typography,
 } from "@mui/material";
 import React from "react";
@@ -19,6 +18,8 @@ import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import Kotlin from "../../../images/Kotlin.png";
 import Dev from "../../../images/dev.jpeg";
+import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import "../Events.css";
 
 function LiveLayout() {
@@ -31,16 +32,33 @@ function LiveLayout() {
   };
 
   return (
-    <>
+    <React.Fragment>
       <Box display={"flex"} justifyContent={"center"}>
         <Card
           elevation={0}
-          className="rounded shadow mb-4"
-          sx={{ maxWidth: 500, padding: "0 2px" }}
+          className={
+            CustomDeviceIsSmall() || CustomDeviceTablet()
+              ? "shadow rounded"
+              : "rounded"
+          }
+          sx={{
+            maxWidth: 500,
+            padding: "0 2px",
+            border:
+              (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
+                ? "1px solid"
+                : "1px solid",
+            borderColor:
+              (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
+                ? "divider"
+                : "divider",
+
+            mb: 3,
+          }}
         >
           <CardContent>
             {isDarkMode ? (
-              <>
+              <React.Fragment>
                 {/* DARK MODE */}
 
                 <Box className="container-live-header-night">
@@ -120,10 +138,10 @@ function LiveLayout() {
 
                 <Typography
                   variant="body2"
-                  className="fw-medium"
-                  sx={{ color: "text.secondary" }}
+                  color={"text.secondary"}
+                  fontWeight={"bold"}
                 >
-                  Topics Being Covered :
+                  Topics Being Addressed :
                 </Typography>
 
                 {/* topics section */}
@@ -167,8 +185,8 @@ function LiveLayout() {
 
                 <Typography
                   variant="body2"
-                  className="fw-medium"
-                  sx={{ color: "text.secondary" }}
+                  color={"text.secondary"}
+                  fontWeight={"bold"}
                 >
                   Chief Event Instructor :
                 </Typography>
@@ -180,11 +198,9 @@ function LiveLayout() {
                     fontWeight={"bold"}
                   >
                     <Link to={""} className="text-decoration-none ">
-                      <Typography
-                        color={"text.secondary"}
+                      <Box
                         variant="body2"
                         gap={1}
-                        fontWeight={"bold"}
                         alignItems={"center"}
                         display={"flex"}
                       >
@@ -198,6 +214,7 @@ function LiveLayout() {
                             variant="body2"
                             display={"flex"}
                             alignItems={"center"}
+                            color={"primary"}
                             gap={1}
                             fontWeight={"bold"}
                           >
@@ -206,12 +223,13 @@ function LiveLayout() {
                           <Typography
                             textTransform={"capitalize"}
                             variant="caption"
+                            color={"text.secondary"}
                             className="fw-medium"
                           >
                             Software Dev at Melian Chronicles
                           </Typography>
                         </Box>
-                      </Typography>
+                      </Box>
                     </Link>
                   </Typography>
                 </Box>
@@ -219,22 +237,26 @@ function LiveLayout() {
                 <Box display={"flex"} justifyContent={"center"} pt={3}>
                   <Button
                     disableElevation
-                    className="w-75 rounded-5 align-items-center fw-bold"
+                    className="fw-bold pt-1"
                     type="submit"
+                    color="success"
                     variant="outlined"
-                    size="small"
                     sx={{ borderRadius: "20px" }}
                     onClick={handleNavigateLiveAttend}
-                    endIcon={<ArrowForwardIosRounded />}
+                    startIcon={
+                      <LiveTvRounded
+                        color="warning"
+                        sx={{ width: 20, height: 20 }}
+                      />
+                    }
                   >
                     Join Meeting Now
                   </Button>
                 </Box>
-              </>
+              </React.Fragment>
             ) : (
-              <>
+              <React.Fragment>
                 {/* LIGHT MODE */}
-
                 <Box className="container-live-header-light">
                   <Typography
                     gutterBottom
@@ -311,10 +333,10 @@ function LiveLayout() {
 
                 <Typography
                   variant="body2"
-                  className="fw-medium"
-                  sx={{ color: "text.secondary" }}
+                  color={"text.secondary"}
+                  fontWeight={"bold"}
                 >
-                  Topics Being Covered :
+                  Topics Being Addressed:
                 </Typography>
 
                 {/* topics section */}
@@ -358,8 +380,8 @@ function LiveLayout() {
 
                 <Typography
                   variant="body2"
-                  className="fw-medium"
-                  sx={{ color: "text.secondary" }}
+                  color={"text.secondary"}
+                  fontWeight={"bold"}
                 >
                   Chief Event Instructor :
                 </Typography>
@@ -413,26 +435,28 @@ function LiveLayout() {
                 <Box display={"flex"} justifyContent={"center"} pt={3}>
                   <Button
                     disableElevation
-                    className="w-75 align-items-center fw-bold"
+                    className="fw-bold pt-1"
                     type="submit"
+                    color="success"
                     variant="outlined"
-                    size="small"
                     sx={{ borderRadius: "20px" }}
                     onClick={handleNavigateLiveAttend}
-                    endIcon={<ArrowForwardIosRounded />}
+                    startIcon={
+                      <LiveTvRounded
+                        color="warning"
+                        sx={{ width: 20, height: 20 }}
+                      />
+                    }
                   >
                     Join Meeting Now
                   </Button>
                 </Box>
-              </>
+              </React.Fragment>
             )}
           </CardContent>
         </Card>
       </Box>
-
-      {/* border at darkly */}
-      {isDarkMode && <Divider component={"div"} className="mb-4" />}
-    </>
+    </React.Fragment>
   );
 }
 

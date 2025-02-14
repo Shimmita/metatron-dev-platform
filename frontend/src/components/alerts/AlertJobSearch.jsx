@@ -25,7 +25,7 @@ import Slide from "@mui/material/Slide";
 import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateJobSearch } from "../../redux/CurrentJobSearch";
+import { updateCurrentJobs } from "../../redux/CurrentJobs";
 import AllSkills from "../data/AllSkillsData";
 import AccordionSearchOptions from "../modal/AccordionSearchOptions";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
@@ -39,8 +39,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function AlertJobSearch({
   openAlert,
   setOpenAlert,
-  setValue,
-  isPreviousResults,
+  isFullView,
 }) {
   const [isFetching, setIsFetching] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -59,11 +58,6 @@ export default function AlertJobSearch({
     setOpenAlert(false);
     // clear messages
     handleClearing();
-    // if no previous results nav to index tab
-    if (!isPreviousResults) {
-      // close alert
-      setValue(0);
-    }
   };
 
   // redux states
@@ -109,7 +103,7 @@ export default function AlertJobSearch({
           // update success message
           setSuccessMessage(res.data?.message);
           // update the redux states for job search
-          dispatch(updateJobSearch(res.data?.data));
+          dispatch(updateCurrentJobs(res.data?.data));
         } else {
           // no jobs
           setErrorMessage("no matching results");
@@ -149,7 +143,9 @@ export default function AlertJobSearch({
       sx={{
         marginLeft:
           CustomDeviceTablet() && isTabSideBar
-            ? "34%"
+            ? !isFullView
+              ? "34%"
+              : "20%"
             : CustomLandscapeWidest()
             ? "-2%"
             : CustomLandScape()
@@ -211,7 +207,7 @@ export default function AlertJobSearch({
           >
             <Collapse in={errorMessage || false}>
               <Alert
-                severity="warning"
+                severity="info"
                 className="rounded"
                 onClick={handleClearing}
                 action={

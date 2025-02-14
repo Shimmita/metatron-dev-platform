@@ -1,7 +1,7 @@
 import { Message } from "@mui/icons-material";
 import { Box, Fab, Tooltip } from "@mui/material";
 import axios from "axios";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ConversationDetailed from "./ConversationDetailed";
 import ConversationLayout from "./layout/ConversationLayout";
@@ -28,7 +28,8 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
   axios.defaults.withCredentials = true;
 
   // fetch or get all conversations done by the current user
-  useEffect(() => {
+  // use layout effect to prefetch details earlier before dom rendered
+  useLayoutEffect(() => {
     // return if are conversations
     if (availableUserConversations.length > 0) {
       return;
@@ -68,8 +69,11 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
   // controll showing of new conversation when fab is clicked
   const [fabNewConversation, setFabNewConversation] = useState(false);
 
-  // handle message clicked
-  const handleConversationClicked = () => {
+  // handle complete opening the focused conversation
+  const handleOpenFocusedConversation = () => {
+    // set available conversations to null for refresh from the backend
+    setAvailableUserConversations([]);
+
     // show message details and hide all messages
     setMessageClicked((prev) => !prev);
 
@@ -82,6 +86,44 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
   const handleFabClicked = useCallback(() => {
     setFabNewConversation((prev) => !prev);
   }, []);
+
+  // handle message clicked
+  const handleConversationClicked = async () => {
+    if (focusedConveration) {
+      // update the attribute sender or target read the conversation based on the current user
+      // usually the current user should not be the one updated but target,
+      if (
+        currentUserID === focusedConveration?.lastSenderId ||
+        focusedConveration?.isTargetRead
+      ) {
+        // proceed to conversation details since last conv message was read or user is the sender
+        handleOpenFocusedConversation();
+      } else {
+        // update that the target of the last message is viewed before opening the full conversaation
+
+        try {
+          // set is fetching to true
+          setIsFetching(true);
+
+          // api request
+          const response = await axios.put(
+            `http://localhost:5000/metatron/api/v1/conversations/users/message/last/${focusedConveration?._id}`
+          );
+          // if response data means updated the isTargetRead thus lets now open the conversation details
+          if (response.data) {
+            // proceed to conversation details since the owner is the current user
+            handleOpenFocusedConversation();
+          }
+        } catch (err) {
+          // error occured during fetch query
+          console.error(err);
+        } finally {
+          // close is fetching
+          setIsFetching(false);
+        }
+      }
+    }
+  };
 
   return (
     <Box>
@@ -108,16 +150,17 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
               scrollbarWidth: "none",
             }}
           >
-            {/* if message not clicked display all message summarily */}
+            {/* if message not clicked display all conversations summarily */}
             {!messageClicked ? (
               <Box pt={2} pb={2}>
                 {availableUserConversations &&
                   availableUserConversations.map((conversation, index) => (
                     <ConversationLayout
                       conversation={conversation}
-                      key={index}
                       handleConversationClicked={handleConversationClicked}
+                      key={index}
                       currentUserName={user?.name}
+                      currentUserID={currentUserID}
                       setFocusedConversation={setFocusedConversation}
                     />
                   ))}

@@ -25,6 +25,8 @@ import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 
 const Search = styled("div")(({ theme }) => ({
+  border: "1px solid",
+  borderColor: "gray",
   position: "relative",
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.15),
@@ -319,7 +321,7 @@ function NewConversation({ handleFabClicked, setAvailableUserConversations }) {
           {showMessageArea && (
             <Stack width={"100%"} mt={2} gap={1}>
               <form onSubmit={handleSubmitConversation}>
-                <Search className="shadow rounded">
+                <Search className="rounded">
                   <SearchIconWrapper>
                     <Edit sx={{ width: 17, height: 17 }} color="primary" />
                   </SearchIconWrapper>

@@ -6,10 +6,11 @@ import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { handleShowingSpeedDial } from "../../redux/AppUI";
-import { getImageMatch } from "../utilities/getImageMatch";
+import { handleShowingSpeedDial } from "../../../redux/AppUI";
+import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+import { getImageMatch } from "../../utilities/getImageMatch";
 
-export default function UserPostCard({
+export default function UserPostCardDrawer({
   post,
   setPostDetailedData,
   setShowDeleteAlert,
@@ -70,7 +71,7 @@ export default function UserPostCard({
         <CardMedia
           component="img"
           className="rounded"
-          sx={{ maxHeight: 180 }}
+          sx={{ maxHeight: CustomDeviceIsSmall() ? 150 : 180 }}
           image={handlePostImagePresent()}
           alt="image"
         />
@@ -150,15 +151,20 @@ export default function UserPostCard({
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
-            gap={1}
+            gap={CustomDeviceIsSmall() ? 2 : 5}
           >
             {/* update button */}
             <Button
               variant="text"
-              sx={{ fontSize: "small" }}
+              sx={{
+                fontSize: "small",
+                fontWeight: "bold",
+                borderRadius: 2,
+                textTransform: "capitalize",
+              }}
               size="small"
-              disabled={deletePostID}
               onClick={handleUpdateMyPost}
+              disabled={deletePostID}
               color="success"
             >
               update
@@ -166,7 +172,12 @@ export default function UserPostCard({
             {/* delete button */}
             <Button
               variant="text"
-              sx={{ fontSize: "small" }}
+              sx={{
+                fontSize: "small",
+                fontWeight: "bold",
+                borderRadius: 2,
+                textTransform: "capitalize",
+              }}
               size="small"
               disabled={deletePostID}
               onClick={handleDeleteMyPost}

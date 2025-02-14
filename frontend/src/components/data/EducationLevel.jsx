@@ -1,2 +1,8 @@
-const EducationLevel = ["Diploma", "Bachelors", "Masters", "PhD"];
+const EducationLevel = [
+  "Certificate",
+  "Diploma",
+  "Bachelors Degree",
+  "Masters Degree",
+  "PhD",
+];
 export default EducationLevel;

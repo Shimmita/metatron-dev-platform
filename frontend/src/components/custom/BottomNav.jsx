@@ -1,4 +1,4 @@
-import { Home, SchoolRounded, Work } from "@mui/icons-material";
+import { CachedRounded, Home, SchoolRounded, Work } from "@mui/icons-material";
 import {
   BottomNavigation,
   BottomNavigationAction,
@@ -8,23 +8,46 @@ import {
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import {
+  handleShowingSpeedDial,
+  handleSidebarRightbar,
+} from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 const BottomNav = () => {
   // redux states
+  const { isSidebarRighbar } = useSelector((state) => state.appUI);
+
   const { position } = useSelector((state) => state.currentBottomNav);
+  const { isPostSearch } = useSelector((state) => state.currentPosts);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // return home or default card page
   const handleReturnHome = () => {
+    // update the sidbar to be shown always
+    // always default sidebar and rightbar showing for larger screens
+    if (!isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+
+    // show speed dial if aint visible
+    dispatch(handleShowingSpeedDial(true));
+
+    // return home
     navigate("/");
   };
 
   // return job page
   const handleJobContent = () => {
     navigate("/jobs");
+
+    // disable sidebar
+    if (isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
   };
 
   // return learning page
@@ -58,7 +81,13 @@ const BottomNav = () => {
         <Tooltip title="home" arrow>
           <BottomNavigationAction
             label="Home"
-            icon={<Home sx={{ width: 34, height: 34 }} />}
+            icon={
+              isPostSearch ? (
+                <CachedRounded color="info" sx={{ width: 34, height: 34 }} />
+              ) : (
+                <Home sx={{ width: 34, height: 34 }} />
+              )
+            }
             style={{
               marginLeft:
                 CustomDeviceTablet() && isTabSideBar ? "30%" : undefined,

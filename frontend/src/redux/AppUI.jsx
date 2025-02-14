@@ -4,17 +4,20 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   defaultState: true, // default
   isAccountSettings: false,
-  isAbout: false,
   isDefaultBottomNav: true,
   isDefaultSpeedDial: true,
   isMobileRighBar: false,
   isSearchBar: true,
   isOpenMessageDrawer: false,
+  isOpenDrawerProfile: false,
+  isMessageProfile: false,
   isSidebarRighbar: true,
   isTabSideBar: true,
   isPostModalRedux: false,
   isLoadingPostLaunch: false,
   isSimilarCoursesModal: false,
+  isJobSearchGlobal: false,
+  isPostDetailed: false,
 
   // theme
   isDarkMode: false,
@@ -45,26 +48,6 @@ const appUISliceReducerSlice = createSlice({
       state.isSimilarCoursesModal = !state.isSimilarCoursesModal;
     },
 
-    // reset all UI states to default
-    resetAll: (state) => {
-      return {
-        ...state,
-        defaultState: true,
-        isAccountSettings: false,
-        isAbout: false,
-        isDefaultBottomNav: true,
-        isMobileRighBar: false,
-        isSearchBar: true,
-        isOpenMessageDrawer: false,
-        isSidebarRighbar: true,
-        isTabSideBar: true,
-        isPostModalRedux: false,
-        isLoadingPostLaunch: false,
-        isSimilarCoursesModal: false,
-        isDefaultSpeedDial: true,
-      };
-    },
-
     resetDarkMode: (state) => {
       return {
         ...state,
@@ -83,8 +66,11 @@ const appUISliceReducerSlice = createSlice({
       state.isDefaultSpeedDial = action.payload;
     },
 
+    // update is post detaled that wll be used to override speed dial state
+    handleUpdateIsPostDetailed: (state, action) => {
+      state.isPostDetailed = action.payload;
+    },
     // reset the to default the showing of the default bottom nav
-
     resetDefaultBottomNav: (state) => {
       state.isDefaultBottomNav = true;
     },
@@ -104,6 +90,24 @@ const appUISliceReducerSlice = createSlice({
       };
     },
 
+    // show the profile drawer when user clicks avatar navbar
+    showUserProfileDrawer: (state) => {
+      return {
+        ...state,
+        isOpenDrawerProfile: !state.isOpenDrawerProfile,
+      };
+    },
+
+    // handle showing message input when profile drawer is opened
+    showProfileDrawerMessageInput: (state, action) => {
+      state.isMessageProfile = action.payload;
+    },
+
+    // reset the showing of message input when profile is opened
+    resetClearShowMessageInput: (state) => {
+      state.isMessageProfile = false;
+    },
+
     // manage showing of sidebar and righbar appropriately when invoked
     handleSidebarRightbar: (state) => {
       return {
@@ -113,11 +117,39 @@ const appUISliceReducerSlice = createSlice({
       };
     },
 
+    // handle job search results from global search bar, routing to jobs page
+    handleIsJobsGlobalResults: (state, action) => {
+      state.isJobSearchGlobal = action.payload;
+    },
+
     // manage showing of sidebar specific for tabs to allow toggling of fullscreen
     showTabSideBar: (state) => {
       return {
         ...state,
         isTabSideBar: !state.isTabSideBar,
+      };
+    },
+
+    // reset all UI states to default
+    resetAll: (state) => {
+      return {
+        ...state,
+        defaultState: true,
+        isAccountSettings: false,
+        isDefaultBottomNav: true,
+        isMobileRighBar: false,
+        isSearchBar: true,
+        isOpenMessageDrawer: false,
+        isOpenDrawerProfile: false,
+        isSidebarRighbar: true,
+        isTabSideBar: true,
+        isPostModalRedux: false,
+        isLoadingPostLaunch: false,
+        isSimilarCoursesModal: false,
+        isDefaultSpeedDial: true,
+        isMessageProfile: false,
+        isJobSearchGlobal: false,
+        isPostDetailed: false,
       };
     },
   },
@@ -133,12 +165,17 @@ export const {
   resetDefaultBottomNav,
   showMobileRighBar,
   showMessagingDrawer,
+  showUserProfileDrawer,
+  showProfileDrawerMessageInput,
+  resetClearShowMessageInput,
   showTabSideBar,
   handleSidebarRightbar,
   showPostModalRedux,
   handleLoadingPostLaunch,
   resetSimilarCoursesModal,
   handleShowingSpeedDial,
+  handleIsJobsGlobalResults,
+  handleUpdateIsPostDetailed,
 } = appUISliceReducerSlice.actions;
 
 // export the appUISliceReducer for universal purposes

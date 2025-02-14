@@ -3,6 +3,7 @@ import {
   ContentCopyRounded,
   DocumentScannerRounded,
   PhishingRounded,
+  PlagiarismRounded,
   PsychologyAltRounded,
   WarningRounded,
 } from "@mui/icons-material";
@@ -235,7 +236,7 @@ export default function AlertReportPost({
                       ) : about.includes("Scammish") ? (
                         <PhishingRounded color="info" />
                       ) : about.includes("Plagiarised") ? (
-                        <ContentCopyRounded color="secondary" />
+                        <PlagiarismRounded color="secondary" />
                       ) : (
                         <DocumentScannerRounded />
                       )}{" "}

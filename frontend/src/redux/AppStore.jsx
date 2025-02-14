@@ -11,6 +11,7 @@ import currentBottomNavReducer from "./CurrentBottomNav";
 import currentChatBot from "./CurrentChatBot";
 import currentConnectRequestReducer from "./CurrentConnect";
 import currentConnectNotifReducer from "./CurrentConnectNotif";
+import currentGlobalSearchReducer from "./CurrentGlobalSearch";
 import currentJobsReducer from "./CurrentJobs";
 import currentJobSearchReducer from "./CurrentJobSearch";
 import currentJobsTopReducer from "./CurrentJobsTop";
@@ -20,6 +21,7 @@ import currentReportedPostReducer from "./CurrentPostReported";
 import currentPostsReducer from "./CurrentPosts";
 import currentSnackReducer from "./CurrentSnackBar";
 import currentUserReducer from "./CurrentUser";
+import currentModalReducer from "./CurrentModal";
 
 // Configure persist settings
 const persistConfig = {
@@ -45,9 +47,11 @@ const rootReducer = combineReducers({
   currentConnectRequest: currentConnectRequestReducer,
   currentConnectNotif: currentConnectNotifReducer,
   currentReportedPost: currentReportedPostReducer,
+  currentGlobalSearch: currentGlobalSearchReducer,
+  currentModal: currentModalReducer,
 });
 
-// Persist the root reducer
+// Persist the root reducer for caching session states
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 // Configure store with persisted reducer

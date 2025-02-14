@@ -1,10 +1,10 @@
 import {
+  ExpandMoreRounded,
   FavoriteRounded,
   ForumRounded,
   GitHub,
   MoreVertRounded,
   VerifiedRounded,
-  WbIncandescentRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -18,6 +18,7 @@ import {
   ListItemAvatar,
   Menu,
   Skeleton,
+  Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -26,7 +27,7 @@ import React, { lazy, useCallback, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch, useSelector } from "react-redux";
 import dev from "../../images/dev.jpeg";
-import { handleShowingSpeedDial } from "../../redux/AppUI";
+import { handleUpdateIsPostDetailed } from "../../redux/AppUI";
 import { updateCurrentPostDetails } from "../../redux/CurrentPosts";
 import AlertReportPost from "../alerts/AlertReportPost";
 import PostData from "../data/PostData";
@@ -56,9 +57,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
   const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
-  const [isLoadingRequest, setIsLoadingRequest] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoadingRequest, setIsLoadingRequest] = useState(false);
   const [isFullDescription, setFullDiscription] = useState(false);
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
   const [messageMore, setMessageMore] = useState("");
@@ -108,7 +107,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     ? 122
     : CustomLandScape()
     ? 182
-    : 220;
+    : 219;
   const details = PostData?.details || "";
   const detailsLong = details.length > max_description;
 
@@ -121,11 +120,6 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     name,
     title,
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoadingRequest(false), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleDetailsLength = () =>
     detailsLong ? details.substring(0, max_description) : details;
@@ -190,7 +184,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     userInfo.message = message;
     userInfo.minimessage = minimessage;
     // add users to the liked clickers group and increment the value of clicks
-    setIsUploading(true);
+    setIsLoadingRequest(true);
     // performing post request
     axios
       .put(
@@ -212,15 +206,10 @@ const CardFeed = ({ post, setPostDetailedData }) => {
         }
       })
       .catch(async (err) => {
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage("Server Unreachable");
-          return;
-        }
-
-        setErrorMessage(err?.response.data);
+        console.log(err);
       })
       .finally(() => {
-        setIsUploading(false);
+        setIsLoadingRequest(false);
       });
   };
 
@@ -233,7 +222,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     userInfo.message = message;
     userInfo.minimessage = minimessage;
     // add users to the liked clickers group and increment the value of clicks
-    setIsUploading(true);
+    setIsLoadingRequest(true);
     // performing post request
     axios
       .put(
@@ -248,15 +237,10 @@ const CardFeed = ({ post, setPostDetailedData }) => {
         dispatch(updateCurrentPostDetails(res.data));
       })
       .catch(async (err) => {
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage("Server Unreachable");
-          return;
-        }
-
-        setErrorMessage(err?.response.data);
+        console.log(err);
       })
       .finally(() => {
-        setIsUploading(false);
+        setIsLoadingRequest(false);
       });
   };
 
@@ -281,10 +265,11 @@ const CardFeed = ({ post, setPostDetailedData }) => {
 
   // handle showing post comments layout like full post details plus comments
   const handleShowFullPostComments = () => {
-    setPostDetailedData(post);
+    // true is post details in redux to avoid speed dial show in details view
+    dispatch(handleUpdateIsPostDetailed(true));
 
-    // false showing of the speed dial for tabs and small devices
-    dispatch(handleShowingSpeedDial(false));
+    // populate with current post for details
+    setPostDetailedData(post);
   };
 
   // handle display of miniprofile
@@ -328,7 +313,6 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                 ) : (
                   <ListItemAvatar onClick={handleMiniProfileView}>
                     <Avatar
-                      // src={post.post_owner.owneravatar}
                       src={dev}
                       variant="rounded"
                       sx={{
@@ -336,7 +320,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                         width: 50,
                         height: 50,
                       }}
-                      alt=""
+                      alt={post?.post_owner?.ownername?.split(" ")[0]}
                     >
                       {handleNoProfilePicture()}
                     </Avatar>
@@ -346,53 +330,61 @@ const CardFeed = ({ post, setPostDetailedData }) => {
             }
             action={
               !isLoadingRequest && (
-                <Box
-                  flexDirection={"row"}
-                  display={"flex"}
-                  mt={1}
-                  alignItems={"center"}
-                >
-                  <Typography
-                    className={postBelongsCurrentUser && "me-3"}
-                    variant="body2"
+                <Stack>
+                  <Box
+                    flexDirection={"row"}
+                    display={"flex"}
+                    mt={1}
+                    alignItems={"center"}
                   >
-                    {getElapsedTime(post?.createdAt)}
-                  </Typography>
+                    <Typography ml={'4px'} variant="body2">
+                      {getElapsedTime(post?.createdAt)}
+                    </Typography>
 
-                  {!postBelongsCurrentUser && (
-                    <Tooltip title="more" arrow>
-                      <IconButton
-                        size="small"
-                        aria-label="more"
-                        onClick={handleClickMoreVertPost}
-                      >
-                        <MoreVertRounded
-                          color="primary"
-                          sx={{ width: 20, height: 20 }}
-                        />
-                      </IconButton>
-                    </Tooltip>
+                    {!postBelongsCurrentUser && (
+                      <Tooltip title="more" arrow>
+                        <IconButton
+                          size="small"
+                          aria-label="more"
+                          onClick={handleClickMoreVertPost}
+                        >
+                          <MoreVertRounded
+                            color="primary"
+                            sx={{ width: 20, height: 20 }}
+                          />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={openMenu}
+                      onClose={handleCloseMenu}
+                      MenuListProps={{ "aria-labelledby": "more-button" }}
+                      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                      transformOrigin={{ vertical: "top", horizontal: "right" }}
+                    >
+                      <CardFeedMore
+                        ownerId={post?.post_owner?.ownerId}
+                        currentUserNetwork={user?.network}
+                        ownerName={post?.post_owner?.ownername}
+                        setMessageMore={setMessageMore}
+                        handleCloseMenu={handleCloseMenu}
+                        setOpenAlertReport={setOpenAlertReport}
+                        post={post}
+                        setPostWhole={setPostWholeReport}
+                      />
+                    </Menu>
+                  </Box>
+
+                  {/* if post edited */}
+                  {post?.post_edited && (
+                    <Box display={"flex"} justifyContent={"flex-end"} pr={2}>
+                      <Typography color={"text.secondary"} variant="caption">
+                        Edited
+                      </Typography>
+                    </Box>
                   )}
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={openMenu}
-                    onClose={handleCloseMenu}
-                    MenuListProps={{ "aria-labelledby": "more-button" }}
-                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                    transformOrigin={{ vertical: "top", horizontal: "right" }}
-                  >
-                    <CardFeedMore
-                      ownerId={post?.post_owner?.ownerId}
-                      currentUserNetwork={user?.network}
-                      ownerName={post?.post_owner?.ownername}
-                      setMessageMore={setMessageMore}
-                      handleCloseMenu={handleCloseMenu}
-                      setOpenAlertReport={setOpenAlertReport}
-                      post={post}
-                      setPostWhole={setPostWholeReport}
-                    />
-                  </Menu>
-                </Box>
+                </Stack>
               )
             }
             title={
@@ -484,29 +476,10 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                     alignItems={"center"}
                     gap={2}
                   >
-                    <WbIncandescentRounded
-                      sx={{
-                        width: 18,
-                        height: 18,
-                        color: isDarkMode ? "yellow" : "orange",
-                      }}
-                    />
                     {/* title of the post */}
-                    <Typography
-                      variant="body2"
-                      color={"text.secondary"}
-                      fontWeight={"bold"}
-                    >
+                    <Typography variant="body2" fontWeight={"bold"}>
                       {post?.post_title}
                     </Typography>
-
-                    <WbIncandescentRounded
-                      sx={{
-                        width: 18,
-                        height: 18,
-                        color: isDarkMode ? "yellow" : "orange",
-                      }}
-                    />
                   </Box>
                 </Box>
                 <CardActionArea
@@ -538,7 +511,8 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                           fontWeight={"bold"}
                           color={"primary"}
                         >
-                          &nbsp; more
+                          ...{" "}
+                          <ExpandMoreRounded sx={{ width: 20, height: 20 }} />
                         </Typography>
                       )}
                       {isFullDescription && details}
@@ -561,7 +535,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                     height={CustomDeviceScreenSize()}
                     width={
                       CustomDeviceIsSmall()
-                        ? "95%"
+                        ? "100%"
                         : CustomDeviceTablet()
                         ? "95%"
                         : "92%"
@@ -628,7 +602,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                       onChange={onClick}
                       icon={icon}
                       checkedIcon={icon}
-                      disabled={isUploading}
+                      disabled={isLoadingRequest}
                     />
                   </Tooltip>
                   <Typography

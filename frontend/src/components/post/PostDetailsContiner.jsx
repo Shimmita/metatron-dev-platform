@@ -7,6 +7,7 @@ import {
   IconButton,
   InputBase,
   Stack,
+  Tooltip,
 } from "@mui/material";
 
 import { Close, SendOutlined } from "@mui/icons-material";
@@ -14,12 +15,21 @@ import { Close, SendOutlined } from "@mui/icons-material";
 import axios from "axios";
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import PostDetailsFeed from "./PostDetailsFeed";
+import {
+  handleShowingSpeedDial,
+  handleUpdateIsPostDetailed,
+} from "../../redux/AppUI";
 import CustomCountryName from "../utilities/CustomCountryName";
-import { handleShowingSpeedDial } from "../../redux/AppUI";
+import PostDetailsFeed from "./PostDetailsFeed";
 
 const CommentContainer = lazy(() => import("./CommentContainer"));
-function PostDetailsContainer({ postDetailedData, setPostDetailedData }) {
+function PostDetailsContainer({
+  postDetailedData,
+  setPostDetailedData,
+  isDrawerFocused = false,
+  isPostEditMode = false,
+  setIsPostEditMode,
+}) {
   // hold temporarily the post param, could mutate its values
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -30,6 +40,8 @@ function PostDetailsContainer({ postDetailedData, setPostDetailedData }) {
   axios.defaults.withCredentials = true;
   // redux states
   const { user } = useSelector((state) => state.currentUser);
+  const { isDefaultSpeedDial } = useSelector((state) => state.appUI);
+
   const dispatch = useDispatch();
   // extract basic current user details
   const { _id, avatar, name, specialisationTitle: title } = user || {};
@@ -89,102 +101,157 @@ function PostDetailsContainer({ postDetailedData, setPostDetailedData }) {
 
   // handle clearing of the post data so that the userprofile defaults also restore the speed dial
   const handleClearPostDetailedData = () => {
+    // set is post editing mode false if its true only
+    if (isPostEditMode) {
+      setIsPostEditMode(false);
+    }
+
+    // set post detailed data to empty or null
     setPostDetailedData();
 
-    // restore the speed dial
+    // restore the speed dial for editing mode
     dispatch(handleShowingSpeedDial(true));
+
+    // restore speed dial in focus mode
+    dispatch(handleUpdateIsPostDetailed(false));
   };
 
   return (
     <Stack gap={1}>
-      {/* close button */}
-      <Box display={"flex"} justifyContent={"flex-end"}>
-        <IconButton onClick={handleClearPostDetailedData}>
-          <Close sx={{ width: 15, height: 15 }} color="primary" />
-        </IconButton>
-      </Box>
-
-      {/* display error */}
-      {errorMessage && (
-        <Box p={1} display={"flex"} justifyContent={"center"}>
-          <Collapse in={errorMessage || false}>
-            <Alert
-              severity="warning"
-              className="rounded-5"
-              onClick={() => setErrorMessage("")}
-              action={
-                <IconButton aria-label="close" color="inherit" size="small">
-                  <Close fontSize="inherit" />
-                </IconButton>
-              }
-              sx={{ mb: 2 }}
-            >
-              {errorMessage}
-            </Alert>
-          </Collapse>
-        </Box>
-      )}
-
-      {/* card container */}
-      <Box p={2}>
-        {/* render post details feed here */}
-        <PostDetailsFeed
-          postDetailedData={postDetailedData}
-          setPostDetailedData={setPostDetailedData}
-        />
-
-        {/* all user comments container pass the comments of the post */}
-        <Box>
-          <CommentContainer
-            post_comments={postDetailedData?.post_comments.comments}
-          />
-        </Box>
-      </Box>
-
-      {/* comment input text  */}
-      <Box
-        display={"flex"}
-        justifyContent={"space-between"}
-        alignItems={"center"}
-        width={"100%"}
-        p={2}
-        bgcolor={"background.default"}
-      >
-        {/* input for comment */}
-        <Box width={"100%"}>
-          <InputBase
-            multiline
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            maxRows={2}
-            disabled={isUploading}
-            className="w-100"
-            placeholder="comment here..."
-            sx={{
-              fontSize: "small",
-            }}
-          />
-        </Box>
-
-        {/* send comment button icon */}
-        <Box className=" t rounded ms-1" alignContent={"center"}>
-          {isUploading ? (
-            <CircularProgress size={17} />
-          ) : (
-            <Badge badgeContent={`${100 - comment.length}`}>
-              <IconButton
-                disabled={comment.length > 100}
-                onClick={handleSendCommentNow}
-              >
-                <SendOutlined
-                  color={comment.length <= 100 ? "primary" : "inherit"}
-                  sx={{ width: 18, height: 18 }}
-                />
+      {isPostEditMode ? (
+        <React.Fragment>
+          {/* close button */}
+          <Box display={"flex"} justifyContent={"flex-end"} p={1}>
+            <Tooltip arrow title={"close"}>
+              <IconButton onClick={handleClearPostDetailedData}>
+                <Close sx={{ width: 15, height: 15 }} color="primary" />
               </IconButton>
-            </Badge>
+            </Tooltip>
+          </Box>
+
+          {/* display error */}
+          {errorMessage && (
+            <Box p={1} display={"flex"} justifyContent={"center"}>
+              <Collapse in={errorMessage || false}>
+                <Alert
+                  severity="warning"
+                  className="rounded-5"
+                  onClick={() => setErrorMessage("")}
+                  action={
+                    <IconButton aria-label="close" color="inherit" size="small">
+                      <Close fontSize="inherit" />
+                    </IconButton>
+                  }
+                  sx={{ mb: 2 }}
+                >
+                  {errorMessage}
+                </Alert>
+              </Collapse>
+            </Box>
           )}
-        </Box>
-      </Box>
+
+          {/* card container */}
+          <Box p={isDrawerFocused ? 0 : 2}>
+            {/* render post details feed here */}
+            <PostDetailsFeed
+              postDetailedData={postDetailedData}
+              setPostDetailedData={setPostDetailedData}
+              isPostEditMode={isPostEditMode}
+            />
+          </Box>
+        </React.Fragment>
+      ) : (
+        <React.Fragment>
+          {/* close button */}
+          <Box display={"flex"} justifyContent={"flex-end"}>
+            <IconButton onClick={handleClearPostDetailedData}>
+              <Close sx={{ width: 15, height: 15 }} color="primary" />
+            </IconButton>
+          </Box>
+
+          {/* display error */}
+          {errorMessage && (
+            <Box p={1} display={"flex"} justifyContent={"center"}>
+              <Collapse in={errorMessage || false}>
+                <Alert
+                  severity="warning"
+                  className="rounded-5"
+                  onClick={() => setErrorMessage("")}
+                  action={
+                    <IconButton aria-label="close" color="inherit" size="small">
+                      <Close fontSize="inherit" />
+                    </IconButton>
+                  }
+                  sx={{ mb: 2 }}
+                >
+                  {errorMessage}
+                </Alert>
+              </Collapse>
+            </Box>
+          )}
+
+          {/* card container */}
+          <Box p={isDrawerFocused ? 0 : 2}>
+            {/* render post details feed here */}
+            <PostDetailsFeed
+              postDetailedData={postDetailedData}
+              setPostDetailedData={setPostDetailedData}
+            />
+
+            {/* all user comments container pass the comments of the post */}
+            <Box>
+              <CommentContainer
+                post_comments={postDetailedData?.post_comments.comments}
+              />
+            </Box>
+          </Box>
+
+          {/* comment input text  */}
+          <Box
+            display={"flex"}
+            justifyContent={"space-between"}
+            alignItems={"center"}
+            width={"100%"}
+            p={2}
+            bgcolor={"background.default"}
+          >
+            {/* input for comment */}
+            <Box width={"100%"}>
+              <InputBase
+                multiline
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                maxRows={2}
+                disabled={isUploading}
+                className="w-100"
+                placeholder="comment here..."
+                sx={{
+                  fontSize: "small",
+                }}
+              />
+            </Box>
+
+            {/* send comment button icon */}
+            <Box className=" t rounded ms-1" alignContent={"center"}>
+              {isUploading ? (
+                <CircularProgress size={17} />
+              ) : (
+                <Badge badgeContent={`${100 - comment.length}`}>
+                  <IconButton
+                    disabled={comment.length > 100}
+                    onClick={handleSendCommentNow}
+                  >
+                    <SendOutlined
+                      color={comment.length <= 100 ? "primary" : "inherit"}
+                      sx={{ width: 18, height: 18 }}
+                    />
+                  </IconButton>
+                </Badge>
+              )}
+            </Box>
+          </Box>
+        </React.Fragment>
+      )}
     </Stack>
   );
 }

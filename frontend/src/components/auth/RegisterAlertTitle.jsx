@@ -51,7 +51,8 @@ export default function RegisterAlertTitle({
         <DialogTitle>Preferred Title</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            Please enter your preferred title relating to tech industry
+            Please provide specialisation title that is relevant to the Tech or
+            IT Industry.
           </DialogContentText>
 
           <TextField

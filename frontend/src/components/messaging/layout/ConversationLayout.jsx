@@ -1,4 +1,5 @@
-import { Box, CardActionArea, Divider } from "@mui/material";
+import { Visibility } from "@mui/icons-material";
+import { Badge, Box, CardActionArea, Divider } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -15,6 +16,7 @@ export default function ConversationLayout({
   conversation,
   handleConversationClicked,
   currentUserName,
+  currentUserID,
   setFocusedConversation,
 }) {
   // function to reduct nessage header or summary
@@ -53,6 +55,17 @@ export default function ConversationLayout({
     return [conversation?.senderName, conversation?.senderAvatar];
   };
 
+  // handle last conversation message display font based on the last sender
+  const handleLastMessageFontWeight = () => {
+
+    if (currentUserID !== conversation?.lastSenderId) {
+      if (!conversation?.isTargetRead) {
+        return true;
+      } else return false;
+    }
+  };
+
+
   return (
     <List sx={{ bgcolor: "background.paper" }}>
       <Box
@@ -72,32 +85,80 @@ export default function ConversationLayout({
           </ListItemAvatar>
           <CardActionArea
             onClick={() => {
-              // handle UI display swithcing
-              handleConversationClicked();
-
               // set the current conversation to be the one focused on
               setFocusedConversation(conversation);
+
+              // handle UI display swithcing
+              handleConversationClicked();
             }}
             className="p-2"
           >
-            <ListItemText
-              primary={
-                <Typography variant="body2" gutterBottom>
-                  {handleConversationNameAvatar()[0]}
-                </Typography>
-              }
-              secondary={handleMessageSummary()}
-            />
+            {/* bold message when last message not read by the target */}
+            {handleLastMessageFontWeight() ? (
+              <ListItemText
+                primary={
+                  <Badge
+                    badgeContent={1}
+                    color="primary"
+                    className={!CustomDeviceIsSmall() && "pe-3"}
+                  >
+                    <Typography
+                      variant="body2"
+                      gutterBottom
+                      fontWeight={"bold"}
+                    >
+                      {handleConversationNameAvatar()[0]}
+                    </Typography>
+                  </Badge>
+                }
+                secondary={<Typography>{handleMessageSummary()}</Typography>}
+              />
+            ) : (
+              <ListItemText
+                primary={
+                  <Typography variant="body2" gutterBottom>
+                    {handleConversationNameAvatar()[0]}
+                  </Typography>
+                }
+                secondary={handleMessageSummary()}
+              />
+            )}
           </CardActionArea>
         </ListItem>
 
-        {/* time stamp */}
-        <Box mr={2}>
+        {/* target viewed last message status and time stamp */}
+        <Box mr={1}>
           {/* time  */}
-          <Box>
-            <Typography gutterBottom variant="caption" color="text.secondary">
-              {getElapsedTime(conversation?.updatedAt)} ago
-            </Typography>
+          <Box display={"flex"} alignItems={"center"} gap={"3px"}>
+            {conversation?.isTargetRead &&
+            currentUserID === conversation?.lastSenderId ? (
+              <React.Fragment>
+                <Box>
+                  <Visibility sx={{ width: 15, height: 15 }} color="primary" />
+                </Box>
+                {/* time elapsed */}
+                <Typography
+                  gutterBottom
+                  variant="caption"
+                  color="text.secondary"
+                  className="pt-2"
+                >
+                  {getElapsedTime(conversation?.updatedAt)}
+                </Typography>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                {/* time elapsed */}
+                <Typography
+                  gutterBottom
+                  variant="caption"
+                  color="text.secondary"
+                  className="pt-2"
+                >
+                  {getElapsedTime(conversation?.updatedAt)} ago
+                </Typography>
+              </React.Fragment>
+            )}
           </Box>
 
           {/* date */}
@@ -108,7 +169,6 @@ export default function ConversationLayout({
           </Box>
         </Box>
       </Box>
-
       <Divider component={"li"} />
     </List>
   );

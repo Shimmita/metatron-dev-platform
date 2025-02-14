@@ -1,12 +1,13 @@
+import CustomDeviceIsSmall from "./CustomDeviceIsSmall";
+import CustomDeviceSmallest from "./CustomDeviceSmallest";
+
 function CustomModalHeight() {
   // check the width and decide whether to display the tabletsidebar
-  const screenWidth = window.screen.availWidth;
-
-  if (screenWidth <= 350) {
+  if (CustomDeviceSmallest()) {
     return 400;
   }
 
-  if (screenWidth <= 500) {
+  if (CustomDeviceIsSmall()) {
     return 500;
   }
 

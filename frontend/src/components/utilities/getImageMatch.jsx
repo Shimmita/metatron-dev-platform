@@ -1,27 +1,6 @@
-import AwsLogo from "../../images/aws.jpeg";
-import NodeLogo from "../../images/node.png";
-import PythonLogo from "../../images/python.jpeg";
-import ReactLogo from "../../images/react.png";
-import KotlinLogo from "../../images/Kotlin.png";
-import CppLogo from "../../images/c++.png";
-import AjaxLogo from "../../images/ajax.png";
-import AzureLogo from "../../images/azure.jpeg";
-import BootstrapLogo from "../../images/bootsrap.jpeg";
-import AngularLogo from "../../images/angular.png";
-import VueLogo from "../../images/vue.png";
-import TypescriptLogoLogo from "../../images/typescript.png";
-import SwiftLogo from "../../images/swift1.png";
-import SqliteLogo from "../../images/sqlite.png";
-import RubyLogo from "../../images/ruby.jpg";
-import PostgresLogo from "../../images/postgres.png";
-import PHPLogo from "../../images/php_1.png";
-import MongoLogo from "../../images/mongo.png";
 import AiLogo from "../../images/Ai.png";
-import MeteorLogo from "../../images/meteor.png";
-import LinuxLogo from "../../images/linux.jpeg";
-import JavascriptLogo from "../../images/javascript.png";
-import HTMLCSSLogo from "../../images/html_css.webp";
-import Cybersecurity from "../../images/cybersecurity.jpeg";
+import AjaxLogo from "../../images/ajax.png";
+import AngularLogo from "../../images/angular.png";
 import ApacheSparkLogo from "../../images/apache_spark.png";
 import AppleLogo from "../../images/apple.png";
 import Appollo1 from "../../images/appolo.jpeg";
@@ -29,16 +8,21 @@ import ArcoreLogo from "../../images/arcore.jpeg";
 import Arkit from "../../images/arkit.jpeg";
 import Asp1 from "../../images/aspcore.png";
 import Avalonia from "../../images/avalonia.jpeg";
+import AwsLogo from "../../images/aws.jpeg";
+import AzureLogo from "../../images/azure.jpeg";
 import BabylonjsLogo from "../../images/babylonjs.jpeg";
 import BackendLogo from "../../images/backend.jpeg";
 import BashLogo from "../../images/bash.jpeg";
+import BootstrapLogo from "../../images/bootsrap.jpeg";
+import CppLogo from "../../images/c++.png";
 import CLanguge from "../../images/C.png";
 import CICD from "../../images/ci.jpeg";
 import Cocoapods from "../../images/cocopods.png";
-import CssLogo from "../../images/css_2.png";
 import CodingGeneral from "../../images/coding.png";
 import CryEngine from "../../images/cryengine.png";
 import Csharp from "../../images/cshap.png";
+import CssLogo from "../../images/css_2.png";
+import Cybersecurity from "../../images/cybersecurity.jpeg";
 import DartLogo from "../../images/dart.png";
 import DevOps from "../../images/devOps.jpeg";
 import DjangoLogo from "../../images/django.png";
@@ -63,29 +47,41 @@ import GodotLogo from "../../images/godot.png";
 import GoogleLogo from "../../images/google.png";
 import GraphQLogo from "../../images/graph.png";
 import GraphicDesign from "../../images/graphic_design.jpeg";
+import HTMLCSSLogo from "../../images/html_css.webp";
 import IonicLogo from "../../images/ionic.png";
 import IoTLogo from "../../images/iot2.png";
 import JavaLogo from "../../images/java.png";
+import JavascriptLogo from "../../images/javascript.png";
 import JenkinsLogo from "../../images/jenkins.png";
 import JetpakCompose from "../../images/jetpakcompose.png";
-import KMM from "../../images/kmp.png";
 import JquerryLogo from "../../images/jquery.png";
 import PythonKivyLogo from "../../images/kivy.png";
+import KMM from "../../images/kmp.png";
+import KotlinLogo from "../../images/Kotlin.png";
 import KuberLogo from "../../images/kuber.jpeg";
 import LaravelLogo from "../../images/laravel.png";
 import LbgdxLogo from "../../images/lbgdx.png";
+import LinuxLogo from "../../images/linux.jpeg";
 import MatplotlibLogo from "../../images/matplotlib.png";
 import MauiLogo from "../../images/maui.png";
+import MeteorLogo from "../../images/meteor.png";
 import MicrosoftLogo from "../../images/microsoft.png";
 import MobileAndroid from "../../images/mobile_andro.png";
+import MongoLogo from "../../images/mongo.png";
 import MonoGameLogo from "../../images/monogame.png";
 import MySQLogo from "../../images/mysql.png";
 import NetworkingLogo from "../../images/networking.png";
+import NodeLogo from "../../images/node.png";
 import NumpyLogo from "../../images/numpy.png";
 import ObjectiveClogo from "../../images/objective_c.png";
 import PandasLogo from "../../images/pandas.png";
+import PHPLogo from "../../images/php_1.png";
+import PostgresLogo from "../../images/postgres.png";
 import PowershelLogo from "../../images/powershel.png";
+import PythonLogo from "../../images/python.jpeg";
+import ReactLogo from "../../images/react.png";
 import ReverseEngineerLogo from "../../images/reverse_2.png";
+import RubyLogo from "../../images/ruby.jpg";
 import RustLanguageLogo from "../../images/rust.png";
 import S3BucketAWSLogo from "../../images/s3.jpeg";
 import ScalaLogo from "../../images/scala.png";
@@ -93,14 +89,18 @@ import ScikitLernLogo from "../../images/scikit.png";
 import SeabornLogo from "../../images/seaborn2.png";
 import SeleniumLogo from "../../images/selenium.png";
 import SpringBootLogo from "../../images/spring.png";
+import SqliteLogo from "../../images/sqlite.png";
+import SwiftLogo from "../../images/swift1.png";
 import TailwindCSS from "../../images/tailwind.png";
 import TensorflowLogo from "../../images/tensorflow.png";
 import TerraformLogo from "../../images/terra.png";
 import ThreeJsLogo from "../../images/threejs.png";
 import TravisCILogo from "../../images/travis.png";
+import TypescriptLogoLogo from "../../images/typescript.png";
 import UIUXLogo from "../../images/ui.png";
 import UnityLogo from "../../images/unity.png";
 import UnrealEngineLogo from "../../images/unrealEngine.png";
+import VueLogo from "../../images/vue.png";
 import WinformsLogo from "../../images/winforms.jpeg";
 import WordPressLogo from "../../images/wordpress.png";
 import XamarinLogo from "../../images/xamarin2.png";
@@ -111,8 +111,6 @@ import Adonisjs from "../../images/adonis.png";
 import Aerospike from "../../images/aerospike.png";
 import Aframe from "../../images/aframe.png";
 import Alchemy from "../../images/alchemy.jpeg";
-import AdobeIllustrator from "../../images/illustrator.png";
-import AdobePhotoshop from "../../images/photoshop.jpeg";
 import Algolia from "../../images/algolia.png";
 import Alpinejs from "../../images/alpine.png";
 import Ansible from "../../images/ansible.png";
@@ -191,6 +189,7 @@ import Heroku from "../../images/heroku.png";
 import Hypertable from "../../images/hypertable.jpeg";
 import IBM from "../../images/ibm.png";
 import IBMDB from "../../images/ibmdb.png";
+import AdobeIllustrator from "../../images/illustrator.png";
 import InfluxDB from "../../images/influx.png";
 import InVision from "../../images/invision.png";
 import JanusGraph from "../../images/janusgraph.png";
@@ -226,8 +225,8 @@ import Nvidia from "../../images/nvidia.png";
 import ObjectDB from "../../images/objectdb.png";
 import DigitalOCean from "../../images/ocean.png";
 import MsOffice from "../../images/office.jpeg";
-import MsOffice365 from "../../images/openTSB.png";
 import OpenTSB from "../../images/office2.jpeg";
+import MsOffice365 from "../../images/openTSB.png";
 import OracleCloudant from "../../images/oracle_cloudant.png";
 import OracleNoSQL from "../../images/oracle_nosql.png";
 import OrientDB from "../../images/orientdb.png";
@@ -235,6 +234,7 @@ import Paypal from "../../images/paypal2.png";
 import PayTM from "../../images/paytm.png";
 import Percona from "../../images/percona.jpeg";
 import Phaserjs from "../../images/phaserjs.jpeg";
+import AdobePhotoshop from "../../images/photoshop.jpeg";
 import PineConeDB from "../../images/pinecondb.png";
 import PlanetScaleDB from "../../images/planetscaledb.png";
 import PlatformEngineer from "../../images/platform.png";
@@ -275,8 +275,8 @@ import Sybase from "../../images/sybase.jpeg";
 import Symfony from "../../images/symfony.png";
 import Tableu from "../../images/tableu.png";
 import TaranTool from "../../images/taran.png";
-import TBCO from "../../images/tbco.jpeg";
 import Tauri from "../../images/tauri.png";
+import TBCO from "../../images/tbco.jpeg";
 import TeamCity from "../../images/teamcity.png";
 import TiDB from "../../images/tidb.png";
 import TigerGraph from "../../images/tiger_graph.png";
@@ -319,7 +319,7 @@ const imageMap = {
   Tableu: Tableu,
   Symfony: Symfony,
   Sybase: Sybase,
-  Svlete: Svelte,
+  Svelte: Svelte,
   "Surreal DB": Surreal,
   Supabase: Supabase,
   Stripe: Stripe,
@@ -405,7 +405,7 @@ const imageMap = {
   Heroku: Heroku,
   "HBase DB": HBase,
   "Hazelcast DB": HazelCast,
-  Haskel: HaskelLang,
+  Haskell: HaskelLang,
   "Harness DevOps": Harness,
   Hanami: Hanami,
   Hacker: Hacker,
@@ -421,7 +421,7 @@ const imageMap = {
   Framework7: Framework7,
   Framer: Framer,
   "Foundation DB": FoundationDB,
-  "Flow Map": FlowMap,
+  FlowMap: FlowMap,
   Firebird: Firebird,
   Firebase: FirebaseDB,
   Figma: Figma,
@@ -477,6 +477,7 @@ const imageMap = {
   "Azure Cosmos": AzureCosmos,
   "AWS CodePipeline": AWS_Code_Pipeline,
   "Amazon Timestream": AWS_Timestream,
+  "Amazon Web Services": AwsLogo,
   "Amazon Aurora": AWSAurora,
   "Amazon DocumentDB": AWSDocumentDB,
   "Amazon Lamberyard": AWSLambayard,
@@ -494,7 +495,7 @@ const imageMap = {
   Python: PythonLogo,
   React: ReactLogo,
   Kotlin: KotlinLogo,
-  KMM: KMM,
+  "Kotlin Multiplatform": KMM,
   Java: JavaLogo,
   Jenkins: JenkinsLogo,
   Coding: CodingGeneral,
@@ -521,11 +522,12 @@ const imageMap = {
   Appollo: Appollo1,
   Arcore: ArcoreLogo,
   Arkit: Arkit,
-  ASP: Asp1,
+  "ASP.NET": Asp1,
   Avalonia: Avalonia,
   Babylon: BabylonjsLogo,
   Backend: BackendLogo,
   Bash: BashLogo,
+  "Bash/Shell": BashLogo,
   C: CLanguge,
   "CI/CD": CICD,
   CocoaPods: Cocoapods,
@@ -557,7 +559,7 @@ const imageMap = {
   "Graphic Design": GraphicDesign,
   Ionic: IonicLogo,
   IoT: IoTLogo,
-  "Jetpack Compose": JetpakCompose,
+  JetpackCompose: JetpakCompose,
   JQuery: JquerryLogo,
   Kivy: PythonKivyLogo,
   Kubernetes: KuberLogo,
@@ -605,7 +607,7 @@ export const getImageMatch = (title = "", isAll = false) => {
     return [matchingKey, values];
   } else {
     const matchingKey = Object.keys(imageMap).find(
-      (key) => title.toLowerCase() === key.toLowerCase()
+      (key) => title?.trim()?.toLowerCase() === key?.trim()?.toLowerCase()
     );
     return matchingKey ? imageMap[matchingKey] : CodingGeneral; // Default logo if no match
   }

@@ -1,29 +1,40 @@
 import {
+  Close,
+  Edit,
   FavoriteRounded,
   ForumRounded,
   GitHub,
   MoreVertRounded,
+  UpdateRounded,
   VerifiedRounded,
   WbIncandescentRounded,
 } from "@mui/icons-material";
 import {
+  Alert,
+  alpha,
   Avatar,
   Box,
+  Button,
   Card,
   CardActionArea,
   CardContent,
   CardHeader,
   Checkbox,
+  Collapse,
   IconButton,
+  InputBase,
   Menu,
+  Stack,
+  styled,
   Tooltip,
   Typography,
 } from "@mui/material";
 import axios from "axios";
 import React, { lazy, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import dev from "../../images/dev.jpeg";
+import { handleShowingSpeedDial } from "../../redux/AppUI";
 import CardFeedMore from "../custom/CardFeedMore";
 import PostData from "../data/PostData";
 import CustomCountryName from "../utilities/CustomCountryName";
@@ -39,19 +50,72 @@ const AlertMiniProfileView = lazy(() =>
   import("../alerts/AlertMiniProfileView")
 );
 
-const PostDetailsFeed = ({ postDetailedData, setPostDetailedData }) => {
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    marginLeft: theme.spacing(1),
+    width: "auto",
+  },
+}));
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 1),
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  height: "20%",
+  alignItems: "center",
+  justifyContent: "center",
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "inherit",
+  width: CustomDeviceIsSmall()
+    ? "32ch"
+    : CustomDeviceTablet()
+    ? "40ch"
+    : "45ch",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(3)})`,
+  },
+}));
+
+const PostDetailsFeed = ({
+  postDetailedData,
+  setPostDetailedData,
+  isPostEditMode = false,
+}) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
   const openMenu = Boolean(anchorEl);
   const [isUploading, setIsUploading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [messageResponse, setMessageResponse] = useState("");
   const [isFullDescription, setFullDiscription] = useState(false);
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
 
+  const [editedText, setEditedText] = useState(
+    `${postDetailedData?.post_body}`
+  );
+
   // axios default credentials
   axios.defaults.withCredentials = true;
+
   // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { isDarkMode } = useSelector(
+    (state) => state.appUI
+  );
+
+
+
   const { user } = useSelector((state) => state.currentUser);
   // extract basic current user details
   const { _id, avatar, name, specialisationTitle: title } = user || {};
@@ -188,11 +252,11 @@ const PostDetailsFeed = ({ postDetailedData, setPostDetailedData }) => {
       })
       .catch(async (err) => {
         if (err?.code === "ERR_NETWORK") {
-          setErrorMessage("Server Unreachable");
+          setMessageResponse("Server Unreachable");
           return;
         }
 
-        setErrorMessage(err?.response.data);
+        setMessageResponse(err?.response.data);
       })
       .finally(() => {
         setIsUploading(false);
@@ -218,8 +282,80 @@ const PostDetailsFeed = ({ postDetailedData, setPostDetailedData }) => {
     return postDetailedData?.post_url;
   };
 
+  // handle updating of the post
+  const completePostUpdating = () => {
+    // check if post contains added data to update else reject
+
+    // add users to the liked clickers group and increment the value of clicks
+    setIsUploading(true);
+    // performing post request
+    axios
+      .put(
+        `http://localhost:5000/metatron/api/v1/posts/update/post/${postDetailedData?._id}`,
+        { post_body: editedText },
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        // update passedPost with the returned post object
+        if (res.data.message === "updated successfully") {
+          setPostDetailedData(res.data.post);
+
+          setMessageResponse(res.data.message);
+        }
+      })
+      .catch(async (err) => {
+        console.log(err);
+        if (err?.code === "ERR_NETWORK") {
+          setMessageResponse("Server Unreachable");
+          return;
+        }
+
+        setMessageResponse(err?.response.data);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
+  };
+
+ 
+
+  // handle close aler delete
+  const handleClose = () => {
+    // close alert
+    setMessageResponse("");
+  };
+
   return (
     <React.Fragment>
+      {/* display error message */}
+      {messageResponse && (
+        <Collapse in={messageResponse || false}>
+          <Alert
+            severity="info"
+            onClose={handleClose}
+            className="rounded-5 mb-1"
+            action={
+              <Stack direction={"row"} alignItems={"center"} gap={1}>
+                {/* yes btn */}
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={handleClose}
+                >
+                  <Close sx={{ width: 15, height: 15 }} />
+                </IconButton>
+              </Stack>
+            }
+          >
+            {messageResponse}
+          </Alert>
+        </Collapse>
+      )}
+
       <Card
         style={{
           border: openMenu && isDarkMode ? "1px solid gray" : undefined,
@@ -365,123 +501,186 @@ const PostDetailsFeed = ({ postDetailedData, setPostDetailedData }) => {
                 />
               </Box>
             </Box>
-            <CardActionArea
-              onClick={handleFullDiscription}
-              disabled={!detailsLong}
-            >
-              <Box display={"flex"} justifyContent={"center"} width={"100%"}>
-                <Typography
-                  variant={"body2"}
-                  maxWidth={
-                    CustomLandscapeWidest()
-                      ? "90%"
+
+            {isPostEditMode ? (
+              <Box
+                display={"flex"}
+                justifyContent={"center"}
+                width={"100%"}
+                flexDirection={"column"}
+              >
+                <Search
+                  className="rounded"
+                  sx={{
+                    mr: 2,
+                    border: !isDarkMode && "1px solid",
+                    borderColor: "gray",
+                  }}
+                >
+                  <SearchIconWrapper>
+                    <Edit sx={{ width: 15, height: 15 }} color="primary" />
+                  </SearchIconWrapper>
+                  <StyledInputBase
+                    inputProps={{ "aria-label": "search" }}
+                    multiline
+                    minRows={10}
+                    maxRows={20}
+                    value={editedText}
+                    onChange={(e) => setEditedText(e.target.value)}
+                    required
+                    fullWidth
+                  />
+                </Search>
+                {/* send button */}
+                <Box mt={2} display={"flex"} justifyContent={"center"}>
+                  <Button
+                    startIcon={<UpdateRounded />}
+                    disableElevation
+                    disabled={
+                      isUploading ||
+                      editedText?.trim()?.length ===
+                        postDetailedData?.post_body?.trim()?.length
+                    }
+                    onClick={completePostUpdating}
+                    variant="text"
+                    color="success"
+                    sx={{
+                      borderRadius: 5,
+                      textTransform: "capitalize",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    complete updating
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <CardActionArea
+                onClick={handleFullDiscription}
+                disabled={!detailsLong}
+              >
+                <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+                  <Typography
+                    variant={"body2"}
+                    maxWidth={
+                      CustomLandscapeWidest()
+                        ? "90%"
+                        : CustomDeviceTablet()
+                        ? "95%"
+                        : CustomLandScape()
+                        ? "93%"
+                        : "98%"
+                    }
+                  >
+                    {!isFullDescription && handleDetailsLength()}
+                    {detailsLong && !isFullDescription && (
+                      <Typography
+                        variant="body2"
+                        component={"span"}
+                        fontWeight={"bold"}
+                        color={"primary"}
+                      >
+                        &nbsp; more
+                      </Typography>
+                    )}
+                    {isFullDescription && details}
+                  </Typography>
+                </Box>
+              </CardActionArea>
+            )}
+          </CardContent>
+
+          {/* display image or log if is not in edit mode */}
+
+          {!isPostEditMode && (
+            <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+              <Box
+                sx={{
+                  width: "92%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {/* smart 300,350 */}
+                <LazyLoadImage
+                  src={handlePostImagePresent()}
+                  alt=""
+                  height={CustomDeviceScreenSize()}
+                  width={
+                    CustomDeviceIsSmall()
+                      ? "95%"
                       : CustomDeviceTablet()
                       ? "95%"
-                      : CustomLandScape()
-                      ? "93%"
-                      : "98%"
+                      : "92%"
                   }
-                >
-                  {!isFullDescription && handleDetailsLength()}
-                  {detailsLong && !isFullDescription && (
-                    <Typography
-                      variant="body2"
-                      component={"span"}
-                      fontWeight={"bold"}
-                      color={"primary"}
-                    >
-                      &nbsp; more
-                    </Typography>
-                  )}
-                  {isFullDescription && details}
-                </Typography>
+                  style={{
+                    objectFit: "fill",
+                    borderRadius: 10,
+                    border: "1px solid",
+                    borderColor: "grey",
+                  }}
+                />
               </Box>
-            </CardActionArea>
-          </CardContent>
-          <Box display={"flex"} justifyContent={"center"} width={"100%"}>
-            <Box
-              sx={{
-                width: "92%",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              {/* smart 300,350 */}
-              <LazyLoadImage
-                src={handlePostImagePresent()}
-                alt=""
-                height={CustomDeviceScreenSize()}
-                width={
-                  CustomDeviceIsSmall()
-                    ? "95%"
-                    : CustomDeviceTablet()
-                    ? "95%"
-                    : "92%"
-                }
-                style={{
-                  objectFit: "fill",
-                  borderRadius: 10,
-                  border: "1px solid",
-                  borderColor: "grey",
-                }}
-              />
             </Box>
-          </Box>
+          )}
         </Box>
 
-        <Box
-          display="flex"
-          p={1}
-          justifyContent="space-around"
-          alignItems="center"
-        >
-          {[
-            {
-              icon: (
-                <FavoriteRounded
-                  sx={{ width: 23, height: 23 }}
-                  color={currentUserLiked ? "primary" : undefined}
-                />
-              ),
-              count: post_likes,
-              title: "like",
-              onClick: handlePostLikes,
-            },
-            {
-              icon: <GitHub sx={{ width: 21, height: 21 }} />,
-              count: post_github_clicks,
-              title: "Github",
-            },
-            {
-              icon: (
-                <ForumRounded
-                  sx={{ width: 21, height: 21 }}
-                  color={currentUserCommentented ? "primary" : undefined}
-                />
-              ),
-              count: post_comment_count,
-              title: "comment",
-            },
-          ].map(({ icon, count, title, onClick }) => (
-            <Box display="flex" alignItems="center" key={title}>
-              <Tooltip title={title} arrow>
-                <Checkbox
-                  onChange={onClick}
-                  icon={icon}
-                  checkedIcon={icon}
-                  disabled={isUploading}
-                />
-              </Tooltip>
-              <Typography
-                fontWeight="bold"
-                variant="body2"
-                color="text.secondary"
-              >
-                {count}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
+        {/* when post is not in edit mode display the like,git and comment */}
+        {!isPostEditMode && (
+          <Box
+            display="flex"
+            p={1}
+            justifyContent="space-around"
+            alignItems="center"
+          >
+            {[
+              {
+                icon: (
+                  <FavoriteRounded
+                    sx={{ width: 23, height: 23 }}
+                    color={currentUserLiked ? "primary" : undefined}
+                  />
+                ),
+                count: post_likes,
+                title: "like",
+                onClick: handlePostLikes,
+              },
+              {
+                icon: <GitHub sx={{ width: 21, height: 21 }} />,
+                count: post_github_clicks,
+                title: "Github",
+              },
+              {
+                icon: (
+                  <ForumRounded
+                    sx={{ width: 21, height: 21 }}
+                    color={currentUserCommentented ? "primary" : undefined}
+                  />
+                ),
+                count: post_comment_count,
+                title: "comment",
+              },
+            ].map(({ icon, count, title, onClick }) => (
+              <Box display="flex" alignItems="center" key={title}>
+                <Tooltip title={title} arrow>
+                  <Checkbox
+                    onChange={onClick}
+                    icon={icon}
+                    checkedIcon={icon}
+                    disabled={isUploading}
+                  />
+                </Tooltip>
+                <Typography
+                  fontWeight="bold"
+                  variant="body2"
+                  color="text.secondary"
+                >
+                  {count}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        )}
       </Card>
 
       {/* alert for showing user miniprofile details by passing the post ownerID */}

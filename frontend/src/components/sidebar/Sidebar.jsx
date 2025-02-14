@@ -1,19 +1,11 @@
 import {
-  AccountBox,
-  AndroidRounded,
-  Apple,
-  ArrowDropDown,
   BusinessRounded,
   CoffeeRounded,
-  Diversity3Rounded,
   Home,
-  Lightbulb,
   LightModeOutlined,
   LightModeRounded,
   LogoutRounded,
-  MonetizationOn,
-  PostAdd,
-  Settings,
+  PsychologyRounded,
   Smartphone,
   SupportAgentRounded,
 } from "@mui/icons-material";
@@ -21,7 +13,6 @@ import {
   Avatar,
   Badge,
   Box,
-  Collapse,
   Divider,
   List,
   ListItem,
@@ -42,11 +33,11 @@ import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
 import logoCompany from "../../images/logo_sm.png";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import { handleShowChatBot } from "../../redux/CurrentChatBot";
 import EventsTablet from "../events/EventsIsTablet";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import "./Sidebar.css";
 const AlertSponsorship = lazy(() => import("../alerts/AlertSponsorship"));
 const AlertSupport = lazy(() => import("../alerts/AlertSupport"));
 const SkillAvatars = lazy(() => import("./SkillAvatars"));
@@ -82,7 +73,6 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 const Sidebar = () => {
-  const [openAccountMore, setOpenAccountMore] = useState(false);
   const [openMobileApp, setOpenMobileApp] = useState(false);
   const [openSupportAlert, setOpenAlertSupport] = useState(false);
 
@@ -121,34 +111,10 @@ const Sidebar = () => {
     navigate("/");
   };
 
-  // show posts
-  const handleShowMyPost = () => {
-    navigate("/account/posts");
-  };
-
-  // show people
-  const handleShowMyNetwork = () => {
-    navigate("/account/people");
-  };
-
-  // show settings
-  const handleShowSettings = () => {
-    navigate("/account/settings");
-  };
-
-  // show premium
-  const handleShowPremium = () => {
-    navigate("/account/premium");
-  };
   // UI theme dark light teaking effect
   const handleShowDarkMode = () => {
     // update the redux theme boolean state
     dispatch(resetDarkMode());
-  };
-
-  // handle show about page
-  const handleShowAboutPage = () => {
-    navigate("/about");
   };
 
   // return the screen width in parcentage for wider screens
@@ -188,9 +154,15 @@ const Sidebar = () => {
     setOpenSponsorAlert(true);
   };
 
+  // handle the display of the metatron ai assistant
+  const handleShowAiBot = () => {
+    // close the drawer
+    dispatch(handleShowChatBot());
+  };
+
   return (
     <Box
-      height={"100vh"}
+      height={"90vh"}
       flex={CustomDeviceTablet() ? 1 : 2}
       p={CustomDeviceTablet() ? 1 : 2}
       marginLeft={equidistantSidebar()}
@@ -214,7 +186,7 @@ const Sidebar = () => {
           (CustomDeviceTablet() ? "shadow rounded" : "rounded")
         }
         width={correctWidthInPercentage()}
-        maxHeight={CustomDeviceTablet() ? "88vh" : "84vh"}
+        maxHeight={"88vh"}
         sx={{
           border:
             (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
@@ -247,11 +219,7 @@ const Sidebar = () => {
               <React.Fragment>
                 <BoxAvatarContent>
                   <Box width={"100%"}>
-                    <Box
-                      className={
-                        isDarkMode ? "profile-header" : "bg-dark rounded-top"
-                      }
-                    >
+                    <Box className={isDarkMode && "bg-dark rounded-top"}>
                       <Box
                         display={"flex"}
                         justifyContent={"center"}
@@ -267,7 +235,7 @@ const Sidebar = () => {
                           variant="dot"
                         >
                           <Avatar
-                            alt={"user image"}
+                            alt={user?.name?.split(" ")[0]}
                             src={
                               !businessAccount
                                 ? devImage || logoCompany
@@ -319,52 +287,6 @@ const Sidebar = () => {
                     </Box>
                   </Box>
                 </BoxAvatarContent>
-
-                {/* connections */}
-                <List>
-                  <ListItemButton onClick={handleShowMyNetwork}>
-                    <ListItemIcon>
-                      <Diversity3Rounded
-                        color="primary"
-                        sx={{ width: 26, height: 26 }}
-                      />{" "}
-                    </ListItemIcon>
-
-                    {/* shown for personal */}
-                    {!businessAccount ? (
-                      <>
-                        <ListItemText
-                          primary={
-                            <Typography variant="body2"> Network</Typography>
-                          }
-                        />
-                        <Typography
-                          fontWeight={"bold"}
-                          color={"primary"}
-                          variant="body2"
-                        >
-                          {user?.network_count}
-                        </Typography>
-                      </>
-                    ) : (
-                      <>
-                        {/* shown for business a/c */}
-                        <ListItemText
-                          primary={
-                            <Typography variant="body2"> Followers</Typography>
-                          }
-                        />
-                        <Typography
-                          fontWeight={"bold"}
-                          color={"primary"}
-                          variant="body2"
-                        >
-                          {user?.network_count}
-                        </Typography>
-                      </>
-                    )}
-                  </ListItemButton>
-                </List>
               </React.Fragment>
             )}
           </Box>
@@ -396,77 +318,7 @@ const Sidebar = () => {
                   />
                 </ListItemButton>
 
-                <ListItemButton
-                  onClick={(e) => setOpenAccountMore(!openAccountMore)}
-                >
-                  <ListItemIcon>
-                    <AccountBox color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">Account Status </Typography>
-                    }
-                  />
-                  {openAccountMore ? (
-                    <ArrowDropDown sx={{ rotate: "180deg" }} />
-                  ) : (
-                    <ArrowDropDown />
-                  )}
-                </ListItemButton>
-
-                <Collapse
-                  className=" border-top"
-                  in={openAccountMore}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 8 }} onClick={handleShowMyPost}>
-                      <ListItemIcon>
-                        <PostAdd color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={<Typography variant="body2">Posts</Typography>}
-                      />
-                    </ListItemButton>
-
-                    <ListItemButton sx={{ pl: 8 }} onClick={handleShowSettings}>
-                      <ListItemIcon>
-                        <Settings color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Typography variant="body2">Settings</Typography>
-                        }
-                      />
-                    </ListItemButton>
-                    <ListItemButton sx={{ pl: 8 }} onClick={handleShowPremium}>
-                      <ListItemIcon>
-                        <MonetizationOn color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Typography variant="body2">Premium</Typography>
-                        }
-                      />
-                    </ListItemButton>
-                  </List>
-                </Collapse>
-
-                {/* about */}
-                <ListItemButton onClick={handleShowAboutPage}>
-                  <ListItemIcon>
-                    <Lightbulb color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">About Metatron</Typography>
-                    }
-                  />
-                </ListItemButton>
-
                 {/* install app */}
-
                 <ListItemButton
                   onClick={(e) => setOpenMobileApp(!openMobileApp)}
                 >
@@ -474,52 +326,29 @@ const Sidebar = () => {
                     <Smartphone color="primary" />
                   </ListItemIcon>
                   <ListItemText
-                    primary={
-                      <Typography variant="body2">Download App </Typography>
-                    }
+                    primary={<Typography variant="body2">Download</Typography>}
                   />
-                  {openMobileApp ? (
-                    <ArrowDropDown sx={{ rotate: "180deg" }} />
-                  ) : (
-                    <ArrowDropDown />
-                  )}{" "}
                 </ListItemButton>
 
-                <Collapse
-                  className=" border-top"
-                  in={openMobileApp}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 8 }}>
-                      <ListItemIcon>
-                        <AndroidRounded color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Typography variant="body2">Android</Typography>
-                        }
-                      />
-                    </ListItemButton>
-
-                    <ListItemButton sx={{ pl: 8 }}>
-                      <ListItemIcon>
-                        <Apple color="primary" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={<Typography variant="body2">iOS</Typography>}
-                      />
-                    </ListItemButton>
-                  </List>
-                </Collapse>
+                {/* metatron ai chat */}
+                <ListItemButton onClick={handleShowAiBot}>
+                  <ListItemIcon>
+                    <PsychologyRounded
+                      sx={{ width: 26, height: 26 }}
+                      color="primary"
+                    />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={<Typography variant="body2">Dynamo AI</Typography>}
+                  />
+                </ListItemButton>
               </List>
             )}
           </Box>
 
           {/* box for Events displayed for tablets only */}
           {CustomDeviceTablet() && (
-            <>
+            <React.Fragment>
               {/* divider be shown on tablets */}
               <Divider component={"div"} className="mb-2" />
 
@@ -530,7 +359,7 @@ const Sidebar = () => {
                   justifyContent={"center"}
                 >
                   <Typography fontWeight={"bold"} color={"primary"}>
-                    GREAT TECH EVENTS
+                    DEV SPACE EVENTS
                   </Typography>
                 </Box>
 
@@ -544,7 +373,7 @@ const Sidebar = () => {
                   <EventsTablet />
                 )}
               </Box>
-            </>
+            </React.Fragment>
           )}
 
           <Divider component={"div"} className="mt-1" />
@@ -634,11 +463,7 @@ const Sidebar = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={
-                      <Typography variant="body2">
-                        <Typography variant="body2">
-                          Sponsor Platform
-                        </Typography>
-                      </Typography>
+                      <Typography variant="body2">Sponsor Platform</Typography>
                     }
                   />
                 </ListItemButton>

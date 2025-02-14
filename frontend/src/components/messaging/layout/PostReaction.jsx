@@ -5,7 +5,6 @@ import {
   Flag,
   ForumRounded,
   GitHub,
-  SendRounded,
 } from "@mui/icons-material";
 import {
   Box,
@@ -13,7 +12,6 @@ import {
   CircularProgress,
   Divider,
   IconButton,
-  TextField,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
@@ -34,10 +32,7 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
 export default function PostReaction({ reaction, isLastItem }) {
   const [isFetching, setIsFetching] = useState(false);
   const [isMiniProfile, setIsMiniProfile] = useState(false);
-  const [userMessage, setUserMessage] = useState("");
-  const [showMessageInput, setShowMessageInput] = useState(false);
   const navigate = useNavigate();
-  const max_message_count = 50;
 
   // dispatch for redux functionalities
   const dispatch = useDispatch();
@@ -105,7 +100,7 @@ export default function PostReaction({ reaction, isLastItem }) {
         <React.Fragment>
           {/* user miniprofile */}
           <Box
-            className={showMessageInput ? " mb-1" : " mb-2"}
+            className={"mb-2"}
             sx={{
               border: "1px solid",
               borderColor: "divider",
@@ -114,54 +109,8 @@ export default function PostReaction({ reaction, isLastItem }) {
             <MiniProfileLayout
               handleShowMiniProfile={handleShowMiniProfile}
               userId={reaction?.userId}
-              showMessageInput={showMessageInput}
-              setShowMessageInput={setShowMessageInput}
             />
           </Box>
-
-          {/* message input */}
-          {showMessageInput && (
-            <Box className="border border-top-0 p-1" width={"100%"}>
-              {/* close the message box  */}
-              <Box display={"flex"} justifyContent={"flex-end"} width={"100%"}>
-                <IconButton onClick={() => setShowMessageInput(false)}>
-                  <Close sx={{ width: 14, height: 14 }} color="primary" />
-                </IconButton>
-              </Box>
-              <Box
-                width={"100%"}
-                display={"flex"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-                gap={1}
-              >
-                {/*input field */}
-                <TextField
-                  id="standard-text-field-message"
-                  variant="standard"
-                  fullWidth
-                  value={userMessage}
-                  label={
-                    <React.Fragment>
-                      <Typography variant="caption" className="ms-2">
-                        message {max_message_count - userMessage.length}
-                      </Typography>
-                    </React.Fragment>
-                  }
-                  className="w-100"
-                  onChange={(e) => setUserMessage(e.target.value)}
-                  error={userMessage.length > max_message_count}
-                  placeholder="..."
-                />
-                {/* send button */}
-                {userMessage && (
-                  <IconButton>
-                    <SendRounded sx={{ width: 16, height: 16 }} />
-                  </IconButton>
-                )}
-              </Box>
-            </Box>
-          )}
         </React.Fragment>
       ) : (
         <List

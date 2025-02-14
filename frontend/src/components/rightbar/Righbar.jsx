@@ -1,5 +1,5 @@
 import { SchoolRounded } from "@mui/icons-material";
-import { Backdrop, Box, Divider, Skeleton, Typography } from "@mui/material";
+import { Backdrop, Box, Skeleton, Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import BasicSpeedDial from "../custom/SpeedDial";
@@ -28,7 +28,7 @@ const RightbarAll = () => {
 
   return (
     <Box
-      height={"100vh"}
+      height={"90vh"}
       flex={2}
       marginRight={window.screen.availWidth > 1200 ? "5%" : "0"}
       p={2}
@@ -46,7 +46,7 @@ const RightbarAll = () => {
           CustomDeviceIsSmall() ||
           (CustomDeviceTablet() ? "shadow rounded" : "rounded")
         }
-        maxHeight={CustomDeviceTablet() ? "88vh" : "84vh"}
+        maxHeight={"85vh"}
         sx={{
           border:
             (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
@@ -97,9 +97,6 @@ const RightbarAll = () => {
           </Box>
         </Box>
 
-        {/* divider */}
-        <Divider className="mb-2" component={"div"} />
-
         {/* events */}
         <Box>
           <Box
@@ -107,10 +104,11 @@ const RightbarAll = () => {
             alignItems={"center"}
             justifyContent={"center"}
             gap={2}
-            pt={2}
+            ml={1}
+            mt={"3px"}
           >
             <Typography fontWeight={"bold"} color={"primary"}>
-              GREAT TECH EVENTS
+              DEV SPACE EVENTS
             </Typography>
             <SchoolRounded color="primary" sx={{ width: 24, height: 24 }} />
           </Box>
@@ -130,12 +128,12 @@ const RightbarAll = () => {
         <Box>
           {/* show speed dial if not scrolling down */}
           {isDefaultBottomNav && (
-            <>
+            <React.Fragment>
               <Backdrop open={openBackdrop} />
               <Box position={"fixed"} sx={{ left: 0, right: 1, bottom: 55 }}>
                 <BasicSpeedDial setOpenBackdrop={setOpenBackdrop} />
               </Box>
-            </>
+            </React.Fragment>
           )}
         </Box>
       )}

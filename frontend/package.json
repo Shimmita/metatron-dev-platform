@@ -33,6 +33,7 @@
     "react-virtualized": "^9.22.5",
     "react-window": "^1.8.10",
     "redux-persist": "^6.0.0",
+    "simple-peer": "^9.11.1",
     "socket.io-client": "^4.7.4",
     "web-vitals": "^2.1.4"
   },

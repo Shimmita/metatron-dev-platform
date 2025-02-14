@@ -1,21 +1,30 @@
 import {
-  AccessTimeRounded,
+  AccessTimeFilledRounded,
   BalanceRounded,
-  BoltRounded,
+  CalendarMonthRounded,
   LocationCityRounded,
-  OpenInBrowserRounded,
   PaidRounded,
   PeopleRounded,
+  VerifiedRounded,
   WbIncandescentRounded,
   WorkHistoryRounded,
 } from "@mui/icons-material";
-import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
+import {
+  Avatar,
+  AvatarGroup,
+  Box,
+  Button,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import React, { useState } from "react";
 import ApplyJobModal from "../../modal/ApplyJobModal";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
-function JobLayout({ isDarkMode, job }) {
+function JobLayout({ isDarkMode, job, isOne = false }) {
   const [openModal, setOpenApplyJobModal] = useState(false);
 
   const handleShowingApply = () => {
@@ -45,22 +54,47 @@ function JobLayout({ isDarkMode, job }) {
     return finalName;
   };
 
+  // format entry position level
+
+  const handleEntryPosition = () => {
+    if (job.entry.level?.split(" ")[0]?.includes("Entry")) {
+      return `An ${job.entry.level?.split(" ")[0]}`;
+    }
+    return job.entry.level?.split(" ")[0];
+  };
+
   return (
     <Stack
       justifyContent={"center"}
       alignItems={"center"}
-      className={!CustomDeviceIsSmall() ? "rounded shadow py-3 mb-3" : "py-3"}
-      gap={1}
+      classes={"job-card"}
+      className="rounded"
+      maxWidth={300}
+      mb={2}
+      height={
+        !(CustomDeviceIsSmall() || CustomDeviceTablet()) ? "70%" : undefined
+      }
+      p={2}
+      width={300}
+      sx={{
+        border: !CustomDeviceIsSmall() && "1px solid",
+        borderColor: !CustomDeviceIsSmall() && "divider",
+        "&:hover": {
+          boxShadow: `4px 0px 50px -10px inset ${
+            !isDarkMode ? "#3333" : "lightgreen"
+          }`,
+        },
+      }}
     >
       <Avatar
         alt=""
         className="border"
-        sx={{ width: 40, height: 40 }}
+        sx={{ width: 42, height: 42 }}
         src={getImageMatch(job.logo)}
       />
 
       {/* job title */}
-      <Stack textAlign={"center"} gap={1}>
+      <Stack textAlign={"center"} gap={1} mt={1}>
         <Box display={"flex"} justifyContent={"center"}>
           <Typography variant="body1" color={"primary"} fontWeight={"bold"}>
             {job.title}
@@ -81,45 +115,53 @@ function JobLayout({ isDarkMode, job }) {
           </Typography>
         </Box>
 
-        {/* brief info */}
-        <Box display={"flex"} gap={1} alignItems={"center"}>
-          <LocationCityRounded sx={{ width: 22, height: 22 }} />
-          <Typography variant="body2">
-            {handleCountryName()} | {job.location.state}{" "}
-          </Typography>
-        </Box>
-        <Box display={"flex"} gap={1} alignItems={"center"}>
-          <PaidRounded sx={{ width: 20, height: 20 }} />
-          <Typography variant="body2" textTransform={"uppercase"}>
-            {job.salary}
-          </Typography>
-        </Box>
+        <React.Fragment>
+          <Box display={"flex"} gap={1} alignItems={"center"}>
+            <LocationCityRounded sx={{ width: 22, height: 22 }} />
+            <Typography variant="body2">
+              {handleCountryName()} | {job.location.state}{" "}
+            </Typography>
+          </Box>
+          <Box display={"flex"} gap={1} alignItems={"center"}>
+            <AccessTimeFilledRounded sx={{ width: 20, height: 20 }} />
+            <Typography variant="body2">
+              Access {job.jobtypeaccess.access} | {job.jobtypeaccess.type}
+            </Typography>
+          </Box>
+          <Box display={"flex"} gap={1} alignItems={"center"}>
+            <PaidRounded sx={{ width: 20, height: 20 }} />
+            <Typography variant="body2" textTransform={"uppercase"}>
+              {job.salary}
+            </Typography>
+          </Box>
 
-        <Box display={"flex"} gap={1} alignItems={"center"}>
-          <BalanceRounded sx={{ width: 22, height: 22 }} />
-          <Typography variant="body2" textTransform={"capitalize"}>
-            {job.entry.level?.split(" ")[0]} Position Level
-          </Typography>
-        </Box>
-        <Box display={"flex"} gap={1} alignItems={"center"}>
-          <WorkHistoryRounded sx={{ width: 20, height: 20 }} />
-          <Typography variant="body2" textTransform={"capitalize"}>
-            {job.entry.years}
-          </Typography>
-        </Box>
+          <Box display={"flex"} gap={1} alignItems={"center"}>
+            <WorkHistoryRounded sx={{ width: 20, height: 20 }} />
+            <Typography variant="body2" textTransform={"capitalize"}>
+              {job.entry.years}
+            </Typography>
+          </Box>
 
-        <Box display={"flex"} gap={1} alignItems={"center"}>
-          <PeopleRounded sx={{ width: 20, height: 20 }} />
-          <Typography variant="body2">
-            Current Applications {job.applicants.total}/500
-          </Typography>
-        </Box>
-        <Box display={"flex"} gap={1} alignItems={"center"}>
-          <AccessTimeRounded sx={{ width: 20, height: 20 }} />
-          <Typography variant="body2">
-            Date Uploaded {handleDateDisplay()}
-          </Typography>
-        </Box>
+          <Box display={"flex"} gap={1} alignItems={"center"}>
+            <BalanceRounded sx={{ width: 22, height: 22 }} />
+            <Typography variant="body2" textTransform={"capitalize"}>
+              {handleEntryPosition()} Position Level
+            </Typography>
+          </Box>
+
+          <Box display={"flex"} gap={1} alignItems={"center"}>
+            <PeopleRounded sx={{ width: 20, height: 20 }} />
+            <Typography variant="body2">
+              Current Applications {job.applicants.total}/1000
+            </Typography>
+          </Box>
+          <Box display={"flex"} gap={1} alignItems={"center"}>
+            <CalendarMonthRounded sx={{ width: 20, height: 20 }} />
+            <Typography variant="body2">
+              Date Uploaded {handleDateDisplay()}
+            </Typography>
+          </Box>
+        </React.Fragment>
       </Stack>
 
       {/* skills mandatory */}
@@ -146,17 +188,21 @@ function JobLayout({ isDarkMode, job }) {
           </Box>
         </Box>
 
-        <Box mt={1}>
-          {mandatorySkills.map((val, index) => (
-            <Typography
-              key={index}
-              gutterBottom
-              variant="body2"
-              component={"li"}
-            >
-              {val}
-            </Typography>
-          ))}
+        <Box mt={1} mb={3} display={"flex"} justifyContent={"center"}>
+          <AvatarGroup max={mandatorySkills?.length}>
+            {/* loop through the skills and their images matched using custim fn */}
+            {mandatorySkills?.map((skill, index) => (
+              <Tooltip title={skill} arrow>
+                <Avatar
+                  key={index}
+                  alt={skill}
+                  className="border"
+                  sx={{ width: 34, height: 34 }}
+                  src={getImageMatch(skill)}
+                />
+              </Tooltip>
+            ))}
+          </AvatarGroup>
         </Box>
       </Box>
 
@@ -165,27 +211,25 @@ function JobLayout({ isDarkMode, job }) {
         <Button
           variant={isDarkMode ? "outlined" : "contained"}
           color="primary"
-          className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
           size="small"
           disableElevation
+          endIcon={<VerifiedRounded />}
           onClick={handleShowingApply}
-          endIcon={<BoltRounded />}
-          sx={{ borderRadius: "20px", mb: 3 }}
+          sx={{ borderRadius: "20px", mb: 1, width: "80%" }}
         >
-          View and Apply
+          Apply Now
         </Button>
       ) : (
         <Button
           variant={isDarkMode ? "outlined" : "contained"}
           color="primary"
-          className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
+          className={"w-75"}
           size="small"
           disableElevation
           onClick={handleShowingApply}
-          endIcon={<OpenInBrowserRounded />}
-          sx={{ borderRadius: "20px", mb: 3 }}
+          sx={{ borderRadius: "20px", mb: 1, width: "80%" }}
         >
-          View and Apply
+          Apply Now
         </Button>
       )}
 
@@ -197,8 +241,12 @@ function JobLayout({ isDarkMode, job }) {
         websiteLink={websiteLink}
         openApplyJobModal={openModal}
         setOpenApplyJobModal={setOpenApplyJobModal}
-        jobID={job._id}
-        jobaccesstype={job.jobtypeaccess}
+        jobID={job?._id}
+        salary={job?.salary}
+        skills={job?.skills}
+        jobaccesstype={job?.jobtypeaccess}
+        location={job?.location}
+        isFullView={true}
       />
     </Stack>
   );
