@@ -8,6 +8,10 @@ import { PersistGate } from "redux-persist/integration/react";
 import App from "./App";
 import { persistor, store } from "./redux/AppStore"; // Import the modified store and persistor
 import reportWebVitals from "./reportWebVitals";
+import LiveVideo from "./components/testing/LiveVideo";
+import process from "process";
+
+window.process = process;
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -16,7 +20,8 @@ root.render(
       {/*  PersistGate to handle rehydration */}
       <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
         <Router>
-          <App />
+          {/* <App /> */}
+          <LiveVideo />
         </Router>
       </PersistGate>
     </Provider>
