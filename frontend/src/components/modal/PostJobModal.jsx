@@ -1534,7 +1534,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
           openAlertLogout={openAlertLogout}
           setOpenAlertLogout={setOpenAlertLogout}
           title="Session Expired"
-          body="Please login to complete your request,previous session has expired. We do this to deter unauthorised access on accounts that have not been logged out for a while."
+          body="Please login to complete your request,previous session has expired. We do this to deter unauthorised access to accounts."
         />
       </Box>
     </StyledModalJob>

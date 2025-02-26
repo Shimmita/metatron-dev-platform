@@ -5,11 +5,10 @@ import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 
+import process from "process";
 import App from "./App";
 import { persistor, store } from "./redux/AppStore"; // Import the modified store and persistor
 import reportWebVitals from "./reportWebVitals";
-import LiveVideo from "./components/testing/LiveVideo";
-import process from "process";
 
 window.process = process;
 
@@ -20,8 +19,7 @@ root.render(
       {/*  PersistGate to handle rehydration */}
       <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
         <Router>
-          {/* <App /> */}
-          <LiveVideo />
+          <App />
         </Router>
       </PersistGate>
     </Provider>

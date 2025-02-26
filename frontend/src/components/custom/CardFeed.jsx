@@ -337,7 +337,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                     mt={1}
                     alignItems={"center"}
                   >
-                    <Typography ml={'4px'} variant="body2">
+                    <Typography variant="body2" mr={2}>
                       {getElapsedTime(post?.createdAt)}
                     </Typography>
 

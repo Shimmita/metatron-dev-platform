@@ -39,7 +39,7 @@ import { resetDarkMode } from "../../redux/AppUI";
 import { updateTempUserDetails } from "../../redux/CompleteSigning";
 import { resetClearCurrentAuthMessage } from "../../redux/CurrentAuthMessages";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
-import { auth, providerGoogle } from "../firebase/FirebaseConfig";
+import { auth, providerGoogle } from "../gcp/FirebaseConfig";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import OptionsMoreLogin from "./OptionsMoreLogin";
