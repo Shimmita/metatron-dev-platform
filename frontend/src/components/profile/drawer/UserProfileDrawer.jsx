@@ -1,5 +1,5 @@
 import {
-  Diversity3Rounded,
+  Diversity1Rounded,
   GradeRounded,
   LaptopRounded,
   Message,
@@ -31,6 +31,8 @@ import { updateMessageConnectRequest } from "../../../redux/CurrentSnackBar";
 import SnackbarConnect from "../../snackbar/SnackbarConnect";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import UserNetwork from "../UserNetwork";
+import { updateUserCurrentUserRedux } from "../../../redux/CurrentUser";
 const PostDetailsContainer = lazy(() =>
   import("../../post/PostDetailsContiner")
 );
@@ -221,10 +223,15 @@ export default function UserProfileDrawer({ profileData }) {
         `http://localhost:5000/metatron/api/v1/connections/connection/unfriend/${currentUserId}/${profileData?._id}`
       )
       .then((res) => {
-        // update the message state
         if (res?.data && res.data) {
           // update the redux state of the currently logged in user from backend who is sender user
-          dispatch(updateMessageConnectRequest(res.data.senderUser));
+          dispatch(updateUserCurrentUserRedux(res.data.senderUser));
+
+          // update the message of the snackbar
+          dispatch(updateMessageConnectRequest(res.data.message));
+
+          // set is friend false
+          setIsFriend(false);
         }
       })
       .catch(async (err) => {
@@ -385,13 +392,13 @@ export default function UserProfileDrawer({ profileData }) {
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    sx={{ pt: "1px" }}
+                    sx={{ pt: "2px" }}
                   >
                     {profileData?.network_count}
                   </Typography>
 
                   {/* diversity network icon */}
-                  <Diversity3Rounded sx={{ width: 20, height: 20 }} />
+                  <Diversity1Rounded sx={{ width: 20, height: 20 }} />
                 </Box>
               </Box>
 
@@ -404,9 +411,32 @@ export default function UserProfileDrawer({ profileData }) {
                     alignItems={"center"}
                     m={2}
                   >
+                    {/* message */}
+                    <Button
+                      variant="outlined"
+                      disableElevation
+                      onClick={handleShowMessageInput}
+                      disabled={isShowMessageInput}
+                      startIcon={<Message />}
+                      sx={{ borderRadius: 5, fontWeight: "bold" }}
+                    >
+                      <Typography variant="body2">
+                        <small
+                          style={{
+                            fontSize: "small",
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          Message
+                        </small>
+                      </Typography>
+                    </Button>
+
+                    {/* befriend or unfriend */}
+
                     {isFriend ? (
                       <Button
-                        variant="contained"
+                        variant="outlined"
                         disableElevation
                         startIcon={<PersonRemove />}
                         disabled={isConnecting}
@@ -427,7 +457,7 @@ export default function UserProfileDrawer({ profileData }) {
                       </Button>
                     ) : (
                       <Button
-                        variant="contained"
+                        variant="outlined"
                         disableElevation
                         startIcon={<PersonAdd />}
                         disabled={isConnecting}
@@ -446,26 +476,6 @@ export default function UserProfileDrawer({ profileData }) {
                         </Typography>
                       </Button>
                     )}
-
-                    <Button
-                      variant="contained"
-                      disableElevation
-                      onClick={handleShowMessageInput}
-                      disabled={isShowMessageInput}
-                      startIcon={<Message />}
-                      sx={{ borderRadius: 5, fontWeight: "bold" }}
-                    >
-                      <Typography variant="body2">
-                        <small
-                          style={{
-                            fontSize: "small",
-                            textTransform: "capitalize",
-                          }}
-                        >
-                          Message
-                        </small>
-                      </Typography>
-                    </Button>
                   </Box>
                 </React.Fragment>
               )}
@@ -519,7 +529,7 @@ export default function UserProfileDrawer({ profileData }) {
                 <StyledTab
                   className="pe-5"
                   label={
-                    <Typography className=" fw-bold" variant="body2">
+                    <Typography className=" fw-bold" variant="body1">
                       Post
                     </Typography>
                   }
@@ -529,7 +539,7 @@ export default function UserProfileDrawer({ profileData }) {
                 <StyledTab
                   className="pe-3 ps-3"
                   label={
-                    <Typography className="fw-bold" variant="body2">
+                    <Typography className="fw-bold" variant="body1">
                       Network
                     </Typography>
                   }
@@ -538,7 +548,7 @@ export default function UserProfileDrawer({ profileData }) {
                 {/* info more about the user */}
                 <StyledTab
                   label={
-                    <Typography className="ps-5 fw-bold" variant="body2">
+                    <Typography className="ps-5 fw-bold" variant="body1">
                       About
                     </Typography>
                   }
@@ -609,6 +619,12 @@ export default function UserProfileDrawer({ profileData }) {
                       />
                     )}
                     {/* user network of people */}
+                    {profileSection === 1 && (
+                      <UserNetwork
+                        otherUserID={!isCurrentUser ? profileData?._id : null}
+                      />
+                    )}
+
                     {/* about view */}
                     {profileSection === 2 && (
                       <UserAbout profileData={profileData} />

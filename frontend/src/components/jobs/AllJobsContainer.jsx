@@ -2,6 +2,7 @@ import {
   AddCircleRounded,
   AssignmentTurnedInRounded,
   BarChartRounded,
+  DarkModeRounded,
   FindInPageRounded,
   HighlightOffOutlined,
   HowToRegRounded,
@@ -21,6 +22,7 @@ import {
   CssBaseline,
   Stack,
   Toolbar,
+  Tooltip,
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -39,6 +41,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
+  resetDarkMode,
 } from "../../redux/AppUI";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
 import AlertJobSearch from "../alerts/AlertJobSearch";
@@ -288,6 +291,12 @@ export default function MiniDrawer() {
     setIsDrawerPane((prev) => !prev);
   };
 
+  // UI theme dark light teaking effect
+  const handleShowDarkMode = () => {
+    // update the redux theme boolean state
+    dispatch(resetDarkMode());
+  };
+
   return (
     <React.Fragment>
       <Suspense
@@ -306,52 +315,57 @@ export default function MiniDrawer() {
               sx={{
                 width: "100%",
                 display: "flex",
-                justifyContent: "center",
+                justifyContent: "space-between",
+                alignItems: "center",
                 pt: 2,
               }}
             >
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleShowDrawerPane}
-                edge="start"
-                sx={[
-                  {
-                    marginRight: 5,
-                  },
-                  open && { display: "none" },
-                ]}
-              >
-                <Menu />
-              </IconButton>
+              <Box>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={handleShowDrawerPane}
+                  edge="start"
+                  sx={[
+                    {
+                      marginRight: 5,
+                    },
+                    open && { display: "none" },
+                  ]}
+                >
+                  <Menu />
+                </IconButton>
+              </Box>
 
-              <Box
-                width={"100%"}
-                textAlign={"center"}
-                display={"flex"}
-                mr={!isDrawerPane ? 10 : 2}
-                gap={1}
-                justifyContent={"center"}
-              >
-                <Box width={"100%"}>
-                  {/* main jobs title */}
-                  <Typography
-                    noWrap
-                    component="div"
-                    textAlign={"center"}
-                    fontWeight={"bold"}
-                    textTransform={"uppercase"}
-                  >
-                    Metatron Jobs
+              {/* main jobs title and the current selection */}
+              <Box width={"100%"}>
+                <Typography
+                  noWrap
+                  component="div"
+                  textAlign={"center"}
+                  fontWeight={"bold"}
+                  textTransform={"uppercase"}
+                >
+                  Metatron Jobs
+                </Typography>
+
+                {/* current navigation counter */}
+                <Box display={"flex"} justifyContent={"center"}>
+                  <Typography variant="caption" fontWeight={"bold"}>
+                    {textOption}
                   </Typography>
-
-                  {/* current navigation counter */}
-                  <Box display={"flex"} justifyContent={"center"}>
-                    <Typography variant="caption" fontWeight={"bold"}>
-                      {textOption}
-                    </Typography>
-                  </Box>
                 </Box>
+              </Box>
+
+              {/* alter theme */}
+              <Box>
+                <IconButton onClick={handleShowDarkMode}>
+                  <Tooltip arrow title={isDarkMode ? "Try Light" : "Try Dark"}>
+                    <DarkModeRounded
+                      sx={{ color: isDarkMode ? "yellow" : "white" }}
+                    />
+                  </Tooltip>
+                </IconButton>
               </Box>
             </Toolbar>
           </AppBar>

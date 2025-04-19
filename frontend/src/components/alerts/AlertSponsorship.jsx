@@ -1,13 +1,14 @@
-import { BoltRounded, CoffeeRounded } from "@mui/icons-material";
-import { Box, Typography } from "@mui/material";
+import { CoffeeRounded } from "@mui/icons-material";
+import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
-import axios from "axios";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { showSponsorAlert } from "../../redux/AppUI";
 import SponsorshipLayout from "../custom/SponsorshipLayout";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
@@ -17,17 +18,19 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function AlertSponsorship({
   openSponsorAlert,
-  setOpenSponsorAlert,
   isLaunchPage = false,
+  setOpenSponsorAlert,
 }) {
   const [isSponsorTeam, setIsSponsorTeam] = useState(false);
   const [isGitTeam, setIsGitTeam] = useState(false);
-
-  // configuring axios defaults
-  axios.defaults.withCredentials = true;
+  const dispatch = useDispatch();
 
   const handleClose = () => {
-    setOpenSponsorAlert(false);
+    if (isLaunchPage) {
+      dispatch(showSponsorAlert(false));
+    } else {
+      setOpenSponsorAlert(false);
+    }
   };
 
   //handle showing of the sponsors
@@ -55,22 +58,7 @@ export default function AlertSponsorship({
             {"Sponsor Us"}
           </Box>
         </DialogTitle>
-        {/* metatron slogan */}
-        <Box
-          display={"flex"}
-          justifyContent={"center"}
-          alignItems={"center"}
-          gap={1}
-        >
-          <BoltRounded sx={{ width: 15, height: 15 }} />
-          <Typography
-            variant="caption"
-            color={"text.secondary"}
-            fontWeight={"bold"}
-          >
-            Enlightening Technology
-          </Typography>
-        </Box>
+       
         <DialogContent dividers>
           {/* render sponsorship layout */}
           <SponsorshipLayout

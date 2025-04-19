@@ -158,7 +158,6 @@ const FeedDefaultContent = () => {
               display={"flex"}
               justifyContent={"center"}
               alignItems={"center"}
-              className="shadow rounded"
             >
               <Box>
                 <Box display={"flex"} justifyContent={"center"}>

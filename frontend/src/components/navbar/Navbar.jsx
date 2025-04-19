@@ -1,10 +1,10 @@
 import {
   Close,
-  Diversity3Rounded,
+  Diversity1Outlined,
+  EmailOutlined,
   FullscreenExitRounded,
   FullscreenRounded,
   MenuRounded,
-  Notifications,
   SearchRounded,
 } from "@mui/icons-material";
 import {
@@ -38,10 +38,13 @@ import {
   resetClearCurrentGlobalSearch,
   updateCurrentGlobalSearchResults,
 } from "../../redux/CurrentGlobalSearch";
+import AlertSponsorship from "../alerts/AlertSponsorship";
+import AlertSupport from "../alerts/AlertSupport";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import AlertAboutMetatron from "../alerts/AlertAboutMetatron";
 const PeopleModal = lazy(() => import("../modal/PeopleModal"));
 const AlertGlobalSearch = lazy(() => import("../alerts/AlertGlobalSearch"));
 const ProfileDrawer = lazy(() => import("../profile/drawer/ProfileDrawer"));
@@ -112,9 +115,13 @@ const Navbar = ({ setMode, mode }) => {
   };
 
   // redux state UI
-  const { isSidebarRighbar, isDefaultSpeedDial } = useSelector(
-    (state) => state.appUI
-  );
+  const {
+    isSidebarRighbar,
+    isDefaultSpeedDial,
+    isOpenSponsorAlert,
+    isOpenSupportAlert,
+    isOpenAboutMetatron,
+  } = useSelector((state) => state.appUI);
 
   // home page
   const handleHome = () => {
@@ -413,16 +420,16 @@ const Navbar = ({ setMode, mode }) => {
 
             {/* display connection count for largets screens only */}
             {!(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
-              <Tooltip arrow title={"connection"}>
+              <Tooltip arrow title={"connections"}>
                 <Box
                   display={"flex"}
                   justifyContent={"center"}
                   alignItems={"center"}
                   gap={1}
                 >
-                  <IconButton onClick={null}>
-                    <Diversity3Rounded sx={{ color: "white" }} />
-                  </IconButton>
+                  <Box>
+                    <Diversity1Outlined sx={{ color: "white" }} />
+                  </Box>
                   <Box>
                     <Typography
                       variant="caption"
@@ -454,12 +461,13 @@ const Navbar = ({ setMode, mode }) => {
                       sx={{ padding: 0 }}
                       onClick={handleShowMessageDrawer}
                     >
-                      <Notifications
-                        sx={{ width: 27, height: 27, color: "white" }}
+                      <EmailOutlined
+                        sx={{ width: 25, height: 25, color: "white" }}
                       />
                     </IconButton>
                   </Tooltip>
                 </Badge>
+
                 <Tooltip arrow title={"profile"}>
                   <IconButton onClick={handleShowingProfileDrawer}>
                     <Avatar
@@ -473,6 +481,24 @@ const Navbar = ({ setMode, mode }) => {
             )}
           </IconsContainer>
         </MetatronToolBar>
+
+        {/* control showing of the about us alert */}
+        {isOpenAboutMetatron && (
+          <AlertAboutMetatron openAboutMetatron={isOpenAboutMetatron} />
+        )}
+
+        {/* control showing of sponsorship alert */}
+        {isOpenSponsorAlert && (
+          <AlertSponsorship
+            openSponsorAlert={isOpenSponsorAlert}
+            isLaunchPage={true}
+          />
+        )}
+
+        {/* alert technical support */}
+        {isOpenSupportAlert && (
+          <AlertSupport openSupportAlert={isOpenSupportAlert} />
+        )}
 
         {/* show modal connect with people or people search results */}
         <PeopleModal

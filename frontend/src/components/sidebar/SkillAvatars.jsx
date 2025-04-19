@@ -12,7 +12,7 @@ import { getImageMatch } from "../utilities/getImageMatch";
 
 export default function SkillAvatars({ user, isDarkMode }) {
   return (
-    <Box display={"flex"} justifyContent={"center"}>
+    <Box display={"flex"} justifyContent={"center"} pt={1}>
       <Stack gap={1}>
         {/* skills avatars */}
         <Box display={"flex"} justifyContent={"center"}>
@@ -24,7 +24,7 @@ export default function SkillAvatars({ user, isDarkMode }) {
                   key={index}
                   alt={skill}
                   className="border"
-                  sx={{ width: 28, height: 28 }}
+                  sx={{ width: 30, height: 30 }}
                   src={getImageMatch(skill)}
                 />
               </Tooltip>
@@ -36,9 +36,10 @@ export default function SkillAvatars({ user, isDarkMode }) {
         <Typography
           textAlign={"center"}
           fontWeight={"bold"}
+          textTransform={"uppercase"}
           color={isDarkMode ? "whitesmoke" : "inherit"}
         >
-          {user?.name}
+           {user?.name}
         </Typography>
 
         {/* specialisation */}
@@ -65,16 +66,28 @@ export default function SkillAvatars({ user, isDarkMode }) {
           maxWidth={275}
           display={"flex"}
           justifyContent={"center"}
-          px={'2px'}
+          px={"2px"}
         >
-          <Typography
-            textTransform={"capitalize"}
-            variant="body2"
-            width={"100%"}
-            color={"text.secondary"}
-          >
-            {user?.about || `**No About**`}
-          </Typography>
+          {user?.about && user?.about ? (
+            <Typography
+              textTransform={"capitalize"}
+              variant="body2"
+              width={"100%"}
+              color={"text.secondary"}
+            >
+              {user?.about}
+            </Typography>
+          ) : (
+            <Typography
+              textTransform={"capitalize"}
+              variant="body2"
+              width={"100%"}
+              color={"text.secondary"}
+              textAlign={"center"}
+            >
+              ** No About **
+            </Typography>
+          )}
         </Box>
       </Stack>
     </Box>

@@ -18,6 +18,9 @@ const initialState = {
   isSimilarCoursesModal: false,
   isJobSearchGlobal: false,
   isPostDetailed: false,
+  isOpenSupportAlert: false,
+  isOpenSponsorAlert: false,
+  isOpenAboutMetatron: false,
 
   // theme
   isDarkMode: false,
@@ -130,6 +133,21 @@ const appUISliceReducerSlice = createSlice({
       };
     },
 
+    // manage showing of the alert support
+    showSupportAlert: (state, action) => {
+      state.isOpenSupportAlert = action.payload;
+    },
+
+    // manage showing of the sponsor alert
+    showSponsorAlert: (state, action) => {
+      state.isOpenSponsorAlert = action.payload;
+    },
+
+    // manage showing of the about metatron alert
+    showAboutMetatron: (state, action) => {
+      state.isOpenAboutMetatron = action.payload;
+    },
+
     // reset all UI states to default
     resetAll: (state) => {
       return {
@@ -150,6 +168,9 @@ const appUISliceReducerSlice = createSlice({
         isMessageProfile: false,
         isJobSearchGlobal: false,
         isPostDetailed: false,
+        isOpenSponsorAlert: false,
+        isOpenSupportAlert: false,
+        isOpenAboutMetatron: false,
       };
     },
   },
@@ -160,7 +181,6 @@ export const {
   showAccountSettings,
   resetAll,
   resetDarkMode,
-  showAbout,
   handleDefaultBottomNav,
   resetDefaultBottomNav,
   showMobileRighBar,
@@ -176,6 +196,9 @@ export const {
   handleShowingSpeedDial,
   handleIsJobsGlobalResults,
   handleUpdateIsPostDetailed,
+  showSponsorAlert,
+  showSupportAlert,
+  showAboutMetatron
 } = appUISliceReducerSlice.actions;
 
 // export the appUISliceReducer for universal purposes

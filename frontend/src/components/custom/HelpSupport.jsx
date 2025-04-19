@@ -1,149 +1,39 @@
 import { Call, EmailRounded } from "@mui/icons-material";
-import { Avatar, Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Button, Divider, Typography } from "@mui/material";
 import React from "react";
-import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import MachineLogo from "../../images/Ai.png";
-import { handleShowChatBot } from "../../redux/CurrentChatBot";
 import DevAccountConfig from "../config/DevAccountConfig";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 
-const HelpSupport = ({ setOpenAlertSupport }) => {
+const HelpSupport = () => {
   //   handle emailSupport
   const handleEmailSupport = () => {
     return;
-  };
-
-  const dispatch = useDispatch();
-
-  // handle display of  metatron ai goverened by redux
-  const handleMetatronAi = () => {
-    // close the alert before firing the ai interface
-    setOpenAlertSupport(false);
-    dispatch(handleShowChatBot());
   };
 
   return (
     <Box
       width={"100%"}
       p={CustomDeviceIsSmall() ? undefined : 2}
-      maxHeight={"70vh"}
-      sx={{
-        overflow: "auto",
-        // Hide scrollbar for Chrome, Safari and Opera
-        "&::-webkit-scrollbar": {
-          display: "none",
-        },
-        // Hide scrollbar for IE, Edge and Firefox
-        msOverflowStyle: "none",
-        scrollbarWidth: "none",
-      }}
+    
     >
-      {/* form for input fields */}
-      <form
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          width: "100%",
-        }}
-      >
-        <div>
-          <Typography
-            variant="body2"
-            textAlign={"center"}
-            gutterBottom
-            fontWeight={"bold"}
-          >
-            Send Us Message
-          </Typography>
-          <Typography
-            variant="body2"
-            className="ms-2"
-            color={"text.secondary"}
-            gutterBottom
-          >
-            {" "}
-            what's the problem
-          </Typography>
-          <textarea
-            name="message-area"
-            className="form-control rounded"
-            rows={5}
-            required
-            style={{ width: "100%" }}
-            id="message"
-            placeholder="..."
-          />
-        </div>
-
-        {/* send button section */}
-        <div style={{ marginTop: "10px" }}>
-          <button
-            type="submit"
-            className="btn btn-light"
-            style={{ fontSize: "small" }}
-          >
-            message
-          </button>
-        </div>
-      </form>
-
-      {/* divider */}
-      <Box
-        display={"flex"}
-        justifyContent={"center"}
-        width={"100%"}
-        mt={4}
-        mb={2}
-      >
-        <Divider component={"div"} className="w-75" />
-      </Box>
 
       {/* other communication channels */}
       <Box width={"100%"}>
-        <Typography
-          variant="body2"
-          textAlign={"center"}
-          fontWeight={"bold"}
-          gutterBottom
-        >
-          Or
-        </Typography>
-
         {/* row of comm channels */}
         <Box
-          mt={2}
           display={"flex"}
           justifyContent={"space-around"}
           width={"100%"}
           gap={2}
         >
-          {/* ai agent not shown on smaller devices */}
-          {!CustomDeviceIsSmall() && (
-            <Button
-              startIcon={
-                <Avatar
-                  src={MachineLogo}
-                  alt=""
-                  sx={{ width: 25, height: 25 }}
-                />
-              }
-              variant="text"
-              onClick={handleMetatronAi}
-              size="large"
-              sx={{ textTransform: "capitalize", borderRadius: "20px" }}
-            >
-              Metatron Ai
-            </Button>
-          )}
           {/* call */}
           <Link to={`tel:${DevAccountConfig.dev_phone}`}>
             <Button
               startIcon={<Call />}
               variant="text"
               size="large"
-              sx={{ textTransform: "capitalize", borderRadius: "20px" }}
+              sx={{ textTransform: "capitalize", borderRadius: "20px", fontWeight:'bold' }}
             >
               call
             </Button>
@@ -158,7 +48,7 @@ const HelpSupport = ({ setOpenAlertSupport }) => {
               variant="text"
               onClick={handleEmailSupport}
               size="large"
-              sx={{ textTransform: "capitalize", borderRadius: "20px" }}
+              sx={{ textTransform: "capitalize", borderRadius: "20px", fontWeight:'bold'  }}
             >
               email
             </Button>
@@ -184,7 +74,7 @@ const HelpSupport = ({ setOpenAlertSupport }) => {
           textAlign={"center"}
           gutterBottom
         >
-          Info
+          Tips
         </Typography>
 
         <Typography

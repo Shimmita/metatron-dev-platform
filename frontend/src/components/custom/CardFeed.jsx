@@ -14,10 +14,10 @@ import {
   CardContent,
   CardHeader,
   Checkbox,
+  CircularProgress,
   IconButton,
   ListItemAvatar,
   Menu,
-  Skeleton,
   Stack,
   Tooltip,
   Typography,
@@ -46,18 +46,11 @@ const AlertMiniProfileView = lazy(() =>
   import("../alerts/AlertMiniProfileView")
 );
 
-const renderSkeleton = () => (
-  <>
-    <Skeleton animation="wave" height={10} style={{ marginBottom: 6 }} />
-    <Skeleton animation="wave" height={10} width="80%" />
-  </>
-);
-
 const CardFeed = ({ post, setPostDetailedData }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
   const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
-  const [isLoadingRequest, setIsLoadingRequest] = useState(false);
+  const [isProcessingPost, setIsProcessingPost] = useState(false);
   const [isFullDescription, setFullDiscription] = useState(false);
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
   const [messageMore, setMessageMore] = useState("");
@@ -184,7 +177,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     userInfo.message = message;
     userInfo.minimessage = minimessage;
     // add users to the liked clickers group and increment the value of clicks
-    setIsLoadingRequest(true);
+    setIsProcessingPost(true);
     // performing post request
     axios
       .put(
@@ -209,7 +202,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
         console.log(err);
       })
       .finally(() => {
-        setIsLoadingRequest(false);
+        setIsProcessingPost(false);
       });
   };
 
@@ -222,7 +215,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     userInfo.message = message;
     userInfo.minimessage = minimessage;
     // add users to the liked clickers group and increment the value of clicks
-    setIsLoadingRequest(true);
+    setIsProcessingPost(true);
     // performing post request
     axios
       .put(
@@ -235,12 +228,14 @@ const CardFeed = ({ post, setPostDetailedData }) => {
       .then((res) => {
         // update the returned post object to reflect in the global redux
         dispatch(updateCurrentPostDetails(res.data));
+
+        // naviget to github page
       })
       .catch(async (err) => {
         console.log(err);
       })
       .finally(() => {
-        setIsLoadingRequest(false);
+        setIsProcessingPost(false);
       });
   };
 
@@ -303,319 +298,294 @@ const CardFeed = ({ post, setPostDetailedData }) => {
             sx={{ ml: 1, p: 0 }}
             avatar={
               <React.Fragment>
-                {isLoadingRequest ? (
-                  <Skeleton
-                    animation="wave"
-                    variant="rectangular"
-                    width={40}
-                    height={40}
-                  />
-                ) : (
-                  <ListItemAvatar onClick={handleMiniProfileView}>
-                    <Avatar
-                      src={dev}
-                      variant="rounded"
-                      sx={{
-                        backgroundColor: isDarkMode ? "#99CEF9" : "#1976D2",
-                        width: 50,
-                        height: 50,
-                      }}
-                      alt={post?.post_owner?.ownername?.split(" ")[0]}
-                    >
-                      {handleNoProfilePicture()}
-                    </Avatar>
-                  </ListItemAvatar>
-                )}
+                <ListItemAvatar onClick={handleMiniProfileView}>
+                  <Avatar
+                    src={dev}
+                    variant="rounded"
+                    sx={{
+                      backgroundColor: isDarkMode ? "#99CEF9" : "#1976D2",
+                      width: 50,
+                      height: 50,
+                    }}
+                    alt={post?.post_owner?.ownername?.split(" ")[0]}
+                  >
+                    {handleNoProfilePicture()}
+                  </Avatar>
+                </ListItemAvatar>
               </React.Fragment>
             }
             action={
-              !isLoadingRequest && (
-                <Stack>
-                  <Box
-                    flexDirection={"row"}
-                    display={"flex"}
-                    mt={1}
-                    alignItems={"center"}
-                  >
-                    <Typography variant="body2" mr={2}>
-                      {getElapsedTime(post?.createdAt)}
-                    </Typography>
+              <Stack>
+                <Box
+                  flexDirection={"row"}
+                  display={"flex"}
+                  mt={1}
+                  alignItems={"center"}
+                >
+                  <Typography variant="body2" mr={2}>
+                    {getElapsedTime(post?.createdAt)}
+                  </Typography>
 
-                    {!postBelongsCurrentUser && (
-                      <Tooltip title="more" arrow>
-                        <IconButton
-                          size="small"
-                          aria-label="more"
-                          onClick={handleClickMoreVertPost}
-                        >
-                          <MoreVertRounded
-                            color="primary"
-                            sx={{ width: 20, height: 20 }}
-                          />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={openMenu}
-                      onClose={handleCloseMenu}
-                      MenuListProps={{ "aria-labelledby": "more-button" }}
-                      anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                      transformOrigin={{ vertical: "top", horizontal: "right" }}
-                    >
-                      <CardFeedMore
-                        ownerId={post?.post_owner?.ownerId}
-                        currentUserNetwork={user?.network}
-                        ownerName={post?.post_owner?.ownername}
-                        setMessageMore={setMessageMore}
-                        handleCloseMenu={handleCloseMenu}
-                        setOpenAlertReport={setOpenAlertReport}
-                        post={post}
-                        setPostWhole={setPostWholeReport}
-                      />
-                    </Menu>
-                  </Box>
-
-                  {/* if post edited */}
-                  {post?.post_edited && (
-                    <Box display={"flex"} justifyContent={"flex-end"} pr={2}>
-                      <Typography color={"text.secondary"} variant="caption">
-                        Edited
-                      </Typography>
-                    </Box>
+                  {!postBelongsCurrentUser && (
+                    <Tooltip title="more" arrow>
+                      <IconButton
+                        size="small"
+                        aria-label="more"
+                        onClick={handleClickMoreVertPost}
+                      >
+                        <MoreVertRounded
+                          color="primary"
+                          sx={{ width: 20, height: 20 }}
+                        />
+                      </IconButton>
+                    </Tooltip>
                   )}
-                </Stack>
-              )
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={openMenu}
+                    onClose={handleCloseMenu}
+                    MenuListProps={{ "aria-labelledby": "more-button" }}
+                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                    transformOrigin={{ vertical: "top", horizontal: "right" }}
+                  >
+                    <CardFeedMore
+                      ownerId={post?.post_owner?.ownerId}
+                      currentUserNetwork={user?.network}
+                      ownerName={post?.post_owner?.ownername}
+                      setMessageMore={setMessageMore}
+                      handleCloseMenu={handleCloseMenu}
+                      setOpenAlertReport={setOpenAlertReport}
+                      post={post}
+                      setPostWhole={setPostWholeReport}
+                    />
+                  </Menu>
+                </Box>
+
+                {/* if post edited */}
+                {post?.post_edited && (
+                  <Box display={"flex"} justifyContent={"flex-end"} pr={2}>
+                    <Typography color={"text.secondary"} variant="caption">
+                      Edited
+                    </Typography>
+                  </Box>
+                )}
+              </Stack>
             }
             title={
-              isLoadingRequest ? (
-                <Skeleton
-                  animation="wave"
-                  height={10}
-                  width="80%"
-                  style={{ marginBottom: 6 }}
+              <Box display="flex" alignItems="center" mt={1} gap={1}>
+                <Typography
+                  fontWeight="bold"
+                  variant={CustomDeviceIsSmall() ? "body2" : "body1"}
+                >
+                  {CustomDeviceSmallest()
+                    ? handleName()
+                    : `${post?.post_owner.ownername}`}
+                </Typography>
+                <VerifiedRounded
+                  color="primary"
+                  sx={{ width: 18, height: 18 }}
                 />
-              ) : (
-                <Box display="flex" alignItems="center" mt={1} gap={1}>
-                  <Typography
-                    fontWeight="bold"
-                    variant={CustomDeviceIsSmall() ? "body2" : "body1"}
-                  >
-                    {CustomDeviceSmallest()
-                      ? handleName()
-                      : `${post?.post_owner.ownername}`}
-                  </Typography>
-                  <VerifiedRounded
-                    color="primary"
-                    sx={{ width: 18, height: 18 }}
-                  />
-                </Box>
-              )
+              </Box>
             }
             subheader={
-              isLoadingRequest ? (
-                <Skeleton animation="wave" height={10} width="40%" />
-              ) : (
-                <Box>
-                  {/*occupation title */}
-                  <Typography variant="body2">
-                    {CustomDeviceSmallest()
-                      ? handleOccupation()
-                      : `${post?.post_owner.ownertitle}`}
-                  </Typography>
-                  {/* skills */}
-                  <Typography
-                    variant="body2"
-                    display={"flex"}
-                    alignItems={"center"}
-                  >
-                    {post?.post_owner.ownerskills[0]} |{" "}
-                    {post?.post_owner.ownerskills[1]} |{" "}
-                    {post?.post_owner.ownerskills[2]}
-                  </Typography>
-                  {/* location */}
-                  <Typography
-                    variant="body2"
-                    display={"flex"}
-                    alignItems={"center"}
-                  >
-                    {CustomCountryName(post?.post_location.country)} |{" "}
-                    {post?.post_location.state}{" "}
-                  </Typography>
-                </Box>
-              )
+              <Box>
+                {/*occupation title */}
+                <Typography variant="body2">
+                  {CustomDeviceSmallest()
+                    ? handleOccupation()
+                    : `${post?.post_owner.ownertitle}`}
+                </Typography>
+                {/* skills */}
+                <Typography
+                  variant="body2"
+                  display={"flex"}
+                  alignItems={"center"}
+                >
+                  {post?.post_owner.ownerskills[0]} |{" "}
+                  {post?.post_owner.ownerskills[1]} |{" "}
+                  {post?.post_owner.ownerskills[2]}
+                </Typography>
+                {/* location */}
+                <Typography
+                  variant="body2"
+                  display={"flex"}
+                  alignItems={"center"}
+                >
+                  {CustomCountryName(post?.post_location.country)} |{" "}
+                  {post?.post_location.state}{" "}
+                </Typography>
+              </Box>
             }
           />
 
-          {isLoadingRequest ? (
-            <Box mt={1}>
-              <Skeleton
-                sx={{ height: 350, borderRadius: "10px" }}
-                animation="wave"
-                variant="rectangular"
-              />
-            </Box>
-          ) : (
-            <Box>
-              <CardContent>
-                <Box mb={2} width={"100%"}>
-                  <Box mb={1}>
-                    {/* post specialisation */}
-                    <Typography
-                      variant="body2"
-                      textAlign={"center"}
-                      fontWeight={"bold"}
-                    >
-                      {post?.post_category.main}
-                    </Typography>
-                  </Box>
-
-                  <Box
-                    display={"flex"}
-                    justifyContent={"center"}
-                    alignItems={"center"}
-                    gap={2}
-                  >
-                    {/* title of the post */}
-                    <Typography variant="body2" fontWeight={"bold"}>
-                      {post?.post_title}
-                    </Typography>
-                  </Box>
-                </Box>
-                <CardActionArea
-                  onClick={handleFullDiscription}
-                  disabled={!detailsLong}
-                >
-                  <Box
-                    display={"flex"}
-                    justifyContent={"center"}
-                    width={"100%"}
-                  >
-                    <Typography
-                      variant={"body2"}
-                      maxWidth={
-                        CustomLandscapeWidest()
-                          ? "90%"
-                          : CustomDeviceTablet()
-                          ? "95%"
-                          : CustomLandScape()
-                          ? "93%"
-                          : "98%"
-                      }
-                    >
-                      {!isFullDescription && handleDetailsLength()}
-                      {detailsLong && !isFullDescription && (
-                        <Typography
-                          variant="body2"
-                          component={"span"}
-                          fontWeight={"bold"}
-                          color={"primary"}
-                        >
-                          ...{" "}
-                          <ExpandMoreRounded sx={{ width: 20, height: 20 }} />
-                        </Typography>
-                      )}
-                      {isFullDescription && details}
-                    </Typography>
-                  </Box>
-                </CardActionArea>
-              </CardContent>
-              <Box display={"flex"} justifyContent={"center"} width={"100%"}>
-                <Box
-                  sx={{
-                    width: "92%",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  {/* smart 300,350 */}
-                  <LazyLoadImage
-                    src={handlePostImagePresent()}
-                    alt=""
-                    height={CustomDeviceScreenSize()}
-                    width={
-                      CustomDeviceIsSmall()
-                        ? "100%"
-                        : CustomDeviceTablet()
-                        ? "95%"
-                        : "92%"
-                    }
-                    style={{
-                      objectFit: "fill",
-                      borderRadius: 10,
-                      border: "1px solid",
-                      borderColor: "grey",
-                    }}
-                  />
-                </Box>
-              </Box>
-            </Box>
-          )}
-
-          {isLoadingRequest ? (
-            renderSkeleton()
-          ) : (
-            <Box
-              display="flex"
-              p={1}
-              justifyContent="space-around"
-              alignItems="center"
-            >
-              {[
-                {
-                  icon: (
-                    <FavoriteRounded
-                      sx={{ width: 23, height: 23 }}
-                      color={currentUserLiked ? "primary" : undefined}
-                    />
-                  ),
-                  count: post_likes,
-                  title: "like",
-                  onClick: handlePostLikes,
-                },
-                {
-                  icon: (
-                    <GitHub
-                      sx={{ width: 21, height: 21 }}
-                      color={currentUserClickedGithub ? "primary" : undefined}
-                    />
-                  ),
-                  count: post_github_clicks,
-                  title: "Github",
-                  onClick: handleGithubClicks,
-                },
-                {
-                  icon: (
-                    <ForumRounded
-                      sx={{ width: 21, height: 21 }}
-                      color={currentUserCommentented ? "primary" : undefined}
-                    />
-                  ),
-                  count: post_comment_count,
-                  title: "comment",
-                  onClick: handleShowFullPostComments,
-                },
-              ].map(({ icon, count, title, onClick }) => (
-                <Box display="flex" alignItems="center" key={title}>
-                  <Tooltip title={title} arrow>
-                    <Checkbox
-                      onChange={onClick}
-                      icon={icon}
-                      checkedIcon={icon}
-                      disabled={isLoadingRequest}
-                    />
-                  </Tooltip>
+          <Box>
+            <CardContent>
+              <Box mb={2} width={"100%"}>
+                <Box mb={1}>
+                  {/* post specialisation */}
                   <Typography
-                    fontWeight="bold"
                     variant="body2"
-                    color="text.secondary"
+                    textAlign={"center"}
+                    fontWeight={"bold"}
                   >
-                    {count}
+                    {post?.post_category.main}
                   </Typography>
                 </Box>
-              ))}
+
+                <Box
+                  display={"flex"}
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  gap={2}
+                >
+                  {/* title of the post */}
+                  <Typography variant="body2" fontWeight={"bold"}>
+                    {post?.post_title}
+                  </Typography>
+                </Box>
+              </Box>
+              <CardActionArea
+                onClick={handleFullDiscription}
+                disabled={!detailsLong}
+              >
+                <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+                  <Typography
+                    variant={"body2"}
+                    maxWidth={
+                      CustomLandscapeWidest()
+                        ? "90%"
+                        : CustomDeviceTablet()
+                        ? "95%"
+                        : CustomLandScape()
+                        ? "93%"
+                        : "98%"
+                    }
+                  >
+                    {!isFullDescription && handleDetailsLength()}
+                    {detailsLong && !isFullDescription && (
+                      <Typography
+                        variant="body2"
+                        component={"span"}
+                        fontWeight={"bold"}
+                        color={"primary"}
+                      >
+                        ... <ExpandMoreRounded sx={{ width: 20, height: 20 }} />
+                      </Typography>
+                    )}
+                    {isFullDescription && details}
+                  </Typography>
+                </Box>
+              </CardActionArea>
+            </CardContent>
+            <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+              <Box
+                sx={{
+                  width: "92%",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                {/* smart 300,350 */}
+                <LazyLoadImage
+                  src={handlePostImagePresent()}
+                  alt=""
+                  height={CustomDeviceScreenSize()}
+                  width={
+                    CustomDeviceIsSmall()
+                      ? "100%"
+                      : CustomDeviceTablet()
+                      ? "95%"
+                      : "92%"
+                  }
+                  style={{
+                    objectFit: "fill",
+                    borderRadius: 10,
+                    border: "1px solid",
+                    borderColor: "grey",
+                  }}
+                />
+              </Box>
             </Box>
-          )}
+          </Box>
+
+          <Box
+            display="flex"
+            p={1}
+            justifyContent="space-around"
+            alignItems="center"
+          >
+            {[
+              {
+                icon: (
+                  <React.Fragment>
+                    {isProcessingPost ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <FavoriteRounded
+                        sx={{ width: 23, height: 23 }}
+                        color={currentUserLiked ? "primary" : undefined}
+                      />
+                    )}
+                  </React.Fragment>
+                ),
+                count: post_likes,
+                title: "like",
+                onClick: handlePostLikes,
+              },
+              {
+                icon: (
+                  <React.Fragment>
+                    {isProcessingPost ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <GitHub
+                        sx={{ width: 21, height: 21 }}
+                        color={currentUserClickedGithub ? "primary" : undefined}
+                      />
+                    )}
+                  </React.Fragment>
+                ),
+                count: post_github_clicks,
+                title: "Github",
+                onClick: handleGithubClicks,
+              },
+              {
+                icon: (
+                  <React.Fragment>
+                    {isProcessingPost ? (
+                      <CircularProgress size={20} />
+                    ) : (
+                      <ForumRounded
+                        sx={{ width: 21, height: 21 }}
+                        color={currentUserCommentented ? "primary" : undefined}
+                      />
+                    )}
+                  </React.Fragment>
+                ),
+                count: post_comment_count,
+                title: "comment",
+                onClick: handleShowFullPostComments,
+              },
+            ].map(({ icon, count, title, onClick }) => (
+              <Box display="flex" alignItems="center" key={title}>
+                <Tooltip title={title} arrow>
+                  <Checkbox
+                    onChange={onClick}
+                    icon={icon}
+                    checkedIcon={icon}
+                    disabled={isProcessingPost}
+                  />
+                </Tooltip>
+                <Typography
+                  fontWeight="bold"
+                  variant="body2"
+                  color="text.secondary"
+                >
+                  {count}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
         </Card>
       </Box>
 

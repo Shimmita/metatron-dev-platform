@@ -5,9 +5,9 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
-import axios from "axios";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { showSupportAlert } from "../../redux/AppUI";
 import HelpSupport from "../custom/HelpSupport";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
@@ -17,16 +17,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AlertSupport({
-  openSupportAlert,
-  setOpenAlertSupport,
-}) {
+export default function AlertSupport({ openSupportAlert }) {
+  const dispatch = useDispatch();
   const handleClose = () => {
-    setOpenAlertSupport(false);
+    dispatch(showSupportAlert(false));
   };
-
-  // configuring axios defaults
-  axios.defaults.withCredentials = true;
 
   //   redux states
   const { isTabSideBar } = useSelector((state) => state.appUI);
@@ -55,6 +50,7 @@ export default function AlertSupport({
           display={"flex"}
           alignItems={"center"}
           variant="body1"
+          fontWeight={"bold"}
           gap={2}
         >
           <SupportAgentRounded />
@@ -62,7 +58,7 @@ export default function AlertSupport({
         </DialogTitle>
         <DialogContent dividers>
           {/* render the support layout */}
-          <HelpSupport setOpenAlertSupport={setOpenAlertSupport}/>
+          <HelpSupport  />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>close</Button>

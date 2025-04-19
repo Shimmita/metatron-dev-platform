@@ -1,21 +1,16 @@
 import {
-  BusinessRounded,
+  ChatBubbleRounded,
   CoffeeRounded,
-  Home,
-  LightModeOutlined,
-  LightModeRounded,
-  LogoutRounded,
-  PsychologyRounded,
+  DarkModeRounded,
+  HelpCenterRounded,
   Smartphone,
-  SupportAgentRounded,
+  TipsAndUpdatesRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
   Badge,
   Box,
-  Divider,
   List,
-  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
@@ -25,23 +20,22 @@ import {
   Typography,
 } from "@mui/material";
 
-import { resetDarkMode } from "../../redux/AppUI";
+import {
+  resetDarkMode,
+  showAboutMetatron,
+  showSponsorAlert,
+  showSupportAlert,
+} from "../../redux/AppUI";
 
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import devImage from "../../images/dev.jpeg";
 import logoCompany from "../../images/logo_sm.png";
-import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import { handleShowChatBot } from "../../redux/CurrentChatBot";
-import EventsTablet from "../events/EventsIsTablet";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-const AlertSponsorship = lazy(() => import("../alerts/AlertSponsorship"));
-const AlertSupport = lazy(() => import("../alerts/AlertSupport"));
 const SkillAvatars = lazy(() => import("./SkillAvatars"));
-const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -74,7 +68,6 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 const Sidebar = () => {
   const [openMobileApp, setOpenMobileApp] = useState(false);
-  const [openSupportAlert, setOpenAlertSupport] = useState(false);
 
   // redux sates
   const {
@@ -86,11 +79,6 @@ const Sidebar = () => {
 
   const { user } = useSelector((state) => state.currentUser);
 
-  // alert logout controls
-  const [openAlertLogout, setOpenAlertLogout] = useState(false);
-  const [openSponsorAlert, setOpenSponsorAlert] = useState(false);
-
-  const navigate = useNavigate();
   // screen width
   const screenWidth = window.screen.availWidth;
 
@@ -103,13 +91,6 @@ const Sidebar = () => {
     alignItems: "center",
     gap: "1rem",
   });
-
-  // return home
-  const handleReturnHome = () => {
-    // update the bottom nav counter
-    dispatch(updateCurrentBottomNav(0));
-    navigate("/");
-  };
 
   // UI theme dark light teaking effect
   const handleShowDarkMode = () => {
@@ -137,21 +118,16 @@ const Sidebar = () => {
     return;
   };
 
-  // handle logout
-  const handleLogout = () => {
-    setOpenAlertLogout(true);
-  };
-
   // handle showing of technical support
   const handleTechnicalSupport = () => {
-    setOpenAlertSupport(true);
+    dispatch(showSupportAlert(true));
   };
 
   let businessAccount = false;
 
   // handle showing of the sponsorship program
   const handleShowingSponsorship = () => {
-    setOpenSponsorAlert(true);
+    dispatch(showSponsorAlert(true));
   };
 
   // handle the display of the metatron ai assistant
@@ -160,6 +136,10 @@ const Sidebar = () => {
     dispatch(handleShowChatBot());
   };
 
+  // handle showing about metatron platform
+  const handleShowAboutMetatron = () => {
+    dispatch(showAboutMetatron(true));
+  };
   return (
     <Box
       height={"90vh"}
@@ -207,11 +187,11 @@ const Sidebar = () => {
         }}
       >
         <Box width={CustomLandscapeWidest() ? 300 : undefined}>
-          <Box bgcolor={"background.default"} className=" rounded mt-0">
+          <Box bgcolor={"background.default"} className=" rounded">
             {isLoadingRequest ? (
               <Box width={"100%"}>
                 <Box mb={1} display={"flex"} justifyContent={"center"}>
-                  <Skeleton variant="circular" width={70} height={70} />
+                  <Skeleton variant="circular" width={80} height={80} />
                 </Box>
                 <Skeleton variant="rectangular" height={"20vh"} />
               </Box>
@@ -241,7 +221,7 @@ const Sidebar = () => {
                                 ? devImage || logoCompany
                                 : logoCompany || logoCompany
                             }
-                            sx={{ width: 70, height: 70 }}
+                            sx={{ width: 100, height: 100, mt: 1.5 }}
                           />
                         </StyledBadge>
                       </Box>
@@ -290,31 +270,32 @@ const Sidebar = () => {
               </React.Fragment>
             )}
           </Box>
-          {/* divider */}
-          <Divider component={"div"} className="mb-2" />
-
-          <Box bgcolor={"background.default"} className="p-1">
-            <Box
-              display={"flex"}
-              alignItems={"center"}
-              justifyContent={"center"}
-              pt={1}
-            >
-              <Typography fontWeight={"bold"} color={"primary"}>
-                NAVIGATION MENU
-              </Typography>
-            </Box>
-
+          <Box bgcolor={"background.default"} p={1}>
             {isLoadingRequest ? (
               <Skeleton variant="rectangular" width={"100%"} height={"35vh"} />
             ) : (
               <List>
-                <ListItemButton onClick={handleReturnHome}>
+                {/* metatron ai chat */}
+                <ListItemButton onClick={handleShowAiBot}>
                   <ListItemIcon>
-                    <Home color="primary" />
+                    <ChatBubbleRounded sx={{ width: 27, height: 27 }} />
                   </ListItemIcon>
                   <ListItemText
-                    primary={<Typography variant="body2"> Homepage</Typography>}
+                    primary={
+                      <Typography variant="body1">Metatron Agent</Typography>
+                    }
+                  />
+                </ListItemButton>
+
+                {/* customer help */}
+                <ListItemButton onClick={handleTechnicalSupport}>
+                  <ListItemIcon>
+                    <HelpCenterRounded sx={{ width: 28, height: 28 }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body1">Technical Team</Typography>
+                    }
                   />
                 </ListItemButton>
 
@@ -323,35 +304,63 @@ const Sidebar = () => {
                   onClick={(e) => setOpenMobileApp(!openMobileApp)}
                 >
                   <ListItemIcon>
-                    <Smartphone color="primary" />
+                    <Smartphone sx={{ width: 30, height: 30 }} />
                   </ListItemIcon>
                   <ListItemText
-                    primary={<Typography variant="body2">Download</Typography>}
+                    primary={
+                      <Typography variant="body1">Download App</Typography>
+                    }
                   />
                 </ListItemButton>
 
-                {/* metatron ai chat */}
-                <ListItemButton onClick={handleShowAiBot}>
+                {/* sponsor us */}
+                <ListItemButton onClick={handleShowingSponsorship}>
                   <ListItemIcon>
-                    <PsychologyRounded
-                      sx={{ width: 26, height: 26 }}
-                      color="primary"
+                    <CoffeeRounded sx={{ width: 30, height: 30 }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body1">Sponsor Team</Typography>
+                    }
+                  />
+                </ListItemButton>
+
+                {/* about metatron */}
+                <ListItemButton onClick={handleShowAboutMetatron}>
+                  <ListItemIcon>
+                    <TipsAndUpdatesRounded sx={{ width: 28, height: 28 }} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body1">About Metatron</Typography>
+                    }
+                  />
+                </ListItemButton>
+
+                {/* change theme */}
+                <ListItemButton onClick={handleShowDarkMode}>
+                  <ListItemIcon>
+                    <DarkModeRounded
+                      sx={{ width: 28, height: 28 }}
+                      color={isDarkMode ? "warning" : undefined}
                     />
                   </ListItemIcon>
                   <ListItemText
-                    primary={<Typography variant="body2">Dynamo AI</Typography>}
+                    primary={
+                      <Typography variant="body1">
+                        {isDarkMode ? "Try Light Mode" : "Try Dark Mode"}
+                      </Typography>
+                    }
                   />
                 </ListItemButton>
               </List>
             )}
           </Box>
 
+          {/* events to be implemented later */}
           {/* box for Events displayed for tablets only */}
-          {CustomDeviceTablet() && (
+          {/* {CustomDeviceTablet() && (
             <React.Fragment>
-              {/* divider be shown on tablets */}
-              <Divider component={"div"} className="mb-2" />
-
               <Box bgcolor={"background.default"} className="p-1">
                 <Box
                   display={"flex"}
@@ -374,142 +383,9 @@ const Sidebar = () => {
                 )}
               </Box>
             </React.Fragment>
-          )}
-
-          <Divider component={"div"} className="mt-1" />
-
-          {/* slogan */}
-          {isLoadingRequest ? (
-            <Box bgcolor={"background.default"} className="mt-3  p-2 rounded">
-              <Skeleton variant="rectangular" width={"100%"} height={"10vh"} />
-            </Box>
-          ) : (
-            <Box bgcolor={"background.default"}>
-              <List>
-                <ListItem>
-                  {!businessAccount ? (
-                    <>
-                      {/* personal a/c */}
-                      <ListItemIcon>
-                        <Avatar
-                          src={logoCompany}
-                          sx={{ width: 32, height: 32 }}
-                          alt="logo"
-                        />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Typography
-                            width={175}
-                            fontWeight={"bold"}
-                            variant="body1"
-                            color={"primary"}
-                            sx={{ textTransform: "uppercase" }}
-                          >
-                            {" "}
-                            Best IT Platform
-                          </Typography>
-                        }
-                      />
-                    </>
-                  ) : (
-                    <>
-                      {/* business a/c */}
-                      <ListItemIcon>
-                        <BusinessRounded color="success" />
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={
-                          <Typography variant="body2">
-                            {" "}
-                            Business Account
-                          </Typography>
-                        }
-                      />
-                    </>
-                  )}
-                </ListItem>
-
-                {/* customer help */}
-                <ListItemButton onClick={handleTechnicalSupport}>
-                  <ListItemIcon>
-                    <SupportAgentRounded color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">Technical Team</Typography>
-                    }
-                  />
-                </ListItemButton>
-
-                {/* Logout */}
-                <ListItemButton onClick={handleLogout}>
-                  <ListItemIcon>
-                    <LogoutRounded color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">
-                        <Typography variant="body2">Account Logout</Typography>
-                      </Typography>
-                    }
-                  />
-                </ListItemButton>
-
-                {/* sponsor us */}
-                <ListItemButton onClick={handleShowingSponsorship}>
-                  <ListItemIcon>
-                    <CoffeeRounded color="primary" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">Sponsor Platform</Typography>
-                    }
-                  />
-                </ListItemButton>
-
-                {/* change theme */}
-                <ListItemButton onClick={handleShowDarkMode}>
-                  <ListItemIcon>
-                    {isDarkMode ? (
-                      <LightModeRounded color="warning" />
-                    ) : (
-                      <LightModeOutlined color="primary" />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">
-                        <Typography variant="body2">Change Theme</Typography>
-                      </Typography>
-                    }
-                  />
-                  <Switch disableRipple size="small" checked={isDarkMode} />
-                </ListItemButton>
-              </List>
-            </Box>
-          )}
+          )} */}
         </Box>
       </Box>
-
-      {/* control showing of sponsorship alert */}
-      <AlertSponsorship
-        openSponsorAlert={openSponsorAlert}
-        setOpenSponsorAlert={setOpenSponsorAlert}
-        isLaunchPage={true}
-      />
-
-      {/* alert technical support */}
-      <AlertSupport
-        openSupportAlert={openSupportAlert}
-        setOpenAlertSupport={setOpenAlertSupport}
-      />
-
-      {/* logout alert */}
-      <LogoutAlert
-        openAlertLogout={openAlertLogout}
-        setOpenAlertLogout={setOpenAlertLogout}
-      />
     </Box>
   );
 };

@@ -15,23 +15,24 @@ const MobileTabCorousel = () => {
       {/* connect suggestion  */}
       <Box bgcolor={"background.default"} className="shadow rounded ">
         <Box>
-          {/* jobs */}
+          {/*  top jobs */}
           <Box display={corouselCounter === 0 ? "block" : "none"}>
             <JobsContainer />
           </Box>
-          {/* featured courses */}
+
+          {/* connect request */}
           <Box display={corouselCounter === 1 ? "block" : "none"}>
             <RequestContainer />
           </Box>
-          
-          {/* popular courses */}
+
+          {/* featured posts */}
           <Box display={corouselCounter === 2 ? "block" : "none"}>
-            <CoursesContainer />
+            <FeaturedPostContainer />
           </Box>
 
-          {/* connect request */}
+          {/* popular courses */}
           <Box display={corouselCounter === 3 ? "block" : "none"}>
-            <FeaturedPostContainer />
+            <CoursesContainer />
           </Box>
         </Box>
         {/* stepper controller */}

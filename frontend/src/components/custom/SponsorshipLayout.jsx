@@ -2,8 +2,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Close,
-  FavoriteRounded,
-  PaidRounded,
   VisibilityRounded,
 } from "@mui/icons-material";
 import {
@@ -295,13 +293,7 @@ const SponsorshipLayout = ({ isSponsorTeam, setIsSponsorTeam }) => {
               {/* funding */}
               <Stack gap={1}>
                 <Box display={"flex"} justifyContent={"center"}>
-                  <Box
-                    display={"flex"}
-                    justifyContent={"center"}
-                    gap={2}
-                    alignItems={"center"}
-                  >
-                    <PaidRounded sx={{ width: 20, height: 20 }} />{" "}
+                  <Box display={"flex"} justifyContent={"center"}>
                     <Typography variant="body2" fontWeight={"bold"}>
                       Donation Program
                     </Typography>
@@ -319,13 +311,7 @@ const SponsorshipLayout = ({ isSponsorTeam, setIsSponsorTeam }) => {
                       size="small"
                       onClick={handleShowDonate}
                       disableElevation
-                      variant="contained"
-                      startIcon={
-                        <FavoriteRounded sx={{ width: 10, height: 10 }} />
-                      }
-                      endIcon={
-                        <FavoriteRounded sx={{ width: 10, height: 10 }} />
-                      }
+                      variant="outlined"
                       className={
                         CustomDeviceSmallest() ? "rounded-5" : "rounded-5 ms-2"
                       }

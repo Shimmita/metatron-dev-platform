@@ -302,7 +302,7 @@ const LoginAuth = () => {
                 gutterBottom
                 color={"primary"}
               >
-                Metatron Foundation
+                Metatron Developer
               </Typography>
 
               <Typography
@@ -548,6 +548,7 @@ const LoginAuth = () => {
         <AlertSponsorship
           openSponsorAlert={openSponsorAlert}
           setOpenSponsorAlert={setOpenSponsorAlert}
+          
         />
       </Box>
       {/* show the account help info modal when toggled */}

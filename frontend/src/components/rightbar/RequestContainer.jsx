@@ -33,7 +33,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
     // set is fetching to true
     setIsFetching(true);
 
-    // performing post request
+    // performing get request
     axios
       .get(
         `http://localhost:5000/metatron/api/v1/connections/connection/users/${_id}`,
@@ -105,7 +105,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
       >
         <Box>
           {connectTop &&
-            connectTop.slice(0, 3).map((connection, index) => (
+            connectTop.slice(0, 4).map((connection, index) => (
               <Box key={index}>
                 <FriendRequest
                   isLoadingRequest={isFetching}

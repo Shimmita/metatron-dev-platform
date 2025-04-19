@@ -1,4 +1,5 @@
 import {
+  Diversity1Rounded,
   Diversity3Rounded,
   GradeRounded,
   LaptopRounded,
@@ -34,6 +35,8 @@ import SnackbarConnect from "../snackbar/SnackbarConnect";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../utilities/getImageMatch";
+import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
+const UserNetwork = lazy(() => import("./UserNetwork"));
 const UserPostContainer = lazy(() => import("./UserPostContainer"));
 const UserAbout = lazy(() => import("./UserAbout"));
 const StyledTabs = styled((props) => (
@@ -243,10 +246,15 @@ export default function UserProfile() {
         `http://localhost:5000/metatron/api/v1/connections/connection/unfriend/${currentUserId}/${profileData?._id}`
       )
       .then((res) => {
-        // update the message state
         if (res?.data && res.data) {
           // update the redux state of the currently logged in user from backend who is sender user
-          dispatch(updateMessageConnectRequest(res.data.senderUser));
+          dispatch(updateUserCurrentUserRedux(res.data.senderUser));
+
+          // update the message of the snackbar
+          dispatch(updateMessageConnectRequest(res.data.message));
+
+          // set is friend false
+          setIsFriend(false);
         }
       })
       .catch(async (err) => {
@@ -458,13 +466,12 @@ export default function UserProfile() {
                       <Typography
                         variant="body2"
                         color="text.secondary"
-                        sx={{ pt: "1px" }}
+                        sx={{ pt: "2px" }}
                       >
                         {profileData?.network_count}
                       </Typography>
-
                       {/* diversity network icon */}
-                      <Diversity3Rounded sx={{ width: 20, height: 20 }} />
+                      <Diversity1Rounded sx={{ width: 20, height: 20 }} />{" "}
                     </Box>
                   </Box>
 
@@ -508,6 +515,29 @@ export default function UserProfile() {
                         alignItems={"center"}
                         m={2}
                       >
+                        {/* message */}
+
+                        <Button
+                          variant="contained"
+                          disableElevation
+                          disabled={isShowMessageInput}
+                          onClick={handleShowMessageInput}
+                          startIcon={<Message />}
+                          sx={{ borderRadius: 5, fontWeight: "bold" }}
+                        >
+                          <Typography variant="body2">
+                            <small
+                              style={{
+                                fontSize: "small",
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              Message
+                            </small>
+                          </Typography>
+                        </Button>
+
+                        {/* friend or unfriend */}
                         {isFriend ? (
                           <Button
                             variant="contained"
@@ -550,26 +580,6 @@ export default function UserProfile() {
                             </Typography>
                           </Button>
                         )}
-
-                        <Button
-                          variant="contained"
-                          disableElevation
-                          disabled={isShowMessageInput}
-                          onClick={handleShowMessageInput}
-                          startIcon={<Message />}
-                          sx={{ borderRadius: 5, fontWeight: "bold" }}
-                        >
-                          <Typography variant="body2">
-                            <small
-                              style={{
-                                fontSize: "small",
-                                textTransform: "capitalize",
-                              }}
-                            >
-                              Message
-                            </small>
-                          </Typography>
-                        </Button>
                       </Box>
                     </React.Fragment>
                   )}
@@ -681,7 +691,10 @@ export default function UserProfile() {
                             setIsPostEditMode={setIsPostEditMode}
                           />
                         )}
+
                         {/* user network of people */}
+                        {profileSection === 1 && <UserNetwork />}
+
                         {/* about view */}
                         {profileSection === 2 && (
                           <UserAbout profileData={profileData} />

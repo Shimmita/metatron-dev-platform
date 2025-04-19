@@ -1,5 +1,4 @@
-import { SchoolRounded } from "@mui/icons-material";
-import { Backdrop, Box, Skeleton, Typography } from "@mui/material";
+import { Backdrop, Box } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import BasicSpeedDial from "../custom/SpeedDial";
@@ -9,7 +8,6 @@ import CoursesContainer from "./CoursesContainer";
 import FeaturedPostContainer from "./FeaturedPostContainer";
 import JobsContainer from "./JobsContainer";
 import RequestContainer from "./RequestContainer";
-import RightBarEvents from "./RightBarEvents";
 import RightBarStepper from "./RightBarStepper";
 import "./Rightbar.css";
 
@@ -19,12 +17,9 @@ const RightbarAll = () => {
   const [corouselCounter, setCorouselCounter] = React.useState(0);
 
   // redux states
-  const {
-    isDarkMode,
-    isDefaultBottomNav,
-    isSidebarRighbar,
-    isLoadingPostLaunch: isLoadingRequest,
-  } = useSelector((state) => state.appUI);
+  const { isDarkMode, isDefaultBottomNav, isSidebarRighbar } = useSelector(
+    (state) => state.appUI
+  );
 
   return (
     <Box
@@ -69,23 +64,24 @@ const RightbarAll = () => {
         {/* connect suggestion  */}
         <Box bgcolor={"background.default"} className=" rounded  ">
           <Box>
-            {/* jobs */}
+            {/*  top jobs */}
             <Box display={corouselCounter === 0 ? "block" : "none"}>
               <JobsContainer />
             </Box>
 
-            {/* featured courses */}
+            {/* connect request */}
             <Box display={corouselCounter === 1 ? "block" : "none"}>
               <RequestContainer />
             </Box>
-            {/* popular courses */}
+
+            {/* featured posts */}
             <Box display={corouselCounter === 2 ? "block" : "none"}>
-              <CoursesContainer />
+              <FeaturedPostContainer />
             </Box>
 
-            {/* connect request */}
+            {/* popular courses */}
             <Box display={corouselCounter === 3 ? "block" : "none"}>
-              <FeaturedPostContainer />
+              <CoursesContainer />
             </Box>
           </Box>
           {/* stepper controller */}
@@ -97,8 +93,8 @@ const RightbarAll = () => {
           </Box>
         </Box>
 
-        {/* events */}
-        <Box>
+        {/* events to be implemented later as latest feature */}
+        {/* <Box>
           <Box
             display={"flex"}
             alignItems={"center"}
@@ -120,7 +116,7 @@ const RightbarAll = () => {
               <RightBarEvents />
             )}
           </Box>
-        </Box>
+        </Box> */}
       </Box>
 
       {/* display speed dial in feed section only for mobile and no landscape */}
