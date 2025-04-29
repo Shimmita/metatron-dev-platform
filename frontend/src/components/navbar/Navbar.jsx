@@ -1,11 +1,11 @@
 import {
   Close,
-  Diversity1Outlined,
-  EmailOutlined,
+  DarkModeRounded,
   FullscreenExitRounded,
   FullscreenRounded,
   MenuRounded,
-  SearchRounded,
+  NotificationsRounded,
+  SearchRounded
 } from "@mui/icons-material";
 import {
   AppBar,
@@ -19,7 +19,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { lazy, Suspense, useState } from "react";
+import React, { lazy, Suspense, useLayoutEffect, useState } from "react";
 
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,22 +29,26 @@ import AppLogo from "../../images/logo_sm.png";
 import {
   handleShowingSpeedDial,
   handleSidebarRightbar,
+  resetDarkMode,
   showMessagingDrawer,
   showTabSideBar,
   showUserProfileDrawer,
 } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import { updateCurrentConnectNotif } from "../../redux/CurrentConnectNotif";
 import {
   resetClearCurrentGlobalSearch,
   updateCurrentGlobalSearchResults,
 } from "../../redux/CurrentGlobalSearch";
+import { updateCurrentPostReactions } from "../../redux/CurrentPostReactions";
+import { updateCurrentReport } from "../../redux/CurrentPostReported";
+import AlertAboutMetatron from "../alerts/AlertAboutMetatron";
 import AlertSponsorship from "../alerts/AlertSponsorship";
 import AlertSupport from "../alerts/AlertSupport";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import AlertAboutMetatron from "../alerts/AlertAboutMetatron";
 const PeopleModal = lazy(() => import("../modal/PeopleModal"));
 const AlertGlobalSearch = lazy(() => import("../alerts/AlertGlobalSearch"));
 const ProfileDrawer = lazy(() => import("../profile/drawer/ProfileDrawer"));
@@ -84,13 +88,16 @@ const LogoContent = styled(Box)({
   alignItems: "center",
 });
 
-const Navbar = ({ setMode, mode }) => {
+const Navbar = ({mode,setMode}) => {
   const [isFetching, setIsFetching] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [openAlertResults, setOpenAlertResults] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
+    const dispatch = useDispatch();
+    const [errorMessage, setErrorMessage] = useState("");
+
   // axios default credentials
   axios.defaults.withCredentials = true;
   // control opening of the events modal
@@ -100,28 +107,36 @@ const Navbar = ({ setMode, mode }) => {
 
   const navigate = useNavigate();
 
-  // redux states
-  const dispatch = useDispatch();
-  // get redux states
-  const { user } = useSelector((state) => state.currentUser);
+
+ 
   const { isPeopleModal, peopleData } = useSelector(
     (state) => state.currentModal
   );
 
-  const handleShowMobileSearch = () => {
-    setShowMobileSearch((prev) => !prev);
-    // clear search term
-    setSearchTerm("");
-  };
+    const { user } = useSelector((state) => state.currentUser);
+    const { post_reactions } = useSelector((state) => state.currentPostReactions);
+    const { reportedPost } = useSelector((state) => state.currentReportedPost);
+    const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
+  
+  // extracting current user ID
+  const { _id } = user;
+
 
   // redux state UI
   const {
+    isDarkMode,
     isSidebarRighbar,
     isDefaultSpeedDial,
     isOpenSponsorAlert,
     isOpenSupportAlert,
     isOpenAboutMetatron,
   } = useSelector((state) => state.appUI);
+
+  const handleShowMobileSearch = () => {
+    setShowMobileSearch((prev) => !prev);
+    // clear search term
+    setSearchTerm("");
+  };
 
   // home page
   const handleHome = () => {
@@ -172,7 +187,7 @@ const Navbar = ({ setMode, mode }) => {
     // start the put request axios
     axios
       .get(
-        `http://localhost:5000/metatron/api/v1/global/search/${searchTerm}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/global/search/${searchTerm}`,
         {
           withCredentials: true,
         }
@@ -211,6 +226,108 @@ const Navbar = ({ setMode, mode }) => {
         setIsFetching(false);
       });
   };
+
+    // UI theme dark light teaking effect
+    const handleShowDarkMode = () => {
+      // update the redux theme boolean state
+      dispatch(resetDarkMode());
+    };
+
+
+
+
+  // get all possoble post reaction notifications based on current userID
+  useLayoutEffect(() => {
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request
+    axios
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/reactions/all/${_id}`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        // update the redux of current post
+        if (res?.data) {
+          dispatch(updateCurrentPostReactions(res.data));
+        }
+      })
+      .catch((err) => {
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage(
+            "Server is unreachable please try again later to complete your request"
+          );
+          return;
+        }
+        setErrorMessage(err?.response.data);
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  }, [dispatch, _id]);
+
+  // get all connect requests sent by users to the current user as being target
+  useLayoutEffect(() => {
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request
+    axios
+      .get(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/all/${_id}`,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        // update the redux for connectNotif
+        if (res?.data) {
+          dispatch(updateCurrentConnectNotif(res.data));
+        }
+      })
+      .catch((err) => {
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("server is unreachable please try again later");
+          return;
+        }
+        setErrorMessage(err?.response.data);
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  }, [dispatch, _id]);
+
+  // get all posts reports that targets this currently logged in user
+  useLayoutEffect(() => {
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request
+    axios
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/report/get/${_id}`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        // update the redux for post
+        if (res?.data) {
+          dispatch(updateCurrentReport(res.data));
+        }
+      })
+      .catch((err) => {
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("server is unreachable");
+          return;
+        }
+        setErrorMessage(err?.response.data);
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  }, [dispatch, _id]);
+   
 
   return (
     <React.Fragment>
@@ -420,27 +537,13 @@ const Navbar = ({ setMode, mode }) => {
 
             {/* display connection count for largets screens only */}
             {!(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
-              <Tooltip arrow title={"connections"}>
-                <Box
-                  display={"flex"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                  gap={1}
-                >
-                  <Box>
-                    <Diversity1Outlined sx={{ color: "white" }} />
-                  </Box>
-                  <Box>
-                    <Typography
-                      variant="caption"
-                      fontWeight={"bold"}
-                      color="white"
-                    >
-                      {user?.network_count}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Tooltip>
+                     <IconButton onClick={handleShowDarkMode}> 
+                     <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
+                     <DarkModeRounded
+                   
+                       sx={{ color: "white", height:25, width:25 }}
+                     />
+                   </Tooltip> </IconButton>
             )}
             {/* display when search not clicked */}
             {!showMobileSearch && (
@@ -455,13 +558,13 @@ const Navbar = ({ setMode, mode }) => {
                     : 2
                 }
               >
-                <Badge badgeContent={1} color="warning">
+                <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length} color="warning">
                   <Tooltip arrow title={"notifications"}>
                     <IconButton
                       sx={{ padding: 0 }}
                       onClick={handleShowMessageDrawer}
                     >
-                      <EmailOutlined
+                      <NotificationsRounded
                         sx={{ width: 25, height: 25, color: "white" }}
                       />
                     </IconButton>

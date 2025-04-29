@@ -103,7 +103,7 @@ export default function AlertReportPost({
     // viewed
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/posts/report/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/report/create`,
         reportObject
       )
       .then((res) => {

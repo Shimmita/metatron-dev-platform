@@ -1,18 +1,13 @@
 import {
-  AddCircleRounded,
   AssignmentTurnedInRounded,
-  BarChartRounded,
   DarkModeRounded,
   FindInPageRounded,
   HighlightOffOutlined,
-  HowToRegRounded,
   Menu,
   MyLocationRounded,
-  SettingsSuggestRounded,
   VerifiedRounded,
   VisibilityRounded,
-  WorkHistoryRounded,
-  WorkRounded,
+  WorkRounded
 } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -45,7 +40,6 @@ import {
 } from "../../redux/AppUI";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
 import AlertJobSearch from "../alerts/AlertJobSearch";
-import AlertNoPosts from "../alerts/AlertNoPosts";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
@@ -108,6 +102,7 @@ const Drawer = styled(MuiDrawer, {
   ],
 }));
 
+
 export default function MiniDrawer() {
   // redux states
   const { isDarkMode, isDefaultSpeedDial, isJobSearchGlobal } = useSelector(
@@ -122,7 +117,6 @@ export default function MiniDrawer() {
   );
   const theme = useTheme();
 
-  const [openAlertNoPosts, setOpenAlertNoPosts] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -171,17 +165,14 @@ export default function MiniDrawer() {
     // fetch all jobs if the request is so
     if (textOption === "All Jobs") {
       axios
-        .get("http://localhost:5000/metatron/api/v1/jobs/all", {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all`, {
           withCredentials: true,
         })
         .then((res) => {
           // update the redux of current post
           if (res?.data) {
             dispatch(updateCurrentJobs(res.data));
-          } else {
-            // no more posts
-            setOpenAlertNoPosts(true);
-          }
+          } 
         })
         .catch(async (err) => {
           console.log(err);
@@ -193,10 +184,8 @@ export default function MiniDrawer() {
             setErrorMessage(
               "server unreachable please try again later to complete your request"
             );
-            setOpenAlertNoPosts(true);
             return;
           }
-          setOpenAlertNoPosts(true);
           setErrorMessage(err?.response.data);
         })
         .finally(() => {
@@ -207,17 +196,14 @@ export default function MiniDrawer() {
     // fetch all jobs that have been verified
     if (textOption === "Verified Jobs") {
       axios
-        .get("http://localhost:5000/metatron/api/v1/jobs/all/verified", {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/verified`, {
           withCredentials: true,
         })
         .then((res) => {
           // update the redux of current post
           if (res?.data) {
             dispatch(updateCurrentJobs(res.data));
-          } else {
-            // no more posts
-            setOpenAlertNoPosts(true);
-          }
+          } 
         })
         .catch(async (err) => {
           console.log(err);
@@ -229,10 +215,8 @@ export default function MiniDrawer() {
             setErrorMessage(
               "server unreachable please try again later to complete your request"
             );
-            setOpenAlertNoPosts(true);
             return;
           }
-          setOpenAlertNoPosts(true);
           setErrorMessage(err?.response.data);
         })
         .finally(() => {
@@ -244,7 +228,7 @@ export default function MiniDrawer() {
     if (textOption === "Nearby Jobs") {
       axios
         .post(
-          "http://localhost:5000/metatron/api/v1/jobs/all/nearby",
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/nearby`,
           { country },
           {
             withCredentials: true,
@@ -254,10 +238,7 @@ export default function MiniDrawer() {
           // update the redux of current post
           if (res?.data) {
             dispatch(updateCurrentJobs(res.data));
-          } else {
-            // no more posts
-            setOpenAlertNoPosts(true);
-          }
+          } 
         })
         .catch(async (err) => {
           console.log(err);
@@ -269,10 +250,8 @@ export default function MiniDrawer() {
             setErrorMessage(
               "server unreachable please try again later to complete your request"
             );
-            setOpenAlertNoPosts(true);
             return;
           }
-          setOpenAlertNoPosts(true);
           setErrorMessage(err?.response.data);
         })
         .finally(() => {
@@ -281,10 +260,7 @@ export default function MiniDrawer() {
     }
   }, [dispatch, textOption, user, isJobSearchGlobal]);
 
-  // handle clearing of isNetwork and error message when the alert shown
-  const handleClearing = () => {
-    setErrorMessage("");
-  };
+ 
 
   // handle display of the darwaer pane
   const handleShowDrawerPane = () => {
@@ -298,7 +274,6 @@ export default function MiniDrawer() {
   };
 
   return (
-    <React.Fragment>
       <Suspense
         fallback={
           <Box height={"90vh"} display={"flex"} justifyContent={"center"}>
@@ -418,8 +393,8 @@ export default function MiniDrawer() {
               <React.Fragment>
                 <Box pt={1} ml={3}>
                   {/*applicants */}
-                  <Typography variant="body1" fontWeight={"bold"}>
-                    Applicant Section
+                  <Typography variant="body1" textAlign={'center'} fontWeight={"bold"}>
+                   DashBoard
                   </Typography>
                 </Box>
 
@@ -478,6 +453,7 @@ export default function MiniDrawer() {
                             },
                       ]}
                     >
+                      <Tooltip title={text} arrow>
                       {index === 0 ? (
                         <WorkRounded
                           color={text === textOption ? "primary" : "inherit"}
@@ -503,6 +479,7 @@ export default function MiniDrawer() {
                           color={text === textOption ? "primary" : "inherit"}
                         />
                       )}
+                      </Tooltip>
                     </ListItemIcon>
                     <ListItemText
                       primary={
@@ -529,117 +506,6 @@ export default function MiniDrawer() {
               ))}
             </List>
 
-            <Divider className="p-1 w-100" component={"div"} />
-
-            {/* recruiter section */}
-            {open && (
-              <React.Fragment>
-                <Box pt={1} ml={3}>
-                  <Typography variant="body1" fontWeight={"bold"}>
-                    Recruiter Section
-                  </Typography>
-                </Box>
-
-                {/* divider */}
-                <Divider className="p-1 w-100" component={"div"} />
-              </React.Fragment>
-            )}
-            <List>
-              {[
-                "Job Posting",
-                "My Posted Jobs",
-                "My Jobs Statistics",
-                "Manage Applicants",
-                "Manage My Jobs",
-              ].map((text, index) => (
-                <ListItem key={text} disablePadding sx={{ display: "block" }}>
-                  <ListItemButton
-                    sx={[
-                      {
-                        minHeight: 48,
-                        px: 2.5,
-                      },
-                      open
-                        ? {
-                            justifyContent: "initial",
-                          }
-                        : {
-                            justifyContent: "center",
-                          },
-                    ]}
-                  >
-                    <ListItemIcon
-                      sx={[
-                        {
-                          minWidth: 0,
-                          justifyContent: "center",
-                        },
-                        open
-                          ? {
-                              mr: 3,
-                            }
-                          : {
-                              mr: "auto",
-                            },
-                      ]}
-                    >
-                      {index === 0 ? (
-                        <AddCircleRounded />
-                      ) : index === 1 ? (
-                        <WorkHistoryRounded />
-                      ) : index === 2 ? (
-                        <BarChartRounded />
-                      ) : index === 3 ? (
-                        <HowToRegRounded />
-                      ) : (
-                        <SettingsSuggestRounded />
-                      )}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body2" color="inherit">
-                          {text}
-                        </Typography>
-                      }
-                      sx={[
-                        open
-                          ? {
-                              opacity: 1,
-                            }
-                          : {
-                              opacity: 0,
-                            },
-                      ]}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-            <Divider className="p-1 w-100" component={"div"} />
-
-            {/* advert promoted if full screen*/}
-            <Stack width={"100%"} mt={1}>
-              {open ? (
-                <Typography
-                  variant="caption"
-                  color={"text.secondary"}
-                  textAlign={"center"}
-                  fontWeight={"bold"}
-                >
-                  Promoted Ads
-                </Typography>
-              ) : (
-                <Typography
-                  variant="caption"
-                  color={"text.secondary"}
-                  textAlign={"center"}
-                  fontWeight={"bold"}
-                >
-                  Ads
-                </Typography>
-              )}
-            </Stack>
-            <Divider className="p-1 w-100" component={"div"} />
           </Drawer>
           {/* body of the jobs */}
           <Box
@@ -713,7 +579,6 @@ export default function MiniDrawer() {
             </Box>
           </Box>
 
-          {/* alerts  */}
           {/* show job search alert */}
           <AlertJobSearch
             openAlert={openAlert}
@@ -721,18 +586,9 @@ export default function MiniDrawer() {
             isFullView={true}
           />
 
-          {/* alert no posts if true */}
-          <AlertNoPosts
-            openAlert={openAlertNoPosts}
-            setOpenAlert={setOpenAlertNoPosts}
-            errorMessage={errorMessage}
-            handleClearing={handleClearing}
-          />
-
           {/* show success snackbar when redux snack state is updated */}
           {messageSnack && <SnackBarSuccess message={messageSnack} />}
         </Box>
       </Suspense>
-    </React.Fragment>
   );
 }

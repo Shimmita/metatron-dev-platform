@@ -49,7 +49,7 @@ function UserPostContainDrawer({
 
     // fetch details of the liked or reacted user based on their id
     axios
-      .get(`http://localhost:5000/metatron/api/v1/posts/users/all/${userId}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/users/all/${userId}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -89,7 +89,7 @@ function UserPostContainDrawer({
     // backend validation
     axios
       .delete(
-        `http://localhost:5000/metatron/api/v1/posts/delete/${user?._id}/${deletePostID}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/delete/${user?._id}/${deletePostID}`,
         {
           withCredentials: true,
         }

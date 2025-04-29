@@ -68,7 +68,7 @@ export default function ProfileDrawer() {
 
       axios
         .get(
-          `http://localhost:5000/metatron/api/v1/users/all/${tempUserProfileID}`,
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/${tempUserProfileID}`,
           {
             withCredentials: true,
           }
@@ -104,7 +104,7 @@ export default function ProfileDrawer() {
   const handleCompleteLogout = async () => {
     try {
       // send a post request to the backend to clear all cookie sessions if any
-      await axios.post(`http://localhost:5000/metatron/api/v1/signout`);
+      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signout`);
 
       // clear any firebase authentication details
       const auth = getAuth();
@@ -141,7 +141,7 @@ export default function ProfileDrawer() {
             ? 330
             : CustomDeviceTablet()
             ? 450
-            : 470
+            : 400
         }
         bgcolor={"background.default"}
       >

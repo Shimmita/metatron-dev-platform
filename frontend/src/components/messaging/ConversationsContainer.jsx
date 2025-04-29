@@ -40,7 +40,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
     // performing post request
     axios
       .get(
-        `http://localhost:5000/metatron/api/v1/conversations/users/all/${currentUserID}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/all/${currentUserID}`,
         {
           withCredentials: true,
         }
@@ -107,7 +107,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
 
           // api request
           const response = await axios.put(
-            `http://localhost:5000/metatron/api/v1/conversations/users/message/last/${focusedConveration?._id}`
+            `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/last/${focusedConveration?._id}`
           );
           // if response data means updated the isTargetRead thus lets now open the conversation details
           if (response.data) {
@@ -153,8 +153,8 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
             {/* if message not clicked display all conversations summarily */}
             {!messageClicked ? (
               <Box pt={2} pb={2}>
-                {availableUserConversations &&
-                  availableUserConversations.map((conversation, index) => (
+                {
+                  availableUserConversations?.map((conversation, index) => (
                     <ConversationLayout
                       conversation={conversation}
                       handleConversationClicked={handleConversationClicked}

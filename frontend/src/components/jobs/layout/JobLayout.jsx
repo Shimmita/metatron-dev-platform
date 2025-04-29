@@ -89,7 +89,7 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
       <Avatar
         alt=""
         className="border"
-        sx={{ width: 42, height: 42 }}
+        sx={{ width: 42, height: 42, mt:8 }}
         src={getImageMatch(job.logo)}
       />
 

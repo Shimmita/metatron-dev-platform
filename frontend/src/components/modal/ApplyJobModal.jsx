@@ -25,8 +25,6 @@ import AppLogo from "../../images/logo_sm.png";
 import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
 
 // styled modal
@@ -111,7 +109,7 @@ const ApplyJobModal = ({
     // performing post request
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/jobs/application/apply`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/application/apply`,
         formData,
         {
           withCredentials: true,
@@ -162,32 +160,14 @@ const ApplyJobModal = ({
     <StyledModalJob
       keepMounted
       open={openApplyJobModal}
-      sx={{
-        marginLeft:
-          CustomDeviceTablet() && isTabSideBar
-            ? !isFullView
-              ? "34%"
-              : "10%"
-            : undefined,
-      }}
       // onClose={(e) => setOpenPostModal(false)}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
       <Box
         width={
-          CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
-            ? "90%"
-            : CustomDeviceTablet()
-            ? isFullView
-              ? "80%"
-              : "100%"
-            : CustomLandscapeWidest()
-            ? isFullView
-              ? "40%"
-              : "35%"
-            : "100%"
-        }
+          CustomDeviceIsSmall() ? "100%":CustomDeviceTablet()?"80%":"40%"
+     }
         p={1}
         borderRadius={5}
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
@@ -315,7 +295,7 @@ const ApplyJobModal = ({
 
           <Box
             mt={1}
-            maxHeight={"70vh"}
+            maxHeight={"65vh"}
             className={"px-3"}
             sx={{
               overflow: "auto",

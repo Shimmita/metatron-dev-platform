@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialstate = {
-  isOnline: true,
+  isOnline: false,
 };
 
 const CurrentChatBot = createSlice({

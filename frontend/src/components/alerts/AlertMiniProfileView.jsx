@@ -111,7 +111,7 @@ export default function AlertMiniProfileView({
   useEffect(() => {
     // fetch details of the liked or reacted user based on their id
     axios
-      .get(`http://localhost:5000/metatron/api/v1/users/all/${userId}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/${userId}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -152,7 +152,7 @@ export default function AlertMiniProfileView({
 
     // get online status of the user from the backend
     axios
-      .get(`http://localhost:5000/metatron/api/v1/users/all/online/${userId}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/online/${userId}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -195,7 +195,7 @@ export default function AlertMiniProfileView({
     // performing post request and passing
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/connections/connection/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/create`,
         dataUserAcknowLedging
       )
       .then((res) => {
@@ -226,7 +226,7 @@ export default function AlertMiniProfileView({
     // viewed
     axios
       .delete(
-        `http://localhost:5000/metatron/api/v1/connections/connection/unfriend/${currentUserId}/${userId}`
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/unfriend/${currentUserId}/${userId}`
       )
       .then((res) => {
         // update the message state

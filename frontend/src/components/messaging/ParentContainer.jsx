@@ -1,11 +1,11 @@
+import { EmailRounded, NotificationsRounded } from "@mui/icons-material";
 import {
   AppBar,
   Badge,
   styled,
   Tab,
   Tabs,
-  Toolbar,
-  Typography,
+  Toolbar
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -112,30 +112,26 @@ export default function ParentContainer() {
                   >
                     <StyledTab
                       label={
-                        <Badge color="warning" variant="dot" className="me-5">
-                          <Typography
-                            fontWeight={"bold"}
+                        <Badge  color="warning" badgeContent={post_reactions?.length +reportedPost?.length + connectNotifications?.length} className="me-5">
+                          <NotificationsRounded
                             className={value === 0 && "border-bottom pb-1"}
                             variant="body2"
-                            sx={{ color: "white" }}
-                          >
-                            Notification
-                          </Typography>
+                            sx={{ color: "white",  width:28, height:28 }}
+                          />
+                        
                         </Badge>
                       }
                     />
 
                     <StyledTab
                       label={
-                        <Badge color="warning" variant="dot" className="ms-3">
-                          <Typography
-                            fontWeight={"bold"}
+                        <Badge color="warning" badgeContent={1} className="ms-3">
+                          <EmailRounded
                             className={value === 1 && "border-bottom pb-1"}
                             variant="body2"
-                            sx={{ color: "white" }}
-                          >
-                            Messages
-                          </Typography>
+                            sx={{ color: "white", width:25, height:25 }}
+                          />
+                          
                         </Badge>
                       }
                     />

@@ -6,7 +6,7 @@ import React, { lazy } from "react";
 
 import { CodeRounded, SchoolRounded, Work } from "@mui/icons-material";
 import { Typography } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 const PostCourseModal = lazy(() => import("../modal/PostCourseModal"));
@@ -29,7 +29,6 @@ const actions = [
 ];
 
 export default function BasicSpeedDial() {
-  const dispatch = useDispatch();
   const [open, setOpen] = React.useState(false);
 
   const handleOpen = (prev) => {

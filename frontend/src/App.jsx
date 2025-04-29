@@ -13,12 +13,8 @@ import AppLogo from "./images/logo_sm.png";
 const RegPersonalCompletion = lazy(() =>
   import("./components/auth/RegPersonalCompletion")
 );
-const LoginBusinessAuth = lazy(() =>
-  import("./components/auth/LoginBusinessAuth")
-);
-const RegistrationBusinessLazy = lazy(() =>
-  import("./components/auth/RegistrationBusiness")
-);
+
+
 const HomePageLazy = lazy(() => import("./components/account/HomePage"));
 const RecoverAuthLazy = lazy(() => import("./components/auth/RecoverAuth"));
 const RegistrationAuthLazy = lazy(() =>
@@ -73,7 +69,7 @@ const App = () => {
             </Box>
           }
         >
-          <>
+          
             <Routes>
               <Route
                 exact
@@ -86,11 +82,7 @@ const App = () => {
               />
 
               <Route exact path={"/auth/login"} element={<LoginAuthLazy />} />
-              <Route
-                exact
-                path={"/auth/login/business"}
-                element={<LoginBusinessAuth />}
-              />
+             
               <Route
                 exact
                 path={"/auth/register/personal"}
@@ -103,11 +95,7 @@ const App = () => {
                 element={<RegPersonalCompletion />}
               />
 
-              <Route
-                exact
-                path={"/auth/register/business"}
-                element={<RegistrationBusinessLazy />}
-              />
+             
 
               <Route
                 exact
@@ -115,7 +103,6 @@ const App = () => {
                 element={<RecoverAuthLazy />}
               />
             </Routes>
-          </>
         </Suspense>
       </Box>
     </ThemeProvider>

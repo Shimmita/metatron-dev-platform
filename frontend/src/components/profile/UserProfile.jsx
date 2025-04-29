@@ -141,7 +141,7 @@ export default function UserProfile() {
   useEffect(() => {
     // fetch details of the liked or reacted user based on their id
     axios
-      .get(`http://localhost:5000/metatron/api/v1/users/all/${userId}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/${userId}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -208,7 +208,7 @@ export default function UserProfile() {
     // performing post request and passing data for body request
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/connections/connection/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/create`,
         dataUserSendingRequest
       )
       .then((res) => {
@@ -243,7 +243,7 @@ export default function UserProfile() {
     // viewed
     axios
       .delete(
-        `http://localhost:5000/metatron/api/v1/connections/connection/unfriend/${currentUserId}/${profileData?._id}`
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/unfriend/${currentUserId}/${profileData?._id}`
       )
       .then((res) => {
         if (res?.data && res.data) {
@@ -288,9 +288,9 @@ export default function UserProfile() {
   const handleSendingMessage = async () => {
     // conversationObject
     const conversation = {
-      senderId: user._id,
+      senderId: user?._id,
       content: messageContent,
-      participants: [user._id, profileData._id],
+      participants: [user?._id, profileData?._id],
     };
 
     // call api request to post data to the backed
@@ -298,7 +298,7 @@ export default function UserProfile() {
       // set is fetching to true
       setIsConnect(true);
       const response = await axios.post(
-        `http://localhost:5000/metatron/api/v1/conversations/users/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/create`,
         conversation
       );
       //update the conversation with the one returned from the backend

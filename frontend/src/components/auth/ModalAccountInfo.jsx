@@ -121,12 +121,12 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                     mb={1}
                     textAlign={"center"}
                   >
-                    Personal Account
+                    Registered Account
                   </Typography>
 
                   <ol>
-                    {DataAccounts &&
-                      DataAccounts.Personal.map((data, index) => (
+                    {
+                      DataAccounts?.Personal.map((data, index) => (
                         <Typography
                           key={index}
                           variant="body2"
@@ -142,39 +142,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                 </Box>
               </Box>
 
-              {/* Business account */}
-              <Box>
-                <Box mb={1} display={"flex"} justifyContent={"center"}>
-                  <Business color="primary" sx={{ width: 40, height: 40 }} />
-                </Box>
-                <Box>
-                  <Typography
-                    gutterBottom
-                    fontWeight={"bold"}
-                    variant="body2"
-                    mb={1}
-                    textAlign={"center"}
-                  >
-                    Business Account
-                  </Typography>
-
-                  <ol>
-                    {DataAccounts &&
-                      DataAccounts.Business.map((data, index) => (
-                        <Typography
-                          key={index}
-                          variant="body2"
-                          gutterBottom
-                          mb={1}
-                          component={"li"}
-                          color={"text.secondary"}
-                        >
-                          {data}
-                        </Typography>
-                      ))}
-                  </ol>
-                </Box>
-              </Box>
+              
 
               {/* donation, affiliate programs */}
 
@@ -194,8 +162,8 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                   </Typography>
 
                   <ol>
-                    {DataAccounts &&
-                      DataAccounts.Donation.map((data, index) => (
+                    {
+                      DataAccounts?.Donation.map((data, index) => (
                         <Typography
                           key={index}
                           variant="body2"

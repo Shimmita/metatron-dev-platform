@@ -73,7 +73,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
   const { clicks: post_like_cicks } = post.post_liked || {};
 
   // extract the counts of github clicks
-  const { clicks: post_github_clicks } = post.post_github || {};
+  const { clicks: post_github_clicks, link:post_github_link } = post.post_github || {};
 
   //   extract the counts of comments
   const { count: post_comment_count } = post?.post_comments || {};
@@ -181,7 +181,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     // performing post request
     axios
       .put(
-        `http://localhost:5000/metatron/api/v1/posts/update/likes`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/likes`,
         userInfo,
         {
           withCredentials: true,
@@ -219,7 +219,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     // performing post request
     axios
       .put(
-        `http://localhost:5000/metatron/api/v1/posts/update/github`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/github`,
         userInfo,
         {
           withCredentials: true,
@@ -573,7 +573,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                     onChange={onClick}
                     icon={icon}
                     checkedIcon={icon}
-                    disabled={isProcessingPost}
+                    disabled={isProcessingPost || (title==='Github' && !post_github_link)}
                   />
                 </Tooltip>
                 <Typography

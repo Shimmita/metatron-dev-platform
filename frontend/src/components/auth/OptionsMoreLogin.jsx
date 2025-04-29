@@ -1,9 +1,8 @@
 import {
-  BusinessRounded,
   GavelRounded,
   InfoRounded,
-  PersonRounded,
-  SecurityRounded,
+  PersonAddRounded,
+  SecurityRounded
 } from "@mui/icons-material";
 import { Box, Divider, ListItemText, MenuItem } from "@mui/material";
 import React from "react";
@@ -20,10 +19,7 @@ function OptionsMoreLogin({
     navigate("/auth/register/personal");
   };
 
-  // navigae to the registration business
-  const handleRegisterBusiness = () => {
-    navigate("/auth/register/business");
-  };
+  
 
   //handle toggling of the modal accounts
   const handleShowingModalInfo = () => {
@@ -54,18 +50,10 @@ function OptionsMoreLogin({
     <Box>
       <MenuItem onClick={handleRegisterPersonal}>
         <ListItemText>
-          <PersonRounded color="primary" className="mx-2" />
+          <PersonAddRounded color="primary" className="mx-2" />
         </ListItemText>
-        <ListItemText primary={<small>Personal Account</small>} />
-      </MenuItem>
-      <Divider component={"div"} />
-
-      <MenuItem onClick={handleRegisterBusiness}>
-        <ListItemText>
-          <BusinessRounded color="primary" className="mx-2" />
-        </ListItemText>
-        <ListItemText primary={<small>Business Account </small>} />
-      </MenuItem>
+        <ListItemText primary={<small>Register Account</small>} />
+      </MenuItem>      
 
       <Divider component={"div"} />
 

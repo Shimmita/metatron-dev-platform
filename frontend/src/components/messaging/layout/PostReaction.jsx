@@ -51,7 +51,7 @@ export default function PostReaction({ reaction, isLastItem }) {
     // performing post request
     axios
       .delete(
-        `http://localhost:5000/metatron/api/v1/posts/reactions/delete/${_id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/reactions/delete/${_id}`,
         {
           withCredentials: true,
         }

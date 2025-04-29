@@ -1,6 +1,8 @@
-import { Backdrop, Box } from "@mui/material";
+import { Backdrop, Box, Button, Stack } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { handleSidebarRightbar } from "../../redux/AppUI";
 import BasicSpeedDial from "../custom/SpeedDial";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
@@ -10,16 +12,27 @@ import JobsContainer from "./JobsContainer";
 import RequestContainer from "./RequestContainer";
 import RightBarStepper from "./RightBarStepper";
 import "./Rightbar.css";
+import { InsightsRounded } from "@mui/icons-material";
 
 const RightbarAll = () => {
   // backdrop state
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const [corouselCounter, setCorouselCounter] = React.useState(0);
+  const navigate=useNavigate()
+  const dispatch=useDispatch()
 
   // redux states
   const { isDarkMode, isDefaultBottomNav, isSidebarRighbar } = useSelector(
     (state) => state.appUI
   );
+
+  const handleNavigateJobs=()=>{
+    navigate("/jobs"); 
+    // disable sidebar
+      if (isSidebarRighbar) {
+        dispatch(handleSidebarRightbar());
+      }
+  }
 
   return (
     <Box
@@ -65,9 +78,13 @@ const RightbarAll = () => {
         <Box bgcolor={"background.default"} className=" rounded  ">
           <Box>
             {/*  top jobs */}
-            <Box display={corouselCounter === 0 ? "block" : "none"}>
+            <Stack gap={1}  display={corouselCounter === 0 ? "block" : "none"}>
               <JobsContainer />
-            </Box>
+              <Box display={'flex'} justifyContent={'center'} width={'auto'}>
+
+              <Button startIcon={<InsightsRounded/>} onClick={handleNavigateJobs} size="small" sx={{ textTransform:'capitalize', borderRadius:4 }} >more jobs</Button>
+              </Box>
+            </Stack>
 
             {/* connect request */}
             <Box display={corouselCounter === 1 ? "block" : "none"}>

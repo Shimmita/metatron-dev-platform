@@ -91,7 +91,7 @@ export default function AlertJobSearch({
     // performing post request
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/jobs/all/search`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search`,
         jobSearch,
         {
           withCredentials: true,

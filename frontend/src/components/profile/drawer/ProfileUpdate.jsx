@@ -136,7 +136,7 @@ function ProfileUpdate({ user }) {
     // start the put request axios
     axios
       .put(
-        `http://localhost:5000/metatron/api/v1/users/update/${user?._id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/update/${user?._id}`,
         formData,
         {
           withCredentials: true,

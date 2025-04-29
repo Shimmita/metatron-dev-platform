@@ -18,7 +18,7 @@ const AuthCheck = ({ children }) => {
   axios.defaults.withCredentials = true;
 
   axios
-    .post(`http://localhost:5000/metatron/api/v1/valid`)
+    .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/valid`)
     .then((res) => {
       setIsAuthorised(res.data.authorised);
     })

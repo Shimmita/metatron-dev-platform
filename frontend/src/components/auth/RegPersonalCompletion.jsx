@@ -207,7 +207,7 @@ const RegPersonalCompletion = () => {
     if (!token) {
       navigate("/");
     }
-  }, [token]);
+  }, [token, navigate]);
 
   return (
     <Box

@@ -185,7 +185,7 @@ export default function UserProfileDrawer({ profileData }) {
     // performing post request and passing data for body request
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/connections/connection/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/create`,
         dataUserSendingRequest
       )
       .then((res) => {
@@ -220,7 +220,7 @@ export default function UserProfileDrawer({ profileData }) {
     // viewed
     axios
       .delete(
-        `http://localhost:5000/metatron/api/v1/connections/connection/unfriend/${currentUserId}/${profileData?._id}`
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/unfriend/${currentUserId}/${profileData?._id}`
       )
       .then((res) => {
         if (res?.data && res.data) {
@@ -265,7 +265,7 @@ export default function UserProfileDrawer({ profileData }) {
       // set is fetching to true
       setIsConnecting(true);
       const response = await axios.post(
-        `http://localhost:5000/metatron/api/v1/conversations/users/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/create`,
         conversation
       );
       //update the conversation with the one returned from the backend

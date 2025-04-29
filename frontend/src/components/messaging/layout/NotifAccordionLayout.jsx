@@ -12,12 +12,8 @@ import MuiAccordionSummary, {
 } from "@mui/material/AccordionSummary";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import axios from "axios";
-import React, { useLayoutEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { updateCurrentConnectNotif } from "../../../redux/CurrentConnectNotif";
-import { updateCurrentPostReactions } from "../../../redux/CurrentPostReactions";
-import { updateCurrentReport } from "../../../redux/CurrentPostReported";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import FriendRequest from "../../rightbar/layouts/FriendRequest";
 import PostReaction from "./PostReaction";
 import PostReported from "./PostReported";
@@ -68,112 +64,9 @@ export default function NotifAccordionLayout({
   const [openReaction, setOpenReaction] = useState(true);
   const [openConnect, setOpenConnect] = useState(true);
   const [openReported, setOpenReported] = useState(true);
-  // dispatch
-  const dispatch = useDispatch();
-  // api request monitors
-  const [isFetching, setIsFetching] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
-  // get redux states
-  const { user } = useSelector((state) => state.currentUser);
 
-  // extracting current user ID
-  const { _id } = user;
-
-  // axios default credentials
-  axios.defaults.withCredentials = true;
-
-  // get all possoble post reaction notifications based on current userID
-  useLayoutEffect(() => {
-    // set is fetching to true
-    setIsFetching(true);
-
-    // performing post request
-    axios
-      .get(`http://localhost:5000/metatron/api/v1/posts/reactions/all/${_id}`, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        // update the redux of current post
-        if (res?.data) {
-          dispatch(updateCurrentPostReactions(res.data));
-        }
-      })
-      .catch((err) => {
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage(
-            "Server is unreachable please try again later to complete your request"
-          );
-          return;
-        }
-        setErrorMessage(err?.response.data);
-      })
-      .finally(() => {
-        // set is fetching to false
-        setIsFetching(false);
-      });
-  }, [dispatch, _id]);
-
-  // get all connect requests sent by users to the current user as being target
-  useLayoutEffect(() => {
-    // set is fetching to true
-    setIsFetching(true);
-
-    // performing post request
-    axios
-      .get(
-        `http://localhost:5000/metatron/api/v1/connections/connection/all/${_id}`,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        // update the redux for connectNotif
-        if (res?.data) {
-          dispatch(updateCurrentConnectNotif(res.data));
-        }
-      })
-      .catch((err) => {
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage("server is unreachable please try again later");
-          return;
-        }
-        setErrorMessage(err?.response.data);
-      })
-      .finally(() => {
-        // set is fetching to false
-        setIsFetching(false);
-      });
-  }, [dispatch, _id]);
-
-  // get all posts reports that targets this currently logged in user
-  useLayoutEffect(() => {
-    // set is fetching to true
-    setIsFetching(true);
-
-    // performing post request
-    axios
-      .get(`http://localhost:5000/metatron/api/v1/posts/report/get/${_id}`, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        // update the redux for post
-        if (res?.data) {
-          dispatch(updateCurrentReport(res.data));
-        }
-      })
-      .catch((err) => {
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage("server is unreachable");
-          return;
-        }
-        setErrorMessage(err?.response.data);
-      })
-      .finally(() => {
-        // set is fetching to false
-        setIsFetching(false);
-      });
-  }, [dispatch, _id]);
+ 
 
   return (
     <Stack gap={2}>

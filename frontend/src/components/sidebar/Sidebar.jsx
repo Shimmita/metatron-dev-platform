@@ -1,10 +1,9 @@
 import {
-  ChatBubbleRounded,
   CoffeeRounded,
   DarkModeRounded,
   HelpCenterRounded,
   Smartphone,
-  TipsAndUpdatesRounded,
+  TipsAndUpdatesRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -16,8 +15,7 @@ import {
   ListItemText,
   Skeleton,
   styled,
-  Switch,
-  Typography,
+  Typography
 } from "@mui/material";
 
 import {
@@ -106,7 +104,6 @@ const Sidebar = () => {
       return "21%";
     }
 
-    return;
   };
 
   // fun to make the sidebar equidistant from the feed in relation to the rightbar
@@ -115,7 +112,6 @@ const Sidebar = () => {
     if (screenWidth > 1400) {
       return "8%";
     }
-    return;
   };
 
   // handle showing of technical support
@@ -196,7 +192,6 @@ const Sidebar = () => {
                 <Skeleton variant="rectangular" height={"20vh"} />
               </Box>
             ) : (
-              <React.Fragment>
                 <BoxAvatarContent>
                   <Box width={"100%"}>
                     <Box className={isDarkMode && "bg-dark rounded-top"}>
@@ -221,53 +216,18 @@ const Sidebar = () => {
                                 ? devImage || logoCompany
                                 : logoCompany || logoCompany
                             }
-                            sx={{ width: 100, height: 100, mt: 1.5 }}
+                            sx={{ width: 100, height: 100, mt: 1 }}
                           />
                         </StyledBadge>
                       </Box>
                       <Box display={"flex"} justifyContent={"center"} pb={2}>
-                        {!businessAccount ? (
-                          <React.Fragment>
-                            {/* shown for personal a/c */}
+                        
                             <SkillAvatars user={user} isDarkMode={isDarkMode} />
-                          </React.Fragment>
-                        ) : (
-                          <>
-                            {/* shown for businesss a/c */}
-                            <Box
-                              p={1}
-                              width={CustomLandscapeWidest() ? 260 : 250}
-                            >
-                              <Box>
-                                <Typography
-                                  fontWeight={"bold"}
-                                  textAlign={"center"}
-                                  variant="body2"
-                                  gutterBottom
-                                  textTransform={"uppercase"}
-                                  color={isDarkMode ? "black" : "primary"}
-                                >
-                                  Metatron Foundation
-                                </Typography>
-                                <Typography
-                                  textAlign={"center"}
-                                  variant="body2"
-                                  color={
-                                    isDarkMode ? "black" : "text.secondary"
-                                  }
-                                >
-                                  Software and Machine Learning Development
-                                  Company In Kenya
-                                </Typography>
-                              </Box>
-                            </Box>
-                          </>
-                        )}
+                      
                       </Box>
                     </Box>
                   </Box>
                 </BoxAvatarContent>
-              </React.Fragment>
             )}
           </Box>
           <Box bgcolor={"background.default"} p={1}>
@@ -276,7 +236,7 @@ const Sidebar = () => {
             ) : (
               <List>
                 {/* metatron ai chat */}
-                <ListItemButton onClick={handleShowAiBot}>
+                {/* <ListItemButton onClick={handleShowAiBot}>
                   <ListItemIcon>
                     <ChatBubbleRounded sx={{ width: 27, height: 27 }} />
                   </ListItemIcon>
@@ -285,12 +245,12 @@ const Sidebar = () => {
                       <Typography variant="body1">Metatron Agent</Typography>
                     }
                   />
-                </ListItemButton>
+                </ListItemButton> */}
 
                 {/* customer help */}
                 <ListItemButton onClick={handleTechnicalSupport}>
                   <ListItemIcon>
-                    <HelpCenterRounded sx={{ width: 28, height: 28 }} />
+                    <HelpCenterRounded color="primary" sx={{ width: 28, height: 28 }} />
                   </ListItemIcon>
                   <ListItemText
                     primary={
@@ -304,7 +264,7 @@ const Sidebar = () => {
                   onClick={(e) => setOpenMobileApp(!openMobileApp)}
                 >
                   <ListItemIcon>
-                    <Smartphone sx={{ width: 30, height: 30 }} />
+                    <Smartphone color="primary" sx={{ width: 30, height: 30 }} />
                   </ListItemIcon>
                   <ListItemText
                     primary={
@@ -316,7 +276,7 @@ const Sidebar = () => {
                 {/* sponsor us */}
                 <ListItemButton onClick={handleShowingSponsorship}>
                   <ListItemIcon>
-                    <CoffeeRounded sx={{ width: 30, height: 30 }} />
+                    <CoffeeRounded color="primary" sx={{ width: 30, height: 30 }} />
                   </ListItemIcon>
                   <ListItemText
                     primary={
@@ -328,7 +288,7 @@ const Sidebar = () => {
                 {/* about metatron */}
                 <ListItemButton onClick={handleShowAboutMetatron}>
                   <ListItemIcon>
-                    <TipsAndUpdatesRounded sx={{ width: 28, height: 28 }} />
+                    <TipsAndUpdatesRounded color="primary" sx={{ width: 28, height: 28 }} />
                   </ListItemIcon>
                   <ListItemText
                     primary={

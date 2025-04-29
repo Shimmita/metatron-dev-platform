@@ -18,12 +18,10 @@ import MobileTabCorousel from "../rightbar/MobileTabCorousel";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 const AlertChatBot = lazy(() => import("../alerts/AlertChatBot"));
-const AlertNoPosts = lazy(() => import("../alerts/AlertNoPosts"));
 
 const FeedDefaultContent = () => {
   // axios default credentials
   axios.defaults.withCredentials = true;
-  const [openAlertNoPosts, setOpenAlertNoPosts] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -69,7 +67,7 @@ const FeedDefaultContent = () => {
 
     // performing post request
     axios
-      .get(`http://localhost:5000/metatron/api/v1/posts/all`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -78,7 +76,7 @@ const FeedDefaultContent = () => {
           dispatch(updateCurrentPosts(res.data));
         } else {
           // no more posts
-          setOpenAlertNoPosts(true);
+          //setOpenAlertNoPosts(true);
         }
       })
       .catch((err) => {
@@ -90,10 +88,8 @@ const FeedDefaultContent = () => {
           setErrorMessage(
             "Server is unreachable please try again later to complete your request"
           );
-          setOpenAlertNoPosts(true);
           return;
         }
-        setOpenAlertNoPosts(true);
         setErrorMessage(err?.response.data);
       })
       .finally(() => {
@@ -104,10 +100,7 @@ const FeedDefaultContent = () => {
       });
   }, [dispatch, posts]);
 
-  // handle clearing of isNetwork and error message when the alert shown
-  const handleClearing = () => {
-    setErrorMessage("");
-  };
+
 
   return (
     <Box
@@ -208,8 +201,8 @@ const FeedDefaultContent = () => {
             )}
 
             {/* map through the posts and display them to the user */}
-            {posts &&
-              posts.map((post, index) => {
+            {
+              posts?.map((post, index) => {
                 return (
                   <Box key={index}>
                     <Box>
@@ -228,13 +221,7 @@ const FeedDefaultContent = () => {
 
       {/* display chat bot */}
       <AlertChatBot />
-      {/* alert no posts if true */}
-      <AlertNoPosts
-        openAlert={openAlertNoPosts}
-        setOpenAlert={setOpenAlertNoPosts}
-        errorMessage={errorMessage}
-        handleClearing={handleClearing}
-      />
+   
     </Box>
   );
 };

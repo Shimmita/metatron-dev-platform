@@ -66,7 +66,6 @@ export default function AlertChatBot() {
   };
 
   return (
-    <React.Fragment>
       <Dialog
         open={isOnline}
         TransitionComponent={Transition}
@@ -127,6 +126,5 @@ export default function AlertChatBot() {
           </DialogContentText>
         </DialogContent>
       </Dialog>
-    </React.Fragment>
   );
 }

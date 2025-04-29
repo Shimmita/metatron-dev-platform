@@ -1,15 +1,12 @@
 import {
   Close,
-  CoffeeRounded,
+  DarkModeRounded,
   Google,
-  LightModeOutlined,
-  LightModeRounded,
   PersonAddRounded,
-  PersonRounded,
   StarRounded,
   Visibility,
   VisibilityOff,
-  WbIncandescentRounded,
+  WbIncandescentRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -43,14 +40,12 @@ import { auth, providerGoogle } from "../gcp/FirebaseConfig";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import OptionsMoreLogin from "./OptionsMoreLogin";
-const AlertSponsorship = lazy(() => import("../alerts/AlertSponsorship"));
 const ModalPolicyTerms = lazy(() => import("./ModalPolicyTerms"));
 const ModalAccountInfo = lazy(() => import("./ModalAccountInfo"));
 
 const LoginAuth = () => {
   const [openModalInfo, setOpenModalInfo] = useState(false);
   const [openModalTerms, setOpenModalTerms] = useState(false);
-  const [openSponsorAlert, setOpenSponsorAlert] = useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -110,7 +105,7 @@ const LoginAuth = () => {
             // else redirect them to complet reg page
             axios
               .post(
-                `http://localhost:5000/metatron/api/v1/signup/personal/google/${token}`,
+                `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/google/${token}`,
                 emptyForm
               )
               .then((res) => {
@@ -167,7 +162,7 @@ const LoginAuth = () => {
     // login user without provider
     setIsLogin(true);
     axios
-      .post(`http://localhost:5000/metatron/api/v1/signin/personal`, user)
+      .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signin/personal`, user)
       .then((res) => {
         // populating the redux for the logged in user
         dispatch(updateUserCurrentUserRedux(res.data));
@@ -198,11 +193,7 @@ const LoginAuth = () => {
     }
   };
 
-  // handle showing of sponsorship alert
-  const handleSponsorAlert = () => {
-    setOpenSponsorAlert(true);
-  };
-
+ 
   return (
     <Box
       display={"flex"}
@@ -233,15 +224,15 @@ const LoginAuth = () => {
         <Box>
           <Box display={"flex"} justifyContent={"space-between"}>
             <Box>
-              <Tooltip arrow title={isDarkMode ? "light" : "dark"}>
+              <Tooltip arrow title={isDarkMode ? "Light" : "Dark"}>
                 <IconButton onClick={handleShowDarkMode}>
                   {isDarkMode ? (
-                    <LightModeRounded
+                    <DarkModeRounded
                       color="warning"
-                      sx={{ width: 30, height: 30 }}
+                      sx={{ width: 26, height: 26 }}
                     />
                   ) : (
-                    <LightModeOutlined sx={{ width: 30, height: 30 }} />
+                    <DarkModeRounded sx={{ width: 26, height: 26 }} />
                   )}
                 </IconButton>
               </Tooltip>
@@ -342,23 +333,7 @@ const LoginAuth = () => {
                 />
               </Box>
 
-              <Typography
-                mb={2}
-                display={"flex"}
-                justifyContent={"center"}
-                gap={1}
-                color={"text.secondary"}
-                alignItems={"center"}
-              >
-                <PersonRounded color="primary" sx={{ width: 18, height: 18 }} />
-                <Typography
-                  variant={CustomDeviceSmallest() ? "caption" : "body2"}
-                  color={"text.secondary"}
-                >
-                  Personal Account Login
-                </Typography>
-                <PersonRounded color="primary" sx={{ width: 18, height: 18 }} />
-              </Typography>
+            
             </Box>
           </Box>
           <Box>
@@ -522,20 +497,6 @@ const LoginAuth = () => {
               </Tooltip>{" "}
             </Box>
 
-            {/* buy me coffe */}
-            <Box mb={2} display={"flex"} justifyContent={"center"}>
-              <Tooltip arrow title={"we value your contribution"}>
-                <Button
-                  onClick={handleSponsorAlert}
-                  variant="text"
-                  size="small"
-                  sx={{ textTransform: "lowercase", fontWeight: "bold" }}
-                  startIcon={<CoffeeRounded />}
-                >
-                  Sponsor Metatron
-                </Button>
-              </Tooltip>
-            </Box>
           </Box>
         </Box>
       </Box>
@@ -543,14 +504,6 @@ const LoginAuth = () => {
       {/* show backdrop when is login */}
       {isLogin && <Backdrop />}
 
-      {/* show alert sponsorshio */}
-      <Box>
-        <AlertSponsorship
-          openSponsorAlert={openSponsorAlert}
-          setOpenSponsorAlert={setOpenSponsorAlert}
-          
-        />
-      </Box>
       {/* show the account help info modal when toggled */}
       <Box>
         <ModalAccountInfo

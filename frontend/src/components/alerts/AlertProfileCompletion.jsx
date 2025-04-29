@@ -130,8 +130,8 @@ export default function AlertProfileCompletion({
     axios
       .post(
         token
-          ? `http://localhost:5000/metatron/api/v1/signup/personal/google/${token}`
-          : `http://localhost:5000/metatron/api/v1/signup/personal/mongo`,
+          ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/google/${token}`
+          : `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/mongo`,
         formData
       )
       .then((res) => {
@@ -178,8 +178,8 @@ export default function AlertProfileCompletion({
     axios
       .post(
         token
-          ? `http://localhost:5000/metatron/api/v1/signup/personal/google/${token}`
-          : `http://localhost:5000/metatron/api/v1/signup/personal/mongo`,
+          ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/google/${token}`
+          : `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/mongo`,
         formData
       )
       .then((res) => {
@@ -291,8 +291,7 @@ export default function AlertProfileCompletion({
                         gutterBottom
                         id="alert-dialog-slide-description"
                       >
-                        Choose your favourite avatar icon from your device local
-                        storage. Avatar should not exceed the threshold size of
+                        Choose your favourite avatar icon from your device storage, it should not exceed the threshold size of
                         5MB
                       </DialogContentText>{" "}
                       {/* Display error message if file exceeds 2MB */}
@@ -384,8 +383,8 @@ export default function AlertProfileCompletion({
                         gutterBottom
                         id="alert-dialog-slide-description-about"
                       >
-                        Briefly tell us more about yourself, this helps in
-                        articulating your technical experience or aspirations to
+                        Briefly tell us more about yourself to facilitate
+                        articulation of your technical experience or aspirations to
                         the fellow tech enthusiasts.
                       </DialogContentText>
                       <Box
@@ -413,9 +412,9 @@ export default function AlertProfileCompletion({
                         gutterBottom
                         id="alert-dialog-slide-description"
                       >
-                        Suppose you are Interested in updating your avatar or
+                        Suppose you are Interested in updating 
                         profile picture then click update to upload your custom
-                        avatar.
+                        picture or avatar.
                       </DialogContentText>
                     </React.Fragment>
                   )}

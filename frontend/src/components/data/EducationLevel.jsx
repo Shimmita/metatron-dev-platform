@@ -1,8 +1,8 @@
 const EducationLevel = [
-  "Certificate",
-  "Diploma",
+  "Secondary School",
+  "Diploma Certificate",
   "Bachelors Degree",
   "Masters Degree",
-  "PhD",
+  "Doctorate Degree",
 ];
 export default EducationLevel;

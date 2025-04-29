@@ -33,7 +33,7 @@ const UserNetwork = ({ otherUserID }) => {
     // performing post request to fetch the names of the friends
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/network/all`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/network/all`,
         { currentUserID, networks },
         {
           withCredentials: true,
