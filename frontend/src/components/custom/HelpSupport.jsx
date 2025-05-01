@@ -4,12 +4,16 @@ import React from "react";
 import { Link } from "react-router-dom";
 import DevAccountConfig from "../config/DevAccountConfig";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import { useSelector } from "react-redux";
 
 const HelpSupport = () => {
   //   handle emailSupport
   const handleEmailSupport = () => {
     return;
   };
+
+      const { user } = useSelector((state) => state.currentUser);
+  
 
   return (
     <Box
@@ -19,7 +23,7 @@ const HelpSupport = () => {
     >
 
       {/* other communication channels */}
-      <Box width={"100%"}>
+      <Box width={"100%"} mb={2}>
         {/* row of comm channels */}
         <Box
           display={"flex"}
@@ -39,9 +43,10 @@ const HelpSupport = () => {
             </Button>
           </Link>
 
+
           {/* email */}
           <Link
-            to={`mailto:[${DevAccountConfig.dev_email_1},${DevAccountConfig.dev_email_2} ]`}
+            to={`mailto:[${DevAccountConfig.dev_email_1} ]`}
           >
             <Button
               startIcon={<EmailRounded />}
@@ -56,37 +61,9 @@ const HelpSupport = () => {
         </Box>
       </Box>
 
-      {/* info or about */}
-      <Box
-        display={"flex"}
-        justifyContent={"center"}
-        width={"100%"}
-        mt={5}
-        mb={1}
-      >
-        <Divider component={"div"} className="w-75" />
-      </Box>
-
+   
       <Box>
-        <Typography
-          variant="body2"
-          fontWeight={"bold"}
-          textAlign={"center"}
-          gutterBottom
-        >
-          Tips
-        </Typography>
-
-        <Typography
-          variant="body2"
-          component={"li"}
-          color={"text.secondary"}
-          gutterBottom
-        >
-          Dear esteemed user our support team will reach out and respond to your
-          inquiries at the shortest time possible.
-        </Typography>
-
+   
         <Typography
           variant="body2"
           component={"li"}
@@ -94,8 +71,8 @@ const HelpSupport = () => {
           color={"text.secondary"}
           mt={1}
         >
-          Our support team will reach out via registered email linked to your
-          account or send a direct message to your Metatron application inbox
+          Technical support team will reach out via registered email linked to your Metatron
+          account {`( ${user?.email}) `} or send a direct message to your Metatron inbox
           section.
         </Typography>
       </Box>

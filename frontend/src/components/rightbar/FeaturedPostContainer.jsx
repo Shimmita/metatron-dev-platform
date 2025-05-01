@@ -43,7 +43,7 @@ export default function FeaturedPostContainer() {
 
     // performing post request
     axios
-      .get(`http://localhost:5000/metatron/api/v1/posts/top`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/top`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -86,7 +86,7 @@ export default function FeaturedPostContainer() {
         </Box>
       </Box>
       <List
-        className="rounded"
+        className="rounded mt-1"
         sx={{
           bgcolor: "background.paper",
           width: rightBarExpaned(),

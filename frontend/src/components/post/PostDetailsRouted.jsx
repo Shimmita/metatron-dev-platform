@@ -30,7 +30,7 @@ function PostDetailsRouted() {
 
     // performing post request
     axios
-      .get(`http://localhost:5000/metatron/api/v1/posts/all/${postId}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all/${postId}`, {
         withCredentials: true,
       })
       .then((res) => {

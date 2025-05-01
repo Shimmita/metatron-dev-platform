@@ -27,7 +27,6 @@ export default function AlertSupport({ openSupportAlert }) {
   const { isTabSideBar } = useSelector((state) => state.appUI);
 
   return (
-    <React.Fragment>
       <Dialog
         open={openSupportAlert}
         TransitionComponent={Transition}
@@ -64,6 +63,5 @@ export default function AlertSupport({ openSupportAlert }) {
           <Button onClick={handleClose}>close</Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
   );
 }

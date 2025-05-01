@@ -1,5 +1,10 @@
-import { Box } from "@mui/material";
+import { InsightsRounded } from "@mui/icons-material";
+import { Box, Button } from "@mui/material";
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { handleSidebarRightbar } from "../../redux/AppUI";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import CoursesContainer from "./CoursesContainer";
 import FeaturedPostContainer from "./FeaturedPostContainer";
 import JobsContainer from "./JobsContainer";
@@ -9,16 +14,37 @@ import RightBarStepper from "./RightBarStepper";
 const MobileTabCorousel = () => {
   // backdrop state
   const [corouselCounter, setCorouselCounter] = React.useState(0);
+   // redux states
+    const {  isSidebarRighbar } = useSelector(
+      (state) => state.appUI
+    );
 
+    const dispatch=useDispatch()
+    const navigate=useNavigate()
+  
+
+  const handleNavigateJobs=()=>{
+    navigate("/jobs"); 
+    // update the bottom index to match jobs
+    dispatch(updateCurrentBottomNav(1))
+    // disable sidebar
+      if (isSidebarRighbar) {
+        dispatch(handleSidebarRightbar());
+      }
+  }
   return (
     <Box color={"text.primary"}>
       {/* connect suggestion  */}
       <Box bgcolor={"background.default"} className="shadow rounded ">
         <Box>
           {/*  top jobs */}
-          <Box display={corouselCounter === 0 ? "block" : "none"}>
-            <JobsContainer />
-          </Box>
+          <Box gap={1}  display={corouselCounter === 0 ? "block" : "none"}>
+              <JobsContainer />
+              <Box display={'flex'} justifyContent={'center'} width={'auto'}>
+
+              <Button startIcon={<InsightsRounded/>} onClick={handleNavigateJobs} size="small" sx={{ textTransform:'capitalize', borderRadius:4}} >more jobs</Button>
+              </Box>
+            </Box>
 
           {/* connect request */}
           <Box display={corouselCounter === 1 ? "block" : "none"}>

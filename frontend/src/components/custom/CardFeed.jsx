@@ -297,7 +297,6 @@ const CardFeed = ({ post, setPostDetailedData }) => {
           <CardHeader
             sx={{ ml: 1, p: 0 }}
             avatar={
-              <React.Fragment>
                 <ListItemAvatar onClick={handleMiniProfileView}>
                   <Avatar
                     src={dev}
@@ -312,7 +311,6 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                     {handleNoProfilePicture()}
                   </Avatar>
                 </ListItemAvatar>
-              </React.Fragment>
             }
             action={
               <Stack>

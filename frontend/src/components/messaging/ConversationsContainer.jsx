@@ -1,78 +1,37 @@
 import { Message } from "@mui/icons-material";
 import { Box, Fab, Tooltip } from "@mui/material";
 import axios from "axios";
-import React, { useCallback, useLayoutEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import ConversationDetailed from "./ConversationDetailed";
 import ConversationLayout from "./layout/ConversationLayout";
 import NewConversation from "./layout/NewConversation";
 
 export default function ConversationsContainer({ setMessageNotifClicked }) {
-  const [availableUserConversations, setAvailableUserConversations] = useState(
-    []
-  );
+  // axios default credentials
+  axios.defaults.withCredentials = true;
 
-  const [focusedConveration, setFocusedConversation] = useState();
+    // hold the message clicked bool
+    const [messageClicked, setMessageClicked] = useState(false);
+
+    // controll showing of new conversation when fab is clicked
+    const [fabNewConversation, setFabNewConversation] = useState(false);
 
   // api request monitors
   const [isFetching, setIsFetching] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [focusedConveration, setFocusedConversation] = useState();
 
   // get redux states
   const { user } = useSelector((state) => state.currentUser);
+  const { conversations } = useSelector((state) => state.currentConversation);
+
 
   // extracting user id
   const { _id: currentUserID } = user;
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
-
-  // fetch or get all conversations done by the current user
-  // use layout effect to prefetch details earlier before dom rendered
-  useLayoutEffect(() => {
-    // return if are conversations
-    if (availableUserConversations.length > 0) {
-      return;
-    }
-    // set is fetching to true
-    setIsFetching(true);
-
-    // performing post request
-    axios
-      .get(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/all/${currentUserID}`,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        // update the states of conversations
-        setAvailableUserConversations(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage("server is unreachable!");
-          return;
-        }
-        setErrorMessage(err?.response.data);
-      })
-      .finally(() => {
-        // set is fetching to false
-        setIsFetching(false);
-      });
-  }, [currentUserID, availableUserConversations]);
-
-  // hold the message clicked bool
-  const [messageClicked, setMessageClicked] = useState(false);
-
-  // controll showing of new conversation when fab is clicked
-  const [fabNewConversation, setFabNewConversation] = useState(false);
 
   // handle complete opening the focused conversation
   const handleOpenFocusedConversation = () => {
-    // set available conversations to null for refresh from the backend
-    setAvailableUserConversations([]);
 
     // show message details and hide all messages
     setMessageClicked((prev) => !prev);
@@ -132,7 +91,6 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
         <Box mt={1}>
           <NewConversation
             handleFabClicked={handleFabClicked}
-            setAvailableUserConversations={setAvailableUserConversations}
           />
         </Box>
       ) : (
@@ -154,7 +112,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
             {!messageClicked ? (
               <Box pt={2} pb={2}>
                 {
-                  availableUserConversations?.map((conversation, index) => (
+                  conversations?.map((conversation, index) => (
                     <ConversationLayout
                       conversation={conversation}
                       handleConversationClicked={handleConversationClicked}

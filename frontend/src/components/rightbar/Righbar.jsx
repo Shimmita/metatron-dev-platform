@@ -1,8 +1,10 @@
+import { InsightsRounded } from "@mui/icons-material";
 import { Backdrop, Box, Button, Stack } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { handleSidebarRightbar } from "../../redux/AppUI";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import BasicSpeedDial from "../custom/SpeedDial";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
@@ -12,7 +14,6 @@ import JobsContainer from "./JobsContainer";
 import RequestContainer from "./RequestContainer";
 import RightBarStepper from "./RightBarStepper";
 import "./Rightbar.css";
-import { InsightsRounded } from "@mui/icons-material";
 
 const RightbarAll = () => {
   // backdrop state
@@ -28,6 +29,8 @@ const RightbarAll = () => {
 
   const handleNavigateJobs=()=>{
     navigate("/jobs"); 
+    // update the bottom index to match jobs
+    dispatch(updateCurrentBottomNav(1))
     // disable sidebar
       if (isSidebarRighbar) {
         dispatch(handleSidebarRightbar());
@@ -82,7 +85,7 @@ const RightbarAll = () => {
               <JobsContainer />
               <Box display={'flex'} justifyContent={'center'} width={'auto'}>
 
-              <Button startIcon={<InsightsRounded/>} onClick={handleNavigateJobs} size="small" sx={{ textTransform:'capitalize', borderRadius:4 }} >more jobs</Button>
+              <Button startIcon={<InsightsRounded/>} onClick={handleNavigateJobs} size="small" sx={{ textTransform:'capitalize', borderRadius:4}} >more jobs</Button>
               </Box>
             </Stack>
 

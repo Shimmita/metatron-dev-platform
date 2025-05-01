@@ -1,86 +1,54 @@
-import {
-  BarChartRounded,
-  FavoriteRounded,
-  Flag,
-  ForumRounded,
-  GitHub,
-} from "@mui/icons-material";
+import { FavoriteRounded, Flag, ForumRounded, GitHub } from "@mui/icons-material";
 import {
   Avatar,
   Box,
   CardActionArea,
   Divider,
   Stack,
-  Typography,
+  Tooltip,
+  Typography
 } from "@mui/material";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import ListItemText from "@mui/material/ListItemText";
 import React from "react";
-import DevLogo from "../../../images/dev.jpeg";
-import CustomCountryName from "../../utilities/CustomCountryName";
+import { useNavigate } from "react-router-dom";
+import { getImageMatch } from "../../utilities/getImageMatch";
 
 function FeaturedPost({ post }) {
+  const navigate=useNavigate()
+
+    // navigate to post details routed page, alse close the drawer notification
+    const handleNavigatePostDetailsRoute = () => {
+     ;
+  
+      // navigate
+      navigate("posts/details/" + post?._id);
+    };
+
+      const handlePostImagePresent = () => {
+        // if the url name of the image present in the logo names use getImage fn
+        const arrayFreeLogoName = getImageMatch("", true)[0];
+        if (arrayFreeLogoName?.includes(post?.post_url)) {
+          // they used free logo images, return the matching image using getImage
+          return getImageMatch(post?.post_url);
+        }
+    
+        // the user possibly uploaded the image to cloud thus return the url incorporated
+        return post?.post_url;
+      };
+   
   return (
-    <CardActionArea>
-      <List sx={{ width: "100%", minWidth: 200, bgcolor: "background.paper" }}>
-        <ListItem>
-          <ListItemAvatar>
-            <Avatar
-              variant="rounded"
-              src={DevLogo}
-              sx={{
-                backgroundColor: "#1976D2",
-                width: 40,
-                height: 40,
-              }}
-              alt="S"
-              aria-label="avatar"
-            />
-          </ListItemAvatar>
-          <ListItemText
-            primary={
-              <Typography
-                sx={{ color: "text.primary" }}
-                fontWeight={"bold"}
-                gutterBottom
-                variant="body2"
-                textTransform={"uppercase"}
-              >
-                {post?.post_owner?.ownername}
-              </Typography>
-            }
-            secondary={
-              <React.Fragment>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  color={"text.secondary"}
-                >
-                  {post?.post_owner?.ownertitle}
-                </Typography>
+    <Box mb={2}>
+      <Tooltip title="view this post" arrow>
+      <CardActionArea onClick={handleNavigatePostDetailsRoute}>
+    <Box display={'flex'} justifyContent={'space-around'} alignItems={'center'}>
+      {/* image preview of the post */}
+      <Box>
+    <Avatar alt="" src={handlePostImagePresent()} variant="rounded" sx={{ width:125, height:125 }}/>
+      </Box>
 
-                <Typography variant="body2" color={"text.secondary"}>
-                  {CustomCountryName(post?.post_location?.country)} |{" "}
-                  {post?.post_location?.state}
-                </Typography>
-              </React.Fragment>
-            }
-          />
-        </ListItem>
-
-        <Stack gap={1} width={"100%"}>
-          <Typography
-            textAlign={"end"}
-            variant="body2"
-            color={"text.secondary"}
-            pr={2}
-          >
-            {post?.post_title}
+          <Stack gap={1} justifyContent={'center'}>
+          <Typography variant="body2" fontWeight={'bold'} textAlign={'center'}>{post?.post_title}</Typography>
+          <Typography variant="body2"  textAlign={'center'}>  {post?.post_category.main}
           </Typography>
-
-          {/* post counters */}
           <Box
             display={"flex"}
             justifyContent={"flex-end"}
@@ -88,10 +56,7 @@ function FeaturedPost({ post }) {
             gap={1}
             pr={1}
           >
-            {/* stats svg */}
-            <Box>
-              <BarChartRounded sx={{ width: 16, height: 16 }} />
-            </Box>
+          
             <Box
               sx={{
                 pe: 1,
@@ -158,11 +123,15 @@ function FeaturedPost({ post }) {
                 {post?.report_count}
               </Typography>
             </Box>
-          </Box>
-        </Stack>
-      </List>
-      <Divider variant="fullWidth" component="div" className="pt-2" />
+            </Box>
+          </Stack>
+    </Box>
     </CardActionArea>
+    <Divider className="p-1"/>
+    </Tooltip>
+    </Box>
+
+
   );
 }
 

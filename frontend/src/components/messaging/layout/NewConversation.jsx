@@ -65,7 +65,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-function NewConversation({ handleFabClicked, setAvailableUserConversations }) {
+function NewConversation({ handleFabClicked }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [userSearched, setUserSearched] = useState({});
   const [suggestions, setSuggestions] = useState([]);
@@ -88,7 +88,7 @@ function NewConversation({ handleFabClicked, setAvailableUserConversations }) {
         // set is fetching to true
         setIsFetching(true);
         const response = await axios.get(
-          `http://localhost:5000/metatron/api/v1/users/all/search/result/user`,
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/search/result/user`,
           {
             params: { search: value },
           }
@@ -123,18 +123,16 @@ function NewConversation({ handleFabClicked, setAvailableUserConversations }) {
       participants: [user._id, userSearched._id],
     };
 
-    // call api request to post data to the backed
+    // call api request to post data to the backend
     try {
       // set is fetching to true
       setIsUploading(true);
       const response = await axios.post(
-        `http://localhost:5000/metatron/api/v1/conversations/users/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/create`,
         conversation
       );
-      //update the conversation with the one returned from the backend
       if (response.data) {
-        // set conversations to [] this will refresh whole conversations from server
-        setAvailableUserConversations([]);
+   
         // revere the state which will display conversations
         handleFabClicked();
       }

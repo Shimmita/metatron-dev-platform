@@ -13,7 +13,6 @@ import MuiAccordionSummary, {
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
 import FriendRequest from "../../rightbar/layouts/FriendRequest";
 import PostReaction from "./PostReaction";
 import PostReported from "./PostReported";
@@ -66,7 +65,6 @@ export default function NotifAccordionLayout({
   const [openReported, setOpenReported] = useState(true);
 
 
- 
 
   return (
     <Stack gap={2}>

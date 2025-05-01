@@ -151,7 +151,6 @@ function CardFeedMore({
   };
 
   return (
-    <React.Fragment>
       <Box borderRadius={5}>
         {isFriend ? (
           <React.Fragment>
@@ -174,17 +173,7 @@ function CardFeedMore({
                 primary={"Download Media"}
               />
             </MenuItem>
-            {/* repost content */}
-            <Divider component={"li"} />
-            <MenuItem>
-              <ListItemText>
-                <PostAddRounded color="secondary" className="mx-2" />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={"Repost Content"}
-              />
-            </MenuItem>
+          
 
             {/* report content */}
             <Divider component={"li"} />
@@ -222,17 +211,7 @@ function CardFeedMore({
               />
             </MenuItem>
 
-            {/* repost content */}
-            <Divider component={"li"} />
-            <MenuItem>
-              <ListItemText>
-                <PostAddRounded color="secondary" className="mx-2" />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={"Repost Content"}
-              />
-            </MenuItem>
+        
 
             {/* report post */}
             <Divider component={"li"} />
@@ -248,7 +227,6 @@ function CardFeedMore({
           </React.Fragment>
         )}
       </Box>
-    </React.Fragment>
   );
 }
 

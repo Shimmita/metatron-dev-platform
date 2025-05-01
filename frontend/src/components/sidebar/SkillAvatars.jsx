@@ -19,9 +19,9 @@ export default function SkillAvatars({ user, isDarkMode }) {
           <AvatarGroup max={user?.selectedSkills?.length}>
             {/* loop through the skills and their images matched using custim fn */}
             {user?.selectedSkills?.map((skill, index) => (
-              <Tooltip title={skill} arrow>
+              <Tooltip title={skill} arrow  key={index}
+>
                 <Avatar
-                  key={index}
                   alt={skill}
                   className="border"
                   sx={{ width: 30, height: 30 }}
@@ -66,7 +66,7 @@ export default function SkillAvatars({ user, isDarkMode }) {
           maxWidth={275}
           display={"flex"}
           justifyContent={"center"}
-          px={"2px"}
+          px={"4px"}
         >
           {user?.about && user?.about ? (
             <Typography

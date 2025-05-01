@@ -1,14 +1,15 @@
 import {
   CoffeeRounded,
   DarkModeRounded,
-  HelpCenterRounded,
   Smartphone,
+  SupportAgentRounded,
   TipsAndUpdatesRounded
 } from "@mui/icons-material";
 import {
   Avatar,
   Badge,
   Box,
+  Divider,
   List,
   ListItemButton,
   ListItemIcon,
@@ -30,6 +31,7 @@ import { useDispatch, useSelector } from "react-redux";
 import devImage from "../../images/dev.jpeg";
 import logoCompany from "../../images/logo_sm.png";
 import { handleShowChatBot } from "../../redux/CurrentChatBot";
+import AlertGeneral from "../alerts/AlertGeneral";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -136,6 +138,11 @@ const Sidebar = () => {
   const handleShowAboutMetatron = () => {
     dispatch(showAboutMetatron(true));
   };
+
+  // handle showing of the alert mobile app not yet developed
+  const handleMobileApp=()=>{
+    setOpenMobileApp(prev=>!prev)
+  }
   return (
     <Box
       height={"90vh"}
@@ -192,44 +199,44 @@ const Sidebar = () => {
                 <Skeleton variant="rectangular" height={"20vh"} />
               </Box>
             ) : (
-                <BoxAvatarContent>
-                  <Box width={"100%"}>
-                    <Box className={isDarkMode && "bg-dark rounded-top"}>
-                      <Box
-                        display={"flex"}
-                        justifyContent={"center"}
-                        alignItems={"center"}
-                        p={1}
+              <BoxAvatarContent>
+                <Box width={"100%"}>
+                  <Box className={isDarkMode && "bg-dark rounded-top"}>
+                    <Box
+                      display={"flex"}
+                      justifyContent={"center"}
+                      alignItems={"center"}
+                      p={1}
+                    >
+                      <StyledBadge
+                        overlap="circular"
+                        anchorOrigin={{
+                          vertical: "bottom",
+                          horizontal: "right",
+                        }}
+                        variant="dot"
                       >
-                        <StyledBadge
-                          overlap="circular"
-                          anchorOrigin={{
-                            vertical: "bottom",
-                            horizontal: "right",
-                          }}
-                          variant="dot"
-                        >
-                          <Avatar
-                            alt={user?.name?.split(" ")[0]}
-                            src={
-                              !businessAccount
-                                ? devImage || logoCompany
-                                : logoCompany || logoCompany
-                            }
-                            sx={{ width: 100, height: 100, mt: 1 }}
-                          />
-                        </StyledBadge>
-                      </Box>
-                      <Box display={"flex"} justifyContent={"center"} pb={2}>
-                        
-                            <SkillAvatars user={user} isDarkMode={isDarkMode} />
-                      
-                      </Box>
+                        <Avatar
+                          alt={user?.name?.split(" ")[0]}
+                          src={
+                            !businessAccount
+                              ? devImage || logoCompany
+                              : logoCompany || logoCompany
+                          }
+                          sx={{ width: 100, height: 100, mt: 1 }}
+                        />
+                      </StyledBadge>
+                    </Box>
+                    <Box display={"flex"} justifyContent={"center"} pb={2}>
+                      <SkillAvatars user={user} isDarkMode={isDarkMode} />
                     </Box>
                   </Box>
-                </BoxAvatarContent>
+                </Box>
+              </BoxAvatarContent>
             )}
           </Box>
+
+          <Divider component="div" />
           <Box bgcolor={"background.default"} p={1}>
             {isLoadingRequest ? (
               <Skeleton variant="rectangular" width={"100%"} height={"35vh"} />
@@ -250,7 +257,10 @@ const Sidebar = () => {
                 {/* customer help */}
                 <ListItemButton onClick={handleTechnicalSupport}>
                   <ListItemIcon>
-                    <HelpCenterRounded color="primary" sx={{ width: 28, height: 28 }} />
+                    <SupportAgentRounded
+                      color="primary"
+                      sx={{ width: 28, height: 28 }}
+                    />
                   </ListItemIcon>
                   <ListItemText
                     primary={
@@ -260,11 +270,12 @@ const Sidebar = () => {
                 </ListItemButton>
 
                 {/* install app */}
-                <ListItemButton
-                  onClick={(e) => setOpenMobileApp(!openMobileApp)}
-                >
+                <ListItemButton onClick={handleMobileApp}>
                   <ListItemIcon>
-                    <Smartphone color="primary" sx={{ width: 30, height: 30 }} />
+                    <Smartphone
+                      color="primary"
+                      sx={{ width: 30, height: 30 }}
+                    />
                   </ListItemIcon>
                   <ListItemText
                     primary={
@@ -276,7 +287,10 @@ const Sidebar = () => {
                 {/* sponsor us */}
                 <ListItemButton onClick={handleShowingSponsorship}>
                   <ListItemIcon>
-                    <CoffeeRounded color="primary" sx={{ width: 30, height: 30 }} />
+                    <CoffeeRounded
+                      color="primary"
+                      sx={{ width: 30, height: 30 }}
+                    />
                   </ListItemIcon>
                   <ListItemText
                     primary={
@@ -288,7 +302,10 @@ const Sidebar = () => {
                 {/* about metatron */}
                 <ListItemButton onClick={handleShowAboutMetatron}>
                   <ListItemIcon>
-                    <TipsAndUpdatesRounded color="primary" sx={{ width: 28, height: 28 }} />
+                    <TipsAndUpdatesRounded
+                      color="primary"
+                      sx={{ width: 28, height: 28 }}
+                    />
                   </ListItemIcon>
                   <ListItemText
                     primary={
@@ -346,6 +363,15 @@ const Sidebar = () => {
           )} */}
         </Box>
       </Box>
+
+      {/* alert General for mobile app under development */}
+      <AlertGeneral
+        title={"Mobile App"}
+        message={"Mobile application is still under development once completed by our esteemed software engineers, it will be rolled out."}
+        openAlertGeneral={openMobileApp}
+        setOpenAlertGenral={setOpenMobileApp}
+        defaultIcon={<Smartphone/>}
+      />
     </Box>
   );
 };

@@ -24,6 +24,7 @@ import currentUserReducer from "./CurrentUser";
 import currentModalReducer from "./CurrentModal";
 import currentNetworkReducer from "./CurrentNetwork";
 import currentPostsTopReducer from "./CurrentPostsTop";
+import currentConversationReducer from './CurrentConversations'
 
 // Configure persist settings
 const persistConfig = {
@@ -53,6 +54,7 @@ const rootReducer = combineReducers({
   currentModal: currentModalReducer,
   currentNetwork: currentNetworkReducer,
   currentPostsTop: currentPostsTopReducer,
+  currentConversation:currentConversationReducer
 });
 
 // Persist the root reducer for caching session states

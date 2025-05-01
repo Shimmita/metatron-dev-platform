@@ -40,7 +40,6 @@ const reporting_about_array = [
   "Irrelevant tech content",
   "Plagiarised tech content",
   "Scammish and fraudulent",
-  "I prefer other option",
 ].sort();
 
 export default function AlertReportPost({
@@ -137,7 +136,6 @@ export default function AlertReportPost({
     setMessage("");
   };
   return (
-    <React.Fragment>
       <Dialog
         open={openAlertReport}
         TransitionComponent={Transition}
@@ -171,14 +169,13 @@ export default function AlertReportPost({
 
           {/* post title */}
           <Box display={"flex"} justifyContent={"center"}>
-            <Typography variant="body2">{post?.post_title}</Typography>
+            <Typography variant="body2" fontWeight={'bold'}>{post?.post_title}</Typography>
           </Box>
         </Stack>
         <form onSubmit={handleSubmitReport}>
           <DialogContent dividers>
             {/* show message if present */}
             {message && (
-              <React.Fragment>
                 <Collapse in={message || false}>
                   <Alert
                     severity="info"
@@ -198,13 +195,12 @@ export default function AlertReportPost({
                     {message}
                   </Alert>
                 </Collapse>
-              </React.Fragment>
             )}
 
             <Box mb={1} mt={message && 1}>
               <DialogContentText>
                 Metatron has provided default issues facing digital content
-                select appropriately.
+                select the most appropriate.
               </DialogContentText>
             </Box>
             <Stack gap={3}>
@@ -221,8 +217,8 @@ export default function AlertReportPost({
                 disabled={isFetching || message}
                 variant="outlined"
               >
-                {reporting_about_array &&
-                  reporting_about_array.map((about, index) => (
+                {
+                  reporting_about_array?.map((about, index) => (
                     <MenuItem
                       key={index}
                       value={about}
@@ -277,6 +273,5 @@ export default function AlertReportPost({
           </DialogActions>
         </form>
       </Dialog>
-    </React.Fragment>
   );
 }

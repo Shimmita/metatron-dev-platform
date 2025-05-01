@@ -21,7 +21,7 @@ export default function ConversationLayout({
 }) {
   // function to reduct nessage header or summary
   const handleMessageSummary = () => {
-    const lastMessage = conversation && conversation?.lastMessage;
+    const lastMessage = conversation?.lastMessage;
     if (CustomDeviceSmallest()) {
       return lastMessage.substring(0, 12) + "...";
     }
@@ -61,7 +61,7 @@ export default function ConversationLayout({
     if (currentUserID !== conversation?.lastSenderId) {
       if (!conversation?.isTargetRead) {
         return true;
-      } else return false;
+      } 
     }
   };
 

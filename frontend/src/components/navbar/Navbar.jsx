@@ -19,7 +19,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { lazy, Suspense, useLayoutEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useLayoutEffect, useState } from "react";
 
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,6 +36,7 @@ import {
 } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import { updateCurrentConnectNotif } from "../../redux/CurrentConnectNotif";
+import { updateConversations } from "../../redux/CurrentConversations";
 import {
   resetClearCurrentGlobalSearch,
   updateCurrentGlobalSearchResults,
@@ -117,10 +118,10 @@ const Navbar = ({mode,setMode}) => {
     const { post_reactions } = useSelector((state) => state.currentPostReactions);
     const { reportedPost } = useSelector((state) => state.currentReportedPost);
     const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
+    const { conversations } = useSelector((state) => state.currentConversation);
   
   // extracting current user ID
   const { _id } = user;
-
 
   // redux state UI
   const {
@@ -327,6 +328,38 @@ const Navbar = ({mode,setMode}) => {
         setIsFetching(false);
       });
   }, [dispatch, _id]);
+
+
+  // fetch or get all conversations done by the current user
+    useLayoutEffect(() => {
+      // set is fetching to true
+      setIsFetching(true);
+  
+      // performing post request under the id of the current user
+      axios
+        .get(
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/all/${_id}`,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          // update the states of conversations
+         dispatch(updateConversations(res?.data)) ;
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage("server is unreachable!");
+            return;
+          }
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          // set is fetching to false
+          setIsFetching(false);
+        });
+    }, [_id, dispatch]);
    
 
   return (
