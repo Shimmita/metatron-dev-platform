@@ -1,3 +1,4 @@
+import { Close, DoneRounded, SendOutlined } from "@mui/icons-material";
 import { Alert, Badge, Box, Button, CircularProgress, Collapse, IconButton, InputBase, Stack, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
@@ -9,21 +10,15 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import devImage from "../../images/dev.jpeg";
 import { getElapsedTime } from "../utilities/getElapsedTime";
-import { Close, DoneRounded, Reply, SendOutlined } from "@mui/icons-material";
-import CustomCountryName from "../utilities/CustomCountryName";
-import CommentsReply from "./CommentsReply";
 
 const MAX_TEXT_LENGTH=100
 
-export default function CommentUser({ comment: commenter, postId, setPostDetailedData }) {
+export default function CommentsReply({ comment: commenter, setPostDetailedData, setRepliesData }) {
   const [isUploading, setIsUploading] = useState(false);  
   const [replyText, setReplyText] = useState("");
   const [errorMessage, setErrorMessage] = useState("");  
-  const[isOpenReply,setIsOpenReply]=useState(false)
-  const[isOpenReplyComments,setIsOpenReplyComments]=useState(false)
   const[isEditing,setIsEditing]=useState(false)
   const[isDeleteComment,setIsDeleteComment]=useState(false)
-  const [repliesData,setRepliesData]=useState([])
 
     // axios default credentials
     axios.defaults.withCredentials = true;
@@ -37,13 +32,6 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
     // hold the id of the comment, this is not userId
     const commentId=commenter?._id
 
-    // holds the commenter id, the id of the owner of the parent comment
-    const parentCommenterId=commenter?.userId
-
-    // handle showing of the reply box input
-    const handleShowReplyInput=()=>{
-      setIsOpenReply((prev)=>!prev)
-    }
 
     // handle editing
     const handleEditing=()=>{
@@ -58,79 +46,26 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
       setIsDeleteComment((prev)=>!prev)
     }
 
-    // handle complete sending reply
-      const handleCompleteSendingReply=()=>{
-        // extract basic current user details
-        const { avatar, name, specialisationTitle: title } = user || {};
-
-        // user location
-        const country = CustomCountryName(user?.country);
-
-        const replyCommentObject = {
-          userId,
-          avatar,
-          name,
-          country,
-          title,
-          parentPostId:postId,
-          parentCommentId:commentId,
-          parentCommenterId,
-          minimessage:replyText
-        };
-
-        setIsUploading(true);
-          // performing delete request
-          axios
-            .post(
-              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/reply/comments/`, replyCommentObject,
-              {
-                withCredentials: true,
-              }
-            )
-            .then((res) => {
-              // update passedPost with the returned post object
-             setPostDetailedData(res.data)
-            })
-            .catch(async (err) => {
-
-              if (err?.code === "ERR_NETWORK") {
-                setErrorMessage("Server Unreachable");
-                return;
-              }
-      
-              setErrorMessage(err?.response.data);
-
-              console.log(errorMessage)
-            })
-            .finally(() => {
-              setIsUploading(false);
-              setIsOpenReply(false)
-            });
-
-        }
-    
     // handle update the comment now
-    const handleCompleteUpdateComment=()=>{
+    const handleCompleteUpdateCommentReply=()=>{
       const commentObject={
-        postId,
         userId,
         commentId,
         replyText
       }
 
-
       setIsUploading(true);
           // performing delete request
           axios
             .put(
-              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/edit/comments/`, commentObject,
+              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/edit/reply/comments/`, commentObject,
               {
                 withCredentials: true,
               }
             )
             .then((res) => {
-              // update passedPost with the returned post object
-             setPostDetailedData(res.data)
+              // update the comment replies with data from the backend
+              setRepliesData(res.data)
             })
             .catch(async (err) => {
 
@@ -151,20 +86,21 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
 
   
     // handle delete comment now
-    const handleCompleteCommentDeletion=()=>{
+    const handleCompleteCommentReplyDeletion=()=>{
 
       setIsUploading(true);
           // performing delete request
           axios
             .delete(
-              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/delete/comments/${postId}/${userId}/${commentId}`,
+              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/delete/reply/comments/${userId}/${commentId}`,
               {
                 withCredentials: true,
               }
             )
             .then((res) => {
-              // update passedPost with the returned post object
-             setPostDetailedData(res.data)
+              // update response from the backend (parentPost, repliesData)
+              setRepliesData(res.data?.replies)
+              setPostDetailedData(res.data?.parentPost)
             })
             .catch(async (err) => {
 
@@ -182,51 +118,11 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
               setIsDeleteComment(false)
             });
 
-
     }
 
-
-    // handle showing of the replies to a comment
-    const handleShowCommentReplies=()=>{
-      // trigger showing of the reply box
-      setIsOpenReplyComments(prev=>!prev)
-
-      if (isOpenReplyComments) {
-        return
-      }
-
-      setIsUploading(true);
-          // performing delete request
-          axios
-            .get(
-              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/reply/comments/${postId}/${commentId}/${userId}`,
-              {
-                withCredentials: true,
-              }
-            )
-            .then((res) => {
-              // update the comments reply object
-             setRepliesData(res.data)
-
-            })
-            .catch(async (err) => {
-
-              if (err?.code === "ERR_NETWORK") {
-                setErrorMessage("Server Unreachable");
-                return;
-              }
-      
-              setErrorMessage(err?.response.data);
-
-              console.log(errorMessage)
-            })
-            .finally(() => {
-              setIsUploading(false);
-            });
-    }
 
   return (
-    <List className="w-100" sx={{ bgcolor: "background.paper", borderBottom:'1px solid', borderColor:'divider' }}>
+    <List className="w-100 rounded" sx={{ bgcolor: "background.paper", border:'1px solid', borderColor:'divider', mt:1.5 }}>
       <ListItem alignItems="flex-start">
         <ListItemAvatar>
           <Avatar
@@ -242,23 +138,18 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
               justifyContent={"space-between"}
               alignItems={"center"}
             >
-              <Typography 
-              variant={"body2"}
-              component={'span'}
-              alignItems={"center"}
+              <Typography variant={"body2"} component={'span'}  sx={{ color: "text.primary" }}>
+                {commenter?.name}
 
-              
-              >
-                {commenter?.name}  
-                {isCurrentUserComment && (
-                  <Typography
-                  ml={1}
-                  variant={"caption"}
-                  sx={{ color: "text.secondary", fontSize:'x-small' }}
-                >
-                {"(You)"}
-                </Typography>
-                )}
+                   {isCurrentUserComment && (
+                                  <Typography
+                                  ml={1}
+                                  variant={"caption"}
+                                  sx={{ color: "text.secondary", fontSize:'x-small' }}
+                                >
+                                {"(You)"}
+                                </Typography>
+                                )}
               </Typography>
 
               <Typography variant={"caption"}>
@@ -299,30 +190,20 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 </Typography>              
               </Box>
               {/* edit and delete buttons if current user's comment else reply */}
-              <Box display={'flex'} alignItems={'center'} gap={1} mt={1}>
-              {isCurrentUserComment ? (
+              <Box display={'flex'} alignItems={'center'} mt={1} gap={1}>
+              {isCurrentUserComment && (
                 <React.Fragment>
                 {/* edit button */}
                 <Button onClick={handleEditing} variant={isEditing ? 'outlined':'text'} size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>edit</Button>
 
                 {/* delete button */}
                 <Button disabled={isDeleteComment} onClick={handleDeleteComment} variant="text" color="warning" size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>delete</Button>
-                {/* view replies button, only shown if the comment got at-least a comment */}
-                {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>{commenter?.replyCount} replied</Button>}
-                </React.Fragment>
-              ):(
-                <React.Fragment>
-                {/* reply button */}
-               <Button onClick={handleShowReplyInput} variant={isOpenReply ? 'outlined':'text'} size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>reply</Button>
-               {/* view replies button, only shown if the comment got at-least a comment */}
-               {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>{commenter?.replyCount} replied</Button>
-              
-              }
+
                 </React.Fragment>
               )}
               </Box>
 
-              {(isOpenReply || isEditing) && (
+              {isEditing && (
                 <React.Fragment>
                   {/* reply input text  */}
                             <Box
@@ -345,7 +226,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                                   maxRows={2}
                                   disabled={isUploading}
                                   className="w-100"
-                                  placeholder={`${isOpenReply ? 'reply text':'edit text'} ...`}
+                                  placeholder={" edit text ..."}
                                   sx={{
                                     fontSize: "small",
                                   }}
@@ -360,7 +241,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                                   <Badge badgeContent={`${MAX_TEXT_LENGTH - replyText.length}`}>
                                     <IconButton
                                       disabled={replyText.length > MAX_TEXT_LENGTH || replyText===commenter?.minimessage}
-                                      onClick={isEditing ? handleCompleteUpdateComment: handleCompleteSendingReply}
+                                      onClick={handleCompleteUpdateCommentReply}
                                     >
                                       <SendOutlined
                                         color={replyText.length <= MAX_TEXT_LENGTH && replyText!==commenter?.minimessage ? "primary" : "inherit"}
@@ -390,11 +271,9 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                          color="inherit"
                          size="small"
                          disabled={isUploading}
-                         onClick={handleCompleteCommentDeletion}
+                         onClick={handleCompleteCommentReplyDeletion}
                        >
                         {isUploading ? <CircularProgress size={15} /> :<DoneRounded color="warning" sx={{ width:16,height:16 }}/>}
-
-                         
                        </IconButton>
                        |{/* no btn */}
                        <IconButton
@@ -411,7 +290,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                  >
                    <Box mb={1}>
                      <Typography variant="body2">
-                     {isUploading ? "deleting...":"delete ?"}
+                       {isUploading ? "deleting...":"delete ?"}
                      </Typography>
                    </Box>
                
@@ -422,14 +301,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
               )}
 
               {/* show replies to the comment */}
-              {isOpenReplyComments && repliesData && (
-                <React.Fragment>
-                  {repliesData?.map(replyData=>(
-                   <CommentsReply key={replyData?._id} comment={replyData} setPostDetailedData={setPostDetailedData} setRepliesData={setRepliesData}/>
-
-                  ))}
-                </React.Fragment>
-              ) }
+              
             </Box>
           }
         />

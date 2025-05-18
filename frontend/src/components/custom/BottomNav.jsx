@@ -27,13 +27,13 @@ const BottomNav = () => {
 
   // return home or default card page
   const handleReturnHome = () => {
-    // update the sidbar to be shown always
-    // always default sidebar and rightbar showing for larger screens
+    // update the sidebar to be shown always
+    // always default sidebar and right-bar showing for larger screens
     if (!isSidebarRighbar) {
       dispatch(handleSidebarRightbar());
     }
 
-    // show speed dial if aint visible
+    // show speed dial if ain't visible
     dispatch(handleShowingSpeedDial(true));
 
     // return home

@@ -53,13 +53,12 @@ export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
   } = user || {};
 
   // checks for if current user is friends
-  const isFriends =
-    miniProfileData && miniProfileData?.network?.includes(currentUserId);
+  const isFriends =miniProfileData?.network?.includes(currentUserId);
 
   useEffect(() => {
     // fetch details of the liked or reacted user based on their id
     axios
-      .get(`http://localhost:5000/metatron/api/v1/users/all/${userId}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/${userId}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -131,7 +130,7 @@ export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
     // performing post request and passing
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/connections/connection/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/create`,
         dataUserAcknowLedging
       )
       .then((res) => {
@@ -158,11 +157,11 @@ export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
     // set is fetching to true
     setIsFetching(true);
 
-    // performing delete request and passing id of the currenly user and that of miniprofile user being
+    // performing delete request and passing id of the currently user and that of miniprofile user being
     // viewed
     axios
       .delete(
-        `http://localhost:5000/metatron/api/v1/connections/connection/unfriend/${currentUserId}/${userId}`
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/unfriend/${currentUserId}/${userId}`
       )
       .then((res) => {
         // update the message state
@@ -194,7 +193,7 @@ export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
   // handle sending of the message
   const handleSendMessage = () => {
     if (CustomDeviceIsSmall()) {
-      // navigate user profile specially smalller devices + mesaging true
+      // navigate user profile specially smaller devices + messaging true
       // update the message shown input when drawer is opened
       dispatch(showProfileDrawerMessageInput(true));
       navigate("users/profile/" + userId);
@@ -227,7 +226,6 @@ export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
     <React.Fragment>
       {/* message from backend of connect request */}
       {message && (
-        <React.Fragment>
           <Collapse in={message || false}>
             <Alert
               severity="info"
@@ -247,7 +245,6 @@ export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
               {message}
             </Alert>
           </Collapse>
-        </React.Fragment>
       )}
 
       {/* error present of fetching user details */}
@@ -408,11 +405,10 @@ export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
               {/* skills avatars */}
               <Box display={"flex"} justifyContent={"center"}>
                 <AvatarGroup max={miniProfileData?.selectedSkills?.length}>
-                  {/* loop through the skills and their images matched using custim fn */}
+                  {/* loop through the skills and their images matched using custom fn */}
                   {miniProfileData?.selectedSkills?.map((skill, index) => (
-                    <Tooltip title={skill} arrow>
+                    <Tooltip title={skill} arrow key={skill}>
                       <Avatar
-                        key={index}
                         alt={skill}
                         className="border"
                         sx={{ width: 34, height: 34 }}

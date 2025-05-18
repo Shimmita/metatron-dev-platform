@@ -73,7 +73,7 @@ function UserPostContainDrawer({
       });
   }, [userId, postsData]);
 
-  // handle close aler delete
+  // handle close alert delete
   const handleClose = () => {
     // close alert
     setShowDeleteAlert(false);
@@ -99,7 +99,7 @@ function UserPostContainDrawer({
           // set post data to null for useEffect will re-render
           setPostsData();
 
-          // update redux snack notfication message
+          // update redux snack notification message
           dispatch(updateMessageConnectRequest(res.data));
 
           // update the redux of current posts suppose the post is present
@@ -134,25 +134,24 @@ function UserPostContainDrawer({
         {showDeleteALert && (
           <Collapse in={showDeleteALert || false}>
             <Alert
-              severity="warning"
+              severity="info"
               className="rounded-5"
               action={
                 <Stack direction={"row"} alignItems={"center"} gap={1}>
                   {/* yes btn */}
                   <IconButton
                     aria-label="close"
-                    color="inherit"
+                    color="warning"
                     disabled={isDeleting}
                     size="small"
                     onClick={handleCompletePostDelete}
                   >
-                    <Typography
+                   {isDeleting ? <CircularProgress size={15}/>: <Typography
                       variant="body2"
-                      color={"error"}
                       fontWeight={"bold"}
                     >
                       Yes
-                    </Typography>
+                    </Typography>}
                   </IconButton>
                   |{/* no btn */}
                   <IconButton
@@ -162,20 +161,18 @@ function UserPostContainDrawer({
                     disabled={isDeleting}
                     onClick={handleClose}
                   >
-                    <Typography
+                    {isDeleting ? <CircularProgress size={15}/>:<Typography
                       variant="body2"
                       color={"inherit"}
                       fontWeight={"bold"}
                     >
                       No
-                    </Typography>
+                    </Typography>}
                   </IconButton>
                 </Stack>
               }
             >
-              <Box mb={1}>Delete ?</Box>
-              {/* show progress when is deleting */}
-              {isDeleting && <LinearProgress color="inherit" />}
+              <Box mb={1}>{isDeleting ? "deleting...":"delete post ?"}</Box>
             </Alert>
           </Collapse>
         )}
@@ -216,9 +213,8 @@ function UserPostContainDrawer({
         )}
 
         {/* rendered when there is data only */}
-        {postsData &&
-          postsData?.map((post, index) => (
-            <Box key={index}>
+        {postsData?.map((post,) => (
+            <Box key={post?._id}>
               <UserPostCardDrawer
                 post={post}
                 setPostDetailedData={setPostDetailedData}
@@ -230,20 +226,7 @@ function UserPostContainDrawer({
             </Box>
           ))}
 
-        {/* displayed when no post and no fetching request on progress */}
-        {!(postsData && isFetching && erroMessage) && (
-          <Box width={"100%"}>
-            <Typography
-              mt={"8rem"}
-              textAlign={"center"}
-              fontWeight={"bold"}
-              color={"text.secondary"}
-              variant="body2"
-            >
-              No Post Yet
-            </Typography>
-          </Box>
-        )}
+  
       </Box>
 
       {/* show snack bar of any response of deletion, using snack connect */}

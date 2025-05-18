@@ -101,8 +101,8 @@ const LoginAuth = () => {
         response.user
           .getIdToken()
           .then((token) => {
-            // use axios to fecth user details and if they exist from msg resp
-            // else redirect them to complet reg page
+            // use axios to fetch user details and if they exist from msg resp
+            // else redirect them to complete reg page
             axios
               .post(
                 `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/google/${token}`,
@@ -110,7 +110,7 @@ const LoginAuth = () => {
               )
               .then((res) => {
                 console.log(res);
-                // in the res messge can be true or false if user registered
+                // in the res message can be true or false if user registered
                 if (res?.data?.message) {
                   // user already registered redirect them home
                   // update current user redux states + online status by passing payload
@@ -339,7 +339,7 @@ const LoginAuth = () => {
           <Box>
             {/* displays error when login is unsuccessful */}
             {messageGeneral && (
-              <Box display={"flex"} justifyContent={"center"}>
+              <Box display={"flex"} justifyContent={"center"} mb={1}>
                 <Collapse in={messageGeneral || false}>
                   <Alert
                     className="rounded-5"
@@ -395,7 +395,7 @@ const LoginAuth = () => {
                 label="Email"
                 className="w-75"
                 value={email}
-                onChange={(e) => setEmail(e.target.value.toLowerCase())}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="username@gmail.com"
                 type="email"
               />
@@ -410,7 +410,7 @@ const LoginAuth = () => {
                   required
                   value={password}
                   id="outlined-adornment-password"
-                  onChange={(e) => setPassword(e.target.value.toLowerCase())}
+                  onChange={(e) => setPassword(e.target.value)}
                   type={showPassword ? "text" : "password"}
                   endAdornment={
                     <InputAdornment position="end">
@@ -437,24 +437,18 @@ const LoginAuth = () => {
                 gap={1}
                 alignItems={"center"}
               >
-                <Link
-                  to={"/auth/login/business"}
-                  className="text-decoration-none"
-                >
-                  <Typography
+                 <Typography
                     variant="body2"
-                    sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
                   >
-                    Business Account
+                   Forgot Password?
                   </Typography>
-                </Link>
                 |
                 <Link to={"/auth/recover"} className="text-decoration-none">
                   <Typography
                     variant="body2"
                     sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
                   >
-                    Password Reset
+                    reset password
                   </Typography>
                 </Link>
               </Typography>

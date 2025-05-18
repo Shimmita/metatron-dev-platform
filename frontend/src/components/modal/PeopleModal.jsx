@@ -19,6 +19,7 @@ import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CustomModalHeight from "../utilities/CustomModalHeight";
+import CustomLandScape from "../utilities/CustomLandscape";
 
 // styled modal
 const StyledModalPeople = styled(Modal)({
@@ -50,11 +51,13 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
     >
       <Box
         width={
-          CustomLandscapeWidest()
-            ? "30%"
-            : CustomDeviceIsSmall()
-            ? "95%"
-            : "85%"
+          CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
+            ? "40%"
+            : CustomDeviceTablet()
+            ? "90%"
+            : CustomLandscapeWidest()
+            ? "35%"
+            : "100%"
         }
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
         color={"text.primary"}
@@ -127,10 +130,9 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
               scrollbarWidth: "none",
             }}
           >
-            <Box display={"flex"} flexDirection={"column"} gap={4}>
-              {PeopleConnect &&
-                PeopleConnect?.map((person, index) => (
-                  <FriendRequest key={index} connect_request={person} />
+            <Box display={"flex"} flexDirection={"column"} >
+              {PeopleConnect?.map((person) => (
+                  <FriendRequest key={person?._id} connect_request={person} />
                 ))}
             </Box>
           </Box>

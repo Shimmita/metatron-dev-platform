@@ -1,4 +1,4 @@
-import { Add, Close } from "@mui/icons-material";
+import { Add, Close, PersonAddRounded } from "@mui/icons-material";
 import {
   AvatarGroup,
   Box,
@@ -80,7 +80,7 @@ function FriendRequest({
     // performing post request and passing data for body request
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/connections/connection/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/create`,
         dataUserAcknowLedging
       )
       .then((res) => {
@@ -128,7 +128,7 @@ function FriendRequest({
     // performing post request and passing
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/connections/connection/accept/${connectRequestID}/${senderId}/${currentUserId}`
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/accept/${connectRequestID}/${senderId}/${currentUserId}`
       )
       .then((res) => {
         // update the redux of current post
@@ -161,7 +161,7 @@ function FriendRequest({
       });
   };
 
-  // handle rejecting the user from acceting the connect request
+  // handle rejecting the user from accepting the connect request
 
   // id of the connect request object
   const { _id: connectRequestID } = connect_request || {};
@@ -170,10 +170,10 @@ function FriendRequest({
     // set is fetching to true
     setIsFetching(true);
 
-    // performing post request and passing
+    // performing post request
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/connections/connection/reject/${connectRequestID}`
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/reject/${connectRequestID}`
       )
       .then((res) => {
         // update the redux of current post
@@ -207,7 +207,7 @@ function FriendRequest({
   };
 
   // check if the user is the current user
-  const isCurrentUser = connectRequestID == currentUserId;
+  const isCurrentUser = connectRequestID === currentUserId;
   return (
     <React.Fragment>
       {isLoadingRequest ? (
@@ -235,8 +235,19 @@ function FriendRequest({
           <Divider variant="inset" component="li" />
         </List>
       ) : (
-        <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-          <ListItem>
+        <List
+         sx={{ 
+          display:'flex',
+          justifyContent:'center',
+          alignItems:'center',
+          width: "100%",
+          bgcolor: "background.paper",
+          p:1,
+          }}>
+          <ListItem className="rounded" 
+          sx={{ 
+          border: "1px solid",
+          borderColor: "divider" }}>
             <ListItemAvatar onClick={handleShowMiniProfile}>
               {isAcceptFriends ? (
                 <Avatar
@@ -249,7 +260,8 @@ function FriendRequest({
                   aria-label="avatar"
                 />
               ) : (
-                <Avatar
+                <Tooltip title={'profile'} arrow>
+                  <Avatar
                   src={devImage}
                   variant="rounded"
                   sx={{
@@ -261,6 +273,7 @@ function FriendRequest({
                   alt={connect_request?.name?.split(" ")[0]}
                   aria-label="avatar"
                 />
+                </Tooltip>
               )}
             </ListItemAvatar>
             <ListItemText
@@ -278,31 +291,30 @@ function FriendRequest({
                   {/* location of the user */}
                   {isAcceptFriends ? (
                     <React.Fragment>
+                        <Typography variant="body2" color={"text.secondary"}>
+                        {connect_request?.title}
+                      </Typography>
                       <Typography variant="caption" color={"text.secondary"}>
                         {connect_request?.country} | {connect_request?.state}
                       </Typography>
-
-                      <Typography variant="body2" color={"text.secondary"}>
-                        {connect_request?.title}
-                      </Typography>
+                      <br/>
                       <Typography
                         variant="caption"
-                        color={"text.secondary"}
-                        fontWeight={"bold"}
+                        sx={{ color:'text.primary' }}
                       >
                         - is {connect_request?.message} -
                       </Typography>
                     </React.Fragment>
                   ) : (
                     <React.Fragment>
+                        {/* specialisation of the user */}
+                        <Typography variant="body2" color={"text.secondary"}>
+                        {connect_request?.specialisationTitle}
+                      </Typography>
+
                       <Typography variant="caption" color={"text.secondary"}>
                         {CustomCountryName(connect_request?.country)} |{" "}
                         {connect_request?.county}
-                      </Typography>
-
-                      {/* specialisation of the user */}
-                      <Typography variant="body2" color={"text.secondary"}>
-                        {connect_request?.specialisationTitle}
                       </Typography>
 
                       {/* skills of the user */}
@@ -310,12 +322,11 @@ function FriendRequest({
                         <AvatarGroup
                           max={connect_request?.selectedSkills?.length}
                         >
-                          {/* loop through the skills and their images matched using custim fn */}
+                          {/* loop through the skills and their images matched using custom fn */}
                           {connect_request?.selectedSkills?.map(
                             (skill, index) => (
-                              <Tooltip title={skill} arrow>
+                              <Tooltip title={skill} arrow key={index}>
                                 <Avatar
-                                  key={index}
                                   alt={skill}
                                   className="border"
                                   sx={{ width: 28, height: 28 }}
@@ -350,7 +361,7 @@ function FriendRequest({
                         </Typography>
                       </Box>
 
-                      {/* action bitn accepting request */}
+                      {/* action btn accepting request */}
                       <Stack
                         direction={"row"}
                         gap={"3px"}
@@ -362,7 +373,7 @@ function FriendRequest({
                             color="primary"
                             onClick={handleAcceptConnectRequestFriends}
                           >
-                            <Add sx={{ width: 15, height: 15 }} />
+                            <PersonAddRounded sx={{ width: 18, height: 18 }} />
                           </IconButton>
                         </Tooltip>
 
@@ -372,7 +383,7 @@ function FriendRequest({
                             size="small"
                             onClick={handleRejectConnectRequest}
                           >
-                            <Close sx={{ width: 14, height: 14 }} />
+                            <Close sx={{ width: 17, height: 17 }} />
                           </IconButton>
                         </Tooltip>
                       </Stack>
@@ -397,7 +408,7 @@ function FriendRequest({
                             className="border"
                             onClick={handleSendConnectRequest}
                           >
-                            <Add sx={{ width: 17, height: 17 }} />
+                            <PersonAddRounded sx={{ width: 18, height: 18 }} />
                           </IconButton>
                         </Tooltip>
                       )}
@@ -408,11 +419,10 @@ function FriendRequest({
             </Box>
           </ListItem>
           {/* show divider is is not last item */}
-          {!isLastItem && <Divider variant="inset" component="li" />}{" "}
         </List>
       )}
 
-      {/* will display miniprofile if state is true */}
+      {/* will display mini-profile if state is true */}
       <AlertMiniProfileView
         openAlert={showMiniProfile}
         userId={

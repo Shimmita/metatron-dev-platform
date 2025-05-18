@@ -25,7 +25,7 @@ export default function UserPostCardDrawer({
   const isMyPost = user?._id === post?.post_owner?.ownerId;
 
   const dispatch = useDispatch();
-  //  update the postdetailed data with the current iterated post
+  //  update the post-detailed data with the current iterated post
   // will lift-up the state and make the data available to root parent
   const handlePostDetails = async () => {
     await setPostDetailedData(post);
@@ -66,12 +66,12 @@ export default function UserPostCardDrawer({
   };
 
   return (
-    <Card elevation={0} className="mt-1">
+    <Card elevation={0} className="rounded"  sx={{ border:'1px solid', color:'divider' }}>
       <CardActionArea onClick={handlePostDetails}>
         <CardMedia
           component="img"
           className="rounded"
-          sx={{ maxHeight: CustomDeviceIsSmall() ? 150 : 180 }}
+          sx={{ height: 100}}
           image={handlePostImagePresent()}
           alt="image"
         />
@@ -82,13 +82,18 @@ export default function UserPostCardDrawer({
               variant="body2"
               fontWeight={"bold"}
               textAlign={"center"}
+              sx={{ color:'text.primary' }}
             >
               {post?.post_title}
             </Typography>
           </Box>
           {/* post subcategory */}
           <Box display={"flex"} justifyContent={"center"} mt={1}>
-            <Typography variant="caption" textAlign={"center"}>
+            <Typography 
+            variant="caption" 
+            textAlign={"center"}
+            sx={{ color:'text.primary' }}
+            >
               {post?.post_category.main?.substring(0, 20)}
             </Typography>
           </Box>
@@ -98,11 +103,15 @@ export default function UserPostCardDrawer({
             justifyContent={"space-between"}
             alignItems={"center"}
             width={"100%"}
-            className="border-bottom border-top py-1 "
+            sx={{ 
+              borderTop:'1px solid',
+              borderBottom:'1px solid',
+              color:'divider'
+             }}
           >
             {/* post likes */}
             <Box display={"flex"} alignItems={"center"} gap={"4px"}>
-              <FavoriteRounded sx={{ width: 15, height: 15 }} />{" "}
+              <FavoriteRounded color="info" sx={{ width: 15, height: 15 }} />{" "}
               <Typography
                 fontWeight={"bold"}
                 color={"text.secondary"}
@@ -119,7 +128,7 @@ export default function UserPostCardDrawer({
               alignItems={"center"}
               gap={"4px"}
             >
-              <GitHub sx={{ width: 15, height: 15 }} />{" "}
+              <GitHub color="info" sx={{ width: 15, height: 15 }} />{" "}
               <Typography
                 fontWeight={"bold"}
                 color={"text.secondary"}
@@ -131,7 +140,7 @@ export default function UserPostCardDrawer({
 
             {/* post comments */}
             <Box display={"flex"} alignItems={"center"} gap={"4px"}>
-              <ForumRounded sx={{ width: 15, height: 15 }} />{" "}
+              <ForumRounded color="info" sx={{ width: 15, height: 15 }} />{" "}
               <Typography
                 fontWeight={"bold"}
                 color={"text.secondary"}
@@ -144,7 +153,7 @@ export default function UserPostCardDrawer({
         </CardContent>
       </CardActionArea>
 
-      {/* delet and update buttons if post belongs to the current user */}
+      {/* delete and update buttons if post belongs to the current user */}
       {isMyPost && (
         <Box display={"flex"} justifyContent={"center"}>
           <Box
@@ -155,28 +164,30 @@ export default function UserPostCardDrawer({
           >
             {/* update button */}
             <Button
-              variant="text"
+              variant="outlined"
               sx={{
-                fontSize: "small",
+                fontSize: "x-small",
                 fontWeight: "bold",
                 borderRadius: 2,
-                textTransform: "capitalize",
+                textTransform: "lowercase",
               }}
               size="small"
               onClick={handleUpdateMyPost}
               disabled={deletePostID}
+              disableElevation
               color="success"
             >
               update
             </Button>
             {/* delete button */}
             <Button
-              variant="text"
+            disableElevation
+              variant="outlined"
               sx={{
-                fontSize: "small",
+                fontSize: "x-small",
                 fontWeight: "bold",
                 borderRadius: 2,
-                textTransform: "capitalize",
+                textTransform: "lowercase",
               }}
               size="small"
               disabled={deletePostID}

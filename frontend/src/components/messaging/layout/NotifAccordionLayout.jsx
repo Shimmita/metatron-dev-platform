@@ -68,7 +68,7 @@ export default function NotifAccordionLayout({
 
   return (
     <Stack gap={2}>
-      {/* accordion post reactions notif */}
+      {/* accordion post reactions notify */}
       {post_reactions?.length > 0 && (
         <Accordion
           expanded={openReaction}
@@ -166,7 +166,7 @@ export default function NotifAccordionLayout({
             >
               {connectNotifications?.map((connect, index) => (
                 <FriendRequest
-                  key={index}
+                  key={connect?._id}
                   connect_request={connect}
                   isAcceptFriends={true}
                   isLastItem={connectNotifications?.length - 1 === index}

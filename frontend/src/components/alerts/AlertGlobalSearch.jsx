@@ -76,7 +76,7 @@ export default function AlertGlobalSearch({
     // close the alert
     handleClose();
 
-    // updating current jobs in rdux to match the searched results
+    // updating current jobs in redux to match the searched results
     dispatch(updateCurrentJobs(globalSearchResults?.jobs?.data));
 
     // set is search jobs global in redux ui to true
@@ -107,7 +107,7 @@ export default function AlertGlobalSearch({
 
   // handle updating of the post search
   const handlePostSearchUpdate = () => {
-    // udpate the current posts in the redux by passing the feed from the search
+    // update the current posts in the redux by passing the feed from the search
     dispatch(updateCurrentPostsFromSearch(globalSearchResults?.posts?.data));
     // close the alert result
     handleClose();
@@ -116,7 +116,6 @@ export default function AlertGlobalSearch({
   };
 
   return (
-    <React.Fragment>
       <Dialog
         className="shadow"
         open={openAlert}
@@ -316,6 +315,5 @@ export default function AlertGlobalSearch({
           </Box>
         </DialogContent>
       </Dialog>
-    </React.Fragment>
   );
 }

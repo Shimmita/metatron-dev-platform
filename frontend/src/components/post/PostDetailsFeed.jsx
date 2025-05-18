@@ -32,9 +32,8 @@ import {
 import axios from "axios";
 import React, { lazy, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import dev from "../../images/dev.jpeg";
-import { handleShowingSpeedDial } from "../../redux/AppUI";
 import CardFeedMore from "../custom/CardFeedMore";
 import PostData from "../data/PostData";
 import CustomCountryName from "../utilities/CustomCountryName";
@@ -99,7 +98,7 @@ const PostDetailsFeed = ({
   const openMenu = Boolean(anchorEl);
   const [isUploading, setIsUploading] = useState(false);
   const [messageResponse, setMessageResponse] = useState("");
-  const [isFullDescription, setFullDiscription] = useState(false);
+  const [isFullDescription, setFullDescription] = useState(false);
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
 
   const [editedText, setEditedText] = useState(
@@ -151,7 +150,7 @@ const PostDetailsFeed = ({
   const details = PostData?.details || "";
   const detailsLong = details.length > max_description;
 
-  // get coduntry name
+  // get country name
   const country = CustomCountryName(postDetailedData?.post_location?.country);
 
   // current user info
@@ -174,7 +173,7 @@ const PostDetailsFeed = ({
   const handleOccupation = () => {
     const title = postDetailedData?.post_owner?.ownertitle?.split(" ");
     const first = title[0];
-    var second = title[1];
+    let second = title[1];
 
     if (second?.toLowerCase().includes("developer")) {
       second = "Dev";
@@ -190,7 +189,7 @@ const PostDetailsFeed = ({
   const handleName = () => {
     const title = postDetailedData?.post_owner?.ownername?.split(" ");
     const first = title[0];
-    var second = title[1].substring(0, 1);
+    let second = title[1].substring(0, 1);
 
     return first + " " + second;
   };
@@ -199,7 +198,7 @@ const PostDetailsFeed = ({
   const handleNoProfilePicture = () => {
     const title = postDetailedData?.post_owner?.ownername?.split(" ");
     const first = title[0].substring(0, 1);
-    var second = title[1].substring(0, 1);
+    let second = title[1].substring(0, 1);
 
     return first + "" + second;
   };
@@ -234,7 +233,7 @@ const PostDetailsFeed = ({
     // performing post request
     axios
       .put(
-        `http://localhost:5000/metatron/api/v1/posts/update/likes`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/likes`,
         reactingUserInfo,
         {
           withCredentials: true,
@@ -264,8 +263,8 @@ const PostDetailsFeed = ({
   };
 
   // handle showing full post description
-  const handleFullDiscription = () => {
-    setFullDiscription((prev) => !prev);
+  const handleFullDescription = () => {
+    setFullDescription((prev) => !prev);
   };
 
   // handle the image incorporated in the post for some is free logo
@@ -291,7 +290,7 @@ const PostDetailsFeed = ({
     // performing post request
     axios
       .put(
-        `http://localhost:5000/metatron/api/v1/posts/update/post/${postDetailedData?._id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/post/${postDetailedData?._id}`,
         { post_body: editedText },
         {
           withCredentials: true,
@@ -322,7 +321,7 @@ const PostDetailsFeed = ({
 
  
 
-  // handle close aler delete
+  // handle close alert delete
   const handleClose = () => {
     // close alert
     setMessageResponse("");
@@ -366,7 +365,6 @@ const PostDetailsFeed = ({
         <CardHeader
           sx={{ padding: 0, margin: 0 }}
           avatar={
-            <React.Fragment>
               <IconButton onClick={() => setOpenMiniProfileAlert(true)}>
                 <Avatar
                   // src={post.post_owner.owneravatar}
@@ -382,7 +380,6 @@ const PostDetailsFeed = ({
                   {handleNoProfilePicture()}
                 </Avatar>
               </IconButton>
-            </React.Fragment>
           }
           action={
             <Box
@@ -464,7 +461,7 @@ const PostDetailsFeed = ({
           <CardContent>
             <Box mb={2} width={"100%"}>
               <Box mb={1}>
-                {/* post specialisation */}
+                {/* post specialization */}
                 <Typography
                   variant="body2"
                   textAlign={"center"}
@@ -556,7 +553,7 @@ const PostDetailsFeed = ({
               </Box>
             ) : (
               <CardActionArea
-                onClick={handleFullDiscription}
+                onClick={handleFullDescription}
                 disabled={!detailsLong}
               >
                 <Box display={"flex"} justifyContent={"center"} width={"100%"}>
@@ -683,7 +680,7 @@ const PostDetailsFeed = ({
         )}
       </Card>
 
-      {/* alert for showing user miniprofile details by passing the post ownerID */}
+      {/* alert for showing user mini-profile details by passing the post ownerID */}
       <AlertMiniProfileView
         openAlert={openMiniProfileAlert}
         setOpenAlert={setOpenMiniProfileAlert}

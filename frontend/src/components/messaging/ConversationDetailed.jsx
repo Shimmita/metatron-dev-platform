@@ -34,7 +34,7 @@ const ConversationDetailed = ({
   currentUserID,
 }) => {
   const [replyContent, setReplyContent] = useState("");
-  const [conversationMessges, setConversationMessages] = useState([]);
+  const [conversationMessages, setConversationMessages] = useState([]);
   const [isEditingMessge, setIsEditingMessage] = useState(false);
   const [messageFocused, setMessageFocused] = useState();
 
@@ -70,16 +70,16 @@ const ConversationDetailed = ({
 
   // fetch or get all conversations done by the current user
   useEffect(() => {
-    if (conversationMessges?.length > 0) {
+    if (conversationMessages?.length > 0) {
       return;
     }
     // set is fetching to true
     setIsFetching(true);
 
-    // performing get request for all mesages with coversationId.
+    // performing get request for all messages with coversationId.
     axios
       .get(
-        `http://localhost:5000/metatron/api/v1/conversations/users/message/${focusedConveration?._id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/${focusedConveration?._id}`,
         {
           withCredentials: true,
         }
@@ -100,7 +100,7 @@ const ConversationDetailed = ({
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [conversationMessges, focusedConveration]);
+  }, [conversationMessages, focusedConveration]);
 
   const handleDateDisplay = () => {
     const parent = focusedConveration?.updatedAt?.split("T")[0]?.split("-");
@@ -124,7 +124,7 @@ const ConversationDetailed = ({
 
       // api request
       const response = await axios.post(
-        `http://localhost:5000/metatron/api/v1/conversations/users/message/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/create`,
         messageObject
       );
       // if response data means sent message thus back to conversation page
@@ -136,7 +136,7 @@ const ConversationDetailed = ({
         setReplyContent("");
       }
     } catch (err) {
-      // error occured during fetch query
+      // error occurred during fetch query
       console.error(err);
     } finally {
       // close is fetching
@@ -153,7 +153,7 @@ const ConversationDetailed = ({
 
       // api request
       const response = await axios.put(
-        `http://localhost:5000/metatron/api/v1/conversations/users/message/update/${messageFocused._id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/update/${messageFocused._id}`,
         { content: replyContent }
       );
       // if response data means sent message thus back to conversation page
@@ -182,7 +182,7 @@ const ConversationDetailed = ({
 
       // api request
       const response = await axios.delete(
-        `http://localhost:5000/metatron/api/v1/conversations/users/message/delete/${messageFocused._id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/delete/${messageFocused._id}`,
         { content: replyContent }
       );
       // if response data means sent message thus back to conversation page
@@ -191,7 +191,7 @@ const ConversationDetailed = ({
         setConversationMessages([]);
       }
     } catch (err) {
-      // error occured during fetch query
+      // error occurred during fetch query
       console.error(err);
     } finally {
       // close is fetching
@@ -244,8 +244,8 @@ const ConversationDetailed = ({
         gap={3}
       >
         <Box>
-          {conversationMessges &&
-            conversationMessges.map((message, index) => (
+          {
+            conversationMessages?.map((message, index) => (
               <Stack key={index} gap={2}>
                 {/* current user message styling */}
                 {message.senderId === currentUserID ? (

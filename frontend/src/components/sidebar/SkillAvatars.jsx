@@ -42,7 +42,7 @@ export default function SkillAvatars({ user, isDarkMode }) {
            {user?.name}
         </Typography>
 
-        {/* specialisation */}
+        {/* specialization */}
         <Typography
           display={"flex"}
           justifyContent={"center"}
@@ -71,7 +71,8 @@ export default function SkillAvatars({ user, isDarkMode }) {
           {user?.about && user?.about ? (
             <Typography
               textTransform={"capitalize"}
-              variant="body2"
+              variant="caption"
+              p={1}
               width={"100%"}
               color={"text.secondary"}
             >

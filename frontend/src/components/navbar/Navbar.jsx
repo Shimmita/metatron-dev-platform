@@ -12,6 +12,7 @@ import {
   Avatar,
   Badge,
   Box,
+  Button,
   CircularProgress,
   IconButton,
   styled,
@@ -141,8 +142,8 @@ const Navbar = ({mode,setMode}) => {
 
   // home page
   const handleHome = () => {
-    // update the sidbar to be shown always
-    // always default sidebar and rightbar showing for larger screens
+    // update the sidebar to be shown always
+    // always default sidebar and right-bar showing for larger screens
     if (!isSidebarRighbar) {
       dispatch(handleSidebarRightbar());
     }
@@ -158,7 +159,7 @@ const Navbar = ({mode,setMode}) => {
     navigate("/");
   };
 
-  // show the notificationa and messaing triggered by redux
+  // show the notification and messaging triggered by redux
   const handleShowMessageDrawer = () => {
     dispatch(showMessagingDrawer());
   };
@@ -378,13 +379,11 @@ const Navbar = ({mode,setMode}) => {
           >
             <Box display={"flex"} alignItems={"center"} gap={1}>
               <Avatar alt="KE" src={AppLogo} sx={{ width: 40, height: 40 }} />
-              <Tooltip title={"home"} arrow>
-                <IconButton onClick={handleHome} style={{ color: "white" }}>
-                  <Typography variant="h6" fontWeight={"bold"}>
+                <Button onClick={handleHome} >
+                  <Typography variant="h6" fontWeight={"bold"} sx={{ color:'white' }}>
                     METATRON
                   </Typography>
-                </IconButton>
-              </Tooltip>
+                </Button>
             </Box>
           </LogoContent>
 

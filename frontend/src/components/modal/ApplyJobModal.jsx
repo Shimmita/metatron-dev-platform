@@ -96,12 +96,12 @@ const ApplyJobModal = ({
 
     // set is uploading true
     setIsUploading(true);
-    // create a form which will faciltate parsing of the file for upload to cloud
+    // create a form which will facilitate parsing of the file for upload to cloud
     const formData = new FormData();
     // append post body after stringify it due to form data
     formData.append("jobItem", JSON.stringify(jobItem));
 
-    //  check if document CV, Cover Letter or both presendt and append
+    //  check if document CV, Cover Letter or both present and append
     if (cvUpload) {
       formData.append("file", cvUpload);
     }
@@ -180,7 +180,7 @@ const ApplyJobModal = ({
         <Box
           bgcolor={"background.default"}
           borderRadius={5}
-          className="shadow-lg"
+          className="shadow-lg pt-2"
         >
           {/* toolbar like box */}
           <Box
@@ -190,13 +190,46 @@ const ApplyJobModal = ({
           >
             {/* logo */}
             <Box>
-              <Avatar sx={{ width: 60, height: 60 }} src={AppLogo} alt="logo" />
+              <Avatar sx={{ width: 50, height: 50 }} src={AppLogo} alt="logo" />
             </Box>
 
             {/*  title job application form */}
-            <Typography variant="body1" gutterBottom fontWeight={"bold"}>
+            <Box display={'flex'} justifyContent={'center'} alignItems={'center'} flexDirection={'column'}>
+            <Typography variant="body1" fontWeight={"bold"}>
               {title}
             </Typography>
+
+             {/* org name */}
+          <Typography
+            variant="body2"
+            color={"text.secondary"}
+            textAlign={"center"}
+            gutterBottom
+          >
+            {organisation.name}
+          </Typography>
+
+           {/* salary */}
+           <Typography
+                variant="body2"
+                display={"flex"}
+                gutterBottom
+                color={"text.secondary"}
+                sx={{fontSize:'small' }}
+              >
+                {salary}
+              </Typography>
+
+            <Typography
+                variant="caption"
+                display={"flex"}
+                gutterBottom
+                color={"text.secondary"}
+              >
+                {jobaccesstype?.type} | {jobaccesstype?.access} | {handleCountryName()} | {location.state}
+              </Typography>
+
+            </Box>
 
             {/*close icon */}
             <IconButton
@@ -204,63 +237,11 @@ const ApplyJobModal = ({
               disabled={isUploading || errorMessage}
             >
               <Tooltip title={"close"}>
-                <Close />
+                <Close  sx={{width:20, height:20}}/>
               </Tooltip>
             </IconButton>
           </Box>
 
-          {/* org name */}
-          <Typography
-            variant="body1"
-            color={"text.secondary"}
-            fontWeight={"bold"}
-            textAlign={"center"}
-            gutterBottom
-          >
-            {organisation.name}
-          </Typography>
-
-          {/* job type and means of access if no error message */}
-          {!errorMessage && (
-            <Stack
-              justifyContent={"center"}
-              mt={1}
-              mb={1}
-              alignItems={"center"}
-            >
-              <Typography
-                variant="body2"
-                display={"flex"}
-                gap={2}
-                fontWeight={"bold"}
-                gutterBottom
-                color={"text.secondary"}
-              >
-                {jobaccesstype?.type} | {jobaccesstype?.access}
-              </Typography>
-              {/* salary */}
-              <Typography
-                variant="body2"
-                display={"flex"}
-                gutterBottom
-                fontWeight={"bold"}
-                color={"text.secondary"}
-              >
-                {salary}
-              </Typography>
-
-              {/* location of the job */}
-              <Typography
-                variant="body2"
-                display={"flex"}
-                fontWeight={"bold"}
-                gutterBottom
-                color={"text.secondary"}
-              >
-                {handleCountryName()} | {location.state}{" "}
-              </Typography>
-            </Stack>
-          )}
 
           {/* display error of missing filed if any */}
           <Box

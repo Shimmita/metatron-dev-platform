@@ -1,11 +1,10 @@
 import {
   Diversity1Rounded,
-  Diversity3Rounded,
   GradeRounded,
   LaptopRounded,
   Message,
   PersonAdd,
-  PersonRemove,
+  PersonRemove
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -30,12 +29,12 @@ import {
   resetDefaultBottomNav,
 } from "../../redux/AppUI";
 import { updateMessageConnectRequest } from "../../redux/CurrentSnackBar";
+import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import PostDetailsContainer from "../post/PostDetailsContiner";
 import SnackbarConnect from "../snackbar/SnackbarConnect";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../utilities/getImageMatch";
-import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 const UserNetwork = lazy(() => import("./UserNetwork"));
 const UserPostContainer = lazy(() => import("./UserPostContainer"));
 const UserAbout = lazy(() => import("./UserAbout"));
@@ -96,7 +95,7 @@ export default function UserProfile() {
   const [isFetching, setIsFetching] = useState(true);
   const [isConnecting, setIsConnect] = useState(false);
   const [profileData, setProfileData] = useState();
-  const [erroMessage, setErrorMesssage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   // for full post details rendering
   const [postDetailedData, setPostDetailedData] = useState();
   // controls the tab to be displayed
@@ -126,7 +125,7 @@ export default function UserProfile() {
   // for checking user relationships
   useEffect(() => {
     // map through ids of friends if the current user network
-    // has the id of the post owner, measns are friends else false
+    // has the id of the post owner, means are friends else false
     if (user?.network?.includes(profileData?._id)) {
       setIsFriend(true);
     }
@@ -153,11 +152,11 @@ export default function UserProfile() {
         // there is an error
         if (err?.code === "ERR_NETWORK") {
           // update the snackbar notification of the error of connection
-          setErrorMesssage("Network Error");
+          setErrorMessage("Network Error");
           return;
         }
         // update the snackbar notification of error from the server
-        setErrorMesssage(err?.response.data);
+        setErrorMessage(err?.response.data);
       })
       .finally(() => {
         // set is fetching to false
@@ -174,7 +173,7 @@ export default function UserProfile() {
     return parentName;
   };
 
-  // check if is current user and manouvre the display of follow and send messge btb
+  // check if is current user and manoeuver the display of follow and send message btb
   const isCurrentUser = user._id === userId;
 
   const {
@@ -186,7 +185,7 @@ export default function UserProfile() {
     specialisationTitle: title,
   } = user || {};
 
-  // id of the target user requesting connect, its the id of the profiledata
+  // id of the target user requesting connect, its the id of the profile-data
   const { _id: targetID } = profileData || {};
 
   // handle user connect request
@@ -318,7 +317,7 @@ export default function UserProfile() {
       }
       dispatch(updateMessageConnectRequest(err?.response?.data));
 
-      // error occured during fetch query
+      // error occurred during fetch query
       console.error(err);
     } finally {
       // close is fetching
@@ -380,7 +379,7 @@ export default function UserProfile() {
               </Box>
             )}
             {/* shown when there is an error */}
-            {erroMessage && (
+            {errorMessage && (
               <Box
                 display={"flex"}
                 justifyContent={"center"}
@@ -390,7 +389,7 @@ export default function UserProfile() {
               >
                 <Box display={"flex"} justifyContent={"center"}>
                   <Typography variant="body2" color={"text.secondary"}>
-                    {erroMessage}
+                    {errorMessage}
                   </Typography>
                 </Box>
               </Box>
@@ -417,7 +416,7 @@ export default function UserProfile() {
                       {profileData?.name}
                     </Typography>
                   </Box>
-                  {/* specialisation */}
+                  {/* specialization */}
                   <Box
                     display={"flex"}
                     justifyContent={"center"}
@@ -438,7 +437,7 @@ export default function UserProfile() {
                   >
                     {/* country */}
                     <Typography variant="body2" color={"text.secondary"}>
-                      {/* call this if only miniprofile data present */}
+                      {/* call this if only mini-profile data present */}
                       {handleCountryName(profileData?.country)}
                     </Typography>
                     {/* divider vert */}

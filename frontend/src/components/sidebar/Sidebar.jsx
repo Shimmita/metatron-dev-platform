@@ -1,6 +1,5 @@
 import {
   CoffeeRounded,
-  DarkModeRounded,
   Smartphone,
   SupportAgentRounded,
   TipsAndUpdatesRounded
@@ -20,16 +19,14 @@ import {
 } from "@mui/material";
 
 import {
-  resetDarkMode,
   showAboutMetatron,
   showSponsorAlert,
-  showSupportAlert,
+  showSupportAlert
 } from "../../redux/AppUI";
 
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import devImage from "../../images/dev.jpeg";
-import logoCompany from "../../images/logo_sm.png";
 import { handleShowChatBot } from "../../redux/CurrentChatBot";
 import AlertGeneral from "../alerts/AlertGeneral";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -92,15 +89,10 @@ const Sidebar = () => {
     gap: "1rem",
   });
 
-  // UI theme dark light teaking effect
-  const handleShowDarkMode = () => {
-    // update the redux theme boolean state
-    dispatch(resetDarkMode());
-  };
 
-  // return the screen width in parcentage for wider screens
+  // return the screen width in parentage for wider screens
   // to handle correct positioning issues with middle content feed
-
+  
   const correctWidthInPercentage = () => {
     if (screenWidth > 1200 && screenWidth <= 1400) {
       return "21%";
@@ -121,7 +113,6 @@ const Sidebar = () => {
     dispatch(showSupportAlert(true));
   };
 
-  let businessAccount = false;
 
   // handle showing of the sponsorship program
   const handleShowingSponsorship = () => {
@@ -219,15 +210,14 @@ const Sidebar = () => {
                         <Avatar
                           alt={user?.name?.split(" ")[0]}
                           src={
-                            !businessAccount
-                              ? devImage || logoCompany
-                              : logoCompany || logoCompany
+                            devImage
                           }
                           sx={{ width: 100, height: 100, mt: 1 }}
                         />
                       </StyledBadge>
+
                     </Box>
-                    <Box display={"flex"} justifyContent={"center"} pb={2}>
+                    <Box display={"flex"} justifyContent={"center"} pb={1}>
                       <SkillAvatars user={user} isDarkMode={isDarkMode} />
                     </Box>
                   </Box>
@@ -237,6 +227,7 @@ const Sidebar = () => {
           </Box>
 
           <Divider component="div" />
+
           <Box bgcolor={"background.default"} p={1}>
             {isLoadingRequest ? (
               <Skeleton variant="rectangular" width={"100%"} height={"35vh"} />
@@ -264,7 +255,7 @@ const Sidebar = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={
-                      <Typography variant="body1">Technical Team</Typography>
+                      <Typography variant="body2">Technical Team</Typography>
                     }
                   />
                 </ListItemButton>
@@ -279,7 +270,7 @@ const Sidebar = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={
-                      <Typography variant="body1">Download App</Typography>
+                      <Typography variant="body2">Download App</Typography>
                     }
                   />
                 </ListItemButton>
@@ -294,7 +285,7 @@ const Sidebar = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={
-                      <Typography variant="body1">Sponsor Team</Typography>
+                      <Typography variant="body2">Sponsor Team</Typography>
                     }
                   />
                 </ListItemButton>
@@ -309,27 +300,11 @@ const Sidebar = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary={
-                      <Typography variant="body1">About Metatron</Typography>
+                      <Typography variant="body2">About Metatron</Typography>
                     }
                   />
                 </ListItemButton>
 
-                {/* change theme */}
-                <ListItemButton onClick={handleShowDarkMode}>
-                  <ListItemIcon>
-                    <DarkModeRounded
-                      sx={{ width: 28, height: 28 }}
-                      color={isDarkMode ? "warning" : undefined}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body1">
-                        {isDarkMode ? "Try Light Mode" : "Try Dark Mode"}
-                      </Typography>
-                    }
-                  />
-                </ListItemButton>
               </List>
             )}
           </Box>

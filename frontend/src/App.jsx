@@ -22,8 +22,6 @@ const RegistrationAuthLazy = lazy(() =>
 );
 const AuthCheckLazy = lazy(() => import("./components/account/AuthCheck"));
 
-const LoginAuthLazy = lazy(() => import("./components/auth/LoginAuth"));
-
 const App = () => {
   // global dark mode state from redux
   const { currentMode } = useSelector((state) => state.appUI);
@@ -81,7 +79,6 @@ const App = () => {
                 }
               />
 
-              <Route exact path={"/auth/login"} element={<LoginAuthLazy />} />
              
               <Route
                 exact

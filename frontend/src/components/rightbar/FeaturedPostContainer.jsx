@@ -1,4 +1,4 @@
-import { GradeRounded } from "@mui/icons-material";
+import { CodeRounded } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
 import List from "@mui/material/List";
 import axios from "axios";
@@ -82,7 +82,7 @@ export default function FeaturedPostContainer() {
           <Typography fontWeight={"bold"} color={"primary"}>
             FEATURED POST
           </Typography>
-          <GradeRounded color="primary" />
+          <CodeRounded color="primary" sx={{width:26, height:26}} />
         </Box>
       </Box>
       <List
@@ -93,9 +93,8 @@ export default function FeaturedPostContainer() {
         }}
       >
         <Box>
-          {postsTop &&
-            postsTop.map((post, index) => (
-              <Box key={index}>
+          {postsTop?.map((post, index) => (
+              <Box key={post?._id}>
                 <FeaturedPost post={post} />
               </Box>
             ))}

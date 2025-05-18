@@ -17,7 +17,9 @@ import ListItemText from "@mui/material/ListItemText";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import ApplyJobModal from "../../modal/ApplyJobModal";
+import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import { Bolt } from "@mui/icons-material";
 
 function FeaturedJobs({ isLoading, jobTop }) {
   const [openApplyJobModal, setOpenApplyJobModal] = useState();
@@ -38,6 +40,8 @@ function FeaturedJobs({ isLoading, jobTop }) {
   const handleOpeningApplyJob = () => {
     setOpenApplyJobModal(true);
   };
+
+
 
   return (
     <React.Fragment>
@@ -124,10 +128,9 @@ function FeaturedJobs({ isLoading, jobTop }) {
                   <Box display={"flex"} mt={"2px"}>
                     <AvatarGroup max={jobTop?.skills?.length}>
                       {/* loop through the skills and their images matched using custim fn */}
-                      {jobTop?.skills?.map((skill, index) => (
-                        <Tooltip title={skill} arrow>
+                      {jobTop?.skills?.map((skill) => (
+                        <Tooltip title={skill} key={skill} arrow>
                           <Avatar
-                            key={index}
                             alt={skill}
                             className="border"
                             sx={{ width: 27, height: 27 }}
@@ -145,7 +148,7 @@ function FeaturedJobs({ isLoading, jobTop }) {
               {/* applicants counter */}
               <Box>
                 <Typography variant="caption" color={"text.secondary"} fontWeight={'bold'}>
-                  {jobTop?.applicants?.total}/1000
+                   {!(jobTop?.website==="") ? "(N/A)" :`${jobTop?.applicants?.total}/200 `}
                 </Typography>
               </Box>
 
@@ -155,9 +158,11 @@ function FeaturedJobs({ isLoading, jobTop }) {
                 size="small"
                 onClick={handleOpeningApplyJob}
                 variant="contained"
+                startIcon={!(jobTop?.website==="") ? undefined :<Bolt/>}
                 sx={{
                   textTransform: "capitalize",
                   borderRadius: "20px",
+                  fontSize:!CustomDeviceIsSmall() && 'x-small'
                 }}
               >
                 Apply

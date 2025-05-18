@@ -73,7 +73,7 @@ export default function ParentContainer() {
   const handleClose = () => {
     dispatch(showMessagingDrawer());
 
-    // restore message and notif states to default
+    // restore message and notification states to default
     setMessageNotifClicked((prev) => (prev === true ? false : false));
   };
 

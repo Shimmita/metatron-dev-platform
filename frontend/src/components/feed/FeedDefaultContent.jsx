@@ -39,7 +39,7 @@ const FeedDefaultContent = () => {
     (state) => state.appUI
   );
 
-  // show speed dial if aint visible
+  // show speed dial if ain't visible
   if (!isDefaultSpeedDial) {
     dispatch(handleShowingSpeedDial(true));
   }
@@ -49,7 +49,7 @@ const FeedDefaultContent = () => {
     dispatch(resetDefaultBottomNav());
   }, [dispatch]);
 
-  // reset clear any previous posts results specailly from search
+  // reset clear any previous posts results specially from search
   useEffect(() => {
     dispatch(resetClearCurrentPosts());
   }, [dispatch]);
@@ -95,7 +95,7 @@ const FeedDefaultContent = () => {
       .finally(() => {
         // set is fetching to false
         setIsFetching(false);
-        // reset all the UI states to default which will update isloading in redux
+        // reset all the UI states to default which will update is_loading in redux
         dispatch(resetAll());
       });
   }, [dispatch, posts]);
@@ -106,10 +106,10 @@ const FeedDefaultContent = () => {
     <Box
       height={
         CustomDeviceTablet()
-          ? "92.5vh"
+          ? "92vh"
           : CustomDeviceIsSmall()
-          ? "91.7vh"
-          : "91vh"
+          ? "90vh"
+          : "85vh"
       }
     >
       {/* render the post is focused for full viewing and that post detailed
@@ -170,7 +170,7 @@ const FeedDefaultContent = () => {
 
           {/* scrollable container for the content */}
           <Box
-            height={CustomDeviceIsSmall() ? "80vh" : "83vh"}
+            height={"80vh"}
             sx={{
               overflowX: "auto",
               // Hide scrollbar for Chrome, Safari and Opera
@@ -182,7 +182,7 @@ const FeedDefaultContent = () => {
               "scrollbar-width": "none",
             }}
           >
-            {/* display the overview posts on tablets(portratit) and mobiles only */}
+            {/* display the overview posts on tablets(portrait) and mobiles only */}
             {!isFetching && (
               <React.Fragment>
                 {(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
@@ -204,7 +204,7 @@ const FeedDefaultContent = () => {
             {
               posts?.map((post, index) => {
                 return (
-                  <Box key={index}>
+                  <Box key={post?._id}>
                     <Box>
                       {/* feed card detailed post */}
                       <CardFeed

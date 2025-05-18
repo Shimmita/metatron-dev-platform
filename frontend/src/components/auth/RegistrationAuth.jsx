@@ -333,7 +333,7 @@ const RegistrationAuth = () => {
                     justifyContent={"center"}
                     className="w-75"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value.toLowerCase())}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="username@gmail.com"
                     type="email"
                   />
@@ -360,8 +360,8 @@ const RegistrationAuth = () => {
                     className="w-75"
                     onChange={(e) => setGender(e.target.value)}
                   >
-                    {GenderData &&
-                      GenderData.map((gender) => (
+                    {
+                      GenderData?.map((gender) => (
                         <MenuItem key={gender} value={gender}>
                           {gender}
                         </MenuItem>
@@ -399,7 +399,6 @@ const RegistrationAuth = () => {
               </>
             ) : (
               <>
-                {/* next section details */}
 
                 {/* specialisation title */}
                 <Box display={"flex"} justifyContent={"center"}>
@@ -412,8 +411,8 @@ const RegistrationAuth = () => {
                     className="w-75"
                     onChange={(e) => setSpecialisationTitle(e.target.value)}
                   >
-                    {SpecialisationJobs &&
-                      SpecialisationJobs.map((specialisation_title) => (
+                    {
+                      SpecialisationJobs?.map((specialisation_title) => (
                         <MenuItem
                           key={specialisation_title}
                           value={specialisation_title}
@@ -435,8 +434,8 @@ const RegistrationAuth = () => {
                     className="w-75"
                     onChange={(e) => setEducationLevel(e.target.value)}
                   >
-                    {EducationLevel &&
-                      EducationLevel.map((education_level) => (
+                    {
+                      EducationLevel?.map((education_level) => (
                         <MenuItem key={education_level} value={education_level}>
                           {education_level}
                         </MenuItem>
@@ -545,8 +544,8 @@ const RegistrationAuth = () => {
                       className="w-75"
                       onChange={(e) => setCounty(e.target.value)}
                     >
-                      {CountiesInKenya &&
-                        CountiesInKenya.map((county) => (
+                      {
+                        CountiesInKenya?.map((county) => (
                           <MenuItem key={county} value={county}>
                             {county}
                           </MenuItem>
@@ -608,7 +607,6 @@ const RegistrationAuth = () => {
 
             <Box pb={1} display={"flex"} justifyContent={"center"}>
               {!showNext ? (
-                <React.Fragment>
                   <Button
                     variant="contained"
                     className="w-25"
@@ -619,9 +617,7 @@ const RegistrationAuth = () => {
                   >
                     Next
                   </Button>
-                </React.Fragment>
               ) : (
-                <React.Fragment>
                   <Button
                     variant="contained"
                     className="w-25"
@@ -633,7 +629,6 @@ const RegistrationAuth = () => {
                   >
                     Signup
                   </Button>
-                </React.Fragment>
               )}
             </Box>
           </Box>

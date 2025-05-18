@@ -24,7 +24,7 @@ export default function UserPostCard({
   const isMyPost = user?._id === post?.post_owner?.ownerId;
 
   const dispatch = useDispatch();
-  //  update the postdetailed data with the current iterated post
+  //  update the post-detailed data with the current iterated post
   // will lift-up the state and make the data available to root parent
   const handlePostDetails = async () => {
     await setPostDetailedData(post);
@@ -70,9 +70,9 @@ export default function UserPostCard({
         <CardMedia
           component="img"
           className="rounded"
-          sx={{ maxHeight: 180 }}
+          sx={{ maxHeight: 120 }}
           image={handlePostImagePresent()}
-          alt="image"
+          alt=""
         />
         <CardContent>
           {/* post title */}
@@ -88,7 +88,7 @@ export default function UserPostCard({
           {/* post subcategory */}
           <Box display={"flex"} justifyContent={"center"} mt={1}>
             <Typography variant="caption" textAlign={"center"}>
-              {post?.post_category.main?.substring(0, 20)}
+              {post?.post_category?.main?.substring(0, 20)}
             </Typography>
           </Box>
           <Box
@@ -143,7 +143,7 @@ export default function UserPostCard({
         </CardContent>
       </CardActionArea>
 
-      {/* delet and update buttons if post belongs to the current user */}
+      {/* delete and update buttons if post belongs to the current user */}
       {isMyPost && (
         <Box display={"flex"} justifyContent={"center"}>
           <Box

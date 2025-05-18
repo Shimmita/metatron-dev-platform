@@ -179,7 +179,7 @@ function ProfileUpdate({ user }) {
   return (
     <Box
       p={1}
-      maxHeight={"88vh"}
+      maxHeight={"85vh"}
       sx={{
         overflowX: "auto",
         // Hide scrollbar for Chrome, Safari and Opera

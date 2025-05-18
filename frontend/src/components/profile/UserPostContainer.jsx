@@ -110,7 +110,7 @@ function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
       });
   };
 
-  // handle close aler delete
+  // handle close alert delete
   const handleClose = () => {
     // close alert
     setShowDeleteAlert(false);
@@ -164,7 +164,7 @@ function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
                 </Stack>
               }
             >
-              <Box mb={1}>Delete ?</Box>
+            <Box mb={1}>{isDeleting ? "Deleting...":"Delete ?"}</Box> 
               {/* show progress when is deleting */}
               {isDeleting && <LinearProgress color="inherit" />}
             </Alert>
@@ -220,20 +220,6 @@ function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
             </Box>
           ))}
 
-        {/* displayed when no post and no fetching request on progress */}
-        {!(postsData && isFetching && erroMessage) && (
-          <Box width={"100%"}>
-            <Typography
-              mt={"8rem"}
-              textAlign={"center"}
-              fontWeight={"bold"}
-              color={"text.secondary"}
-              variant="body2"
-            >
-              No Post Yet
-            </Typography>
-          </Box>
-        )}
       </Box>
 
       {/* show snack bar of any response of deletion, using snack connect */}

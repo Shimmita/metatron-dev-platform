@@ -3,8 +3,8 @@ import {
   Box,
   CardActionArea,
   CircularProgress,
-  Divider,
   IconButton,
+  Tooltip
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
@@ -21,7 +21,7 @@ import { updateCurrentReportID } from "../../../redux/CurrentPostReported";
 import MiniProfileLayout from "../../custom/MiniProfileLayout";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
 
-export default function PostReported({ report, isLastItem }) {
+export default function PostReported({ report }) {
   const [isFetching, setIsFetching] = useState(false);
   const [isMiniProfile, setIsMiniProfile] = useState(false);
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ export default function PostReported({ report, isLastItem }) {
     // performing post request
     axios
       .delete(
-        `http://localhost:5000/metatron/api/v1/posts/report/delete/${_id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/report/delete/${_id}`,
         {
           withCredentials: true,
         }
@@ -67,13 +67,13 @@ export default function PostReported({ report, isLastItem }) {
 
   // handle fetch user details
   const handleShowMiniProfile = () => {
-    // show user miniprofile view instead of their post reaction
+    // show user mini-profile view instead of their post reaction
     setIsMiniProfile((prev) => !prev);
   };
 
-  // navigate to post details routed page, alse close the drawer notification
+  // navigate to post details routed page, else close the drawer notification
   const handleNavigatePostDetailsRoute = () => {
-    // close drawer messageing by updating the redux state
+    // close drawer messaging by updating the redux state
     dispatch(showMessagingDrawer());
 
     // navigate
@@ -84,7 +84,7 @@ export default function PostReported({ report, isLastItem }) {
     <React.Fragment>
       {isMiniProfile ? (
         <React.Fragment>
-          {/* user miniprofile */}
+          {/* user mini-profile */}
           <Box
             className={" mb-2"}
             sx={{
@@ -102,7 +102,10 @@ export default function PostReported({ report, isLastItem }) {
         <List
           sx={{ width: "100%", maxWidth: 400, bgcolor: "background.paper" }}
         >
-          <ListItem alignItems="flex-start">
+          <ListItem alignItems="flex-start" className={'rounded'} sx={{ 
+             border: "1px solid",
+             borderColor: "divider",
+           }}>
             <ListItemAvatar onClick={handleShowMiniProfile}>
               <Avatar src="" alt="">
                 <Typography
@@ -139,13 +142,16 @@ export default function PostReported({ report, isLastItem }) {
                       <Typography variant="caption">
                         {getElapsedTime(report?.createdAt)}
                       </Typography>
+                      &nbsp;
                       {/* delete reaction */}
-                      <IconButton
-                        size="small"
-                        onClick={handleDeleteReportReaction}
-                      >
-                        <Close sx={{ width: 15, height: 15 }} />
-                      </IconButton>
+                          <Tooltip title={'clear'} arrow>
+                                   <IconButton size="small" onClick={handleDeleteReportReaction} sx={{ 
+                                   border: "1px solid",
+                                   borderColor: "divider",
+                                 }}>
+                                              <Close sx={{ width: 13, height: 13 }} />
+                                            </IconButton>
+                                   </Tooltip>
                     </Box>
                   )}
                 </Box>
@@ -175,7 +181,7 @@ export default function PostReported({ report, isLastItem }) {
                       />
                       {/* message  */}
                       {report?.report_title}
-                      {/* minimessage of post section */}
+                      {/* mini-message of post section */}
                     </Typography>
                     {` — ${report?.report_message}`}
 
@@ -192,6 +198,7 @@ export default function PostReported({ report, isLastItem }) {
                         <BarChartRounded sx={{ width: 16, height: 16 }} />
                       </Box>
                       <Box
+                      className={'rounded'}
                         sx={{
                           pe: 1,
                           display: "inline-flex",
@@ -217,8 +224,7 @@ export default function PostReported({ report, isLastItem }) {
               }
             />
           </ListItem>
-          {/* show divider is is not last item */}
-          {!isLastItem && <Divider variant="inset" component="li" />}
+     
         </List>
       )}
     </React.Fragment>

@@ -5,6 +5,7 @@ import {
   GitHub,
   MoreVertRounded,
   VerifiedRounded,
+  WbIncandescentRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -20,7 +21,7 @@ import {
   Menu,
   Stack,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
 import axios from "axios";
 import React, { lazy, useCallback, useEffect, useState } from "react";
@@ -85,13 +86,13 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     (clickerId) => clickerId === _id
   );
 
-  // check for if current user cliked github
+  // check for if current user clicked github
   const currentUserClickedGithub = post?.post_github?.clickers?.some(
     (clickerId) => clickerId === _id
   );
 
   // for checking if the current user commented any on the post
-  const currentUserCommentented = post?.post_comments?.comments?.some(
+  const currentUserCommented = post?.post_comments?.comments?.some(
     (commentors) => commentors.userId === _id
   );
 
@@ -229,7 +230,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
         // update the returned post object to reflect in the global redux
         dispatch(updateCurrentPostDetails(res.data));
 
-        // naviget to github page
+        // navigate to github page
       })
       .catch(async (err) => {
         console.log(err);
@@ -240,7 +241,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
   };
 
   // handle showing full post description
-  const handleFullDiscription = () => {
+  const handleFullDescription = () => {
     setFullDiscription((prev) => !prev);
   };
 
@@ -420,7 +421,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
             <CardContent>
               <Box mb={2} width={"100%"}>
                 <Box mb={1}>
-                  {/* post specialisation */}
+                  {/* post specialization */}
                   <Typography
                     variant="body2"
                     textAlign={"center"}
@@ -436,14 +437,30 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                   alignItems={"center"}
                   gap={2}
                 >
+                  <WbIncandescentRounded
+                    sx={{
+                      width: 18,
+                      height: 18,
+                      color: isDarkMode ? "yellow" : "orange",
+                    }}
+                  />
                   {/* title of the post */}
-                  <Typography variant="body2" fontWeight={"bold"}>
+                  <Typography variant="body2">
                     {post?.post_title}
                   </Typography>
+
+                  <WbIncandescentRounded
+                    sx={{
+                      width: 18,
+                      height: 18,
+                      color: isDarkMode ? "yellow" : "orange",
+                    }}
+                  />
                 </Box>
+
               </Box>
               <CardActionArea
-                onClick={handleFullDiscription}
+                onClick={handleFullDescription}
                 disabled={!detailsLong}
               >
                 <Box display={"flex"} justifyContent={"center"} width={"100%"}>
@@ -467,7 +484,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                         fontWeight={"bold"}
                         color={"primary"}
                       >
-                        ... <ExpandMoreRounded sx={{ width: 20, height: 20 }} />
+                        ... &nbsp;more
                       </Typography>
                     )}
                     {isFullDescription && details}
@@ -504,6 +521,8 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                 />
               </Box>
             </Box>
+
+          
           </Box>
 
           <Box
@@ -555,7 +574,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                     ) : (
                       <ForumRounded
                         sx={{ width: 21, height: 21 }}
-                        color={currentUserCommentented ? "primary" : undefined}
+                        color={currentUserCommented ? "primary" : undefined}
                       />
                     )}
                   </React.Fragment>
@@ -597,10 +616,10 @@ const CardFeed = ({ post, setPostDetailedData }) => {
         />
       )}
 
-      {/* snackbar showing results, specially cardfeed more response */}
+      {/* snackbar showing results, specially card-feed more response */}
       {messageMore && <SnackbarConnect message={messageMore} />}
 
-      {/* alert for showing user miniprofile details by passing the post ownerID */}
+      {/* alert for showing user mini-profile details by passing the post ownerID */}
       <AlertMiniProfileView
         openAlert={openMiniProfileAlert}
         setOpenAlert={setOpenMiniProfileAlert}

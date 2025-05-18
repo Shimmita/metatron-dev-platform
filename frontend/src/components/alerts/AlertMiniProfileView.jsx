@@ -105,8 +105,7 @@ export default function AlertMiniProfileView({
   axios.defaults.withCredentials = true;
 
   // checks for if current user is friends
-  const isFriends =
-    miniProfileData && miniProfileData?.network?.includes(currentUserId);
+  const isFriends =miniProfileData?.network?.includes(currentUserId);
 
   useEffect(() => {
     // fetch details of the liked or reacted user based on their id
@@ -268,7 +267,7 @@ export default function AlertMiniProfileView({
     setMessage("");
   };
 
-  // navigate to full proile using the current userId
+  // navigate to full profile using the current userId
 
   /*   open drawer to display full user profile if user temp display it firs else 
 small devices display on separate window. big devices just drawer it.
@@ -290,7 +289,7 @@ small devices display on separate window. big devices just drawer it.
   // handle sending of the message
   const handleSendMessage = () => {
     if (CustomDeviceIsSmall()) {
-      // navigate user profile specially smalller devices + mesaging true
+      // navigate user profile specially smaller devices + messaging true
       // update the message shown input when drawer is opened
       dispatch(showProfileDrawerMessageInput(true));
       navigate("users/profile/" + userId);
@@ -310,7 +309,6 @@ small devices display on separate window. big devices just drawer it.
   };
 
   return (
-    <React.Fragment>
       <Dialog
         className="shadow"
         open={openAlert}
@@ -330,7 +328,6 @@ small devices display on separate window. big devices just drawer it.
         <DialogContent dividers>
           {/* message from backend present display this */}
           {message && (
-            <React.Fragment>
               <Collapse in={message || false}>
                 <Alert
                   severity="info"
@@ -350,7 +347,6 @@ small devices display on separate window. big devices just drawer it.
                   {message}
                 </Alert>
               </Collapse>
-            </React.Fragment>
           )}
 
           {/* show circular progress */}
@@ -366,7 +362,7 @@ small devices display on separate window. big devices just drawer it.
                 {/* avatar */}
                 <Box display={"flex"} justifyContent={"center"}>
                   {/* show this avatar only when user is online */}
-                  {isOnline && isOnline ? (
+                  {isOnline ? (
                     <StyledBadge
                       overlap="circular"
                       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
@@ -596,6 +592,5 @@ small devices display on separate window. big devices just drawer it.
           </Box>
         </DialogContent>
       </Dialog>
-    </React.Fragment>
   );
 }

@@ -14,7 +14,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
     // hold the message clicked bool
     const [messageClicked, setMessageClicked] = useState(false);
 
-    // controll showing of new conversation when fab is clicked
+    // control showing of new conversation when fab is clicked
     const [fabNewConversation, setFabNewConversation] = useState(false);
 
   // api request monitors
@@ -36,7 +36,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
     // show message details and hide all messages
     setMessageClicked((prev) => !prev);
 
-    // hide the inbox and notif bars when message details is focused
+    // hide the inbox and notification bars when message details is focused
     // from the top most parent level
     setMessageNotifClicked((prev) => !prev);
   };
@@ -55,10 +55,10 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
         currentUserID === focusedConveration?.lastSenderId ||
         focusedConveration?.isTargetRead
       ) {
-        // proceed to conversation details since last conv message was read or user is the sender
+        // proceed to conversation details since last conversation message was read or user is the sender
         handleOpenFocusedConversation();
       } else {
-        // update that the target of the last message is viewed before opening the full conversaation
+        // update that the target of the last message is viewed before opening the full conversation
 
         try {
           // set is fetching to true
@@ -74,7 +74,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
             handleOpenFocusedConversation();
           }
         } catch (err) {
-          // error occured during fetch query
+          // error occurred during fetch query
           console.error(err);
         } finally {
           // close is fetching

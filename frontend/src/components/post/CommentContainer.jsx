@@ -1,14 +1,12 @@
 import { Box } from "@mui/material";
 import React from "react";
 import CommentUser from "./CommentUser";
-export default function CommentContainer({ post_comments }) {
+export default function CommentContainer({ post_comments,postId,setPostDetailedData }) {
   return (
-    <Box>
-      
+    <Box sx={{ borderTop:'1px solid', borderColor:'divider' }}>
       <small style={{ fontSize: "small" }}>
-        {post_comments &&
-          post_comments?.map((comment, index) => (
-            <CommentUser comment={comment} key={index} />
+        {post_comments?.map((comment) => (
+            <CommentUser comment={comment} postId={postId} key={comment?._id} setPostDetailedData={setPostDetailedData} />
           ))}
       </small>
     </Box>

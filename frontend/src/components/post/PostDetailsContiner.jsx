@@ -22,6 +22,8 @@ import {
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
 
+const MAX_TEXT_LENGTH=100
+
 const CommentContainer = lazy(() => import("./CommentContainer"));
 function PostDetailsContainer({
   postDetailedData,
@@ -40,13 +42,13 @@ function PostDetailsContainer({
   axios.defaults.withCredentials = true;
   // redux states
   const { user } = useSelector((state) => state.currentUser);
-  const { isDefaultSpeedDial } = useSelector((state) => state.appUI);
 
   const dispatch = useDispatch();
   // extract basic current user details
   const { _id, avatar, name, specialisationTitle: title } = user || {};
 
-  const country = CustomCountryName(postDetailedData?.post_location?.country);
+  // user location
+  const country = CustomCountryName(user?.country);
 
   // current user info
   const reactingUserInfo = {
@@ -59,7 +61,7 @@ function PostDetailsContainer({
     title,
   };
 
-  // complete sendin of the comment to the backend
+  // complete sending of the comment to the backend
   const handleSendCommentNow = () => {
     // sending the post tile embed in message and will split for separation backend
     let message = `commented on your post.${postDetailedData?.post_title?.substring(
@@ -74,7 +76,7 @@ function PostDetailsContainer({
     // performing post request
     axios
       .put(
-        `http://localhost:5000/metatron/api/v1/posts/update/comments`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/comments`,
         reactingUserInfo,
         {
           withCredentials: true,
@@ -201,7 +203,9 @@ function PostDetailsContainer({
             {/* all user comments container pass the comments of the post */}
             <Box>
               <CommentContainer
-                post_comments={postDetailedData?.post_comments.comments}
+                post_comments={postDetailedData?.post_comments?.comments}
+                postId={postDetailedData?._id}
+                setPostDetailedData={setPostDetailedData}
               />
             </Box>
           </Box>
@@ -212,8 +216,11 @@ function PostDetailsContainer({
             justifyContent={"space-between"}
             alignItems={"center"}
             width={"100%"}
-            p={2}
+            p={1}
+            mb={2}
             bgcolor={"background.default"}
+            className={'rounded'}
+            sx={{ border:'1px solid', borderColor:'divider' }}
           >
             {/* input for comment */}
             <Box width={"100%"}>
@@ -224,7 +231,7 @@ function PostDetailsContainer({
                 maxRows={2}
                 disabled={isUploading}
                 className="w-100"
-                placeholder="comment here..."
+                placeholder="write new comment ..."
                 sx={{
                   fontSize: "small",
                 }}
@@ -232,17 +239,17 @@ function PostDetailsContainer({
             </Box>
 
             {/* send comment button icon */}
-            <Box className=" t rounded ms-1" alignContent={"center"}>
+            <Box className=" rounded ms-1 pe-1" alignContent={"center"}>
               {isUploading ? (
                 <CircularProgress size={17} />
               ) : (
-                <Badge badgeContent={`${100 - comment.length}`}>
+                <Badge badgeContent={`${MAX_TEXT_LENGTH - comment.length}`}>
                   <IconButton
-                    disabled={comment.length > 100}
+                    disabled={comment.length > MAX_TEXT_LENGTH}
                     onClick={handleSendCommentNow}
                   >
                     <SendOutlined
-                      color={comment.length <= 100 ? "primary" : "inherit"}
+                      color={comment.length <= MAX_TEXT_LENGTH ? "primary" : "inherit"}
                       sx={{ width: 18, height: 18 }}
                     />
                   </IconButton>

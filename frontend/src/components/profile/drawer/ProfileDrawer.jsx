@@ -37,7 +37,7 @@ export default function ProfileDrawer() {
   const [isProfileUpdate, setIsProfileUpdate] = useState(false);
 
   const [isFetching, setIsFetching] = useState(false);
-  const [erroMessage, setErrorMesssage] = useState("");
+  const [erroMessage, setErrorMessage] = useState("");
 
   // get redux states
   const { user: nativeLoggedinUser, tempUserProfileID } = useSelector(
@@ -82,11 +82,11 @@ export default function ProfileDrawer() {
           // there is an error
           if (err?.code === "ERR_NETWORK") {
             // update the snackbar notification of the error of connection
-            setErrorMesssage("Network Error");
+            setErrorMessage("Network Error");
             return;
           }
           // update the snackbar notification of error from the server
-          setErrorMesssage(err?.response.data);
+          setErrorMessage(err?.response.data);
         })
         .finally(() => {
           // set is fetching to false
@@ -100,9 +100,11 @@ export default function ProfileDrawer() {
     setOpenLogoutAlert((prev) => !prev);
   };
 
-  // handle competion of logging out
+  // handle competition of logging out
   const handleCompleteLogout = async () => {
     try {
+      // set is fetching true
+      setIsFetching(true)
       // send a post request to the backend to clear all cookie sessions if any
       await axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signout`);
 
@@ -123,6 +125,8 @@ export default function ProfileDrawer() {
       dispatch(showUserProfileDrawer());
     } catch (error) {
       console.error("Error during logout:", error);
+    }finally{
+      setIsFetching(false)
     }
   };
 
@@ -219,7 +223,7 @@ export default function ProfileDrawer() {
                   </Stack>
                 }
               >
-                End current session?
+                {isFetching ? "ending session...":"end current session?"}
               </Alert>
             </Collapse>
           )}
@@ -229,7 +233,7 @@ export default function ProfileDrawer() {
         <Box>
           <Suspense
             fallback={
-              <Box height={"90vh"} display={"flex"} justifyContent={"center"}>
+              <Box height={"85vh"} display={"flex"} justifyContent={"center"}>
                 <Box display={"flex"} justifyContent={"center"}>
                   <CircularProgress size={20} />
                 </Box>
@@ -247,11 +251,11 @@ export default function ProfileDrawer() {
               <React.Fragment>
                 {/* show default profile if is no update setting clicked */}
                 {isProfileUpdate ? (
-                  <Box height={"91.7vh"}>
+                  <Box height={"85vh"}>
                     <ProfileUpdate user={nativeLoggedinUser} />
                   </Box>
                 ) : (
-                  <Box height={"91.7vh"} p={"5px"}>
+                  <Box height={"85vh"} p={"5px"}>
                     {temporaryProfileData ? (
                       <UserProfileDrawer profileData={temporaryProfileData} />
                     ) : (

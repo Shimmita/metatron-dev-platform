@@ -117,7 +117,7 @@ export default function UserProfileDrawer({ profileData }) {
   // for checking user relationships
   useEffect(() => {
     // map through ids of friends if the current user network
-    // has the id of the post owner, measns are friends else false
+    // has the id of the post owner, means are friends else false
     if (user?.network?.includes(profileData?._id)) {
       setIsFriend(true);
     }
@@ -216,7 +216,7 @@ export default function UserProfileDrawer({ profileData }) {
     // set is fetching to true
     setIsConnecting(true);
 
-    // performing delete request and passing id of the currenly user and that of miniprofile user being
+    // performing delete request and passing id of the currently user and that of miniprofile user being
     // viewed
     axios
       .delete(
@@ -285,7 +285,7 @@ export default function UserProfileDrawer({ profileData }) {
       }
       dispatch(updateMessageConnectRequest(err?.response?.data));
 
-      // error occured during fetch query
+      // error occurred during fetch query
       console.error(err);
     } finally {
       // close is fetching
@@ -296,7 +296,7 @@ export default function UserProfileDrawer({ profileData }) {
   return (
     <Box
       color={"text.primary"}
-      maxHeight={"90vh"}
+      maxHeight={"85vh"}
       borderRadius={2}
       mb={2}
       sx={{
@@ -493,11 +493,11 @@ export default function UserProfileDrawer({ profileData }) {
                 {/* skills avatars */}
                 <Box display={"flex"} justifyContent={"center"}>
                   <AvatarGroup max={profileData?.selectedSkills?.length}>
-                    {/* loop through the skills and their images matched using custim fn */}
+                    {/* loop through the skills and their images matched using custom fn */}
                     {profileData?.selectedSkills?.map((skill, index) => (
-                      <Tooltip title={skill} arrow>
+                      <Tooltip title={skill} arrow key={skill}
+>
                         <Avatar
-                          key={index}
                           alt={skill}
                           className="border"
                           sx={{ width: 30, height: 30 }}

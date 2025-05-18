@@ -262,7 +262,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     if (handleEmptyFields()) {
       // set is uploading true
       setIsUploading(true);
-      // create a form which will faciltate parsing of the file for upload to cloud
+      // create a form which will facilitate parsing of the file for upload to cloud
       const formData = new FormData();
       // append post body after stringify it due to form data
       formData.append("post", JSON.stringify(post));
@@ -274,7 +274,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
       // performing post request
       axios
-        .post(`http://localhost:5000/metatron/api/v1/posts/create`, formData, {
+        .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/create`, formData, {
           withCredentials: true,
         })
         .then((res) => {
@@ -327,42 +327,39 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
   return (
     <StyledModalPost
-      keepMounted
+    keepMounted
+    open={openModalTech}
+    sx={{
+      marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
+    }}
+    // onClose={(e) => setOpenPostModal(false)}
+    aria-labelledby="modal-modal-title"
+    aria-describedby="modal-modal-description"
+  >
+    <Box
+      width={
+        CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
+          ? "70%"
+          : CustomDeviceTablet()
+          ? "90%"
+          : CustomLandscapeWidest()
+          ? "35%"
+          : "100%"
+      }
+      p={1}
+      borderRadius={5}
+      bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
+      color={"text.primary"}
       sx={{
-        marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
+        border: isDarkMode && "1px solid gray",
+        marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
       }}
-      open={openModalTech && !openAlertLogout}
-      // onClose={(e) => setOpenPostModal(false)}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
     >
       <Box
-        width={
-          CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
-            ? "85%"
-            : CustomDeviceTablet()
-            ? "100%"
-            : CustomLandscapeWidest()
-            ? "35%"
-            : "100%"
-        }
-        p={1}
+        bgcolor={"background.default"}
         borderRadius={5}
-        bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
-        color={"text.primary"}
-        display={"flex"}
-        justifyContent={"center"}
-        alignItems={"center"}
-        sx={{
-          border: isDarkMode && "1px solid gray",
-          marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
-        }}
+        className="shadow-lg"
       >
-        <Box
-          bgcolor={"background.default"}
-          borderRadius={5}
-          className="shadow-lg"
-        >
           {/* toolbar like box */}
           <Box
             display={"flex"}
@@ -472,8 +469,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   fullWidth
                   onChange={(e) => setPostCategory(e.target.value)}
                 >
-                  {SpecialisationTech &&
-                    SpecialisationTech.filter((about) => about !== "None").map(
+                  {SpecialisationTech?.filter((about) => about !== "None").map(
                       (about, index) => (
                         <MenuItem
                           key={index}
@@ -494,11 +490,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 </TextField>
               </Box>
 
-              {/* Containerisation  */}
+              {/* Containerization  */}
               {post_category === "Containerisation and Orchestration" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
-                    Containerisation and Orchestration option that your post
+                    Containerization and Orchestration option that your post
                     aims to enlighten to other potential users on the platform.
                   </Typography>
                   <Box className="w-100 mb-2 ">
@@ -507,12 +503,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       select
                       disabled={isUploading}
                       value={category1}
-                      label="Containerisation technology"
+                      label="Containerization technology"
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Containerisation.map((container) => (
+                      {SubsectionTech?.Containerisation.map((container) => (
                           <MenuItem key={container} value={container}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -551,8 +546,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.MachineLearning.map((ml_ai) => (
+                      {SubsectionTech?.MachineLearning.map((ml_ai) => (
                           <MenuItem key={ml_ai} value={ml_ai}>
                             <Box
                               display={"flex"}
@@ -587,8 +581,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.DataScience.map((data_science) => (
+                      {SubsectionTech?.DataScience.map((data_science) => (
                           <MenuItem key={data_science} value={data_science}>
                             <Box
                               display={"flex"}
@@ -624,8 +617,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Cybersec.map((cybersec) => (
+                      {SubsectionTech?.Cybersec.map((cybersec) => (
                           <MenuItem key={cybersec} value={cybersec}>
                             <Box
                               display={"flex"}
@@ -662,8 +654,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Desktop.map((desktop) => (
+                      {SubsectionTech?.Desktop.map((desktop) => (
                           <MenuItem key={desktop} value={desktop}>
                             <Box
                               display={"flex"}
@@ -699,8 +690,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.GameDev.map((game_dev) => (
+                      {SubsectionTech?.GameDev.map((game_dev) => (
                           <MenuItem key={game_dev} value={game_dev}>
                            <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -739,8 +729,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Language.map((language) => (
+                      {SubsectionTech?.Language.map((language) => (
                           <MenuItem key={language} value={language}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -784,8 +773,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Cloud.map((cloud_provider) => (
+                      {SubsectionTech?.Cloud.map((cloud_provider) => (
                           <MenuItem key={cloud_provider} value={cloud_provider}>
                             <Box display={"flex"} gap={2}>
                               <small style={{ fontSize: "small" }}>
@@ -821,8 +809,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.DevOps.map((devops_tool) => (
+                      {SubsectionTech?.DevOps.map((devops_tool) => (
                           <MenuItem key={devops_tool} value={devops_tool}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -860,8 +847,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Design.map((design_tool) => (
+                      {SubsectionTech?.Design.map((design_tool) => (
                           <MenuItem key={design_tool} value={design_tool}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -885,7 +871,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* frontend */}
               {(post_category === "Frontend App Development" ||
                 post_category === "Fullstack Application Development") && (
-                <Box>
+                <Box Box>
                   <Typography variant="body2" color={"text.secondary"}>
                     Which frontend technology are you intrested in? If your post
                     is based on a bare HTML/CSS/Js version of a project, select
@@ -901,8 +887,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setFrontend(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Frontend.map((frontend) => (
+                      {SubsectionTech?.Frontend.map((frontend) => (
                           <MenuItem key={frontend} value={frontend}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -942,8 +927,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setBackend(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Backend.map((backend) => (
+                      {SubsectionTech?.Backend.map((backend) => (
                           <MenuItem key={backend} value={backend}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -984,8 +968,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setDatabase(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Database.map((database) => (
+                      {SubsectionTech?.Database.map((database) => (
                           <MenuItem key={database} value={database}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -1024,8 +1007,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Android.map((android) => (
+                      {SubsectionTech?.Android.map((android) => (
                           <MenuItem key={android} value={android}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -1063,8 +1045,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.IOS.map((ios) => (
+                      {
+                        SubsectionTech?.IOS.map((ios) => (
                           <MenuItem key={ios} value={ios}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -1101,8 +1083,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       fullWidth
                       onChange={(e) => setCategory1(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Multiplatfotm.map((multiplatform) => (
+                      {
+                        SubsectionTech?.Multiplatfotm.map((multiplatform) => (
                           <MenuItem key={multiplatform} value={multiplatform}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -1123,32 +1105,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 </Box>
               )}
 
-              {/* Github link */}
-
-              <Typography variant="body2" color={"text.secondary"}>
-                Suppose your post is about a particular project you worked on
-                and aiming to display your technicalities, please provide GiHub
-                or Gitlab link to promote your project.
-              </Typography>
-
-              <Box className="mb-2">
-                <TextField
-                  fullWidth
-                  disabled={isUploading}
-                  value={gitHub}
-                  onChange={(e) => setGitHub(e.target.value)}
-                  id="github-gitlab"
-                  label={"Version control link (optional)"}
-                  placeholder=" https://github.com/username/project-name.git"
-                />
-              </Box>
+              
 
               {/* image and pdf for the post */}
 
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Visual representation of your post to the target users is highly
-                encouraged thus recommeded attachment of an image or pdf file
-                for referential purposes.
+                Visual representation of your post is highly recommended on the platform please embed or upload an image/pdf file that is relevant to the post.
               </Typography>
 
               {/* preview the file uploaded from storage */}
@@ -1230,10 +1192,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     fullWidth
                     onChange={handleFreeLogoPicked}
                   >
-                    {logoNamesOptions &&
-                      logoNamesOptions.map((name, index) => (
+                    {
+                      logoNamesOptions?.map((name, index) => (
                         <MenuItem
-                          key={index}
+                          key={name}
                           value={name}
                           sx={{ display: "flex", gap: 2 }}
                         >
@@ -1257,6 +1219,27 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   </IconButton>
                 </Box>
               )}
+
+
+              {/* Github link */}
+
+              <Typography variant="body2" color={"text.secondary"}>
+                Suppose your post is about a particular project you worked on
+                and aiming to display your technicalities, please provide GiHub
+                or Gitlab link to promote your project.
+              </Typography>
+
+              <Box className="mb-2">
+                <TextField
+                  fullWidth
+                  disabled={isUploading}
+                  value={gitHub}
+                  onChange={(e) => setGitHub(e.target.value)}
+                  id="github-gitlab"
+                  label={"Version control link (optional)"}
+                  placeholder=" https://github.com/username/project-name.git"
+                />
+              </Box>
 
               {/* description */}
 

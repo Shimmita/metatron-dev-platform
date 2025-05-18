@@ -289,11 +289,11 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
     }
 
     if (county?.trim === "") {
-      setErrorMessage("organisation location is incomplete");
+      setErrorMessage("organization location is incomplete");
       return false;
     }
     if (country?.trim === "") {
-      setErrorMessage("organisation location is incomplete");
+      setErrorMessage("organization location is incomplete");
       return false;
     }
 
@@ -371,7 +371,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
     if (handleEmptyFields()) {
       // set is uploading true
       setIsUploading(true);
-      // create a form which will faciltate parsing of the file for upload to cloud
+      // create a form which will facilitate parsing of the file for upload to cloud
       const formData = new FormData();
       // append post body after stringify it due to form data
       formData.append("job", JSON.stringify(job));
@@ -383,7 +383,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
 
       // performing post request
       axios
-        .post(`http://localhost:5000/metatron/api/v1/jobs/create`, formData, {
+        .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/create`, formData, {
           withCredentials: true,
         })
         .then((res) => {
@@ -440,9 +440,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
       <Box
         width={
           CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
-            ? "90%"
+            ? "70%"
             : CustomDeviceTablet()
-            ? "100%"
+            ? "90%"
             : CustomLandscapeWidest()
             ? "35%"
             : "100%"

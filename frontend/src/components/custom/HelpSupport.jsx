@@ -1,5 +1,5 @@
 import { Call, EmailRounded } from "@mui/icons-material";
-import { Box, Button, Divider, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import React from "react";
 import { Link } from "react-router-dom";
 import DevAccountConfig from "../config/DevAccountConfig";

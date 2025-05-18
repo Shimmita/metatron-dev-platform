@@ -12,6 +12,7 @@ import {
   CircularProgress,
   Divider,
   IconButton,
+  Tooltip,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
@@ -29,7 +30,7 @@ import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
 import MiniProfileLayout from "../../custom/MiniProfileLayout";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
 
-export default function PostReaction({ reaction, isLastItem }) {
+export default function PostReaction({ reaction }) {
   const [isFetching, setIsFetching] = useState(false);
   const [isMiniProfile, setIsMiniProfile] = useState(false);
   const navigate = useNavigate();
@@ -81,13 +82,13 @@ export default function PostReaction({ reaction, isLastItem }) {
 
   // handle fetch user details
   const handleShowMiniProfile = () => {
-    // show user miniprofile view instead of their post reaction
+    // show user mini-profile view instead of their post reaction
     setIsMiniProfile((prev) => !prev);
   };
 
-  // navigate to post details routed page, alse close the drawer notification
+  // navigate to post details routed page, else close the drawer notification
   const handleNavigatePostDetailsRoute = () => {
-    // close drawer messageing by updating the redux state
+    // close drawer messaging by updating the redux state
     dispatch(showMessagingDrawer());
 
     // navigate
@@ -98,7 +99,7 @@ export default function PostReaction({ reaction, isLastItem }) {
     <React.Fragment>
       {isMiniProfile ? (
         <React.Fragment>
-          {/* user miniprofile */}
+          {/* user mini-profile */}
           <Box
             className={"mb-2"}
             sx={{
@@ -116,7 +117,10 @@ export default function PostReaction({ reaction, isLastItem }) {
         <List
           sx={{ width: "100%", maxWidth: 400, bgcolor: "background.paper" }}
         >
-          <ListItem alignItems="flex-start">
+          <ListItem alignItems="flex-start" className={'rounded'} sx={{ 
+             border: "1px solid",
+             borderColor: "divider",
+           }}>
             <ListItemAvatar onClick={handleShowMiniProfile}>
               <Avatar src="" alt="">
                 <Typography
@@ -141,6 +145,7 @@ export default function PostReaction({ reaction, isLastItem }) {
                     fontWeight={"bold"}
                     variant="body2"
                     width={"100%"}
+                    
                   >
                     {reaction?.name}
                   </Typography>
@@ -153,10 +158,16 @@ export default function PostReaction({ reaction, isLastItem }) {
                       <Typography variant="caption">
                         {getElapsedTime(reaction?.createdAt)}
                       </Typography>
+                      &nbsp;
                       {/* delete reaction */}
-                      <IconButton size="small" onClick={handleDeleteReaction}>
-                        <Close sx={{ width: 15, height: 15 }} />
+             <Tooltip title={'clear'} arrow>
+             <IconButton size="small" onClick={handleDeleteReaction} sx={{ 
+             border: "1px solid",
+             borderColor: "divider",
+           }}>
+                        <Close sx={{ width: 13, height: 13 }} />
                       </IconButton>
+             </Tooltip>
                     </Box>
                   )}
                 </Box>
@@ -173,10 +184,10 @@ export default function PostReaction({ reaction, isLastItem }) {
                         alignItems: "center",
                       }}
                     >
-                      {reaction?.title} <br />
+                      {reaction?.title} <br /> <br/>
                       {reaction?.message?.toLowerCase().includes("liked") && (
                         <FavoriteRounded
-                          sx={{ width: 14, height: 14 }}
+                          sx={{ width: 14, height: 14, }}
                           color="primary"
                           className="me-1"
                         />
@@ -199,7 +210,7 @@ export default function PostReaction({ reaction, isLastItem }) {
                       )}
                       {/* message  */}
                       {reaction?.message}
-                      {/* minimessage of post section */}
+                      {/* mini-message of post section */}
                     </Typography>
                     {` — ${reaction?.minimessage}`}
 
@@ -216,6 +227,7 @@ export default function PostReaction({ reaction, isLastItem }) {
                         <BarChartRounded sx={{ width: 16, height: 16 }} />
                       </Box>
                       <Box
+                      className={'rounded'}
                         sx={{
                           pe: 1,
                           display: "inline-flex",
@@ -230,10 +242,12 @@ export default function PostReaction({ reaction, isLastItem }) {
                         }}
                       >
                         {/* likes count */}
-                        <FavoriteRounded sx={{ width: 14, height: 14 }} />
+                      <Tooltip title={'likes'} arrow>
+                      <FavoriteRounded sx={{ width: 14, height: 14 }} />
                         <Typography variant="caption">
                           {reaction?.likes}
                         </Typography>
+                      </Tooltip>
 
                         {/* divider */}
                         <Divider
@@ -245,10 +259,12 @@ export default function PostReaction({ reaction, isLastItem }) {
                         />
 
                         {/* github counts */}
-                        <GitHub sx={{ width: 14, height: 14 }} />
+                       <Tooltip title={'github views'} arrow>
+                       <GitHub sx={{ width: 14, height: 14 }} />
                         <Typography variant="caption">
                           {reaction?.github}
                         </Typography>
+                       </Tooltip>
 
                         {/* divider */}
                         <Divider
@@ -260,10 +276,12 @@ export default function PostReaction({ reaction, isLastItem }) {
                         />
 
                         {/* comments count */}
-                        <ForumRounded sx={{ width: 14, height: 14 }} />
+                       <Tooltip title={'comments'} arrow>
+                       <ForumRounded sx={{ width: 14, height: 14 }} />
                         <Typography variant="caption" className="pe-1">
                           {reaction?.comments}
                         </Typography>
+                       </Tooltip>
 
                         {/* divider */}
                         <Divider
@@ -275,10 +293,12 @@ export default function PostReaction({ reaction, isLastItem }) {
                         />
 
                         {/* flags or number reports */}
-                        <Flag sx={{ width: 14, height: 14 }} />
+                       <Tooltip title={'reported'} arrow>
+                       <Flag sx={{ width: 14, height: 14 }} />
                         <Typography variant="caption" className="pe-1">
                           {reaction?.report_count}
                         </Typography>
+                       </Tooltip>
                       </Box>
                     </Box>
                   </React.Fragment>
@@ -286,8 +306,6 @@ export default function PostReaction({ reaction, isLastItem }) {
               }
             />
           </ListItem>
-          {/* show divider is is not last item */}
-          {!isLastItem && <Divider variant="inset" component="li" />}
         </List>
       )}
     </React.Fragment>

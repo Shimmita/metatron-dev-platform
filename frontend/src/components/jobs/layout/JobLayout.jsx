@@ -152,7 +152,7 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
           <Box display={"flex"} gap={1} alignItems={"center"}>
             <PeopleRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2">
-              Current Applications {job.applicants.total}/1000
+              Current Applications {!(job.website==="") ? "(N/A)":`${job.applicants.total}/1000`}
             </Typography>
           </Box>
           <Box display={"flex"} gap={1} alignItems={"center"}>
@@ -190,11 +190,10 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
 
         <Box mt={1} mb={3} display={"flex"} justifyContent={"center"}>
           <AvatarGroup max={mandatorySkills?.length}>
-            {/* loop through the skills and their images matched using custim fn */}
-            {mandatorySkills?.map((skill, index) => (
-              <Tooltip title={skill} arrow>
+            {/* loop through the skills and their images matched using custom fn */}
+            {mandatorySkills?.map((skill) => (
+              <Tooltip title={skill} key={skill} arrow>
                 <Avatar
-                  key={index}
                   alt={skill}
                   className="border"
                   sx={{ width: 34, height: 34 }}
