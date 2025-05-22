@@ -3,12 +3,9 @@ import {
   BalanceRounded,
   CalendarMonthRounded,
   LocationCityRounded,
-  OpenInBrowser,
   PaidRounded,
   PeopleRounded,
-  VerifiedRounded,
-  WbIncandescentRounded,
-  WorkHistoryRounded,
+  WorkHistoryRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -18,23 +15,17 @@ import {
   Divider,
   Stack,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
-import React, { useState } from "react";
-import ApplyJobModal from "../../modal/ApplyJobModal";
+import React from "react";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
-function JobLayout({ isDarkMode, job, isOne = false }) {
-  const [openModal, setOpenApplyJobModal] = useState(false);
-
-  const handleShowingApply = () => {
-    setOpenApplyJobModal(true);
-  };
+function JobLayoutHiring({ isDarkMode, job, textOption = "",setIsApplicantsTable,setFocusedJob }) {
+ 
   // extracting contents in job
   const mandatorySkills = [...job?.skills];
-  const websiteLink = job?.website?.trim();
 
   // handle date display
   const handleDateDisplay = () => {
@@ -56,8 +47,16 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
     return finalName;
   };
 
-  // format entry position level
+   // close the applicants table
+   const handleOpenApplicantsTable=()=>{
+    // update the focused job to be assessed
+    setFocusedJob(job)
+    // triggers the display of job applicants table
+    setIsApplicantsTable(true)
+  }
 
+
+  // format entry position level
   const handleEntryPosition = () => {
     if (job?.entry?.level?.split(" ")[0]?.includes("Entry")) {
       return `An ${job?.entry?.level?.split(" ")[0]}`;
@@ -91,12 +90,12 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
       <Avatar
         alt=""
         className="border"
-        sx={{ width: 42, height: 42, mt:6 }}
+        sx={{ width: 42, height: 42,  }}
         src={getImageMatch(job?.logo)}
       />
 
       {/* job title */}
-      <Stack textAlign={"center"} gap={1} mt={1} mb={2}>
+      <Stack textAlign={"center"} gap={1} >
         <Box display={"flex"} justifyContent={"center"}>
           <Typography variant="body1" 
           color={"primary"} 
@@ -121,22 +120,22 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
           </Typography>
         </Box>
 
-        <Box display={"flex"} justifyContent={"center"}>
-          <AvatarGroup max={mandatorySkills?.length}>
-            {/* loop through the skills and their images matched using custom fn */}
-            {mandatorySkills?.map((skill) => (
-              <Tooltip title={skill} key={skill} arrow>
-                <Avatar
-                  alt={skill}
-                  className="border"
-                  sx={{ width: 30, height: 30 }}
-                  src={getImageMatch(skill)}
-                />
-              </Tooltip>
-            ))}
-          </AvatarGroup>
+         <Box display={"flex"} justifyContent={"center"}>
+        <AvatarGroup max={mandatorySkills?.length}>
+        {/* loop through the skills and their images matched using custom fn */}
+        {mandatorySkills?.map((skill) => (
+            <Tooltip title={skill} key={skill} arrow>
+            <Avatar
+                alt={skill}
+                className="border"
+                sx={{ width: 30, height: 30 }}
+                src={getImageMatch(skill)}
+            />
+            </Tooltip>
+        ))}
+        </AvatarGroup>
         </Box>
-        
+
         {/* divider centered */}
         <Box display={'flex'} justifyContent={'center'} width={'100%'}>
         <Divider className="p-1 w-75" component={'div'}/>
@@ -191,54 +190,25 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
         </React.Fragment>
       </Stack>
 
+      {/* control assessment */}
 
-      {/* application  btn */}
-      {websiteLink === "" ? (
+      {textOption === "Assess Jobs" && (
         <Button
-          variant={isDarkMode ? "outlined" : "contained"}
-          color="primary"
-          size="small"
-          disableElevation
-          className={"w-50"}
-          endIcon={<VerifiedRounded />}
-          disabled={job?.currentUserApplied}
-          onClick={handleShowingApply}
-          sx={{ borderRadius: "20px", mb: 1, width: "80%",fontSize:'small', textTransform:'capitalize' }}
+        variant={"contained"}
+        color="primary"
+        size="small"
+        onClick={handleOpenApplicantsTable}
+        disableElevation
+        disabled={job?.applicants?.total===0}
+        sx={{ borderRadius: "20px", mb:1, width: "60%",fontSize:'x-small', textTransform:'capitalize', }}
         >
-          {job?.currentUserApplied ? "Applied":"Apply Now"}
-        </Button>
-      ) : (
-        <Button
-          variant={isDarkMode ? "outlined" : "contained"}
-          color="primary"
-          className={"w-50"}
-          size="small"
-          disableElevation
-          endIcon={<OpenInBrowser />}
-          onClick={handleShowingApply}
-          sx={{ borderRadius: "20px", mb: 1, width: "80%",fontSize:'small',textTransform:'capitalize' }}
-        >
-          Apply Now
-        </Button>
+        Assess {job?.applicants?.total}
+    </Button>
       )}
 
-      {/* show modal apply jobs */}
-      <ApplyJobModal
-        title={job.title}
-        organisation={job.organisation}
-        requirements={job.requirements}
-        websiteLink={websiteLink}
-        openApplyJobModal={openModal}
-        setOpenApplyJobModal={setOpenApplyJobModal}
-        jobID={job?._id}
-        salary={job?.salary}
-        skills={job?.skills}
-        jobaccesstype={job?.jobtypeaccess}
-        location={job?.location}
-        isFullView={true}
-      />
+
     </Stack>
   );
 }
 
-export default JobLayout;
+export default JobLayoutHiring;

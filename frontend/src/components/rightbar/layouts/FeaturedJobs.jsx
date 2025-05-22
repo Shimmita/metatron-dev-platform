@@ -1,3 +1,4 @@
+import { Bolt, OpenInBrowser, Verified } from "@mui/icons-material";
 import {
   Avatar,
   AvatarGroup,
@@ -19,7 +20,6 @@ import { useSelector } from "react-redux";
 import ApplyJobModal from "../../modal/ApplyJobModal";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
-import { Bolt } from "@mui/icons-material";
 
 function FeaturedJobs({ isLoading, jobTop }) {
   const [openApplyJobModal, setOpenApplyJobModal] = useState();
@@ -40,6 +40,8 @@ function FeaturedJobs({ isLoading, jobTop }) {
   const handleOpeningApplyJob = () => {
     setOpenApplyJobModal(true);
   };
+
+  // check if the job is already applied by the
 
 
 
@@ -127,7 +129,7 @@ function FeaturedJobs({ isLoading, jobTop }) {
                   {/* job skills */}
                   <Box display={"flex"} mt={"2px"}>
                     <AvatarGroup max={jobTop?.skills?.length}>
-                      {/* loop through the skills and their images matched using custim fn */}
+                      {/* loop through the skills and their images matched using custom fn */}
                       {jobTop?.skills?.map((skill) => (
                         <Tooltip title={skill} key={skill} arrow>
                           <Avatar
@@ -158,14 +160,15 @@ function FeaturedJobs({ isLoading, jobTop }) {
                 size="small"
                 onClick={handleOpeningApplyJob}
                 variant="contained"
-                startIcon={!(jobTop?.website==="") ? undefined :<Bolt/>}
+                startIcon={!(jobTop?.website==="") ? <OpenInBrowser /> :<Verified />}
+                disabled={jobTop?.currentUserApplied}
                 sx={{
                   textTransform: "capitalize",
                   borderRadius: "20px",
                   fontSize:!CustomDeviceIsSmall() && 'x-small'
                 }}
               >
-                Apply
+                {jobTop?.currentUserApplied ? "Applied":"Apply"}
               </Button>
             </Stack>
           </ListItem>

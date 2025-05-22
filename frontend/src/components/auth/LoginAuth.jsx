@@ -77,7 +77,7 @@ const LoginAuth = () => {
     setAnchorEl(null);
   };
 
-  // UI theme dark light teaking effect
+  // UI theme dark light tweaking effect
   const handleShowDarkMode = () => {
     // update the redux theme boolean state
     dispatch(resetDarkMode());
@@ -228,8 +228,7 @@ const LoginAuth = () => {
                 <IconButton onClick={handleShowDarkMode}>
                   {isDarkMode ? (
                     <DarkModeRounded
-                      color="warning"
-                      sx={{ width: 26, height: 26 }}
+                      sx={{ width: 26, height: 26 ,}}
                     />
                   ) : (
                     <DarkModeRounded sx={{ width: 26, height: 26 }} />

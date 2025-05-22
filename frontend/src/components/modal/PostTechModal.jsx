@@ -491,7 +491,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               </Box>
 
               {/* Containerization  */}
-              {post_category === "Containerisation and Orchestration" && (
+              {post_category === "Containerization and Orchestration" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Containerization and Orchestration option that your post

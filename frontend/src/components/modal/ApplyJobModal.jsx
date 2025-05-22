@@ -83,7 +83,7 @@ const ApplyJobModal = ({
     jobID,
     applicant: {
       name: user.name,
-      ID: user._id,
+      applicantID: user._id,
       gender: user.gender,
       country: user.country,
     },
@@ -146,13 +146,10 @@ const ApplyJobModal = ({
 
   // handle country length to only two names and code label
   const handleCountryName = () => {
-    const parent = location.country.split(" ");
-    const countryCode = parent.pop();
-    const finalName =
-      parent.length > 2
-        ? `${parent[0]} ${parent[1]} ${countryCode}`
-        : location.country;
-
+    const parent = location?.country?.split(" ");
+    const countryCode = parent?.pop();
+    const finalName = parent?.length > 2? `${parent[0]} ${parent[1]} ${countryCode}` : location?.country;
+    
     return finalName;
   };
 

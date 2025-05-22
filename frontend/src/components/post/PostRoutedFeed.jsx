@@ -47,7 +47,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
     country,
     title,
   };
-  // complete sendin of the comment to the backend
+  // complete sending of the comment to the backend
   const handleSendCommentNow = () => {
     // sending the post tile embed in message and will split for separation backend
     let message = `commented on your post.${postDetailedData?.post_title?.substring(
@@ -62,7 +62,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
     // performing post request
     axios
       .put(
-        `http://localhost:5000/metatron/api/v1/posts/update/comments`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/comments`,
         reactingUserInfo,
         {
           withCredentials: true,

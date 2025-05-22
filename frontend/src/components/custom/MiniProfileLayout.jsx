@@ -58,7 +58,7 @@ export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
   useEffect(() => {
     // fetch details of the liked or reacted user based on their id
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/${userId}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/specific/${userId}`, {
         withCredentials: true,
       })
       .then((res) => {

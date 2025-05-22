@@ -367,7 +367,7 @@ const PostDetailsFeed = ({
           avatar={
               <IconButton onClick={() => setOpenMiniProfileAlert(true)}>
                 <Avatar
-                  // src={post.post_owner.owneravatar}
+                  // src={post.post_owner.owner-avatar}
                   src={dev}
                   variant="rounded"
                   sx={{
@@ -390,7 +390,7 @@ const PostDetailsFeed = ({
             >
               <Typography
                 className={postBelongsCurrentUser && "me-3"}
-                variant="body2"
+                variant="caption"
               >
                 {getElapsedTime(postDetailedData?.createdAt)}
               </Typography>
@@ -404,7 +404,7 @@ const PostDetailsFeed = ({
                   >
                     <MoreVertRounded
                       color="primary"
-                      sx={{ width: 20, height: 20 }}
+                      sx={{ width: 18, height: 18 }}
                     />
                   </IconButton>
                 </Tooltip>
@@ -427,7 +427,7 @@ const PostDetailsFeed = ({
           }
           title={
             <Box display="flex" alignItems="center" mt={1} gap={1}>
-              <Typography fontWeight="bold" variant={"body1"}>
+              <Typography fontWeight="bold" variant={"body2"}>
                 {CustomDeviceSmallest()
                   ? handleName()
                   : `${postDetailedData.post_owner.ownername}`}
@@ -558,6 +558,7 @@ const PostDetailsFeed = ({
               >
                 <Box display={"flex"} justifyContent={"center"} width={"100%"}>
                   <Typography
+                  sx={{ fontSize:'small' }}
                     variant={"body2"}
                     maxWidth={
                       CustomLandscapeWidest()
@@ -576,6 +577,7 @@ const PostDetailsFeed = ({
                         component={"span"}
                         fontWeight={"bold"}
                         color={"primary"}
+                        sx={{ fontSize:'small' }}
                       >
                         &nbsp; more
                       </Typography>
@@ -634,7 +636,7 @@ const PostDetailsFeed = ({
               {
                 icon: (
                   <FavoriteRounded
-                    sx={{ width: 23, height: 23 }}
+                  sx={{ width: 18, height: 18 }}
                     color={currentUserLiked ? "primary" : undefined}
                   />
                 ),
@@ -643,14 +645,14 @@ const PostDetailsFeed = ({
                 onClick: handlePostLikes,
               },
               {
-                icon: <GitHub sx={{ width: 21, height: 21 }} />,
+                icon: <GitHub sx={{ width: 18, height: 18 }} />,
                 count: post_github_clicks,
                 title: "Github",
               },
               {
                 icon: (
                   <ForumRounded
-                    sx={{ width: 21, height: 21 }}
+                  sx={{ width: 18, height: 18 }}
                     color={currentUserCommentented ? "primary" : undefined}
                   />
                 ),

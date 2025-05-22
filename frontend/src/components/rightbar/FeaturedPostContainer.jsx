@@ -8,8 +8,8 @@ import { updateCurrentPostsTop } from "../../redux/CurrentPostsTop";
 import FeaturedPost from "./layouts/FeaturedPost";
 
 const screenWidth = window.screen.availWidth;
-// get the rightbar expanded appropritately
-const rightBarExpaned = () => {
+// get the rightbar expanded appropriately
+const rightBarExpanded = () => {
   if (screenWidth > 1300) {
     return 360;
   }
@@ -21,7 +21,6 @@ const rightBarExpaned = () => {
   if (screenWidth > 1400) {
     return 380;
   }
-  return;
 };
 
 export default function FeaturedPostContainer() {
@@ -34,7 +33,7 @@ export default function FeaturedPostContainer() {
   const { postsTop } = useSelector((state) => state.currentPostsTop);
   // fetch posts from the backend
   useEffect(() => {
-    // check if there is no posts then fetch else dont api calls
+    // check if there is no posts then fetch else don't api calls
     if (postsTop) {
       return;
     }
@@ -89,7 +88,7 @@ export default function FeaturedPostContainer() {
         className="rounded mt-1"
         sx={{
           bgcolor: "background.paper",
-          width: rightBarExpaned(),
+          width: rightBarExpanded(),
         }}
       >
         <Box>

@@ -62,6 +62,8 @@ export default function AlertJobSearch({
 
   // redux states
   const { isTabSideBar } = useSelector((state) => state.appUI);
+  const { user } = useSelector((state) => state.currentUser);
+  
 
   const handleChangeTitles = (_, newValue) => {
     if (newValue.length > 3) {
@@ -91,7 +93,7 @@ export default function AlertJobSearch({
     // performing post request
     axios
       .post(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search/${user?._id}`,
         jobSearch,
         {
           withCredentials: true,
@@ -277,6 +279,7 @@ export default function AlertJobSearch({
                 onClick={handleCloseAlert}
                 color="success"
                 variant="outlined"
+                className="rounded-5"
                 disableElevation
                 size="small"
                 startIcon={<PreviewRounded sx={{ width: 25, height: 25 }} />}
@@ -288,22 +291,20 @@ export default function AlertJobSearch({
             <React.Fragment>
               <Button
                 disabled={isFetching || errorMessage || successMessage}
-                sx={{ borderRadius: "20px" }}
                 onClick={handleFetchingJobsSearch}
                 startIcon={
                   <Tooltip arrow title="search">
-                    <PageviewRounded sx={{ width: 25, height: 25 }} />
+                    <PageviewRounded sx={{ width: 23, height: 23 }} />
                   </Tooltip>
                 }
               />
               <Button
-                sx={{ borderRadius: "20px" }}
                 disabled={isFetching || errorMessage || successMessage}
                 onClick={handleCloseAlert}
                 startIcon={
                   <Tooltip arrow title="close">
                     {" "}
-                    <Close sx={{ width: 22, height: 22 }} />{" "}
+                    <Close sx={{ width: 18, height: 18 }} />{" "}
                   </Tooltip>
                 }
               />

@@ -52,7 +52,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
   const openMenu = Boolean(anchorEl);
   const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
   const [isProcessingPost, setIsProcessingPost] = useState(false);
-  const [isFullDescription, setFullDiscription] = useState(false);
+  const [isFullDescription, setFullDescription] = useState(false);
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
   const [messageMore, setMessageMore] = useState("");
   const [openAlertReport, setOpenAlertReport] = useState(false);
@@ -242,7 +242,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
 
   // handle showing full post description
   const handleFullDescription = () => {
-    setFullDiscription((prev) => !prev);
+    setFullDescription((prev) => !prev);
   };
 
   // handle the image incorporated in the post for some is free logo
@@ -321,7 +321,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                   mt={1}
                   alignItems={"center"}
                 >
-                  <Typography variant="body2" mr={2}>
+                  <Typography variant="caption" mr={2}>
                     {getElapsedTime(post?.createdAt)}
                   </Typography>
 
@@ -334,7 +334,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                       >
                         <MoreVertRounded
                           color="primary"
-                          sx={{ width: 20, height: 20 }}
+                          sx={{ width: 18, height: 18 }}
                         />
                       </IconButton>
                     </Tooltip>
@@ -374,7 +374,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
               <Box display="flex" alignItems="center" mt={1} gap={1}>
                 <Typography
                   fontWeight="bold"
-                  variant={CustomDeviceIsSmall() ? "body2" : "body1"}
+                  variant={'body2'}
                 >
                   {CustomDeviceSmallest()
                     ? handleName()
@@ -466,6 +466,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                 <Box display={"flex"} justifyContent={"center"} width={"100%"}>
                   <Typography
                     variant={"body2"}
+                    sx={{ fontSize:'small' }}
                     maxWidth={
                       CustomLandscapeWidest()
                         ? "90%"
@@ -483,6 +484,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                         component={"span"}
                         fontWeight={"bold"}
                         color={"primary"}
+                        sx={{ fontSize:'small' }}
                       >
                         ... &nbsp;more
                       </Typography>
@@ -539,7 +541,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                       <CircularProgress size={20} />
                     ) : (
                       <FavoriteRounded
-                        sx={{ width: 23, height: 23 }}
+                        sx={{ width: 18, height: 18 }}
                         color={currentUserLiked ? "primary" : undefined}
                       />
                     )}
@@ -556,7 +558,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                       <CircularProgress size={20} />
                     ) : (
                       <GitHub
-                        sx={{ width: 21, height: 21 }}
+                        sx={{ width: 18, height: 18 }}
                         color={currentUserClickedGithub ? "primary" : undefined}
                       />
                     )}
@@ -573,7 +575,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                       <CircularProgress size={20} />
                     ) : (
                       <ForumRounded
-                        sx={{ width: 21, height: 21 }}
+                        sx={{ width: 18, height: 18 }}
                         color={currentUserCommented ? "primary" : undefined}
                       />
                     )}

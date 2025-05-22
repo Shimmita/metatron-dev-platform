@@ -12,6 +12,7 @@ const FeedDefaultSearch = lazy(() => import("./FeedDefaultSearch"));
 const PostDetailsRouted = lazy(() => import("../post/PostDetailsRouted"));
 const CourseDetailed = lazy(() => import("../courses/layout/CourseDetailed"));
 
+const AllJobsHiringManager=lazy(()=>import("../jobs/AllJobsHiringManager")) ;
 const AllJobsContainer = lazy(() => import("../jobs/AllJobsContainer"));
 
 const CoursePaidContainer = lazy(() =>
@@ -44,7 +45,7 @@ const Feed = () => {
 
   const dispatch = useDispatch();
 
-  // restore default states which couldve been bypassed unnecessarily
+  // restore default states which could've been bypassed unnecessarily
   useLayoutEffect(() => {
     // restore speed dial it could have been not closed in previous histories
     dispatch(handleShowingSpeedDial(true));
@@ -86,7 +87,11 @@ const Feed = () => {
                 path="/courses/paid/detailed"
                 element={<CourseDetailed />}
               />
+              {/* jobseeker pane */}
               <Route path="/jobs" element={<AllJobsContainer />} />
+
+              {/* hiring manager pane */}
+              <Route path="/jobs/hiring" element={<AllJobsHiringManager/>}/>
 
               <Route path="/events/live" element={<EventsLive />} />
               <Route path="/events/bookmarks" element={<EventsBookMarks />} />
@@ -184,8 +189,11 @@ const Feed = () => {
                   path="/courses/paid/detailed"
                   element={<CourseDetailed />}
                 />
-
+                {/* jobseeker pane */}
                 <Route path="/jobs" element={<AllJobsContainer />} />
+
+                {/* hiring manager pane */}
+                <Route path="/jobs/hiring" element={<AllJobsHiringManager/>}/>
 
                 <Route path="/events/live" element={<EventsLive />} />
                 <Route path="/events/bookmarks" element={<EventsBookMarks />} />

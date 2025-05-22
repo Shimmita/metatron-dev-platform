@@ -1,15 +1,13 @@
 import {
   AssignmentTurnedInRounded,
   BarChartRounded,
-  BookRounded,
   DarkModeRounded,
-  FindInPageRounded,
   HighlightOffOutlined,
   InsightsRounded,
   LibraryBooksRounded,
+  ListRounded,
   Menu,
   MyLocationRounded,
-  VerifiedRounded,
   WorkRounded
 } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -37,6 +35,8 @@ import Typography from "@mui/material/Typography";
 import axios from "axios";
 import React, { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import devImage from '../../images/dev.jpeg';
 import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
@@ -44,15 +44,13 @@ import {
   showUserProfileDrawer,
 } from "../../redux/AppUI";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
-import AlertJobSearch from "../alerts/AlertJobSearch";
+import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import JobLayout from "./layout/JobLayout";
+import ApplicantsTable from "./layout/ApplicantsTable";
+import JobLayoutHiring from "./layout/JobLayoutHiring";
 import JobStatsLayout from "./layout/JobStatsLayouts";
-import { useNavigate } from "react-router-dom";
-import devImage from '../../images/dev.jpeg'
-import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 
 const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
 
@@ -112,59 +110,71 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 
-export default function MiniDrawer() {
+export default function AllJobsHiringManager() {
+  // track theme
+  const theme = useTheme();
+
   // redux states
   const { isDarkMode, isDefaultSpeedDial, isJobSearchGlobal } = useSelector(
     (state) => state.appUI
   );
-
   const { jobs } = useSelector((state) => state.currentJobs);
   const { user } = useSelector((state) => state.currentUser);
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
-  const theme = useTheme();
 
+  // statistics tracker
   const[isMyStats,setIsMyStats]=useState(false)
+  // job application table
+  const[isApplicantsTable,setIsApplicantsTable]=useState(false)
 
-  const navigate=useNavigate()
-
+  // selected option
   const [textOption, setTextOption] = useState(
-    isJobSearchGlobal ? "Search Jobs" : "Explore Jobs"
+    isJobSearchGlobal ? "Search Jobs" : "Posted Jobs"
   );
-  const [isDrawerPane, setIsDrawerPane] = useState(true);
-  const [open, setOpen] = useState(
-    !(CustomDeviceIsSmall() || CustomDeviceTablet()) && true
-  );
- 
 
+  // holds drawer status
+  const [isDrawerPane, setIsDrawerPane] = useState(true);
+  
+  const [open, setOpen] = useState(
+    !(CustomDeviceIsSmall() || CustomDeviceTablet()) &&  true
+  );
+
+  // focused job for assessment and fetch prospective applicants
+  const[focusedJob,setFocusedJob]=useState({})
+
+  // navigate to other routes
+  const navigate=useNavigate()
+  // track axios progress
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  // trigger redux update
+  const dispatch = useDispatch();
+
+   // handle navigation to hiring pane
+   const handleNavigateJobSeeker=()=>{
+    navigate('/jobs')
+  }
+
+
+//   handle opening of drawer profile
+const handleShowingProfileDrawer = () => {
+    dispatch(showUserProfileDrawer());
+  };
 
   // axios default credentials
   axios.defaults.withCredentials = true;
   
-  const [openAlert, setOpenAlert] = useState(false);
 
-  //   handle opening of drawer profile
-  const handleShowingProfileDrawer = () => {
-      dispatch(showUserProfileDrawer());
-    };
-  
-
-  // handle navigation to hiring pane
-  const handleNavigateHiring=()=>{
-    navigate('/jobs/hiring')
-  }
-
-  // open drawer
+  // handle opening drawer
   const handleDrawerOpen = () => {
     setOpen(true);
   };
 
-  // close drawer
+  // handle closing of the drawer
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const dispatch = useDispatch();
 
   // handle showing of speed dial by making it off in this window of jobs
   if (isDefaultSpeedDial) {
@@ -181,14 +191,7 @@ export default function MiniDrawer() {
       return;
     }
 
-    // show search jobs alert when its the one focused
-    if (textOption === "Search Jobs") {
-      // false my stats
-      setIsMyStats(false)
-
-      setOpenAlert(true);
-      return;
-    }
+  
 
     // nearby jobs are those within the country of the currently logged in user
     const country = user.country.split(" ")[1];
@@ -197,10 +200,10 @@ export default function MiniDrawer() {
     setIsFetching(true);
 
     // fetch all jobs if the request is so
-    if (textOption === "Explore Jobs") {
+    if (textOption === "Posted Jobs" || textOption === "Assess Jobs") {
 
       axios
-        .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/${user?._id}`, {
+        .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/posted/${user?.email}`, {
           withCredentials: true,
         })
         .then((res) => {
@@ -227,11 +230,14 @@ export default function MiniDrawer() {
           setIsFetching(false);
           // false my stats
           setIsMyStats(false)
+          
         });
     }
 
     // fetch all jobs that have been verified
-    if (textOption === "Verified Jobs") {
+    if (textOption === "Assess applicants") {
+
+
       axios
         .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/verified/${user?._id}`, {
           withCredentials: true,
@@ -473,6 +479,7 @@ export default function MiniDrawer() {
                 >
                   <Menu />
                 </IconButton>
+
               </Box>
 
               {/* main jobs title and the current selection */}
@@ -483,12 +490,13 @@ export default function MiniDrawer() {
                   textAlign={"center"}
                   textTransform={"uppercase"}
                   ml={open && 22}
+                  
                 >
                   Metatron Jobs
                 </Typography>
 
                 {/* current navigation counter */}
-                <Box display={"flex"} justifyContent={"center"}>
+                <Box display={"flex"} justifyContent={"center"} >
                   <Typography variant="caption" textTransform={'lowercase'} ml={open && 22}>
                     - {textOption} -
                   </Typography>
@@ -505,16 +513,18 @@ export default function MiniDrawer() {
                   </Tooltip>
                 </IconButton>
               </Box>
-              {/* profile */}
-              <Tooltip arrow title={"profile"}>
-                <IconButton onClick={handleShowingProfileDrawer}>
-                <Avatar
-                    sx={{ width: 26, height: 26 }}
-                    src={devImage}
-                    alt={"user image"}
-                />
-                </IconButton>
-              </Tooltip>
+
+              {/* profile avatar */}
+        <Tooltip arrow title={"profile"}>
+            <IconButton onClick={handleShowingProfileDrawer}>
+            <Avatar
+                sx={{ width: 26, height: 26 }}
+                src={devImage}
+                alt={"user image"}
+            />
+            </IconButton>
+            </Tooltip>
+
             </Toolbar>
           </AppBar>
 
@@ -540,23 +550,23 @@ export default function MiniDrawer() {
               )}
 
               {open && (
-               <Box display={'flex'} gap={1} alignItems={'center'}>
-               {/* icon right or left arrow */}
-             <IconButton onClick={handleDrawerClose}>
-               {theme.direction === "rtl" ? (
-                 <ChevronRightIcon  sx={{ color:'white' }}/>
-               ) : (
-                 <ChevronLeftIcon sx={{ color:'white' }} />
-               )}
-             </IconButton>
+                <Box display={'flex'} gap={1} alignItems={'center'}>
+                    {/* icon right or left arrow */}
+                  <IconButton onClick={handleDrawerClose}>
+                    {theme.direction === "rtl" ? (
+                      <ChevronRightIcon  sx={{ color:'white' }}/>
+                    ) : (
+                      <ChevronLeftIcon sx={{ color:'white' }} />
+                    )}
+                  </IconButton>
 
-             {/* title hiring */}
-             <Typography variant="body2" 
-             sx={{color:'white'}} 
-             textTransform={'uppercase'}>
-               jobseeker
-             </Typography>
-           </Box>
+                  {/* title hiring */}
+                  <Typography variant="body2" 
+                  sx={{color:'white'}} 
+                  textTransform={'uppercase'}>
+                    hiring Manager
+                  </Typography>
+                </Box>
               )}
             </DrawerHeader>
             <Divider className=" w-100" component={"div"} />
@@ -572,11 +582,12 @@ export default function MiniDrawer() {
                 </ListItemButton>
               </Stack>
             )}
-
+         
+            {/* job seeker options */}
             <List>
               {[
-                "Explore Jobs",
-                "Search Jobs",
+                "Posted Jobs",
+                "Assess Jobs",
                 "Verified Jobs",
                 "Nearby Jobs",
                 "Recommend",
@@ -631,23 +642,19 @@ export default function MiniDrawer() {
                           sx={{width:22,height:22}}
                         />
                       ) : index === 1 ? (
-                        <FindInPageRounded
+                        <ListRounded
                           color={text === textOption ? "primary" : "inherit"}
                         />
                       ) : index === 2 ? (
-                        <VerifiedRounded
-                          color={text === textOption ? "primary" : "inherit"}
-                        />
-                      ) : index === 3 ? (
                         <MyLocationRounded
                           color={text === textOption ? "primary" : "inherit"}
                         />
-                      ) : index === 4 ? (
+                      ) : index === 3 ? (
                         <InsightsRounded
                         color={text === textOption ? "primary" : "inherit"}
                       />
                        
-                      ) :index===5 ? (
+                      ) :index===4 ? (
                         <AssignmentTurnedInRounded
                         color={text === textOption ? "primary" : "inherit"}
                       />
@@ -683,18 +690,18 @@ export default function MiniDrawer() {
                 </ListItem>
               ))}
             </List>
-
+          
             {/* divider */}
             <Divider component={'div'} className={'p-1'}/>
             {open ? (
               <>
               {/* hiring section */}
-            <Button size="small" sx={{mt:1,}} onClick={handleNavigateHiring}>Hiring Manager</Button>
+            <Button size="small" sx={{mt:1}} onClick={handleNavigateJobSeeker}> jobseeker </Button>
               </>
             ):(
-              <ListItemButton size="small" >
+              <ListItemButton size="small" onClick={handleNavigateJobSeeker}>
               <Tooltip title={"i'm hiring"} arrow>
-              <ListItemIcon onClick={handleNavigateHiring}>
+              <ListItemIcon>
               <LibraryBooksRounded sx={{width:24,height:24}}/>
               </ListItemIcon>
               </Tooltip>
@@ -732,9 +739,15 @@ export default function MiniDrawer() {
               }}
             >
               <React.Fragment>
-                {/* all jobs and verified jobs and Nearby that have no external link */}
-                {(textOption === "Explore Jobs" ||
-                  textOption === "Nearby Jobs" ||
+
+                {/* if is applicants table vs jobs layout */}
+                {isApplicantsTable ? (
+                  <ApplicantsTable setIsApplicantsTable={setIsApplicantsTable} focusedJob={focusedJob} />
+                ):(
+                  <React.Fragment>
+                  {/* all jobs and verified jobs and Nearby that have no external link */}
+                {(textOption === "Posted Jobs" ||
+                  textOption === "Assess Jobs" ||
                   textOption === "Verified Jobs" ||
                   textOption === "Recommend" ||
                   textOption === "Applications"||
@@ -766,10 +779,13 @@ export default function MiniDrawer() {
                                 job={job}
                               />
                               ):(
-                                <JobLayout
+                                <JobLayoutHiring
+                                textOption={textOption}
                                 key={job?._id}
                                 isDarkMode={isDarkMode}
                                 job={job}
+                                setFocusedJob={setFocusedJob}
+                                setIsApplicantsTable={setIsApplicantsTable}
                               />
                               )}
                               {/* divider for small devices */}
@@ -785,20 +801,17 @@ export default function MiniDrawer() {
                     )}
                   </React.Fragment>
                 )}
+                  </React.Fragment>
+                )}
+
               </React.Fragment>
             </Box>
           </Box>
 
+        {/* holds the profile drawer which contains user account info */}
+        <ProfileDrawer />
 
-           {/* holds the profile drawer which contains user account info */}
-            <ProfileDrawer />
-
-          {/* show job search alert */}
-          <AlertJobSearch
-            openAlert={openAlert}
-            setOpenAlert={setOpenAlert}
-            isFullView={true}
-          />
+    
 
           {/* show success snackbar when redux snack state is updated */}
           {messageSnack && <SnackBarSuccess message={messageSnack} />}

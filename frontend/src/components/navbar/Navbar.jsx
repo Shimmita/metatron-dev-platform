@@ -229,7 +229,7 @@ const Navbar = ({mode,setMode}) => {
       });
   };
 
-    // UI theme dark light teaking effect
+    // UI theme dark light tweaking effect
     const handleShowDarkMode = () => {
       // update the redux theme boolean state
       dispatch(resetDarkMode());
@@ -238,7 +238,7 @@ const Navbar = ({mode,setMode}) => {
 
 
 
-  // get all possoble post reaction notifications based on current userID
+  // get all possible post reaction notifications based on current userID
   useLayoutEffect(() => {
     // set is fetching to true
     setIsFetching(true);
@@ -422,7 +422,7 @@ const Navbar = ({mode,setMode}) => {
                   ) : (
                     <IconButton onClick={handleHome}>
                       <Avatar
-                        alt="KE"
+                        alt=""
                         src={AppLogo}
                         sx={{ width: 38, height: 38 }}
                       />
@@ -567,7 +567,7 @@ const Navbar = ({mode,setMode}) => {
               </Box>
             )}
 
-            {/* display connection count for largets screens only */}
+            {/* display connection count for largest screens only */}
             {!(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
                      <IconButton onClick={handleShowDarkMode}> 
                      <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
@@ -674,7 +674,7 @@ const Navbar = ({mode,setMode}) => {
             setOpenModalEventAdd={setOpenModalEventAdd}
           />
 
-          {/* holds the notification and messaging drawe */}
+          {/* holds the notification and messaging drawer */}
           <ParentNotifMessageContainer />
 
           {/* holds the profile drawer which contains user account info */}

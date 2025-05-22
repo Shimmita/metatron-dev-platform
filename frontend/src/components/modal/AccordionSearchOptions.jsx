@@ -62,7 +62,7 @@ export default function AccordionSearchOptions({
   successMessage,
   errorMessage,
 }) {
-  const [expanded, setExpanded] = React.useState(true);
+  const [expanded, setExpanded] = React.useState(false);
 
   // countries
   const countriesOption = AllCountries.map((val) => {
@@ -90,9 +90,8 @@ export default function AccordionSearchOptions({
               fullWidth
               onChange={(e) => setDatePosted(e.target.value)}
             >
-              {datePostedArray &&
-                datePostedArray.map((expert_level, index) => (
-                  <MenuItem key={index} value={expert_level}>
+              {datePostedArray?.map((expert_level) => (
+                  <MenuItem key={expert_level} value={expert_level}>
                     <small style={{ fontSize: "small" }}>{expert_level}</small>
                   </MenuItem>
                 ))}
@@ -108,9 +107,8 @@ export default function AccordionSearchOptions({
               fullWidth
               onChange={(e) => setJobEntry(e.target.value.trim())}
             >
-              {SubsectionJob &&
-                SubsectionJob.Expert_Level.map((expert_level, index) => (
-                  <MenuItem key={index} value={expert_level?.split(" ")[0]}>
+              {SubsectionJob?.Expert_Level.map((expert_level) => (
+                  <MenuItem key={expert_level} value={expert_level?.split(" ")[0]}>
                     <small style={{ fontSize: "small" }}>{expert_level}</small>
                   </MenuItem>
                 ))}
@@ -125,9 +123,8 @@ export default function AccordionSearchOptions({
               fullWidth
               onChange={(e) => setCountry(e.target.value?.trim())}
             >
-              {countriesOption &&
-                countriesOption?.map((documents_req, index) => (
-                  <MenuItem key={index} value={documents_req}>
+              {countriesOption?.map((documents_req) => (
+                  <MenuItem key={documents_req} value={documents_req}>
                     <small style={{ fontSize: "small" }}>{documents_req}</small>
                   </MenuItem>
                 ))}

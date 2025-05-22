@@ -1,6 +1,6 @@
 export default function CustomCountryName(country) {
   // handle the country name
-  var country_name = "";
+  let country_name = "";
   if (country) {
     const split_res = country.split(" (")[0].split(" ");
     if (split_res.length <= 2) {

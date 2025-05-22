@@ -11,26 +11,29 @@ export default function JobsContainer() {
   // screen width of the device
   const screenWidth = window.screen.availWidth;
   // redux states
+  const { user } = useSelector((state) => state.currentUser);
   const { jobsTop } = useSelector((state) => state.currentJobsTop);
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   
+  // dispatch
   const dispatch = useDispatch();
+
   // axios default credentials
   axios.defaults.withCredentials = true;
 
   // fetch posts from the backend
   useEffect(() => {
-    // check if there is no jobs then fetch else dont api calls
+    // check if there is no jobs then fetch else don't api calls
     if (jobsTop) {
       return;
     }
     // set is fetching to true
     setIsFetching(true);
 
-    // performing post request
+    // performing get request and passing userId 
     axios
-      .get(`http://localhost:5000/metatron/api/v1/jobs/all/top`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/top/${user?._id}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -54,11 +57,11 @@ export default function JobsContainer() {
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [dispatch, jobsTop]);
+  }, [dispatch, jobsTop, user]);
 
 
-  // get the rightbar expanded appropritately
-  const rightBarExpaned = () => {
+  // get the right-bar expanded appropriately
+  const rightBarExpanded = () => {
     if (screenWidth > 1300) {
       return 360;
     }
@@ -70,7 +73,6 @@ export default function JobsContainer() {
     if (screenWidth > 1400) {
       return 380;
     }
-    return;
   };
 
   return (
@@ -93,12 +95,12 @@ export default function JobsContainer() {
         className="rounded"
         sx={{
           bgcolor: "background.paper",
-          width: rightBarExpaned(),
+          width: rightBarExpanded(),
         }}
       >
         <Box>
-          {jobsTop?.map((jobTop, index) => (
-            <Box key={index}>
+          {jobsTop?.map((jobTop) => (
+            <Box key={jobTop?._id}>
               <FeaturedJobs isLoading={isFetching} jobTop={jobTop} />
             </Box>
           ))}

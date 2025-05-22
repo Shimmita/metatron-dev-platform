@@ -574,9 +574,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob }) => {
                       fullWidth
                       onChange={(e) => setJobTitle(e.target.value)}
                     >
-                      {SpecialisationJobs &&
-                        SpecialisationJobs.map((title, index) => (
-                          <MenuItem key={index} value={title}>
+                      {SpecialisationJobs?.map((title) => (
+                          <MenuItem key={title} value={title}>
                             <small style={{ fontSize: "small" }}>{title}</small>
                           </MenuItem>
                         ))}

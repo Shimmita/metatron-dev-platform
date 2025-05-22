@@ -108,9 +108,13 @@ export default function AlertMiniProfileView({
   const isFriends =miniProfileData?.network?.includes(currentUserId);
 
   useEffect(() => {
+  
+    // track fetching backend true
+    setIsFetching(true)
+
     // fetch details of the liked or reacted user based on their id
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/${userId}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/specific/${userId}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -123,10 +127,8 @@ export default function AlertMiniProfileView({
         if (err?.code === "ERR_NETWORK") {
           // update the snackbar notification of the error of connection
           setMessage("Network Error");
-          return;
         }
-        // update the snackbar notification of error from the server
-        setMessage(err?.response.data);
+      
       })
       .finally(() => {
         // set is fetching to false
@@ -146,6 +148,7 @@ export default function AlertMiniProfileView({
   // fetch the online status of the user from the backend that checks on
   // user session database collection  /all/online/:userID
   useEffect(() => {
+  
     // update is fetching true
     setIsFetching(true);
 
@@ -164,10 +167,8 @@ export default function AlertMiniProfileView({
         if (err?.code === "ERR_NETWORK") {
           // update the snackbar notification of the error of connection
           setMessage("Network Error");
-          return;
         }
-        // update the snackbar notification of error from the server
-        setMessage(err?.response.data);
+      
       })
       .finally(() => {
         // set is fetching to false
@@ -221,7 +222,7 @@ export default function AlertMiniProfileView({
     // set is fetching to true
     setIsFetching(true);
 
-    // performing delete request and passing id of the currenly user and that of miniprofile user being
+    // performing delete request and passing id of the currently user and that of miniprofile user being
     // viewed
     axios
       .delete(
