@@ -35,7 +35,7 @@ const ConversationDetailed = ({
 }) => {
   const [replyContent, setReplyContent] = useState("");
   const [conversationMessages, setConversationMessages] = useState([]);
-  const [isEditingMessge, setIsEditingMessage] = useState(false);
+  const [isEditingMessage, setIsEditingMessage] = useState(false);
   const [messageFocused, setMessageFocused] = useState();
 
   // api request monitors
@@ -53,16 +53,16 @@ const ConversationDetailed = ({
 
   // determine the name and avatar of the conversation displayed.
   const handleTopBarNameAvatar = () => {
-    // this prevents currently user being displayed on topbar of conversation
+    // this prevents currently user being displayed on top-bar of conversation
     if (
       currentUserName?.toLowerCase() ===
       focusedConveration?.senderName?.toLowerCase()
     ) {
-      return [focusedConveration?.targetName, focusedConveration?.targetAvatar];
+      return [`TO: ${focusedConveration?.targetName}`, focusedConveration?.targetAvatar];
     }
 
     // return the sender name and avatar
-    return [focusedConveration?.senderName, focusedConveration?.senderAvatar];
+    return [`FROM: ${focusedConveration?.senderName}`, focusedConveration?.senderAvatar];
   };
 
   // axios default credentials
@@ -76,7 +76,7 @@ const ConversationDetailed = ({
     // set is fetching to true
     setIsFetching(true);
 
-    // performing get request for all messages with coversationId.
+    // performing get request for all messages with conversationId.
     axios
       .get(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/${focusedConveration?._id}`,
@@ -115,6 +115,7 @@ const ConversationDetailed = ({
       conversationId: focusedConveration._id,
       content: replyContent,
       senderId: currentUserID,
+      senderName:currentUserName
     };
 
     // call api request to post data to the backed
@@ -132,8 +133,7 @@ const ConversationDetailed = ({
         // set conversation to the response returned from the server which is last message sent
         setConversationMessages((prev) => [...prev, response.data]);
 
-        // clear the reply
-        setReplyContent("");
+       
       }
     } catch (err) {
       // error occurred during fetch query
@@ -141,6 +141,8 @@ const ConversationDetailed = ({
     } finally {
       // close is fetching
       setIsFetching(false);
+       // clear the reply
+       setReplyContent("");
     }
   };
 
@@ -165,7 +167,7 @@ const ConversationDetailed = ({
         setReplyContent("");
       }
     } catch (err) {
-      // error occured during fetch query
+      // error occurred during fetch query
       console.error(err);
     } finally {
       // close is fetching
@@ -245,8 +247,8 @@ const ConversationDetailed = ({
       >
         <Box>
           {
-            conversationMessages?.map((message, index) => (
-              <Stack key={index} gap={2}>
+            conversationMessages?.map((message) => (
+              <Stack key={message} gap={2}>
                 {/* current user message styling */}
                 {message.senderId === currentUserID ? (
                   <Box>
@@ -271,7 +273,7 @@ const ConversationDetailed = ({
                               // call show more function
                               handleClickMoreMessage(event);
 
-                              // set message passed to the current nessage
+                              // set message passed to the current message
                               setMessageFocused(message);
                             }}
                           >
@@ -395,7 +397,7 @@ const ConversationDetailed = ({
                           }}
                         >
                           {`( ${
-                            focusedConveration?.targetName
+                            focusedConveration?.senderName
                               ?.toLowerCase()
                               ?.split(" ")[0]
                           } )`}
@@ -446,7 +448,7 @@ const ConversationDetailed = ({
           />
           <Box display={"flex"} justifyContent={"flex-end"} mr={1}>
             <Box display={"flex"} gap={1} alignItems={"center"}>
-              {isEditingMessge ? (
+              {isEditingMessage ? (
                 <React.Fragment>
                   <Button
                     variant="outlined"

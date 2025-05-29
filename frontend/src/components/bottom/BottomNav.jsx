@@ -1,7 +1,8 @@
-import { CachedRounded, Home, SchoolRounded, Work } from "@mui/icons-material";
+import { CachedRounded, Home, SchoolRounded, VideoCameraBackRounded, Work } from "@mui/icons-material";
 import {
   BottomNavigation,
   BottomNavigationAction,
+  Box,
   Paper,
   Tooltip,
 } from "@mui/material";
@@ -14,6 +15,8 @@ import {
 } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import CustomLandScape from "../utilities/CustomLandscape";
 
 const BottomNav = () => {
   // redux states
@@ -57,11 +60,18 @@ const BottomNav = () => {
 
   // accessing the redux state values
   const { isTabSideBar } = useSelector((state) => state.appUI);
+  
+  // larger devices, beyond tablet
+  const isBeyondTablets=CustomLandScape() || CustomLandscapeWidest()
 
   return (
-    <Paper sx={{ position: "fixed", bottom: 0, left: 0, right: 0 }}>
+    <Paper sx={{ position: "fixed",
+     bottom: 0,
+      left: 0,
+       right: 0,
+         }}>
       <BottomNavigation
-        showLabels={false}
+        showLabels={true}
         sx={{
           overflowX: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
@@ -78,39 +88,54 @@ const BottomNav = () => {
           dispatch(updateCurrentBottomNav(newValue));
         }}
       >
-        <Tooltip title="home" arrow>
+        <Tooltip title="Home" arrow  
+        style={{
+              marginLeft:
+                CustomDeviceTablet() && isTabSideBar && "30%",
+            }}>
           <BottomNavigationAction
             label="Home"
             icon={
               isPostSearch ? (
-                <CachedRounded color="info" sx={{ width: 34, height: 34 }} />
+                <CachedRounded color="info" sx={{ width: 30, height: 30 }} />
               ) : (
-                <Home sx={{ width: 34, height: 34 }} />
+                <Home sx={{ width: 32, height: 32}} />
               )
             }
-            style={{
-              marginLeft:
-                CustomDeviceTablet() && isTabSideBar ? "30%" : undefined,
-            }}
             onClick={handleReturnHome}
           />
         </Tooltip>
 
-        <Tooltip title="Jobs" arrow>
+        <Tooltip title="Tech Jobs" arrow>
           <BottomNavigationAction
             onClick={handleJobContent}
             label="Jobs"
-            icon={<Work sx={{ width: 30, height: 30 }} />}
+            icon={<Work sx={{ width: 29, height: 29 }} />}
           />
         </Tooltip>
 
-        <Tooltip title="courses" arrow>
+        
+        {/* online courses */}
+        <Tooltip title="Tech Courses" arrow>
           <BottomNavigationAction
             onClick={handleOpenCourses}
             label="Courses"
-            icon={<SchoolRounded sx={{ width: 34, height: 34 }} />}
+            icon={<SchoolRounded sx={{ width: 32, height: 32 }} />}
           />
         </Tooltip>
+
+         {/* tech events */}
+         <Tooltip 
+         title="Tech Events"
+          arrow
+          sx={{ marginRight:isBeyondTablets && position===0 && 12 }}>
+          <BottomNavigationAction
+            onClick={handleJobContent}
+            label="Events"
+            icon={<VideoCameraBackRounded sx={{ width: 28, height: 28 }} />}
+          />
+        </Tooltip>
+
       </BottomNavigation>
     </Paper>
   );

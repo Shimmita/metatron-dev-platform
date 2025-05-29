@@ -510,6 +510,7 @@ const imageMap = {
   SQLite: SqliteLogo,
   PostgreSQL: PostgresLogo,
   PHP: PHPLogo,
+  "Microsoft Azure":AzureLogo,
   MySQL: MySQLogo,
   Meteor: MeteorLogo,
   MongoDB: MongoLogo,

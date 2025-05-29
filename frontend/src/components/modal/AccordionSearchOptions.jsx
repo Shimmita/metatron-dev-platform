@@ -68,7 +68,7 @@ export default function AccordionSearchOptions({
   const countriesOption = AllCountries.map((val) => {
     let country = val.label;
     return country;
-  }).sort();
+  }).sort((a, b) => a.localeCompare(b));
 
   const handleChange = () => {
     setExpanded((prev) => !prev);

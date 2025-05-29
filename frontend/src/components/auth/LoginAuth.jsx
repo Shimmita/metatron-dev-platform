@@ -307,7 +307,7 @@ const LoginAuth = () => {
                 justifyContent={"center"}
               >
                 <StarRounded sx={{ width: 20, height: 20 }} />
-                The Best IT Platform{" "}
+                Visit The Best IT Platform{" "}
                 <StarRounded sx={{ width: 20, height: 20 }} />
               </Typography>
 
@@ -332,7 +332,6 @@ const LoginAuth = () => {
                 />
               </Box>
 
-            
             </Box>
           </Box>
           <Box>
@@ -342,7 +341,7 @@ const LoginAuth = () => {
                 <Collapse in={messageGeneral || false}>
                   <Alert
                     className="rounded-5"
-                    severity="warning"
+                    severity="info"
                     onClick={() => setMessageGeneral("")}
                     action={
                       <IconButton
@@ -360,7 +359,7 @@ const LoginAuth = () => {
                 </Collapse>
               </Box>
             )}
-            {/* display when is server auth messages session and server maintainance */}
+            {/* display when is server auth messages session and server maintenance */}
             {authMessage && (
               <Box display={"flex"} justifyContent={"center"}>
                 <Collapse in={authMessage || false}>

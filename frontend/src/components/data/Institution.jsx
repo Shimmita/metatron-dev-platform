@@ -236,6 +236,7 @@ const Institutions = [
   "Wumingu Technical and Vocational College",
   "Ziwa Technical Training Institute",
   "Bukura Agricultural College",
+  "Cambridge University Kenya",
 
   // Institutes of Technology
   "Coast Institute of Technology (CIT)",

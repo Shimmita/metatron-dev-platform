@@ -9,7 +9,7 @@ const CurrentPostReactions = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadate the post_reactions by the feed from the payload
+    // update the post_reactions by the feed from the payload
     updateCurrentPostReactions: (state, action) => {
       state.post_reactions = action.payload;
     },

@@ -15,7 +15,6 @@ import { showMessagingDrawer } from "../../redux/AppUI";
 import SnackBarNotifications from "../snackbar/SnackBarNotifications";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import NotifAccordionLayout from "./layout/NotifAccordionLayout";
 const ConversationContainer = lazy(() => import("./ConversationsContainer"));
 
@@ -50,7 +49,7 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
   })
 );
 
-export default function ParentContainer() {
+export default function ParentNotifMessageDrawer() {
   const [value, setValue] = useState(0);
   // this will define display of inbox and notif bars appropriately
   const [messageNotifClicked, setMessageNotifClicked] = useState(false);
@@ -66,7 +65,13 @@ export default function ParentContainer() {
   const { connectNotifications } = useSelector(
     (state) => state.currentConnectNotif
   );
+
   const { reportedPost } = useSelector((state) => state.currentReportedPost);
+
+  const { profile_views } = useSelector((state) => state.currentProfileView);
+
+  const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
+  
 
   const dispatch = useDispatch();
 
@@ -86,9 +91,7 @@ export default function ParentContainer() {
               ? 270
               : CustomDeviceIsSmall()
               ? 330
-              : CustomDeviceTablet()
-              ? 420
-              : 450
+              :400
           }
           bgcolor={"background.default"}
           height={"100vh"}
@@ -174,6 +177,8 @@ export default function ParentContainer() {
                     post_reactions={post_reactions}
                     reportedPost={reportedPost}
                     connectNotifications={connectNotifications}
+                    profile_views={profile_views}
+                    jobFeedBacks={job_feedback}
                   />
                 </Box>
               )}

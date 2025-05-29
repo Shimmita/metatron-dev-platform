@@ -52,7 +52,6 @@ export default function AlertInput({
   const { isTabSideBar } = useSelector((state) => state.appUI);
 
   return (
-    <React.Fragment>
       <Dialog
         open={openAlert}
         TransitionComponent={Transition}
@@ -98,6 +97,5 @@ export default function AlertInput({
           </Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
   );
 }

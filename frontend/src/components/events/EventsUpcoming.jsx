@@ -27,7 +27,6 @@ const EventsUpcoming = () => {
   });
 
   return (
-    <>
       <Box bgcolor={"background.default"} height={"92vh"}>
         <Box
           mb={2}
@@ -69,7 +68,6 @@ const EventsUpcoming = () => {
           </Box>
         </Box>
       </Box>
-    </>
   );
 };
 

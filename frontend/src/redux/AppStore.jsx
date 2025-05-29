@@ -1,8 +1,15 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { persistReducer, persistStore } from "redux-persist";
+import {
+  configureStore
+} from "@reduxjs/toolkit";
+import {
+  persistReducer,
+  persistStore
+} from "redux-persist";
 import storage from "redux-persist/lib/storage"; // using localStorage as the storage engine
 
-import { combineReducers } from "redux";
+import {
+  combineReducers
+} from "redux";
 
 import appUISliceReducer from "./AppUI";
 import completeSigningReducer from "./CompleteSigning";
@@ -11,20 +18,22 @@ import currentBottomNavReducer from "./CurrentBottomNav";
 import currentChatBot from "./CurrentChatBot";
 import currentConnectRequestReducer from "./CurrentConnect";
 import currentConnectNotifReducer from "./CurrentConnectNotif";
+import currentConversationReducer from './CurrentConversations';
 import currentGlobalSearchReducer from "./CurrentGlobalSearch";
+import currentJobFeedBackReducer from './CurrentJobFeedBack';
 import currentJobsReducer from "./CurrentJobs";
 import currentJobSearchReducer from "./CurrentJobSearch";
 import currentJobsTopReducer from "./CurrentJobsTop";
+import currentModalReducer from "./CurrentModal";
+import currentNetworkReducer from "./CurrentNetwork";
 import currentPaginationReducer from "./CurrentPagination";
 import currentPostReactionsReducer from "./CurrentPostReactions";
 import currentReportedPostReducer from "./CurrentPostReported";
 import currentPostsReducer from "./CurrentPosts";
+import currentPostsTopReducer from "./CurrentPostsTop";
+import currentProfileViewReducer from './CurrentProfileView';
 import currentSnackReducer from "./CurrentSnackBar";
 import currentUserReducer from "./CurrentUser";
-import currentModalReducer from "./CurrentModal";
-import currentNetworkReducer from "./CurrentNetwork";
-import currentPostsTopReducer from "./CurrentPostsTop";
-import currentConversationReducer from './CurrentConversations'
 
 // Configure persist settings
 const persistConfig = {
@@ -54,7 +63,10 @@ const rootReducer = combineReducers({
   currentModal: currentModalReducer,
   currentNetwork: currentNetworkReducer,
   currentPostsTop: currentPostsTopReducer,
-  currentConversation:currentConversationReducer
+  currentConversation: currentConversationReducer,
+  currentProfileView: currentProfileViewReducer,
+  currentJobFeedBack: currentJobFeedBackReducer
+
 });
 
 // Persist the root reducer for caching session states
@@ -69,4 +81,7 @@ const store = configureStore({
 const persistor = persistStore(store);
 
 // Exporting both store and persistor for UI rehydration
-export { persistor, store };
+export {
+  persistor,
+  store
+};

@@ -19,7 +19,7 @@ export default function ConversationLayout({
   currentUserID,
   setFocusedConversation,
 }) {
-  // function to reduct nessage header or summary
+  // function to reduce message header or summary
   const handleMessageSummary = () => {
     const lastMessage = conversation?.lastMessage;
     if (CustomDeviceSmallest()) {
@@ -75,7 +75,7 @@ export default function ConversationLayout({
         gap={2}
         width={"100%"}
       >
-        {/* message conntent */}
+        {/* message content */}
         <ListItem alignItems="flex-start">
           <ListItemAvatar>
             <Avatar
@@ -88,7 +88,7 @@ export default function ConversationLayout({
               // set the current conversation to be the one focused on
               setFocusedConversation(conversation);
 
-              // handle UI display swithcing
+              // handle UI display switching
               handleConversationClicked();
             }}
             className="p-2"

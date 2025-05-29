@@ -1,4 +1,4 @@
-import { Close, DownloadRounded } from '@mui/icons-material';
+import { Close, Done, DownloadRounded, EmailOutlined, QuestionMark } from '@mui/icons-material';
 import { Avatar, Box, Button, IconButton, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -8,17 +8,16 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import  React from 'react';
 import devImage from '../../../images/dev.jpeg';
 import CustomDeviceIsSmall from '../../utilities/CustomDeviceIsSmall';
 import CustomDeviceTablet from '../../utilities/CustomDeviceTablet';
 import { getImageMatch } from '../../utilities/getImageMatch';
-import { useState } from 'react';
-import { useLayoutEffect } from 'react';
+import React, { useState,useLayoutEffect } from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import CustomCountryName from '../../utilities/CustomCountryName';
 import AlertMiniProfileView from '../../alerts/AlertMiniProfileView';
+import AlertInputMessage from '../../alerts/AlertInputMessage';
 
 const columnsHeader = [
   { id: 'profile', label: 'Profile', minWidth: 170 },
@@ -35,16 +34,24 @@ const columnsHeader = [
     align: 'right',
   },
 
-  
+  {
+    id: 'status',
+    label: 'Status',
+    minWidth: 170,
+    align: 'right',
+  },
+
+    
   {
     id: 'resume',
     label: 'Resume',
     minWidth: 170,
     align: 'right',
   },
+
   {
-    id: 'status',
-    label: 'Status',
+    id: 'message',
+    label: 'Message',
     minWidth: 170,
     align: 'right',
   },
@@ -61,13 +68,19 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
   // track axios progress
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [messageResponse,setMessageResponse]=useState("")
+
+  // display of message alert
+  const [openAlertMessage,setOpenAlertMessage]=useState(false)
 
   // redux user HR manager
   const { user } = useSelector((state) => state.currentUser);
 
   // track the applicant status and Id on change; default pending
-  const[currentStatus,setCurrentStatus]=useState("pending")
+  const[currentJob,setCurrentJob]=useState({})
   const[applicantId,setApplicantId]=useState("")
+  const[applicantName,setApplicantName]=useState('')
+
 
   // control showing of the miniprofile of the user
   const[openMiniProfile,setOpenMiniProfile]=useState(false)
@@ -87,15 +100,43 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
     setIsApplicantsTable(false)
   }
 
-   // Download CV
-   const handleDownload = async (link) => {
+   // Download CV, when success load the url from backend to a new window for download
+   const handleDownload = async (cvName,jobID) => {
 
-    // testing download
-    window.open(link,"__blank")
+    // perform a post request sending emailId user, and JobId as req params, while cvName 
+    // as body of the request
+   
+    setIsFetching(true)
+
+     axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/download/cv/${user?.email}/${jobID}`,{cvName}, {
+              withCredentials: true,
+            })
+            .then((res) => {
+              // open new window to download the pdf separately
+              window.open(res.data,"_blank_")
+            })
+            .catch(async (err) => {
+
+              //  user login session expired show logout alert
+              if (err?.response?.data.login) {
+                window.location.reload();
+              }
+              if (err?.code === "ERR_NETWORK") {
+                setErrorMessage(
+                  "server unreachable"
+                );
+                return;
+              }
+              setErrorMessage(err?.response.data);
+            })
+            .finally(() => {
+              setIsFetching(false);
+            });
    
   };
 
-  // use layout effect to fetch the data of the job applicants
+  // use layout effect to fetch the data of job applicants
+  // also when current job that has been update, refetch though expensive; 
   useLayoutEffect(()=>{
     setIsFetching(true)
      axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/applicants/${user?.email}/${focusedJob?._id}`, {
@@ -124,7 +165,7 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
             .finally(() => {
               setIsFetching(false);
             });
-  },[focusedJob,user])
+  },[focusedJob,user,currentJob])
 
 
   // handle showing of mini profile of the job applicant
@@ -136,11 +177,64 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
     setOpenMiniProfile(true)
   }
 
+  // handle update of the application status of the particular job
+  const handleUpdateStateApplicant=(statusText,jobApplication)=>{
+
+    const jobApplicationUpdateObject={
+      statusText,
+      jobApplicationID:jobApplication?._id,
+      applicantID:jobApplication?.applicant?.applicantID
+    }
+
+    // use axios to post to the backend of status update
+    setIsFetching(true)
+
+     axios.put(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/application/status/${user?.email}/${jobApplication.jobID}`,jobApplicationUpdateObject,{
+              withCredentials: true,
+            })
+            .then((res) => {
+              // update the success message from the backend
+              if (res?.data) {
+                setMessageResponse(res.data)
+              } 
+            })
+            .catch(async (err) => {
+
+              //  user login session expired show logout alert
+              if (err?.response?.data.login) {
+                window.location.reload();
+              }
+              if (err?.code === "ERR_NETWORK") {
+                setErrorMessage(
+                  "server unreachable"
+                );
+                return;
+              }
+              setErrorMessage(err?.response.data);
+            })
+            .finally(() => {
+              setIsFetching(false);
+
+              setCurrentJob(jobApplication)
+            
+            });
+
+  }
+
+  // handle opening of alert message to send message to the job applicant
+  const handleOpenAlertMessage=(applicant)=>{
+    setApplicantName(applicant?.applicant?.name)
+    setApplicantId(applicant?.applicant?.applicantID)
+
+    // set open alert message 
+    setOpenAlertMessage(true)
+  }
+
   return (
     <Paper elevation={0} 
     className={'rounded'}
     sx={{ 
-    maxWidth: '100%', 
+    maxWidth: window.screen.availWidth, 
     border:'1px solid',
     color:'divider',  
     overflow:'auto',
@@ -170,13 +264,14 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
     <Box display={'flex'} justifyContent={'flex-end'} p={1}>
       <Tooltip title={'close'} arrow>
       <IconButton className='border' onClick={handleCloseApplicantsTable}>
-        <Close sx={{ width:11,height:11 }}/>
+        <Close sx={{ width:10,height:10 }}/>
       </IconButton>
       </Tooltip>
       </Box>
     </Box>
 
-      <TableContainer sx={{ 
+      <TableContainer       
+       sx={{ 
         maxHeight: CustomDeviceIsSmall() || CustomDeviceTablet() ? 700:440, 
         maxWidth: window.screen.availWidth, 
        overflow: "auto",
@@ -206,7 +301,7 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((job_applicant,index) => {
                 return (
-                  <TableRow hover tabIndex={-1} key={job_applicant.code}>
+                  <TableRow hover tabIndex={-1} key={job_applicant}>
                     {columnsHeader.map((column) => {
                       return (
                         
@@ -217,7 +312,7 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                         >
                           {/* avatar section */}
                           {column.id==="profile" && (
-                          <Box display={'flex'} alignItems={'center'} gap={3}>
+                          <Box display={'flex'} alignItems={'center'} gap={2}>
                             {`${index+1}.`}
                               <IconButton onClick={()=>{handleShowProfile(job_applicant?.applicant?.applicantID)}}>   
                             <Tooltip title={'profile'} arrow>
@@ -236,7 +331,15 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
 
                           {/* name */}
                           {column.id==='name' && (
-                            `${job_applicant?.applicant?.name}`
+                            <Box display={'flex'} gap={1} alignItems={'center'}>
+                              {/* tic or x status or question */}
+                              {job_applicant?.status.toLowerCase()==='proceed' && (<Done color='success' sx={{width:17,height:17}}/>)}
+                              {job_applicant?.status.toLowerCase()==='rejected' && (<Close color='warning' sx={{width:17,height:17}}/>)}
+                              {job_applicant?.status.toLowerCase()==='pending' && (<QuestionMark color='info' sx={{width:17,height:17}}/>)}
+
+                              {/* name of the applicant */}
+                              {job_applicant?.applicant?.name}
+                            </Box>
                           )}
 
                           {/* country of the applicant */}
@@ -244,10 +347,6 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                           ${CustomCountryName(job_applicant?.applicant?.country)}`
                           )}
 
-                          {/* cv part is download button */}
-                          {column.id==='resume' && (
-                            <Button size='small' sx={{ borderRadius:5 }} endIcon={<DownloadRounded/>} onClick={()=>handleDownload(job_applicant?.cvLink)}>download </Button>
-                          )}
 
                           {/* status of the application */}
                           {column.id==='status' && (
@@ -255,24 +354,39 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                               required
                               select
                               variant='standard'
-                              value={currentStatus}
-                              sx={{ fontSize:'small' }}
+                              value={job_applicant.status}
+                              sx={{ fontSize:'small'}}
                               onChange={(e)=>{
-                                // update the selected status
-                                setCurrentStatus(e.target.value)
-
-                                // update the job applicant id for backend update of job status too
-                                setApplicantId(job_applicant?.applicant?.applicantID)
+                              // update the function fo text status and main job iD
+                              handleUpdateStateApplicant(e.target.value,job_applicant)
                               }}
                             >
                               {applicantStatus.map((status) => (
                                 <MenuItem key={status} value={status} sx={{ fontSize:'small' }}>
-                                    <Typography variant='body2'>
+                                    <Typography
+                                     variant='body2'
+                                      >
                                     {status}
                                     </Typography>
                                 </MenuItem>
                                 ))}
                             </TextField>
+                          )}
+
+
+                          {/* cv part is download button */}
+                          {column.id==='resume' && (
+                            <Button size='small'
+                             sx={{ borderRadius:5 }}
+                              endIcon={<DownloadRounded/>} 
+                              onClick={()=>handleDownload(job_applicant?.cvName,job_applicant?.jobID)
+
+                              }>download </Button>
+                          )}
+
+                          {/* message the applicant */}
+                          {column.id==='message' && (
+                            <Button size='small' sx={{ borderRadius:5 }} endIcon={<EmailOutlined/>} onClick={()=>handleOpenAlertMessage(job_applicant)}>message </Button>
                           )}
 
                         </TableCell>
@@ -294,9 +408,23 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
 
+      {/* open alert message box */}
+      {openAlertMessage && (
+        <AlertInputMessage
+         openAlert={openAlertMessage} 
+         setOpenAlert={setOpenAlertMessage} 
+         targetId={applicantId}
+         targetName={applicantName}
+         />
+      )}
+
       {/* alert mini profile */}
-      <AlertMiniProfileView openAlert={openMiniProfile} setOpenAlert={setOpenMiniProfile} userId={applicantId}/>
-    
+      {openMiniProfile && (
+        <AlertMiniProfileView 
+        openAlert={openMiniProfile} 
+        setOpenAlert={setOpenMiniProfile}
+         userId={applicantId}/>
+      )}    
     </Paper>
   );
 }

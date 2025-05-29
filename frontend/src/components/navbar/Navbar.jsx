@@ -20,7 +20,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { lazy, Suspense, useEffect, useLayoutEffect, useState } from "react";
+import React, { lazy, Suspense, useLayoutEffect, useState } from "react";
 
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
@@ -42,8 +42,10 @@ import {
   resetClearCurrentGlobalSearch,
   updateCurrentGlobalSearchResults,
 } from "../../redux/CurrentGlobalSearch";
+import { updateCurrentJobFeedBack } from "../../redux/CurrentJobFeedBack";
 import { updateCurrentPostReactions } from "../../redux/CurrentPostReactions";
 import { updateCurrentReport } from "../../redux/CurrentPostReported";
+import { updateCurrentProfileViews } from "../../redux/CurrentProfileView";
 import AlertAboutMetatron from "../alerts/AlertAboutMetatron";
 import AlertSponsorship from "../alerts/AlertSponsorship";
 import AlertSupport from "../alerts/AlertSupport";
@@ -55,8 +57,8 @@ const PeopleModal = lazy(() => import("../modal/PeopleModal"));
 const AlertGlobalSearch = lazy(() => import("../alerts/AlertGlobalSearch"));
 const ProfileDrawer = lazy(() => import("../profile/drawer/ProfileDrawer"));
 const EventsAddModal = lazy(() => import("../modal/EventsAddModal"));
-const ParentNotifMessageContainer = lazy(() =>
-  import("../messaging/ParentContainer")
+const ParentNotifMessageDrawer = lazy(() =>
+  import("../messaging/ParentNotifMessageDrawer")
 );
 const DrawerSmartphone = lazy(() => import("./DrawerSmartphone"));
 
@@ -97,8 +99,8 @@ const Navbar = ({mode,setMode}) => {
   const [openAlertResults, setOpenAlertResults] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
-    const dispatch = useDispatch();
-    const [errorMessage, setErrorMessage] = useState("");
+  const dispatch = useDispatch();
+  const [errorMessage, setErrorMessage] = useState("");
 
   // axios default credentials
   axios.defaults.withCredentials = true;
@@ -119,10 +121,11 @@ const Navbar = ({mode,setMode}) => {
     const { post_reactions } = useSelector((state) => state.currentPostReactions);
     const { reportedPost } = useSelector((state) => state.currentReportedPost);
     const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
-    const { conversations } = useSelector((state) => state.currentConversation);
+    const { profile_views } = useSelector((state) => state.currentProfileView);
+    const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
   
   // extracting current user ID
-  const { _id } = user;
+  const { _id: currentUserId } = user;
 
   // redux state UI
   const {
@@ -132,6 +135,8 @@ const Navbar = ({mode,setMode}) => {
     isOpenSponsorAlert,
     isOpenSupportAlert,
     isOpenAboutMetatron,
+    isOpenDrawerProfile,
+    isOpenMessageDrawer
   } = useSelector((state) => state.appUI);
 
   const handleShowMobileSearch = () => {
@@ -139,6 +144,13 @@ const Navbar = ({mode,setMode}) => {
     // clear search term
     setSearchTerm("");
   };
+
+   // UI theme dark light tweaking effect
+   const handleShowDarkMode = () => {
+    // update the redux theme boolean state
+    dispatch(resetDarkMode());
+  };
+
 
   // home page
   const handleHome = () => {
@@ -148,7 +160,7 @@ const Navbar = ({mode,setMode}) => {
       dispatch(handleSidebarRightbar());
     }
 
-    // show speed dial if aint visible
+    // show speed dial if ain't visible
     if (!isDefaultSpeedDial) {
       dispatch(handleShowingSpeedDial(true));
     }
@@ -229,23 +241,15 @@ const Navbar = ({mode,setMode}) => {
       });
   };
 
-    // UI theme dark light tweaking effect
-    const handleShowDarkMode = () => {
-      // update the redux theme boolean state
-      dispatch(resetDarkMode());
-    };
-
-
-
 
   // get all possible post reaction notifications based on current userID
   useLayoutEffect(() => {
     // set is fetching to true
     setIsFetching(true);
 
-    // performing post request
+    // performing get request
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/reactions/all/${_id}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/reactions/all/${currentUserId}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -267,7 +271,7 @@ const Navbar = ({mode,setMode}) => {
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [dispatch, _id]);
+  }, [dispatch, currentUserId]);
 
   // get all connect requests sent by users to the current user as being target
   useLayoutEffect(() => {
@@ -277,7 +281,7 @@ const Navbar = ({mode,setMode}) => {
     // performing post request
     axios
       .get(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/all/${_id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/all/${currentUserId}`,
         {
           withCredentials: true,
         }
@@ -299,7 +303,7 @@ const Navbar = ({mode,setMode}) => {
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [dispatch, _id]);
+  }, [dispatch, currentUserId]);
 
   // get all posts reports that targets this currently logged in user
   useLayoutEffect(() => {
@@ -308,7 +312,7 @@ const Navbar = ({mode,setMode}) => {
 
     // performing post request
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/report/get/${_id}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/report/get/${currentUserId}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -328,7 +332,7 @@ const Navbar = ({mode,setMode}) => {
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [dispatch, _id]);
+  }, [dispatch, currentUserId]);
 
 
   // fetch or get all conversations done by the current user
@@ -339,7 +343,7 @@ const Navbar = ({mode,setMode}) => {
       // performing post request under the id of the current user
       axios
         .get(
-          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/all/${_id}`,
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/all/${currentUserId}`,
           {
             withCredentials: true,
           }
@@ -360,8 +364,71 @@ const Navbar = ({mode,setMode}) => {
           // set is fetching to false
           setIsFetching(false);
         });
-    }, [_id, dispatch]);
-   
+    }, [currentUserId, dispatch]);
+
+
+    // get all profile views data from the backend
+    useLayoutEffect(() => {
+      // set is fetching to true
+      setIsFetching(true);
+  
+      // performing post request under the id of the current user
+      axios
+        .get(
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/profile_views/${currentUserId}`,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          // update the states of conversations
+         dispatch(updateCurrentProfileViews(res?.data)) ;
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage("server is unreachable!");
+            return;
+          }
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          // set is fetching to false
+          setIsFetching(false);
+        });
+    }, [currentUserId, dispatch]);
+
+
+    // fetching of all job feedback 
+    useLayoutEffect(() => {
+      // set is fetching to true
+      setIsFetching(true);
+  
+      // performing post request under the id of the current user
+      axios
+        .get(
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/feedback/${currentUserId}`,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          // update the states of conversations
+         dispatch(updateCurrentJobFeedBack(res?.data)) ;
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage("server is unreachable!");
+            return;
+          }
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          // set is fetching to false
+          setIsFetching(false);
+        });
+    }, [currentUserId, dispatch]);
 
   return (
     <React.Fragment>
@@ -450,7 +517,7 @@ const Navbar = ({mode,setMode}) => {
                     </Typography>
                   )}
 
-                  {/* fullscreen when clicked sidabar tabs collapse and menu be seen */}
+                  {/* fullscreen when clicked sidebar tabs collapse and menu be seen */}
                   <IconButton onClick={handleFullscreenClicked}>
                     {!fullScreen ? (
                       <FullscreenRounded style={{ color: "white" }} />
@@ -590,7 +657,7 @@ const Navbar = ({mode,setMode}) => {
                     : 2
                 }
               >
-                <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length} color="warning">
+                <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
                   <Tooltip arrow title={"notifications"}>
                     <IconButton
                       sx={{ padding: 0 }}
@@ -675,10 +742,14 @@ const Navbar = ({mode,setMode}) => {
           />
 
           {/* holds the notification and messaging drawer */}
-          <ParentNotifMessageContainer />
+          {isOpenMessageDrawer && (
+          <ParentNotifMessageDrawer />
+          )}
 
           {/* holds the profile drawer which contains user account info */}
+          {isOpenDrawerProfile && (
           <ProfileDrawer />
+          )}
 
           {/* EventsAdd Modal to be displayed if toggled */}
           <EventsAddModal

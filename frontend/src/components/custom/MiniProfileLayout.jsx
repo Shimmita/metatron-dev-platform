@@ -56,9 +56,9 @@ export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
   const isFriends =miniProfileData?.network?.includes(currentUserId);
 
   useEffect(() => {
-    // fetch details of the liked or reacted user based on their id
+    // fetch details of the liked or reacted user based on their id also the id of the current user
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/specific/${userId}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/specific/${userId}/${currentUserId}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -81,7 +81,7 @@ export default function MiniProfileLayout({ handleShowMiniProfile, userId }) {
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [userId, dispatch]);
+  }, [userId,currentUserId, dispatch]);
 
   // handle country length to only two names
   const handleCountryName = (country) => {

@@ -7,8 +7,7 @@ import {
   PaidRounded,
   PeopleRounded,
   VerifiedRounded,
-  WbIncandescentRounded,
-  WorkHistoryRounded,
+  WorkHistoryRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -25,9 +24,20 @@ import ApplyJobModal from "../../modal/ApplyJobModal";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import { useSelector } from "react-redux";
 
-function JobLayout({ isDarkMode, job, isOne = false }) {
+function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
   const [openModal, setOpenApplyJobModal] = useState(false);
+
+
+  // redux states
+    const { user } = useSelector((state) => state.currentUser);
+
+  // extract user email, for checks if job posted by the user or not
+  const {email}=user
+
+  // if not true the false is default
+  const isMyJob=email===job?.my_email || false
 
   const handleShowingApply = () => {
     setOpenApplyJobModal(true);
@@ -72,7 +82,7 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
       classes={"job-card"}
       className="rounded"
       maxWidth={300}
-      mb={2}
+      mb={isMyJob? 0:2}
       height={
         !(CustomDeviceIsSmall() || CustomDeviceTablet()) ? "70%" : undefined
       }
@@ -91,7 +101,7 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
       <Avatar
         alt=""
         className="border"
-        sx={{ width: 42, height: 42, mt:6 }}
+        sx={{ width: 42, height: 42, mt:isMyJob ? 4:isPreviewHR? 0:6 }}
         src={getImageMatch(job?.logo)}
       />
 
@@ -191,8 +201,16 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
         </React.Fragment>
       </Stack>
 
-
-      {/* application  btn */}
+      {/* displayed is not previewHR, probably hr definitely their jobs*/}
+      {!isPreviewHR && (
+        <React.Fragment>
+           {isMyJob ?(
+        <Box display={'flex'} justifyContent={'center'}>
+          <Typography textAlign={'center'} variant="caption" sx={{ color:'text.secondary', textTransform:'capitalize' }}> - you posted this job -</Typography>
+        </Box>
+      ):(
+        <React.Fragment>
+          {/* application  btn */}
       {websiteLink === "" ? (
         <Button
           variant={isDarkMode ? "outlined" : "contained"}
@@ -221,9 +239,12 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
           Apply Now
         </Button>
       )}
+        </React.Fragment>
+      )}
 
       {/* show modal apply jobs */}
-      <ApplyJobModal
+      {openModal && (
+        <ApplyJobModal
         title={job.title}
         organisation={job.organisation}
         requirements={job.requirements}
@@ -237,6 +258,11 @@ function JobLayout({ isDarkMode, job, isOne = false }) {
         location={job?.location}
         isFullView={true}
       />
+      )}
+      
+        </React.Fragment>
+      )}
+     
     </Stack>
   );
 }

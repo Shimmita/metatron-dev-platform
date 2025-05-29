@@ -29,6 +29,7 @@ import { deleteCurrentPostReaction } from "../../../redux/CurrentPostReactions";
 import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
 import MiniProfileLayout from "../../custom/MiniProfileLayout";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
+import CustomCountryName from "../../utilities/CustomCountryName";
 
 export default function PostReaction({ reaction }) {
   const [isFetching, setIsFetching] = useState(false);
@@ -160,14 +161,14 @@ export default function PostReaction({ reaction }) {
                       </Typography>
                       &nbsp;
                       {/* delete reaction */}
-             <Tooltip title={'clear'} arrow>
-             <IconButton size="small" onClick={handleDeleteReaction} sx={{ 
-             border: "1px solid",
-             borderColor: "divider",
-           }}>
+                        <Tooltip title={'clear'} arrow>
+                        <IconButton size="small" onClick={handleDeleteReaction} sx={{ 
+                        border: "1px solid",
+                        borderColor: "divider",
+                      }}>
                         <Close sx={{ width: 13, height: 13 }} />
                       </IconButton>
-             </Tooltip>
+                    </Tooltip>    
                     </Box>
                   )}
                 </Box>
@@ -179,19 +180,26 @@ export default function PostReaction({ reaction }) {
                       component="span"
                       variant="body2"
                       sx={{
-                        color: "text.primary",
+                        color: "text.secondary",
                         display: "inline",
                         alignItems: "center",
                       }}
                     >
-                      {reaction?.title} <br /> <br/>
-                      {reaction?.message?.toLowerCase().includes("liked") && (
+                      {reaction?.title}
+                      <br/>
+                      <Typography variant="caption" color={"text.secondary"}>
+                        {CustomCountryName(reaction?.country)} | {reaction?.county}
+                      </Typography>
+                      <br/>
+                       {reaction?.message?.toLowerCase().includes("liked") && (
                         <FavoriteRounded
                           sx={{ width: 14, height: 14, }}
                           color="primary"
                           className="me-1"
                         />
                       )}
+
+
                       {reaction?.message?.toLowerCase().includes("github") && (
                         <GitHub
                           sx={{ width: 14, height: 14 }}
@@ -199,6 +207,7 @@ export default function PostReaction({ reaction }) {
                           className="me-1"
                         />
                       )}
+
                       {reaction?.message
                         ?.toLowerCase()
                         .includes("commented") && (
@@ -208,11 +217,19 @@ export default function PostReaction({ reaction }) {
                           className="me-1"
                         />
                       )}
+
                       {/* message  */}
+                      <Typography variant="caption" sx={{ color:'text.primary' }}>
+
                       {reaction?.message}
+                       </Typography>
                       {/* mini-message of post section */}
                     </Typography>
+
+                    <Typography variant="caption" sx={{ color:'text.primary' }}>
+
                     {` — ${reaction?.minimessage}`}
+                       </Typography>
 
                     {/* post counters */}
                     <Box

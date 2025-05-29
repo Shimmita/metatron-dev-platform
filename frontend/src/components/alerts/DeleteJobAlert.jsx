@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import { Box, Typography } from "@mui/material";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -21,6 +22,9 @@ export default function DeleteJobAlert({
   setOpenAlert,
   message,
   title,
+  applicants=0,
+  my_email,
+  job_id,
 }) {
   const handleClose = () => {
     // close alert
@@ -31,12 +35,10 @@ export default function DeleteJobAlert({
   const { isTabSideBar } = useSelector((state) => state.appUI);
 
   return (
-    <React.Fragment>
       <Dialog
         open={openAlert}
         TransitionComponent={Transition}
         keepMounted
-        onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
         sx={{
           marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
@@ -53,29 +55,38 @@ export default function DeleteJobAlert({
       >
         <DialogTitle
           display={"flex"}
-          variant="body1"
           alignItems={"center"}
-          gap={1}
+          variant="body1"
+          gap={2}
         >
           {/* delete icon */}
           <DeleteRounded />
+
+          <Box>
           {/* title */}
-          {title}
+          <Typography 
+          >
+          {title}  
+          </Typography>
+          <Typography textAlign={'center'} variant={'caption'} sx={{ color:'text.secondary' }}>
+            {applicants} applicant(s)
+          </Typography>
+          </Box>
+         
         </DialogTitle>
-        <DialogContent>
+        <DialogContent dividers>
           <DialogContentText id="alert-dialog-slide-description">
             {message}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button sx={{ borderRadius: "20px" }} onClick={handleClose}>
-            Disagree
+            No
           </Button>
-          <Button sx={{ borderRadius: "20px" }} onClick={handleClose}>
-            Agree
+          <Button sx={{ borderRadius: "20px" }} onClick={handleClose} color="warning">
+            Yes
           </Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
   );
 }

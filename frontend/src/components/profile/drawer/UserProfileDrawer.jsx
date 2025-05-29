@@ -111,7 +111,6 @@ export default function UserProfileDrawer({ profileData }) {
 
   const handleChange = (event, newValue) => {
     setProfileSection(newValue);
-    return;
   };
 
   // for checking user relationships
@@ -141,7 +140,7 @@ export default function UserProfileDrawer({ profileData }) {
     return parentName;
   };
 
-  // check if is current user and manouvre the display of follow and send messge btb
+  // check if is current user and manoeuver the display of follow and send message btb
   const isCurrentUser = user._id === profileData?._id;
 
   const {
@@ -153,7 +152,7 @@ export default function UserProfileDrawer({ profileData }) {
     specialisationTitle: title,
   } = user || {};
 
-  // id of the target user requesting connect, its the id of the profiledata
+  // id of the target user requesting connect, its the id of the profile data
   const { _id: targetID } = profileData || {};
 
   // handle display of message input
@@ -284,9 +283,6 @@ export default function UserProfileDrawer({ profileData }) {
         return;
       }
       dispatch(updateMessageConnectRequest(err?.response?.data));
-
-      // error occurred during fetch query
-      console.error(err);
     } finally {
       // close is fetching
       setIsConnecting(false);
@@ -517,9 +513,9 @@ export default function UserProfileDrawer({ profileData }) {
                 {profileData?.about || "** No About**"}
               </Typography>
             </Box>
-            <Divider component={"div"} />
 
-            <Box className="mt-2 d-flex justify-content-center align-items-center">
+            <Divider component={"div"} />
+            <Box className="mt-1 d-flex justify-content-center align-items-center">
               <StyledTabs
                 value={profileSection}
                 onChange={handleChange}
@@ -529,7 +525,7 @@ export default function UserProfileDrawer({ profileData }) {
                 <StyledTab
                   className="pe-5"
                   label={
-                    <Typography className=" fw-bold" variant="body1">
+                    <Typography fontWeight={'bold'} variant="body2">
                       Post
                     </Typography>
                   }
@@ -539,8 +535,8 @@ export default function UserProfileDrawer({ profileData }) {
                 <StyledTab
                   className="pe-3 ps-3"
                   label={
-                    <Typography className="fw-bold" variant="body1">
-                      Network
+                    <Typography fontWeight={'bold'}  variant="body2">
+                      Connection
                     </Typography>
                   }
                 />
@@ -548,13 +544,15 @@ export default function UserProfileDrawer({ profileData }) {
                 {/* info more about the user */}
                 <StyledTab
                   label={
-                    <Typography className="ps-5 fw-bold" variant="body1">
+                    <Typography fontWeight={'bold'} className="ps-5" variant="body2">
                       About
                     </Typography>
                   }
                 />
               </StyledTabs>
             </Box>
+
+            <Divider component={"div"} />
 
             {/* show message input if state permits */}
             {isShowMessageInput ? (

@@ -1,4 +1,4 @@
-import { Add, Close, PersonAddRounded } from "@mui/icons-material";
+import { Close, PersonAddRounded } from "@mui/icons-material";
 import {
   AvatarGroup,
   Box,
@@ -118,7 +118,7 @@ function FriendRequest({
   // handle accept friend request from senders which came in notif section
   // handle the connect request
   const handleAcceptConnectRequestFriends = () => {
-    // accept option, the current user should add the senderid in their network
+    // accept option, the current user should add the senderId in their network
     // connect request is for validation that the request exists in the db and updating db connectRequests
     const { _id: connectRequestID, senderId } = connect_request || {};
 
@@ -244,7 +244,8 @@ function FriendRequest({
           bgcolor: "background.paper",
           p:1,
           }}>
-          <ListItem className="rounded" 
+          <ListItem 
+          className="rounded" 
           sx={{ 
           border: "1px solid",
           borderColor: "divider" }}>

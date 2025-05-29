@@ -95,7 +95,7 @@ function NewConversation({ handleFabClicked }) {
         );
         setSuggestions(response.data);
       } catch (err) {
-        // error occured during fetch query
+        // error occurred during fetch query
         console.error(err);
       } finally {
         // close is fetching
@@ -137,7 +137,7 @@ function NewConversation({ handleFabClicked }) {
         handleFabClicked();
       }
     } catch (err) {
-      // error occured during fetch query
+      // error occurred during fetch query
       console.error(err);
     } finally {
       // close is fetching
@@ -198,7 +198,7 @@ function NewConversation({ handleFabClicked }) {
             <CircularProgress size={18} />
           ) : (
             <React.Fragment>
-              {/* control showing of dropdwon */}
+              {/* control showing of dropdown */}
               {isClosedDropDown && suggestions?.length > 0 ? (
                 <Stack direction={"row"} justifyContent={"center"}>
                   <Button
@@ -234,14 +234,14 @@ function NewConversation({ handleFabClicked }) {
                         <MenuItem
                           key={availableuser._id}
                           onClick={() => {
-                            // extaract the name of the currently selected user
+                            // extract the name of the currently selected user
                             setSearchTerm(`${availableuser?.name}`);
 
                             // update the value of user being searched
                             if (availableuser._id !== user._id) {
                               setUserSearched(availableuser);
                             } else {
-                              // clear serach term
+                              // clear search term
                               setSearchTerm("");
                               // clear user
                               setUserSearched();
@@ -313,7 +313,7 @@ function NewConversation({ handleFabClicked }) {
             </React.Fragment>
           )}
 
-          {/* input for writing messsage that will be sent to the user and create
+          {/* input for writing message that will be sent to the user and create
           conversation if not present */}
 
           {showMessageArea && (

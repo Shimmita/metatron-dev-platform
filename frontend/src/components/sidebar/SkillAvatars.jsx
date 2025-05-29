@@ -12,12 +12,12 @@ import { getImageMatch } from "../utilities/getImageMatch";
 
 export default function SkillAvatars({ user, isDarkMode }) {
   return (
-    <Box display={"flex"} justifyContent={"center"} pt={1}>
+    <Box display={"flex"} justifyContent={"center"} mb={1}>
       <Stack gap={1}>
         {/* skills avatars */}
         <Box display={"flex"} justifyContent={"center"}>
           <AvatarGroup max={user?.selectedSkills?.length}>
-            {/* loop through the skills and their images matched using custim fn */}
+            {/* loop through the skills and their images matched using custom fn */}
             {user?.selectedSkills?.map((skill, index) => (
               <Tooltip title={skill} arrow  key={index}
 >

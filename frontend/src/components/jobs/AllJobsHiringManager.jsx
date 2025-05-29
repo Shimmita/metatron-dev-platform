@@ -1,13 +1,13 @@
 import {
-  AssignmentTurnedInRounded,
+  Add,
   BarChartRounded,
   DarkModeRounded,
   HighlightOffOutlined,
-  InsightsRounded,
   LibraryBooksRounded,
   ListRounded,
   Menu,
-  MyLocationRounded,
+  NotificationsRounded,
+  SettingsRounded,
   WorkRounded
 } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -15,6 +15,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
   AppBar,
   Avatar,
+  Badge,
   Button,
   CircularProgress,
   Stack,
@@ -33,17 +34,20 @@ import ListItemText from "@mui/material/ListItemText";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from '../../images/dev.jpeg';
 import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
+  handleSidebarRightbar,
   resetDarkMode,
+  showMessagingDrawer,
   showUserProfileDrawer,
 } from "../../redux/AppUI";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
+import PostJobModal from "../modal/PostJobModal";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -51,6 +55,8 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import ApplicantsTable from "./layout/ApplicantsTable";
 import JobLayoutHiring from "./layout/JobLayoutHiring";
 import JobStatsLayout from "./layout/JobStatsLayouts";
+import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
+import ManageJobsTable from "./layout/ManageJobsTable";
 
 const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
 
@@ -111,26 +117,60 @@ const Drawer = styled(MuiDrawer, {
 
 
 export default function AllJobsHiringManager() {
+    // track axios progress
+    const [isFetching, setIsFetching] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [openJobPostModal,setOpenJobPostModal]=useState(false)
+
   // track theme
   const theme = useTheme();
 
   // redux states
-  const { isDarkMode, isDefaultSpeedDial, isJobSearchGlobal } = useSelector(
+  const { 
+    isDarkMode,
+     isDefaultSpeedDial, 
+     isJobSearchGlobal,
+     isSidebarRighbar,
+     isOpenDrawerProfile,
+     isOpenMessageDrawer
+     } = useSelector(
     (state) => state.appUI
   );
   const { jobs } = useSelector((state) => state.currentJobs);
   const { user } = useSelector((state) => state.currentUser);
+  const { post_reactions } = useSelector((state) => state.currentPostReactions);
+  const { reportedPost } = useSelector((state) => state.currentReportedPost);
+  const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
+  const { profile_views } = useSelector((state) => state.currentProfileView);
+  const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
+
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
+
+  // trigger redux update
+  const dispatch = useDispatch();
 
   // statistics tracker
   const[isMyStats,setIsMyStats]=useState(false)
+
   // job application table
   const[isApplicantsTable,setIsApplicantsTable]=useState(false)
 
+  // manage jobs posted
+  const[isManageJobsTable,setIsManageJobsTable]=useState(false)
+
   // selected option
   const [textOption, setTextOption] = useState(
-    isJobSearchGlobal ? "Search Jobs" : "Posted Jobs"
+    isJobSearchGlobal ? "Search Jobs" : "Your Jobs"
   );
+
+  // false right bar is no of use this route
+  useLayoutEffect(()=>{
+     // updating right bar show false
+     if (isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+  },[dispatch,isSidebarRighbar])
+  
 
   // holds drawer status
   const [isDrawerPane, setIsDrawerPane] = useState(true);
@@ -144,18 +184,17 @@ export default function AllJobsHiringManager() {
 
   // navigate to other routes
   const navigate=useNavigate()
-  // track axios progress
-  const [isFetching, setIsFetching] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
 
-  // trigger redux update
-  const dispatch = useDispatch();
+
+   // show the notification and messaging triggered by redux
+    const handleShowMessageDrawer = () => {
+      dispatch(showMessagingDrawer());
+    };
 
    // handle navigation to hiring pane
    const handleNavigateJobSeeker=()=>{
     navigate('/jobs')
   }
-
 
 //   handle opening of drawer profile
 const handleShowingProfileDrawer = () => {
@@ -181,6 +220,11 @@ const handleShowingProfileDrawer = () => {
     dispatch(handleShowingSpeedDial(false));
   }
 
+  // updating right bar show false
+  if (isSidebarRighbar) {
+    dispatch(handleSidebarRightbar());
+  }
+
   // use effect for fetching jobs
   // fetch job posts from the backend (all,verified,nearby,recommended etc)
   useEffect(() => {
@@ -191,16 +235,24 @@ const handleShowingProfileDrawer = () => {
       return;
     }
 
-  
+      // open jobs creation modal
+      if (textOption === "Create Jobs") {
+        setOpenJobPostModal(true)
+        return
+      }
 
-    // nearby jobs are those within the country of the currently logged in user
-    const country = user.country.split(" ")[1];
+      // show the manage jobs table
+      if (textOption==="Manage Jobs") {
+        setIsManageJobsTable(true)
+        return
+      }
+  
 
     // set is fetching to true
     setIsFetching(true);
 
     // fetch all jobs if the request is so
-    if (textOption === "Posted Jobs" || textOption === "Assess Jobs") {
+    if (textOption === "Your Jobs" || textOption === "Assess Jobs") {
 
       axios
         .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/posted/${user?.email}`, {
@@ -269,168 +321,9 @@ const handleShowingProfileDrawer = () => {
         });
     }
 
-    // performing post request and get the nearby jobs base on the country
-    if (textOption === "Nearby Jobs") {
-      axios
-        .post(
-          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/nearby/${user?._id}`,
-          { country },
-          {
-            withCredentials: true,
-          }
-        )
-        .then((res) => {
-          // update the redux of current post
-          if (res?.data) {
-            dispatch(updateCurrentJobs(res.data));
-          } 
-        })
-        .catch(async (err) => {
-          console.log(err);
-          //  user login session expired show logout alert
-          if (err?.response?.data.login) {
-            window.location.reload();
-          }
-          if (err?.code === "ERR_NETWORK") {
-            setErrorMessage(
-              "server unreachable please try again later to complete your request"
-            );
-            return;
-          }
-          setErrorMessage(err?.response.data);
-        })
-        .finally(() => {
-          setIsFetching(false);
-          // false myStats
-          setIsMyStats(false)
-        });
-    }
-
-    // handle getting of the recommended jobs from backend
-    if (textOption === "Recommend") {
-
-      const userSkills=user?.selectedSkills
-      
-      axios
-        .post(
-          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/recommended/${user?._id}`,
-          userSkills ,
-          {
-            withCredentials: true,
-          }
-        )
-        .then((res) => {
-          // update the redux of current post
-          if (res?.data) {
-            dispatch(updateCurrentJobs(res.data));
-          } 
-        })
-        .catch(async (err) => {
-          console.log(err);
-          //  user login session expired show logout alert
-          if (err?.response?.data.login) {
-            window.location.reload();
-          }
-          if (err?.code === "ERR_NETWORK") {
-            setErrorMessage(
-              "server unreachable"
-            );
-            return;
-          }
-          setErrorMessage(err?.response.data);
-        })
-        .finally(() => {
-          setIsFetching(false);
-          // false myStats
-          setIsMyStats(false)
-        });
-
-    }
-
-   // get all job applications done by the current user /all/my/application/:userId
-   if (textOption === "Applications") {
-
-    axios
-      .get(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/my/application/${user?._id}`,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        // update the redux of current post
-        if (res?.data) {
-          dispatch(updateCurrentJobs(res.data));
-        } 
-      })
-      .catch(async (err) => {
-        console.log(err);
-        //  user login session expired show logout alert
-        if (err?.response?.data.login) {
-          window.location.reload();
-        }
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage(
-            "server unreachable"
-          );
-          return;
-        }
-        setErrorMessage(err?.response.data);
-      })
-      .finally(() => {
-        setIsFetching(false);
-        // false myStats
-        setIsMyStats(false)
-      });
-
-  }
-
-
-  // fetching my jobs statistics
-  if (textOption === "My Statistics") {
-
-    axios
-      .get(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/my/statistics/${user?._id}`,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        // update the redux of current post
-        if (res?.data) {
-          dispatch(updateCurrentJobs(res.data));
-        } 
-      })
-      .catch(async (err) => {
-        console.log(err);
-        //  user login session expired show logout alert
-        if (err?.response?.data.login) {
-          window.location.reload();
-        }
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage(
-            "server unreachable"
-          );
-          return;
-        }
-        setErrorMessage(err?.response.data);
-      })
-      .finally(() => {
-        setIsFetching(false);
-        // true myStats
-        setIsMyStats(true)
-      });
-
-  }
-
-
 
   }, [dispatch, textOption, user, isJobSearchGlobal]);
 
-   
-
- 
 
   // handle display of the drawer pane
   const handleShowDrawerPane = () => {
@@ -453,7 +346,20 @@ const handleShowingProfileDrawer = () => {
           </Box>
         }
       >
-        <Box display={"flex"} width={"100%"}>
+        <Box
+        height={'85vh'}
+         display={"flex"} 
+         sx={{
+          width:window.screen.availWidth-18,
+          overflow: "auto",
+          // Hide scrollbar for Chrome, Safari and Opera
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          // Hide scrollbar for IE, Edge and Firefox
+          msOverflowStyle: "none",
+          scrollbarWidth: "none", 
+        }}>
           <AppBar position="fixed" open={open}>
             <Toolbar
               sx={{
@@ -503,6 +409,8 @@ const handleShowingProfileDrawer = () => {
                 </Box>
               </Box>
 
+              <Box display={'flex'} gap={2} alignItems={'center'} justifyContent={'flex-end'}>
+
               {/* alter theme */}
               <Box>
                 <IconButton onClick={handleShowDarkMode}>
@@ -514,8 +422,22 @@ const handleShowingProfileDrawer = () => {
                 </IconButton>
               </Box>
 
+              {/* notification and messaging */}
+              <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
+                <Tooltip arrow title={"notifications"}>
+                  <IconButton
+                    sx={{ padding: 0 }}
+                    onClick={handleShowMessageDrawer}
+                  >
+                    <NotificationsRounded
+                      sx={{ width: 25, height: 25, color: "white" }}
+                    />
+                  </IconButton>
+                </Tooltip>
+              </Badge>
+
               {/* profile avatar */}
-        <Tooltip arrow title={"profile"}>
+            <Tooltip arrow title={"profile"}>
             <IconButton onClick={handleShowingProfileDrawer}>
             <Avatar
                 sx={{ width: 26, height: 26 }}
@@ -524,6 +446,8 @@ const handleShowingProfileDrawer = () => {
             />
             </IconButton>
             </Tooltip>
+
+            </Box>
 
             </Toolbar>
           </AppBar>
@@ -560,12 +484,26 @@ const handleShowingProfileDrawer = () => {
                     )}
                   </IconButton>
 
+                  <Box
+                  display={'flex'} 
+                  flexDirection={'column'} 
+                  justifyContent={'center'} 
+                  alignItems={'center'}
+                  >
                   {/* title hiring */}
                   <Typography variant="body2" 
                   sx={{color:'white'}} 
                   textTransform={'uppercase'}>
                     hiring Manager
                   </Typography>
+                  {/* name of the current user */}
+                  <Typography variant="caption" 
+                  sx={{color:'white'}} 
+                  >
+                   - {user?.name} -
+                  </Typography>
+                  </Box>
+
                 </Box>
               )}
             </DrawerHeader>
@@ -575,24 +513,24 @@ const handleShowingProfileDrawer = () => {
             {!open && (
               <Stack justifyContent={"center"} mt={1}>
                 {/* hide drawer visibility */}
+                <Tooltip title={'close'} arrow>
                 <ListItemButton size="small" onClick={handleShowDrawerPane}>
                   <ListItemIcon>
                   <HighlightOffOutlined sx={{width:24,height:24}}/>
                   </ListItemIcon>
                 </ListItemButton>
+                </Tooltip>
               </Stack>
             )}
          
             {/* job seeker options */}
             <List>
               {[
-                "Posted Jobs",
+                "Your Jobs",
                 "Assess Jobs",
-                "Verified Jobs",
-                "Nearby Jobs",
-                "Recommend",
-                "Applications",
-                "My Statistics",
+                "Create Jobs",
+                "Manage Jobs",
+                "Job Statistics",
               ].map((text, index) => (
                 <ListItem
                   key={text}
@@ -646,23 +584,19 @@ const handleShowingProfileDrawer = () => {
                           color={text === textOption ? "primary" : "inherit"}
                         />
                       ) : index === 2 ? (
-                        <MyLocationRounded
+                        <Add
                           color={text === textOption ? "primary" : "inherit"}
                         />
                       ) : index === 3 ? (
-                        <InsightsRounded
+                        <SettingsRounded
                         color={text === textOption ? "primary" : "inherit"}
                       />
                        
-                      ) :index===4 ? (
-                        <AssignmentTurnedInRounded
-                        color={text === textOption ? "primary" : "inherit"}
-                      />
-                        
-                      ):(
+                      ) : (
                         <BarChartRounded
                         color={text === textOption ? "primary" : "inherit"}
                       />
+                        
                       )}
                       </Tooltip>
                     </ListItemIcon>
@@ -743,14 +677,13 @@ const handleShowingProfileDrawer = () => {
                 {/* if is applicants table vs jobs layout */}
                 {isApplicantsTable ? (
                   <ApplicantsTable setIsApplicantsTable={setIsApplicantsTable} focusedJob={focusedJob} />
-                ):(
+                ):isManageJobsTable ? (
+                  <ManageJobsTable setIsManageJobsTable={setIsManageJobsTable} MyPostedJobs={jobs}/>
+                ) :(
                   <React.Fragment>
                   {/* all jobs and verified jobs and Nearby that have no external link */}
-                {(textOption === "Posted Jobs" ||
+                {(textOption === "Your Jobs" ||
                   textOption === "Assess Jobs" ||
-                  textOption === "Verified Jobs" ||
-                  textOption === "Recommend" ||
-                  textOption === "Applications"||
                   textOption === "My Statistics" ||
                   textOption === "Search Jobs") && (
                   <React.Fragment>
@@ -808,11 +741,26 @@ const handleShowingProfileDrawer = () => {
             </Box>
           </Box>
 
+          {/* open job posting modal */}
+          {openJobPostModal && (
+            <PostJobModal 
+            openModalJob={openJobPostModal} 
+            setOpenModalJob={setOpenJobPostModal}
+            isHiring={true}
+            setTextOption={setTextOption}
+            />
+          )}
+
+          {/* holds the notification and messaging drawer */}
+          {isOpenMessageDrawer && (
+          <ParentNotifMessageDrawer />
+          )}
+
         {/* holds the profile drawer which contains user account info */}
+        {isOpenDrawerProfile && (
         <ProfileDrawer />
-
-    
-
+        )}
+  
           {/* show success snackbar when redux snack state is updated */}
           {messageSnack && <SnackBarSuccess message={messageSnack} />}
         </Box>

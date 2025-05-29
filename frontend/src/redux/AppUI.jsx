@@ -69,7 +69,7 @@ const appUISliceReducerSlice = createSlice({
       state.isDefaultSpeedDial = action.payload;
     },
 
-    // update is post detaled that wll be used to override speed dial state
+    // update is post detailed that wll be used to override speed dial state
     handleUpdateIsPostDetailed: (state, action) => {
       state.isPostDetailed = action.payload;
     },
@@ -111,7 +111,7 @@ const appUISliceReducerSlice = createSlice({
       state.isMessageProfile = false;
     },
 
-    // manage showing of sidebar and righbar appropriately when invoked
+    // manage showing of sidebar and rightbar appropriately when invoked
     handleSidebarRightbar: (state) => {
       return {
         ...state,

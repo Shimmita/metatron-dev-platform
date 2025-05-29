@@ -151,7 +151,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     },
   };
 
-  // useEffect hook for upadating category values
+  // useEffect hook for updating category values
   useEffect(() => {
     // handle the value fo backend
     const updatePostCategoryValue = () => {
@@ -1256,7 +1256,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   disabled={isUploading}
                   contentEditable={false}
                   error={description.length > 1000}
-                  id="descr-body-post"
+                  id="description-body-post"
                   label={
                     <p>
                       {`Description  ${1000 - description.length} characters`} *

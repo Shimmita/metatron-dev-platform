@@ -5,7 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import BasicSpeedDial from "../custom/SpeedDial";
 
 import { handleShowingSpeedDial } from "../../redux/AppUI";
-import BottomNav from "../custom/BottomNav";
+import BottomNav from "../bottom/BottomNav";
 import SnackBarPostSuccess from "../snackbar/SnackBarPostSuccess";
 import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
 const FeedDefaultSearch = lazy(() => import("./FeedDefaultSearch"));
@@ -243,7 +243,7 @@ const Feed = () => {
                           bottom: 50,
                         }}
                       >
-                        {/* if is post search meaning posts from redux need referesh to default so fab else dial  */}
+                        {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}
 
                         <BasicSpeedDial />
                       </Box>

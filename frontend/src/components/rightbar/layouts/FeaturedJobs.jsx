@@ -27,6 +27,14 @@ function FeaturedJobs({ isLoading, jobTop }) {
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
     (state) => state.appUI
   );
+  // redux states
+    const { user } = useSelector((state) => state.currentUser);
+
+  // extract user email, for checks if job posted by the user or not
+  const {email}=user
+
+  // if not true the false is default
+  const isMyJob=email===jobTop?.my_email || false
 
   const handleCountryName = (job) => {
     const parent = job.location.country.split(" ");
@@ -154,7 +162,13 @@ function FeaturedJobs({ isLoading, jobTop }) {
                 </Typography>
               </Box>
 
-              {/* button apply */}
+              {isMyJob ? (
+                 <Box display={'flex'} justifyContent={'center'}>
+                  <Typography textAlign={'center'} variant="caption" sx={{ color:'text.secondary' }}>Yours</Typography>
+                </Box>
+              ):(
+                <React.Fragment>
+                  {/* button apply */}
               <Button
                 disableElevation
                 size="small"
@@ -170,6 +184,8 @@ function FeaturedJobs({ isLoading, jobTop }) {
               >
                 {jobTop?.currentUserApplied ? "Applied":"Apply"}
               </Button>
+                </React.Fragment>
+              )}
             </Stack>
           </ListItem>
           <Divider variant="inset" component="li" />

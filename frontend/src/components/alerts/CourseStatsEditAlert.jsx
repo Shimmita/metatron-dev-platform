@@ -154,7 +154,7 @@ export default function CourseStatsAlert({
   const handleAddUpdateTopic = () => {
     // Add the inputText as a new requirement if it's not empty
     if (topic_text.trim() !== "") {
-      // if the name of the topic does not extist add
+      // if the name of the topic does not exists add
       if (!topicsArray.includes(topic_text.trim())) {
         setTopicsArray((prev) => [...prev, topic_text.trim()]);
         setTopicText(""); // Clear the input field
@@ -167,7 +167,7 @@ export default function CourseStatsAlert({
     setTopicsArray((prev) => prev.filter((val) => val !== req));
   };
 
-  // handle updating of the couse section
+  // handle updating of the course section
   const handleSectionUpdate = () => {};
 
   // handle updating the entire course
@@ -177,7 +177,6 @@ export default function CourseStatsAlert({
   const handleEntireDeletion = () => {};
 
   return (
-    <React.Fragment>
       <Dialog
         open={openAlertCourseStats}
         TransitionComponent={Transition}
@@ -836,6 +835,5 @@ export default function CourseStatsAlert({
           )}
         </DialogActions>
       </Dialog>
-    </React.Fragment>
   );
 }

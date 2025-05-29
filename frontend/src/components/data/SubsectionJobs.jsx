@@ -5,8 +5,12 @@ const SubsectionJob = {
     "Remote Job",
     "Onsite Job",
     "Hybrid Job",
-  ].sort(),
-  Post_Duration: ["7 days", "14 days", "21 days", "30 days"].sort(),
+  ].sort((a, b) => a.localeCompare(b)),
+  Post_Duration: [
+    "7 days",
+     "14 days",
+      "21 days",
+      "30 days"].sort((a, b) => a.localeCompare(b)),
   Expert_Level: [
     "Internship Level",
     "Entry Level",
@@ -18,7 +22,7 @@ const SubsectionJob = {
     "2-4 Years of Experience",
     "4-6 Years of Experience",
     "7+ Years of Experience",
-  ].sort(),
+  ].sort((a, b) => a.localeCompare(b)),
 
   Document_Req: ["Curriculum Vitae (CV)", "No, I have Website"],
 

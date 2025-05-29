@@ -1,11 +1,10 @@
 import {
-  ExpandMoreRounded,
   FavoriteRounded,
   ForumRounded,
   GitHub,
   MoreVertRounded,
   VerifiedRounded,
-  WbIncandescentRounded,
+  WbIncandescentRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -24,12 +23,13 @@ import {
   Typography
 } from "@mui/material";
 import axios from "axios";
-import React, { lazy, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch, useSelector } from "react-redux";
 import dev from "../../images/dev.jpeg";
 import { handleUpdateIsPostDetailed } from "../../redux/AppUI";
 import { updateCurrentPostDetails } from "../../redux/CurrentPosts";
+import AlertMiniProfileView from "../alerts/AlertMiniProfileView";
 import AlertReportPost from "../alerts/AlertReportPost";
 import PostData from "../data/PostData";
 import SnackbarConnect from "../snackbar/SnackbarConnect";
@@ -43,9 +43,6 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
 import CardFeedMore from "./CardFeedMore";
-const AlertMiniProfileView = lazy(() =>
-  import("../alerts/AlertMiniProfileView")
-);
 
 const CardFeed = ({ post, setPostDetailedData }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -68,7 +65,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
   const { user } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
   // extract basic current user details
-  const { _id, avatar, name, specialisationTitle: title } = user || {};
+  const { _id, avatar, name, specialisationTitle: title, country, county } = user || {};
 
   // extract the likes and array of liked usersIDs of this post
   const { clicks: post_like_cicks } = post.post_liked || {};
@@ -113,6 +110,8 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     avatar,
     name,
     title,
+    country,
+    county
   };
 
   const handleDetailsLength = () =>
@@ -138,7 +137,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
   const handleName = () => {
     const title = post.post_owner.ownername.split(" ");
     const first = title[0];
-    var second = title[1].substring(0, 1);
+    let second = title[1].substring(0, 1);
 
     return first + " " + second;
   };
@@ -147,7 +146,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
   const handleNoProfilePicture = () => {
     const title = post.post_owner.ownername.split(" ");
     const first = title[0].substring(0, 1);
-    var second = title[1].substring(0, 1);
+    let second = title[1].substring(0, 1);
 
     return first + "" + second;
   };
@@ -622,11 +621,13 @@ const CardFeed = ({ post, setPostDetailedData }) => {
       {messageMore && <SnackbarConnect message={messageMore} />}
 
       {/* alert for showing user mini-profile details by passing the post ownerID */}
-      <AlertMiniProfileView
+      {openMiniProfileAlert && (
+        <AlertMiniProfileView
         openAlert={openMiniProfileAlert}
         setOpenAlert={setOpenMiniProfileAlert}
         userId={post.post_owner.ownerId}
       />
+      )}
     </React.Fragment>
   );
 };

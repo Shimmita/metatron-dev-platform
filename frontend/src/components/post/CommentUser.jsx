@@ -1,3 +1,4 @@
+import { Close, DoneRounded, SendOutlined } from "@mui/icons-material";
 import { Alert, Badge, Box, Button, CircularProgress, Collapse, IconButton, InputBase, Stack, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
@@ -8,9 +9,8 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import devImage from "../../images/dev.jpeg";
-import { getElapsedTime } from "../utilities/getElapsedTime";
-import { Close, DoneRounded, Reply, SendOutlined } from "@mui/icons-material";
 import CustomCountryName from "../utilities/CustomCountryName";
+import { getElapsedTime } from "../utilities/getElapsedTime";
 import CommentsReply from "./CommentsReply";
 
 const MAX_TEXT_LENGTH=100

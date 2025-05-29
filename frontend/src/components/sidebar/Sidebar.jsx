@@ -185,7 +185,7 @@ const Sidebar = () => {
             {isLoadingRequest ? (
               <Box width={"100%"}>
                 <Box mb={1} display={"flex"} justifyContent={"center"}>
-                  <Skeleton variant="circular" width={80} height={80} />
+                  <Skeleton variant="circular" width={70} height={70} />
                 </Box>
                 <Skeleton variant="rectangular" height={"20vh"} />
               </Box>
@@ -197,7 +197,6 @@ const Sidebar = () => {
                       display={"flex"}
                       justifyContent={"center"}
                       alignItems={"center"}
-                      p={1}
                     >
                       <StyledBadge
                         overlap="circular"
@@ -212,7 +211,7 @@ const Sidebar = () => {
                           src={
                             devImage
                           }
-                          sx={{ width: 100, height: 100, mt: 1 }}
+                          sx={{ width: 90, height: 90, mt: 1 }}
                         />
                       </StyledBadge>
 
@@ -250,7 +249,7 @@ const Sidebar = () => {
                   <ListItemIcon>
                     <SupportAgentRounded
                       color="primary"
-                      sx={{ width: 28, height: 28 }}
+                      sx={{ width: 24, height: 24 }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -265,7 +264,7 @@ const Sidebar = () => {
                   <ListItemIcon>
                     <Smartphone
                       color="primary"
-                      sx={{ width: 30, height: 30 }}
+                      sx={{ width: 26, height: 26 }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -280,7 +279,7 @@ const Sidebar = () => {
                   <ListItemIcon>
                     <CoffeeRounded
                       color="primary"
-                      sx={{ width: 30, height: 30 }}
+                      sx={{ width: 26, height: 26 }}
                     />
                   </ListItemIcon>
                   <ListItemText
@@ -295,7 +294,7 @@ const Sidebar = () => {
                   <ListItemIcon>
                     <TipsAndUpdatesRounded
                       color="primary"
-                      sx={{ width: 28, height: 28 }}
+                      sx={{ width: 24, height: 24 }}
                     />
                   </ListItemIcon>
                   <ListItemText

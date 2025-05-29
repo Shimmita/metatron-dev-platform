@@ -1,16 +1,16 @@
 import {
   DownloadForOfflineRounded,
-  DownloadRounded,
+  EmailOutlined,
   FlagRounded,
   PersonAddRounded,
-  PersonRemoveRounded,
-  PostAddRounded
+  PersonRemoveRounded
 } from "@mui/icons-material";
-import { Box, Divider, ListItemText, MenuItem } from "@mui/material";
+import { Box, Divider, ListItemText, MenuItem, Typography } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
+import AlertInputMessage from "../alerts/AlertInputMessage";
 import CustomCountryName from "../utilities/CustomCountryName";
 function CardFeedMore({
   ownerId,
@@ -24,11 +24,12 @@ function CardFeedMore({
 }) {
   const [isFriend, setIsFriend] = useState();
   const [isFetching, setIsFetching] = useState(false);
+  const [openAlertMessage,setOpenAlertMessage]=useState(false)
 
   // redux states
-  const { user } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
-
+  
+  const { user } = useSelector((state) => state.currentUser);
   const {
     _id: currentUserId,
     name,
@@ -45,18 +46,24 @@ function CardFeedMore({
   // axios default credentials
   axios.defaults.withCredentials = true;
 
+
+  // handle showing of alert input message
+  const handleOpeningAlertMessage=()=>{
+    // open the alert
+    setOpenAlertMessage(true)
+  }
+
   // extracting the list of friends/network from the current user
   useEffect(() => {
     // map through ids of friends if the current user network
-    // has the id of the post owner, measns are friends else false
+    // has the id of the post owner, means are friends else false
     if (currentUserNetwork.includes(ownerId)) {
       setIsFriend(true);
     }
   }, [isFriend, currentUserNetwork, ownerId]);
 
   // handle creating connection with the user of the post
-
-  const handlelCreateConnection = () => {
+  const handleCreateConnection = () => {
     // data user sending connect request, its the current user
     const dataUserAcknowLedging = {
       senderId: currentUserId,
@@ -75,7 +82,7 @@ function CardFeedMore({
     // performing post request and passing
     axios
       .post(
-        `http://localhost:5000/metatron/api/v1/connections/connection/create`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/create`,
         dataUserAcknowLedging
       )
       .then((res) => {
@@ -101,7 +108,6 @@ function CardFeedMore({
   };
 
   // handle unfriending the user, like remove them from the network
-
   const handleUnfriendFriend = () => {
     // set is fetching to true
     setIsFetching(true);
@@ -109,7 +115,7 @@ function CardFeedMore({
     // performing delete request and passing the ids of current user and owner of the post
     axios
       .delete(
-        `http://localhost:5000/metatron/api/v1/connections/connection/unfriend/${currentUserId}/${ownerId}`
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/unfriend/${currentUserId}/${ownerId}`
       )
       .then((res) => {
         // update the message state
@@ -152,29 +158,51 @@ function CardFeedMore({
 
   return (
       <Box borderRadius={5}>
-        {isFriend ? (
-          <React.Fragment>
-            <MenuItem onClick={handleUnfriendFriend} disabled={isFetching}>
+            {isFriend ? (
+              <MenuItem onClick={handleUnfriendFriend} disabled={isFetching}>
               <ListItemText>
                 <PersonRemoveRounded color="warning" className="mx-2" />
               </ListItemText>
               <ListItemText
                 sx={{ textTransform: "capitalize" }}
-                primary={owner_post}
+                primary={<Typography variant={'body2'}>{owner_post}</Typography>}
               />
             </MenuItem>
-            <Divider component={"li"} />
-            <MenuItem>
+            ):(
+          <MenuItem onClick={handleCreateConnection} disabled={isFetching}>
               <ListItemText>
-                <DownloadForOfflineRounded color="primary" className="mx-2" />
+                <PersonAddRounded color="primary" className="mx-2" />
               </ListItemText>
               <ListItemText
                 sx={{ textTransform: "capitalize" }}
-                primary={"Download Media"}
+                primary={<Typography variant={'body2'}>{owner_post}</Typography>}
+              />
+            </MenuItem>
+            )}
+            
+            <Divider component={"li"} />
+
+            <MenuItem onClick={handleOpeningAlertMessage} disabled={isFetching}>
+              <ListItemText>
+                <EmailOutlined color="primary" className="mx-2" sx={{ width:22,height:22 }}/>
+              </ListItemText>
+              <ListItemText
+                sx={{ textTransform: "capitalize" }}
+                primary={<Typography variant={'body2'}>{owner_post}</Typography>}
+              />
+            </MenuItem>
+            <Divider component={"li"} />
+
+            <MenuItem>
+              <ListItemText>
+                <DownloadForOfflineRounded color="primary" className="mx-2" sx={{ width:22,height:22 }} />
+              </ListItemText>
+              <ListItemText
+                sx={{ textTransform: "capitalize" }}
+                primary={<Typography variant={'body2'}>Download Media</Typography>}
               />
             </MenuItem>
           
-
             {/* report content */}
             <Divider component={"li"} />
             <MenuItem onClick={handleShowReportAlert}>
@@ -183,49 +211,19 @@ function CardFeedMore({
               </ListItemText>
               <ListItemText
                 sx={{ textTransform: "capitalize" }}
-                primary={"Report Content"}
-              />
-            </MenuItem>
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
-            <MenuItem onClick={handlelCreateConnection} disabled={isFetching}>
-              <ListItemText>
-                <PersonAddRounded color="primary" className="mx-2" />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={owner_post}
+                primary={<Typography variant={'body2'}>Report Content</Typography>}
               />
             </MenuItem>
 
-            <Divider component={"li"} />
-            {/* download media */}
-            <MenuItem>
-              <ListItemText>
-                <DownloadRounded color="success" className="mx-2" />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={"Download Media"}
-              />
-            </MenuItem>
-
-        
-
-            {/* report post */}
-            <Divider component={"li"} />
-            <MenuItem onClick={handleShowReportAlert}>
-              <ListItemText>
-                <FlagRounded color="info" className="mx-2" />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={"Report Content"}
-              />
-            </MenuItem>
-          </React.Fragment>
-        )}
+            {/* alert message render */}
+            {openAlertMessage && (
+              <AlertInputMessage openAlert={openAlertMessage}
+               setOpenAlert={setOpenAlertMessage} 
+               targetId={ownerId} 
+               targetName={ownerName}
+               targetSpecialisation={post?.post_owner?.ownertitle}
+               />
+            )}
       </Box>
   );
 }

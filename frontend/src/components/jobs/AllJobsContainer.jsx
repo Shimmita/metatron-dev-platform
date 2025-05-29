@@ -1,14 +1,15 @@
 import {
   AssignmentTurnedInRounded,
   BarChartRounded,
-  BookRounded,
   DarkModeRounded,
   FindInPageRounded,
   HighlightOffOutlined,
+  InfoRounded,
   InsightsRounded,
   LibraryBooksRounded,
   Menu,
   MyLocationRounded,
+  NotificationsRounded,
   VerifiedRounded,
   WorkRounded
 } from "@mui/icons-material";
@@ -17,6 +18,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
   AppBar,
   Avatar,
+  Badge,
   Button,
   CircularProgress,
   Stack,
@@ -35,24 +37,28 @@ import ListItemText from "@mui/material/ListItemText";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import devImage from '../../images/dev.jpeg';
 import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
+  handleSidebarRightbar,
   resetDarkMode,
+  showMessagingDrawer,
   showUserProfileDrawer,
 } from "../../redux/AppUI";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
 import AlertJobSearch from "../alerts/AlertJobSearch";
+import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import JobLayout from "./layout/JobLayout";
 import JobStatsLayout from "./layout/JobStatsLayouts";
-import { useNavigate } from "react-router-dom";
-import devImage from '../../images/dev.jpeg'
-import ProfileDrawer from "../profile/drawer/ProfileDrawer";
+import AlertGeneral from "../alerts/AlertGeneral";
+import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 
 const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
 
@@ -113,15 +119,34 @@ const Drawer = styled(MuiDrawer, {
 
 
 export default function MiniDrawer() {
+  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
+  const [generalTitle,setGeneralTitle]=useState("")
+  const [messageGeneral,setMessageGeneral]=useState("")
   // redux states
-  const { isDarkMode, isDefaultSpeedDial, isJobSearchGlobal } = useSelector(
+  const { isDarkMode, 
+    isDefaultSpeedDial, 
+    isJobSearchGlobal,
+    isSidebarRighbar,
+    isOpenDrawerProfile,
+    isOpenMessageDrawer
+   } = useSelector(
     (state) => state.appUI
   );
 
+
   const { jobs } = useSelector((state) => state.currentJobs);
   const { user } = useSelector((state) => state.currentUser);
+  const { post_reactions } = useSelector((state) => state.currentPostReactions);
+  const { reportedPost } = useSelector((state) => state.currentReportedPost);
+  const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
+  const { profile_views } = useSelector((state) => state.currentProfileView);
+  const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
+
+
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
   const theme = useTheme();
+    // trigger redux update
+    const dispatch = useDispatch();
 
   const[isMyStats,setIsMyStats]=useState(false)
 
@@ -144,16 +169,27 @@ export default function MiniDrawer() {
   
   const [openAlert, setOpenAlert] = useState(false);
 
-  //   handle opening of drawer profile
-  const handleShowingProfileDrawer = () => {
+   //   handle opening of drawer profile
+   const handleShowingProfileDrawer = () => {
       dispatch(showUserProfileDrawer());
     };
+
+     // handle display of the drawer pane
+  const handleShowDrawerPane = () => {
+    setIsDrawerPane((prev) => !prev);
+  };
+
+  // UI theme dark light tweaking effect
+  const handleShowDarkMode = () => {
+    // update the redux theme boolean state
+    dispatch(resetDarkMode());
+  };
   
 
-  // handle navigation to hiring pane
-  const handleNavigateHiring=()=>{
-    navigate('/jobs/hiring')
-  }
+  // show the notification and messaging triggered by redux
+  const handleShowMessageDrawer = () => {
+    dispatch(showMessagingDrawer());
+  };
 
   // open drawer
   const handleDrawerOpen = () => {
@@ -164,12 +200,21 @@ export default function MiniDrawer() {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const dispatch = useDispatch();
 
   // handle showing of speed dial by making it off in this window of jobs
   if (isDefaultSpeedDial) {
     dispatch(handleShowingSpeedDial(false));
   }
+
+  // false right bar is no of use this route
+  useLayoutEffect(()=>{
+     // updating right bar show false
+     if (isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+  },[dispatch,isSidebarRighbar])
+  
+  
 
   // use effect for fetching jobs
   // fetch job posts from the backend (all,verified,nearby,recommended etc)
@@ -418,24 +463,53 @@ export default function MiniDrawer() {
 
   }
 
-
-
   }, [dispatch, textOption, user, isJobSearchGlobal]);
 
-   
 
- 
 
-  // handle display of the drawer pane
-  const handleShowDrawerPane = () => {
-    setIsDrawerPane((prev) => !prev);
-  };
+   // handle navigation to hiring pane if the user has jobs he/she posted
+  // as the recruiter
+  const handleNavigateHiring=()=>{
+    // set is fetching true
+    setIsFetching(true)
 
-  // UI theme dark light tweaking effect
-  const handleShowDarkMode = () => {
-    // update the redux theme boolean state
-    dispatch(resetDarkMode());
-  };
+     axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/posted/${user?.email}`, {
+              withCredentials: true,
+            })
+            .then((res) => {
+              // if the length is greater than 0 then navigate hiring pane since 
+              // are jobs user posted
+              if (res?.data?.length>0) {
+                navigate('/jobs/hiring')
+              } else{
+                // don't navigate alert you have not posted any jobs
+                setGeneralTitle("Hiring Manager")
+                setMessageGeneral("Currently you have not posted any jobs as a hiring manager, kindly post your job(s) and this page will be ready.")
+                setOpenAlertGeneral(true)
+              }
+            })
+            .catch(async (err) => {
+              console.log(err);
+              //  user login session expired show logout alert
+              if (err?.response?.data.login) {
+                window.location.reload();
+              }
+              if (err?.code === "ERR_NETWORK") {
+                setErrorMessage(
+                  "server unreachable please try again later to complete your request"
+                );
+                return;
+              }
+              setErrorMessage(err?.response.data);
+            })
+            .finally(() => {
+              setIsFetching(false);
+              // false my stats
+              setIsMyStats(false)
+              
+            });
+  }
+
 
   return (
       <Suspense
@@ -447,7 +521,21 @@ export default function MiniDrawer() {
           </Box>
         }
       >
-        <Box display={"flex"} width={"100%"}>
+        <Box 
+        display={"flex"} 
+        height={'85vh'}
+         sx={{
+          width:window.screen.availWidth-18,
+          overflow: "auto",
+          // Hide scrollbar for Chrome, Safari and Opera
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          // Hide scrollbar for IE, Edge and Firefox
+          msOverflowStyle: "none",
+          scrollbarWidth: "none", 
+         }}
+        >
           <AppBar position="fixed" open={open}>
             <Toolbar
               sx={{
@@ -495,6 +583,7 @@ export default function MiniDrawer() {
                 </Box>
               </Box>
 
+              <Box display={'flex'} gap={2} alignItems={'center'} justifyContent={'flex-end'}>
               {/* alter theme */}
               <Box>
                 <IconButton onClick={handleShowDarkMode}>
@@ -505,6 +594,22 @@ export default function MiniDrawer() {
                   </Tooltip>
                 </IconButton>
               </Box>
+
+
+              {/* notification and messaging */}
+              <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
+                <Tooltip arrow title={"notifications"}>
+                  <IconButton
+                    sx={{ padding: 0 }}
+                    onClick={handleShowMessageDrawer}
+                  >
+                    <NotificationsRounded
+                      sx={{ width: 25, height: 25, color: "white" }}
+                    />
+                  </IconButton>
+                </Tooltip>
+              </Badge>
+
               {/* profile */}
               <Tooltip arrow title={"profile"}>
                 <IconButton onClick={handleShowingProfileDrawer}>
@@ -515,6 +620,7 @@ export default function MiniDrawer() {
                 />
                 </IconButton>
               </Tooltip>
+              </Box>
             </Toolbar>
           </AppBar>
 
@@ -549,13 +655,24 @@ export default function MiniDrawer() {
                  <ChevronLeftIcon sx={{ color:'white' }} />
                )}
              </IconButton>
-
+             <Box 
+             display={'flex'} 
+             flexDirection={'column'} 
+             justifyContent={'center'} 
+             alignItems={'center'}>
              {/* title hiring */}
              <Typography variant="body2" 
              sx={{color:'white'}} 
              textTransform={'uppercase'}>
                jobseeker
              </Typography>
+             <Typography variant="caption" 
+              sx={{color:'white'}} 
+              >
+              - {user?.name} -
+              </Typography>
+              </Box>
+
            </Box>
               )}
             </DrawerHeader>
@@ -764,6 +881,7 @@ export default function MiniDrawer() {
                                 key={job?._id}
                                 isDarkMode={isDarkMode}
                                 job={job}
+                                user={user}
                               />
                               ):(
                                 <JobLayout
@@ -789,16 +907,35 @@ export default function MiniDrawer() {
             </Box>
           </Box>
 
+          {/* open alert general for no jobs */}
+          {openAlertGeneral && (
+            <AlertGeneral openAlertGeneral={openAlertGeneral} 
+            setOpenAlertGeneral={setOpenAlertGeneral}
+            title={generalTitle}
+            message={messageGeneral}
+            defaultIcon={<InfoRounded/>}
+            />
+          )}
+
+            {/* holds the notification and messaging drawer */}
+            {isOpenMessageDrawer && (
+            <ParentNotifMessageDrawer />
+            )}
 
            {/* holds the profile drawer which contains user account info */}
-            <ProfileDrawer />
+           {isOpenDrawerProfile && (
+             <ProfileDrawer />
+           )}
 
           {/* show job search alert */}
-          <AlertJobSearch
-            openAlert={openAlert}
-            setOpenAlert={setOpenAlert}
-            isFullView={true}
-          />
+          {openAlert && (
+             <AlertJobSearch
+             openAlert={openAlert}
+             setOpenAlert={setOpenAlert}
+             isFullView={true}
+           />
+          )}
+         
 
           {/* show success snackbar when redux snack state is updated */}
           {messageSnack && <SnackBarSuccess message={messageSnack} />}

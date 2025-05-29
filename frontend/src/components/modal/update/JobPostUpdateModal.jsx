@@ -5,6 +5,7 @@ import {
   CloudUploadRounded,
   DiamondRounded,
   LinkRounded,
+  UpdateTwoTone,
   Work,
 } from "@mui/icons-material";
 import {
@@ -27,24 +28,22 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import React, { lazy, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import AppLogo from "../../images/logo_sm.png";
-import AllCountries from "../data/AllCountries";
-import AllSkills from "../data/AllSkillsData";
-import CountiesInKenya from "../data/Counties";
-import SpecialisationJobs from "../data/SpecialisationJobs";
-import SubsectionJob from "../data/SubsectionJobs";
-import BrowserCompress from "../utilities/BrowserCompress";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import { getImageMatch } from "../utilities/getImageMatch";
-import { resetClearCurrentJobsTop, updateCurrentJobsTop } from "../../redux/CurrentJobsTop";
-import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
-const CurrencyControl = lazy(() => import("./CurrencyControl"));
-const LocationControl = lazy(() => import("./LocationControl"));
-const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
+import { useSelector } from "react-redux";
+import AppLogo from "../../../images/logo_sm.png";
+import AllCountries from "../../data/AllCountries";
+import AllSkills from "../../data/AllSkillsData";
+import CountiesInKenya from "../../data/Counties";
+import SpecialisationJobs from "../../data/SpecialisationJobs";
+import SubsectionJob from "../../data/SubsectionJobs";
+import BrowserCompress from "../../utilities/BrowserCompress";
+import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
+import CustomLandScape from "../../utilities/CustomLandscape";
+import CustomLandscapeWidest from "../../utilities/CustomLandscapeWidest";
+import { getImageMatch } from "../../utilities/getImageMatch";
+const CurrencyControl = lazy(() => import("../CurrencyControl"));
+const LocationControl = lazy(() => import("../LocationControl"));
+const LogoutAlert = lazy(() => import("../../alerts/LogoutAlert"));
 
 // styled modal
 const StyledModalJob = styled(Modal)({
@@ -74,49 +73,48 @@ const jobTypeAccess = {
 // array for image names and values
 const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
 
-const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=false}) => {
-  const [job_title, setJobTitle] = useState("");
-  const [organisationName, setOrganisationName] = useState("");
-  const [county, setCounty] = useState("");
-  const [job_type, setJobType] = useState({ type: "", access: "" });
-  const [country, setCountry] = useState("");
+const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCurrentJobs}) => {
+  const [job_title, setJobTitle] = useState(job_updated?.title);
+  const [organisationName, setOrganisationName] = useState(job_updated?.organisation?.name);
+  const [county, setCounty] = useState(job_updated?.location?.state);
+  const [job_type, setJobType] = useState({ type: job_updated?.jobtypeaccess?.type, access: job_updated?.jobtypeaccess?.access });
+  const [country, setCountry] = useState(job_updated?.location?.country);
   const [location, setLocation] = useState("KE");
-  const [job_main_doc, setJobMainDoc] = useState("");
-  const [job_main_skill, setJobMainSkill] = useState([]);
-  const [job_salary, setJobSalary] = useState("");
-  const [job_entry_type, setJobEntryType] = useState("");
-  const [job_experience, setJobExperience] = useState("");
-  const [webLink, setWebLink] = useState("");
-  const [poster_about, setPosterAbout] = useState("");
+  const [job_main_doc, setJobMainDoc] = useState(job_updated?.requirements?.document);
+  const [job_main_skill, setJobMainSkill] = useState([...job_updated?.skills]);
+  const [job_salary, setJobSalary] = useState(job_updated?.salary);
+  const [job_entry_type, setJobEntryType] = useState(job_updated?.entry?.level);
+  const [job_experience, setJobExperience] = useState(job_updated?.entry?.years);
+  const [webLink, setWebLink] = useState(job_updated?.website);
+  const [poster_about, setPosterAbout] = useState(job_updated?.organisation?.about);
   const [showCustomTitle, setShowCustomTitle] = useState(false);
   const [currency, setCurrency] = useState("Ksh");
   const [fileUpload, setFileUpload] = useState(null);
-  const [filePreview, setFilePreview] = useState(null);
+  const [filePreview, setFilePreview] = useState(getImageMatch(job_updated?.logo));
   const [fileLink, setFileLink] = useState("");
   const [isFileLink, setIsFileLink] = useState(false);
-  const [isFreeLogo, setIsFreeLogo] = useState(false);
-  const [freeLogo, setFreeLogo] = useState("");
+  const [isFreeLogo, setIsFreeLogo] = useState(true);
+  const [freeLogo, setFreeLogo] = useState(job_updated?.logo);
    // To hold user input text for req
-    const [req_text, setReqText] = useState("");
-     // To hold checked requirements as chips
-    const [requirementsQual, setRequirementsQual] = useState([]);
-    // Available options to display in the Autocomplete dropdown
-    const options_req = []; 
-    // Available options to display in the Autocomplete dropdown
-    const options_desc = []; 
-    // for descriptions
-    const [description, setDescription] = useState([]); 
-    // To hold user input text for desc
-    const [desc_text, setDescText] = useState(""); 
+  const [req_text, setReqText] = useState("");
+   // To hold checked requirements as chips
+  const [requirementsQual, setRequirementsQual] = useState([...job_updated?.requirements?.qualification]);
+  // Available options to display in the Autocomplete dropdown
+  const options_req = []; 
+  // Available options to display in the Autocomplete dropdown
+  const options_desc = []; 
+  // for descriptions
+  const [description, setDescription] = useState([...job_updated?.requirements?.description]); 
+  // To hold user input text for desc
+  const [desc_text, setDescText] = useState(""); 
 
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  
+
   // control showing of logout user session expired
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
 
   // get redux states
-  const dispatch=useDispatch()
   const { user } = useSelector((state) => state.currentUser);
 
   // axios default credentials
@@ -176,22 +174,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
     setJobTitle("");
   };
 
-  // handle show file link field when btn link clicked
-  const handleFileUploadLink = () => {
-    // clear file uploaded if any
-    setFileUpload(null);
-    // set true link video full
-    setIsFileLink(true);
-  };
-
-  // handle closing
-  const handleCloseFileUploadLink = () => {
-    // clear
-    setFileLink("");
-    // default showing of btn upload and link
-    setIsFileLink(false);
-  };
-
+ 
   // Handle input change for req
   const handleTextChangeReq = (e, value) => {
     setReqText(value);
@@ -230,26 +213,6 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
     }
   };
 
-  // handle when free logos is selected or changed
-  const handleFreeLogoPicked = (event) => {
-    // clear file preview
-    setFilePreview(null);
-    // update free logo value
-    setFreeLogo(event.target.value);
-    // update file preview for free logo
-    setFilePreview(getImageMatch(event.target.value));
-  };
-
-  //   handle file change and compress the image
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-    // compress the file using the custom utility created
-    const compressedFile = await BrowserCompress(file);
-
-    setFileUpload(compressedFile);
-    // create an object from URI of the image for local preview
-    setFilePreview(URL.createObjectURL(compressedFile));
-  };
 
   // handle core missing fields
   const handleEmptyFields = () => {
@@ -326,8 +289,21 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
     return true;
   };
 
+
+  // close freeLogo
+  const handleCloseFreeLogo = () => {
+    setFreeLogo("");
+    setIsFreeLogo(false);
+  };
+
+ 
+  // close the modal
+  const handleClosingJobPostModal=()=>{
+    setOpenModalJob(false)
+  }
+
   // create job object
-  const job = {
+  const jobObject = {
     title: job_title,
     organisation: {
       name: organisationName,
@@ -364,39 +340,30 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
     my_email: user?.email,
     my_phone: user?.phone,
   };
+  
 
   // handle posting of data to the backend
-  const handleJobPost = () => {
+  const handleJobPostUpdate = () => {
     // clear any error message
     setErrorMessage("");
     // core fields not empty
     if (handleEmptyFields()) {
       // set is uploading true
       setIsUploading(true);
-      // create a form which will facilitate parsing of the file for upload to cloud
-      const formData = new FormData();
-      // append post body after stringify it due to form data
-      formData.append("job", JSON.stringify(job));
-
-      // check if file is present then upload append it for upload
-      if (fileUpload) {
-        formData.append("image", fileUpload);
-      }
-
-      // performing post request, passing current userId
+      // performing put request to update the job passing email and jobId.
+      // job email and current user's email are same.
       axios
-        .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/create`, formData, {
+        .put(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/job/update/${job_updated?.my_email}/${job_updated?._id}`, jobObject, {
           withCredentials: true,
         })
-        .then((res) => {
-          // update current jobs top, with the ones from backend
-          dispatch(updateCurrentSnackBar(res?.data))
-          // clear top jobs this will make the react refetch the top jobs
-          dispatch(resetClearCurrentJobsTop())
+        .then((res) => {          
+          // set current job to the one returned from backend
+          setMyCurrentJobs(res?.data)
+
           // close the modal
           setOpenModalJob(false)
         })
-        .catch((err) => {
+        .catch( (err) => {
           //  user login session expired show logout alert
           if (err?.response?.data.login) {
             setOpenAlertLogout(true);
@@ -409,41 +376,12 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
           setErrorMessage(err?.response.data);
         })
         .finally(() => {
+          // false is isUploading
           setIsUploading(false);
         });
     }
   };
 
-  //handle free logo
-  const handleFreeLogoPick = () => {
-    // free logo shown for picks
-    setIsFreeLogo(true);
-    // clear file upload
-    setFileUpload(null);
-    // false file link
-    setIsFileLink(false);
-    // clear any file link info
-    setFileLink("");
-  };
-
-  // close freeLogo
-  const handleCloseFreeLogo = () => {
-    setFreeLogo("");
-    setIsFreeLogo(false);
-
-  };
-
- 
-  // close the modal
-  const handleClosingJobPostModal=()=>{
-    setOpenModalJob(false)
-    // modal is opened from hiring page
-      if(isHiring)
-      {
-      // avoid blank page by populating jobs default
-      setTextOption("Your Jobs")
-      }
-  }
 
 
   return (
@@ -572,7 +510,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
             <Box display={"flex"} flexDirection={"column"} gap={3} mt={3}>
               {/* job title */}
               {!showCustomTitle ? (
-                <>
+                <React.Fragment>
                   <Typography
                     gutterBottom
                     variant="body2"
@@ -587,7 +525,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   <Box className="w-100 mb-3">
                     <TextField
                       required
-                      disabled={isUploading}
+                      disabled={true}
                       select
                       value={job_title}
                       label="Preferred job title"
@@ -601,7 +539,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                         ))}
                     </TextField>
                   </Box>
-                </>
+                </React.Fragment>
               ) : (
                 <>
                   {/* custom job title */}
@@ -623,7 +561,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   >
                     <TextField
                       fullWidth
-                      disabled={isUploading}
+                      disabled={true}
                       required
                       value={job_title}
                       onChange={(e) => setJobTitle(e.target.value)}
@@ -647,7 +585,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               <Box className="mb-3 mt-2 ">
                 <TextField
                   fullWidth
-                  disabled={isUploading}
+                  disabled={true}
                   value={organisationName}
                   onChange={(e) => setOrganisationName(e.target.value)}
                   required
@@ -705,8 +643,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                     })
                   }
                 >
-                  {jobTypeAccess.access.map((access) => (
-                    <MenuItem key={access} value={access}>
+                  {jobTypeAccess.access.map((access, index) => (
+                    <MenuItem key={index} value={access}>
                       {access}
                     </MenuItem>
                   ))}
@@ -734,155 +672,6 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                 </Box>
               )}
 
-              {/* free logos pick */}
-              {isFreeLogo && (
-                <Box
-                  mt={1}
-                  className="w-100 mb-4"
-                  display={"flex"}
-                  alignItems={"center"}
-                  gap={1}
-                >
-                  <TextField
-                    required
-                    disabled={isUploading || errorMessage}
-                    select
-                    value={freeLogo}
-                    variant="standard"
-                    label="Free logos"
-                    fullWidth
-                    onChange={handleFreeLogoPicked}
-                  >
-                    {logoNamesOptions?.map((name, index) => (
-                        <MenuItem
-                          key={name}
-                          value={name}
-                          sx={{ display: "flex", gap: 2 }}
-                        >
-                          {/* logo */}
-                          <Avatar
-                            src={logoValueOptions[index]}
-                            sx={{ width: 32, height: 32 }}
-                            alt=""
-                          />
-                          {/* name */}
-                          <Typography variant="body2">{name}</Typography>
-                        </MenuItem>
-                      ))}
-                  </TextField>
-
-                  {/* close button */}
-                  <IconButton onClick={handleCloseFreeLogo}>
-                    <Tooltip title={"exit link"}>
-                      <Close />
-                    </Tooltip>
-                  </IconButton>
-                </Box>
-              )}
-
-              {!isFileLink && !isFreeLogo ? (
-                <Box
-                  display={"flex"}
-                  justifyContent={"flex-end"}
-                  alignItems={"center"}
-                  width={"100%"}
-                  gap={3}
-                  mb={3}
-                >
-                  <Button
-                    variant="text"
-                    disableElevation
-                    disabled={isUploading}
-                    sx={{ textTransform: "none", borderRadius: "20px" }}
-                    onClick={handleFreeLogoPick}
-                    size="medium"
-                    startIcon={<DiamondRounded />}
-                  >
-                    Free
-                  </Button>
-
-                  <Button
-                    component="label"
-                    role={undefined}
-                    variant="text"
-                    disableElevation
-                    tabIndex={-1}
-                    size="medium"
-                    disabled={isUploading}
-                    sx={{ textTransform: "none", borderRadius: "20px" }}
-                    startIcon={<CloudUploadRounded />}
-                  >
-                    Upload
-                    <StyledInput
-                      type="file"
-                      accept="image/*,"
-                      onChange={handleFileChange}
-                      multiple
-                    />
-                  </Button>
-
-                  <Button
-                    variant="text"
-                    disableElevation
-                    disabled={isUploading}
-                    sx={{ textTransform: "none", borderRadius: "20px" }}
-                    onClick={handleFileUploadLink}
-                    size="medium"
-                    startIcon={<LinkRounded />}
-                  >
-                    Link
-                  </Button>
-                </Box>
-              ) : (
-                <Box>
-                  {!isFreeLogo && (
-                    <Box>
-                      {/* link from external source */}
-                      {/* preview the file link */}
-                      {(fileLink?.trim() !== null ||
-                        fileLink?.trim() !== "") && (
-                        <Box mt={3} display={"flex"} justifyContent={"center"}>
-                          <img
-                            src={fileLink}
-                            alt=""
-                            className="rounded"
-                            style={{
-                              maxWidth: 100,
-                            }}
-                          />
-                        </Box>
-                      )}
-
-                      <Box
-                        mt={1}
-                        className="w-100 mb-4"
-                        display={"flex"}
-                        alignItems={"center"}
-                        gap={1}
-                      >
-                        <TextField
-                          required
-                          variant="standard"
-                          type="url"
-                          disabled={isUploading}
-                          value={fileLink}
-                          label={`Logo link`}
-                          placeholder="https://...."
-                          fullWidth
-                          onChange={(e) => setFileLink(e.target.value)}
-                        />
-
-                        {/* close button */}
-                        <IconButton onClick={handleCloseFileUploadLink}>
-                          <Tooltip title={"exit link"}>
-                            <Close />
-                          </Tooltip>
-                        </IconButton>
-                      </Box>
-                    </Box>
-                  )}
-                </Box>
-              )}
 
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
                 What technical skills are{" "}
@@ -930,15 +719,15 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               <Box className="w-100 mb-3">
                 <TextField
                   required
-                  disabled={isUploading}
+                  disabled={true}
                   select
                   value={job_main_doc}
                   label="Mandatory documents"
                   fullWidth
                   onChange={(e) => setJobMainDoc(e.target.value)}
                 >
-                  {SubsectionJob?.Document_Req.map((documents_req) => (
-                      <MenuItem key={documents_req} value={documents_req}>
+                  {SubsectionJob?.Document_Req?.map((documents_req, index) => (
+                      <MenuItem key={index} value={documents_req}>
                         <small style={{ fontSize: "small" }}>
                           {documents_req}
                         </small>
@@ -993,7 +782,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   fullWidth
                   onChange={(e) => setJobEntryType(e.target.value)}
                 >
-                  {SubsectionJob?.Expert_Level.map((expert_level, index) => (
+                  {SubsectionJob?.Expert_Level.map((expert_level) => (
                       <MenuItem key={expert_level} value={expert_level}>
                         <small style={{ fontSize: "small" }}>
                           {expert_level}
@@ -1019,7 +808,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   fullWidth
                   onChange={(e) => setJobExperience(e.target.value)}
                 >
-                  {SubsectionJob?.Expert_Years?.map(
+                  {SubsectionJob?.Expert_Years.map(
                       (experience_years) => (
                         <MenuItem key={experience_years} value={experience_years}>
                           <small style={{ fontSize: "small" }}>
@@ -1118,8 +907,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                     fullWidth
                     onChange={(e) => setCounty(e.target.value)}
                   >
-                    {CountiesInKenya &&
-                      CountiesInKenya.map((county) => (
+                    {CountiesInKenya?.map((county) => (
                         <MenuItem key={county} value={county}>
                           <small style={{ fontSize: "small" }}> {county}</small>
                         </MenuItem>
@@ -1213,6 +1001,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   </Stack>
                 )}
               </Box>
+
 
               {/* About your Org */}
               <Typography variant="body2" color={"text.secondary"}>
@@ -1503,17 +1292,18 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                 )}
               </Box>
 
-              {/*  button for posting */}
+              {/*  button for updating the job */}
               <Box mb={2} display={"flex"} justifyContent={"center"}>
                 <Button
-                  startIcon={<Work />}
+                  startIcon={<UpdateTwoTone />}
                   className="w-75 rounded-5 shadow-sm"
                   variant="contained"
-                  onClick={handleJobPost}
+                  color="success"
+                  onClick={handleJobPostUpdate}
                   disabled={isUploading || errorMessage}
                   size="small"
                 >
-                  Post This Job Now
+                  Update This Job Now
                 </Button>
               </Box>
             </Box>
@@ -1521,15 +1311,17 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
         </Box>
 
         {/* show logout session expired alert */}
-        <LogoutAlert
-          openAlertLogout={openAlertLogout}
-          setOpenAlertLogout={setOpenAlertLogout}
-          title="Session Expired"
-          body="Please login to complete your request,previous session has expired. We do this to deter unauthorised access to accounts."
-        />
+       {openAlertLogout && (
+         <LogoutAlert
+         openAlertLogout={openAlertLogout}
+         setOpenAlertLogout={setOpenAlertLogout}
+         title="Session Expired"
+         body="Please login to complete your request,session has expired."
+       />
+       )}
       </Box>
     </StyledModalJob>
   );
 };
 
-export default PostJobModal;
+export default JobPostUpdateModal;
