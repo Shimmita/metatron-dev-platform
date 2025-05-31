@@ -1,4 +1,4 @@
-import { Bolt, OpenInBrowser, Verified } from "@mui/icons-material";
+import { OpenInBrowser, Verified } from "@mui/icons-material";
 import {
   Avatar,
   AvatarGroup,
@@ -20,6 +20,9 @@ import { useSelector } from "react-redux";
 import ApplyJobModal from "../../modal/ApplyJobModal";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
+
+const MAX_APPLICANTS=300
+
 
 function FeaturedJobs({ isLoading, jobTop }) {
   const [openApplyJobModal, setOpenApplyJobModal] = useState();
@@ -49,9 +52,10 @@ function FeaturedJobs({ isLoading, jobTop }) {
     setOpenApplyJobModal(true);
   };
 
-  // check if the job is already applied by the
-
-
+  // job has been paused or deactivated by the poster
+  const isDeactivated=jobTop?.status==="inactive"
+    // check if job reached maxima number of applicants
+    const isMaxApplicants=jobTop?.applicants?.total>=MAX_APPLICANTS
 
   return (
     <React.Fragment>
@@ -150,6 +154,23 @@ function FeaturedJobs({ isLoading, jobTop }) {
                       ))}
                     </AvatarGroup>
                   </Box>
+
+                  {/* description if is job belongs to the current user */}
+                 {isMyJob && (
+                   <Box 
+                   display={'flex'}
+                   justifyContent={'center'}
+                   mt={1}
+                   >
+                   <Typography 
+                   textAlign={'center'}
+                    variant="caption"
+                   sx={{ color:'text.secondary', 
+                   textTransform:'lowercase' }}> - you posted this job -
+                   </Typography>
+                   </Box>
+                 )}
+
                 </Box>
               }
             />
@@ -158,36 +179,32 @@ function FeaturedJobs({ isLoading, jobTop }) {
               {/* applicants counter */}
               <Box>
                 <Typography variant="caption" color={"text.secondary"} fontWeight={'bold'}>
-                   {!(jobTop?.website==="") ? "(N/A)" :`${jobTop?.applicants?.total}/200 `}
+                   {!(jobTop?.website==="") ? "(N/A)" :`${jobTop?.applicants?.total}/300 `}
                 </Typography>
               </Box>
 
-              {isMyJob ? (
-                 <Box display={'flex'} justifyContent={'center'}>
-                  <Typography textAlign={'center'} variant="caption" sx={{ color:'text.secondary' }}>Yours</Typography>
-                </Box>
-              ):(
                 <React.Fragment>
                   {/* button apply */}
-              <Button
-                disableElevation
-                size="small"
-                onClick={handleOpeningApplyJob}
-                variant="contained"
-                startIcon={!(jobTop?.website==="") ? <OpenInBrowser /> :<Verified />}
-                disabled={jobTop?.currentUserApplied}
-                sx={{
-                  textTransform: "capitalize",
-                  borderRadius: "20px",
-                  fontSize:!CustomDeviceIsSmall() && 'x-small'
-                }}
-              >
-                {jobTop?.currentUserApplied ? "Applied":"Apply"}
-              </Button>
+                <Button
+                  disableElevation
+                  size="small"
+                  onClick={handleOpeningApplyJob}
+                  variant="contained"
+                  startIcon={!(jobTop?.website==="") ? <OpenInBrowser /> :<Verified />}
+                  disabled={jobTop?.currentUserApplied||isDeactivated || isMyJob||isMaxApplicants}
+                  sx={{
+                    textTransform: "capitalize",
+                    borderRadius: "20px",
+                    fontSize:!CustomDeviceIsSmall() && 'x-small'
+                  }}
+                >
+                  {jobTop?.currentUserApplied ? "Applied":isDeactivated ? "Paused":isMaxApplicants ? "Closed":"Apply"}
+                </Button>
                 </React.Fragment>
-              )}
+              
             </Stack>
           </ListItem>
+        
           <Divider variant="inset" component="li" />
         </List>
       )}

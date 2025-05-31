@@ -10,7 +10,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import axios from 'axios';
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import devImage from '../../../images/dev.jpeg';
 import DeleteJobAlert from '../../alerts/DeleteJobAlert';
 import JobPostUpdateModal from '../../modal/update/JobPostUpdateModal';
@@ -18,6 +18,7 @@ import CustomDeviceIsSmall from '../../utilities/CustomDeviceIsSmall';
 import CustomDeviceTablet from '../../utilities/CustomDeviceTablet';
 import { getImageMatch } from '../../utilities/getImageMatch';
 import AlertJobPreview from '../../alerts/AlertJobPreview';
+import { resetClearCurrentJobsTop } from '../../../redux/CurrentJobsTop';
 
 const columnsHeader = [
   { id: 'logo', label: 'Logo', minWidth: 170 },
@@ -106,6 +107,7 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
 
   // redux user HR manager
   const { user } = useSelector((state) => state.currentUser);
+  const dispatch=useDispatch()
 
   // track axios progress
   const [isFetching, setIsFetching] = useState(false);
@@ -165,9 +167,12 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
             withCredentials: true,
         })
         .then((res) => {
-            // update the success message from the backend
+            // update the jobs from the backend
             if (res?.data) {
             setMyJobsPosted(res.data)
+
+            // clear current jobs for fresh
+              dispatch(resetClearCurrentJobsTop())
             } 
         })
         .catch((err) => {
@@ -188,8 +193,6 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
             // false fetching
             setIsFetching(false);        
         });
-
-     
   }
 
 

@@ -379,9 +379,10 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                             <Button size='small'
                              sx={{ borderRadius:5 }}
                               endIcon={<DownloadRounded/>} 
+                              disabled={isFetching}
                               onClick={()=>handleDownload(job_applicant?.cvName,job_applicant?.jobID)
 
-                              }>download </Button>
+                              }>{isFetching ? "wait...":"download"}</Button>
                           )}
 
                           {/* message the applicant */}

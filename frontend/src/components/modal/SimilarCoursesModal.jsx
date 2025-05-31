@@ -22,6 +22,7 @@ import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CustomModalHeight from "../utilities/CustomModalHeight";
+import CustomLandScape from "../utilities/CustomLandscape";
 
 // styled modal
 const StyledModalSimilarCourses = styled(Modal)({
@@ -50,6 +51,17 @@ const SimilarCoursesModal = ({ openSimilarCourses }) => {
   // simulate array of items
   const items = Array.from(new Array(10));
 
+  // handle return width modal
+    const handleReturnWidthModal=()=>{
+      if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
+        return "40%"
+      } else if (CustomDeviceTablet()){
+        return "90%"
+      } else if(CustomLandscapeWidest()){
+        return "35%"
+      }
+      return "100%"
+    }
   return (
     <StyledModalSimilarCourses
       keepMounted
@@ -62,13 +74,7 @@ const SimilarCoursesModal = ({ openSimilarCourses }) => {
       aria-describedby="modal-modal-description"
     >
       <Box
-        width={
-          CustomLandscapeWidest()
-            ? "35%"
-            : CustomDeviceIsSmall()
-            ? "95%"
-            : "85%"
-        }
+        width={handleReturnWidthModal()}
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
         color={"text.primary"}
         display={"flex"}
@@ -161,8 +167,8 @@ const SimilarCoursesModal = ({ openSimilarCourses }) => {
             }}
           >
             <Box display={"flex"} flexDirection={"column"} gap={4}>
-              {items?.map((val, index) => (
-                <SimilarCoursesLayout />
+              {items?.map((val) => (
+                <SimilarCoursesLayout  key={val}/>
               ))}
             </Box>
           </Box>

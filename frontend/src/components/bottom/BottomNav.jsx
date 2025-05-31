@@ -1,10 +1,9 @@
-import { CachedRounded, Home, SchoolRounded, VideoCameraBackRounded, Work } from "@mui/icons-material";
+import { CachedOutlined, CachedRounded, HomeOutlined, HomeRounded, SchoolOutlined, SchoolRounded, TvOutlined, TvRounded, TvTwoTone, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
 import {
   BottomNavigation,
   BottomNavigationAction,
-  Box,
   Paper,
-  Tooltip,
+  Tooltip
 } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,12 +14,12 @@ import {
 } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CustomLandScape from "../utilities/CustomLandscape";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const BottomNav = () => {
   // redux states
-  const { isSidebarRighbar } = useSelector((state) => state.appUI);
+  const { isSidebarRighbar,isDarkMode } = useSelector((state) => state.appUI);
 
   const { position } = useSelector((state) => state.currentBottomNav);
   const { isPostSearch } = useSelector((state) => state.currentPosts);
@@ -97,9 +96,22 @@ const BottomNav = () => {
             label="Home"
             icon={
               isPostSearch ? (
-                <CachedRounded color="info" sx={{ width: 30, height: 30 }} />
+                <>
+                {isDarkMode ? (
+                  <CachedOutlined color="info" sx={{ width: 28, height: 28 }} />
+                ):(
+                  <CachedRounded color="info" sx={{ width: 28, height: 28 }} />
+                )}
+                </>
               ) : (
-                <Home sx={{ width: 32, height: 32}} />
+                <>
+                {isDarkMode ? (
+                  <HomeOutlined sx={{ width: 29, height: 29}} />
+                ):(
+                  <HomeRounded sx={{ width: 29, height: 29}} />
+                )}
+                
+                </>
               )
             }
             onClick={handleReturnHome}
@@ -110,7 +122,14 @@ const BottomNav = () => {
           <BottomNavigationAction
             onClick={handleJobContent}
             label="Jobs"
-            icon={<Work sx={{ width: 29, height: 29 }} />}
+            icon={<>
+            {isDarkMode ? (
+               <WorkOutlineOutlined sx={{ width: 28, height: 28 }} />
+            ):(
+              <WorkRounded sx={{ width: 28, height: 28 }} />
+            )}
+           
+            </>}
           />
         </Tooltip>
 
@@ -120,7 +139,14 @@ const BottomNav = () => {
           <BottomNavigationAction
             onClick={handleOpenCourses}
             label="Courses"
-            icon={<SchoolRounded sx={{ width: 32, height: 32 }} />}
+            icon={<>
+            {isDarkMode ? (
+              <SchoolOutlined sx={{ width: 30, height: 30 }} />
+            ):(
+              <SchoolRounded sx={{ width: 30, height: 30 }} />
+            )}
+            
+            </>}
           />
         </Tooltip>
 
@@ -132,7 +158,14 @@ const BottomNav = () => {
           <BottomNavigationAction
             onClick={handleJobContent}
             label="Events"
-            icon={<VideoCameraBackRounded sx={{ width: 28, height: 28 }} />}
+            icon={<>
+            {isDarkMode ?(
+               <TvRounded sx={{ width: 25, height: 25 }} />
+            ):(
+              <TvTwoTone sx={{ width: 25, height: 25 }} />
+            )}
+           
+            </>}
           />
         </Tooltip>
 

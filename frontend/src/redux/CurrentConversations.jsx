@@ -9,7 +9,7 @@ const CurrentConversations = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadate the conversations by the feed from the payload
+    // update the conversations by the feed from the payload
     updateConversations: (state, action) => {
       state.conversations = action.payload;
     },

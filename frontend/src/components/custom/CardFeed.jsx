@@ -272,26 +272,42 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     setOpenMiniProfileAlert(true);
   }, []);
 
+
+    // handle max text width
+    const handleMaxTextWidth=()=>{
+      if (CustomLandscapeWidest()) {
+        return "90%"
+      }else if(CustomDeviceTablet()){
+        return "95%"
+      } else if(CustomLandScape()){
+        return "93%"
+      }
+  
+      return "98%"
+    }
+
+
+    // handle image width
+    const handleImageWidth=()=>{
+      if(CustomDeviceIsSmall()){
+        return "100%"
+      } else if(CustomDeviceTablet()){
+        return "95%"
+      }else{
+        return "92%"
+      } 
+    }
+
   return (
     <React.Fragment>
       <Box
+      className={'rounded'}
         mb={2}
         sx={{
-          border:
-            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
-              ? "1px solid"
-              : "1px solid",
-          borderColor:
-            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
-              ? "divider"
-              : "divider",
+          border:"1px solid",
+          borderColor: "divider",
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
         }}
-        className={
-          CustomDeviceTablet() || CustomDeviceIsSmall()
-            ? "shadow p-2 rounded"
-            : "rounded p-1"
-        }
       >
         <Card elevation={0}>
           <CardHeader
@@ -465,16 +481,9 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                 <Box display={"flex"} justifyContent={"center"} width={"100%"}>
                   <Typography
                     variant={"body2"}
+                    color={isDarkMode && 'text.secondary'}
                     sx={{ fontSize:'small' }}
-                    maxWidth={
-                      CustomLandscapeWidest()
-                        ? "90%"
-                        : CustomDeviceTablet()
-                        ? "95%"
-                        : CustomLandScape()
-                        ? "93%"
-                        : "98%"
-                    }
+                    maxWidth={handleMaxTextWidth()}
                   >
                     {!isFullDescription && handleDetailsLength()}
                     {detailsLong && !isFullDescription && (
@@ -506,18 +515,12 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                   src={handlePostImagePresent()}
                   alt=""
                   height={CustomDeviceScreenSize()}
-                  width={
-                    CustomDeviceIsSmall()
-                      ? "100%"
-                      : CustomDeviceTablet()
-                      ? "95%"
-                      : "92%"
-                  }
+                  width={handleImageWidth()}
                   style={{
                     objectFit: "fill",
                     borderRadius: 10,
                     border: "1px solid",
-                    borderColor: "grey",
+                    borderColor: "gray",
                   }}
                 />
               </Box>

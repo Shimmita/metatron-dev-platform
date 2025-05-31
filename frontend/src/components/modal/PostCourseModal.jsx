@@ -295,7 +295,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
     if (handleEmptyFields()) {
       // set is uploading true
       setIsUploading(true);
-      // create a form which will faciltate parsing of the file for upload to cloud
+      // create a form which will facilitate parsing of the file for upload to cloud
       const formData = new FormData();
       // append post body after stringify it due to form data
       formData.append("course", JSON.stringify(course));
@@ -315,7 +315,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
       // performing post request
       axios
         .post(
-          `http://localhost:5000/metatron/api/v1/courses/create`,
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/create`,
           formData,
           {
             withCredentials: true,
@@ -345,6 +345,19 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
     }
   };
 
+  
+  // handle return width modal
+    const handleReturnWidthModal=()=>{
+      if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
+        return "40%"
+      } else if (CustomDeviceTablet()){
+        return "90%"
+      } else if(CustomLandscapeWidest()){
+        return "35%"
+      }
+      return "100%"
+    }
+
   return (
     <StyledModalPost
       keepMounted
@@ -357,15 +370,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
       aria-describedby="modal-modal-description"
     >
       <Box
-        width={
-          CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
-            ? "85%"
-            : CustomDeviceTablet()
-            ? "100%"
-            : CustomLandscapeWidest()
-            ? "50%"
-            : "100%"
-        }
+        width={handleReturnWidthModal()}
         p={1}
         borderRadius={5}
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}

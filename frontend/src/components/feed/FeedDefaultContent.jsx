@@ -65,7 +65,7 @@ const FeedDefaultContent = () => {
     // dispatch action for updating is loading in the redux
     dispatch(handleLoadingPostLaunch(true));
 
-    // performing post request
+    // performing get all posts request
     axios
       .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all`, {
         withCredentials: true,
@@ -101,30 +101,31 @@ const FeedDefaultContent = () => {
   }, [dispatch, posts]);
 
 
+  // handle height
+  const handleHeight=()=>{
+    if(CustomDeviceTablet()){
+      return "92vh"
+    }else if(CustomDeviceIsSmall()){
+      return "90vh"
+    }
+    return "85vh"
+  }
 
   return (
     <Box
-      height={
-        CustomDeviceTablet()
-          ? "92vh"
-          : CustomDeviceIsSmall()
-          ? "90vh"
-          : "85vh"
-      }
+      height={handleHeight()}
     >
       {/* render the post is focused for full viewing and that post detailed
       data is no null */}
-      {postDetailedData && postDetailedData ? (
+      {postDetailedData ? (
         <Box
-          height={"85vh"}
+          height={"86vh"}
           className={
             CustomDeviceTablet() ? "shadow rounded p-2" : "rounded p-2"
           }
           sx={{
-            border:
-              !CustomDeviceIsSmall() && isDarkMode ? "1px solid" : "1px solid",
-            borderColor:
-              !CustomDeviceIsSmall() && isDarkMode ? "divider" : "divider",
+            border: "1px solid",
+            borderColor:"divider",
 
             overflowX: "auto",
             // Hide scrollbar for Chrome, Safari and Opera
@@ -170,7 +171,7 @@ const FeedDefaultContent = () => {
 
           {/* scrollable container for the content */}
           <Box
-            height={"80vh"}
+            height={"81vh"}
             sx={{
               overflowX: "auto",
               // Hide scrollbar for Chrome, Safari and Opera

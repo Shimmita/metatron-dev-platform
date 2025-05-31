@@ -1,34 +1,21 @@
 import {
-  CoffeeRounded,
-  Smartphone,
-  SupportAgentRounded,
-  TipsAndUpdatesRounded
+  Smartphone
 } from "@mui/icons-material";
 import {
   Avatar,
   Badge,
   Box,
   Divider,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Skeleton,
-  styled,
-  Typography
+  styled
 } from "@mui/material";
 
-import {
-  showAboutMetatron,
-  showSponsorAlert,
-  showSupportAlert
-} from "../../redux/AppUI";
 
 import React, { lazy, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import devImage from "../../images/dev.jpeg";
-import { handleShowChatBot } from "../../redux/CurrentChatBot";
 import AlertGeneral from "../alerts/AlertGeneral";
+import PromotedAds from "../promoted/PromotedAds";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -79,7 +66,6 @@ const Sidebar = () => {
   // screen width
   const screenWidth = window.screen.availWidth;
 
-  const dispatch = useDispatch();
 
   const BoxAvatarContent = styled(Box)({
     display: "flex",
@@ -108,32 +94,7 @@ const Sidebar = () => {
     }
   };
 
-  // handle showing of technical support
-  const handleTechnicalSupport = () => {
-    dispatch(showSupportAlert(true));
-  };
-
-
-  // handle showing of the sponsorship program
-  const handleShowingSponsorship = () => {
-    dispatch(showSponsorAlert(true));
-  };
-
-  // handle the display of the metatron ai assistant
-  const handleShowAiBot = () => {
-    // close the drawer
-    dispatch(handleShowChatBot());
-  };
-
-  // handle showing about metatron platform
-  const handleShowAboutMetatron = () => {
-    dispatch(showAboutMetatron(true));
-  };
-
-  // handle showing of the alert mobile app not yet developed
-  const handleMobileApp=()=>{
-    setOpenMobileApp(prev=>!prev)
-  }
+  
   return (
     <Box
       height={"90vh"}
@@ -216,7 +177,7 @@ const Sidebar = () => {
                       </StyledBadge>
 
                     </Box>
-                    <Box display={"flex"} justifyContent={"center"} pb={1}>
+                    <Box display={"flex"} justifyContent={"center"} >
                       <SkillAvatars user={user} isDarkMode={isDarkMode} />
                     </Box>
                   </Box>
@@ -225,116 +186,12 @@ const Sidebar = () => {
             )}
           </Box>
 
-          <Divider component="div" />
-
-          <Box bgcolor={"background.default"} p={1}>
-            {isLoadingRequest ? (
-              <Skeleton variant="rectangular" width={"100%"} height={"35vh"} />
-            ) : (
-              <List>
-                {/* metatron ai chat */}
-                {/* <ListItemButton onClick={handleShowAiBot}>
-                  <ListItemIcon>
-                    <ChatBubbleRounded sx={{ width: 27, height: 27 }} />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body1">Metatron Agent</Typography>
-                    }
-                  />
-                </ListItemButton> */}
-
-                {/* customer help */}
-                <ListItemButton onClick={handleTechnicalSupport}>
-                  <ListItemIcon>
-                    <SupportAgentRounded
-                      color="primary"
-                      sx={{ width: 24, height: 24 }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">Technical Team</Typography>
-                    }
-                  />
-                </ListItemButton>
-
-                {/* install app */}
-                <ListItemButton onClick={handleMobileApp}>
-                  <ListItemIcon>
-                    <Smartphone
-                      color="primary"
-                      sx={{ width: 26, height: 26 }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">Download App</Typography>
-                    }
-                  />
-                </ListItemButton>
-
-                {/* sponsor us */}
-                <ListItemButton onClick={handleShowingSponsorship}>
-                  <ListItemIcon>
-                    <CoffeeRounded
-                      color="primary"
-                      sx={{ width: 26, height: 26 }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">Sponsor Team</Typography>
-                    }
-                  />
-                </ListItemButton>
-
-                {/* about metatron */}
-                <ListItemButton onClick={handleShowAboutMetatron}>
-                  <ListItemIcon>
-                    <TipsAndUpdatesRounded
-                      color="primary"
-                      sx={{ width: 24, height: 24 }}
-                    />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={
-                      <Typography variant="body2">About Metatron</Typography>
-                    }
-                  />
-                </ListItemButton>
-
-              </List>
-            )}
+          {/* promoted ads  */}
+          <Box width={'100%'} sx={{ 
+           }}>
+            <PromotedAds isDarkMode={isDarkMode}/>
           </Box>
-
-          {/* events to be implemented later */}
-          {/* box for Events displayed for tablets only */}
-          {/* {CustomDeviceTablet() && (
-            <React.Fragment>
-              <Box bgcolor={"background.default"} className="p-1">
-                <Box
-                  display={"flex"}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                >
-                  <Typography fontWeight={"bold"} color={"primary"}>
-                    DEV SPACE EVENTS
-                  </Typography>
-                </Box>
-
-                {isLoadingRequest ? (
-                  <Skeleton
-                    variant="rectangular"
-                    width={"100%"}
-                    height={"20vh"}
-                  />
-                ) : (
-                  <EventsTablet />
-                )}
-              </Box>
-            </React.Fragment>
-          )} */}
+          
         </Box>
       </Box>
 

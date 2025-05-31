@@ -38,6 +38,20 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
   const handleCloseModalPeople = () => {
     dispatch(resetClearPeopleData());
   };
+
+
+   // handle return width modal
+    const handleReturnWidthModal=()=>{
+      if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
+        return "40%"
+      } else if (CustomDeviceTablet()){
+        return "90%"
+      } else if(CustomLandscapeWidest()){
+        return "35%"
+      }
+      return "100%"
+    }
+    
   return (
     <StyledModalPeople
       keepMounted
@@ -50,15 +64,7 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
       aria-describedby="modal-modal-description"
     >
       <Box
-        width={
-          CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
-            ? "40%"
-            : CustomDeviceTablet()
-            ? "90%"
-            : CustomLandscapeWidest()
-            ? "35%"
-            : "100%"
-        }
+        width={handleReturnWidthModal()}
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
         color={"text.primary"}
         display={"flex"}

@@ -66,10 +66,8 @@ function PostDetailsRouted() {
             : "rounded"
         }
         sx={{
-          border:
-            !(CustomDeviceIsSmall() || CustomDeviceTablet()) && "1px solid",
-          borderColor:
-            !(CustomDeviceIsSmall() || CustomDeviceTablet()) && "divider",
+          border: "1px solid",
+          borderColor:"divider",
           overflowX: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {

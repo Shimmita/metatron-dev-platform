@@ -204,7 +204,6 @@ function ProfileUpdate({ user }) {
         {/* display message response from the backend */}
         {/* message from backend of connect request */}
         {responseMessage && (
-          <React.Fragment>
             <Collapse in={responseMessage || false}>
               <Alert
                 severity="info"
@@ -224,7 +223,6 @@ function ProfileUpdate({ user }) {
                 {responseMessage}
               </Alert>
             </Collapse>
-          </React.Fragment>
         )}
 
         {/* avatar image for updating */}
@@ -264,11 +262,10 @@ function ProfileUpdate({ user }) {
         <Box display={"flex"} justifyContent={"center"}>
           {/* avatar skills */}
           <AvatarGroup max={user?.selectedSkills?.length}>
-            {/* loop through the skills and their images matched using custim fn */}
+            {/* loop through the skills and their images matched using custom fn */}
             {user?.selectedSkills?.map((skill, index) => (
-              <Tooltip title={skill} arrow>
+              <Tooltip title={skill} key={skill} arrow>
                 <Avatar
-                  key={index}
                   alt={skill}
                   className="border"
                   sx={{ width: 32, height: 32 }}
@@ -404,8 +401,7 @@ function ProfileUpdate({ user }) {
               fullWidth
               onChange={(e) => setCounty(e.target.value)}
             >
-              {CountiesInKenya &&
-                CountiesInKenya.map((county) => (
+              {CountiesInKenya?.map((county) => (
                   <MenuItem key={county} value={county}>
                     {county}
                   </MenuItem>

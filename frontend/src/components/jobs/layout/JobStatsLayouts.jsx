@@ -221,9 +221,13 @@ function JobStatsLayout({ isDarkMode, job,user }) {
     </Box>
     {/* conclusion results here */}
     <Box display={'flex'} justifyContent={'space-around'} alignItems={'center'}>
-    <Typography mt={1} variant="caption" fontSize={'small'} sx={{ color:'text.secondary' }}>- results are :&nbsp;{job?.status} -</Typography>
-    {/* status rejected show delete button */}
-    {job?.status==="rejected" && (
+      {!job?.isAvailable ? (
+            <Typography mt={1} variant="caption" fontSize={'small'} sx={{ color:'text.secondary' }}>-job no longer available -</Typography>
+      ):(
+        <Typography mt={1} variant="caption" fontSize={'small'} sx={{ color:'text.secondary' }}>- results are :&nbsp;{job?.status} -</Typography>
+      )}    
+    {/* status rejected or !isAvailable show delete button */}
+    {(job?.status==="rejected" || !job?.isAvailable) && (
       <Button variant="text"
        size="small"
        onClick={handleDeleteJobApplication}

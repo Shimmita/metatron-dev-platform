@@ -10,17 +10,21 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import { Close, SendOutlined } from "@mui/icons-material";
+import { Close, FullscreenOutlined, SendOutlined } from "@mui/icons-material";
 
 import axios from "axios";
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  handleSetPostEditIdModal,
   handleShowingSpeedDial,
+  handleShowPostEditModal,
   handleUpdateIsPostDetailed,
+  showUserProfileDrawer,
 } from "../../redux/AppUI";
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
+import { resetClearCurrentPostReactions } from "../../redux/CurrentPostReactions";
 
 const MAX_TEXT_LENGTH=100
 
@@ -32,6 +36,7 @@ function PostDetailsContainer({
   isPostEditMode = false,
   setIsPostEditMode,
 }) {
+
   // hold temporarily the post param, could mutate its values
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -83,8 +88,13 @@ function PostDetailsContainer({
         }
       )
       .then((res) => {
+        
         // update passedPost with the returned post object
         setPostDetailedData(res.data);
+
+        // reset post reactions through clearing redux
+        dispatch(resetClearCurrentPostReactions())
+        
       })
       .catch(async (err) => {
         if (err?.code === "ERR_NETWORK") {
@@ -118,15 +128,40 @@ function PostDetailsContainer({
     dispatch(handleUpdateIsPostDetailed(false));
   };
 
+  // handle showing of the post details outside drawer panel.
+  const handleShowPostDetailedNoDrawer=()=>{
+
+    // update the redux ui state for post edit mode true
+    dispatch(handleShowPostEditModal(true))
+    
+    // update the Id of the post detailed data
+    dispatch(handleSetPostEditIdModal(postDetailedData?._id))
+
+    // close drawer profile
+    dispatch(showUserProfileDrawer())
+
+  }
+
   return (
-    <Stack gap={1}>
+    <Stack 
+    gap={1} 
+    >
       {isPostEditMode ? (
         <React.Fragment>
           {/* close button */}
-          <Box display={"flex"} justifyContent={"flex-end"} p={1}>
+          <Box display={"flex"} justifyContent={"flex-end"} alignItems={'center'} p={1}>
+            {/* full screen */}
+          {isDrawerFocused && (
+             <Tooltip arrow title={"wide"}>
+             <IconButton onClick={handleShowPostDetailedNoDrawer}>
+               <FullscreenOutlined sx={{ width: 15, height: 15 }} color="primary" />
+             </IconButton>
+           </Tooltip>
+          )}
+            {/* close  the post */}
             <Tooltip arrow title={"close"}>
               <IconButton onClick={handleClearPostDetailedData}>
-                <Close sx={{ width: 15, height: 15 }} color="primary" />
+                <Close sx={{ width: 14, height: 14 }} color="primary" />
               </IconButton>
             </Tooltip>
           </Box>
@@ -217,13 +252,13 @@ function PostDetailsContainer({
             alignItems={"center"}
             width={"100%"}
             p={1}
-            mb={2}
+            mb={5}
             bgcolor={"background.default"}
             className={'rounded'}
             sx={{ border:'1px solid', borderColor:'divider' }}
           >
             {/* input for comment */}
-            <Box width={"100%"}>
+            <Box width={"100%"} mx={1}>
               <InputBase
                 multiline
                 value={comment}
@@ -245,7 +280,7 @@ function PostDetailsContainer({
               ) : (
                 <Badge badgeContent={`${MAX_TEXT_LENGTH - comment.length}`}>
                   <IconButton
-                    disabled={comment.length > MAX_TEXT_LENGTH}
+                    disabled={comment.length > MAX_TEXT_LENGTH || comment.length<1}
                     onClick={handleSendCommentNow}
                   >
                     <SendOutlined

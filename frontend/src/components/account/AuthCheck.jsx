@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { persistor } from "../../redux/AppStore";
 import { updateCurrentAuthMessage } from "../../redux/CurrentAuthMessages";
-import { resetClearCurrentUserRedux } from "../../redux/CurrentUser";
 import LoginAuth from "../auth/LoginAuth";
 
 const AuthCheck = ({ children }) => {
@@ -12,7 +11,7 @@ const AuthCheck = ({ children }) => {
   // from the server
   const { isOnline } = useSelector((state) => state.currentUser);
   const [isAuthorised, setIsAuthorised] = useState(isOnline);
-
+  
   const dispatch = useDispatch();
   // axios to confirm with the server validity of the online status of frontend
   axios.defaults.withCredentials = true;
@@ -23,8 +22,13 @@ const AuthCheck = ({ children }) => {
       setIsAuthorised(res.data.authorised);
     })
     .catch(async (err) => {
+
+      // update user authorised to false
       setIsAuthorised(false);
-      // logout if any firebase user
+
+        // update authMessage error in redux for display on auth pages
+        dispatch(updateCurrentAuthMessage(err?.response?.data));
+
       // clear any firebase authentication details
       const auth = getAuth();
       const firebaseUser = auth?.currentUser;
@@ -32,13 +36,9 @@ const AuthCheck = ({ children }) => {
         await signOut(auth);
       }
 
-      // Clear persisted storage and redux
+      //final clearance of any persisted storage
       await persistor.purge();
-      // reset user information for auto logout
-      dispatch(resetClearCurrentUserRedux());
-
-      // update authMessage error in redux for display on auth pages
-      dispatch(updateCurrentAuthMessage(err?.response?.data));
+      
     });
 
   // check login status before proceeding

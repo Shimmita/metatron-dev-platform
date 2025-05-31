@@ -21,6 +21,8 @@ const initialState = {
   isOpenSupportAlert: false,
   isOpenSponsorAlert: false,
   isOpenAboutMetatron: false,
+  isPostEditModal:false,
+  postEditUniqueId:"",
 
   // theme
   isDarkMode: false,
@@ -73,6 +75,17 @@ const appUISliceReducerSlice = createSlice({
     handleUpdateIsPostDetailed: (state, action) => {
       state.isPostDetailed = action.payload;
     },
+
+    // handle opening and closing of post edit modal
+    handleShowPostEditModal:(state,action)=>{
+      state.isPostEditModal=action.payload
+    },
+
+    // set the postEditId
+    handleSetPostEditIdModal:(state,action)=>{
+      state.postEditUniqueId=action.payload
+    },
+
     // reset the to default the showing of the default bottom nav
     resetDefaultBottomNav: (state) => {
       state.isDefaultBottomNav = true;
@@ -171,6 +184,9 @@ const appUISliceReducerSlice = createSlice({
         isOpenSponsorAlert: false,
         isOpenSupportAlert: false,
         isOpenAboutMetatron: false,
+        isPostEditModal:false,
+        postEditUniqueId:'',
+        isDarkMode:false
       };
     },
   },
@@ -198,7 +214,9 @@ export const {
   handleUpdateIsPostDetailed,
   showSponsorAlert,
   showSupportAlert,
-  showAboutMetatron
+  showAboutMetatron,
+  handleShowPostEditModal,
+  handleSetPostEditIdModal,
 } = appUISliceReducerSlice.actions;
 
 // export the appUISliceReducer for universal purposes

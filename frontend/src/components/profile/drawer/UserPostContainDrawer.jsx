@@ -4,9 +4,8 @@ import {
   CircularProgress,
   Collapse,
   IconButton,
-  LinearProgress,
   Stack,
-  Typography,
+  Typography
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";

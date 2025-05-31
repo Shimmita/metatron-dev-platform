@@ -26,6 +26,9 @@ import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../utilities/getImageMatch";
+import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
+import CustomLandScape from "../utilities/CustomLandscape";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 // styled modal
 const StyledModalJob = styled(Modal)({
@@ -47,6 +50,7 @@ const StyledInput = styled("input")({
   width: 1,
 });
 
+
 const ApplyJobModal = ({
   openApplyJobModal,
   setOpenApplyJobModal,
@@ -59,7 +63,7 @@ const ApplyJobModal = ({
   salary,
   skills,
   location,
-  isFullView = false,
+  
 }) => {
   const [cvUpload, setCvUpload] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -116,8 +120,13 @@ const ApplyJobModal = ({
         }
       )
       .then((res) => {
+
+        // reset the current featured jobs for refetch to effect
+        dispatch(resetClearCurrentJobsTop())
+
         // snackbar success message from the backend update redux state
         dispatch(updateCurrentSnackBar(res.data));
+
         // close the currently displayed modal
         handleClosingModal();
       })
@@ -153,6 +162,19 @@ const ApplyJobModal = ({
     return finalName;
   };
 
+
+  // handle return width modal
+  const handleReturnWidthModal=()=>{
+    if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
+      return "60%"
+    } else if (CustomDeviceTablet()){
+      return "90%"
+    } else if(CustomLandscapeWidest()){
+      return "35%"
+    }
+    return "100%"
+  }
+
   return (
     <StyledModalJob
       keepMounted
@@ -162,9 +184,7 @@ const ApplyJobModal = ({
       aria-describedby="modal-modal-description"
     >
       <Box
-        width={
-          CustomDeviceIsSmall() ? "100%":CustomDeviceTablet()?"80%":"40%"
-     }
+        width={handleReturnWidthModal()}
         p={1}
         borderRadius={5}
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
@@ -250,7 +270,7 @@ const ApplyJobModal = ({
             {errorMessage ? (
               <Collapse in={errorMessage || false}>
                 <Alert
-                  severity="warning"
+                  severity="info"
                   onClick={() => setErrorMessage("")}
                   className="rounded-5"
                   action={
@@ -404,7 +424,7 @@ const ApplyJobModal = ({
                       >
                         {" "}
                         Upload your latest version of Curriculum Vitae (CV) in
-                        the format of PDF (.pdf) or Microsoft Document (.docx)
+                        the format of PDF (.pdf) only.
                       </Typography>
 
                       {cvUpload && (
@@ -447,7 +467,7 @@ const ApplyJobModal = ({
                           Upload CV
                           <StyledInput
                             type="file"
-                            accept="application/pdf, .docx"
+                            accept="application/pdf"
                             onChange={handleCVFile}
                             multiple
                           />

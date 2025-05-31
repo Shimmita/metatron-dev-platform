@@ -13,6 +13,7 @@ import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import axios from "axios";
 import { updateMessageConnectRequest } from "../../redux/CurrentSnackBar";
+import { resetClearConversations } from "../../redux/CurrentConversations";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -78,6 +79,10 @@ export default function AlertInputMessage({
         );
         //update the conversation with the one returned from the backend
         if (response.data) {
+          // reset conversations by clearing the info in redux for auto refetch
+          dispatch(resetClearConversations())
+          
+          // update notification
           dispatch(updateMessageConnectRequest("message has been sent"));
         
         }

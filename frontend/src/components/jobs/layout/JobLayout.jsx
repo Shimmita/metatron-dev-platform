@@ -26,9 +26,10 @@ import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../../utilities/getImageMatch";
 import { useSelector } from "react-redux";
 
+const MAX_APPLICANTS=300
+
 function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
   const [openModal, setOpenApplyJobModal] = useState(false);
-
 
   // redux states
     const { user } = useSelector((state) => state.currentUser);
@@ -74,6 +75,13 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
     }
     return job?.entry?.level?.split(" ")[0];
   };
+
+
+  // job has been paused or deactivated by the poster
+  const isDeactivated=job?.status==="inactive"
+
+  // check if job reached maxima number of applicants
+  const isMaxApplicants=job?.applicants?.total>=MAX_APPLICANTS
 
   return (
     <Stack
@@ -189,7 +197,7 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
           <Box display={"flex"} gap={1} alignItems={"center"}>
             <PeopleRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
-              Current Applications {!(job?.website==="") ? "(N/A)":`${job?.applicants?.total}/200`}
+              Current Applications {!(job?.website==="") ? "(N/A)":`${job?.applicants?.total}/300`}
             </Typography>
           </Box>
           <Box display={"flex"} gap={1} alignItems={"center"}>
@@ -219,11 +227,11 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
           disableElevation
           className={"w-50"}
           endIcon={<VerifiedRounded />}
-          disabled={job?.currentUserApplied}
+          disabled={job?.currentUserApplied || isMaxApplicants}
           onClick={handleShowingApply}
           sx={{ borderRadius: "20px", mb: 1, width: "80%",fontSize:'small', textTransform:'capitalize' }}
         >
-          {job?.currentUserApplied ? "Applied":"Apply Now"}
+          {job?.currentUserApplied ? "Applied":isDeactivated ? "Paused":isMaxApplicants ? "Closed":"Apply"}
         </Button>
       ) : (
         <Button
@@ -231,12 +239,18 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
           color="primary"
           className={"w-50"}
           size="small"
+          disabled={isDeactivated}
           disableElevation
           endIcon={<OpenInBrowser />}
           onClick={handleShowingApply}
-          sx={{ borderRadius: "20px", mb: 1, width: "80%",fontSize:'small',textTransform:'capitalize' }}
+          sx={{ 
+            borderRadius: "20px",
+             mb: 1, 
+             width: "80%",
+             fontSize:'small',
+             textTransform:'capitalize' }}
         >
-          Apply Now
+          {isDeactivated ? "paused":"apply"}
         </Button>
       )}
         </React.Fragment>
@@ -259,7 +273,6 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
         isFullView={true}
       />
       )}
-      
         </React.Fragment>
       )}
      

@@ -132,8 +132,6 @@ const ConversationDetailed = ({
       if (response.data) {
         // set conversation to the response returned from the server which is last message sent
         setConversationMessages((prev) => [...prev, response.data]);
-
-       
       }
     } catch (err) {
       // error occurred during fetch query

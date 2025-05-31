@@ -19,10 +19,11 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
+import { resetClearConversations } from "../../../redux/CurrentConversations";
 
 const Search = styled("div")(({ theme }) => ({
   border: "1px solid",
@@ -76,8 +77,10 @@ function NewConversation({ handleFabClicked }) {
   const [isFetching, setIsFetching] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
+
   // redux states
   const { user } = useSelector((state) => state.currentUser);
+  const dispatch=useDispatch()
 
   const handleSearch = async (event) => {
     const value = event.target.value;
@@ -132,7 +135,9 @@ function NewConversation({ handleFabClicked }) {
         conversation
       );
       if (response.data) {
-   
+        // reset clear all the current conversation messages for redux to trigger refetch
+        dispatch(resetClearConversations())
+        
         // revere the state which will display conversations
         handleFabClicked();
       }

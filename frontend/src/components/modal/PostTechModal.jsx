@@ -325,6 +325,19 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     dispatch(showPostModalRedux());
   };
 
+
+  // handle return width modal
+    const handleReturnWidthModal=()=>{
+      if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
+        return "40%"
+      } else if (CustomDeviceTablet()){
+        return "90%"
+      } else if(CustomLandscapeWidest()){
+        return "35%"
+      }
+      return "100%"
+    }
+
   return (
     <StyledModalPost
     keepMounted
@@ -337,15 +350,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     aria-describedby="modal-modal-description"
   >
     <Box
-      width={
-        CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
-          ? "70%"
-          : CustomDeviceTablet()
-          ? "90%"
-          : CustomLandscapeWidest()
-          ? "35%"
-          : "100%"
-      }
+      width={handleReturnWidthModal()}
       p={1}
       borderRadius={5}
       bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
@@ -398,7 +403,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     <IconButton aria-label="close" color="inherit" size="small">
                       <Close
                         fontSize="inherit"
-                        sx={{ width: 15, height: 15 }}
+                        sx={{ width: 14, height: 14 }}
                       />
                     </IconButton>
                   }

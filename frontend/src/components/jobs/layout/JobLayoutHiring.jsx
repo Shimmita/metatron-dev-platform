@@ -199,10 +199,9 @@ function JobLayoutHiring({ isDarkMode, job, textOption = "",setIsApplicantsTable
         size="small"
         onClick={handleOpenApplicantsTable}
         disableElevation
-        disabled={job?.applicants?.total===0}
         sx={{ borderRadius: "20px", mb:1, width: "60%",fontSize:'x-small', textTransform:'capitalize', }}
         >
-        Assess {job?.applicants?.total}
+        Assess {job?.applicants?.total-job?.applicants?.assessed}
     </Button>
       )}
 

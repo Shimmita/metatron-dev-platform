@@ -2,10 +2,11 @@ import { Message } from "@mui/icons-material";
 import { Box, Fab, Tooltip } from "@mui/material";
 import axios from "axios";
 import React, { useCallback, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ConversationDetailed from "./ConversationDetailed";
 import ConversationLayout from "./layout/ConversationLayout";
 import NewConversation from "./layout/NewConversation";
+import { resetClearConversations } from "../../redux/CurrentConversations";
 
 export default function ConversationsContainer({ setMessageNotifClicked }) {
   // axios default credentials
@@ -24,7 +25,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
   // get redux states
   const { user } = useSelector((state) => state.currentUser);
   const { conversations } = useSelector((state) => state.currentConversation);
-
+  const dispatch=useDispatch()
 
   // extracting user id
   const { _id: currentUserID } = user;
@@ -48,6 +49,9 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
 
   // handle message clicked
   const handleConversationClicked = async () => {
+
+  
+
     if (focusedConveration) {
       // update the attribute sender or target read the conversation based on the current user
       // usually the current user should not be the one updated but target,
@@ -116,7 +120,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
                     <ConversationLayout
                       conversation={conversation}
                       handleConversationClicked={handleConversationClicked}
-                      key={index}
+                      key={conversation}
                       currentUserName={user?.name}
                       currentUserID={currentUserID}
                       setFocusedConversation={setFocusedConversation}
@@ -124,7 +128,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
                   ))}
               </Box>
             ) : (
-              // show message details and pass props for altering its state of visbility
+              // show message details and pass props for altering its state of visibility
               <Box>
                 <ConversationDetailed
                   handleConversationClicked={handleConversationClicked}
@@ -142,6 +146,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
               <Fab
                 color="primary"
                 aria-label="start a new message conversation"
+                disabled={isFetching}
                 onClick={handleFabClicked}
                 sx={{ left: "46%", mt: 10 }}
               >

@@ -53,6 +53,7 @@ import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import PostEditModal from "../modal/PostEditModal";
 const PeopleModal = lazy(() => import("../modal/PeopleModal"));
 const AlertGlobalSearch = lazy(() => import("../alerts/AlertGlobalSearch"));
 const ProfileDrawer = lazy(() => import("../profile/drawer/ProfileDrawer"));
@@ -136,7 +137,8 @@ const Navbar = ({mode,setMode}) => {
     isOpenSupportAlert,
     isOpenAboutMetatron,
     isOpenDrawerProfile,
-    isOpenMessageDrawer
+    isOpenMessageDrawer,
+    isPostEditModal
   } = useSelector((state) => state.appUI);
 
   const handleShowMobileSearch = () => {
@@ -708,6 +710,11 @@ const Navbar = ({mode,setMode}) => {
           PeopleConnect={peopleData}
         />
 
+         {/* show alert post edit modal when triggered by redux */}
+            {isPostEditModal && (
+              <PostEditModal/>
+            )}
+
         {/* show alert search results global */}
         <AlertGlobalSearch
           openAlert={openAlertResults}
@@ -735,10 +742,6 @@ const Navbar = ({mode,setMode}) => {
           <DrawerSmartphone
             openDrawer={openDrawer}
             setOpenDrawer={setOpenDrawer}
-            mode={mode}
-            setMode={setMode}
-            openModalEventAdd={openModalEventAdd}
-            setOpenModalEventAdd={setOpenModalEventAdd}
           />
 
           {/* holds the notification and messaging drawer */}

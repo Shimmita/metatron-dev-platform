@@ -445,6 +445,17 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
       }
   }
 
+  // handle return width modal
+      const handleReturnWidthModal=()=>{
+        if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
+          return "40%"
+        } else if (CustomDeviceTablet()){
+          return "90%"
+        } else if(CustomLandscapeWidest()){
+          return "35%"
+        }
+        return "100%"
+      }
 
   return (
     <StyledModalJob
@@ -458,15 +469,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
       aria-describedby="modal-modal-description"
     >
       <Box
-        width={
-          CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
-            ? "70%"
-            : CustomDeviceTablet()
-            ? "90%"
-            : CustomLandscapeWidest()
-            ? "35%"
-            : "100%"
-        }
+        width={handleReturnWidthModal()}
         p={1}
         borderRadius={5}
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}

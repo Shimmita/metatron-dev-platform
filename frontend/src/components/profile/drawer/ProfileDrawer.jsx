@@ -135,17 +135,24 @@ export default function ProfileDrawer() {
     setIsProfileUpdate((prev) => !prev);
   };
 
+  // handle the width of the drawer
+  const handleDrawerWidth=()=>{
+    if (CustomDeviceSmallest()) {
+      return 275
+    }else if(CustomDeviceIsSmall()){
+      return 330
+    }else if (CustomDeviceTablet()) {
+      return 450
+    }
+
+    return 400
+  }
+
   return (
     <Drawer anchor={"right"} open={isOpenDrawerProfile} onClose={handleClose}>
       <Box
         width={
-          CustomDeviceSmallest()
-            ? 275
-            : CustomDeviceIsSmall()
-            ? 330
-            : CustomDeviceTablet()
-            ? 450
-            : 400
+         handleDrawerWidth()
         }
         bgcolor={"background.default"}
       >
@@ -251,11 +258,11 @@ export default function ProfileDrawer() {
               <React.Fragment>
                 {/* show default profile if is no update setting clicked */}
                 {isProfileUpdate ? (
-                  <Box height={"85vh"}>
+                  <Box height={CustomDeviceTablet()||CustomDeviceIsSmall() ? "94vh":"88.8vh"}>
                     <ProfileUpdate user={nativeLoggedinUser} />
                   </Box>
                 ) : (
-                  <Box height={"85vh"} p={"5px"}>
+                  <Box height={CustomDeviceTablet()||CustomDeviceIsSmall() ? "94vh":"88.8vh"} p={"5px"}>
                     {temporaryProfileData ? (
                       <UserProfileDrawer profileData={temporaryProfileData} />
                     ) : (

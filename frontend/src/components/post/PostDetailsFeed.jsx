@@ -74,25 +74,25 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   justifyContent: "center",
 }));
 
+// controls the width of the input text
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
-  width: CustomDeviceIsSmall()
-    ? "32ch"
-    : CustomDeviceTablet()
-    ? "40ch"
-    : "45ch",
+  
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
     // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(3)})`,
   },
+  fontSize:'small'
 }));
+
 
 const PostDetailsFeed = ({
   postDetailedData,
   setPostDetailedData,
   isPostEditMode = false,
 }) => {
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
   const openMenu = Boolean(anchorEl);
@@ -142,11 +142,7 @@ const PostDetailsFeed = ({
     );
 
   // controls the length of description shown for each devices
-  const max_description = CustomDeviceIsSmall()
-    ? 122
-    : CustomLandScape()
-    ? 182
-    : 220;
+  const max_description = CustomDeviceIsSmall()? 122: CustomLandScape() ? 182  : 220;
   const details = PostData?.details || "";
   const detailsLong = details.length > max_description;
 
@@ -319,13 +315,37 @@ const PostDetailsFeed = ({
       });
   };
 
- 
 
   // handle close alert delete
   const handleClose = () => {
     // close alert
     setMessageResponse("");
   };
+ 
+  // handle max text width
+  const handleMaxTextWidth=()=>{
+    if (CustomLandscapeWidest()) {
+      return "90%"
+    }else if(CustomDeviceTablet()){
+      return "95%"
+    } else if(CustomLandScape()){
+      return "93%"
+    }
+
+    return "98%"
+  }
+
+  
+  // handle image width
+    const handleImageWidth=()=>{
+      if(CustomDeviceIsSmall()){
+        return "100%"
+      } else if(CustomDeviceTablet()){
+        return "95%"
+      }else{
+        return "92%"
+      } 
+    }
 
   return (
     <React.Fragment>
@@ -356,9 +376,11 @@ const PostDetailsFeed = ({
       )}
 
       <Card
+      className="rounded"
         style={{
-          border: openMenu && isDarkMode ? "1px solid gray" : undefined,
+          border: openMenu  ? "1px solid" : undefined,
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
+          borderColor:'divider'
         }}
         elevation={0}
       >
@@ -510,8 +532,9 @@ const PostDetailsFeed = ({
                   className="rounded"
                   sx={{
                     mr: 2,
-                    border: !isDarkMode && "1px solid",
-                    borderColor: "gray",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    width:'100%'
                   }}
                 >
                   <SearchIconWrapper>
@@ -558,17 +581,10 @@ const PostDetailsFeed = ({
               >
                 <Box display={"flex"} justifyContent={"center"} width={"100%"}>
                   <Typography
+                  color={isDarkMode && 'text.secondary'}
                   sx={{ fontSize:'small' }}
                     variant={"body2"}
-                    maxWidth={
-                      CustomLandscapeWidest()
-                        ? "90%"
-                        : CustomDeviceTablet()
-                        ? "95%"
-                        : CustomLandScape()
-                        ? "93%"
-                        : "98%"
-                    }
+                    maxWidth={handleMaxTextWidth()}
                   >
                     {!isFullDescription && handleDetailsLength()}
                     {detailsLong && !isFullDescription && (
@@ -605,13 +621,7 @@ const PostDetailsFeed = ({
                   src={handlePostImagePresent()}
                   alt=""
                   height={CustomDeviceScreenSize()}
-                  width={
-                    CustomDeviceIsSmall()
-                      ? "95%"
-                      : CustomDeviceTablet()
-                      ? "95%"
-                      : "92%"
-                  }
+                  width={handleImageWidth()}
                   style={{
                     objectFit: "fill",
                     borderRadius: 10,

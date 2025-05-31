@@ -11,13 +11,13 @@ const currentUser = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadte  user and online status to true
+    // update  user and online status to true
     updateUserCurrentUserRedux: (state, action) => {
       state.user = action.payload;
       state.isOnline = true;
     },
 
-    // nullify user and fale online
+    // nullify user and false online
     resetClearCurrentUserRedux: (state) => {
       state.user = null;
       state.isOnline = false;

@@ -87,6 +87,19 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd }) => {
     e.preventDefault();
   };
 
+
+   // handle return width modal
+    const handleReturnWidthModal=()=>{
+      if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
+        return "60%"
+      } else if (CustomDeviceTablet()){
+        return "90%"
+      } else if(CustomLandscapeWidest()){
+        return "35%"
+      }
+      return "100%"
+    }
+
   return (
     <StyledModalEvent
       keepMounted
@@ -99,15 +112,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd }) => {
       aria-describedby="modal-modal-description"
     >
       <Box
-        width={
-          CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)
-            ? "85%"
-            : CustomDeviceTablet()
-            ? "100%"
-            : CustomLandscapeWidest()
-            ? "35%"
-            : "100%"
-        }
+        width={handleReturnWidthModal()}
         p={1}
         borderRadius={5}
         bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
