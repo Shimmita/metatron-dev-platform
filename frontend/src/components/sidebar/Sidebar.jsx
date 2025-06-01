@@ -5,7 +5,6 @@ import {
   Avatar,
   Badge,
   Box,
-  Divider,
   Skeleton,
   styled
 } from "@mui/material";
@@ -15,7 +14,6 @@ import React, { lazy, useState } from "react";
 import { useSelector } from "react-redux";
 import devImage from "../../images/dev.jpeg";
 import AlertGeneral from "../alerts/AlertGeneral";
-import PromotedAds from "../promoted/PromotedAds";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -123,14 +121,8 @@ const Sidebar = () => {
         width={correctWidthInPercentage()}
         maxHeight={"88vh"}
         sx={{
-          border:
-            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
-              ? "1px solid"
-              : "1px solid",
-          borderColor:
-            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
-              ? "divider"
-              : "divider",
+          border:"1px solid",
+          borderColor:"divider",
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -146,7 +138,7 @@ const Sidebar = () => {
             {isLoadingRequest ? (
               <Box width={"100%"}>
                 <Box mb={1} display={"flex"} justifyContent={"center"}>
-                  <Skeleton variant="circular" width={70} height={70} />
+                  <Skeleton variant="circular" width={80} height={80} />
                 </Box>
                 <Skeleton variant="rectangular" height={"20vh"} />
               </Box>
@@ -186,11 +178,7 @@ const Sidebar = () => {
             )}
           </Box>
 
-          {/* promoted ads  */}
-          <Box width={'100%'} sx={{ 
-           }}>
-            <PromotedAds isDarkMode={isDarkMode}/>
-          </Box>
+        {/* to add content here any */}
           
         </Box>
       </Box>

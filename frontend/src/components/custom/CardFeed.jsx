@@ -336,7 +336,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
                   mt={1}
                   alignItems={"center"}
                 >
-                  <Typography variant="caption" mr={2}>
+                  <Typography variant="caption" mr={1}>
                     {getElapsedTime(post?.createdAt)}
                   </Typography>
 
@@ -377,9 +377,13 @@ const CardFeed = ({ post, setPostDetailedData }) => {
 
                 {/* if post edited */}
                 {post?.post_edited && (
-                  <Box display={"flex"} justifyContent={"flex-end"} pr={2}>
-                    <Typography color={"text.secondary"} variant="caption">
-                      Edited
+                  <Box display={"flex"} justifyContent={"flex-end"} mr={2}>
+                    <Typography 
+                    color={"text.secondary"} 
+                    variant="caption"
+                    
+                    >
+                      edited
                     </Typography>
                   </Box>
                 )}

@@ -3,16 +3,16 @@ import {
   Avatar,
   AvatarGroup,
   Box,
+  Divider,
   Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
 import React from "react";
 import { getImageMatch } from "../utilities/getImageMatch";
-
 export default function SkillAvatars({ user, isDarkMode }) {
   return (
-    <Box display={"flex"} justifyContent={"center"} mb={1}>
+    <Box display={"flex"} justifyContent={"center"} my={2}>
       <Stack gap={1}>
         {/* skills avatars */}
         <Box display={"flex"} justifyContent={"center"}>
@@ -61,34 +61,36 @@ export default function SkillAvatars({ user, isDarkMode }) {
           />
         </Typography>
 
+        {/* divider */}
+        <Divider component={'div'} className="w-100 p-2"/>
+
         {/* about */}
         <Box
           maxWidth={275}
           display={"flex"}
           justifyContent={"center"}
+          flexDirection={'column'}
           px={"4px"}
         >
-          {user?.about && user?.about ? (
+          {/* about me */}
+          <Typography 
+          textAlign={'center'} 
+          variant="body2" 
+          sx={{ fontSize:'small' }}>
+            About Me
+          </Typography>
+
+          {user?.about && user?.about && (
             <Typography
               textTransform={"capitalize"}
               variant="caption"
               p={1}
               width={"100%"}
-              color={"text.secondary"}
+              color={isDarkMode ? "text.secondary":"inherit"}
             >
               {user?.about}
             </Typography>
-          ) : (
-            <Typography
-              textTransform={"capitalize"}
-              variant="body2"
-              width={"100%"}
-              color={"text.secondary"}
-              textAlign={"center"}
-            >
-              ** No About **
-            </Typography>
-          )}
+          )}       
         </Box>
       </Stack>
     </Box>
