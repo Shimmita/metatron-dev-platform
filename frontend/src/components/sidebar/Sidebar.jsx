@@ -5,8 +5,10 @@ import {
   Avatar,
   Badge,
   Box,
+  Divider,
   Skeleton,
-  styled
+  styled,
+  Typography
 } from "@mui/material";
 
 
@@ -17,6 +19,7 @@ import AlertGeneral from "../alerts/AlertGeneral";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import CustomCountryName from "../utilities/CustomCountryName";
 const SkillAvatars = lazy(() => import("./SkillAvatars"));
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -114,10 +117,7 @@ const Sidebar = () => {
     >
       <Box
         position={"fixed"}
-        className={
-          CustomDeviceIsSmall() ||
-          (CustomDeviceTablet() ? "shadow rounded" : "rounded")
-        }
+        className={'rounded'}
         width={correctWidthInPercentage()}
         maxHeight={"88vh"}
         sx={{
@@ -145,10 +145,10 @@ const Sidebar = () => {
             ) : (
               <BoxAvatarContent>
                 <Box width={"100%"}>
-                  <Box className={isDarkMode && "bg-dark rounded-top"}>
                     <Box
                       display={"flex"}
                       justifyContent={"center"}
+                      flexDirection={'column'}
                       alignItems={"center"}
                     >
                       <StyledBadge
@@ -164,11 +164,9 @@ const Sidebar = () => {
                           src={
                             devImage
                           }
-                          sx={{ width: 90, height: 90, mt: 1 }}
+                          sx={{ width: 100, height: 100, mt: 1 }}
                         />
                       </StyledBadge>
-
-                    </Box>
                     <Box display={"flex"} justifyContent={"center"} >
                       <SkillAvatars user={user} isDarkMode={isDarkMode} />
                     </Box>

@@ -54,7 +54,12 @@ const BottomNav = () => {
 
   // return learning page
   const handleOpenCourses = () => {
-    navigate("/courses/paid");
+     // disable sidebar
+     if (isSidebarRighbar) {
+      
+      dispatch(handleSidebarRightbar());
+    }
+    navigate("/courses/available");
   };
 
   // accessing the redux state values

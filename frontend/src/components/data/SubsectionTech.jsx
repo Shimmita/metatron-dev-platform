@@ -1,4 +1,8 @@
 const SubsectionTech = {
+  Payment:[
+    "Free",
+    "Paid"
+  ],
   Language: [
     "Java",
     "Javascript",
@@ -46,16 +50,40 @@ const SubsectionTech = {
     "Angular",
     "Vue",
     "Svelte",
-    "Nextjs",
-    "Nuxtjs",
+    "Next",
+    "Nuxt",
     "Remix",
     "Preact",
     "Streamlit",
-    "Alpinejs",
+    "Alpine",
     "HTML",
     "WordPress",
     "Zero none (other)",
   ],
+  FrontendUI:[
+    "Material UI",
+    "JoyUI",
+    "Tailwind CSS",
+    "Shadcn UI",
+    "AntDesign",
+    "Chakra UI",
+    "Mantime",
+    "Radix UI",
+    "Blueprint UI",
+    "React Bootstrap",
+    "Semantic UI",
+    "Prime React",
+    "Headless UI",
+    "Motion One",
+    "Hyper UI",
+    "Daisy UI",
+    "Aria Kit",
+    "React Aria",
+    "Hero UI",
+    "Tremor UI",
+    "Zero none (other)"
+  ].sort(),
+
   Cybersec: [
     // Core Cybersecurity Concepts
     "Introduction to Cybersecurity",

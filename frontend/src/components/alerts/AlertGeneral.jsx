@@ -19,32 +19,49 @@ export default function AlertGeneral({
   setOpenAlertGeneral,
   title,
   message,
-  defaultIcon
+  defaultIcon,
+  setErrorMessage,
+  isError=false,
 }) {
   const handleClose = () => {
+
+    // if is error means the alert has setError message to clear
+    if (isError) {
+
+      setErrorMessage("")
+    }else{
+
     // close alert
     setOpenAlertGeneral(false);
+    }
+
   };
 
-    //   redux states
-    const { isTabSideBar } = useSelector((state) => state.appUI);
+  //  redux states
+  const { isTabSideBar } = useSelector((state) => state.appUI);
+
+  // handle width of the alert
+  const handleWidthAlert=()=>{
+    if (CustomDeviceTablet() && isTabSideBar) {
+      return "60%"
+    } else if(CustomLandScape()){
+      return "92%"
+    } else if(CustomLandscapeWidest()){
+      return "97.5%"
+    }
+  }
+
 
   return (
       <Dialog
         open={openAlertGeneral}
+        onClose={handleClose}
         TransitionComponent={Transition}
         keepMounted
         aria-describedby="alert-dialog-slide-description"
           sx={{
                marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
-                  width:
-                    CustomDeviceTablet() && isTabSideBar
-                      ? "60%"
-                      : CustomLandScape()
-                      ? "92%"
-                      : CustomLandscapeWidest()
-                      ? "97.5%"
-                      : undefined,
+                  width:handleWidthAlert()
                 }}
       >
           <DialogTitle

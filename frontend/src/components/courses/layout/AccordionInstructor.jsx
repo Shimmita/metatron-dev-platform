@@ -1,11 +1,14 @@
 import {
-  EmailRounded,
+  AddOutlined,
+  CallOutlined,
+  EmailOutlined,
   GitHub,
-  OpenInBrowserRounded,
-  SupportAgentRounded,
+  LinkedIn,
+  Remove,
+  SchoolOutlined,
+  SupportAgentRounded
 } from "@mui/icons-material";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { Avatar, Box, Button, Divider, Fade, Rating } from "@mui/material";
+import { Avatar, Box, Fade, IconButton, Tooltip } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
@@ -15,7 +18,6 @@ import InstructorLogo from "../../../images/dev.jpeg";
 
 export default function AccordionInstructor({ instructor }) {
   const [expanded, setExpanded] = React.useState(false);
-  const items = Array.from(new Array(3));
 
   const handleExpansion = () => {
     setExpanded((prevExpanded) => !prevExpanded);
@@ -49,7 +51,7 @@ export default function AccordionInstructor({ instructor }) {
         ]}
       >
         <AccordionSummary
-          expandIcon={<ArrowDropDownIcon />}
+          expandIcon={expanded ? <Remove sx={{ width:18,height:18 }}/> :<AddOutlined sx={{ width:18,height:18 }} />}
           aria-controls="panel2-content"
           id="panel2-header"
         >
@@ -73,158 +75,81 @@ export default function AccordionInstructor({ instructor }) {
         </AccordionSummary>
         <AccordionDetails>
           {/* image+name */}
-          <Box mt={1} display={"flex"} justifyContent={"center"}>
+          <Box display={"flex"} justifyContent={"center"}>
             <Box>
-              <Box mb={1} display={"flex"} justifyContent={"center"}>
+              <Box display={"flex"} justifyContent={"center"}>
                 <Avatar
                   src={InstructorLogo}
                   sx={{ width: 50, height: 50 }}
                   alt={"image"}
                 />
               </Box>
-              {/* instructors name */}
               <Box width={"100%"}>
+              {/* instructors name */}
                 <Typography
                   gutterBottom
                   textAlign={"center"}
                   color={"text.secondary"}
                   fontWeight={"bold"}
-                  variant="body2"
+                  variant="caption"
                 >
                   {instructor}
                 </Typography>
+                <br/>
                 {/* instructor specialisation */}
                 <Typography
                   textAlign={"center"}
-                  variant="body2"
+                  variant="caption"
                   gutterBottom
                   color="text.secondary"
                 >
                   Cybersecurity Engineer
                 </Typography>
-                {/* instructor skills */}
-                <Typography
-                  textAlign={"center"}
-                  variant="body2"
-                  color="text.secondary"
+                {/* instructor handles and more courses */}
+                <Box 
+                mt={1}
+                display={"flex"} 
+                alignItems={'center'}
+                gap={1}
                 >
-                  Ethical Hacker | Linux | Python | C++
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
+                  {/* email */}
+                  <Tooltip title={'email'} arrow>
+                  <IconButton>
+                    <EmailOutlined sx={{ width:15,height:15 }}/>
+                  </IconButton>
+                  </Tooltip>
 
-          <Box display={"flex"} justifyContent={"center"} mt={2}>
-            <Box
-              display={"flex"}
-              width={"100%"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-            >
-              {/* email */}
-              <Box display={"flex"} alignItems={"center"}>
-                <Button
-                  sx={{ textTransform: "capitalize" }}
-                  size="small"
-                  startIcon={<EmailRounded />}
-                >
-                  Email
-                </Button>
-              </Box>
+                  {/* call */}
+                  <Tooltip title={'call'} arrow>
+                  <IconButton>
+                    <CallOutlined sx={{ width:15,height:15 }}/>
+                  </IconButton>
+                  </Tooltip>
 
-              {/* website */}
-              <Box display={"flex"} gap={1} alignItems={"center"}>
-                <Button
-                  sx={{ textTransform: "capitalize" }}
-                  size="small"
-                  startIcon={<OpenInBrowserRounded />}
-                >
-                  Website
-                </Button>
-              </Box>
+                  {/* github */}
+                  <Tooltip title={'GitHub'} arrow>
+                  <IconButton>
+                    <GitHub sx={{ width:15,height:15 }}/>
+                  </IconButton>
+                  </Tooltip>
 
-              {/* github */}
-              <Box display={"flex"} gap={1} alignItems={"center"}>
-                <Button
-                  sx={{ textTransform: "capitalize" }}
-                  size="small"
-                  startIcon={<GitHub />}
-                >
-                  GitHub
-                </Button>
-              </Box>
-            </Box>
-          </Box>
+                  {/* linkedin */}
+                  <Tooltip title={'LinkedIn'} arrow>
+                  <IconButton>
+                    <LinkedIn sx={{ width:15,height:15 }}/>
+                  </IconButton>
+                  </Tooltip>
 
-          {/* lectures posted */}
-          <Typography
-            gutterBottom
-            mt={2}
-            variant="body2"
-            color={"text.secondary"}
-          >
-            {" "}
-            Other Courses
-          </Typography>
-
-          {/* list all courses posted by the instructor */}
-          <ul>
-            {items.map((val, index) => (
-              <>
-                <Box
-                  width={"100%"}
-                  display={"flex"}
-                  gap={1}
-                  p={1}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                >
-                  {/* course name */}
-                  <Typography
-                    component={"li"}
-                    variant="body2"
-                    gutterBottom
-                    key={index}
-                    color="text.secondary"
-                  >
-                    Reverse Engineering
-                  </Typography>
-
-                  {/* rating */}
-                  <Rating
-                    name="feedback"
-                    size="small"
-                    value={4}
-                    readOnly
-                    precision={0.5}
-                  />
-
-                  {/* link view */}
-                  <Button
-                    disableElevation
-                    size="small"
-                    sx={{ fontSize: "12px", borderRadius: "20px" }}
-                  >
-                    view
-                  </Button>
+                  {/* more courses */}
+                  <Tooltip title={'other courses'}>
+                  <IconButton >
+                    <SchoolOutlined sx={{ width:15,height:15 }}/>
+                  </IconButton>
+                  </Tooltip>
                 </Box>
-                {/* divider */}
-                {index !== items.length - 1 && (
-                  <Divider component={"div"} className="m-1" />
-                )}
-              </>
-            ))}
-            {/* see more  button */}
-            <Box mt={1} display={"flex"} justifyContent={"center"}>
-              <Button
-                sx={{ textTransform: "lowercase", borderRadius: "10px" }}
-                variant="text"
-                size="small"
-              >
-                more courses
-              </Button>
+              </Box>
             </Box>
-          </ul>
+          </Box>
         </AccordionDetails>
       </Accordion>
     </Box>

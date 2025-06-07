@@ -145,13 +145,20 @@ export default function PostReported({ report }) {
                       &nbsp;
                       {/* delete reaction */}
                           <Tooltip title={'clear'} arrow>
-                                   <IconButton size="small" onClick={handleDeleteReportReaction} sx={{ 
-                                   border: "1px solid",
-                                   borderColor: "divider",
-                                 }}>
-                                              <Close sx={{ width: 13, height: 13 }} />
-                                            </IconButton>
-                                   </Tooltip>
+                            <IconButton size="small" 
+                            onClick={handleDeleteReportReaction} 
+                            disabled={isFetching}
+                            sx={{ 
+                            border: "1px solid",
+                            borderColor: "divider",
+                          }}>
+                             {isFetching ? (
+                                  <CircularProgress size={13}/>
+                                ):(
+                                  <Close sx={{ width: 13, height: 13 }} />
+                                )}
+                          </IconButton>
+                          </Tooltip>
                     </Box>
                   )}
                 </Box>

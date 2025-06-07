@@ -8,10 +8,11 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import axios from "axios";
 import { getAuth, signOut } from "firebase/auth";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import logoApp from "../../images/logo_sm.png";
 import { persistor } from "../../redux/AppStore";
+import { handleShowLogout } from "../../redux/AppUI";
 import { resetClearCurrentUserRedux } from "../../redux/CurrentUser";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
@@ -21,27 +22,28 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function LogoutAlert({
-  openAlertLogout,
-  setOpenAlertLogout,
-  title,
-  body,
-}) {
-  const dispatch = useDispatch();
-  const handleClose = () => {
-    setOpenAlertLogout(false);
-  };
-
-  // configuring axios defaults
-  axios.defaults.withCredentials = true;
+export default function LogoutAlert() {
+  const[isLoading,setIsLoading]=useState(false)
 
   //   redux states
-  const { isTabSideBar } = useSelector((state) => state.appUI);
+  const { isTabSideBar,isLogoutAlert } = useSelector((state) => state.appUI);
+
+  const dispatch = useDispatch();
+
+  // handles alert close
+  const handleClose = async() => {
+
+    // set is loading false
+    setIsLoading(false)
+
+    // close the alert
+    dispatch(handleShowLogout(false))
+  };
 
   // navigate to login page and close alert
   const handleNavigateLoginPage = async () => {
-    // close the alert
-    setOpenAlertLogout(false);
+    // is loading true
+    setIsLoading(true)
 
     try {
       // send a post request to the backend to clear all cookie sessions if any
@@ -59,29 +61,36 @@ export default function LogoutAlert({
 
       // Dispatch Redux action to reset user state
       dispatch(resetClearCurrentUserRedux());
+
+      
     } catch (error) {
-      console.error("Error during logout:", error);
+      console.error("Error occurred during logout:", error);
+    } finally{
+      // execute closing of the alert
+      handleClose()
     }
   };
 
+ // handle width of the alert
+    const handleWidthAlert=()=>{
+      if (CustomDeviceTablet() && isTabSideBar) {
+        return "60%"
+      } else if(CustomLandScape()){
+        return "92%"
+      } else if(CustomLandscapeWidest()){
+        return "97.5%"
+      }
+    }
   return (
-    <React.Fragment>
       <Dialog
-        open={openAlertLogout}
+        open={isLogoutAlert}
         TransitionComponent={Transition}
         keepMounted
         aria-describedby="alert-dialog-slide-description"
         sx={{
           marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
 
-          width:
-            CustomDeviceTablet() && isTabSideBar
-              ? "60%"
-              : CustomLandScape()
-              ? "92%"
-              : CustomLandscapeWidest()
-              ? "97.5%"
-              : undefined,
+          width:handleWidthAlert()
         }}
       >
         <DialogTitle
@@ -91,20 +100,17 @@ export default function LogoutAlert({
           gap={2}
         >
           <Avatar src={logoApp} alt="" />
-          {title ? title : "Account Logout?"}
+          Account Logout
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
-            {body
-              ? body
-              : "You will be logged out and required to login next time."}
+            You will be logged out and required to login next time.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          {!title && <Button onClick={handleClose}>Disagree</Button>}
-          <Button onClick={handleNavigateLoginPage}>Agree</Button>
+          <Button onClick={handleClose} disabled={isLoading}>Disagree</Button>
+          <Button onClick={handleNavigateLoginPage} disabled={isLoading}>Agree</Button>
         </DialogActions>
       </Dialog>
-    </React.Fragment>
   );
 }

@@ -26,9 +26,17 @@ export default function AlertAboutMetatron({ openAboutMetatron }) {
 
   //   redux states
   const { isTabSideBar } = useSelector((state) => state.appUI);
-
+  // handle width of the alert
+  const handleWidthAlert=()=>{
+    if (CustomDeviceTablet() && isTabSideBar) {
+      return "60%"
+    } else if(CustomLandScape()){
+      return "92%"
+    } else if(CustomLandscapeWidest()){
+      return "97.5%"
+    }
+  }
   return (
-    <React.Fragment>
       <Dialog
         open={openAboutMetatron}
         TransitionComponent={Transition}
@@ -37,14 +45,7 @@ export default function AlertAboutMetatron({ openAboutMetatron }) {
         sx={{
           marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
 
-          width:
-            CustomDeviceTablet() && isTabSideBar
-              ? "60%"
-              : CustomLandScape()
-              ? "92%"
-              : CustomLandscapeWidest()
-              ? "97.5%"
-              : undefined,
+          width:handleWidthAlert()
         }}
       >
         <DialogTitle
@@ -90,6 +91,5 @@ export default function AlertAboutMetatron({ openAboutMetatron }) {
           <Button onClick={handleClose}>Close</Button>{" "}
         </DialogActions>
       </Dialog>
-    </React.Fragment>
   );
 }

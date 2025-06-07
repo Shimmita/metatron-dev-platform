@@ -17,7 +17,7 @@ const SpecialisationTech = [
   "Site Reliability Engineering",
   "Backend App Development",
   "Containerisation and Orchestration",
-  "Fullstack Application Development",
+  "Fullstack App Development",
   "Database Administration",
   "Programming Languages",
   "Multiplatform Mobile Development",

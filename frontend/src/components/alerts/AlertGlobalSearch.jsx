@@ -115,6 +115,15 @@ export default function AlertGlobalSearch({
     navigate("/posts/search/results");
   };
 
+   
+  // handle width of the global search
+  const handleGlobalSearchWidth=()=>{
+    if (CustomDeviceTablet() && isTabSideBar) {
+      return "36%"
+    } else if(CustomLandscapeWidest()){
+      return "-5%"
+    }
+  }
   return (
       <Dialog
         className="shadow"
@@ -124,12 +133,7 @@ export default function AlertGlobalSearch({
         keepMounted
         aria-describedby="alert-dialog-slide-alering"
         sx={{
-          marginLeft:
-            CustomDeviceTablet() && isTabSideBar
-              ? "36%"
-              : CustomLandscapeWidest()
-              ? "-5%"
-              : undefined,
+          marginLeft:handleGlobalSearchWidth()
         }}
       >
         <DialogTitle

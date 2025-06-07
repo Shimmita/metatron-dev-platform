@@ -1,20 +1,22 @@
+import { Close } from "@mui/icons-material";
 import {
   Alert,
-    Box,
-    CircularProgress,
-    Collapse,
-    IconButton,
-    Modal,
-    styled
+  Box,
+  CircularProgress,
+  Collapse,
+  IconButton,
+  Modal,
+  styled
 } from "@mui/material";
+import axios from "axios";
 import React, { useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { handleSetPostEditIdModal, handleShowPostEditModal } from "../../redux/AppUI";
 import PostDetailsFeed from "../post/PostDetailsFeed";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import { handleSetPostEditIdModal, handleShowPostEditModal } from "../../redux/AppUI";
-import axios from "axios";
-import { Close } from "@mui/icons-material";
+import CustomLandScape from "../utilities/CustomLandscape";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 // styled modal
 const StyledModalJob = styled(Modal)({
@@ -24,29 +26,22 @@ const StyledModalJob = styled(Modal)({
 });
 
 
-const PostEditModal = ({
- 
-}) => {
+const PostEditModal = () => {
 
   const [postDetailedData,setPostDetailedData]=useState()
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   // redux states
-  const { isDarkMode, isTabSideBar,isPostEditModal,postEditUniqueId } = useSelector((state) => state.appUI);
+  const {
+     isDarkMode, 
+    isTabSideBar,
+    isPostEditModal,
+    postEditUniqueId } = useSelector((state) => state.appUI);
 
   const dispatch=useDispatch()
-  // handle the closing of the modal
-  const handleClosingModal = () => {
-    // reset the postId in the redux
-    dispatch(handleSetPostEditIdModal(""))
-    // close the model via redux state
-    dispatch(handleShowPostEditModal(false))
 
-  };
-
-
-    // axios default credentials
-    axios.defaults.withCredentials = true;
+  // axios default credentials
+  axios.defaults.withCredentials = true;
 
   // use layout effect and fetch user specific post based on that Id
   useLayoutEffect(()=>{
@@ -59,10 +54,7 @@ const PostEditModal = ({
       // update the  current post
       if (res?.data) {
        setPostDetailedData(res.data)
-      } else {
-        // no more posts
-        //setOpenAlertNoPosts(true);
-      }
+      } 
     })
     .catch((err) => {
       //  user login session expired show logout alert
@@ -84,6 +76,29 @@ const PostEditModal = ({
     });
   },[postEditUniqueId])
 
+
+   // handle the closing of the modal
+   const handleClosingModal = () => {
+    // reset the postId in the redux
+    dispatch(handleSetPostEditIdModal(""))
+    // update post detailed data to none
+    setPostDetailedData({})
+    // close the model via redux state
+    dispatch(handleShowPostEditModal(false))
+
+  };
+
+   // handle width of the global search
+    const handleModalWidth=()=>{
+      if (CustomDeviceTablet() && isTabSideBar) {
+        return "36%"
+      } else if(CustomLandScape()){
+        return "-8%"
+      } else if(CustomLandscapeWidest()){
+        return "-5%"
+      }
+    }
+
   return (
     <StyledModalJob
       keepMounted
@@ -93,18 +108,29 @@ const PostEditModal = ({
       aria-describedby="modal-modal-description"
     >
       <Box
-        width={
-          CustomDeviceIsSmall() ? "100%":CustomDeviceTablet()?"80%":"40%"
-     }
+        width={CustomDeviceIsSmall() ? "100%":CustomDeviceTablet()?"80%":"40%"}
         p={1}
-        borderRadius={5}
-        bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
+        borderRadius={4}
+        bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
           border: isDarkMode && "1px solid gray",
-          marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
+          marginLeft:handleModalWidth()
         }}
       >
+        <Box
+         maxHeight={"70vh"}
+         sx={{
+           overflow: "auto",
+           // Hide scrollbar for Chrome, Safari and Opera
+           "&::-webkit-scrollbar": {
+             display: "none",
+           },
+           // Hide scrollbar for IE, Edge and Firefox
+           msOverflowStyle: "none",
+           scrollbarWidth: "none",
+         }}
+        >
 
         {/* display progress status */}
         {isFetching && (
@@ -118,22 +144,20 @@ const PostEditModal = ({
           <Box p={1} display={"flex"} justifyContent={"center"}>
             <Collapse in={errorMessage || false}>
               <Alert
-                severity="warning"
-                className="rounded-5"
+                severity="info"
+                className="rounded"
                 onClick={() => setErrorMessage("")}
                 action={
                   <IconButton aria-label="close" color="inherit" size="small">
                     <Close fontSize="inherit" />
                   </IconButton>
                 }
-                sx={{ mb: 2 }}
               >
                 {errorMessage}
               </Alert>
             </Collapse>
           </Box>
         )}
-
 
         {/* rendered when are posts */}
         {postDetailedData && (
@@ -142,6 +166,8 @@ const PostEditModal = ({
             postDetailedData={postDetailedData} 
             setPostDetailedData={setPostDetailedData}/>
         )}
+  </Box>
+
       </Box>
     </StyledModalJob>
   );

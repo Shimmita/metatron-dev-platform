@@ -33,9 +33,16 @@ const MobileTabCorousel = () => {
       }
   }
   return (
-    <Box color={"text.primary"}>
+    <Box
+     color={"text.primary"}
+     className={'rounded'}
+     sx={{ 
+      border: "1px solid",
+      borderColor:"divider",
+      }}
+     >
       {/* connect suggestion  */}
-      <Box bgcolor={"background.default"} className="shadow rounded ">
+      <Box bgcolor={"background.default"} >
         <Box>
           {/*  top jobs */}
           <Box gap={1}  display={corouselCounter === 0 ? "block" : "none"}>

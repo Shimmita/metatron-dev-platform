@@ -26,6 +26,7 @@ import { useSelector } from "react-redux";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
+import CustomLandScape from "../utilities/CustomLandscape";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -143,6 +144,17 @@ export default function AlertMiniProfileView({
     setMessage("");
   };
 
+   // handle width of the global search
+   const handleMiniProfileWidth=()=>{
+    if (CustomDeviceTablet() && isTabSideBar) {
+      return "36%"
+    } else if(CustomLandScape()){
+      return "-8%"
+    } else if(CustomLandscapeWidest()){
+      return "-5%"
+    }
+  }
+  
   return (
       <Dialog
         className="shadow"
@@ -152,12 +164,7 @@ export default function AlertMiniProfileView({
         keepMounted
         aria-describedby="alert-dialog-slide-alering"
         sx={{
-          marginLeft:
-            CustomDeviceTablet() && isTabSideBar
-              ? "36%"
-              : CustomLandscapeWidest()
-              ? "-3%"
-              : undefined,
+          marginLeft:handleMiniProfileWidth()
         }}
       >
         <DialogContent dividers>

@@ -24,7 +24,7 @@ const AuthCheckLazy = lazy(() => import("./components/account/AuthCheck"));
 
 const App = () => {
   // global dark mode state from redux
-  const { currentMode } = useSelector((state) => state.appUI);
+  const { currentMode,isDarkMode } = useSelector((state) => state.appUI);
 
   const darkTheme = createTheme({
     palette: {
@@ -33,7 +33,9 @@ const App = () => {
   });
   return (
     <ThemeProvider theme={darkTheme}>
-      <Box bgcolor={"background.default"} color={"text.primary"}>
+      <Box
+      bgcolor={isDarkMode ? "background.default" :"#f1f1f1"} 
+      color={"text.primary"}>
         {/* error boundary to catch errors from lazily loaded components */}
         <Suspense
           fallback={

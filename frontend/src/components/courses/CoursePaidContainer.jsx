@@ -31,9 +31,7 @@ import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 const WalletLayout = lazy(() => import("../custom/WalletLayout"));
-const HelpSupport = lazy(() => import("../custom/HelpSupport"));
 const SnackBarInfo = lazy(() => import("../snackbar/SnackBarInfo"));
-const SimilarCoursesModal = lazy(() => import("../modal/SimilarCoursesModal"));
 const AlertCourseSearch = lazy(() => import("../alerts/AlertCourseSearch"));
 const CourseLayout = lazy(() => import("./layout/CourseLayout"));
 // array for live events simulation
@@ -75,7 +73,7 @@ const CoursePaidContainer = () => {
 
   // handle machine option
   const handleMachine = () => {
-    // show sanckbar
+    // show snackbar
     setOpenSnack(true);
     // info snack
     setSelectedOption("Machine Learning/Robotics/AI");
@@ -84,7 +82,7 @@ const CoursePaidContainer = () => {
 
   // handle ios option
   const handleios = () => {
-    // show sanckbar
+    // show snackbar
     setOpenSnack(true);
     // info snack
     setSelectedOption("iOS App Development");
@@ -93,7 +91,7 @@ const CoursePaidContainer = () => {
 
   // handle android option
   const handleAndroid = () => {
-    // show sanckbar
+    // show snackbar
     setOpenSnack(true);
     // info snack
     setSelectedOption("Android App Development");
@@ -289,9 +287,8 @@ const CoursePaidContainer = () => {
                     Free
                   </Button>
 
-                  {/* dont on smallest screens like iphone 6 */}
+                  {/* don't on smallest screens like iphone 6 */}
                   {!CustomDeviceSmallest() && (
-                    <>
                       <Button
                         disableElevation
                         className={counter === 2 && "border"}
@@ -301,12 +298,10 @@ const CoursePaidContainer = () => {
                       >
                         ML/AI
                       </Button>
-                    </>
                   )}
 
                   {/* show this on tablet++ */}
                   {!CustomDeviceIsSmall() && (
-                    <>
                       <Button
                         disableElevation
                         className={counter === 3 && "border"}
@@ -316,12 +311,10 @@ const CoursePaidContainer = () => {
                       >
                         IOS
                       </Button>
-                    </>
                   )}
 
                   {/* show this on tablet++ */}
                   {!CustomDeviceIsSmall() && (
-                    <>
                       <Button
                         disableElevation
                         className={counter === 4 && "border"}
@@ -331,7 +324,6 @@ const CoursePaidContainer = () => {
                       >
                         Android
                       </Button>
-                    </>
                   )}
 
                   {/* filter context: paid and free and search */}
@@ -371,8 +363,8 @@ const CoursePaidContainer = () => {
           <React.Fragment>
             {items.length > 0 &&
               items.map((items, index) => (
-                <Box mb={2}>
-                  <CourseLayout key={index} />
+                <Box mb={2} key={items}>
+                  <CourseLayout />
 
                   {/* divider */}
                   {isDarkMode && !CustomDeviceIsSmall() && (
@@ -413,7 +405,7 @@ const CoursePaidContainer = () => {
             <React.Fragment>
               {items.length > 0 &&
                 items.map((items, index) => (
-                  <Box mb={2}>
+                  <Box mb={2} key={items}>
                     <CourseLayout key={index} isUploadedRequest={true} />
 
                     {/* divider */}
@@ -443,12 +435,6 @@ const CoursePaidContainer = () => {
           </Box>
         )}
 
-        {/* help and support */}
-        {counter === 11 && (
-          <Box height={"82vh"}>
-            <HelpSupport />
-          </Box>
-        )}
       </Box>
 
       {/* menu all */}
@@ -519,8 +505,7 @@ const CoursePaidContainer = () => {
         openSearchCourse={openCourseAlert}
         setOpenSearchCourse={setOpenCourseAlert}
       />
-      {/* show similar courses modal controlled by redux state */}
-      <SimilarCoursesModal openSimilarCourses={isSimilarCoursesModal} />
+    
       {/* show snackbar */}
       <SnackBarInfo
         setOpenSnack={setOpenSnack}

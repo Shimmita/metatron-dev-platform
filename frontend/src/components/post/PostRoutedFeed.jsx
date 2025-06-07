@@ -33,22 +33,24 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
   const { user } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
   // extract basic current user details
-  const { _id, avatar, name, specialisationTitle: title } = user || {};
+  const { _id, avatar, name,county, specialisationTitle: title } = user || {};
 
-  const country = CustomCountryName(postDetailedData?.post_location?.country);
 
-  // current user info
-  const reactingUserInfo = {
-    userId: _id,
-    ownerId: postDetailedData.post_owner.ownerId,
-    postId: postDetailedData._id,
-    avatar,
-    name,
-    country,
-    title,
-  };
   // complete sending of the comment to the backend
   const handleSendCommentNow = () => {
+    
+      // current user info
+      const reactingUserInfo = {
+        userId: _id,
+        ownerId: postDetailedData.post_owner.ownerId,
+        postId: postDetailedData._id,
+        avatar,
+        name,
+        country:CustomCountryName(user?.country),
+        county,
+        title,
+      };
+
     // sending the post tile embed in message and will split for separation backend
     let message = `commented on your post.${postDetailedData?.post_title?.substring(
       0,

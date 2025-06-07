@@ -30,7 +30,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import React, { lazy, useEffect, useState } from "react";
+import React, { lazy, useLayoutEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useSelector } from "react-redux";
 import dev from "../../images/dev.jpeg";
@@ -93,6 +93,7 @@ const PostDetailsFeed = ({
   isPostEditMode = false,
 }) => {
 
+
   const [anchorEl, setAnchorEl] = useState(null);
   const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
   const openMenu = Boolean(anchorEl);
@@ -100,7 +101,6 @@ const PostDetailsFeed = ({
   const [messageResponse, setMessageResponse] = useState("");
   const [isFullDescription, setFullDescription] = useState(false);
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
-
   const [editedText, setEditedText] = useState(
     `${postDetailedData?.post_body}`
   );
@@ -112,8 +112,6 @@ const PostDetailsFeed = ({
   const { isDarkMode } = useSelector(
     (state) => state.appUI
   );
-
-
 
   const { user } = useSelector((state) => state.currentUser);
   // extract basic current user details
@@ -136,11 +134,12 @@ const PostDetailsFeed = ({
   );
 
   // for checking if the current user commented any on the post
-  const currentUserCommentented =
+  const currentUserCommented =
     postDetailedData?.post_comments?.comments?.some(
       (commentors) => commentors.userId === _id
     );
 
+    
   // controls the length of description shown for each devices
   const max_description = CustomDeviceIsSmall()? 122: CustomLandScape() ? 182  : 220;
   const details = PostData?.details || "";
@@ -171,10 +170,10 @@ const PostDetailsFeed = ({
     const first = title[0];
     let second = title[1];
 
-    if (second?.toLowerCase().includes("developer")) {
+    if (second?.toLowerCase()?.includes("developer")) {
       second = "Dev";
     }
-    if (second?.toLowerCase().includes("engineer")) {
+    if (second?.toLowerCase()?.includes("engineer")) {
       second = "Eng";
     }
 
@@ -185,23 +184,24 @@ const PostDetailsFeed = ({
   const handleName = () => {
     const title = postDetailedData?.post_owner?.ownername?.split(" ");
     const first = title[0];
-    let second = title[1].substring(0, 1);
+    let second = title[1][0]
 
     return first + " " + second;
   };
 
+
   // handle scenarios when no profile picture
   const handleNoProfilePicture = () => {
-    const title = postDetailedData?.post_owner?.ownername?.split(" ");
-    const first = title[0].substring(0, 1);
-    let second = title[1].substring(0, 1);
+    let title = postDetailedData?.post_owner?.ownername?.split(" ");
+    let first = title[0][0]
+    let second = title[1][0]
 
     return first + "" + second;
   };
 
   // check if the current userID matches the ownerID of the post
   // means belongs to current user thus no need for options menu
-  useEffect(() => {
+  useLayoutEffect(() => {
     const handlePostBelongsCurrentUser = () => {
       const postID = `${postDetailedData?.post_owner?.ownerId}`;
       const currentUserID = `${user._id}`;
@@ -334,7 +334,6 @@ const PostDetailsFeed = ({
 
     return "98%"
   }
-
   
   // handle image width
     const handleImageWidth=()=>{
@@ -355,7 +354,7 @@ const PostDetailsFeed = ({
           <Alert
             severity="info"
             onClose={handleClose}
-            className="rounded-5 mb-1"
+            className="rounded mb-1"
             action={
               <Stack direction={"row"} alignItems={"center"} gap={1}>
                 {/* yes btn */}
@@ -663,7 +662,7 @@ const PostDetailsFeed = ({
                 icon: (
                   <ForumRounded
                   sx={{ width: 18, height: 18 }}
-                    color={currentUserCommentented ? "primary" : undefined}
+                    color={currentUserCommented ? "primary" : undefined}
                   />
                 ),
                 count: post_comment_count,

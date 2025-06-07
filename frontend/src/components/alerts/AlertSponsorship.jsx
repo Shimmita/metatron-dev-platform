@@ -42,7 +42,6 @@ export default function AlertSponsorship({
   };
 
   return (
-    <React.Fragment>
       <Dialog
         open={openSponsorAlert}
         TransitionComponent={Transition}
@@ -76,6 +75,5 @@ export default function AlertSponsorship({
           )}
         </DialogActions>
       </Dialog>
-    </React.Fragment>
   );
 }

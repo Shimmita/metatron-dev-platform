@@ -3,13 +3,17 @@ import {
   Badge,
   Box,
   Drawer,
-  styled
+  IconButton,
+  styled,
+  Tooltip
 } from "@mui/material";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import devImage from "../../images/dev.jpeg";
 import SkillAvatars from "../sidebar/SkillAvatars";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import { DarkModeRounded } from "@mui/icons-material";
+import { resetDarkMode } from "../../redux/AppUI";
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -41,6 +45,15 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
+const BoxAvatarContent = styled(Box)({
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "1rem",
+});
+
+
 const DrawerSmartphone = ({
   openDrawer,
   setOpenDrawer,
@@ -51,29 +64,44 @@ const DrawerSmartphone = ({
   // redux states
   const { isDarkMode } = useSelector((state) => state.appUI);
   const { user } = useSelector((state) => state.currentUser);
+  const dispatch=useDispatch()
 
 
-  const BoxAvatarContent = styled(Box)({
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: "1rem",
-  });
-
+  // UI theme dark light tweaking effect
+    const handleShowDarkMode = () => {
+    // update the redux theme boolean state
+    dispatch(resetDarkMode());
+  };
 
 
   return (
     <Drawer open={openDrawer} onClose={(e) => setOpenDrawer(false)}>
-      <Box maxWidth={300} height={"100%"} bgcolor={"background.default"}>
+      <Box 
+      maxWidth={300} 
+      height={"100%"} 
+      bgcolor={"background.default"}>
+
+        {/* theme changer */}
+        <Box 
+        width={'100%'} 
+        display={'flex'}
+        justifyContent={'flex-end'}
+        >
+           <IconButton disabled onClick={handleShowDarkMode}> 
+            <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
+            <DarkModeRounded/>
+          </Tooltip> 
+          </IconButton>
+        </Box>
+
+        {/* avatar and its subsequent content */}
         <BoxAvatarContent>
           <Box>
-            <Box width={"100%"} className={isDarkMode && "bg-dark rounded-top"}>
               <Box
                 display={"flex"}
                 justifyContent={"center"}
                 alignItems={"center"}
-                className="p-1 pt-4"
+                className="p-1"
               >
                 <StyledBadge
                   overlap="circular"
@@ -88,7 +116,7 @@ const DrawerSmartphone = ({
                     src={
                         devImage   
                     }
-                    sx={{ width: 70, height: 70 }}
+                    sx={{ width: 100, height: 100 }}
                   />
                 </StyledBadge>
               </Box>
@@ -100,11 +128,9 @@ const DrawerSmartphone = ({
                 pb={1}
               >
             
-                  
               <SkillAvatars isDarkMode={isDarkMode} user={user} />
                 
               </Box>
-            </Box>
           </Box>
         </BoxAvatarContent>
 

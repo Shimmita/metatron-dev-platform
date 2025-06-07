@@ -1,6 +1,7 @@
+import { ErrorOutline } from "@mui/icons-material";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import axios from "axios";
-import React, { lazy, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   handleLoadingPostLaunch,
@@ -12,18 +13,17 @@ import {
   resetClearCurrentPosts,
   updateCurrentPosts,
 } from "../../redux/CurrentPosts";
+import AlertGeneral from "../alerts/AlertGeneral";
 import CardFeed from "../custom/CardFeed";
 import PostDetailsContainer from "../post/PostDetailsContiner";
 import MobileTabCorousel from "../rightbar/MobileTabCorousel";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-const AlertChatBot = lazy(() => import("../alerts/AlertChatBot"));
 
 const FeedDefaultContent = () => {
-  // axios default credentials
-  axios.defaults.withCredentials = true;
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [openGeneralAlert,setOpenGeneralAlert]=useState()
 
   // will be used when the post is focused for full details
   const [postDetailedData, setPostDetailedData] = useState();
@@ -74,10 +74,7 @@ const FeedDefaultContent = () => {
         // update the redux of current post
         if (res?.data) {
           dispatch(updateCurrentPosts(res.data));
-        } else {
-          // no more posts
-          //setOpenAlertNoPosts(true);
-        }
+        } 
       })
       .catch((err) => {
         //  user login session expired show logout alert
@@ -86,11 +83,12 @@ const FeedDefaultContent = () => {
         }
         if (err?.code === "ERR_NETWORK") {
           setErrorMessage(
-            "Server is unreachable please try again later to complete your request"
+            "Server is unreachable please try again later."
           );
           return;
         }
         setErrorMessage(err?.response.data);
+        setOpenGeneralAlert(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -101,25 +99,16 @@ const FeedDefaultContent = () => {
   }, [dispatch, posts]);
 
 
-  // handle height
-  const handleHeight=()=>{
-    if(CustomDeviceTablet()){
-      return "92vh"
-    }else if(CustomDeviceIsSmall()){
-      return "90vh"
-    }
-    return "85vh"
-  }
+ 
 
   return (
     <Box
-      height={handleHeight()}
+      height={"88vh"}
     >
       {/* render the post is focused for full viewing and that post detailed
       data is no null */}
       {postDetailedData ? (
         <Box
-          height={"86vh"}
           className={
             CustomDeviceTablet() ? "shadow rounded p-2" : "rounded p-2"
           }
@@ -143,11 +132,10 @@ const FeedDefaultContent = () => {
           />
         </Box>
       ) : (
-        <Box height={isFetching ? "99vh" : undefined}>
+        <Box >
           {/* show progress loader when is fetching true */}
           {isFetching && (
             <Box
-              height={"80vh"}
               width={"100%"}
               display={"flex"}
               justifyContent={"center"}
@@ -171,7 +159,7 @@ const FeedDefaultContent = () => {
 
           {/* scrollable container for the content */}
           <Box
-            height={"81vh"}
+          maxHeight={'85vh'}
             sx={{
               overflowX: "auto",
               // Hide scrollbar for Chrome, Safari and Opera
@@ -220,9 +208,22 @@ const FeedDefaultContent = () => {
         </Box>
       )}
 
-      {/* display chat bot */}
-      <AlertChatBot />
-   
+      {/* alert general error */}
+
+      {openGeneralAlert && (
+        <AlertGeneral 
+        openAlertGeneral={openGeneralAlert}
+        setOpenAlertGeneral={setOpenGeneralAlert}
+        setErrorMessage={setErrorMessage}
+        isError={true}
+        title={"Error"}
+        message={errorMessage}
+        defaultIcon={<ErrorOutline/>}
+
+        />
+      )}
+    
+
     </Box>
   );
 };

@@ -2,6 +2,7 @@ import { ArrowForwardIos, Close } from "@mui/icons-material";
 import {
   Box,
   Button,
+  CircularProgress,
   IconButton,
   Tooltip,
   Typography
@@ -26,8 +27,7 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
     jobFeedBack,
   }) {
   
-  
-  const [showMiniProfile, setShowMiniProfile] = useState(false);
+
   const [isFetching, setIsFetching] = useState(false);
   const dispatch=useDispatch()
   const navigate=useNavigate()
@@ -35,15 +35,6 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
   // redux UI state
    const { isSidebarRighbar } = useSelector((state) => state.appUI);
   
-  // axios default credentials
-  axios.defaults.withCredentials = true;
-  
-  
-    // handle showing of the user profile
-    const handleShowMiniProfile = useCallback(() => {
-      setShowMiniProfile(true);
-    }, []);
-
 
     const handleCountryName = () => {
       const parent = jobFeedBack?.country.split(" ");
@@ -125,19 +116,19 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
         sx={{ 
         border: "1px solid",
         borderColor: "divider" }}>
-          <ListItemAvatar onClick={handleShowMiniProfile}>
-                <Avatar
-                src={devImage}
-                variant="rounded"
-                sx={{
-                  backgroundColor: "#1976D2",
-                  color: "white",
-                  width: 40,
-                  height: 40,
-                }}
-                alt={jobFeedBack?.name?.split(" ")[0]}
-                aria-label="avatar"
-              />
+          <ListItemAvatar >
+            <Avatar
+            src={devImage}
+            variant="rounded"
+            sx={{
+              backgroundColor: "#1976D2",
+              color: "white",
+              width: 40,
+              height: 40,
+            }}
+            alt={jobFeedBack?.name?.split(" ")[0]}
+            aria-label="avatar"
+          />
           </ListItemAvatar>
           <ListItemText
             primary={
@@ -163,11 +154,16 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
                 <Tooltip title={'clear'} arrow>
                 <IconButton size="small" 
                 onClick={handleDeleteReaction} 
+                disabled={isFetching}
                 sx={{ 
                 border: "1px solid",
                 borderColor: "divider",
               }}>
-                <Close sx={{ width: 13, height: 13 }} />
+                {isFetching ? (
+                  <CircularProgress size={13}/>
+                ):(
+                  <Close sx={{ width: 13, height: 13 }} />
+                )}
               </IconButton>
             </Tooltip>    
             </Box>
@@ -176,21 +172,21 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
             secondary={
               <Box>
               
-                  <React.Fragment>
-                      <Typography variant="body2" color={"text.secondary"}>
-                      {jobFeedBack?.title}
-                    </Typography>
-                    <Typography variant="caption" color={"text.secondary"}>
-                      {handleCountryName()} | {jobFeedBack?.state}
-                    </Typography>
-                    <br/>
-                    <Typography
-                      variant="caption"
-                      sx={{ color:'text.primary' }}
-                    >
-                      - recruiter has viewed your c.v check for job results under my statistics option. <Button onClick={handleNavigateJobStats} endIcon={<ArrowForwardIos sx={{ width:10, height:10 }}/>} size="small" variant="text" sx={{ textTransform:'lowercase', fontSize:'small', borderRadius:5 }}>here</Button>
-                    </Typography>
-                  </React.Fragment>
+              <React.Fragment>
+                  <Typography variant="body2" color={"text.secondary"}>
+                  {jobFeedBack?.title}
+                </Typography>
+                <Typography variant="caption" color={"text.secondary"}>
+                  {handleCountryName()} | {jobFeedBack?.state}
+                </Typography>
+                <br/>
+                <Typography
+                  variant="caption"
+                  sx={{ color:'text.primary' }}
+                >
+                  - recruiter has viewed your c.v check for job results under my statistics option. <Button onClick={handleNavigateJobStats} endIcon={<ArrowForwardIos sx={{ width:10, height:10 }}/>} size="small" variant="text" sx={{ textTransform:'lowercase', fontSize:'small', borderRadius:5 }}>here</Button>
+                </Typography>
+              </React.Fragment>
                 
               </Box>
             }

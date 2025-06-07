@@ -100,6 +100,17 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd }) => {
       return "100%"
     }
 
+     // handle width of the global search
+      const handleModalWidth=()=>{
+        if (CustomDeviceTablet() && isTabSideBar) {
+          return "36%"
+        } else if(CustomLandScape()){
+          return "-8%"
+        } else if(CustomLandscapeWidest()){
+          return "-5%"
+        }
+      }
+
   return (
     <StyledModalEvent
       keepMounted
@@ -107,7 +118,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd }) => {
       sx={{
         marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
       }}
-      // onClose={(e) => setOpenPostModal(false)}
+      onClose={(e) => setOpenModalEventAdd(false)}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -115,11 +126,11 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd }) => {
         width={handleReturnWidthModal()}
         p={1}
         borderRadius={5}
-        bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
+        bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
           border: isDarkMode && "1px solid gray",
-          marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
+          marginLeft: handleModalWidth() 
         }}
       >
         <Box

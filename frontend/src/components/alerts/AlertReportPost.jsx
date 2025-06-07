@@ -135,6 +135,17 @@ export default function AlertReportPost({
   const handleClearMessage = () => {
     setMessage("");
   };
+
+  const handleWidthAlert=()=>{
+      if (CustomDeviceTablet() && isTabSideBar) {
+        return "60%"
+      } else if(CustomLandScape()){
+        return "92%"
+      } else if(CustomLandscapeWidest()){
+        return "97.5%"
+      }
+    }
+
   return (
       <Dialog
         open={openAlertReport}
@@ -144,14 +155,7 @@ export default function AlertReportPost({
         sx={{
           marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
 
-          width:
-            CustomDeviceTablet() && isTabSideBar
-              ? "60%"
-              : CustomLandScape()
-              ? "92%"
-              : CustomLandscapeWidest()
-              ? "97.5%"
-              : undefined,
+          width:handleWidthAlert()
         }}
       >
         <Stack mb={1}>
@@ -218,9 +222,9 @@ export default function AlertReportPost({
                 variant="outlined"
               >
                 {
-                  reporting_about_array?.map((about, index) => (
+                  reporting_about_array?.map((about) => (
                     <MenuItem
-                      key={index}
+                      key={about}
                       value={about}
                       sx={{ display: "flex", alignItems: "center", gap: 2 }}
                     >

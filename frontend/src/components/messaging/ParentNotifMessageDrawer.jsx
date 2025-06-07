@@ -16,13 +16,6 @@ import SnackBarNotifications from "../snackbar/SnackBarNotifications";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import NotifAccordionLayout from "./layout/NotifAccordionLayout";
-import { resetClearCurrentReport } from "../../redux/CurrentPostReported";
-import { resetClearConversations } from "../../redux/CurrentConversations";
-import { resetClearCurrentPostReactions } from "../../redux/CurrentPostReactions";
-import { resetClearCurrentJobFeedBack } from "../../redux/CurrentJobFeedBack";
-import { resetClearCurrentConnectTop } from "../../redux/CurrentConnect";
-import { resetClearCurrentConnectNotif } from "../../redux/CurrentConnectNotif";
-import { resetClearCurrentProfileView } from "../../redux/CurrentProfileView";
 const ConversationContainer = lazy(() => import("./ConversationsContainer"));
 
 const StyledTabs = styled((props) => (

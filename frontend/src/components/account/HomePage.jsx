@@ -7,9 +7,12 @@ const Feed = lazy(() => import("../feed/Feed"));
 
 function Homepage() {
   return (
-    <Box bgcolor={"background.default"} color={"text.primary"}>
+    <Box color={"text.primary"}>
       <Navbar />
-      <Stack direction={"row"} justifyContent={"space-around"}>
+      <Stack
+      direction={"row"}
+      justifyContent={"space-around"}
+      >
         <Sidebar />
         <Feed />
         <Righbar />

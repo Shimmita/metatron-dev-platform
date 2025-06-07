@@ -51,6 +51,17 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
       }
       return "100%"
     }
+
+  // handle width of the global search
+        const handleModalWidth=()=>{
+          if (CustomDeviceTablet() && isTabSideBar) {
+            return "36%"
+          } else if(CustomLandScape()){
+            return "-8%"
+          } else if(CustomLandscapeWidest()){
+            return "-5%"
+          }
+        }
     
   return (
     <StyledModalPeople
@@ -59,20 +70,20 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
         marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
       }}
       open={openPeopleModal}
-      // onClose={(e) => setOpenPostModal(false)}
+      onClose={handleCloseModalPeople}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
       <Box
         width={handleReturnWidthModal()}
-        bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
+        bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         display={"flex"}
         className="rounded-1 border"
         justifyContent={"center"}
         alignItems={"center"}
         sx={{
-          marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
+          marginLeft:handleModalWidth() ,
         }}
       >
         <Box

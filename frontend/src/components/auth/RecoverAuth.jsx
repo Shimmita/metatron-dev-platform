@@ -129,6 +129,7 @@ const RecoverAuth = () => {
         className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
         border={isDarkMode ? "1px solid gray" : "none"}
         width={"100%"}
+        bgcolor={!isDarkMode && "background.default"}
         sx={{
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
@@ -152,7 +153,7 @@ const RecoverAuth = () => {
             gutterBottom
             color={"primary"}
           >
-            Metatron Foundation
+            Metatron Developer
           </Typography>
 
           <Box

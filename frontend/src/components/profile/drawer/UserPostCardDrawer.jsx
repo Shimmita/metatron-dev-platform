@@ -17,6 +17,7 @@ export default function UserPostCardDrawer({
   setDeletePostID,
   deletePostID,
   setIsPostEditMode,
+  setIsPostDetailedDrawer
 }) {
   // get redux states
   const { user } = useSelector((state) => state.currentUser);
@@ -27,9 +28,11 @@ export default function UserPostCardDrawer({
   const dispatch = useDispatch();
   //  update the post-detailed data with the current iterated post
   // will lift-up the state and make the data available to root parent
-  const handlePostDetails = async () => {
-    await setPostDetailedData(post);
-
+  const handlePostDetails = () => {
+    // set is post detailed drawer true
+    setIsPostDetailedDrawer(true)
+    // populate the post detailed data
+     setPostDetailedData(post);
     // false showing of the speed dial for tabs and small devices
     dispatch(handleShowingSpeedDial(false));
   };
@@ -52,8 +55,10 @@ export default function UserPostCardDrawer({
   const handleUpdateMyPost = () => {
     // set is edit or update  mode to true
     setIsPostEditMode(true);
-    // set handle post details and also update is edit mode
-    handlePostDetails();
+     // populate the post detailed data
+     setPostDetailedData(post);
+    // false showing of the speed dial for tabs and small devices
+    dispatch(handleShowingSpeedDial(false));
   };
 
   // handle deleting of the post belonging to the current user
@@ -155,8 +160,9 @@ export default function UserPostCardDrawer({
 
       {/* delete and update buttons if post belongs to the current user */}
       {isMyPost && (
-        <Box display={"flex"} justifyContent={"center"}>
+        <Box display={"flex"} justifyContent={"center"} mb={1} width={"100%"}>
           <Box
+            width={"100%"}
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
@@ -164,7 +170,6 @@ export default function UserPostCardDrawer({
           >
             {/* update button */}
             <Button
-              variant="outlined"
               sx={{
                 fontSize: "x-small",
                 fontWeight: "bold",
@@ -182,7 +187,6 @@ export default function UserPostCardDrawer({
             {/* delete button */}
             <Button
             disableElevation
-              variant="outlined"
               sx={{
                 fontSize: "x-small",
                 fontWeight: "bold",

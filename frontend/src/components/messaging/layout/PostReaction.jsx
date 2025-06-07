@@ -27,13 +27,12 @@ import { useNavigate } from "react-router-dom";
 import { showMessagingDrawer } from "../../../redux/AppUI";
 import { deleteCurrentPostReaction } from "../../../redux/CurrentPostReactions";
 import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
-import MiniProfileLayout from "../../custom/MiniProfileLayout";
-import { getElapsedTime } from "../../utilities/getElapsedTime";
 import CustomCountryName from "../../utilities/CustomCountryName";
+import { getElapsedTime } from "../../utilities/getElapsedTime";
+import devLogo from '../../../images/dev.jpeg'
 
 export default function PostReaction({ reaction }) {
   const [isFetching, setIsFetching] = useState(false);
-  const [isMiniProfile, setIsMiniProfile] = useState(false);
   const navigate = useNavigate();
 
   // dispatch for redux functionalities
@@ -81,12 +80,6 @@ export default function PostReaction({ reaction }) {
       });
   };
 
-  // handle fetch user details
-  const handleShowMiniProfile = () => {
-    // show user mini-profile view instead of their post reaction
-    setIsMiniProfile((prev) => !prev);
-  };
-
   // navigate to post details routed page, else close the drawer notification
   const handleNavigatePostDetailsRoute = () => {
     // close drawer messaging by updating the redux state
@@ -96,25 +89,7 @@ export default function PostReaction({ reaction }) {
     navigate("posts/details/" + reaction?.postId);
   };
 
-  return (
-    <React.Fragment>
-      {isMiniProfile ? (
-        <React.Fragment>
-          {/* user mini-profile */}
-          <Box
-            className={"mb-2"}
-            sx={{
-              border: "1px solid",
-              borderColor: "divider",
-            }}
-          >
-            <MiniProfileLayout
-              handleShowMiniProfile={handleShowMiniProfile}
-              userId={reaction?.userId}
-            />
-          </Box>
-        </React.Fragment>
-      ) : (
+  return (    
         <List
           sx={{ width: "100%", maxWidth: 400, bgcolor: "background.paper" }}
         >
@@ -122,8 +97,8 @@ export default function PostReaction({ reaction }) {
              border: "1px solid",
              borderColor: "divider",
            }}>
-            <ListItemAvatar onClick={handleShowMiniProfile}>
-              <Avatar src="" alt="">
+            <ListItemAvatar>
+              <Avatar variant="rounded" src={devLogo} alt="">
                 <Typography
                   variant="body2"
                   textTransform={"uppercase"}
@@ -162,11 +137,18 @@ export default function PostReaction({ reaction }) {
                       &nbsp;
                       {/* delete reaction */}
                         <Tooltip title={'clear'} arrow>
-                        <IconButton size="small" onClick={handleDeleteReaction} sx={{ 
+                        <IconButton size="small" 
+                        onClick={handleDeleteReaction} 
+                        disabled={isFetching}
+                        sx={{ 
                         border: "1px solid",
                         borderColor: "divider",
                       }}>
-                        <Close sx={{ width: 13, height: 13 }} />
+                        {isFetching ? (
+                          <CircularProgress size={13}/>
+                        ):(
+                          <Close sx={{ width: 13, height: 13 }} />
+                        )}
                       </IconButton>
                     </Tooltip>    
                     </Box>
@@ -324,7 +306,6 @@ export default function PostReaction({ reaction }) {
             />
           </ListItem>
         </List>
-      )}
-    </React.Fragment>
+      
   );
 }

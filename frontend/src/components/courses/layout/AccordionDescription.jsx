@@ -1,5 +1,4 @@
-import { DescriptionRounded } from "@mui/icons-material";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { AddOutlined, DescriptionRounded, Remove } from "@mui/icons-material";
 import { Box, Fade } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -42,7 +41,7 @@ export default function AccordionDescription({ description }) {
         ]}
       >
         <AccordionSummary
-          expandIcon={<ArrowDropDownIcon />}
+          expandIcon={expanded ? <Remove sx={{ width:18,height:18 }}/> :<AddOutlined sx={{ width:18,height:18 }} />}
           aria-controls="panel2-content"
           id="panel2-header"
         >
@@ -52,7 +51,7 @@ export default function AccordionDescription({ description }) {
           </Box>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography variant="body2">{description}</Typography>
+          <Typography variant="caption">{description}</Typography>
         </AccordionDetails>
       </Accordion>
     </Box>

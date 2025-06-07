@@ -53,20 +53,11 @@ const RightbarAll = () => {
     >
       <Box
         position={"fixed"}
-        className={
-          CustomDeviceIsSmall() ||
-          (CustomDeviceTablet() ? "shadow rounded" : "rounded")
-        }
+        className={'rounded'}
         maxHeight={"85vh"}
         sx={{
-          border:
-            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
-              ? "1px solid"
-              : "1px solid",
-          borderColor:
-            (CustomDeviceIsSmall() || CustomDeviceTablet()) && isDarkMode
-              ? "divider"
-              : "divider",
+          border: "1px solid",
+          borderColor:"divider",
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -83,10 +74,12 @@ const RightbarAll = () => {
             {/*  top jobs */}
             <Stack gap={1}  display={corouselCounter === 0 ? "block" : "none"}>
               <JobsContainer />
-              <Box display={'flex'} justifyContent={'center'} width={'auto'}>
-
-              <Button startIcon={<InsightsRounded/>} onClick={handleNavigateJobs} size="small" sx={{ textTransform:'capitalize', borderRadius:4}} >more jobs</Button>
-              </Box>
+              {/* shown on smartphones and tablets only */}
+              {CustomDeviceIsSmall()|| CustomDeviceTablet() && (
+                <Box display={'flex'} justifyContent={'center'} width={'auto'}>
+                <Button startIcon={<InsightsRounded/>} onClick={handleNavigateJobs} size="small" sx={{ textTransform:'capitalize', borderRadius:4}} >more jobs</Button>
+                </Box>
+              )}
             </Stack>
 
             {/* connect request */}

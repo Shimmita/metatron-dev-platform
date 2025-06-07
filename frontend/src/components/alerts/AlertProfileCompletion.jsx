@@ -135,7 +135,7 @@ export default function AlertProfileCompletion({
         formData
       )
       .then((res) => {
-        // set success messge
+        // set success message
         setSuccessMsg(res?.data?.message);
         // clear error msg
         setErrorPosting("");
@@ -221,7 +221,6 @@ export default function AlertProfileCompletion({
   };
 
   return (
-    <React.Fragment>
       <Dialog
         open={openAlertProfile}
         TransitionComponent={Transition}
@@ -230,7 +229,7 @@ export default function AlertProfileCompletion({
       >
         {isPosting ? (
           <React.Fragment>
-            {/* content spining wheels or indicators */}
+            {/* content spinning wheels or indicators */}
             <DialogContent>
               <Box display={"flex"} justifyContent={"center"}>
                 <CircularProgress />
@@ -550,6 +549,5 @@ export default function AlertProfileCompletion({
           </React.Fragment>
         )}
       </Dialog>
-    </React.Fragment>
   );
 }

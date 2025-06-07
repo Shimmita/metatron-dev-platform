@@ -33,6 +33,7 @@ import CustomCountryName from "../../utilities/CustomCountryName";
 import { getImageMatch } from "../../utilities/getImageMatch";
 import UserNetwork from "../UserNetwork";
 import { updateUserCurrentUserRedux } from "../../../redux/CurrentUser";
+import PostDetailsInDrawer from "../../post/PostDetailsInDrawer";
 const PostDetailsContainer = lazy(() =>
   import("../../post/PostDetailsContiner")
 );
@@ -84,6 +85,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function UserProfileDrawer({ profileData }) {
+  const[isPostDetailedDrawer,setIsPostDetailedDrawer]=useState(false)
   // get redux states
   const { user } = useSelector((state) => state.currentUser);
 
@@ -292,9 +294,8 @@ export default function UserProfileDrawer({ profileData }) {
   return (
     <Box
       color={"text.primary"}
-      maxHeight={"85vh"}
-      borderRadius={2}
-      mb={2}
+      borderRadius={2} 
+      maxHeight={'90vh'}    
       sx={{
         border: "1px solid",
         borderColor: "divider",
@@ -310,19 +311,35 @@ export default function UserProfileDrawer({ profileData }) {
     >
       {/* displayed for full post details when data is present */}
       {postDetailedData ? (
-        <Box>
-          <PostDetailsContainer
+        <React.Fragment>
+          {isPostDetailedDrawer ?(
+            <React.Fragment>
+          {/* the post is detailed view and not edit mode */}
+           <PostDetailsInDrawer
             postDetailedData={postDetailedData}
             setPostDetailedData={setPostDetailedData}
             isDrawerFocused={true}
-            isPostEditMode={isPostEditMode}
-            setIsPostEditMode={setIsPostEditMode}
+            />
+          
+            </React.Fragment>
+          ):(
+            <React.Fragment>
+              {/* post is in edit mode */}
+              <PostDetailsContainer
+              postDetailedData={postDetailedData}
+              setPostDetailedData={setPostDetailedData}
+              isDrawerFocused={true}
+              isPostEditMode={isPostEditMode}
+              setIsPostEditMode={setIsPostEditMode}
           />
-        </Box>
+            </React.Fragment>
+          )}
+            
+        </React.Fragment>
+        
       ) : (
-        <React.Fragment>
+        <Box p={2}>
           {/* shown when there is profile info */}
-          <Box p={2}>
             <Box>
               <Box display={"flex"} justifyContent={"center"}>
                 <Avatar src={devImage} alt="" sx={{ width: 80, height: 80 }} />
@@ -491,8 +508,7 @@ export default function UserProfileDrawer({ profileData }) {
                   <AvatarGroup max={profileData?.selectedSkills?.length}>
                     {/* loop through the skills and their images matched using custom fn */}
                     {profileData?.selectedSkills?.map((skill, index) => (
-                      <Tooltip title={skill} arrow key={skill}
->
+                      <Tooltip title={skill} arrow key={skill}>
                         <Avatar
                           alt={skill}
                           className="border"
@@ -614,6 +630,7 @@ export default function UserProfileDrawer({ profileData }) {
                         userId={profileData?._id}
                         setPostDetailedData={setPostDetailedData}
                         setIsPostEditMode={setIsPostEditMode}
+                        setIsPostDetailedDrawer={setIsPostDetailedDrawer}
                       />
                     )}
                     {/* user network of people */}
@@ -632,7 +649,6 @@ export default function UserProfileDrawer({ profileData }) {
               </React.Fragment>
             )}
           </Box>
-        </React.Fragment>
       )}
 
       {/* connect request response snackbar */}

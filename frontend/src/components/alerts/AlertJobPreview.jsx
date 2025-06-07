@@ -1,8 +1,5 @@
-import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -27,8 +24,19 @@ export default function AlertJobPreview({
 
   console.log(job)
 
-    //   redux states
-    const { isTabSideBar,isDarkMode } = useSelector((state) => state.appUI);
+  //   redux states
+  const { isTabSideBar,isDarkMode } = useSelector((state) => state.appUI);
+
+  // handle width of the alert
+  const handleWidthAlert=()=>{
+    if (CustomDeviceTablet() && isTabSideBar) {
+      return "60%"
+    } else if(CustomLandScape()){
+      return "92%"
+    } else if(CustomLandscapeWidest()){
+      return "97.5%"
+    }
+  }
 
   return (
       <Dialog
@@ -39,15 +47,8 @@ export default function AlertJobPreview({
         aria-describedby="alert-dialog-slide-description"
           sx={{
                marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
-                  width:
-                    CustomDeviceTablet() && isTabSideBar
-                      ? "60%"
-                      : CustomLandScape()
-                      ? "92%"
-                      : CustomLandscapeWidest()
-                      ? "97.5%"
-                      : undefined,
-                }}
+               width:handleWidthAlert()
+           }}
       >
          
         <DialogContent dividers >

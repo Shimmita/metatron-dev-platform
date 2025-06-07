@@ -279,7 +279,7 @@ const ConversationDetailed = ({
                           </IconButton>
                         </Box>
                         <Box>
-                          <Typography variant="body2" fontWeight={"bold"}>
+                          <Typography variant="caption" fontWeight={"bold"}>
                             {message?.content}
                           </Typography>
                         </Box>
@@ -368,7 +368,7 @@ const ConversationDetailed = ({
                       {/* message content */}
                       <Box>
                         <Typography
-                          variant="body2"
+                          variant="caption"
                           fontWeight={"bold"}
                           color={isDarkMode ? "text.primary" : "text.secondary"}
                         >

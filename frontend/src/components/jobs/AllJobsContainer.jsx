@@ -10,17 +10,20 @@ import {
   Menu,
   MyLocationRounded,
   NotificationsRounded,
+  SearchOutlined,
   VerifiedRounded,
   WorkRounded
 } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
+  alpha,
   AppBar,
   Avatar,
   Badge,
   Button,
   CircularProgress,
+  InputBase,
   Stack,
   Toolbar,
   Tooltip
@@ -59,6 +62,8 @@ import JobLayout from "./layout/JobLayout";
 import JobStatsLayout from "./layout/JobStatsLayouts";
 import AlertGeneral from "../alerts/AlertGeneral";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
+import CustomLandScape from "../utilities/CustomLandscape";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
 
@@ -116,6 +121,50 @@ const Drawer = styled(MuiDrawer, {
     },
   ],
 }));
+
+
+ // search bar option
+  const Search = styled('div')(({ theme }) => ({
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(1),
+      width: 'auto',
+    },
+  }));
+  
+  const SearchIconWrapper = styled('div')(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }));
+  
+  const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: 'inherit',
+    width: '100%',
+    '& .MuiInputBase-input': {
+      padding: theme.spacing(1, 1, 1, 0),
+      // vertical padding + font size from searchIcon
+      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+      transition: theme.transitions.create('width'),
+      [theme.breakpoints.up('sm')]: {
+        width: '12ch',
+        '&:focus': {
+          width: '20ch',
+        },
+      },
+    },
+  }));
 
 
 export default function MiniDrawer() {
@@ -179,12 +228,6 @@ export default function MiniDrawer() {
     setIsDrawerPane((prev) => !prev);
   };
 
-  // UI theme dark light tweaking effect
-  const handleShowDarkMode = () => {
-    // update the redux theme boolean state
-    dispatch(resetDarkMode());
-  };
-  
 
   // show the notification and messaging triggered by redux
   const handleShowMessageDrawer = () => {
@@ -523,9 +566,9 @@ export default function MiniDrawer() {
       >
         <Box 
         display={"flex"} 
-        height={'85vh'}
+        height={(CustomLandScape()|| CustomLandscapeWidest()) ?"86vh":"90vh"}
          sx={{
-          width:window.screen.availWidth-18,
+          width:window.screen.availWidth-32,
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -577,25 +620,29 @@ export default function MiniDrawer() {
 
                 {/* current navigation counter */}
                 <Box display={"flex"} justifyContent={"center"}>
-                  <Typography variant="caption" textTransform={'lowercase'} ml={open && 22}>
+                  <Typography 
+                  variant="caption"
+                   textTransform={'capitalize'}
+                   ml={open && 22}>
                     - {textOption} -
                   </Typography>
                 </Box>
               </Box>
 
               <Box display={'flex'} gap={2} alignItems={'center'} justifyContent={'flex-end'}>
-              {/* alter theme */}
-              <Box>
-                <IconButton onClick={handleShowDarkMode}>
-                  <Tooltip arrow title={isDarkMode ? "Light" : "Dark"}>
-                    <DarkModeRounded
-                      sx={{ color:'white'}}
-                    />
-                  </Tooltip>
-                </IconButton>
-              </Box>
-
-
+                {/* displayed on tabs and big screens */}
+                {!CustomDeviceIsSmall() && (
+                   <Search>
+                   <SearchIconWrapper>
+                     <SearchOutlined />
+                   </SearchIconWrapper>
+                   <StyledInputBase
+                     placeholder="Search…"
+                     inputProps={{ 'aria-label': 'search' }}
+                   />
+                 </Search>
+                )}
+                
               {/* notification and messaging */}
               <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
                 <Tooltip arrow title={"notifications"}>
@@ -634,7 +681,7 @@ export default function MiniDrawer() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                backgroundColor:isDarkMode ? "#272727":"#1976D2"
+                backgroundColor:"#1976D2"
               }}
             >
               {!open && (
@@ -663,6 +710,7 @@ export default function MiniDrawer() {
              {/* title hiring */}
              <Typography variant="body2" 
              sx={{color:'white'}} 
+             mb={1}
              textTransform={'uppercase'}>
                jobseeker
              </Typography>
@@ -797,6 +845,7 @@ export default function MiniDrawer() {
                       ]}
                     />
                   </ListItemButton>
+                   <Divider component={"li"} />
                 </ListItem>
               ))}
             </List>

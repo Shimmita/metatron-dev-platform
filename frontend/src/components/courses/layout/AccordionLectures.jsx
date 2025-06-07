@@ -1,5 +1,4 @@
-import { ArrowForwardRounded, Check, SchoolRounded } from "@mui/icons-material";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import { AddOutlined, ArrowForwardRounded, Check, Remove, SchoolRounded } from "@mui/icons-material";
 import { Box, Fade, Stack } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -42,24 +41,27 @@ export default function AccordionLectures({ lectures }) {
         ]}
       >
         <AccordionSummary
-          expandIcon={<ArrowDropDownIcon />}
+          expandIcon={expanded ? <Remove sx={{ width:18,height:18 }}/> :<AddOutlined sx={{ width:18,height:18 }} />}
           aria-controls="panel2-content"
           id="panel2-header"
         >
           <Box display={"flex"} gap={2} alignItems={"center"}>
             <SchoolRounded sx={{ width: 23, height: 23 }} />{" "}
-            <Typography variant="body2">Topics Debunked</Typography>
+            <Typography variant="body2">Course Topics Outline</Typography>
           </Box>
         </AccordionSummary>
         <AccordionDetails>
-          {lectures &&
-            lectures.map((val, index) => (
-              <Stack direction={"row"} gap={2} alignItems={"center"}>
+          {lectures?.map((val) => (
+              <Stack direction={"row"}
+               gap={2} 
+               alignItems={"center"}
+               key={val}
+               >
                 <ArrowForwardRounded
                   sx={{ width: 20, height: 20 }}
                   color="success"
                 />
-                <Typography variant="body2">{val}</Typography>
+                <Typography variant="caption">{val}</Typography>
               </Stack>
             ))}
 
@@ -67,11 +69,11 @@ export default function AccordionLectures({ lectures }) {
           <Box mt={2}>
             <Stack direction={"row"} gap={2} alignItems={"center"}>
               <Check sx={{ width: 20, height: 20 }} color="success" />
-              <Typography variant="body2">Certificate of Completion</Typography>
+              <Typography variant="caption">Certificate of Completion</Typography>
             </Stack>
             <Stack direction={"row"} gap={2} alignItems={"center"}>
               <Check sx={{ width: 20, height: 20 }} color="success" />
-              <Typography variant="body2">Internship Connections</Typography>
+              <Typography variant="caption">Internship Connections</Typography>
             </Stack>
           </Box>
         </AccordionDetails>

@@ -1,4 +1,5 @@
 import { DeleteRounded } from "@mui/icons-material";
+import { Box, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -6,15 +7,14 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
+import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { updateCurrentJobs } from "../../redux/CurrentJobs";
+import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import { Box, Typography } from "@mui/material";
-import axios from "axios";
-import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
-import { resetClearCurrentJobs, updateCurrentJobs } from "../../redux/CurrentJobs";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -67,22 +67,33 @@ export default function DeleteJobAlert({
             })
             .catch((err) => {
     
-                //  user login session expired show logout alert
-                if (err?.response?.data.login) {
-                window.location.reload();
-                }
-                if (err?.code === "ERR_NETWORK") {
-                setErrorMessage(
-                    "server unreachable"
-                );
-                }
-            })
-            .finally(() => {
-                // false fetching
-                setIsFetching(false);        
-            });
+            //  user login session expired show logout alert
+            if (err?.response?.data.login) {
+            window.location.reload();
+            }
+            if (err?.code === "ERR_NETWORK") {
+            setErrorMessage(
+                "server unreachable"
+            );
+            }
+        })
+        .finally(() => {
+            // false fetching
+            setIsFetching(false);        
+        });
     
   }
+
+  // handle width of the alert
+    const handleWidthAlert=()=>{
+      if (CustomDeviceTablet() && isTabSideBar) {
+        return "60%"
+      } else if(CustomLandScape()){
+        return "92%"
+      } else if(CustomLandscapeWidest()){
+        return "97.5%"
+      }
+    }
 
   return (
       <Dialog
@@ -93,14 +104,7 @@ export default function DeleteJobAlert({
         sx={{
           marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
 
-          width:
-            CustomDeviceTablet() && isTabSideBar
-              ? "60%"
-              : CustomLandScape()
-              ? "92%"
-              : CustomLandscapeWidest()
-              ? "97.5%"
-              : undefined,
+          width:handleWidthAlert()
         }}
       >
         <DialogTitle

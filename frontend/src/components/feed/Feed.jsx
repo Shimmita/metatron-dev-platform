@@ -6,8 +6,10 @@ import BasicSpeedDial from "../custom/SpeedDial";
 
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import BottomNav from "../bottom/BottomNav";
-import SnackBarPostSuccess from "../snackbar/SnackBarPostSuccess";
 import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
+const SnackBarPostSuccess =lazy(()=>import("../snackbar/SnackBarPostSuccess")) ;
+const CoursesMainContainer =lazy(()=>import("../courses/CoursesMainContainer"));
+const CoursesInstrContainer =lazy(()=>import("../courses/CoursesInstrContainer")) ;
 const FeedDefaultSearch = lazy(() => import("./FeedDefaultSearch"));
 const PostDetailsRouted = lazy(() => import("../post/PostDetailsRouted"));
 const CourseDetailed = lazy(() => import("../courses/layout/CourseDetailed"));
@@ -59,6 +61,7 @@ const Feed = () => {
           marginRight={CustomFeedEquidstance()}
           flex={3}
           p={1}
+          mt={1}
           color={"text.primary"}
         >
           <Suspense
@@ -81,12 +84,19 @@ const Feed = () => {
             <Routes>
               <Route path="/" element={<FeedDefaultContent />} />
 
-              {/* <Route path="/account/premium" element={<AccountPremium />} /> */}
+              {/* under development */}
               <Route path="/courses/paid" element={<CoursePaidContainer />} />
               <Route
                 path="/courses/paid/detailed"
                 element={<CourseDetailed />}
               />
+
+              {/* final selection route for courses */}
+              <Route path="/courses/available" element={<CoursesMainContainer />} />
+               {/* instructor */}
+               <Route path="/courses/instructor" element={<CoursesInstrContainer />} />
+
+
               {/* jobseeker pane */}
               <Route path="/jobs" element={<AllJobsContainer />} />
 
@@ -184,11 +194,19 @@ const Feed = () => {
               <Routes>
                 <Route path="/" element={<FeedDefaultContent />} />
 
+                {/* under development */}
                 <Route path="/courses/paid" element={<CoursePaidContainer />} />
                 <Route
                   path="/courses/paid/detailed"
                   element={<CourseDetailed />}
                 />
+
+                {/* final selection route for courses */}
+              <Route path="/courses/available" element={<CoursesMainContainer />} />
+
+              {/* instructor */}
+              <Route path="/courses/instructor" element={<CoursesInstrContainer />} />
+
                 {/* jobseeker pane */}
                 <Route path="/jobs" element={<AllJobsContainer />} />
 

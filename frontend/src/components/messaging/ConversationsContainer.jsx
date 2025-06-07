@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from "react-redux";
 import ConversationDetailed from "./ConversationDetailed";
 import ConversationLayout from "./layout/ConversationLayout";
 import NewConversation from "./layout/NewConversation";
-import { resetClearConversations } from "../../redux/CurrentConversations";
 
 export default function ConversationsContainer({ setMessageNotifClicked }) {
   // axios default credentials

@@ -300,7 +300,7 @@ export default function AlertCountry({
                       label="authorised"
                     >
                       {BusinessData &&
-                        BusinessData.permitted.map((data) => (
+                        BusinessData?.permitted.map((data) => (
                           <MenuItem key={data} value={data}>
                             <Typography variant="body2">{data}</Typography>
                           </MenuItem>

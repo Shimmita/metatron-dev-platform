@@ -74,10 +74,9 @@ const FeedDefaultSearch = () => {
           }}
         >
           {/* map through the posts and display them to the user */}
-          {posts &&
-            posts.map((post, index) => {
+          {posts?.map((post) => {
               return (
-                <Box key={index}>
+                <Box key={post}>
                   <Box>
                     {/* feed card detailed post */}
                     <CardFeed

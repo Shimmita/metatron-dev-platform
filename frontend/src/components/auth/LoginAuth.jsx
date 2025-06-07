@@ -86,7 +86,7 @@ const LoginAuth = () => {
   // handle login  with google
   const handleLoginWithGoogle = () => {
     const googleFailedError =
-      "Google authentication failed, please try again later";
+      "Google authentication failed!";
 
     setIsLogin(true);
     // creating empty form data since the backend parses JSON from  the
@@ -205,7 +205,8 @@ const LoginAuth = () => {
       <Box
         className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
         width={"100%"}
-        maxHeight={"98vh"}
+        maxHeight={"95vh"}
+        bgcolor={!isDarkMode && "background.default"}
         sx={{
           border: isDarkMode && "1px solid",
           borderColor: isDarkMode && "divider",
@@ -281,13 +282,13 @@ const LoginAuth = () => {
           <Box mb={1}>
             <Box display={"flex"} justifyContent={"center"}>
               {/* logo */}
-              <Avatar alt={"logo"} sx={{ width: 60, height: 60 }} src={logo} />
+              <Avatar alt={"logo"} sx={{ width: 70, height: 70 }} src={logo} />
             </Box>
             <Box mb={3}>
               <Typography
                 textAlign={"center"}
                 fontWeight={"bold"}
-                textTransform={"uppercase"}
+                bgcolor={!isDarkMode && "background.default"}            textTransform={"uppercase"}
                 variant={CustomDeviceSmallest() ? "body1" : "h6"}
                 gutterBottom
                 color={"primary"}
@@ -307,7 +308,7 @@ const LoginAuth = () => {
                 justifyContent={"center"}
               >
                 <StarRounded sx={{ width: 20, height: 20 }} />
-                Visit The Best IT Platform{" "}
+                Visiting The Best IT Platform{" "}
                 <StarRounded sx={{ width: 20, height: 20 }} />
               </Typography>
 

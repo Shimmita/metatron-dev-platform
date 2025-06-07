@@ -18,7 +18,7 @@ import { getAuth, signOut } from "firebase/auth";
 import React, { lazy, Suspense, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { persistor } from "../../../redux/AppStore";
-import { showUserProfileDrawer } from "../../../redux/AppUI";
+import { handleShowLogout, showUserProfileDrawer } from "../../../redux/AppUI";
 import {
   resetClearCurrentUserRedux,
   resetClearTempUserIDRedux,
@@ -31,21 +31,17 @@ const UserProfileDrawer = lazy(() => import("./UserProfileDrawer"));
 
 export default function ProfileDrawer() {
   // redux states
-  const { isOpenDrawerProfile } = useSelector((state) => state.appUI);
+  const { isOpenDrawerProfile,isDarkMode,isLogoutAlert } = useSelector((state) => state.appUI);
   const [temporaryProfileData, setTemporaryProfileData] = useState();
-  const [openLogoutAlert, setOpenLogoutAlert] = useState(false);
   const [isProfileUpdate, setIsProfileUpdate] = useState(false);
 
   const [isFetching, setIsFetching] = useState(false);
-  const [erroMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   // get redux states
   const { user: nativeLoggedinUser, tempUserProfileID } = useSelector(
     (state) => state.currentUser
   );
-
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   // dispatch
   const dispatch = useDispatch();
@@ -95,40 +91,15 @@ export default function ProfileDrawer() {
     }
   }, [tempUserProfileID]);
 
-  // handle opening of the logout alert
-  const handleOpeningLogout = () => {
-    setOpenLogoutAlert((prev) => !prev);
-  };
-
-  // handle competition of logging out
-  const handleCompleteLogout = async () => {
-    try {
-      // set is fetching true
-      setIsFetching(true)
-      // send a post request to the backend to clear all cookie sessions if any
-      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signout`);
-
-      // clear any firebase authentication details
-      const auth = getAuth();
-      const firebaseUser = auth?.currentUser;
-      if (firebaseUser) {
-        await signOut(auth);
-      }
-
-      // Clear persisted storage and redux
-      await persistor.purge();
-
-      // Dispatch Redux action to reset user state
-      dispatch(resetClearCurrentUserRedux());
-
-      // close drawer
+  // handle opening of the logout alert via redux
+  const handleShowLogoutAlert = () => {
+    // close the drawer
       dispatch(showUserProfileDrawer());
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }finally{
-      setIsFetching(false)
-    }
+    // show logout alert
+   dispatch(handleShowLogout(true))
   };
+
+ 
 
   // handle showing of profile update
   const handleShowingProfileUpdate = () => {
@@ -149,12 +120,12 @@ export default function ProfileDrawer() {
   }
 
   return (
-    <Drawer anchor={"right"} open={isOpenDrawerProfile} onClose={handleClose}>
+    <Drawer anchor={"right"} 
+    open={isOpenDrawerProfile} onClose={handleClose}>
       <Box
         width={
          handleDrawerWidth()
         }
-        bgcolor={"background.default"}
       >
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
@@ -167,7 +138,7 @@ export default function ProfileDrawer() {
               {!temporaryProfileData && (
                 <Stack direction={"row"} gap={1} alignItems={"center"}>
                   {/* logout */}
-                  <Button color="inherit" onClick={handleOpeningLogout}>
+                  <Button color="inherit" onClick={handleShowLogoutAlert}>
                     Logout
                   </Button>
                   {/* divider */}|{/* profile setting */}
@@ -187,60 +158,12 @@ export default function ProfileDrawer() {
             </Toolbar>
           </AppBar>
         </Box>
-
-        {/* show logout alert */}
-        <Box display={"flex"} justifyContent={"center"} p={1} mb={1}>
-          {openLogoutAlert && (
-            <Collapse in={openLogoutAlert || false}>
-              <Alert
-                severity="info"
-                className="rounded-5"
-                action={
-                  <Stack direction={"row"} alignItems={"center"} gap={1}>
-                    {/* yes btn */}
-                    <IconButton
-                      aria-label="close"
-                      color="inherit"
-                      size="small"
-                      onClick={handleCompleteLogout}
-                    >
-                      <Typography
-                        variant="body2"
-                        color={"orange"}
-                        fontWeight={"bold"}
-                      >
-                        Yes
-                      </Typography>
-                    </IconButton>
-                    |{/* no btn */}
-                    <IconButton
-                      aria-label="close"
-                      color="inherit"
-                      size="small"
-                      onClick={handleOpeningLogout}
-                    >
-                      <Typography
-                        variant="body2"
-                        color={"inherit"}
-                        fontWeight={"bold"}
-                      >
-                        No
-                      </Typography>
-                    </IconButton>
-                  </Stack>
-                }
-              >
-                {isFetching ? "ending session...":"end current session?"}
-              </Alert>
-            </Collapse>
-          )}
-        </Box>
-
+ 
         {/* content */}
         <Box>
           <Suspense
             fallback={
-              <Box height={"85vh"} display={"flex"} justifyContent={"center"}>
+              <Box height={"89vh"} display={"flex"} justifyContent={"center"}>
                 <Box display={"flex"} justifyContent={"center"}>
                   <CircularProgress size={20} />
                 </Box>
@@ -249,7 +172,7 @@ export default function ProfileDrawer() {
           >
             {/* render user profile component passing current user id no temporary data*/}
             {isFetching ? (
-              <Box height={"50vh"}>
+              <Box height={"89vh"}>
                 <Stack alignContent={"center"}>
                   <CircularProgress size={25} />
                 </Stack>

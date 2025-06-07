@@ -95,24 +95,6 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
-
-  // handle showing free logo menu
-  const handleShowFreeLogo = () => {
-    // clear file uploaded if any
-    setFileUpload(null);
-    // set true link video full
-    setIsFreeLogo(true);
-  };
-
-  // handle closing free logo
-  const handleCloseFreeLogo = () => {
-    // clear
-    setFreeLogo("");
-    // default showing of btn upload and link
-    setIsFreeLogo(false);
-  };
 
   // extracting current logged in user details from the redux store
   const ownerId = user._id;
@@ -173,18 +155,41 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     updatePostCategoryValue();
   }, [post_category, backend, database, frontend]);
 
+
+   // handle showing free logo menu
+   const handleShowFreeLogo = () => {
+    // clear file uploaded if any
+    setFileUpload(null);
+    // set true link video full
+    setIsFreeLogo(true);
+  };
+
+  // handle closing free logo
+  const handleCloseFreeLogo = () => {
+    // clear
+    setFreeLogo("");
+    // default showing of btn upload and link
+    setIsFreeLogo(false);
+  };
+
+
   // handle when free logos is selected or changed
   const handleFreeLogoPicked = (event) => {
     // clear file preview
     setFilePreview(null);
     // update free logo value
     setFreeLogo(event.target.value);
+    
     // update file preview for free logo
     setFilePreview(getImageMatch(event.target.value));
   };
 
   //   handle file change and compress the image
   const handleFileChange = async (event) => {
+    // close free logo
+    handleCloseFreeLogo()
+
+    // update file events
     const file = event.target.files[0];
     // compress the file using the custom utility created
     const compressedFile = await BrowserCompress(file);
@@ -338,14 +343,25 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       return "100%"
     }
 
+  // handle width of the global search
+      const handleModalWidth=()=>{
+        if (CustomDeviceTablet() && isTabSideBar) {
+          return "36%"
+        } else if(CustomLandScape()){
+          return "-8%"
+        } else if(CustomLandscapeWidest()){
+          return "-5%"
+        }
+      }
+
   return (
     <StyledModalPost
     keepMounted
     open={openModalTech}
     sx={{
-      marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
+      marginLeft: handleModalWidth()
     }}
-    // onClose={(e) => setOpenPostModal(false)}
+    onClose={handleClosingModal}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
   >
@@ -353,7 +369,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       width={handleReturnWidthModal()}
       p={1}
       borderRadius={5}
-      bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
+      bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
       color={"text.primary"}
       sx={{
         border: isDarkMode && "1px solid gray",
@@ -376,6 +392,16 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               <Avatar sx={{ width: 60, height: 60 }} src={AppLogo} alt="logo" />
             </Box>
 
+              {/* title */}
+              <Typography
+                variant="body2"
+                width={"100%"}
+                fontWeight={"bold"}
+                textAlign={"center"}
+              >
+                {title.length===0 ? "Tech Content Upload":title}
+              </Typography>
+
             {/*close icon */}
             <IconButton
               disabled={isUploading || errorMessage}
@@ -391,7 +417,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           <Box
             display={"flex"}
             justifyContent={"center"}
-            mb={isUploading || errorMessage ? 3 : undefined}
+            mb={isUploading || errorMessage ? 1 : undefined}
           >
             {errorMessage ? (
               <Collapse in={errorMessage || false}>
@@ -407,7 +433,6 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       />
                     </IconButton>
                   }
-                  sx={{ mb: 2 }}
                 >
                   {errorMessage}
                 </Alert>
@@ -875,10 +900,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
               {/* frontend */}
               {(post_category === "Frontend App Development" ||
-                post_category === "Fullstack Application Development") && (
+                post_category === "Fullstack App Development") && (
                 <Box Box>
                   <Typography variant="body2" color={"text.secondary"}>
-                    Which frontend technology are you intrested in? If your post
+                    Which frontend technology are you interested in? If your post
                     is based on a bare HTML/CSS/Js version of a project, select
                     the option with (HTML).
                   </Typography>
@@ -915,10 +940,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
               {/* backend */}
               {(post_category === "Backend App Development" ||
-                post_category === "Fullstack Application Development") && (
+                post_category === "Fullstack App Development") && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
-                    Which backend technology are you intrested in? Suppose none
+                    Which backend technology are you interested in? Suppose none
                     of the provided options matches your preference select
                     (other).
                   </Typography>
@@ -956,7 +981,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* Database */}
               {(post_category === "Database Administration" ||
                 post_category === "Backend App Development" ||
-                post_category === "Fullstack Application Development") && (
+                post_category === "Fullstack App Development") && (
                 <Box>
                   <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Which database did you link it with {backend} for this post.
@@ -1132,7 +1157,46 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 </Box>
               )}
 
-              {!isFreeLogo ? (
+               {/* shown if free logo is true */}
+               {isFreeLogo && (
+                 <Box
+                 mt={1}
+                 className="w-100 mb-4"
+                 display={"flex"}
+                 alignItems={"center"}
+                 gap={1}
+               >
+                 <TextField
+                   required
+                   disabled={isUploading || errorMessage}
+                   select
+                   value={freeLogo}
+                   variant="standard"
+                   label="Free logos"
+                   fullWidth
+                   onChange={handleFreeLogoPicked}
+                 >
+                   {
+                     logoNamesOptions?.map((name, index) => (
+                       <MenuItem
+                         key={name}
+                         value={name}
+                         sx={{ display: "flex", gap: 2 }}
+                       >
+                         {/* logo */}
+                         <Avatar
+                           src={logoValueOptions[index]}
+                           sx={{ width: 32, height: 32 }}
+                           alt=""
+                         />
+                         {/* name */}
+                         <Typography variant="body2">{name}</Typography>
+                       </MenuItem>
+                     ))}
+                 </TextField>
+               </Box>
+               )}
+
                 <Box
                   display={"flex"}
                   justifyContent={"flex-end"}
@@ -1179,52 +1243,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     />
                   </Button>
                 </Box>
-              ) : (
-                <Box
-                  mt={1}
-                  className="w-100 mb-4"
-                  display={"flex"}
-                  alignItems={"center"}
-                  gap={1}
-                >
-                  <TextField
-                    required
-                    disabled={isUploading || errorMessage}
-                    select
-                    value={freeLogo}
-                    variant="standard"
-                    label="Free logos"
-                    fullWidth
-                    onChange={handleFreeLogoPicked}
-                  >
-                    {
-                      logoNamesOptions?.map((name, index) => (
-                        <MenuItem
-                          key={name}
-                          value={name}
-                          sx={{ display: "flex", gap: 2 }}
-                        >
-                          {/* logo */}
-                          <Avatar
-                            src={logoValueOptions[index]}
-                            sx={{ width: 32, height: 32 }}
-                            alt=""
-                          />
-                          {/* name */}
-                          <Typography variant="body2">{name}</Typography>
-                        </MenuItem>
-                      ))}
-                  </TextField>
-
-                  {/* close button */}
-                  <IconButton onClick={handleCloseFreeLogo}>
-                    <Tooltip title={"exit link"}>
-                      <Close />
-                    </Tooltip>
-                  </IconButton>
-                </Box>
-              )}
-
+             
 
               {/* Github link */}
 

@@ -89,6 +89,7 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
       alignItems={"center"}
       classes={"job-card"}
       className="rounded"
+      bgcolor={!isDarkMode && "background.default"}
       maxWidth={300}
       mb={isMyJob? 0:2}
       height={

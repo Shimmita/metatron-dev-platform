@@ -1,5 +1,6 @@
 import {
   Box,
+  CircularProgress,
   IconButton,
   Tooltip,
   Typography
@@ -125,12 +126,17 @@ axios.defaults.withCredentials = true;
             {/* delete reaction */}
               <Tooltip title={'clear'} arrow>
               <IconButton size="small" 
+              disabled={isFetching}
               onClick={handleDeleteReaction} 
               sx={{ 
               border: "1px solid",
               borderColor: "divider",
             }}>
-              <Close sx={{ width: 13, height: 13 }} />
+              {isFetching ? (
+                <CircularProgress size={13}/>
+              ):(
+                <Close sx={{ width: 13, height: 13 }} />
+              )}
             </IconButton>
           </Tooltip>    
           </Box>

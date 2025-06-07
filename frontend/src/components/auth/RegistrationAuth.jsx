@@ -33,10 +33,8 @@ import GenderData from "../data/GenderData";
 import Institutions from "../data/Institution";
 import SpecialisationJobs from "../data/SpecialisationJobs";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-const AlertGeneral = lazy(() => import("../alerts/AlertGeneral"));
-const AlertProfileCompletion = lazy(() =>
-  import("../alerts/AlertProfileCompletion")
-);
+import AlertProfileCompletion from "../alerts/AlertProfileCompletion";
+import AlertGeneral from "../alerts/AlertGeneral";
 const RegisterAlertTitle = lazy(() => import("./RegisterAlertTitle"));
 
 const RegistrationAuth = () => {
@@ -239,8 +237,9 @@ const RegistrationAuth = () => {
       <Box
         className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
         border={isDarkMode ? "1px solid gray" : "none"}
+        bgcolor={!isDarkMode && "background.default"}
         width={"100%"}
-        height={CustomDeviceSmallest() ? "95vh" : undefined}
+        maxHeight={'98vh'}
         sx={{
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
@@ -252,27 +251,24 @@ const RegistrationAuth = () => {
           scrollbarWidth: "none",
         }}
       >
-        <Box>
-          <Box display={"flex"} justifyContent={"center"}>
-            <Avatar alt={"logo"} sx={{ width: 70, height: 70 }} src={logo} />
-          </Box>
-          <Box mb={3}>
+          <Box>
             <Typography
               textAlign={"center"}
               fontWeight={"bold"}
+              mt={1}
               textTransform={"uppercase"}
               variant={CustomDeviceSmallest() ? "body1" : "h6"}
               gutterBottom
               color={"primary"}
             >
-              Metatron Foundation
+              Metatron Developer
             </Typography>
 
             <Typography
               fontWeight={"bold"}
               color={"text.secondary"}
               variant="body2"
-              mb={2}
+              mb={1}
               textTransform={"capitalize"}
               display={"flex"}
               gap={1}
@@ -285,7 +281,7 @@ const RegistrationAuth = () => {
             </Typography>
 
             <Box
-              mb={2}
+              mb={1}
               display={"flex"}
               justifyContent={"center"}
               gap={1}
@@ -296,7 +292,7 @@ const RegistrationAuth = () => {
                 variant={CustomDeviceSmallest() ? "caption" : "body2"}
                 color={"text.secondary"}
               >
-                Personal Account Signup
+                User Account Signup
               </Typography>
               <WorkRounded color="primary" sx={{ width: 17, height: 17 }} />
             </Box>
@@ -306,7 +302,7 @@ const RegistrationAuth = () => {
             display={"flex"}
             flexDirection={"column"}
             justifyContent={"center"}
-            gap={3}
+            gap={2}
           >
             {/* first section */}
 
@@ -632,7 +628,6 @@ const RegistrationAuth = () => {
               )}
             </Box>
           </Box>
-        </Box>
       </Box>
 
       {/* show alert for custom title when zero selection is matched */}
@@ -645,9 +640,11 @@ const RegistrationAuth = () => {
       {/* alert general */}
       <AlertGeneral
         openAlertGeneral={openAlertGenral}
-        setOpenAlertGenral={setOpenAlertGenral}
+        setOpenAlertGeneral={setOpenAlertGenral}
         title={titleAlert}
         message={missing_field_msg}
+        setErrorMessage={setMissinFieldMsg}
+
       />
 
       {/* alert profile picture completion */}

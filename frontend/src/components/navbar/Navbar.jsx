@@ -1,6 +1,7 @@
 import {
   Close,
   DarkModeRounded,
+  ErrorOutline,
   FullscreenExitRounded,
   FullscreenRounded,
   MenuRounded,
@@ -47,13 +48,15 @@ import { updateCurrentPostReactions } from "../../redux/CurrentPostReactions";
 import { updateCurrentReport } from "../../redux/CurrentPostReported";
 import { updateCurrentProfileViews } from "../../redux/CurrentProfileView";
 import AlertAboutMetatron from "../alerts/AlertAboutMetatron";
+import AlertGeneral from "../alerts/AlertGeneral";
 import AlertSponsorship from "../alerts/AlertSponsorship";
-import AlertSupport from "../alerts/AlertSupport";
+import PostDetailedModal from "../modal/PostDetailedModal";
+import PostEditModal from "../modal/PostEditModal";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import PostEditModal from "../modal/PostEditModal";
+import LogoutAlert from "../alerts/LogoutAlert";
 const PeopleModal = lazy(() => import("../modal/PeopleModal"));
 const AlertGlobalSearch = lazy(() => import("../alerts/AlertGlobalSearch"));
 const ProfileDrawer = lazy(() => import("../profile/drawer/ProfileDrawer"));
@@ -63,8 +66,6 @@ const ParentNotifMessageDrawer = lazy(() =>
 );
 const DrawerSmartphone = lazy(() => import("./DrawerSmartphone"));
 
-//fix the appbar contents not showing full when set fixed
-const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
 const MetatronToolBar = styled(Toolbar)({
   display: "flex",
@@ -93,25 +94,24 @@ const LogoContent = styled(Box)({
   alignItems: "center",
 });
 
-const Navbar = ({mode,setMode}) => {
+const Navbar = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [responseMessage, setResponseMessage] = useState("");
   const [openAlertResults, setOpenAlertResults] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
-  const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = useState("");
+  const [openAlertGeneral,setOpenAlertGeneral]=useState(false)
 
   // axios default credentials
   axios.defaults.withCredentials = true;
   // control opening of the events modal
   const [openModalEventAdd, setOpenModalEventAdd] = useState(false);
-
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-
 
  
   const { isPeopleModal, peopleData } = useSelector(
@@ -134,11 +134,12 @@ const Navbar = ({mode,setMode}) => {
     isSidebarRighbar,
     isDefaultSpeedDial,
     isOpenSponsorAlert,
-    isOpenSupportAlert,
     isOpenAboutMetatron,
     isOpenDrawerProfile,
     isOpenMessageDrawer,
-    isPostEditModal
+    isPostEditModal,
+    isPostFullDetailModal,
+    isLogoutAlert
   } = useSelector((state) => state.appUI);
 
   const handleShowMobileSearch = () => {
@@ -243,6 +244,7 @@ const Navbar = ({mode,setMode}) => {
       });
   };
 
+  
 
   // get all possible post reaction notifications based on current userID
   useLayoutEffect(() => {
@@ -263,11 +265,14 @@ const Navbar = ({mode,setMode}) => {
       .catch((err) => {
         if (err?.code === "ERR_NETWORK") {
           setErrorMessage(
-            "Server is unreachable please try again later to complete your request"
+            "Server is unreachable "
           );
           return;
         }
         setErrorMessage(err?.response.data);
+
+        // open alert general
+        setOpenAlertGeneral(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -300,6 +305,9 @@ const Navbar = ({mode,setMode}) => {
           return;
         }
         setErrorMessage(err?.response.data);
+
+        // open alert general
+        setOpenAlertGeneral(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -329,6 +337,8 @@ const Navbar = ({mode,setMode}) => {
           return;
         }
         setErrorMessage(err?.response.data);
+        // open alert general
+        setOpenAlertGeneral(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -361,6 +371,8 @@ const Navbar = ({mode,setMode}) => {
             return;
           }
           setErrorMessage(err?.response.data);
+          // open alert general
+        setOpenAlertGeneral(true)
         })
         .finally(() => {
           // set is fetching to false
@@ -393,6 +405,8 @@ const Navbar = ({mode,setMode}) => {
             return;
           }
           setErrorMessage(err?.response.data);
+          // open alert general
+        setOpenAlertGeneral(true)
         })
         .finally(() => {
           // set is fetching to false
@@ -417,6 +431,8 @@ const Navbar = ({mode,setMode}) => {
         .then((res) => {
           // update the states of conversations
          dispatch(updateCurrentJobFeedBack(res?.data)) ;
+         // open alert general
+        setOpenAlertGeneral(true)
         })
         .catch((err) => {
           console.log(err);
@@ -637,15 +653,17 @@ const Navbar = ({mode,setMode}) => {
             )}
 
             {/* display connection count for largest screens only */}
-            {!(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
-                     <IconButton onClick={handleShowDarkMode}> 
+            {!CustomDeviceIsSmall() && (
+                     <IconButton disabled onClick={handleShowDarkMode}> 
                      <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
                      <DarkModeRounded
                    
                        sx={{ color: "white", height:25, width:25 }}
                      />
-                   </Tooltip> </IconButton>
+                   </Tooltip> 
+                   </IconButton>
             )}
+            
             {/* display when search not clicked */}
             {!showMobileSearch && (
               <Box
@@ -659,8 +677,8 @@ const Navbar = ({mode,setMode}) => {
                     : 2
                 }
               >
+                <Tooltip arrow title={"notifications"}>
                 <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
-                  <Tooltip arrow title={"notifications"}>
                     <IconButton
                       sx={{ padding: 0 }}
                       onClick={handleShowMessageDrawer}
@@ -669,8 +687,8 @@ const Navbar = ({mode,setMode}) => {
                         sx={{ width: 25, height: 25, color: "white" }}
                       />
                     </IconButton>
-                  </Tooltip>
                 </Badge>
+                </Tooltip>
 
                 <Tooltip arrow title={"profile"}>
                   <IconButton onClick={handleShowingProfileDrawer}>
@@ -686,45 +704,7 @@ const Navbar = ({mode,setMode}) => {
           </IconsContainer>
         </MetatronToolBar>
 
-        {/* control showing of the about us alert */}
-        {isOpenAboutMetatron && (
-          <AlertAboutMetatron openAboutMetatron={isOpenAboutMetatron} />
-        )}
-
-        {/* control showing of sponsorship alert */}
-        {isOpenSponsorAlert && (
-          <AlertSponsorship
-            openSponsorAlert={isOpenSponsorAlert}
-            isLaunchPage={true}
-          />
-        )}
-
-        {/* alert technical support */}
-        {isOpenSupportAlert && (
-          <AlertSupport openSupportAlert={isOpenSupportAlert} />
-        )}
-
-        {/* show modal connect with people or people search results */}
-        <PeopleModal
-          openPeopleModal={isPeopleModal}
-          PeopleConnect={peopleData}
-        />
-
-         {/* show alert post edit modal when triggered by redux */}
-            {isPostEditModal && (
-              <PostEditModal/>
-            )}
-
-        {/* show alert search results global */}
-        <AlertGlobalSearch
-          openAlert={openAlertResults}
-          setOpenAlert={setOpenAlertResults}
-          message={responseMessage}
-          setMessage={setResponseMessage}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
-
+       
         {/* use suspense to cover lazy loading as fallback error boundary */}
         <Suspense
           fallback={
@@ -739,10 +719,12 @@ const Navbar = ({mode,setMode}) => {
           }
         >
           {/* drawer smartphones for sidebar purpose */}
-          <DrawerSmartphone
+          {openDrawer && (
+            <DrawerSmartphone
             openDrawer={openDrawer}
             setOpenDrawer={setOpenDrawer}
           />
+          )}
 
           {/* holds the notification and messaging drawer */}
           {isOpenMessageDrawer && (
@@ -755,15 +737,81 @@ const Navbar = ({mode,setMode}) => {
           )}
 
           {/* EventsAdd Modal to be displayed if toggled */}
-          <EventsAddModal
-            openModalEventAdd={openModalEventAdd}
-            setOpenModalEventAdd={setOpenModalEventAdd}
+         {openModalEventAdd && (
+           <EventsAddModal
+           openModalEventAdd={openModalEventAdd}
+           setOpenModalEventAdd={setOpenModalEventAdd}
+         />
+         )}
+
+         {/* show logout alert */}
+         {isLogoutAlert && (
+          <LogoutAlert/>
+         )}
+
+          {/* alert general when is an error */}
+        {errorMessage &&(
+          <AlertGeneral
+           isError={true} 
+           setErrorMessage={setErrorMessage}
+           title={"Error"}
+           message={errorMessage}
+           defaultIcon={<ErrorOutline/>}
+           openAlertGeneral={openAlertGeneral}
+           setOpenAlertGeneral={setOpenAlertGeneral}
+           />
+        )}
+
+        {/* control showing of the about us alert */}
+        {isOpenAboutMetatron && (
+          <AlertAboutMetatron openAboutMetatron={isOpenAboutMetatron} />
+        )}
+
+        {/* control showing of sponsorship alert */}
+        {isOpenSponsorAlert && (
+          <AlertSponsorship
+            openSponsorAlert={isOpenSponsorAlert}
+            isLaunchPage={true}
           />
+        )}
+
+     
+        {/* show modal connect with people or people search results */}
+        {isPeopleModal && (
+          <PeopleModal
+          openPeopleModal={isPeopleModal}
+          PeopleConnect={peopleData}
+        />
+        )}
+
+         {/* show alert post edit modal when triggered by redux */}
+            {isPostEditModal && (
+              <PostEditModal/>
+            )}
+
+            {/* show alert post detailed modal when triggered by redux */}
+            {isPostFullDetailModal && (
+              <PostDetailedModal/>
+            )}
+
+        {/* show alert search results global */}
+        {openAlertResults && (
+          <AlertGlobalSearch
+          openAlert={openAlertResults}
+          setOpenAlert={setOpenAlertResults}
+          message={responseMessage}
+          setMessage={setResponseMessage}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+        />
+        )}
+
+
         </Suspense>
       </AppBar>
 
       {/* fix the contents to be shown fully */}
-      <Offset />
+      <Box mb={5.5}/>
     </React.Fragment>
   );
 };

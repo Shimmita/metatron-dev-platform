@@ -4,7 +4,7 @@ import SpeedDialAction from "@mui/material/SpeedDialAction";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import React, { lazy } from "react";
 
-import { CodeRounded, SchoolRounded, Work } from "@mui/icons-material";
+import { CodeRounded, PictureAsPdfRounded, SchoolRounded, Work } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
@@ -18,6 +18,12 @@ const actions = [
     icon: <SchoolRounded color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Course Upload",
   },
+
+  {
+    icon: <PictureAsPdfRounded color="primary" sx={{ width: 26, height: 26 }} />,
+    name: "PDF Upload",
+  },
+
   {
     icon: <Work color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Job Posting",

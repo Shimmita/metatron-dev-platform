@@ -166,7 +166,7 @@ const ApplyJobModal = ({
   // handle return width modal
   const handleReturnWidthModal=()=>{
     if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
-      return "60%"
+      return "40%"
     } else if (CustomDeviceTablet()){
       return "90%"
     } else if(CustomLandscapeWidest()){
@@ -175,11 +175,22 @@ const ApplyJobModal = ({
     return "100%"
   }
 
+   // handle width of the global search
+     const handleModalWidth=()=>{
+      if (CustomDeviceTablet() && isTabSideBar) {
+        return "36%"
+      } else if(CustomLandScape()){
+        return "-8%"
+      } else if(CustomLandscapeWidest()){
+        return "-5%"
+      }
+    }
+
   return (
     <StyledModalJob
       keepMounted
       open={openApplyJobModal}
-      // onClose={(e) => setOpenPostModal(false)}
+      onClose={handleClosingModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -187,11 +198,11 @@ const ApplyJobModal = ({
         width={handleReturnWidthModal()}
         p={1}
         borderRadius={5}
-        bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
+        bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
           border: isDarkMode && "1px solid gray",
-          marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
+          marginLeft: handleModalWidth()
         }}
       >
         <Box
@@ -243,7 +254,10 @@ const ApplyJobModal = ({
                 gutterBottom
                 color={"text.secondary"}
               >
-                {jobaccesstype?.type} | {jobaccesstype?.access} | {handleCountryName()} | {location.state}
+                {jobaccesstype?.type} | 
+                {jobaccesstype?.access} | 
+                {handleCountryName()} | 
+                {location.state}
               </Typography>
 
             </Box>
@@ -265,14 +279,14 @@ const ApplyJobModal = ({
             mt={1}
             display={"flex"}
             justifyContent={"center"}
-            mb={isUploading || errorMessage ? 3 : undefined}
+            mb={isUploading || errorMessage ? 1 : undefined}
           >
             {errorMessage ? (
               <Collapse in={errorMessage || false}>
                 <Alert
                   severity="info"
                   onClick={() => setErrorMessage("")}
-                  className="rounded-5"
+                  className="rounded"
                   action={
                     <IconButton aria-label="close" color="inherit" size="small">
                       <Close fontSize="inherit" />

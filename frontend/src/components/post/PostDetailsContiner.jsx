@@ -50,24 +50,23 @@ function PostDetailsContainer({
 
   const dispatch = useDispatch();
   // extract basic current user details
-  const { _id, avatar, name, specialisationTitle: title } = user || {};
+  const { _id, avatar, name,county, specialisationTitle: title } = user || {};
 
-  // user location
-  const country = CustomCountryName(user?.country);
-
-  // current user info
-  const reactingUserInfo = {
-    userId: _id,
-    ownerId: postDetailedData.post_owner.ownerId,
-    postId: postDetailedData._id,
-    avatar,
-    name,
-    country,
-    title,
-  };
 
   // complete sending of the comment to the backend
   const handleSendCommentNow = () => {
+     // current user info
+      const reactingUserInfo = {
+        userId: _id,
+        ownerId: postDetailedData.post_owner.ownerId,
+        postId: postDetailedData._id,
+        avatar,
+        name,
+        country:CustomCountryName(user?.country),
+        county,
+        title,
+      };
+      
     // sending the post tile embed in message and will split for separation backend
     let message = `commented on your post.${postDetailedData?.post_title?.substring(
       0,
@@ -92,8 +91,8 @@ function PostDetailsContainer({
         // update passedPost with the returned post object
         setPostDetailedData(res.data);
 
-        // reset post reactions through clearing redux
-        dispatch(resetClearCurrentPostReactions())
+        // come up with redux update strategy in the navbar for
+        // fetching latest notifications
         
       })
       .catch(async (err) => {
@@ -148,7 +147,6 @@ function PostDetailsContainer({
     >
       {isPostEditMode ? (
         <React.Fragment>
-          {/* close button */}
           <Box display={"flex"} justifyContent={"flex-end"} alignItems={'center'} p={1}>
             {/* full screen */}
           {isDrawerFocused && (
@@ -158,6 +156,7 @@ function PostDetailsContainer({
              </IconButton>
            </Tooltip>
           )}
+
             {/* close  the post */}
             <Tooltip arrow title={"close"}>
               <IconButton onClick={handleClearPostDetailedData}>
@@ -171,15 +170,14 @@ function PostDetailsContainer({
             <Box p={1} display={"flex"} justifyContent={"center"}>
               <Collapse in={errorMessage || false}>
                 <Alert
-                  severity="warning"
-                  className="rounded-5"
+                  severity="info"
+                  className="rounded"
                   onClick={() => setErrorMessage("")}
                   action={
                     <IconButton aria-label="close" color="inherit" size="small">
                       <Close fontSize="inherit" />
                     </IconButton>
                   }
-                  sx={{ mb: 2 }}
                 >
                   {errorMessage}
                 </Alert>
@@ -199,8 +197,9 @@ function PostDetailsContainer({
         </React.Fragment>
       ) : (
         <React.Fragment>
+          <Box display={"flex"} justifyContent={"flex-end"} alignItems={'center'}>
+           
           {/* close button */}
-          <Box display={"flex"} justifyContent={"flex-end"}>
             <IconButton onClick={handleClearPostDetailedData}>
               <Close sx={{ width: 15, height: 15 }} color="primary" />
             </IconButton>
@@ -211,15 +210,14 @@ function PostDetailsContainer({
             <Box p={1} display={"flex"} justifyContent={"center"}>
               <Collapse in={errorMessage || false}>
                 <Alert
-                  severity="warning"
-                  className="rounded-5"
+                  severity="info"
+                  className="rounded"
                   onClick={() => setErrorMessage("")}
                   action={
                     <IconButton aria-label="close" color="inherit" size="small">
                       <Close fontSize="inherit" />
                     </IconButton>
                   }
-                  sx={{ mb: 2 }}
                 >
                   {errorMessage}
                 </Alert>

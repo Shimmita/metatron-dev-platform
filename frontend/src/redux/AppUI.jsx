@@ -15,13 +15,14 @@ const initialState = {
   isTabSideBar: true,
   isPostModalRedux: false,
   isLoadingPostLaunch: false,
-  isSimilarCoursesModal: false,
   isJobSearchGlobal: false,
   isPostDetailed: false,
   isOpenSupportAlert: false,
   isOpenSponsorAlert: false,
   isOpenAboutMetatron: false,
   isPostEditModal:false,
+  isPostFullDetailModal:false,
+  isLogoutAlert:false,
   postEditUniqueId:"",
 
   // theme
@@ -48,10 +49,7 @@ const appUISliceReducerSlice = createSlice({
         isAccountSettings: true,
       };
     },
-    // controls the modal similar courses
-    resetSimilarCoursesModal: (state) => {
-      state.isSimilarCoursesModal = !state.isSimilarCoursesModal;
-    },
+  
 
     resetDarkMode: (state) => {
       return {
@@ -61,6 +59,11 @@ const appUISliceReducerSlice = createSlice({
       };
     },
 
+     // manage showing of logout alert
+     handleShowLogout:(state,action)=>{
+      state.isLogoutAlert=action.payload
+     },
+    
     // manages the display of the default bottom nav
     handleDefaultBottomNav: (state) => {
       state.isDefaultBottomNav = false;
@@ -74,6 +77,11 @@ const appUISliceReducerSlice = createSlice({
     // update is post detailed that wll be used to override speed dial state
     handleUpdateIsPostDetailed: (state, action) => {
       state.isPostDetailed = action.payload;
+    },
+
+    // handle showing of post full details modal
+    handleShowingPostDetailedModal:(state,action)=>{
+      state.isPostFullDetailModal=action.payload
     },
 
     // handle opening and closing of post edit modal
@@ -161,6 +169,7 @@ const appUISliceReducerSlice = createSlice({
       state.isOpenAboutMetatron = action.payload;
     },
 
+   
     // reset all UI states to default
     resetAll: (state) => {
       return {
@@ -176,7 +185,6 @@ const appUISliceReducerSlice = createSlice({
         isTabSideBar: true,
         isPostModalRedux: false,
         isLoadingPostLaunch: false,
-        isSimilarCoursesModal: false,
         isDefaultSpeedDial: true,
         isMessageProfile: false,
         isJobSearchGlobal: false,
@@ -185,8 +193,11 @@ const appUISliceReducerSlice = createSlice({
         isOpenSupportAlert: false,
         isOpenAboutMetatron: false,
         isPostEditModal:false,
+        isPostFullDetailModal:false,
         postEditUniqueId:'',
-        isDarkMode:false
+        isDarkMode:false,
+        isLogoutAlert:false,
+
       };
     },
   },
@@ -208,7 +219,6 @@ export const {
   handleSidebarRightbar,
   showPostModalRedux,
   handleLoadingPostLaunch,
-  resetSimilarCoursesModal,
   handleShowingSpeedDial,
   handleIsJobsGlobalResults,
   handleUpdateIsPostDetailed,
@@ -217,6 +227,8 @@ export const {
   showAboutMetatron,
   handleShowPostEditModal,
   handleSetPostEditIdModal,
+  handleShowingPostDetailedModal,
+  handleShowLogout
 } = appUISliceReducerSlice.actions;
 
 // export the appUISliceReducer for universal purposes

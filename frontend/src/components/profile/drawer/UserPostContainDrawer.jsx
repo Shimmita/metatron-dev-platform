@@ -20,10 +20,11 @@ function UserPostContainDrawer({
   userId,
   setPostDetailedData,
   setIsPostEditMode,
+  setIsPostDetailedDrawer
 }) {
   const [isFetching, setIsFetching] = useState(true);
   const [postsData, setPostsData] = useState();
-  const [erroMessage, setErrorMesssage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [showDeleteALert, setShowDeleteAlert] = useState(false);
   const [deletePostID, setDeletePostID] = useState();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -60,11 +61,11 @@ function UserPostContainDrawer({
         // there is an error
         if (err?.code === "ERR_NETWORK") {
           // update the snackbar notification of the error of connection
-          setErrorMesssage("Network Error");
+          setErrorMessage("Network Error");
           return;
         }
         // update the snackbar notification of error from the server
-        setErrorMesssage(err?.response.data);
+        setErrorMessage(err?.response.data);
       })
       .finally(() => {
         // set is fetching to false
@@ -134,7 +135,7 @@ function UserPostContainDrawer({
           <Collapse in={showDeleteALert || false}>
             <Alert
               severity="info"
-              className="rounded-5"
+              className="rounded"
               action={
                 <Stack direction={"row"} alignItems={"center"} gap={1}>
                   {/* yes btn */}
@@ -178,7 +179,7 @@ function UserPostContainDrawer({
       </Box>
       <Box className="post-card-container">
         {/* displayed when there is an error of request */}
-        {erroMessage && (
+        {errorMessage && (
           <Box width={"100%"}>
             <Typography
               mt={"8rem"}
@@ -187,7 +188,7 @@ function UserPostContainDrawer({
               color={"text.secondary"}
               variant="body2"
             >
-              {erroMessage}
+              {errorMessage}
             </Typography>
           </Box>
         )}
@@ -221,6 +222,7 @@ function UserPostContainDrawer({
                 setShowDeleteAlert={setShowDeleteAlert}
                 deletePostID={deletePostID}
                 setIsPostEditMode={setIsPostEditMode}
+                setIsPostDetailedDrawer={setIsPostDetailedDrawer}
               />
             </Box>
           ))}

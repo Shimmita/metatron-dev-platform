@@ -13,6 +13,7 @@ import {
   Button,
   CircularProgress,
   Collapse,
+  Divider,
   IconButton,
   MenuItem,
   Modal,
@@ -22,19 +23,14 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
-import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
-import { updateCurrentSnackPostSuccess } from "../../redux/CurrentSnackBar";
 import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionTech from "../data/SubsectionTech";
 import BrowserCompress from "../utilities/BrowserCompress";
 import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -65,33 +61,34 @@ const StyledInput = styled("input")({
 // array for image names and values
 const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
 
+const MAX_DESCRIPTION=500
+
 const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   const [title, setTitle] = useState("");
-  const [post_category, setPostCategory] = useState("");
-  const [pro_language, setProgLanguage] = useState("");
+  const [postCategory, setPostCategory] = useState("");
+  const [progLanguage, setProgLanguage] = useState("");
   const [backend, setBackend] = useState("");
   const [frontend, setFrontend] = useState("");
+  const [frontendUI,setFrontendUI]=useState("")
   const [database, setDatabase] = useState("");
   const [containerisation, setContainerisation] = useState("");
   const [desktop, setDesktop] = useState("");
   const [multiplatform, setMultiplatform] = useState("");
-  const [ios_dev, setIOSDev] = useState("");
+  const [iosDev, setIOSDev] = useState("");
   const [android, setAndroid] = useState("");
   const [designTool, setDesignTool] = useState("");
-  const [game_dev, setGameDev] = useState("");
-  const [devops_tool, setDevOpsTool] = useState("");
+  const [gameDev, setGameDev] = useState("");
+  const [devOpsTool, setDevOpsTool] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [videoFullUpload, setVideoFullUpload] = useState(null);
-  const [instructor_github, setInstructorGitHub] = useState("");
-  const [instructor_website, setInstructorWebsite] = useState("");
+  const [videoMainUpload, setVideoMainUpload] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isFreeLogo, setIsFreeLogo] = useState(false);
   const [freeLogo, setFreeLogo] = useState("");
-  const [fileUploadCustom, setFileUploadCustom] = useState(null);
-  const [previewCustomLogo, setPreviewCustomLogo] = useState(null);
-  const [topic_text, setTopicText] = useState(""); // To hold user input text for req
+  const [imageUpload, setImageUpload] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  // To hold user input text for req
+  const [topicText, setTopicText] = useState(""); 
   const [topicsArray, setTopicsArray] = useState([]);
 
   // redux states
@@ -102,12 +99,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   const [category1, setCategory1] = useState("");
   const [category2, setCategory2] = useState("");
   const [category3, setCategory3] = useState("");
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  // axios default credentials
-  axios.defaults.withCredentials = true;
+  const [category4, setCategory4] = useState("");
 
   // close freeLogo
   const handleCloseFreeLogo = () => {
@@ -115,34 +107,59 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
     setIsFreeLogo(false);
   };
 
-  //handle free logo
+
+
+
+  //handle free logo when button clicked
   const handleFreeLogoPick = () => {
     // free logo shown for picks
     setIsFreeLogo(true);
     // clear file upload
+    setImageUpload(null);
   };
+
+  // handle the text of free logo that been selected
+  const handleFreeLogoSelection=(event)=>{
+    // update the value of free logo text
+    setFreeLogo(event.target.value)
+
+    // update the preview image since this ain't be sent to cloud but is
+    // freely saved in the react images server folder
+    setPreviewImage(getImageMatch(event.target.value))
+    
+  }
 
   //   handle file change and compress the image
   const handleFileChange = async (event) => {
+    // false free logo pick
+    handleCloseFreeLogo()
+
+    // update the file value
     const file = event.target.files[0];
+
     // compress the file using the custom utility created
     const compressedFile = await BrowserCompress(file);
-    setFileUploadCustom(compressedFile);
+
+    // compressed file update
+    setImageUpload(compressedFile);
+
     // create an object from URI of the image for local preview
-    setPreviewCustomLogo(URL.createObjectURL(compressedFile));
+    setPreviewImage(URL.createObjectURL(compressedFile));
   };
 
-  // handle video full
-  const handleFileChangeVideoFull = (event) => {
-    const file = event.target.files[0];
-    // update full video variable
-    setVideoFullUpload(file);
-  };
 
-  // handle video preview full
-  const handleVideoFullPreview = () => {
-    return URL.createObjectURL(videoFullUpload);
-  };
+  // handle video main selection
+  const handleFileChangeVideoMain=(event)=>{
+    const file=event.target.files[0]
+    //update video main variable
+    setVideoMainUpload(file) 
+  }
+
+
+  // handle video main preview
+  const handleVideoMainPreview=()=>{
+    return URL.createObjectURL(videoMainUpload)
+  }
 
   // Handle input change for req
   const handleTextChangeTopic = (e, value) => {
@@ -152,10 +169,10 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   // Handle adding req
   const handleAddUpdateTopic = () => {
     // Add the inputText as a new requirement if it's not empty
-    if (topic_text.trim() !== "") {
-      // if the name of the topic does not extist add
-      if (!topicsArray.includes(topic_text.trim())) {
-        setTopicsArray((prev) => [...prev, topic_text.trim()]);
+    if (topicText.trim() !== "") {
+      // if the name of the topic does not exists add
+      if (!topicsArray.includes(topicText.trim())) {
+        setTopicsArray((prev) => [...prev, topicText.trim()]);
         setTopicText(""); // Clear the input field
       }
     }
@@ -169,56 +186,67 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   // handle core missing fields
   const handleEmptyFields = () => {
     if (title?.trim() === "") {
-      setErrorMessage("Title field is required");
+      setErrorMessage("Title field required");
       return false;
     }
     if (description?.trim() === "") {
-      setErrorMessage("Description field is required");
+      setErrorMessage("Description field required");
       return false;
     }
-    if (post_category?.trim === "") {
-      setErrorMessage("specialisation field is required");
+    if (postCategory?.toLowerCase().trim === "") {
+      setErrorMessage("specialisation field required");
       return false;
     }
-    if (post_category?.includes("Backend") && category1.trim() === "") {
-      setErrorMessage("backend field is required");
+    if (postCategory?.toLowerCase().includes("frontend") && category1.toLowerCase().trim() === "") {
+      setErrorMessage("frontend framework or library required")
+    }
+    if (postCategory?.toLowerCase().includes("frontend") && category4.toLowerCase().trim() === "") {
+      setErrorMessage("frontend UI styling library required")
+    }
+    if (postCategory?.toLowerCase().includes("backend") && category1.toLowerCase().trim() === "") {
+      setErrorMessage("backend field required");
       return false;
     }
-    if (post_category?.includes("Developer") && category1.trim() === "") {
-      setErrorMessage("DevOps Tool field is required");
+    if (postCategory?.toLowerCase().includes("backend") && category2.toLowerCase().trim() === "") {
+      setErrorMessage("Database field required");
       return false;
     }
-    if (post_category?.includes("Backend") && category2.trim() === "") {
-      setErrorMessage("Database field is required");
+
+    if (postCategory?.toLowerCase().includes("devops") && category1.toLowerCase().trim() === "") {
+      setErrorMessage("DevOps Tool field required");
       return false;
     }
-    if (post_category?.includes("Machine") && category1.trim() === "") {
-      setErrorMessage("ML/AI area of focus is required");
+   
+    if (postCategory?.toLowerCase().includes("machine") && category1.toLowerCase().trim() === "") {
+      setErrorMessage("ML/AI area of focus required");
       return false;
     }
-    if (post_category?.includes("Cybersecurity") && category1.trim() === "") {
-      setErrorMessage("Cybersecurity area field is required");
+    if (postCategory?.toLowerCase().includes("cybersecurity") && category1.toLowerCase().trim() === "") {
+      setErrorMessage("Cybersecurity area field required");
       return false;
     }
     if (
-      post_category?.includes("Data Science and Analytics") &&
-      category1.trim() === ""
+      postCategory?.toLowerCase().includes("data science") &&
+      category1.toLowerCase().trim() === ""
     ) {
-      setErrorMessage("Data science area field is required");
+      setErrorMessage("Data science area field required");
       return false;
     }
 
     if (
-      post_category?.includes("Fullstack") &&
-      (category1.trim() === "" ||
-        category2.trim() === "" ||
-        category3.trim() === "")
+      postCategory?.toLowerCase().includes("fullstack") &&
+      (category1.toLowerCase().trim() === "" ||
+        category2.toLowerCase().trim() === "" ||
+        category3.toLowerCase().trim() === "" ||
+        category4.toLowerCase().trim() ===  ""
+      ) 
+        
     ) {
-      setErrorMessage("Frontend, Backend and Database field all required");
+      setErrorMessage("Frontend, UI Styling Library, Backend and Database required");
       return false;
     }
-    if (!fileUploadCustom) {
-      if (freeLogo?.trim() === " ") {
+    if (!imageUpload) {
+      if (freeLogo?.toLowerCase().trim() === " ") {
         setErrorMessage("provide course logo");
         return false;
       }
@@ -229,7 +257,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
       return false;
     }
 
-    if (!videoFullUpload) {
+    if (!videoMainUpload) {
       setErrorMessage("provide course video");
       return false;
     }
@@ -237,126 +265,176 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
     return true;
   };
 
-  // useEffect hook for upadating category values
+  // useEffect hook for updating category values
   useEffect(() => {
     // handle the value fo backend
     const updatePostCategoryValue = () => {
-      if (post_category.includes("Backend")) {
+
+      // for frontend  category 1 will be tool, category 2 will be UI library
+      if (postCategory.toLowerCase().includes("frontend")) {
+        setCategory1(frontend)
+        setCategory2(frontendUI)
+      }
+
+      if (postCategory.toLowerCase().includes("backend")) {
         setCategory1(backend);
         setCategory2(database);
       }
-      if (post_category.includes("Database")) {
+      if (postCategory.toLowerCase().includes("database")) {
         setCategory1(database);
       }
 
-      if (post_category.includes("Fullstack")) {
+      if (postCategory.toLowerCase().includes("fullstack")) {
         setCategory1(frontend);
         setCategory2(backend);
         setCategory3(database);
+        setCategory4(frontendUI)
       }
     };
 
     updatePostCategoryValue();
-  }, [post_category, backend, database, frontend]);
+  }, [postCategory, backend, database, frontend,frontendUI]);
+
+
+
+  // handle return width modal
+  const handleReturnWidthModal=()=>{
+    if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
+      return "40%"
+    } else if (CustomDeviceTablet()){
+      return "90%"
+    } else if(CustomLandscapeWidest()){
+      return "35%"
+    }
+    return "100%"
+  }
+
+  // handle width of the global search
+    const handleModalWidth=()=>{
+      if (CustomDeviceTablet() && isTabSideBar) {
+        return "36%"
+      } else if(CustomLandScape()){
+        return "-8%"
+      } else if(CustomLandscapeWidest()){
+        return "-5%"
+      }
+    }
+
+  
+// handle closing of the modal
+const handleClosingModal=()=>{
+  // clear every details
+  setVideoMainUpload(null)
+  setImageUpload(null)
+
+  // close the modal
+  setOpenModalCourse(false)
+}
+
 
   // extracting current logged in user details from the redux store
-  const instructor_name = user.name;
-  const instructor_title = user.specialisationTitle;
-  const instructor_skills = user.selectedSkills;
-  const instructor_avatar = user.avatar;
+  const instructorId=user?._id
+  const instructorName = user?.name;
+  const instructorTitle = user?.specialisationTitle;
+  const instructorSkills = user?.selectedSkills;
+  const instructorAvatar = user?.avatar;
+  const instructorEmail=user?.email
+  const instructorPhone=user?.phone
+  const instructorGitHub=user?.gitHub
+  const instructorLinkedIn=user?.linkedin
+  const instructorWebsite=user?.portfolio
 
-  const course = {
+  const courseObject = {
     instructor: {
-      instructor_name,
-      instructor_title,
-      instructor_avatar,
-      instructor_skills,
-      instructor_website,
-      instructor_github,
+      instructorId,
+      instructorName,
+      instructorTitle,
+      instructorAvatar,
+      instructorEmail,
+      instructorSkills,
+      instructorPhone,
+      instructorGitHub,
+      instructorLinkedIn,
+      instructorWebsite
     },
     course_title: title,
-    course_price: price,
     course_description: description,
     course_category: {
-      main: post_category,
+      main: postCategory,
       sub1: category1,
       sub2: category2,
       sub3: category3,
+      sub4: category4
     },
     course_topics: topicsArray,
     course_logo_url: freeLogo,
   };
 
+
   // handle posting of data to the backend
   const handleUploadCourse = () => {
     // clear any error message
     setErrorMessage("");
+    
     // core fields not empty
     if (handleEmptyFields()) {
+
       // set is uploading true
-      setIsUploading(true);
+      setIsUploading(false);
       // create a form which will facilitate parsing of the file for upload to cloud
       const formData = new FormData();
       // append post body after stringify it due to form data
-      formData.append("course", JSON.stringify(course));
+      formData.append("course", JSON.stringify(courseObject));
 
       // check if video and fileCustom the logo file present then append for upload to backend
-      if (videoFullUpload) {
+      if (videoMainUpload) {
         // append video file
-        formData.append("file", videoFullUpload);
+        formData.append("file", videoMainUpload);
       }
 
       // holds image logo
-      if (fileUploadCustom) {
+      if (imageUpload) {
         // append image logo for the course
-        formData.append("file", fileUploadCustom);
+        formData.append("file", imageUpload);
       }
 
-      // performing post request
-      axios
-        .post(
-          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/create`,
-          formData,
-          {
-            withCredentials: true,
-          }
-        )
-        .then((res) => {
-          // show success post snack controlled by redux
-          dispatch(updateCurrentSnackPostSuccess(res.data));
-          // close the current modal
-          setOpenModalCourse(false);
-          // navigate to home route by default
-          navigate("/");
-          // update tab bottom nav to 0
-          updateCurrentBottomNav(0);
-        })
-        .catch(async (err) => {
-          if (err?.code === "ERR_NETWORK") {
-            setErrorMessage("Server Unreachable");
-            return;
-          }
+      console.log(courseObject)
 
-          setErrorMessage(err?.response.data);
-        })
-        .finally(() => {
-          setIsUploading(false);
-        });
+      // performing post request
+      // axios
+      //   .post(
+      //     `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/create`,
+      //     formData,
+      //     {
+      //       withCredentials: true,
+      //     }
+      //   )
+      //   .then((res) => {
+      //     // show success post snack controlled by redux
+      //     dispatch(updateCurrentSnackPostSuccess(res.data));
+      //     // close the current modal
+      //     setOpenModalCourse(false);
+      //     // navigate to home route by default
+      //     navigate("/");
+      //     // update tab bottom nav to 0
+      //     updateCurrentBottomNav(0);
+      //   })
+      //   .catch(async (err) => {
+      //     if (err?.code === "ERR_NETWORK") {
+      //       setErrorMessage("Server Unreachable");
+      //       return;
+      //     }
+
+      //     setErrorMessage(err?.response.data);
+      //   })
+      //   .finally(() => {
+      //     setIsUploading(false);
+      //   });
+
     }
   };
 
   
-  // handle return width modal
-    const handleReturnWidthModal=()=>{
-      if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "40%"
-      } else if (CustomDeviceTablet()){
-        return "90%"
-      } else if(CustomLandscapeWidest()){
-        return "35%"
-      }
-      return "100%"
-    }
 
   return (
     <StyledModalPost
@@ -365,7 +443,6 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
         marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
       }}
       open={openModalCourse}
-      // onClose={(e) => setOpenPostModal(false)}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -373,11 +450,11 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
         width={handleReturnWidthModal()}
         p={1}
         borderRadius={5}
-        bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
+        bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
           border: isDarkMode && "1px solid gray",
-          marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
+          marginLeft: handleModalWidth(),
         }}
       >
         <Box
@@ -393,11 +470,23 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
           >
             {/* logo */}
             <Box>
-              <Avatar sx={{ width: 60, height: 60 }} src={AppLogo} alt="logo" />
+              <Avatar
+               sx={{ width: 60, height: 60 }} 
+               src={AppLogo} alt="logo" />
             </Box>
 
+             {/* title */}
+              <Typography
+                variant="body2"
+                width={"100%"}
+                fontWeight={"bold"}
+                textAlign={"center"}
+              >
+                {title.length===0 ? "Course Upload":title}
+              </Typography>
+
             {/*close icon */}
-            <IconButton onClick={(e) => setOpenModalCourse(false)}>
+            <IconButton onClick={handleClosingModal}>
               <Tooltip title={"close"}>
                 <Close />
               </Tooltip>{" "}
@@ -408,20 +497,19 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
           <Box
             display={"flex"}
             justifyContent={"center"}
-            mb={isUploading || errorMessage ? 3 : undefined}
+            mb={isUploading || errorMessage ? 1 : undefined}
           >
             {errorMessage ? (
               <Collapse in={errorMessage || false}>
                 <Alert
-                  severity="warning"
-                  className="rounded-5"
+                  severity="info"
+                  className="rounded"
                   onClick={() => setErrorMessage("")}
                   action={
                     <IconButton aria-label="close" color="inherit" size="small">
                       <Close fontSize="inherit" />
                     </IconButton>
                   }
-                  sx={{ mb: 2 }}
                 >
                   {errorMessage}
                 </Alert>
@@ -450,31 +538,38 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
             }}
           >
             <Box display={"flex"} flexDirection={"column"} gap={3}>
-              <Box mt={2}>
+              <Box >
                 <Typography
                   gutterBottom
                   mb={2}
-                  variant="body2"
-                  fontWeight={"bold"}
-                  color={"text.secondary"}
+                  variant="caption"
                 >
-                  Note: The course you are posting should be yours and not
-                  someone's intellectual property!
+                  - Courses: Courses uploaded should not be someone's else intellectual property 
+                  and shall be continuously reviewed for approval. <br/>
+                  - Payment: Currently we do not sell or buy courses but rather providing learning 
+                  resources freely to the end users. Certificate of completion will be issued with 
+                  your name printed on them as Instructor. <br/>
+                  - Appreciation: Instructors with high ratings will be offered a chance to work as Software, 
+                  Machine learning, or DevOps engineers at Metatron and also awarded recommendation letters as 
+                  best instructors in their field to boost their profile.
                 </Typography>
-
+              
+                <Divider component={'div'} className={'p-2'}/>
+            
                 <Typography variant="body2" mt={3} color={"text.secondary"}>
                   Provide a relevant course title that will be displayed to the
-                  potential students on the platform. Its recommended to use
-                  simple but captivating titles in this field.
+                  potential target groups on the platform. Use
+                  simple and captivating titles.
                 </Typography>
 
                 <Box mt={4} className="w-100 mb-2">
                   <TextField
                     required
+                    sx={{ textTransform:'capitalize' }}
                     value={title}
                     error={title.length > 100}
                     label={`Title ${100 - title.length}`}
-                    placeholder="Complete Python Course from Beginner to Advanced"
+                    placeholder="Complete Python Course"
                     fullWidth
                     onChange={(e) => setTitle(e.target.value)}
                   />
@@ -483,26 +578,23 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
 
               {/* post about */}
               <Typography variant="body2" color={"text.secondary"}>
-                Select the area of specialisation that you are interested in.
-                Suppose your course is focused on concepts and fundamentals of a
-                programming language, its recommended to select programming
-                languages option.
+                Select the area of specialisation that your course is going to cover.
+                For pure programming language concepts select programming languages.
               </Typography>
 
               <Box className="w-100 mb-2 mt-2 ">
                 <TextField
                   required
                   select
-                  value={post_category}
+                  value={postCategory}
                   label="Course specialisation"
                   fullWidth
                   onChange={(e) => setPostCategory(e.target.value)}
                 >
-                  {SpecialisationTech &&
-                    SpecialisationTech.filter((about) => about !== "None").map(
+                  {SpecialisationTech?.filter((about) => about !== "None").map(
                       (about, index) => (
                         <MenuItem
-                          key={index}
+                          key={about}
                           value={about}
                           sx={{ display: "flex", gap: 2, alignItems: "center" }}
                         >
@@ -518,24 +610,23 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               </Box>
 
               {/* programming Language */}
-              {post_category === "Programming Languages" && (
+              {postCategory === "Programming Languages" && (
                 <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select the programming language which your course will be
-                    addressing in particualar.
+                    addressing in particular from the provided options.
                   </Typography>
 
                   <Box className="w-100 mb-2 ">
                     <TextField
                       required
                       select
-                      value={pro_language}
+                      value={progLanguage}
                       label="Select Programming Language"
                       fullWidth
                       onChange={(e) => setProgLanguage(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Language.map((language) => (
+                      {SubsectionTech?.Language.map((language) => (
                           <MenuItem key={language} value={language}>
                             <Typography variant="body2">{language}</Typography>
                           </MenuItem>
@@ -546,14 +637,15 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               )}
 
               {/* frontend */}
-              {(post_category === "Frontend App Development" ||
-                post_category ===
-                  "Fullstack App Development (Frontend+Backend)") && (
+              {(postCategory === "Frontend App Development" ||
+                postCategory ===
+                  "Fullstack App Development") && (
                 <React.Fragment>
+                  {/* frontend framework or library */}
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Which frontend technology will your course be covering in
-                    particular.If it is based on a bare HTML/CSS version, select
-                    the option with (HTML/CSS).
+                    particular.For Courses based on bare HTML/CSS version,
+                    select (HTML).
                   </Typography>
                   <Box className="w-100 mb-2 ">
                     <TextField
@@ -564,21 +656,42 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       fullWidth
                       onChange={(e) => setFrontend(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Frontend.map((frontend) => (
+                      {SubsectionTech?.Frontend.map((frontend) => (
                           <MenuItem key={frontend} value={frontend}>
                             <Typography variant="body2">{frontend}</Typography>
                           </MenuItem>
                         ))}
                     </TextField>
                   </Box>
+
+                  {/* frontend UI library */}
+                  <Typography variant="body2" color={"text.secondary"} p={1}>
+                    Which frontend UI Library have you used in styling your {!frontend.includes("none") && frontend} components in your course.
+                  </Typography>
+                  <Box className="w-100 mb-2 ">
+                    <TextField
+                      required
+                      select
+                      value={frontendUI}
+                      label="UI Styling Library"
+                      fullWidth
+                      onChange={(e) => setFrontendUI(e.target.value)}
+                    >
+                      {SubsectionTech?.FrontendUI.map((frontend) => (
+                          <MenuItem key={frontend} value={frontend}>
+                            <Typography variant="body2">{frontend}</Typography>
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Box>
+
                 </React.Fragment>
               )}
 
               {/* backend */}
-              {(post_category === "Backend App Development" ||
-                post_category ===
-                  "Fullstack App Development (Frontend+Backend)") && (
+              {(postCategory === "Backend App Development" ||
+                postCategory ===
+                  "Fullstack App Development") && (
                 <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Which backend technology will your course be covering in
@@ -594,8 +707,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       fullWidth
                       onChange={(e) => setBackend(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Backend.map((backend) => (
+                      {SubsectionTech?.Backend.map((backend) => (
                           <MenuItem key={backend} value={backend}>
                             <Typography variant="body2">{backend}</Typography>
                           </MenuItem>
@@ -606,14 +718,14 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               )}
 
               {/* Database */}
-              {(post_category === "Database Administration (SQL/NoSQL)" ||
-                post_category === "Backend App Development" ||
-                post_category ===
-                  "Fullstack App Development (Frontend+Backend)") && (
+              {(postCategory === "Database Administration (SQL/NoSQL)" ||
+                postCategory === "Backend App Development" ||
+                postCategory ===
+                  "Fullstack App Development") && (
                 <React.Fragment>
                   <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Which database in particular will your course make
-                    utilisation of to facilitate storage of data? Suppose none
+                    utilization of to facilitate storage of data? Suppose none
                     of the provided options matches your preference select
                     (other).
                   </Typography>
@@ -626,8 +738,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       fullWidth
                       onChange={(e) => setDatabase(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Database.map((database) => (
+                      {SubsectionTech?.Database.map((database) => (
                           <MenuItem key={database} value={database}>
                             <Typography variant="body2">{database}</Typography>
                           </MenuItem>
@@ -638,11 +749,11 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               )}
 
               {/* Desktop App */}
-              {post_category === "Desktop App Development" && (
+              {postCategory === "Desktop App Development" && (
                 <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select desktop development technology that your course will
-                    be based on such that the overal application runs on either
+                    be based on such that the overall application runs on either
                     Linux OS, MacOS, Windows OS or both.
                   </Typography>
 
@@ -655,8 +766,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       fullWidth
                       onChange={(e) => setDesktop(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Desktop.map((desktop) => (
+                      {SubsectionTech?.Desktop.map((desktop) => (
                           <MenuItem key={desktop} value={desktop}>
                             <Typography variant="body2">{desktop}</Typography>
                           </MenuItem>
@@ -667,7 +777,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               )}
 
               {/* DevOps */}
-              {post_category === "Developer Operations (DevOps+CI/CD)" && (
+              {postCategory === "Developer Operations (DevOps+CI/CD)" && (
                 <Box>
                   <Typography
                     gutterBottom
@@ -683,13 +793,12 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     <TextField
                       required
                       select
-                      value={devops_tool}
+                      value={devOpsTool}
                       label="DevOps platform/tool"
                       fullWidth
                       onChange={(e) => setDevOpsTool(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.DevOps.map((devops_tool) => (
+                      {SubsectionTech?.DevOps.map((devops_tool) => (
                           <MenuItem key={devops_tool} value={devops_tool}>
                             <Typography variant="body2">
                               {devops_tool}
@@ -702,7 +811,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               )}
 
               {/* Game dev */}
-              {post_category === "Game App Development" && (
+              {postCategory === "Game App Development" && (
                 <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select a game application development technology in
@@ -712,13 +821,12 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     <TextField
                       required
                       select
-                      value={game_dev}
+                      value={gameDev}
                       label="game development technology"
                       fullWidth
                       onChange={(e) => setGameDev(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.GameDev.map((game_dev) => (
+                      {SubsectionTech?.GameDev.map((game_dev) => (
                           <MenuItem key={game_dev} value={game_dev}>
                             <Typography variant="body2">{game_dev}</Typography>
                           </MenuItem>
@@ -729,7 +837,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               )}
 
               {/* UI/UX  */}
-              {post_category === "UI/UX Design/Graphic Design" && (
+              {postCategory === "UI/UX Design/Graphic Design" && (
                 <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Select the UI/UX Design tool that you are covering in your
@@ -744,8 +852,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       fullWidth
                       onChange={(e) => setDesignTool(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Design.map((design_tool) => (
+                      {SubsectionTech?.Design.map((design_tool) => (
                           <MenuItem key={design_tool} value={design_tool}>
                             <Typography variant="body2">
                               {design_tool}
@@ -758,7 +865,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               )}
 
               {/* Android App */}
-              {post_category === "Native Android App Development" && (
+              {postCategory === "Native Android App Development" && (
                 <React.Fragment>
                   <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Native Android application development stack is usually
@@ -774,8 +881,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       fullWidth
                       onChange={(e) => setAndroid(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Android.map((android) => (
+                      {SubsectionTech?.Android.map((android) => (
                           <MenuItem key={android} value={android}>
                             <Typography variant="body2">{android}</Typography>
                           </MenuItem>
@@ -786,7 +892,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               )}
 
               {/* IOS App */}
-              {post_category === "Native IOS App Development" && (
+              {postCategory === "Native IOS App Development" && (
                 <React.Fragment>
                   <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Select the stack used in your course for the development of
@@ -796,13 +902,12 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     <TextField
                       required
                       select
-                      value={ios_dev}
+                      value={iosDev}
                       label="IOS app development stack"
                       fullWidth
                       onChange={(e) => setIOSDev(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.IOS.map((ios) => (
+                      {SubsectionTech?.IOS.map((ios) => (
                           <MenuItem key={ios} value={ios}>
                             <Typography variant="body2">{ios}</Typography>
                           </MenuItem>
@@ -813,7 +918,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               )}
 
               {/* Multiplatform Android+IOS */}
-              {post_category ===
+              {postCategory ===
                 "Multiplatform App Development (Android+IOS)" && (
                 <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
@@ -834,8 +939,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       fullWidth
                       onChange={(e) => setMultiplatform(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Multiplatfotm.map((multiplatform) => (
+                      {SubsectionTech?.Multiplatfotm.map((multiplatform) => (
                           <MenuItem key={multiplatform} value={multiplatform}>
                             <Typography variant="body2">
                               {multiplatform}
@@ -848,7 +952,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               )}
 
               {/* Containerisation  */}
-              {post_category === "Containerisation and Orchestration" && (
+              {postCategory === "Containerisation and Orchestration" && (
                 <React.Fragment>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Which containerisation technology will be handled in the
@@ -863,8 +967,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       fullWidth
                       onChange={(e) => setContainerisation(e.target.value)}
                     >
-                      {SubsectionTech &&
-                        SubsectionTech.Containerisation.map((container) => (
+                      {SubsectionTech?.Containerisation.map((container) => (
                           <MenuItem key={container} value={container}>
                             <Typography variant="body2">{container}</Typography>
                           </MenuItem>
@@ -873,6 +976,20 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                   </Box>
                 </React.Fragment>
               )}
+
+                {/* preview the file uploaded from storage */}
+                {previewImage && (
+                  <Box display={"flex"} justifyContent={"center"}>
+                    <img
+                      src={previewImage}
+                      alt=""
+                      className="rounded"
+                      style={{
+                        maxWidth: 100,
+                      }}
+                    />
+                  </Box>
+                )}
 
               <React.Fragment>
                 {/* free logos pick */}
@@ -892,10 +1009,9 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       variant="standard"
                       label="Free logos"
                       fullWidth
-                      onChange={(e) => setFreeLogo(e.target.value)}
+                      onChange={handleFreeLogoSelection}
                     >
-                      {logoNamesOptions &&
-                        logoNamesOptions.map((name, index) => (
+                      {logoNamesOptions?.map((name, index) => (
                           <MenuItem
                             key={index}
                             value={name}
@@ -912,59 +1028,51 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                           </MenuItem>
                         ))}
                     </TextField>
-
-                    {/* close button */}
-                    <IconButton onClick={handleCloseFreeLogo}>
-                      <Tooltip title={"exit link"}>
-                        <Close />
-                      </Tooltip>
-                    </IconButton>
                   </Box>
                 )}
 
-                {/* preview the file uploaded from storage */}
-                {fileUploadCustom && (
-                  <Box display={"flex"} justifyContent={"center"}>
-                    <img
-                      src={previewCustomLogo}
-                      alt=""
-                      className="rounded"
-                      style={{
-                        maxWidth: 100,
-                      }}
-                    />
-                  </Box>
-                )}
+                
 
                 {/* provide a logo for the course */}
                 <Typography variant="body2" color={"text.secondary"}>
-                  Provide logo for the course. You can select the preferred logo
-                  from the free kits that have been provided or uploading the
-                  custom version from your local storage.
+                  Upload course banner which will be displayed on top of your video course.
+                  Eye capturing banner is highly recommended for attention capture.
                 </Typography>
-                <Box display={"flex"} justifyContent={"flex-end"} gap={1}>
+
+                <Box 
+                display={"flex"}
+                justifyContent={"flex-end"}
+                gap={1}
+                alignItems={'center'}
+                >
                   <Button
-                    variant="text"
+                    variant={freeLogo ? "outlined":"text"}
                     disableElevation
                     disabled={isUploading}
-                    sx={{ textTransform: "none", borderRadius: "20px" }}
+                    sx={{
+                      textTransform: "lowercase", 
+                      borderRadius: "20px" }}
                     onClick={handleFreeLogoPick}
                     size="medium"
-                    startIcon={<DiamondRounded />}
+                    startIcon={<DiamondRounded sx={{width:18,height:18}}/>}
                   >
                     Free
                   </Button>
 
+                  |
+
                   <Button
                     component="label"
                     role={undefined}
-                    variant="text"
+                    variant={imageUpload ? "outlined":"text"}
                     disableElevation
                     tabIndex={-1}
                     size="medium"
                     disabled={isUploading}
-                    sx={{ textTransform: "none", borderRadius: "20px" }}
-                    startIcon={<CloudUploadRounded />}
+                    sx={{ 
+                      textTransform: "lowercase",
+                      borderRadius: "20px" }}
+                    startIcon={<CloudUploadRounded sx={{width:17,height:17}}/>}
                   >
                     Upload
                     <StyledInput
@@ -977,41 +1085,22 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                 </Box>
               </React.Fragment>
 
-              <React.Fragment>
-                <Typography variant="body2" mt={3} color={"text.secondary"}>
-                  Provide course price in dollars (USD). Metatron charges 40%
-                  fee of the total price that includes taxes, hosting fee,
-                  advertisement and recommendation to the potential students.
-                </Typography>
 
-                <Box className="w-100 mb-2">
-                  <TextField
-                    required
-                    value={price}
-                    label={"Price (USD)"}
-                    placeholder="30"
-                    type="number"
-                    fullWidth
-                    onChange={(e) => setPrice(e.target.value)}
-                  />
-                </Box>
-              </React.Fragment>
 
-              {/* full video lecture */}
+              {/* main video upload */}
               <React.Fragment>
                 <Typography
                   gutterBottom
                   variant="body2"
-                  mt={3}
+                  mt={1}
                   mb={3}
                   color={"text.secondary"}
                 >
-                  Upload the full video lecture for the course. Its recommended
-                  that your video should not exceed 2GB and the quality should
-                  be standardised to 720p as the mininum.
+                  Upload the course video which the potential target group will watch 
+                  when they enroll into the course. (Max 500MB | Min Quality 480P)
                 </Typography>
 
-                {videoFullUpload && (
+                {videoMainUpload && (
                   <React.Fragment>
                     {/* video box */}
                     <Box
@@ -1024,10 +1113,10 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         className="rounded"
                         muted
                         autoFocus
-                        src={handleVideoFullPreview()}
+                        src={handleVideoMainPreview()}
                         style={{ width: "95%" }}
                         height={280}
-                        poster={previewCustomLogo}
+                        poster={previewImage}
                       >
                         <Typography
                           textAlign={"center"}
@@ -1041,28 +1130,27 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     {/* video name */}
                     <Box display={"flex"} justifyContent={"center"}>
                       <Typography variant="caption" color={"text.secondary"}>
-                        {videoFullUpload.name.split(".")[0].substring(0, 20)}
+                        {videoMainUpload.name.split(".")[0].substring(0, 20)}
                       </Typography>
                     </Box>
                   </React.Fragment>
                 )}
 
-                <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+                <Box 
+                display={"flex"} 
+                justifyContent={"flex-end"} 
+                width={"100%"}>
                   <Button
                     component="label"
                     role={undefined}
-                    variant="outlined"
                     disableElevation
+                    variant={videoMainUpload ? "outlined":"text"}
                     tabIndex={-1}
                     size="small"
                     sx={{
                       textTransform: "lowercase",
                       borderRadius: "20px",
-                      width: CustomDeviceIsSmall()
-                        ? "75%"
-                        : CustomDeviceSmallest()
-                        ? "100%"
-                        : "50%",
+                      
                     }}
                     startIcon={<CloudUploadRounded />}
                   >
@@ -1070,59 +1158,23 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     <StyledInput
                       type="file"
                       accept="video/*"
-                      onChange={handleFileChangeVideoFull}
+                      onChange={handleFileChangeVideoMain}
                       multiple
                     />
                   </Button>
                 </Box>
               </React.Fragment>
 
-              <Typography variant="body2" color={"text.secondary"}>
-                Provide the required link to your website or social media
-                platform which users or potential students to your course could
-                learn more about you.
-              </Typography>
-              {/* Email */}
-              <Box className="mb-3">
-                <TextField
-                  fullWidth
-                  required
-                  type="tel"
-                  value={instructor_website}
-                  onChange={(e) => setInstructorWebsite(e.target.value)}
-                  id="website_instructor"
-                  label={"website"}
-                  placeholder="https://mywebsite.com"
-                />
-              </Box>
 
-              <Typography variant="body2" color={"text.secondary"}>
-                Provide the required link to your GitHub profile which could
-                provide helpful information about your other worked on projects.
-              </Typography>
-
-              {/* Email */}
-              <Box mb={3}>
-                <TextField
-                  fullWidth
-                  value={instructor_github}
-                  onChange={(e) => setInstructorGitHub(e.target.value)}
-                  required
-                  type="url"
-                  id="github_instructor"
-                  label={"GitHub"}
-                  placeholder="https://github/instructor.com"
-                />
-              </Box>
+            
 
               {/* topics covered */}
               <React.Fragment>
                 <Stack mt={2} gap={1}>
                   <Typography variant="body2" color={"text.secondary"}>
                     Provide the topics or lectures that your course is aimed to
-                    debunk during the session. providing concise topics helps
-                    the students to anticipate the general flow of the course
-                    and could influence their preference of selection.
+                    cover during the session. This helps one to anticipate the general 
+                    flow of the course.
                   </Typography>
                   <Box
                     display={"flex"}
@@ -1135,10 +1187,10 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                       freeSolo
                       className="w-100"
                       options={topicsArray} // Show available options when user types
-                      value={topic_text}
+                      value={topicText}
                       onInputChange={handleTextChangeTopic}
                       disableClearable
-                      inputValue={topic_text}
+                      inputValue={topicText}
                       disabled={isUploading}
                       onChange={handleTextChangeTopic}
                       renderInput={(params) => (
@@ -1153,7 +1205,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                         />
                       )}
                       onKeyUp={(e) => {
-                        if (e.key === "Enter" && topic_text?.trim() !== "") {
+                        if (e.key === "Enter" && topicText?.trim() !== "") {
                           handleAddUpdateTopic();
                         }
                       }}
@@ -1163,7 +1215,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                     <IconButton
                       className="border"
                       onClick={handleAddUpdateTopic}
-                      disabled={!topic_text || isUploading}
+                      disabled={!topicText || isUploading}
                     >
                       <Add color="primary" sx={{ width: 16, height: 16 }} />
                     </IconButton>
@@ -1173,7 +1225,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
                 {/* display  latest previous topics or lectures */}
                 <Box mb={1}>
                   {topicsArray.length > 0 && (
-                    <Box mt={2} mb={2}>
+                    <Box mt={2} mb={1}>
                       <Box
                         component={"ol"}
                         bgcolor={isDarkMode ? undefined : "#f1f1f1"}
@@ -1230,21 +1282,21 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               </React.Fragment>
 
               <Typography variant="body2" color={"text.secondary"}>
-                Describe your course in details explaining the important areas
-                that your are going to tackle. Providing a good description
-                could convince many students to enrol into your course.
+                Provide course description explaining the key areas being tackled. 
+                Clear description could convince many 
+                enrolling to your free or paid course.
               </Typography>
 
               <Box mb={3}>
                 <TextField
-                  minRows={window.screen.availWidth <= 320 ? 5 : 10}
+                  minRows={window.screen.availWidth <= 320 ? 5 : 8}
                   multiline
                   contentEditable={false}
-                  error={description.length > 1000}
-                  id="descr-course"
+                  error={description.length > MAX_DESCRIPTION}
+                  id="description-course_upload"
                   label={
                     <p>
-                      {`Description  ${1000 - description.length} characters`} *
+                      {`Description  ${MAX_DESCRIPTION - description.length} characters`} *
                     </p>
                   }
                   fullWidth
@@ -1255,14 +1307,16 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
               </Box>
 
               {/*  button for posting */}
-              <Box display={"flex"} justifyContent={"center"} mb={2}>
+              <Box 
+              display={"flex"} 
+              justifyContent={"center"}
+              width={'100%'}
+               mb={2}>
                 <Button
                   onClick={handleUploadCourse}
                   startIcon={<SchoolRounded />}
-                  className={
-                    CustomDeviceIsSmall() ? "w-75 rounded-5" : "w-50 rounded-5"
-                  }
                   variant="contained"
+                  className="rounded"
                   disabled={isUploading || errorMessage}
                   size="small"
                 >
