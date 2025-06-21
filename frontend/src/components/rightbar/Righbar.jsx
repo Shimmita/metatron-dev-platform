@@ -93,9 +93,9 @@ const RightbarAll = () => {
             </Box>
 
             {/* popular courses */}
-            <Box display={corouselCounter === 3 ? "block" : "none"}>
+            {/* <Box display={corouselCounter === 3 ? "block" : "none"}>
               <CoursesContainer />
-            </Box>
+            </Box> */}
           </Box>
           {/* stepper controller */}
           <Box display={"flex"} justifyContent={"center"}>

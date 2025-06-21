@@ -1,13 +1,11 @@
 import {
-  Add,
   Close,
   CloudUploadRounded,
   DiamondRounded,
-  SchoolRounded,
+  SchoolRounded
 } from "@mui/icons-material";
 import {
   Alert,
-  Autocomplete,
   Avatar,
   Box,
   Button,
@@ -17,25 +15,28 @@ import {
   IconButton,
   MenuItem,
   Modal,
-  Stack,
   styled,
   TextField,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import axios from "axios";
+import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import AppLogo from "../../images/logo_sm.png";
+import { updateCurrentSnackPostSuccess } from "../../redux/CurrentSnackBar";
 import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionTech from "../data/SubsectionTech";
 import BrowserCompress from "../utilities/BrowserCompress";
 import CourseIcon from "../utilities/CourseIcon";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CustomModalHeight from "../utilities/CustomModalHeight";
 import { getImageMatch } from "../utilities/getImageMatch";
+import VideoPreviewComponent from "./VideoPreviewComponent";
+
 
 // styled modal
 const StyledModalPost = styled(Modal)({
@@ -62,8 +63,10 @@ const StyledInput = styled("input")({
 const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
 
 const MAX_DESCRIPTION=500
+const FILE_MAX=50000000
+const MB_CONVERSION=1024*1024
 
-const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
+const PostCourseModal =({ openModalCourse, setOpenModalCourse }) => {
   const [title, setTitle] = useState("");
   const [postCategory, setPostCategory] = useState("");
   const [progLanguage, setProgLanguage] = useState("");
@@ -80,20 +83,18 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   const [gameDev, setGameDev] = useState("");
   const [devOpsTool, setDevOpsTool] = useState("");
   const [description, setDescription] = useState("");
-  const [videoMainUpload, setVideoMainUpload] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isFreeLogo, setIsFreeLogo] = useState(false);
   const [freeLogo, setFreeLogo] = useState("");
   const [imageUpload, setImageUpload] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  // To hold user input text for req
-  const [topicText, setTopicText] = useState(""); 
-  const [topicsArray, setTopicsArray] = useState([]);
-
+  
   // redux states
   const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
   const { user } = useSelector((state) => state.currentUser);
+  const navigate=useNavigate()
+  const dispatch=useDispatch()
 
   // for category 1, 2 and 3
   const [category1, setCategory1] = useState("");
@@ -101,13 +102,42 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   const [category3, setCategory3] = useState("");
   const [category4, setCategory4] = useState("");
 
+  // store selected video files
+  const [videoFiles,setVideoFiles]=useState([])
+  const [uploadProgress, setUploadProgress] = useState(0);
+ 
+
+  // handle video change and update the videoFiles array
+  const handleVideoFilesChange=useCallback((event)=>{
+  
+    // update the file variable
+    let files=[...event.target.files]
+
+    // no course video file selected
+    if (files.length>0) setVideoFiles(files)
+
+    },[])
+
+
+   // handle control of the file replacement change
+   const handleVideoReplace=(fileReplace,video,index)=>{
+    // return videos not contain the focused video to replace
+    let filteredFileVideos=videoFiles.filter(file=>file.name!==video.name)
+    // check if the video replacement exists and return
+    if (filteredFileVideos.some(file=>file.name===fileReplace.name)) return
+
+    // update the filtered videos with fileReplace video at the passed index
+    filteredFileVideos[index]=fileReplace
+
+    // update the videoFiles with this new files
+    setVideoFiles([...filteredFileVideos])
+  }
+
   // close freeLogo
   const handleCloseFreeLogo = () => {
     setFreeLogo("");
     setIsFreeLogo(false);
   };
-
-
 
 
   //handle free logo when button clicked
@@ -129,8 +159,9 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
     
   }
 
+ 
   //   handle file change and compress the image
-  const handleFileChange = async (event) => {
+  const handleFileChangeBannerLogo = async (event) => {
     // false free logo pick
     handleCloseFreeLogo()
 
@@ -148,43 +179,21 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   };
 
 
-  // handle video main selection
-  const handleFileChangeVideoMain=(event)=>{
-    const file=event.target.files[0]
-    //update video main variable
-    setVideoMainUpload(file) 
-  }
 
+  // handle core any errors
+  const handleAnyErrors = () => {
+    // holds the uploaded videoFiles size, max is 1GB per course
+    let sum=0
 
-  // handle video main preview
-  const handleVideoMainPreview=()=>{
-    return URL.createObjectURL(videoMainUpload)
-  }
+     // get the total size of the selected files.
+     videoFiles.forEach(file=>{
+      // get file size in MB
+      let fileMB=Math.ceil((file.size)/(MB_CONVERSION))
 
-  // Handle input change for req
-  const handleTextChangeTopic = (e, value) => {
-    setTopicText(value);
-  };
+      // sum in megabytes
+      sum+=fileMB
+    })
 
-  // Handle adding req
-  const handleAddUpdateTopic = () => {
-    // Add the inputText as a new requirement if it's not empty
-    if (topicText.trim() !== "") {
-      // if the name of the topic does not exists add
-      if (!topicsArray.includes(topicText.trim())) {
-        setTopicsArray((prev) => [...prev, topicText.trim()]);
-        setTopicText(""); // Clear the input field
-      }
-    }
-  };
-
-  // Handle req removal
-  const handleDeleteUpdateTopic = (req) => {
-    setTopicsArray((prev) => prev.filter((val) => val !== req));
-  };
-
-  // handle core missing fields
-  const handleEmptyFields = () => {
     if (title?.trim() === "") {
       setErrorMessage("Title field required");
       return false;
@@ -193,14 +202,16 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
       setErrorMessage("Description field required");
       return false;
     }
-    if (postCategory?.toLowerCase().trim === "") {
+   
+    if (postCategory?.trim === "" || category1.toLowerCase().trim() === "") {
       setErrorMessage("specialisation field required");
       return false;
     }
     if (postCategory?.toLowerCase().includes("frontend") && category1.toLowerCase().trim() === "") {
       setErrorMessage("frontend framework or library required")
     }
-    if (postCategory?.toLowerCase().includes("frontend") && category4.toLowerCase().trim() === "") {
+    if (postCategory?.toLowerCase().includes("frontend") &&
+     (category4.toLowerCase().trim() === "" || category2.toLowerCase().trim() === "") ) {
       setErrorMessage("frontend UI styling library required")
     }
     if (postCategory?.toLowerCase().includes("backend") && category1.toLowerCase().trim() === "") {
@@ -252,15 +263,32 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
       }
     }
 
-    if (topicsArray.length < 5) {
-      setErrorMessage("provide atleast 5 topics");
-      return false;
+    
+    // if file  size exceed 1GB alert courses max is 1GB
+    if (sum>1000) {
+      setErrorMessage("Course exceeded 1GB !")
+      // clear the videos by setting the length 0
+      videoFiles.length=0
+      return
     }
 
-    if (!videoMainUpload) {
-      setErrorMessage("provide course video");
-      return false;
+
+    // uploaded files should be videos only
+    if (!videoFiles.every(file=>file.type.includes('video'))) {
+      setErrorMessage('Lectures should be video files only !')
+      // clear files
+      videoFiles.length=0
+      return
     }
+
+    // ensure each file is less than 50MB
+    if (videoFiles.some(file=>file.size>FILE_MAX)) {
+      setErrorMessage('Each lecture should not exceed 50MB !')
+      // clear files
+      videoFiles.length=0
+      return
+    }
+
 
     return true;
   };
@@ -323,12 +351,20 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   
 // handle closing of the modal
 const handleClosingModal=()=>{
-  // clear every details
-  setVideoMainUpload(null)
-  setImageUpload(null)
-
   // close the modal
   setOpenModalCourse(false)
+  // clear video files
+  videoFiles.length=0
+  //clear other details
+  setImageUpload(null)
+  setPostCategory("")
+  setTitle("")
+  setDescription("")
+  setFreeLogo("")
+  setCategory1("")
+  setCategory2("")
+  setCategory3("")
+  setCategory4("")
 }
 
 
@@ -366,70 +402,76 @@ const handleClosingModal=()=>{
       sub3: category3,
       sub4: category4
     },
-    course_topics: topicsArray,
-    course_logo_url: freeLogo,
+    course_video_lectures:[],
+    course_video_topics:[],
+    course_logo: {
+      logoLink:freeLogo,
+      logoID:""
+
+    },
   };
 
 
   // handle posting of data to the backend
   const handleUploadCourse = () => {
-    // clear any error message
-    setErrorMessage("");
-    
+     // clear any message errors
+     setErrorMessage("")
+     
     // core fields not empty
-    if (handleEmptyFields()) {
-
-      // set is uploading true
-      setIsUploading(false);
+    if (handleAnyErrors()) {
       // create a form which will facilitate parsing of the file for upload to cloud
-      const formData = new FormData();
+      let formData = new FormData();
+
       // append post body after stringify it due to form data
       formData.append("course", JSON.stringify(courseObject));
 
-      // check if video and fileCustom the logo file present then append for upload to backend
-      if (videoMainUpload) {
-        // append video file
-        formData.append("file", videoMainUpload);
+      if (videoFiles.length>0) {
+        videoFiles.forEach(element => {
+          formData.append("videos",element)
+        });
       }
-
-      // holds image logo
+     
+      // holds image logo if present
       if (imageUpload) {
         // append image logo for the course
-        formData.append("file", imageUpload);
+        formData.append("image", imageUpload);
       }
 
-      console.log(courseObject)
+    // set is uploading true
+    setIsUploading(true);
 
-      // performing post request
-      // axios
-      //   .post(
-      //     `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/create`,
-      //     formData,
-      //     {
-      //       withCredentials: true,
-      //     }
-      //   )
-      //   .then((res) => {
-      //     // show success post snack controlled by redux
-      //     dispatch(updateCurrentSnackPostSuccess(res.data));
-      //     // close the current modal
-      //     setOpenModalCourse(false);
-      //     // navigate to home route by default
-      //     navigate("/");
-      //     // update tab bottom nav to 0
-      //     updateCurrentBottomNav(0);
-      //   })
-      //   .catch(async (err) => {
-      //     if (err?.code === "ERR_NETWORK") {
-      //       setErrorMessage("Server Unreachable");
-      //       return;
-      //     }
+    // axios post data to the backend
+      axios.post(
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/create`,
+          formData,
+          {
+            withCredentials: true,
+            onUploadProgress: (progressEvent) => {
+              setUploadProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
+            }
+          },
+          
+        )
+        .then((res) => {
+          // show success post snack controlled by redux
+          dispatch(updateCurrentSnackPostSuccess(res.data));
+          // close the current modal
+          setOpenModalCourse(false);
+          // navigate to home route by default
+          navigate("/");
+          
+        })
+        .catch(async (err) => {
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage("Server Unreachable");
+            return;
+          }
 
-      //     setErrorMessage(err?.response.data);
-      //   })
-      //   .finally(() => {
-      //     setIsUploading(false);
-      //   });
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          setIsUploading(false);
+        });
 
     }
   };
@@ -516,8 +558,15 @@ const handleClosingModal=()=>{
               </Collapse>
             ) : (
               isUploading && (
-                <Box>
+                <Box 
+                display={'flex'}
+                 alignItems={'center'}
+                 gap={1}
+                 >
+                  {/* progress circle */}
                   <CircularProgress size={"25px"} />
+                  {/* progress percentage */}
+                  {uploadProgress}%
                 </Box>
               )
             )}
@@ -592,7 +641,7 @@ const handleClosingModal=()=>{
                   onChange={(e) => setPostCategory(e.target.value)}
                 >
                   {SpecialisationTech?.filter((about) => about !== "None").map(
-                      (about, index) => (
+                      (about) => (
                         <MenuItem
                           key={about}
                           value={about}
@@ -1035,8 +1084,8 @@ const handleClosingModal=()=>{
 
                 {/* provide a logo for the course */}
                 <Typography variant="body2" color={"text.secondary"}>
-                  Upload course banner which will be displayed on top of your video course.
-                  Eye capturing banner is highly recommended for attention capture.
+                  Upload course logo i.e python, nodejs, react, angular, google, 
+                  flutter etc. that will be displayed alongside your course title.
                 </Typography>
 
                 <Box 
@@ -1078,63 +1127,36 @@ const handleClosingModal=()=>{
                     <StyledInput
                       type="file"
                       accept="image/*,"
-                      onChange={handleFileChange}
-                      multiple
+                      onChange={handleFileChangeBannerLogo}
                     />
                   </Button>
                 </Box>
               </React.Fragment>
 
 
-
-              {/* main video upload */}
+              {/* upload video  */}
               <React.Fragment>
-                <Typography
+              <Typography
                   gutterBottom
                   variant="body2"
                   mt={1}
-                  mb={3}
+                  mb={2}
                   color={"text.secondary"}
                 >
-                  Upload the course video which the potential target group will watch 
-                  when they enroll into the course. (Max 500MB | Min Quality 480P)
+                  Upload course video lectures in parts. Max 50MB each; Ensure that each video part is named according to 
+                  the topic or context its going to cover. For example (Introduction, Variables, React_Hooks, MySQL_Database)
                 </Typography>
 
-                {videoMainUpload && (
-                  <React.Fragment>
-                    {/* video box */}
-                    <Box
-                      display={"flex"}
-                      justifyContent={"center"}
-                      width={"100%"}
-                    >
-                      <video
-                        controls
-                        className="rounded"
-                        muted
-                        autoFocus
-                        src={handleVideoMainPreview()}
-                        style={{ width: "95%" }}
-                        height={280}
-                        poster={previewImage}
-                      >
-                        <Typography
-                          textAlign={"center"}
-                          variant="body2"
-                          color={"error"}
-                        >
-                          video not supported
-                        </Typography>
-                      </video>
-                    </Box>
-                    {/* video name */}
-                    <Box display={"flex"} justifyContent={"center"}>
-                      <Typography variant="caption" color={"text.secondary"}>
-                        {videoMainUpload.name.split(".")[0].substring(0, 20)}
-                      </Typography>
-                    </Box>
-                  </React.Fragment>
-                )}
+
+                {/* show selected videos */}
+                {videoFiles?.map((video,index)=>(
+                  <VideoPreviewComponent
+                   key={video?.name}
+                   video={video}
+                   index={index}
+                   handleVideoReplace={handleVideoReplace}
+                   />
+                  ))}
 
                 <Box 
                 display={"flex"} 
@@ -1144,7 +1166,7 @@ const handleClosingModal=()=>{
                     component="label"
                     role={undefined}
                     disableElevation
-                    variant={videoMainUpload ? "outlined":"text"}
+                    variant={videoFiles.length>0 ? "outlined":"text"}
                     tabIndex={-1}
                     size="small"
                     sx={{
@@ -1154,137 +1176,21 @@ const handleClosingModal=()=>{
                     }}
                     startIcon={<CloudUploadRounded />}
                   >
-                    Select Course Video
+                    Select Multiple Course Lectures
                     <StyledInput
                       type="file"
                       accept="video/*"
-                      onChange={handleFileChangeVideoMain}
+                      onChange={handleVideoFilesChange}
                       multiple
                     />
                   </Button>
                 </Box>
-              </React.Fragment>
 
-
-            
-
-              {/* topics covered */}
-              <React.Fragment>
-                <Stack mt={2} gap={1}>
-                  <Typography variant="body2" color={"text.secondary"}>
-                    Provide the topics or lectures that your course is aimed to
-                    cover during the session. This helps one to anticipate the general 
-                    flow of the course.
-                  </Typography>
-                  <Box
-                    display={"flex"}
-                    alignItems={"center"}
-                    width={"100%"}
-                    gap={1}
-                  >
-                    {/* topics added autocomplete */}
-                    <Autocomplete
-                      freeSolo
-                      className="w-100"
-                      options={topicsArray} // Show available options when user types
-                      value={topicText}
-                      onInputChange={handleTextChangeTopic}
-                      disableClearable
-                      inputValue={topicText}
-                      disabled={isUploading}
-                      onChange={handleTextChangeTopic}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Topic name"
-                          variant={
-                            CustomDeviceIsSmall() ? "standard" : "outlined"
-                          }
-                          placeholder="Introduction To React"
-                          fullWidth
-                        />
-                      )}
-                      onKeyUp={(e) => {
-                        if (e.key === "Enter" && topicText?.trim() !== "") {
-                          handleAddUpdateTopic();
-                        }
-                      }}
-                    />
-
-                    {/* add button */}
-                    <IconButton
-                      className="border"
-                      onClick={handleAddUpdateTopic}
-                      disabled={!topicText || isUploading}
-                    >
-                      <Add color="primary" sx={{ width: 16, height: 16 }} />
-                    </IconButton>
-                  </Box>
-                </Stack>
-
-                {/* display  latest previous topics or lectures */}
-                <Box mb={1}>
-                  {topicsArray.length > 0 && (
-                    <Box mt={2} mb={1}>
-                      <Box
-                        component={"ol"}
-                        bgcolor={isDarkMode ? undefined : "#f1f1f1"}
-                        className={isDarkMode ? "border" : "rounded"}
-                      >
-                        {/* available topics */}
-                        <Box
-                          display={"flex"}
-                          justifyContent={"center"}
-                          mb={1}
-                          width={"100%"}
-                        >
-                          <Typography
-                            width={"100%"}
-                            variant="caption"
-                            textTransform={"capitalize"}
-                            fontWeight={"bold"}
-                            sx={{
-                              textDecoration: "underline",
-                            }}
-                            color={"text.secondary"}
-                          >
-                            available course lectures or topics
-                          </Typography>
-                        </Box>
-                        {topicsArray.map((topic, index) => (
-                          <Box
-                            display={"flex"}
-                            gap={1}
-                            key={index}
-                            alignItems={"center"}
-                          >
-                            <Typography
-                              component={"li"}
-                              variant="caption"
-                              fontWeight={"bold"}
-                              color="text.secondary"
-                            >
-                              {topic}
-                            </Typography>
-                            {/* clear or delete icon */}
-                            <IconButton
-                              size="small"
-                              onClick={() => handleDeleteUpdateTopic(topic)}
-                            >
-                              <Close sx={{ width: 15, height: 15 }} />
-                            </IconButton>
-                          </Box>
-                        ))}
-                      </Box>
-                    </Box>
-                  )}
-                </Box>
               </React.Fragment>
 
               <Typography variant="body2" color={"text.secondary"}>
                 Provide course description explaining the key areas being tackled. 
-                Clear description could convince many 
-                enrolling to your free or paid course.
+                Clear description could convince many enrolling to your course.
               </Typography>
 
               <Box mb={3}>
@@ -1316,11 +1222,11 @@ const handleClosingModal=()=>{
                   onClick={handleUploadCourse}
                   startIcon={<SchoolRounded />}
                   variant="contained"
-                  className="rounded"
+                  className="rounded-5"
                   disabled={isUploading || errorMessage}
                   size="small"
                 >
-                  Upload Your Course
+                  Begin Uploading Your Course
                 </Button>
               </Box>
             </Box>

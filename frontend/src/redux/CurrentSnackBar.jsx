@@ -15,7 +15,7 @@ const CurrentSnackBar = createSlice({
     updateCurrentSnackPostSuccess: (state, action) => {
       state.messageSnackPostTech = action.payload;
     },
-    // upadte  user and online status to true
+    // update  user and online status to true
     updateCurrentSnackBar: (state, action) => {
       state.messageSnack = action.payload;
     },

@@ -89,6 +89,8 @@ function CourseLayout({ isUploadedRequest }) {
           controls
           onPlay={handlePlay}
           poster={pythonLogo}
+          playsInline
+          preload="none"
         >
         <Typography 
           color={"error"}>video not supported</Typography>

@@ -11,6 +11,7 @@ import {
   Button,
   CircularProgress,
   Collapse,
+  Divider,
   IconButton,
   Modal,
   Stack,
@@ -254,10 +255,7 @@ const ApplyJobModal = ({
                 gutterBottom
                 color={"text.secondary"}
               >
-                {jobaccesstype?.type} | 
-                {jobaccesstype?.access} | 
-                {handleCountryName()} | 
-                {location.state}
+                {jobaccesstype?.type} | {jobaccesstype?.access} | {handleCountryName()} | {location.state}
               </Typography>
 
             </Box>
@@ -275,38 +273,46 @@ const ApplyJobModal = ({
 
 
           {/* display error of missing filed if any */}
-          <Box
-            mt={1}
-            display={"flex"}
-            justifyContent={"center"}
-            mb={isUploading || errorMessage ? 1 : undefined}
-          >
-            {errorMessage ? (
-              <Collapse in={errorMessage || false}>
-                <Alert
-                  severity="info"
-                  onClick={() => setErrorMessage("")}
-                  className="rounded"
-                  action={
-                    <IconButton aria-label="close" color="inherit" size="small">
-                      <Close fontSize="inherit" />
-                    </IconButton>
-                  }
-                >
-                  {errorMessage}
-                </Alert>
-              </Collapse>
-            ) : (
-              isUploading && (
-                <Box>
-                  <CircularProgress size={"25px"} />
-                </Box>
-              )
+
+          {(errorMessage || isUploading) && (
+             <Box
+             mt={1}
+             display={"flex"}
+             justifyContent={"center"}
+             mb={isUploading || errorMessage ? 1 : undefined}
+           >
+            {errorMessage && (
+               <Collapse in={errorMessage || false}>
+               <Alert
+                 severity="info"
+                 onClick={() => setErrorMessage("")}
+                 className="rounded"
+                 action={
+                   <IconButton aria-label="close" color="inherit" size="small">
+                     <Close fontSize="inherit" />
+                   </IconButton>
+                 }
+               >
+                 {errorMessage}
+               </Alert>
+             </Collapse>
             )}
-          </Box>
+
+            {isUploading && (
+              <Box>
+              <CircularProgress size={"25px"} />
+            </Box>
+            )}
+            
+           </Box>
+          )}
+
+          {/* divider */}
+          <Divider className="p-1" component={'div'}/>
+         
 
           <Box
-            mt={1}
+            mt={2}
             maxHeight={"65vh"}
             className={"px-3"}
             sx={{

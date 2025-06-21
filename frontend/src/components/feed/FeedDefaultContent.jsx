@@ -198,6 +198,7 @@ const FeedDefaultContent = () => {
                       {/* feed card detailed post */}
                       <CardFeed
                         post={post}
+                        isLastIndex={index===posts?.length-1}
                         setPostDetailedData={setPostDetailedData}
                       />
                     </Box>

@@ -23,8 +23,9 @@ export default function AlertGeneral({
   setErrorMessage,
   isError=false,
 }) {
+ 
   const handleClose = () => {
-
+   
     // if is error means the alert has setError message to clear
     if (isError) {
 

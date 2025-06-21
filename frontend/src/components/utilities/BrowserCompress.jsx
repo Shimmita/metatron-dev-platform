@@ -12,7 +12,7 @@ async function BrowserCompress(file) {
     // return the compressed file
     return compressedFile;
   } catch (error) {
-    console.log("something went wrong while compressing the file", error);
+    console.log("file compression failed, try another file", error);
   }
 }
 

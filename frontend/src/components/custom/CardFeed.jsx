@@ -44,7 +44,7 @@ import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
 import CardFeedMore from "./CardFeedMore";
 
-const CardFeed = ({ post, setPostDetailedData }) => {
+const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
   const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
@@ -58,8 +58,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
   const handleClickMoreVertPost = (event) => setAnchorEl(event.currentTarget);
   const handleCloseMenu = () => setAnchorEl(null);
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
+
   // redux states
   const { isDarkMode } = useSelector((state) => state.appUI);
   const { user } = useSelector((state) => state.currentUser);
@@ -302,7 +301,7 @@ const CardFeed = ({ post, setPostDetailedData }) => {
     <React.Fragment>
       <Box
       className={'rounded'}
-        mb={2}
+        mb={isLastIndex ? 6 :3}
         sx={{
           border:"1px solid",
           borderColor: "divider",

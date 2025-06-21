@@ -1,5 +1,4 @@
 import {
-  DownloadForOfflineRounded,
   EmailOutlined,
   FlagRounded,
   PersonAddRounded,
@@ -191,18 +190,7 @@ function CardFeedMore({
                 primary={<Typography variant={'body2'}>{owner_post}</Typography>}
               />
             </MenuItem>
-            <Divider component={"li"} />
-
-            <MenuItem>
-              <ListItemText>
-                <DownloadForOfflineRounded color="primary" className="mx-2" sx={{ width:22,height:22 }} />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={<Typography variant={'body2'}>Download Media</Typography>}
-              />
-            </MenuItem>
-          
+        
             {/* report content */}
             <Divider component={"li"} />
             <MenuItem onClick={handleShowReportAlert}>

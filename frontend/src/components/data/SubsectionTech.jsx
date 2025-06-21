@@ -1,8 +1,4 @@
 const SubsectionTech = {
-  Payment:[
-    "Free",
-    "Paid"
-  ],
   Language: [
     "Java",
     "Javascript",

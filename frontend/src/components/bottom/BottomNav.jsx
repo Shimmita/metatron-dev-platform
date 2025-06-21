@@ -1,11 +1,11 @@
-import { CachedOutlined, CachedRounded, HomeOutlined, HomeRounded, SchoolOutlined, SchoolRounded, TvOutlined, TvRounded, TvTwoTone, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
+import { CachedOutlined, CachedRounded, HomeOutlined, HomeRounded, InfoOutlined, SchoolOutlined, SchoolRounded, TvOutlined, TvRounded, TvTwoTone, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
 import {
   BottomNavigation,
   BottomNavigationAction,
   Paper,
   Tooltip
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -16,6 +16,7 @@ import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import AlertGeneral from "../alerts/AlertGeneral";
 
 const BottomNav = () => {
   // redux states
@@ -24,8 +25,15 @@ const BottomNav = () => {
   const { position } = useSelector((state) => state.currentBottomNav);
   const { isPostSearch } = useSelector((state) => state.currentPosts);
 
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+    // accessing the redux state values
+    const { isTabSideBar } = useSelector((state) => state.appUI);
+  
+    // larger devices, beyond tablet
+    const isBeyondTablets=CustomLandScape() || CustomLandscapeWidest()
 
   // return home or default card page
   const handleReturnHome = () => {
@@ -54,6 +62,7 @@ const BottomNav = () => {
 
   // return learning page
   const handleOpenCourses = () => {
+  
      // disable sidebar
      if (isSidebarRighbar) {
       
@@ -62,11 +71,7 @@ const BottomNav = () => {
     navigate("/courses/available");
   };
 
-  // accessing the redux state values
-  const { isTabSideBar } = useSelector((state) => state.appUI);
-  
-  // larger devices, beyond tablet
-  const isBeyondTablets=CustomLandScape() || CustomLandscapeWidest()
+
 
   return (
     <Paper sx={{ position: "fixed",
@@ -94,8 +99,9 @@ const BottomNav = () => {
       >
         <Tooltip title="Home" arrow  
         style={{
-              marginLeft:
-                CustomDeviceTablet() && isTabSideBar && "30%",
+              marginLeft:CustomDeviceTablet() && isTabSideBar ? "30%":
+              // under development, when courses and events done clear
+              (CustomLandscapeWidest() || CustomLandScape()) && "-7%",
             }}>
           <BottomNavigationAction
             label="Home"
@@ -140,7 +146,7 @@ const BottomNav = () => {
 
         
         {/* online courses */}
-        <Tooltip title="Tech Courses" arrow>
+        {/* <Tooltip title="Tech Courses" arrow>
           <BottomNavigationAction
             onClick={handleOpenCourses}
             label="Courses"
@@ -153,15 +159,15 @@ const BottomNav = () => {
             
             </>}
           />
-        </Tooltip>
+        </Tooltip> */}
 
          {/* tech events */}
-         <Tooltip 
+         {/* <Tooltip 
          title="Tech Events"
           arrow
-          sx={{ marginRight:isBeyondTablets && position===0 && 12 }}>
+          sx={{ marginRight:isBeyondTablets && position===0 && 13 }}>
           <BottomNavigationAction
-            onClick={handleJobContent}
+            onClick={handleEventContent}
             label="Events"
             icon={<>
             {isDarkMode ?(
@@ -172,9 +178,10 @@ const BottomNav = () => {
            
             </>}
           />
-        </Tooltip>
+        </Tooltip> */}
 
       </BottomNavigation>
+
     </Paper>
   );
 };
