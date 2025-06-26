@@ -113,7 +113,7 @@ export default function CourseStatsAlert({
   const [isUploading, setIsUploading] = useState(false);
 
   // redux states
-  const { isTabSideBar, isDarkMode } = useSelector((state) => state.appUI);
+  const { isTabSideBar,currentMode } = useSelector((state) => state.appUI);
 
   const handleCloseAlert = () => {
     // close alert
@@ -558,10 +558,10 @@ export default function CourseStatsAlert({
                                         <Box
                                           component={"ol"}
                                           bgcolor={
-                                            isDarkMode ? undefined : "#f1f1f1"
+                                            currentMode==='dark' ? undefined : "#f1f1f1"
                                           }
                                           className={
-                                            isDarkMode ? "border" : "rounded"
+                                            currentMode==='dark' ? "border" : "rounded"
                                           }
                                         >
                                           {/* available topics */}
@@ -588,7 +588,7 @@ export default function CourseStatsAlert({
                                             <Box
                                               display={"flex"}
                                               gap={1}
-                                              key={index}
+                                              key={topic}
                                               alignItems={"center"}
                                             >
                                               <Typography

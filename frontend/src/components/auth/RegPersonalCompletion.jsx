@@ -81,7 +81,9 @@ const RegPersonalCompletion = () => {
   };
 
   // global dark mode state from redux
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+  // update is dark const
+  const isDarkMode=currentMode==='dark'
 
   // handle showing next and prev inputs
   const handleShowNext = () => {

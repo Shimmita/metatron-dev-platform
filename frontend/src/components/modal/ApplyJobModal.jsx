@@ -71,7 +71,9 @@ const ApplyJobModal = ({
   const [errorMessage, setErrorMessage] = useState("");
 
   // redux states
-  const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
+
   const { user } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
 
@@ -166,13 +168,11 @@ const ApplyJobModal = ({
 
   // handle return width modal
   const handleReturnWidthModal=()=>{
-    if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
-      return "40%"
+    if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+      return "35%"
     } else if (CustomDeviceTablet()){
       return "90%"
-    } else if(CustomLandscapeWidest()){
-      return "35%"
-    }
+    } 
     return "100%"
   }
 
@@ -506,7 +506,6 @@ const ApplyJobModal = ({
                         onClick={handleUploadDocuments}
                         endIcon={<BoltRounded />}
                         sx={{ borderRadius: "20px" }}
-                        className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
                       >
                         Complete Application
                       </Button>
@@ -532,7 +531,6 @@ const ApplyJobModal = ({
                         disableElevation
                         size="small"
                         sx={{ borderRadius: "20px" }}
-                        className={CustomDeviceIsSmall() ? "w-75" : "w-50"}
                       >
                         Continue Application
                       </Button>

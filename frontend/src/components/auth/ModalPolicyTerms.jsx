@@ -31,7 +31,9 @@ const ModalPolicyTerms = ({
   isShowPrivacy,
 }) => {
   // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+  // update is dark const
+  const isDarkMode=currentMode==='dark'
 
   return (
     <StyledModalEvent

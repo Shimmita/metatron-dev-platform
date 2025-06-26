@@ -1,5 +1,4 @@
 import {
-  Business,
   Close,
   PaidRounded,
   WorkRounded
@@ -32,7 +31,21 @@ const StyledModalEvent = styled(Modal)({
 
 const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
   // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+ // update is dark const
+  const isDarkMode=currentMode==='dark'
+
+  // modal width
+  const handleModalWidth=()=>{
+    if (CustomDeviceTablet()||CustomLandScape()) {
+      return "80%"
+    }
+    if (CustomLandscapeWidest()) {
+      return "50%"
+    }
+
+    return "100%"
+  }
 
   return (
     <StyledModalEvent
@@ -44,11 +57,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
     >
       <Box
         width={
-          CustomDeviceTablet() || CustomLandScape()
-            ? "80%"
-            : CustomLandscapeWidest()
-            ? "50%"
-            : "100%"
+          handleModalWidth()
         }
         p={1}
         borderRadius={5}
@@ -158,14 +167,14 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                     mb={1}
                     textAlign={"center"}
                   >
-                    Donation, Patnership and Affiliate Program
+                    Donation, Partnership and Affiliate Program
                   </Typography>
 
                   <ol>
                     {
                       DataAccounts?.Donation.map((data, index) => (
                         <Typography
-                          key={index}
+                          key={data}
                           variant="body2"
                           gutterBottom
                           component={"li"}
@@ -185,5 +194,6 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
     </StyledModalEvent>
   );
 };
+
 
 export default ModalAccountInfo;

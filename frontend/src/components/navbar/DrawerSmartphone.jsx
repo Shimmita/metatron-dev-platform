@@ -62,10 +62,11 @@ const DrawerSmartphone = ({
 
 
   // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+   const isDarkMode=currentMode==='dark'
+
   const { user } = useSelector((state) => state.currentUser);
   const dispatch=useDispatch()
-
 
   // UI theme dark light tweaking effect
     const handleShowDarkMode = () => {
@@ -87,7 +88,7 @@ const DrawerSmartphone = ({
         display={'flex'}
         justifyContent={'flex-end'}
         >
-           <IconButton disabled onClick={handleShowDarkMode}> 
+           <IconButton onClick={handleShowDarkMode}> 
             <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
             <DarkModeRounded/>
           </Tooltip> 

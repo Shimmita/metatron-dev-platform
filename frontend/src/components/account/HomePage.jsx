@@ -6,6 +6,7 @@ const Sidebar = lazy(() => import("../sidebar/Sidebar"));
 const Feed = lazy(() => import("../feed/Feed"));
 
 function Homepage() {
+
   return (
     <Box color={"text.primary"}>
       <Navbar />

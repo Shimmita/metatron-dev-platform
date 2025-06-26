@@ -24,15 +24,16 @@ import "../Events.css";
 
 function LiveLayout() {
   // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+    // update is dark const
+  const isDarkMode=currentMode==='dark'
   const navigate = useNavigate();
-  // handle navigation to the live atttend
+  // handle navigation to the live attending
   const handleNavigateLiveAttend = () => {
     navigate("/events/live-attending");
   };
 
   return (
-    <React.Fragment>
       <Box display={"flex"} justifyContent={"center"}>
         <Card
           elevation={0}
@@ -131,7 +132,7 @@ function LiveLayout() {
                   gutterBottom
                   sx={{ color: "text.secondary" }}
                 >
-                  Join the meeting and meet certified and profesional Kotlin
+                  Join the meeting and meet certified and professional Kotlin
                   developers undertaking you through cross-platform mobile app
                   development.
                 </Typography>
@@ -326,7 +327,7 @@ function LiveLayout() {
                   gutterBottom
                   sx={{ color: "text.secondary" }}
                 >
-                  Join the meeting and meet certified and profesional Kotlin
+                  Join the meeting and meet certified and professional Kotlin
                   developers undertaking you through cross-platform mobile app
                   development.
                 </Typography>
@@ -456,7 +457,6 @@ function LiveLayout() {
           </CardContent>
         </Card>
       </Box>
-    </React.Fragment>
   );
 }
 

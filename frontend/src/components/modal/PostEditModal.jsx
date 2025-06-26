@@ -33,10 +33,13 @@ const PostEditModal = () => {
   const [errorMessage, setErrorMessage] = useState("");
   // redux states
   const {
-     isDarkMode, 
+     currentMode, 
     isTabSideBar,
     isPostEditModal,
     postEditUniqueId } = useSelector((state) => state.appUI);
+
+  // updating the isDark mode 
+  const isDarkMode=currentMode==='dark'
 
   const dispatch=useDispatch()
 

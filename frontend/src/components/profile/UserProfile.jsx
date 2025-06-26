@@ -86,7 +86,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function UserProfile() {
   // get redux states
   const { user } = useSelector((state) => state.currentUser);
-  const { isDarkMode, isMessageProfile } = useSelector((state) => state.appUI);
+  const { currentMode, isMessageProfile } = useSelector((state) => state.appUI);
+   const isDarkMode=currentMode==='dark'
 
   // connect track message connect request from redux
   const { messageConnectRequestSent } = useSelector(

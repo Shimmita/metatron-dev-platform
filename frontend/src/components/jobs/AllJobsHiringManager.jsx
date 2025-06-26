@@ -176,7 +176,7 @@ export default function AllJobsHiringManager() {
 
   // redux states
   const { 
-    isDarkMode,
+    currentMode,
      isDefaultSpeedDial, 
      isJobSearchGlobal,
      isSidebarRighbar,
@@ -185,6 +185,8 @@ export default function AllJobsHiringManager() {
      } = useSelector(
     (state) => state.appUI
   );
+  const isDarkMode=currentMode==='dark'
+
   const { jobs } = useSelector((state) => state.currentJobs);
   const { user } = useSelector((state) => state.currentUser);
   const { post_reactions } = useSelector((state) => state.currentPostReactions);

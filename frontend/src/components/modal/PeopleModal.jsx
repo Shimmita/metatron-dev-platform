@@ -1,25 +1,24 @@
 import { Close } from "@mui/icons-material";
 import {
-    Avatar,
-    Box,
-    Divider,
-    IconButton,
-    Modal,
-    Stack,
-    styled,
-    Tooltip,
-    Typography,
+  Avatar,
+  Box,
+  Divider,
+  IconButton,
+  Modal,
+  Stack,
+  styled,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import { resetClearPeopleData } from "../../redux/CurrentModal";
 import FriendRequest from "../rightbar/layouts/FriendRequest";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CustomModalHeight from "../utilities/CustomModalHeight";
-import CustomLandScape from "../utilities/CustomLandscape";
 
 // styled modal
 const StyledModalPeople = styled(Modal)({
@@ -31,7 +30,9 @@ const StyledModalPeople = styled(Modal)({
 
 const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
   // redux states
-  const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
+
   const dispatch = useDispatch();
 
   // close the modal from redux by altering states to false and null data
@@ -42,13 +43,11 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
 
    // handle return width modal
     const handleReturnWidthModal=()=>{
-      if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "40%"
+      if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+        return "35%"
       } else if (CustomDeviceTablet()){
         return "90%"
-      } else if(CustomLandscapeWidest()){
-        return "35%"
-      }
+      } 
       return "100%"
     }
 

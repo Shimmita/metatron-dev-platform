@@ -24,10 +24,13 @@ import "../Events.css";
 
 function CreatedEvent() {
   // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+    // update is dark const
+  const isDarkMode=currentMode==='dark'
+
   const navigate = useNavigate();
 
-  // handle navigation to the live atttend
+  // handle navigation to the live attending
   const handleNavigateLiveAttend = () => {
     navigate("/events/live-attending");
   };

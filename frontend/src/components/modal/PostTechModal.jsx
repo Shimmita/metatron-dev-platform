@@ -24,7 +24,6 @@ import React, { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import AppLogo from "../../images/logo_sm.png";
-import { showPostModalRedux } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import { resetClearCurrentPosts } from "../../redux/CurrentPosts";
 import { updateCurrentSnackPostSuccess } from "../../redux/CurrentSnackBar";
@@ -64,7 +63,7 @@ const StyledInput = styled("input")({
 const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
 
 const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
-  const [post_category, setPostCategory] = useState("");
+  const [postCategory, setPostCategory] = useState("");
   const [backend, setBackend] = useState("");
   const [frontend, setFrontend] = useState("");
   const [database, setDatabase] = useState("");
@@ -90,7 +89,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
 
   // redux states
-  const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
+   const isDarkMode=currentMode==='dark'
+
   const { user } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -119,7 +120,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     post_url: freeLogo && freeLogo,
     post_body: description,
     post_category: {
-      main: post_category,
+      main: postCategory,
       sub1: category1,
       sub2: category2,
       sub3: category3,
@@ -137,15 +138,15 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   useEffect(() => {
     // handle the value fo backend
     const updatePostCategoryValue = () => {
-      if (post_category.includes("Backend")) {
+      if (postCategory.includes("Backend")) {
         setCategory1(backend);
         setCategory2(database);
       }
-      if (post_category.includes("Database")) {
+      if (postCategory.includes("Database")) {
         setCategory1(database);
       }
 
-      if (post_category.includes("Fullstack")) {
+      if (postCategory.includes("Fullstack")) {
         setCategory1(frontend);
         setCategory2(backend);
         setCategory3(database);
@@ -153,7 +154,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     };
 
     updatePostCategoryValue();
-  }, [post_category, backend, database, frontend]);
+  }, [postCategory, backend, database, frontend]);
 
 
    // handle showing free logo menu
@@ -209,32 +210,32 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       setErrorMessage("Description field is required");
       return false;
     }
-    if (post_category?.trim === "") {
+    if (postCategory?.trim === "") {
       setErrorMessage("specialisation field is required");
       return false;
     }
-    if (post_category?.includes("Backend") && category1.trim() === "") {
+    if (postCategory?.includes("Backend") && category1.trim() === "") {
       setErrorMessage("backend field is required");
       return false;
     }
-    if (post_category?.includes("Developer") && category1.trim() === "") {
+    if (postCategory?.includes("Developer") && category1.trim() === "") {
       setErrorMessage("DevOps Tool field is required");
       return false;
     }
-    if (post_category?.includes("Backend") && category2.trim() === "") {
+    if (postCategory?.includes("Backend") && category2.trim() === "") {
       setErrorMessage("Database field is required");
       return false;
     }
-    if (post_category?.includes("Machine") && category1.trim() === "") {
+    if (postCategory?.includes("Machine") && category1.trim() === "") {
       setErrorMessage("ML/AI area of focus is required");
       return false;
     }
-    if (post_category?.includes("Cybersecurity") && category1.trim() === "") {
+    if (postCategory?.includes("Cybersecurity") && category1.trim() === "") {
       setErrorMessage("Cybersecurity area field is required");
       return false;
     }
     if (
-      post_category?.includes("Data Science and Analytics") &&
+      postCategory?.includes("Data Science and Analytics") &&
       category1.trim() === ""
     ) {
       setErrorMessage("Data science area field is required");
@@ -242,7 +243,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     }
 
     if (
-      post_category?.includes("Fullstack") &&
+      postCategory?.includes("Fullstack") &&
       (category1.trim() === "" ||
         category2.trim() === "" ||
         category3.trim() === "")
@@ -326,24 +327,20 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   // handle closing of the modal
   const handleClosingModal = () => {
     setOpenModalTech(false);
-    // also redux reset for isPostModal Redux if true
-    dispatch(showPostModalRedux());
   };
 
 
   // handle return width modal
     const handleReturnWidthModal=()=>{
-      if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "40%"
+      if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+        return "35%"
       } else if (CustomDeviceTablet()){
         return "90%"
-      } else if(CustomLandscapeWidest()){
-        return "35%"
-      }
+      } 
       return "100%"
     }
 
-  // handle width of the global search
+  // handle width of the modal, margin
       const handleModalWidth=()=>{
         if (CustomDeviceTablet() && isTabSideBar) {
           return "36%"
@@ -494,7 +491,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   required
                   select
                   disabled={isUploading}
-                  value={post_category}
+                  value={postCategory}
                   label="Specialisation"
                   fullWidth
                   onChange={(e) => setPostCategory(e.target.value)}
@@ -521,7 +518,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               </Box>
 
               {/* Containerization  */}
-              {post_category === "Containerization and Orchestration" && (
+              {postCategory === "Containerization and Orchestration" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Containerization and Orchestration option that your post
@@ -559,7 +556,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* machine learning and artificial intelligence */}
-              {post_category === "Artificial Intelligence" && (
+              {postCategory === "Artificial Intelligence" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Provide specific area of focus in the field of Machine
@@ -595,7 +592,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* data science */}
-              {post_category === "Data Science and Analytics" && (
+              {postCategory === "Data Science and Analytics" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Select the area of focus in the field of data science and
@@ -630,7 +627,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* cybersecurity */}
-              {post_category === "Cybersecurity Engineering" && (
+              {postCategory === "Cybersecurity Engineering" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} p={1}>
                     Select the area of focus in the field of cybersecurity
@@ -666,7 +663,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* Desktop App */}
-              {post_category === "Desktop App Development" && (
+              {postCategory === "Desktop App Development" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Desktop development stack used in your project. Desktop
@@ -703,7 +700,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* Game dev */}
-              {post_category === "Game App Development" && (
+              {postCategory === "Game App Development" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"}>
                     Provide game application development technology that your
@@ -742,7 +739,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* programming Language */}
-              {post_category === "Programming Languages" && (
+              {postCategory === "Programming Languages" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"}>
                     Select programming language that you are interested to post
@@ -782,7 +779,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
               {/* cloud computing */}
               {/* DevOps */}
-              {post_category === "Cloud Computing" && (
+              {postCategory === "Cloud Computing" && (
                 <Box>
                   <Typography
                     gutterBottom
@@ -818,7 +815,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* DevOps */}
-              {post_category === "DevOps Engineering" && (
+              {postCategory === "DevOps Engineering" && (
                 <Box>
                   <Typography
                     gutterBottom
@@ -861,7 +858,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* UI/UX  */}
-              {post_category === "UI/UX Design" && (
+              {postCategory === "UI/UX Design" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"}>
                     Provide UI/UX design tool which your post covers and aims to
@@ -899,8 +896,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* frontend */}
-              {(post_category === "Frontend App Development" ||
-                post_category === "Fullstack App Development") && (
+              {(postCategory === "Frontend App Development" ||
+                postCategory === "Fullstack App Development") && (
                 <Box Box>
                   <Typography variant="body2" color={"text.secondary"}>
                     Which frontend technology are you interested in? If your post
@@ -939,8 +936,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* backend */}
-              {(post_category === "Backend App Development" ||
-                post_category === "Fullstack App Development") && (
+              {(postCategory === "Backend App Development" ||
+                postCategory === "Fullstack App Development") && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"} mt={3}>
                     Which backend technology are you interested in? Suppose none
@@ -979,9 +976,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* Database */}
-              {(post_category === "Database Administration" ||
-                post_category === "Backend App Development" ||
-                post_category === "Fullstack App Development") && (
+              {(postCategory === "Database Administration" ||
+                postCategory === "Backend App Development" ||
+                postCategory === "Fullstack App Development") && (
                 <Box>
                   <Typography variant="body2" mt={3} color={"text.secondary"}>
                     Which database did you link it with {backend} for this post.
@@ -1020,7 +1017,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* Android App */}
-              {post_category === "Native Android App Development" && (
+              {postCategory === "Native Android App Development" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"}>
                     Native Android application development stack is usually
@@ -1059,7 +1056,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* IOS App */}
-              {post_category === "Native IOS App Development" && (
+              {postCategory === "Native IOS App Development" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"}>
                     Provide the stack used in the developement of your native
@@ -1096,7 +1093,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
               {/* Multiplatform Android+IOS */}
-              {post_category === "Multiplatform Mobile Development" && (
+              {postCategory === "Multiplatform Mobile Development" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"}>
                     Provide multiplatform or cross-platform development
@@ -1297,8 +1294,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               <Box display={"flex"} justifyContent={"center"} mb={2}>
                 <Button
                   onClick={handlePost}
-                  startIcon={<UploadRounded />}
-                  sx={{ fontWeight: "bold" }}
+                  variant="contained"
+                  size="small"
                   className={
                     CustomDeviceIsSmall() ? "w-75 rounded-5" : "w-50 rounded-5"
                   }

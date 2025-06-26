@@ -147,7 +147,8 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
   };
 
   // redux states
-  const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
+   const isDarkMode=currentMode==='dark'
   const handleChangeMainSkills = (_, newValue) => {
     if (newValue.length > 5) {
       return; // Limit to 5 selections

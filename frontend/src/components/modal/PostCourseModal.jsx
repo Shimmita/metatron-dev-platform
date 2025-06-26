@@ -91,7 +91,9 @@ const PostCourseModal =({ openModalCourse, setOpenModalCourse }) => {
   const [previewImage, setPreviewImage] = useState(null);
   
   // redux states
-  const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
+
   const { user } = useSelector((state) => state.currentUser);
   const navigate=useNavigate()
   const dispatch=useDispatch()
@@ -327,13 +329,11 @@ const PostCourseModal =({ openModalCourse, setOpenModalCourse }) => {
 
   // handle return width modal
   const handleReturnWidthModal=()=>{
-    if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
-      return "40%"
+    if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+      return "35%"
     } else if (CustomDeviceTablet()){
       return "90%"
-    } else if(CustomLandscapeWidest()){
-      return "35%"
-    }
+    } 
     return "100%"
   }
 

@@ -28,7 +28,7 @@ export default function ModalSendMessage({ showModal, setShowModal }) {
     setShowModal(!showModal);
   };
   // redux states access
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
 
   return (
     <Modal
@@ -51,7 +51,7 @@ export default function ModalSendMessage({ showModal, setShowModal }) {
             fullWidth
             className={"rounded-start"}
             sx={{
-              backgroundColor: isDarkMode ? "black" : "white",
+              backgroundColor: currentMode==='dark' ? "black" : "white",
             }}
             label={`max ${messageMax - messageInput.length}`}
             variant="filled"

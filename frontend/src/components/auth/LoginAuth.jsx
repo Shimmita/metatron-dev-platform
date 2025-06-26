@@ -50,8 +50,10 @@ const LoginAuth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // global  state from redux
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const {currentMode } = useSelector((state) => state.appUI);
   const { authMessage } = useSelector((state) => state.currentAuthMessage);
+  // update is dark const
+  const isDarkMode=currentMode==='dark'
 
   // axios defaults with credentials to true
   axios.defaults.withCredentials = true;
@@ -62,7 +64,7 @@ const LoginAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   // control showing of terms of service and privacy policy
-  const [isShowPrivacy, setShowPrivacy] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -509,7 +511,7 @@ const LoginAuth = () => {
         <ModalPolicyTerms
           openModalTerms={openModalTerms}
           setOpenModalTerms={setOpenModalTerms}
-          isShowPrivacy={isShowPrivacy}
+          isShowPrivacy={showPrivacy}
         />
       </Box>
     </Box>

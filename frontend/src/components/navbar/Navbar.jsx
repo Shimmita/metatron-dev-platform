@@ -130,7 +130,7 @@ const Navbar = () => {
 
   // redux state UI
   const {
-    isDarkMode,
+    currentMode,
     isSidebarRighbar,
     isDefaultSpeedDial,
     isOpenSponsorAlert,
@@ -141,6 +141,7 @@ const Navbar = () => {
     isPostFullDetailModal,
     isLogoutAlert
   } = useSelector((state) => state.appUI);
+   const isDarkMode=currentMode==='dark'
 
   const handleShowMobileSearch = () => {
     setShowMobileSearch((prev) => !prev);
@@ -654,7 +655,7 @@ const Navbar = () => {
 
             {/* display connection count for largest screens only */}
             {!CustomDeviceIsSmall() && (
-                     <IconButton disabled onClick={handleShowDarkMode}> 
+                     <IconButton  onClick={handleShowDarkMode}> 
                      <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
                      <DarkModeRounded
                    

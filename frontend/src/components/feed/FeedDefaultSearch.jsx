@@ -19,9 +19,11 @@ const FeedDefaultSearch = () => {
   // redux states access
   const { posts } = useSelector((state) => state.currentPosts);
 
-  const { isDarkMode, isDefaultSpeedDial } = useSelector(
+  const { currentMode, isDefaultSpeedDial } = useSelector(
     (state) => state.appUI
   );
+  const isDarkMode=currentMode==='dark'
+
 
   // show speed dial if aint visible
   if (isDefaultSpeedDial) {

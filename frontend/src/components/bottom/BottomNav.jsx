@@ -1,11 +1,11 @@
-import { CachedOutlined, CachedRounded, HomeOutlined, HomeRounded, InfoOutlined, SchoolOutlined, SchoolRounded, TvOutlined, TvRounded, TvTwoTone, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
+import { CachedOutlined, CachedRounded, HomeOutlined, HomeRounded, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
 import {
   BottomNavigation,
   BottomNavigationAction,
   Paper,
   Tooltip
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -16,11 +16,12 @@ import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import AlertGeneral from "../alerts/AlertGeneral";
 
 const BottomNav = () => {
   // redux states
-  const { isSidebarRighbar,isDarkMode } = useSelector((state) => state.appUI);
+  const { isSidebarRighbar,currentMode } = useSelector((state) => state.appUI);
+  // update is dark const
+  const isDarkMode=currentMode==='dark'
 
   const { position } = useSelector((state) => state.currentBottomNav);
   const { isPostSearch } = useSelector((state) => state.currentPosts);

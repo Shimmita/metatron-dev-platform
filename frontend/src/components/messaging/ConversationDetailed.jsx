@@ -43,7 +43,9 @@ const ConversationDetailed = ({
   const [errorMessage, setErrorMessage] = useState("");
 
   // accessing the redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
+
 
   // controls more info for message
   const [anchorEl, setAnchorEl] = useState(null);

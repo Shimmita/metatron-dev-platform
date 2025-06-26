@@ -60,7 +60,9 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
 
 
   // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+  // update is dark const
+  const isDarkMode=currentMode==='dark'
   const { user } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
   // extract basic current user details

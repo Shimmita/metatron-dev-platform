@@ -15,7 +15,6 @@ export default function AlertJobPreview({
    openAlert,
    setOpenAlert,
     job,
-  defaultIcon
 }) {
   const handleClose = () => {
     // close alert
@@ -25,7 +24,7 @@ export default function AlertJobPreview({
   console.log(job)
 
   //   redux states
-  const { isTabSideBar,isDarkMode } = useSelector((state) => state.appUI);
+  const { isTabSideBar,currentMode } = useSelector((state) => state.appUI);
 
   // handle width of the alert
   const handleWidthAlert=()=>{
@@ -55,7 +54,7 @@ export default function AlertJobPreview({
         {/* show layout job hiring */}
      
         {job && (
-         <JobLayout job={job} isPreviewHR={true} isDarkMode={isDarkMode}/>
+         <JobLayout job={job} isPreviewHR={true} isDarkMode={currentMode==='dark'}/>
        )}
         </DialogContent>
       </Dialog>

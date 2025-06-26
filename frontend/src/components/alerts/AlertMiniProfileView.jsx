@@ -1,6 +1,9 @@
 import {
   Close,
-  Diversity3Rounded
+  Diversity3Rounded,
+  GitHub,
+  Language,
+  LinkedIn
 } from "@mui/icons-material";
 import {
   Alert,
@@ -27,6 +30,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
 import CustomLandScape from "../utilities/CustomLandscape";
+import { Link } from "react-router-dom";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -85,7 +89,7 @@ export default function AlertMiniProfileView({
 
   // checks for if current user is friends
   const isFriends =miniProfileData?.network?.includes(currentUserId);
-
+ 
   useLayoutEffect(() => {
 
     // track fetching backend true
@@ -128,8 +132,6 @@ export default function AlertMiniProfileView({
     return parentName;
   };
 
-
-
  
   const handleClose = () => {
     // close alert
@@ -154,6 +156,7 @@ export default function AlertMiniProfileView({
       return "-5%"
     }
   }
+
   
   return (
       <Dialog
@@ -198,7 +201,7 @@ export default function AlertMiniProfileView({
             </Box>
           )}
           {/* render miniprofile layout */}
-          <Box mb={1} mt={1}>
+          <Box mt={1}>
             <Box display={"flex"} justifyContent={"center"}>
               <Stack gap={1}>
                 {/* avatar */}
@@ -358,13 +361,54 @@ export default function AlertMiniProfileView({
                 </Box>
 
                 <Divider className="p-1" component={"div"} />
-
                 {/* caption joined date */}
                 <Box display={"flex"} justifyContent={"center"}>
                   <Typography variant="caption" color={"text.secondary"}>
                     Joined:{miniProfileData?.createdAt?.split("T")[0]}
                   </Typography>
                 </Box>
+
+              <Box 
+              display={'flex'} 
+              alignItems={'center'} 
+              justifyContent={'flex-end'}
+              borderRadius={5}
+              mt={1}
+              gap={2}
+              >
+                {/* github */}
+                <Tooltip 
+                arrow
+                title='GitHub'>
+                <Link
+                target={miniProfileData?.gitHub?.length>2 && "_blank_"}
+                 to={`${miniProfileData?.gitHub?.length>2 ? miniProfileData?.gitHub :'/'}`}>
+                  <GitHub sx={{ width:17,height:17 }}/>
+                </Link>
+                </Tooltip>
+
+                {/* linkedin */}
+                <Tooltip 
+                arrow
+                title='Linkedin'>
+                <Link 
+                target={miniProfileData?.linkedin?.length>2 && "_blank_"}
+                to={`${miniProfileData?.linkedin?.length>2 ? miniProfileData?.linkedin :"/"}`}>
+                  <LinkedIn sx={{ width:18,height:18 }}/>
+                </Link>
+                </Tooltip>
+
+                {/* website */}
+                <Tooltip 
+                arrow
+                title='portfolio'>
+                <Link
+                target={miniProfileData?.portfolio?.length>2 && "_blank_"}
+                 to={`${miniProfileData?.portfolio?.length>2 ? miniProfileData?.portfolio :"/"}`}>
+                  <Language sx={{ width:18,height:18 }}/>
+                </Link>
+                </Tooltip>
+              </Box>
               </Stack>
             </Box>
           </Box>

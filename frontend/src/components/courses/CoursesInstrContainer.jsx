@@ -123,7 +123,8 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
     const [generalTitle,setGeneralTitle]=useState("")
     const [messageGeneral,setMessageGeneral]=useState("")
     // redux states
-    const { isDarkMode, 
+    const { 
+      currentMode, 
       isDefaultSpeedDial, 
       isJobSearchGlobal,
       isSidebarRighbar,
@@ -132,6 +133,9 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
      } = useSelector(
       (state) => state.appUI
     );
+
+    // update is dark const
+  const isDarkMode=currentMode==='dark'
   
   
     const { jobs } = useSelector((state) => state.currentJobs);

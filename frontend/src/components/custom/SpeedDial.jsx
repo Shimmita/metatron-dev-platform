@@ -14,7 +14,8 @@ const PostTechModal = lazy(() => import("../modal/PostTechModal"));
 const PostJobModal = lazy(() => import("../modal/PostJobModal"));
 
 const actions = [
-  {
+  // under development
+  /* {
     icon: <SchoolRounded color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Course Upload",
   },
@@ -23,14 +24,15 @@ const actions = [
     icon: <PictureAsPdfRounded color="primary" sx={{ width: 26, height: 26 }} />,
     name: "PDF Upload",
   },
+ */
 
   {
     icon: <Work color="primary" sx={{ width: 26, height: 26 }} />,
-    name: "Job Posting",
+    name: "Post Your Job",
   },
   {
     icon: <CodeRounded color="primary" sx={{ width: 28, height: 28 }} />,
-    name: "Tech Posting",
+    name: "Post Milestone",
   },
 ];
 
@@ -80,10 +82,10 @@ export default function BasicSpeedDial() {
             icon={action.icon}
             className="shadow border"
             onClick={(e) => {
-              if (action.name === "Tech Posting") {
+              if (action.name === "Post Milestone") {
                 setOpenModalTech(true);
               }
-              if (action.name === "Job Posting") {
+              if (action.name === "Post Your Job") {
                 setOpenModalJob(true);
               }
 

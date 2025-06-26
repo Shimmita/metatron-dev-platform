@@ -35,9 +35,11 @@ const FeedDefaultContent = () => {
   // redux states access
   const { posts } = useSelector((state) => state.currentPosts);
 
-  const { isDarkMode, isDefaultSpeedDial } = useSelector(
+  const { currentMode, isDefaultSpeedDial } = useSelector(
     (state) => state.appUI
   );
+  const isDarkMode=currentMode==='dark'
+
 
   // show speed dial if ain't visible
   if (!isDefaultSpeedDial) {
@@ -103,7 +105,7 @@ const FeedDefaultContent = () => {
 
   return (
     <Box
-      height={"88vh"}
+      height={"89.5vh"}
     >
       {/* render the post is focused for full viewing and that post detailed
       data is no null */}

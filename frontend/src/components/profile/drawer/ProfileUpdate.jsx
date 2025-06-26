@@ -8,9 +8,11 @@ import {
   Button,
   Chip,
   Collapse,
+  FormControlLabel,
   IconButton,
   MenuItem,
   styled,
+  Switch,
   TextField,
   Tooltip,
   Typography,
@@ -58,6 +60,14 @@ function ProfileUpdate({ user }) {
   const [phone, setPhone] = useState(`${user?.phone}`);
   const [country, setCountry] = useState(`${user?.country}`);
   const [county, setCounty] = useState(`${user?.county}`);
+  const [gitHub, setGitHub] = useState(`${user?.gitHub}`);
+  const [linkedin, setLinkedin] = useState(`${user?.linkedin}`);
+  const [portfolio, setPortfolio] = useState(`${user?.portfolio}`);
+  const [oldPassword,setOldPassword]=useState("")
+  const [newPassword,setNewPassword]=useState("")
+  
+  // controls passwords toggle
+  const[togglePassword,setTogglePassword]=useState(true)
 
   //   control the country selection
   const [inputValue, setInputValue] = useState("");
@@ -65,7 +75,7 @@ function ProfileUpdate({ user }) {
     AllCountries.map((val) => {
       let country = `+${val.phone} ${val.label} (${val.code})`;
       return country;
-    }).sort()
+    }).sort((a,b)=>a.localeCompare(b))
   );
 
   // redux
@@ -77,7 +87,7 @@ function ProfileUpdate({ user }) {
   //   handle file change
   const handleFileChange = async (event) => {
     let file = event.target.files[0];
-    // conver or compress the image
+    // convert or compress the image
     const compressedFile = await BrowserCompress(file);
     // create a url for image preview
     setImagePreview(URL.createObjectURL(compressedFile));
@@ -123,9 +133,17 @@ function ProfileUpdate({ user }) {
     phone,
     country,
     county,
+    gitHub,
+    portfolio,
+    linkedin,
   };
 
   const handleUserUpdate = () => {
+    // appending old and new passwords 
+    if (!togglePassword) {
+      userData.oldPassword=oldPassword
+      userData.newPassword=newPassword
+    }
     // set is connecting to true
     setIsConnecting(true);
     // if there is a file means user updating their profile image
@@ -175,6 +193,11 @@ function ProfileUpdate({ user }) {
   const handleClearMessage = () => {
     setResponseMessage("");
   };
+
+  // handle toggling of passwords to edit mode
+  const handleTogglePasswords=()=>{
+    setTogglePassword(prev=>!prev)
+  }
 
   return (
     <Box
@@ -433,6 +456,68 @@ function ProfileUpdate({ user }) {
           />
         </Box>
 
+        {/* old password */}
+        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
+          <TextField
+            label={"old password"}
+            id="filled-basic-user-old-password"
+            fullWidth
+            disabled={isConnecting || responseMessage || togglePassword}
+            value={oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
+          />
+        </Box>
+
+          {/* new password */}
+        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
+          <TextField
+            label={"new password"}
+            id="filled-basic-user-new-password"
+            fullWidth
+            disabled={isConnecting || responseMessage || togglePassword}
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+        </Box>
+
+
+        {/* Github */}
+        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
+          <TextField
+            label={"gitHub link"}
+            id="filled-basic-user-github"
+            fullWidth
+            disabled={isConnecting || responseMessage}
+            value={gitHub}
+            onChange={(e) => setGitHub(e.target.value)}
+          />
+        </Box>
+
+        {/* linkedin */}
+        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
+          <TextField
+            label={"linkedin link"}
+            id="filled-basic-user-linkedin"
+            fullWidth
+            disabled={isConnecting || responseMessage}
+            value={linkedin}
+            onChange={(e) => setLinkedin(e.target.value)}
+          />
+        </Box>
+
+        {/* portfolio */}
+        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
+          <TextField
+            label={"website portfolio link"}
+            id="filled-basic-user-portfolio"
+            fullWidth
+            disabled={isConnecting || responseMessage}
+            value={portfolio}
+            onChange={(e) => setPortfolio(e.target.value)}
+          />
+        </Box>
+
+
         {/* skills update */}
         <Box display={"flex"} justifyContent={"center"} mt={1}>
           <Autocomplete
@@ -477,6 +562,11 @@ function ProfileUpdate({ user }) {
             multiline
             variant="outlined"
           />
+        </Box>
+
+        {/* toggle password update */}
+        <Box ml={1}>
+        <FormControlLabel  control={<Switch size="small" onChange={handleTogglePasswords} />} label="update my password" />
         </Box>
 
         {/* update button */}

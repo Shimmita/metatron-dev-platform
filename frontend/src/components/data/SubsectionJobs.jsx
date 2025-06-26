@@ -46,7 +46,7 @@ const SubsectionJob = {
   SalaryDollar: [
     "USD 0 - USD 100",
     "USD 100 - USD 200",
-    "USD 2000 - USD 400",
+    "USD 200 - USD 400",
     "USD 400 - USD 600",
     "USD 600 - USD 800",
     "USD 800 - USD 1,000",

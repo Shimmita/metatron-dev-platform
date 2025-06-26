@@ -93,7 +93,8 @@ export default function UserProfileDrawer({ profileData }) {
     (state) => state.currentSnackBar
   );
 
-  const { isDarkMode, isMessageProfile } = useSelector((state) => state.appUI);
+  const { currentMode, isMessageProfile } = useSelector((state) => state.appUI);
+   const isDarkMode=currentMode==='dark'
   // for full post details rendering
   const [postDetailedData, setPostDetailedData] = useState();
   // for monitoring api request status

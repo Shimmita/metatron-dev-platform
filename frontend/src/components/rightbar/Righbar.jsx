@@ -23,7 +23,7 @@ const RightbarAll = () => {
   const dispatch=useDispatch()
 
   // redux states
-  const { isDarkMode, isDefaultBottomNav, isSidebarRighbar } = useSelector(
+  const {isDefaultBottomNav, isSidebarRighbar } = useSelector(
     (state) => state.appUI
   );
 
@@ -75,7 +75,7 @@ const RightbarAll = () => {
             <Stack gap={1}  display={corouselCounter === 0 ? "block" : "none"}>
               <JobsContainer />
               {/* shown on smartphones and tablets only */}
-              {CustomDeviceIsSmall()|| CustomDeviceTablet() && (
+              {(CustomDeviceIsSmall()|| CustomDeviceTablet()) && (
                 <Box display={'flex'} justifyContent={'center'} width={'auto'}>
                 <Button startIcon={<InsightsRounded/>} onClick={handleNavigateJobs} size="small" sx={{ textTransform:'capitalize', borderRadius:4}} >more jobs</Button>
                 </Box>

@@ -1,20 +1,19 @@
 import { Close, SendOutlined } from "@mui/icons-material";
 import {
-    Alert,
-    Badge,
-    Box,
-    CircularProgress,
-    Collapse,
-    IconButton,
-    InputBase,
-    Modal,
-    styled
+  Alert,
+  Badge,
+  Box,
+  CircularProgress,
+  Collapse,
+  IconButton,
+  InputBase,
+  Modal,
+  styled
 } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleSetPostEditIdModal, handleShowingPostDetailedModal } from "../../redux/AppUI";
-import { resetClearCurrentPostReactions } from "../../redux/CurrentPostReactions";
 import CommentContainer from "../post/CommentContainer";
 import PostDetailsFeed from "../post/PostDetailsFeed";
 import CustomCountryName from "../utilities/CustomCountryName";
@@ -45,10 +44,14 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
     // redux states
     const {
-       isDarkMode, 
+       currentMode, 
       isTabSideBar,
       isPostFullDetailModal,
       postEditUniqueId } = useSelector((state) => state.appUI);
+      
+      // updating the isDark mode 
+      const isDarkMode=currentMode==='dark'
+
 
     // redux states
     const { user } = useSelector((state) => state.currentUser);

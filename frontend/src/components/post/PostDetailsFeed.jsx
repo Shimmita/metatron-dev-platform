@@ -109,9 +109,10 @@ const PostDetailsFeed = ({
   axios.defaults.withCredentials = true;
 
   // redux states
-  const { isDarkMode } = useSelector(
+  const { currentMode } = useSelector(
     (state) => state.appUI
   );
+   const isDarkMode=currentMode==='dark'
 
   const { user } = useSelector((state) => state.currentUser);
   // extract basic current user details

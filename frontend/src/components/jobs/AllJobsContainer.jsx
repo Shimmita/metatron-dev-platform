@@ -172,7 +172,8 @@ export default function MiniDrawer() {
   const [generalTitle,setGeneralTitle]=useState("")
   const [messageGeneral,setMessageGeneral]=useState("")
   // redux states
-  const { isDarkMode, 
+  const { 
+    currentMode, 
     isDefaultSpeedDial, 
     isJobSearchGlobal,
     isSidebarRighbar,
@@ -181,6 +182,8 @@ export default function MiniDrawer() {
    } = useSelector(
     (state) => state.appUI
   );
+  const isDarkMode=currentMode==='dark'
+
 
 
   const { jobs } = useSelector((state) => state.currentJobs);
@@ -554,6 +557,13 @@ export default function MiniDrawer() {
   }
 
 
+     // UI theme dark light tweaking effect
+     const handleShowDarkMode = () => {
+      // update the redux theme boolean state
+      dispatch(resetDarkMode());
+    };
+  
+
   return (
       <Suspense
         fallback={
@@ -642,6 +652,17 @@ export default function MiniDrawer() {
                    />
                  </Search>
                 )}
+
+                {/* dark mode */}
+                <IconButton  
+                onClick={handleShowDarkMode}> 
+                  <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
+                  <DarkModeRounded
+                
+                    sx={{ color: "white", height:25, width:25 }}
+                  />
+                </Tooltip> 
+                </IconButton>
                 
               {/* notification and messaging */}
               <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">

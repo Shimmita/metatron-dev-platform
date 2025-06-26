@@ -5,10 +5,8 @@ import {
   Avatar,
   Badge,
   Box,
-  Divider,
   Skeleton,
-  styled,
-  Typography
+  styled
 } from "@mui/material";
 
 
@@ -16,10 +14,8 @@ import React, { lazy, useState } from "react";
 import { useSelector } from "react-redux";
 import devImage from "../../images/dev.jpeg";
 import AlertGeneral from "../alerts/AlertGeneral";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import CustomCountryName from "../utilities/CustomCountryName";
 const SkillAvatars = lazy(() => import("./SkillAvatars"));
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -56,11 +52,13 @@ const Sidebar = () => {
 
   // redux sates
   const {
-    isDarkMode,
+    currentMode,
     isSidebarRighbar,
     isTabSideBar,
     isLoadingPostLaunch: isLoadingRequest,
   } = useSelector((state) => state.appUI);
+
+   const isDarkMode=currentMode==='dark'
 
   const { user } = useSelector((state) => state.currentUser);
 

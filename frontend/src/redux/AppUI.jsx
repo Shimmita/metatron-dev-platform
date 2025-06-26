@@ -13,7 +13,6 @@ const initialState = {
   isMessageProfile: false,
   isSidebarRighbar: true,
   isTabSideBar: true,
-  isPostModalRedux: false,
   isLoadingPostLaunch: false,
   isJobSearchGlobal: false,
   isPostDetailed: false,
@@ -26,7 +25,6 @@ const initialState = {
   postEditUniqueId:"",
 
   // theme
-  isDarkMode: false,
   currentMode: "light",
 };
 
@@ -38,9 +36,7 @@ const appUISliceReducerSlice = createSlice({
       state.isLoadingPostLaunch = action.payload;
     },
 
-    showPostModalRedux: (state) => {
-      state.isPostModalRedux = !state.isPostModalRedux;
-    },
+  
 
     showAccountSettings: (state) => {
       return {
@@ -54,7 +50,6 @@ const appUISliceReducerSlice = createSlice({
     resetDarkMode: (state) => {
       return {
         ...state,
-        isDarkMode: !state.isDarkMode,
         currentMode: state.currentMode === "light" ? "dark" : "light",
       };
     },
@@ -183,7 +178,6 @@ const appUISliceReducerSlice = createSlice({
         isOpenDrawerProfile: false,
         isSidebarRighbar: true,
         isTabSideBar: true,
-        isPostModalRedux: false,
         isLoadingPostLaunch: false,
         isDefaultSpeedDial: true,
         isMessageProfile: false,
@@ -195,7 +189,6 @@ const appUISliceReducerSlice = createSlice({
         isPostEditModal:false,
         isPostFullDetailModal:false,
         postEditUniqueId:'',
-        isDarkMode:false,
         isLogoutAlert:false,
 
       };
@@ -217,7 +210,6 @@ export const {
   resetClearShowMessageInput,
   showTabSideBar,
   handleSidebarRightbar,
-  showPostModalRedux,
   handleLoadingPostLaunch,
   handleShowingSpeedDial,
   handleIsJobsGlobalResults,

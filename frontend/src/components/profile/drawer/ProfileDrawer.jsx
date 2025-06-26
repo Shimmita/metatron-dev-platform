@@ -1,27 +1,22 @@
 import { Settings, UndoRounded } from "@mui/icons-material";
 import {
-  Alert,
   AppBar,
   Button,
   CircularProgress,
-  Collapse,
   IconButton,
   Stack,
   Toolbar,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import axios from "axios";
-import { getAuth, signOut } from "firebase/auth";
 import React, { lazy, Suspense, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { persistor } from "../../../redux/AppStore";
 import { handleShowLogout, showUserProfileDrawer } from "../../../redux/AppUI";
 import {
-  resetClearCurrentUserRedux,
-  resetClearTempUserIDRedux,
+  resetClearTempUserIDRedux
 } from "../../../redux/CurrentUser";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../../utilities/CustomDeviceSmallest";
@@ -31,7 +26,7 @@ const UserProfileDrawer = lazy(() => import("./UserProfileDrawer"));
 
 export default function ProfileDrawer() {
   // redux states
-  const { isOpenDrawerProfile,isDarkMode,isLogoutAlert } = useSelector((state) => state.appUI);
+  const { isOpenDrawerProfile } = useSelector((state) => state.appUI);
   const [temporaryProfileData, setTemporaryProfileData] = useState();
   const [isProfileUpdate, setIsProfileUpdate] = useState(false);
 

@@ -18,7 +18,6 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { showMessagingDrawer } from "../../../redux/AppUI";
 import { updateCurrentReportID } from "../../../redux/CurrentPostReported";
-import MiniProfileLayout from "../../custom/MiniProfileLayout";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
 
 export default function PostReported({ report }) {
@@ -80,25 +79,7 @@ export default function PostReported({ report }) {
     navigate("/posts/details/" + report?.postId);
   };
 
-  return (
-    <React.Fragment>
-      {isMiniProfile ? (
-        <React.Fragment>
-          {/* user mini-profile */}
-          <Box
-            className={" mb-2"}
-            sx={{
-              border: "1px solid",
-              borderColor: "divider",
-            }}
-          >
-            <MiniProfileLayout
-              handleShowMiniProfile={handleShowMiniProfile}
-              userId={report?.reporterId}
-            />
-          </Box>
-        </React.Fragment>
-      ) : (
+  return (    
         <List
           sx={{ width: "100%", maxWidth: 400, bgcolor: "background.paper" }}
         >
@@ -233,7 +214,5 @@ export default function PostReported({ report }) {
           </ListItem>
      
         </List>
-      )}
-    </React.Fragment>
   );
 }

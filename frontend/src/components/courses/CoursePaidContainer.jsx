@@ -44,9 +44,11 @@ const CoursePaidContainer = () => {
   const [isManagementSnack, setIsManagementSnack] = useState(false);
   const [managementMSG, setManagementMSG] = useState("");
   // redux states
-  const { isDarkMode, isSimilarCoursesModal } = useSelector(
+  const { currentMode } = useSelector(
     (state) => state.appUI
   );
+  // update is dark const
+  const isDarkMode=currentMode==='dark'
 
   // all menu controls
   const [anchorEl, setAnchorEl] = React.useState(null);

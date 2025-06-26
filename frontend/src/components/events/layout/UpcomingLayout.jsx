@@ -24,7 +24,10 @@ import "../Events.css";
 
 function LiveLayout() {
   // redux states
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
+
+
 
   return (
     <>

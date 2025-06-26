@@ -29,6 +29,8 @@ import axios from "axios";
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
+import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
+import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
 import AllCountries from "../data/AllCountries";
 import AllSkills from "../data/AllSkillsData";
 import CountiesInKenya from "../data/Counties";
@@ -40,8 +42,6 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
-import { resetClearCurrentJobsTop, updateCurrentJobsTop } from "../../redux/CurrentJobsTop";
-import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
 const CurrencyControl = lazy(() => import("./CurrencyControl"));
 const LocationControl = lazy(() => import("./LocationControl"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
@@ -149,7 +149,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
   };
 
   // redux states
-  const { isDarkMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
+      const isDarkMode=currentMode==='dark'
   const handleChangeMainSkills = (_, newValue) => {
     if (newValue.length > 5) {
       return; // Limit to 5 selections
@@ -447,17 +448,15 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
 
   // handle return width modal
     const handleReturnWidthModal=()=>{
-      if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "40%"
+      if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+        return "35%"
       } else if (CustomDeviceTablet()){
         return "90%"
-      } else if(CustomLandscapeWidest()){
-        return "35%"
-      }
+      } 
       return "100%"
     }
 
-    // handle width of the global search
+    // handle width of the modal, margin
       const handleModalWidth=()=>{
         if (CustomDeviceTablet() && isTabSideBar) {
           return "36%"
@@ -593,8 +592,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                     color={"text.secondary"}
                   >
                     Select relevant job title from the options provided.If none
-                    matches select option (<span className="fw-bold">Zero Matched</span> ) to provide your
-                    preferred title for the role.
+                    matches select option ( zero matched ) and provide your
+                    custom title for the role.
                   </Typography>
 
                   {/* preset job titles */}
@@ -729,9 +728,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
 
               {/* logo or image */}
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Provide organisation logo or job logo for visibility. you may
-                use the freely provided images or upload your custom image from
-                local storage or link from cloud source.
+                Provide organisation job logo for visibility. you may
+                use the default freely provided images.
               </Typography>
 
               {/* preview the file uploaded from storage */}
@@ -1231,11 +1229,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               {/* About your Org */}
               <Typography variant="body2" color={"text.secondary"}>
                 Provide an about summary to the applicants concerning your
-                organisation what kind of people you are,business which you are
-                specialized in, vision or a concise manifesto about your
-                organisation. This may help potential applicants to conform to
-                your business culture in advance suppose they got selected in
-                the end.
+                organisation what kind of people you are, business specialisation and objectives.
               </Typography>
 
               <Box mb={3}>
@@ -1520,14 +1514,13 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               {/*  button for posting */}
               <Box mb={2} display={"flex"} justifyContent={"center"}>
                 <Button
-                  startIcon={<Work />}
                   className="w-75 rounded-5 shadow-sm"
                   variant="contained"
                   onClick={handleJobPost}
                   disabled={isUploading || errorMessage}
                   size="small"
                 >
-                  Post This Job Now
+                  Upload Job Now
                 </Button>
               </Box>
             </Box>
