@@ -26,7 +26,6 @@ import React, { lazy, Suspense, useLayoutEffect, useState } from "react";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import devImage from "../../images/dev.jpeg";
 import AppLogo from "../../images/logo_sm.png";
 import {
   handleShowingSpeedDial,
@@ -50,13 +49,13 @@ import { updateCurrentProfileViews } from "../../redux/CurrentProfileView";
 import AlertAboutMetatron from "../alerts/AlertAboutMetatron";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertSponsorship from "../alerts/AlertSponsorship";
+import LogoutAlert from "../alerts/LogoutAlert";
 import PostDetailedModal from "../modal/PostDetailedModal";
 import PostEditModal from "../modal/PostEditModal";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import LogoutAlert from "../alerts/LogoutAlert";
 const PeopleModal = lazy(() => import("../modal/PeopleModal"));
 const AlertGlobalSearch = lazy(() => import("../alerts/AlertGlobalSearch"));
 const ProfileDrawer = lazy(() => import("../profile/drawer/ProfileDrawer"));
@@ -655,14 +654,14 @@ const Navbar = () => {
 
             {/* display connection count for largest screens only */}
             {!CustomDeviceIsSmall() && (
-                     <IconButton  onClick={handleShowDarkMode}> 
-                     <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
-                     <DarkModeRounded
-                   
-                       sx={{ color: "white", height:25, width:25 }}
-                     />
-                   </Tooltip> 
-                   </IconButton>
+                    <IconButton  onClick={handleShowDarkMode}> 
+                    <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
+                    <DarkModeRounded
+                  
+                      sx={{ color: "white", height:25, width:25 }}
+                    />
+                  </Tooltip> 
+                  </IconButton>
             )}
             
             {/* display when search not clicked */}
@@ -694,9 +693,9 @@ const Navbar = () => {
                 <Tooltip arrow title={"profile"}>
                   <IconButton onClick={handleShowingProfileDrawer}>
                     <Avatar
-                      sx={{ width: 28, height: 28 }}
-                      src={devImage}
-                      alt={"user image"}
+                      sx={{ width: 30, height: 30 }}
+                      src={user?.avatar}
+                      alt={''}
                     />
                   </IconButton>
                 </Tooltip>

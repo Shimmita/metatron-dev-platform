@@ -12,7 +12,6 @@ import {
 
 import React, { lazy, useState } from "react";
 import { useSelector } from "react-redux";
-import devImage from "../../images/dev.jpeg";
 import AlertGeneral from "../alerts/AlertGeneral";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -117,7 +116,7 @@ const Sidebar = () => {
         position={"fixed"}
         className={'rounded'}
         width={correctWidthInPercentage()}
-        maxHeight={"88vh"}
+        maxHeight={"80vh"}
         sx={{
           border:"1px solid",
           borderColor:"divider",
@@ -158,10 +157,8 @@ const Sidebar = () => {
                         variant="dot"
                       >
                         <Avatar
-                          alt={user?.name?.split(" ")[0]}
-                          src={
-                            devImage
-                          }
+                          alt={''}
+                          src={user?.avatar}
                           sx={{ width: 100, height: 100, mt: 1 }}
                         />
                       </StyledBadge>

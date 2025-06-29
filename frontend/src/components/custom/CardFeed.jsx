@@ -26,12 +26,10 @@ import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch, useSelector } from "react-redux";
-import dev from "../../images/dev.jpeg";
 import { handleUpdateIsPostDetailed } from "../../redux/AppUI";
 import { updateCurrentPostDetails } from "../../redux/CurrentPosts";
 import AlertMiniProfileView from "../alerts/AlertMiniProfileView";
 import AlertReportPost from "../alerts/AlertReportPost";
-import PostData from "../data/PostData";
 import SnackbarConnect from "../snackbar/SnackbarConnect";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -49,7 +47,7 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
   const openMenu = Boolean(anchorEl);
   const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
   const [isProcessingPost, setIsProcessingPost] = useState(false);
-  const [isFullDescription, setFullDescription] = useState(false);
+  const [isFullDescription, setIsFullDescription] = useState(false);
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
   const [messageMore, setMessageMore] = useState("");
   const [openAlertReport, setOpenAlertReport] = useState(false);
@@ -95,12 +93,9 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
   );
 
   // controls the length of description shown for each devices
-  const max_description = CustomDeviceIsSmall()
-    ? 122
-    : CustomLandScape()
-    ? 182
-    : 219;
-  const details = PostData?.details || "";
+  const max_description = CustomDeviceIsSmall() || CustomLandScape() ?  230 : 250;
+
+  const details = post?.post_body || "";
   const detailsLong = details.length > max_description;
 
   // current user info
@@ -122,7 +117,7 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
   const handleOccupation = () => {
     const title = post.post_owner.ownertitle.split(" ");
     const first = title[0];
-    var second = title[1];
+    let second = title[1];
 
     if (second?.toLowerCase().includes("developer")) {
       second = "Dev";
@@ -143,14 +138,7 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
     return first + " " + second;
   };
 
-  // handle scenarios when no profile picture
-  const handleNoProfilePicture = () => {
-    const title = post.post_owner.ownername.split(" ");
-    const first = title[0].substring(0, 1);
-    let second = title[1].substring(0, 1);
 
-    return first + "" + second;
-  };
 
   // check if the current userID matches the ownerID of the post
   // means belongs to current user thus no need for options menu
@@ -242,7 +230,7 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
 
   // handle showing full post description
   const handleFullDescription = () => {
-    setFullDescription((prev) => !prev);
+    setIsFullDescription((prev) => !prev);
   };
 
   // handle the image incorporated in the post for some is free logo
@@ -314,20 +302,18 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
           <CardHeader
             sx={{ ml: 1, p: 0 }}
             avatar={
-                <ListItemAvatar onClick={handleMiniProfileView}>
-                  <Avatar
-                    src={dev}
-                    variant="rounded"
-                    sx={{
-                      backgroundColor: isDarkMode ? "#99CEF9" : "#1976D2",
-                      width: 50,
-                      height: 50,
-                    }}
-                    alt={post?.post_owner?.ownername?.split(" ")[0]}
-                  >
-                    {handleNoProfilePicture()}
-                  </Avatar>
-                </ListItemAvatar>
+            <ListItemAvatar onClick={handleMiniProfileView}>
+              <Avatar
+                src={post?.post_owner?.owneravatar}
+                variant="rounded"
+                sx={{
+                  width: 50,
+                  height: 50,
+                }}
+                alt={''}
+              >
+              </Avatar>
+            </ListItemAvatar>
             }
             action={
               <Stack>
@@ -370,8 +356,8 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
                       setMessageMore={setMessageMore}
                       handleCloseMenu={handleCloseMenu}
                       setOpenAlertReport={setOpenAlertReport}
-                      post={post}
                       setPostWhole={setPostWholeReport}
+                      post={post}
                     />
                   </Menu>
                 </Box>

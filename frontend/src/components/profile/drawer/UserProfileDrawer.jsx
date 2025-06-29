@@ -343,7 +343,10 @@ export default function UserProfileDrawer({ profileData }) {
           {/* shown when there is profile info */}
             <Box>
               <Box display={"flex"} justifyContent={"center"}>
-                <Avatar src={devImage} alt="" sx={{ width: 80, height: 80 }} />
+                <Avatar 
+                src={user?.avatar}
+                alt="" 
+                sx={{ width: 90, height: 90 }} />
               </Box>
               {/* name of the user */}
               <Box display={"flex"} justifyContent={"center"} mb={1}>

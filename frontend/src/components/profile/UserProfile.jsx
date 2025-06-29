@@ -23,7 +23,6 @@ import axios from "axios";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import devImage from "../../images/dev.jpeg";
 import {
   resetClearShowMessageInput,
   resetDefaultBottomNav,
@@ -239,7 +238,7 @@ export default function UserProfile() {
     // set is fetching to true
     setIsConnect(true);
 
-    // performing delete request and passing id of the currenly user and that of miniprofile user being
+    // performing delete request and passing id of the currently user and that of miniprofile user being
     // viewed
     axios
       .delete(
@@ -401,8 +400,8 @@ export default function UserProfile() {
                 <Box>
                   <Box display={"flex"} mt={1} justifyContent={"center"}>
                     <Avatar
-                      src={devImage}
-                      alt="user-image"
+                      src={avatar}
+                      alt=""
                       sx={{ width: 80, height: 80 }}
                     />
                   </Box>
@@ -492,10 +491,10 @@ export default function UserProfile() {
                     {/* skills avatars */}
                     <Box display={"flex"} justifyContent={"center"}>
                       <AvatarGroup max={profileData?.selectedSkills?.length}>
-                        {/* loop through the skills and their images matched using custim fn */}
+                        {/* loop through the skills and their images matched using custom fn */}
                         {profileData?.selectedSkills?.map((skill, index) => (
                           <Avatar
-                            key={index}
+                            key={skill}
                             alt={skill}
                             src={getImageMatch(skill)}
                             sx={{ width: 34, height: 34 }}

@@ -8,7 +8,6 @@ import ListItemText from "@mui/material/ListItemText";
 import axios from "axios";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import devImage from "../../images/dev.jpeg";
 import CustomCountryName from "../utilities/CustomCountryName";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import CommentsReply from "./CommentsReply";
@@ -226,12 +225,16 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
     }
 
   return (
-    <List className="w-100" sx={{ bgcolor: "background.paper", borderBottom:'1px solid', borderColor:'divider' }}>
+    <List 
+    className="w-100 rounded" 
+    sx={{ bgcolor: "background.paper", 
+    borderBottom:'1px solid', 
+    borderColor:'divider' }}>
       <ListItem alignItems="flex-start">
         <ListItemAvatar>
           <Avatar
             alt=""
-            src={devImage}
+            src={commenter?.avatar}
             sx={{ width: 30, height: 30 }}
           />
         </ListItemAvatar>
@@ -261,7 +264,12 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 )}
               </Typography>
 
-              <Typography variant={"caption"}>
+              <Typography 
+              variant={"caption"}
+              sx={{ 
+                fontSize:'x-small'
+               }}
+              >
                 {getElapsedTime(commenter?.createdAt)}
               </Typography>
             </Box>
@@ -275,7 +283,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                   display={"flex"}
                   alignItems={"center"}
                 >
-                  {commenter?.title} | {commenter?.country}
+                  {commenter?.title} | {CustomCountryName(commenter?.country)}
                 </Typography>
               </Box>
 
@@ -299,14 +307,34 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 </Typography>              
               </Box>
               {/* edit and delete buttons if current user's comment else reply */}
-              <Box display={'flex'} alignItems={'center'} gap={1} mt={1}>
+              <Box 
+              display={'flex'} 
+              alignItems={'center'} 
+              gap={1} 
+              mt={1}>
               {isCurrentUserComment ? (
                 <React.Fragment>
                 {/* edit button */}
-                <Button onClick={handleEditing} variant={isEditing ? 'outlined':'text'} size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>edit</Button>
+                <Button 
+                onClick={handleEditing} 
+                variant={isEditing ? 'outlined':'text'} 
+                size={'small'} 
+                sx={{ borderRadius:3, 
+                textTransform:'capitalize', 
+                fontSize:"x-small" }}>
+                  edit
+                </Button>
 
                 {/* delete button */}
-                <Button disabled={isDeleteComment} onClick={handleDeleteComment} variant="text" color="warning" size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>delete</Button>
+                <Button 
+                disabled={isDeleteComment} 
+                onClick={handleDeleteComment} 
+                variant="text" 
+                color="warning" 
+                size={'small'} 
+                sx={{ borderRadius:3, 
+                textTransform:'capitalize', 
+                fontSize:"x-small" }}>delete</Button>
                 {/* view replies button, only shown if the comment got at-least a comment */}
                 {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>{commenter?.replyCount} replied</Button>}
                 </React.Fragment>
@@ -323,55 +351,52 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
               </Box>
 
               {(isOpenReply || isEditing) && (
-                <React.Fragment>
-                  {/* reply input text  */}
-                            <Box
-                              display={"flex"}
-                              justifyContent={"space-between"}
-                              alignItems={"center"}
-                              width={"100%"}
-                              p={1}
-                              mt={1}
-                              bgcolor={"background.default"}
-                              className={'rounded'}
-                              sx={{ border:'1px solid', borderColor:'divider' }}
-                            >
-                              {/* input for reply */}
-                              <Box width={"100%"}>
-                                <InputBase
-                                  multiline
-                                  value={replyText}
-                                  onChange={(e) => setReplyText(e.target.value)}
-                                  maxRows={2}
-                                  disabled={isUploading}
-                                  className="w-100"
-                                  placeholder={`${isOpenReply ? 'reply text':'edit text'} ...`}
-                                  sx={{
-                                    fontSize: "small",
-                                  }}
-                                />
-                              </Box>
-                  
-                              {/* send reply button icon */}
-                              <Box className="rounded ms-1 pe-1" alignContent={"center"}>
-                                {isUploading ? (
-                                  <CircularProgress size={15} />
-                                ) : (
-                                  <Badge badgeContent={`${MAX_TEXT_LENGTH - replyText.length}`}>
-                                    <IconButton
-                                      disabled={replyText.length > MAX_TEXT_LENGTH || replyText===commenter?.minimessage}
-                                      onClick={isEditing ? handleCompleteUpdateComment: handleCompleteSendingReply}
-                                    >
-                                      <SendOutlined
-                                        color={replyText.length <= MAX_TEXT_LENGTH && replyText!==commenter?.minimessage ? "primary" : "inherit"}
-                                        sx={{ width: 16, height: 16 }}
-                                      />
-                                    </IconButton>
-                                  </Badge>
-                                )}
-                              </Box>
-                            </Box>
-                </React.Fragment>
+              <Box
+                display={"flex"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+                width={"100%"}
+                p={1}
+                mt={1}
+                bgcolor={"background.default"}
+                className={'rounded'}
+                sx={{ border:'1px solid', borderColor:'divider' }}
+              >
+                {/* input for reply */}
+                <Box width={"100%"}>
+                  <InputBase
+                    multiline
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    maxRows={2}
+                    disabled={isUploading}
+                    className="w-100"
+                    placeholder={`${isOpenReply ? 'reply text':'edit text'} ...`}
+                    sx={{
+                      fontSize: "small",
+                    }}
+                  />
+                </Box>
+    
+                {/* send reply button icon */}
+                <Box className="rounded ms-1 pe-1" alignContent={"center"}>
+                  {isUploading ? (
+                    <CircularProgress size={15} />
+                  ) : (
+                    <Badge badgeContent={`${MAX_TEXT_LENGTH - replyText.length}`}>
+                      <IconButton
+                        disabled={replyText.length > MAX_TEXT_LENGTH || replyText===commenter?.minimessage}
+                        onClick={isEditing ? handleCompleteUpdateComment: handleCompleteSendingReply}
+                      >
+                        <SendOutlined
+                          color={replyText.length <= MAX_TEXT_LENGTH && replyText!==commenter?.minimessage ? "primary" : "inherit"}
+                          sx={{ width: 16, height: 16 }}
+                        />
+                      </IconButton>
+                    </Badge>
+                  )}
+                </Box>
+              </Box>
               )}
 
               {/* delete alert when activated */}

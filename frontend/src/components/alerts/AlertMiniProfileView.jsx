@@ -213,7 +213,7 @@ export default function AlertMiniProfileView({
                       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                       variant="dot"
                     >
-                      <Avatar src="" alt="" sx={{ width: 45, height: 45 }}>
+                      <Avatar src="" alt="" sx={{ width: 50, height: 50 }}>
                         <Typography
                           variant="body2"
                           textTransform={"uppercase"}
@@ -224,7 +224,7 @@ export default function AlertMiniProfileView({
                       </Avatar>
                     </StyledBadge>
                   ) : (
-                    <Avatar src="" alt="" sx={{ width: 45, height: 45 }}>
+                    <Avatar src="" alt="" sx={{ width: 50, height: 50 }}>
                       <Typography
                         variant="body2"
                         textTransform={"uppercase"}

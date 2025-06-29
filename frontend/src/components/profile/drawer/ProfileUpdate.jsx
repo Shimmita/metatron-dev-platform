@@ -44,7 +44,7 @@ const VisuallyHiddenInput = styled("input")({
 let MAX_ABOUT = 142;
 
 function ProfileUpdate({ user }) {
-  const [imagePreview, setImagePreview] = useState(DevImage);
+  const [imagePreview, setImagePreview] = useState(user?.avatar);
   const [responseMessage, setResponseMessage] = useState("");
   const [avatarFile, setAvatarFile] = useState(null);
   // for monitoring api request status
@@ -258,8 +258,8 @@ function ProfileUpdate({ user }) {
         >
           <Avatar
             src={imagePreview}
-            alt={user?.name.split(" ")[0]}
-            sx={{ width: 70, height: 70 }}
+            alt={''}
+            sx={{ width: 90, height: 90 }}
           />
 
           {/* pick image icon button */}

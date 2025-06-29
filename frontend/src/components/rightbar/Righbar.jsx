@@ -8,7 +8,6 @@ import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import BasicSpeedDial from "../custom/SpeedDial";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CoursesContainer from "./CoursesContainer";
 import FeaturedPostContainer from "./FeaturedPostContainer";
 import JobsContainer from "./JobsContainer";
 import RequestContainer from "./RequestContainer";
@@ -54,7 +53,7 @@ const RightbarAll = () => {
       <Box
         position={"fixed"}
         className={'rounded'}
-        maxHeight={"85vh"}
+        maxHeight={"80vh"}
         sx={{
           border: "1px solid",
           borderColor:"divider",
@@ -106,30 +105,7 @@ const RightbarAll = () => {
           </Box>
         </Box>
 
-        {/* events to be implemented later as latest feature */}
-        {/* <Box>
-          <Box
-            display={"flex"}
-            alignItems={"center"}
-            justifyContent={"center"}
-            gap={2}
-            ml={1}
-            mt={"3px"}
-          >
-            <Typography fontWeight={"bold"} color={"primary"}>
-              DEV SPACE EVENTS
-            </Typography>
-            <SchoolRounded color="primary" sx={{ width: 24, height: 24 }} />
-          </Box>
-
-          <Box display={"flex"} justifyContent={"center"} mt={1}>
-            {isLoadingRequest ? (
-              <Skeleton variant="rectangular" width={"100%"} height={"30vh"} />
-            ) : (
-              <RightBarEvents />
-            )}
-          </Box>
-        </Box> */}
+        
       </Box>
 
       {/* display speed dial in feed section only for mobile and no landscape */}

@@ -105,7 +105,7 @@ const FeedDefaultContent = () => {
 
   return (
     <Box
-      height={"89.5vh"}
+      height={"88.5vh"}
     >
       {/* render the post is focused for full viewing and that post detailed
       data is no null */}
@@ -141,6 +141,7 @@ const FeedDefaultContent = () => {
               width={"100%"}
               display={"flex"}
               justifyContent={"center"}
+              height={'95vh'}
               alignItems={"center"}
             >
               <Box>

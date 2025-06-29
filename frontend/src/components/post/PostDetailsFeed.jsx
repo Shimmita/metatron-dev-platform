@@ -45,6 +45,7 @@ import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
+import AlertReportPost from "../alerts/AlertReportPost";
 const AlertMiniProfileView = lazy(() =>
   import("../alerts/AlertMiniProfileView")
 );
@@ -99,8 +100,12 @@ const PostDetailsFeed = ({
   const openMenu = Boolean(anchorEl);
   const [isUploading, setIsUploading] = useState(false);
   const [messageResponse, setMessageResponse] = useState("");
-  const [isFullDescription, setFullDescription] = useState(false);
+  const [isFullDescription, setIsFullDescription] = useState(false);
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
+  const [openAlertReport, setOpenAlertReport] = useState(false);
+  const [postWholeReport, setPostWholeReport] = useState("");
+  
+  
   const [editedText, setEditedText] = useState(
     `${postDetailedData?.post_body}`
   );
@@ -143,7 +148,7 @@ const PostDetailsFeed = ({
     
   // controls the length of description shown for each devices
   const max_description = CustomDeviceIsSmall()? 122: CustomLandScape() ? 182  : 220;
-  const details = PostData?.details || "";
+  const details = postDetailedData?.post_body || "";
   const detailsLong = details.length > max_description;
 
   // get country name
@@ -162,8 +167,7 @@ const PostDetailsFeed = ({
   const handleClickMoreVertPost = (event) => setAnchorEl(event.currentTarget);
   const handleCloseMenu = () => setAnchorEl(null);
 
-  const handleDetailsLength = () =>
-    detailsLong ? details.substring(0, max_description) : details;
+  const handleDetailsLength = () => detailsLong ? details.substring(0, max_description) : details;
 
   // handle the length of owner title for smallest devices
   const handleOccupation = () => {
@@ -188,16 +192,6 @@ const PostDetailsFeed = ({
     let second = title[1][0]
 
     return first + " " + second;
-  };
-
-
-  // handle scenarios when no profile picture
-  const handleNoProfilePicture = () => {
-    let title = postDetailedData?.post_owner?.ownername?.split(" ");
-    let first = title[0][0]
-    let second = title[1][0]
-
-    return first + "" + second;
   };
 
   // check if the current userID matches the ownerID of the post
@@ -261,7 +255,7 @@ const PostDetailsFeed = ({
 
   // handle showing full post description
   const handleFullDescription = () => {
-    setFullDescription((prev) => !prev);
+    setIsFullDescription((prev) => !prev);
   };
 
   // handle the image incorporated in the post for some is free logo
@@ -378,7 +372,6 @@ const PostDetailsFeed = ({
       <Card
       className="rounded"
         style={{
-          border: openMenu  ? "1px solid" : undefined,
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
           borderColor:'divider'
         }}
@@ -390,16 +383,14 @@ const PostDetailsFeed = ({
               <IconButton onClick={() => setOpenMiniProfileAlert(true)}>
                 <Avatar
                   // src={post.post_owner.owner-avatar}
-                  src={dev}
+                  src={postDetailedData?.post_owner?.owneravatar}
                   variant="rounded"
                   sx={{
-                    backgroundColor: isDarkMode ? "#99CEF9" : "#1976D2",
                     width: 50,
                     height: 50,
                   }}
                   alt=""
                 >
-                  {handleNoProfilePicture()}
                 </Avatar>
               </IconButton>
           }
@@ -443,6 +434,9 @@ const PostDetailsFeed = ({
                   ownerId={postDetailedData.post_owner?.ownerId}
                   currentUserNetwork={user?.network}
                   ownerName={postDetailedData.post_owner.ownername}
+                  setOpenAlertReport={setOpenAlertReport}
+                  setPostWhole={setPostWholeReport}
+                  handleCloseMenu={handleCloseMenu}
                 />
               </Menu>
             </Box>
@@ -691,6 +685,16 @@ const PostDetailsFeed = ({
           </Box>
         )}
       </Card>
+
+      {/* show alert report a post  */}
+        {openAlertReport && (
+          <AlertReportPost
+            openAlertReport={openAlertReport}
+            setOpenAlertReport={setOpenAlertReport}
+            post={postWholeReport}
+            currentUser={user}
+          />
+        )}
 
       {/* alert for showing user mini-profile details by passing the post ownerID */}
       <AlertMiniProfileView

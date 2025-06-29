@@ -43,7 +43,6 @@ import axios from "axios";
 import React, { Suspense, useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import devImage from '../../images/dev.jpeg';
 import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
@@ -53,17 +52,17 @@ import {
   showUserProfileDrawer,
 } from "../../redux/AppUI";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
+import AlertGeneral from "../alerts/AlertGeneral";
 import AlertJobSearch from "../alerts/AlertJobSearch";
+import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import JobLayout from "./layout/JobLayout";
-import JobStatsLayout from "./layout/JobStatsLayouts";
-import AlertGeneral from "../alerts/AlertGeneral";
-import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import JobLayout from "./layout/JobLayout";
+import JobStatsLayout from "./layout/JobStatsLayouts";
 
 const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
 
@@ -682,9 +681,9 @@ export default function MiniDrawer() {
               <Tooltip arrow title={"profile"}>
                 <IconButton onClick={handleShowingProfileDrawer}>
                 <Avatar
-                    sx={{ width: 26, height: 26 }}
-                    src={devImage}
-                    alt={"user image"}
+                    sx={{ width: 30, height: 30 }}
+                    src={user?.avatar}
+                    alt={""}
                 />
                 </IconButton>
               </Tooltip>

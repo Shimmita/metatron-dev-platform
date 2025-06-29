@@ -1,7 +1,6 @@
 import {
   Add,
   BarChartRounded,
-  DarkModeRounded,
   HighlightOffOutlined,
   LibraryBooksRounded,
   ListRounded,
@@ -40,28 +39,26 @@ import axios from "axios";
 import React, { Suspense, useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import devImage from '../../images/dev.jpeg';
 import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
   handleSidebarRightbar,
-  resetDarkMode,
   showMessagingDrawer,
-  showUserProfileDrawer,
+  showUserProfileDrawer
 } from "../../redux/AppUI";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
+import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 import PostJobModal from "../modal/PostJobModal";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomLandScape from "../utilities/CustomLandscape";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import ApplicantsTable from "./layout/ApplicantsTable";
 import JobLayoutHiring from "./layout/JobLayoutHiring";
 import JobStatsLayout from "./layout/JobStatsLayouts";
-import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 import ManageJobsTable from "./layout/ManageJobsTable";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
 
@@ -494,9 +491,9 @@ const handleShowingProfileDrawer = () => {
             <Tooltip arrow title={"profile"}>
             <IconButton onClick={handleShowingProfileDrawer}>
             <Avatar
-                sx={{ width: 26, height: 26 }}
-                src={devImage}
-                alt={"user image"}
+                sx={{ width: 30, height: 30 }}
+                src={user?.avatar}
+                alt={""}
             />
             </IconButton>
             </Tooltip>

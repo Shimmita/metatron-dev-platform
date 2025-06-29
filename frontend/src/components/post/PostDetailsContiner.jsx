@@ -24,7 +24,6 @@ import {
 } from "../../redux/AppUI";
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
-import { resetClearCurrentPostReactions } from "../../redux/CurrentPostReactions";
 
 const MAX_TEXT_LENGTH=100
 
@@ -142,17 +141,36 @@ function PostDetailsContainer({
   }
 
   return (
+  
     <Stack 
     gap={1} 
+    maxHeight={'80vh'}
+    sx={{
+      overflow: "auto",
+      // Hide scrollbar for Chrome, Safari and Opera
+      "&::-webkit-scrollbar": {
+        display: "none",
+      },
+      // Hide scrollbar for IE, Edge and Firefox
+      msOverflowStyle: "none",
+      scrollbarWidth: "none",
+    }}
     >
       {isPostEditMode ? (
         <React.Fragment>
-          <Box display={"flex"} justifyContent={"flex-end"} alignItems={'center'} p={1}>
+          <Box 
+          display={"flex"} 
+          justifyContent={"flex-end"} 
+          alignItems={'center'} 
+          p={1}>
             {/* full screen */}
           {isDrawerFocused && (
              <Tooltip arrow title={"wide"}>
-             <IconButton onClick={handleShowPostDetailedNoDrawer}>
-               <FullscreenOutlined sx={{ width: 15, height: 15 }} color="primary" />
+             <IconButton 
+             onClick={handleShowPostDetailedNoDrawer}>
+               <FullscreenOutlined 
+               sx={{ width: 15, height: 15 }} 
+               color="primary" />
              </IconButton>
            </Tooltip>
           )}
@@ -160,7 +178,9 @@ function PostDetailsContainer({
             {/* close  the post */}
             <Tooltip arrow title={"close"}>
               <IconButton onClick={handleClearPostDetailedData}>
-                <Close sx={{ width: 14, height: 14 }} color="primary" />
+                <Close 
+                sx={{ width: 14, height: 14 }}
+                 color="primary" />
               </IconButton>
             </Tooltip>
           </Box>
@@ -186,7 +206,7 @@ function PostDetailsContainer({
           )}
 
           {/* card container */}
-          <Box p={isDrawerFocused ? 0 : 2}>
+          <Box p={isDrawerFocused ? 0 : 1}>
             {/* render post details feed here */}
             <PostDetailsFeed
               postDetailedData={postDetailedData}
@@ -201,7 +221,9 @@ function PostDetailsContainer({
            
           {/* close button */}
             <IconButton onClick={handleClearPostDetailedData}>
-              <Close sx={{ width: 15, height: 15 }} color="primary" />
+              <Close 
+              sx={{ width: 15, height: 15 }} 
+              color="primary" />
             </IconButton>
           </Box>
 
@@ -226,7 +248,7 @@ function PostDetailsContainer({
           )}
 
           {/* card container */}
-          <Box p={isDrawerFocused ? 0 : 2}>
+          <Box >
             {/* render post details feed here */}
             <PostDetailsFeed
               postDetailedData={postDetailedData}
@@ -234,7 +256,7 @@ function PostDetailsContainer({
             />
 
             {/* all user comments container pass the comments of the post */}
-            <Box>
+            <Box mt={1}>
               <CommentContainer
                 post_comments={postDetailedData?.post_comments?.comments}
                 postId={postDetailedData?._id}
@@ -250,7 +272,7 @@ function PostDetailsContainer({
             alignItems={"center"}
             width={"100%"}
             p={1}
-            mb={5}
+            mb={2}
             bgcolor={"background.default"}
             className={'rounded'}
             sx={{ border:'1px solid', borderColor:'divider' }}

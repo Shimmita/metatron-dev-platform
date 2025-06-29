@@ -73,7 +73,7 @@ const Feed = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: "95vh",
+                  height: "98vh",
                 }}
               >
                 {/* loader be shown before actual loading of content */}
@@ -139,7 +139,7 @@ const Feed = () => {
             {/* display speed dial in feed section only for mobile and no landscape */}
             {window.screen.availWidth <= 900 && (
               <Box>
-                {/* decide speed dial being shown or is floating buton to refresh posts or  */}
+                {/* decide speed dial being shown or is floating button to refresh posts or  */}
                 {isDefaultBottomNav &&
                   isDefaultSpeedDial &&
                   !isPostDetailed && (
@@ -151,7 +151,7 @@ const Feed = () => {
                         bottom: 50,
                       }}
                     >
-                      {/* if is post search meaning posts from redux need referesh to default so fab else dial  */}
+                      {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}
 
                       <BasicSpeedDial />
                     </Box>
@@ -183,7 +183,7 @@ const Feed = () => {
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    height: "95vh",
+                    height: "98vh",
                   }}
                 >
                   {/* loader be shown before actual loading of content */}
