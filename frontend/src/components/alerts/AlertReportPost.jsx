@@ -98,7 +98,7 @@ export default function AlertReportPost({
     // set is fetching to true
     setIsFetching(true);
 
-    // performing delete request and passing id of the currenly user and that of miniprofile user being
+    // performing delete request and passing id of the currently user and that of miniprofile user being
     // viewed
     axios
       .post(
@@ -272,7 +272,7 @@ export default function AlertReportPost({
               Submit
             </Button>
             <Button onClick={handleDismiss} disabled={isFetching || message}>
-              Back
+              Close
             </Button>
           </DialogActions>
         </form>

@@ -116,7 +116,11 @@ export default function ProfileDrawer() {
 
   return (
     <Drawer anchor={"right"} 
-    open={isOpenDrawerProfile} onClose={handleClose}>
+    open={isOpenDrawerProfile} onClose={handleClose}
+    sx={{ 
+      backdropFilter:'blur(3px)'
+     }}
+    >
       <Box
         width={
          handleDrawerWidth()

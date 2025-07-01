@@ -83,10 +83,9 @@ export default function NotifAccordionLayout({
         >
           <AccordionSummary aria-controls="panel2d-content" id="panel2d-header">
             <Box display={"flex"} alignItems={"center"} gap={1}>
-              <PeopleRounded color="primary"/>
               <Typography
                 component="span"
-                variant="body2"
+                variant="body1"
                 fontWeight={"bold"}
                 display={"flex"}
                 alignItems={"center"}
@@ -138,10 +137,9 @@ export default function NotifAccordionLayout({
         >
           <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
             <Box display={"flex"} alignItems={"center"} gap={1}>
-              <WarningRounded color="info" />
               <Typography
                 component="span"
-                variant="body2"
+                variant="body1"
                 fontWeight={"bold"}
                 display={"flex"}
                 alignItems={"center"}
@@ -193,10 +191,9 @@ export default function NotifAccordionLayout({
        >
          <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
            <Box display={"flex"} alignItems={"center"} gap={1}>
-             <AccountBoxRounded color="primary" />
              <Typography
                component="span"
-               variant="body2"
+               variant="body1"
                fontWeight={"bold"}
                display={"flex"}
                alignItems={"center"}
@@ -243,10 +240,9 @@ export default function NotifAccordionLayout({
        >
          <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
            <Box display={"flex"} alignItems={"center"} gap={1}>
-             <WorkRounded color="primary" sx={{ width:23,height:23 }} />
              <Typography
                component="span"
-               variant="body2"
+               variant="body1"
                fontWeight={"bold"}
                display={"flex"}
                alignItems={"center"}
@@ -285,18 +281,17 @@ export default function NotifAccordionLayout({
        </Accordion>
       )}
 
-{/* accordion post reactions notify */}
-{post_reactions?.length > 0 && (
+    {/* accordion post reactions notify */}
+    {post_reactions?.length > 0 && (
         <Accordion
           expanded={openReaction}
           onChange={() => setOpenReaction((prev) => !prev)}
         >
           <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
             <Box display={"flex"} alignItems={"center"} gap={1}>
-              <CodeRounded color="primary" />
               <Typography
                 component="span"
-                variant="body2"
+                variant="body1"
                 fontWeight={"bold"}
                 display={"flex"}
                 alignItems={"center"}
@@ -330,7 +325,7 @@ export default function NotifAccordionLayout({
               {post_reactions?.map((reaction, index) => (
                 <PostReaction
                   reaction={reaction}
-                  key={index}
+                  key={reaction}
                   isLastItem={post_reactions?.length - 1 === index}
                 />
               ))}

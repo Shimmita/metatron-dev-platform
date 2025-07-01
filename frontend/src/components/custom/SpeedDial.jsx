@@ -62,6 +62,7 @@ export default function BasicSpeedDial() {
         transform: "translateZ(0px)",
         flexGrow: 1,
         visibility: isLoadingPostLaunch ? "hidden" : "visible",
+      
       }}
     >
       <SpeedDial

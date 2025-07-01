@@ -1,12 +1,12 @@
 import {
   Close,
   DarkModeRounded,
+  EmailRounded,
   ErrorOutline,
-  FullscreenExitRounded,
-  FullscreenRounded,
   MenuRounded,
   NotificationsRounded,
-  SearchRounded
+  SearchRounded,
+  SortRounded
 } from "@mui/icons-material";
 import {
   AppBar,
@@ -32,8 +32,7 @@ import {
   handleSidebarRightbar,
   resetDarkMode,
   showMessagingDrawer,
-  showTabSideBar,
-  showUserProfileDrawer,
+  showUserProfileDrawer
 } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import { updateCurrentConnectNotif } from "../../redux/CurrentConnectNotif";
@@ -53,9 +52,10 @@ import LogoutAlert from "../alerts/LogoutAlert";
 import PostDetailedModal from "../modal/PostDetailedModal";
 import PostEditModal from "../modal/PostEditModal";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import AlertFilterFeed from "../alerts/AlertFilterFeed";
+import SpecialisationTech from "../data/SpecialisationTech";
 const PeopleModal = lazy(() => import("../modal/PeopleModal"));
 const AlertGlobalSearch = lazy(() => import("../alerts/AlertGlobalSearch"));
 const ProfileDrawer = lazy(() => import("../profile/drawer/ProfileDrawer"));
@@ -99,9 +99,10 @@ const Navbar = () => {
   const [responseMessage, setResponseMessage] = useState("");
   const [openAlertResults, setOpenAlertResults] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
-  const [fullScreen, setFullScreen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [openAlertGeneral,setOpenAlertGeneral]=useState(false)
+  const [openAlertFilter,setOpenAlertFilter]=useState(false)
+  const [feedOptions,setFeedOption]=useState(SpecialisationTech)
 
   // axios default credentials
   axios.defaults.withCredentials = true;
@@ -123,6 +124,10 @@ const Navbar = () => {
     const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
     const { profile_views } = useSelector((state) => state.currentProfileView);
     const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
+    const { conversations } = useSelector((state) => state.currentConversation);
+
+    // get count of conversation messages where target read is false
+    const conversationsCount=conversations?.filter(conversation=>conversation?.isTargetRead===false && conversation?.senderName!==user?.name)?.length 
   
   // extracting current user ID
   const { _id: currentUserId } = user;
@@ -175,26 +180,28 @@ const Navbar = () => {
   };
 
   // show the notification and messaging triggered by redux
-  const handleShowMessageDrawer = () => {
-    dispatch(showMessagingDrawer());
+  const handleShowMessageDrawer = (position) => {
+
+    dispatch(showMessagingDrawer(position));
   };
 
   const handleShowingProfileDrawer = () => {
     dispatch(showUserProfileDrawer());
   };
 
-  // handle full screen by collapsing side bar and showing menu on nav
-  const handleFullscreenClicked = () => {
-    setFullScreen((prev) => !prev);
-    // alter display of sidebar from the redux
-    dispatch(showTabSideBar());
-  };
 
   // handle search global
   const handleSubmitGlobalSearch = (event) => {
     // prevent default form submission
     event.preventDefault();
-
+    
+    // alert user to type text in search box
+    if (searchTerm.length<1) {
+     setOpenAlertGeneral(true)
+     setErrorMessage("please type in the search box and search for resources!")
+     return
+    }
+ 
     // clear any redux states of global search if present
     dispatch(resetClearCurrentGlobalSearch());
 
@@ -202,8 +209,7 @@ const Navbar = () => {
     setIsFetching(true);
 
     // start the put request axios
-    axios
-      .get(
+    axios.get(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/global/search/${searchTerm}`,
         {
           withCredentials: true,
@@ -244,6 +250,10 @@ const Navbar = () => {
       });
   };
 
+  // handle showing of the filter dialog to customize feed results
+  const handleShowContentFilter=()=>{
+    setOpenAlertFilter(true)
+  }
   
 
   // get all possible post reaction notifications based on current userID
@@ -462,8 +472,13 @@ const Navbar = () => {
               },
             }}
           >
-            <Box display={"flex"} alignItems={"center"} gap={1}>
-              <Avatar alt="KE" src={AppLogo} sx={{ width: 40, height: 40 }} />
+            <Box 
+            display={"flex"} 
+            alignItems={"center"}
+            gap={1}>
+              <Avatar alt="KE" 
+              src={AppLogo} 
+              sx={{ width: 40, height: 40 }} />
                 <Button onClick={handleHome} >
                   <Typography variant="h6" fontWeight={"bold"} sx={{ color:'white' }}>
                     METATRON
@@ -488,8 +503,8 @@ const Navbar = () => {
                   <IconButton onClick={handleHome} style={{ color: "white" }}>
                     {/* app title small devices */}
                     <Typography
-                      variant={CustomDeviceSmallest() ? "body2" : "body1"}
                       fontWeight={"bold"}
+                      sx={{ fontsize:'medium' }}
                     >
                       METATRON
                     </Typography>
@@ -498,13 +513,6 @@ const Navbar = () => {
               ) : (
                 <Box display={"flex"} ml={0} alignItems={"center"} gap={1}>
                   {/* tablet show app logo not on smaller Devices */}
-
-                  {fullScreen ? (
-                    // show meu when in full screen to use drawer as sidebar
-                    <IconButton onClick={(e) => setOpenDrawer(!openDrawer)}>
-                      <MenuRounded style={{ color: "white" }} />
-                    </IconButton>
-                  ) : (
                     <IconButton onClick={handleHome}>
                       <Avatar
                         alt=""
@@ -512,20 +520,8 @@ const Navbar = () => {
                         sx={{ width: 38, height: 38 }}
                       />
                     </IconButton>
-                  )}
 
                   {/* app title for tablets */}
-                  {fullScreen ? (
-                    <IconButton onClick={handleHome}>
-                      <Typography
-                        variant="h6"
-                        fontWeight={"bold"}
-                        style={{ color: "white" }}
-                      >
-                        METATRON
-                      </Typography>
-                    </IconButton>
-                  ) : (
                     <Typography
                       variant="h6"
                       fontWeight={"bold"}
@@ -533,16 +529,8 @@ const Navbar = () => {
                     >
                       METATRON
                     </Typography>
-                  )}
+                  
 
-                  {/* fullscreen when clicked sidebar tabs collapse and menu be seen */}
-                  <IconButton onClick={handleFullscreenClicked}>
-                    {!fullScreen ? (
-                      <FullscreenRounded style={{ color: "white" }} />
-                    ) : (
-                      <FullscreenExitRounded style={{ color: "white" }} />
-                    )}
-                  </IconButton>
                 </Box>
               )}
             </LogoContent>
@@ -569,22 +557,46 @@ const Navbar = () => {
                       className="form-control w-100 border-0 text-secondary rounded-5"
                     />
                   </Box>
-
-                  <Box>
+                  
+                  <Box 
+                  display={'flex'} 
+                  alignItems={'center'}
+                  ml={1}
+                  gap={1}
+                  >
                     {isFetching ? (
                       <CircularProgress
                         size={18}
                         sx={{ color: "white", ml: 1 }}
                       />
                     ) : (
+                      <React.Fragment>
+                      {/* // search icon */}
+                      <Tooltip title={'search'} arrow>
                       <IconButton
                         type="submit"
-                        disabled={searchTerm?.length < 2}
                       >
                         <SearchRounded
                           sx={{ width: 20, height: 20, color: "white" }}
                         />
                       </IconButton>
+                      </Tooltip>
+
+                      <Tooltip
+                       title={'sort'} 
+                       arrow
+                        >
+                      <IconButton
+                      onClick={handleShowContentFilter}
+                    >
+                      <SortRounded
+                        sx={{ width: 20, height: 20, color: "white" }}
+                      />
+                    </IconButton>
+                    </Tooltip>
+                    
+                    </React.Fragment>
+
                     )}
                   </Box>
                 </form>
@@ -633,6 +645,20 @@ const Navbar = () => {
                   </Box>
                 </form>
 
+                {/* // filter icon */}
+                 <Tooltip
+                      title={'sort'} 
+                      arrow
+                      >
+                    <IconButton
+                    onClick={handleShowContentFilter}
+                  >
+                    <SortRounded
+                      sx={{ width: 20, height: 20, color: "white" }}
+                    />
+                  </IconButton>
+                  </Tooltip>
+
                 <IconButton onClick={handleShowMobileSearch}>
                   <Close sx={{ width: 18, height: 18, color: "whitesmoke" }} />
                 </IconButton>
@@ -652,7 +678,7 @@ const Navbar = () => {
               </Box>
             )}
 
-            {/* display connection count for largest screens only */}
+            {/* change theme trigger */}
             {!CustomDeviceIsSmall() && (
                     <IconButton  onClick={handleShowDarkMode}> 
                     <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
@@ -673,15 +699,20 @@ const Navbar = () => {
                   CustomDeviceTablet() ||
                   CustomLandscapeWidest() ||
                   CustomLandscapeWidest()
-                    ? 5
+                    ? 4
                     : 2
                 }
               >
-                <Tooltip arrow title={"notifications"}>
+                {/* notifications icon */}
+                <Tooltip 
+                arrow 
+                title={"notifications"} 
+                className={CustomDeviceIsSmall() ? 'me-1':'me-3'}
+                >
                 <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
                     <IconButton
                       sx={{ padding: 0 }}
-                      onClick={handleShowMessageDrawer}
+                      onClick={()=>handleShowMessageDrawer(0)}
                     >
                       <NotificationsRounded
                         sx={{ width: 25, height: 25, color: "white" }}
@@ -690,7 +721,31 @@ const Navbar = () => {
                 </Badge>
                 </Tooltip>
 
-                <Tooltip arrow title={"profile"}>
+                {/* messages icon */}
+                <Tooltip 
+                arrow 
+                title={"messages"}
+                >
+                <Badge 
+                badgeContent={conversationsCount} 
+                className={!CustomDeviceIsSmall() && 'me-2'}
+                color="warning">
+                  <IconButton
+                    sx={{ padding: 0 }}
+                    onClick={()=>handleShowMessageDrawer(1)}
+                  >
+                    <EmailRounded
+                      sx={{ width: 22, height: 22,  color: "white" }}
+                    />
+                  </IconButton>
+                </Badge>
+                </Tooltip>
+
+
+                {/* avatar for profile icon */}
+                <Tooltip 
+                arrow 
+                title={"profile"}>
                   <IconButton onClick={handleShowingProfileDrawer}>
                     <Avatar
                       sx={{ width: 30, height: 30 }}
@@ -804,6 +859,15 @@ const Navbar = () => {
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />
+        )}
+
+        {/* open alert filter */}
+        {openAlertFilter && (
+          <AlertFilterFeed 
+          openAlert={openAlertFilter}
+          setOpenAlert={setOpenAlertFilter}
+          feedData={feedOptions}
+          />
         )}
 
 

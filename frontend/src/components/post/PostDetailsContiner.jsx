@@ -76,7 +76,7 @@ function PostDetailsContainer({
     reactingUserInfo.minimessage = comment;
     // add users to the liked clickers group and increment the value of clicks
     setIsUploading(true);
-    // performing post request
+    // performing put request
     axios
       .put(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/comments`,

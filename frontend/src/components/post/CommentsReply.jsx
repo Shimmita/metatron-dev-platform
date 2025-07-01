@@ -6,10 +6,11 @@ import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import devImage from "../../images/dev.jpeg";
 import { getElapsedTime } from "../utilities/getElapsedTime";
+import AlertMiniProfileView from "../alerts/AlertMiniProfileView";
 
 const MAX_TEXT_LENGTH=100
 
@@ -19,6 +20,7 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
   const [errorMessage, setErrorMessage] = useState("");  
   const[isEditing,setIsEditing]=useState(false)
   const[isDeleteComment,setIsDeleteComment]=useState(false)
+  const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
 
     // axios default credentials
     axios.defaults.withCredentials = true;
@@ -31,6 +33,9 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
 
     // hold the id of the comment, this is not userId
     const commentId=commenter?._id
+
+    // holds the commenter id, the id of the owner of the parent comment
+    const parentCommenterId=commenter?.userId
 
 
     // handle editing
@@ -120,15 +125,22 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
 
     }
 
+  // handle display of miniprofile
+  const handleMiniProfileView = useCallback(() => {
+    setOpenMiniProfileAlert(true);
+  }, []);
+
 
   return (
     <List className="w-100 rounded" sx={{ bgcolor: "background.paper", border:'1px solid', borderColor:'divider', mt:1.5 }}>
       <ListItem alignItems="flex-start">
-        <ListItemAvatar>
+        <ListItemAvatar
+          onClick={handleMiniProfileView}
+         >
           <Avatar
             alt=""
             src={devImage}
-            sx={{ width: 30, height: 30 }}
+            sx={{ width: 31, height: 31 }}
           />
         </ListItemAvatar>
         <ListItemText
@@ -141,15 +153,15 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
               <Typography variant={"body2"} component={'span'}  sx={{ color: "text.primary" }}>
                 {commenter?.name}
 
-                   {isCurrentUserComment && (
-                                  <Typography
-                                  ml={1}
-                                  variant={"caption"}
-                                  sx={{ color: "text.secondary", fontSize:'x-small' }}
-                                >
-                                {"(You)"}
-                                </Typography>
-                                )}
+                {isCurrentUserComment && (
+                    <Typography
+                    ml={1}
+                    variant={"caption"}
+                    sx={{ color: "text.secondary", fontSize:'x-small' }}
+                  >
+                  {"(You)"}
+                  </Typography>
+                  )}
               </Typography>
 
               <Typography variant={"caption"}>
@@ -299,13 +311,20 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                </Box>
 
               )}
-
-              {/* show replies to the comment */}
               
             </Box>
           }
         />
       </ListItem>
+
+        {/* alert for showing user mini-profile details by passing the post ownerID */}
+        {openMiniProfileAlert && (
+          <AlertMiniProfileView
+          openAlert={openMiniProfileAlert}
+          setOpenAlert={setOpenMiniProfileAlert}
+          userId={parentCommenterId}
+        />
+        )}
     </List>
   );
 }

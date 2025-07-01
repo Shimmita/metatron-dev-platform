@@ -472,6 +472,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
       keepMounted
       open={openModalJob}
       sx={{
+        backdropFilter:'blur(3px)',
         marginLeft:handleModalWidth(),
       }}
       onClose={handleClosingJobPostModal}
@@ -1130,8 +1131,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                     fullWidth
                     onChange={(e) => setCounty(e.target.value)}
                   >
-                    {CountiesInKenya &&
-                      CountiesInKenya.map((county) => (
+                    {CountiesInKenya?.map((county) => (
                         <MenuItem key={county} value={county}>
                           <small style={{ fontSize: "small" }}> {county}</small>
                         </MenuItem>

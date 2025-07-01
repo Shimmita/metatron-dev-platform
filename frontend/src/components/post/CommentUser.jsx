@@ -6,8 +6,9 @@ import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
+import AlertMiniProfileView from "../alerts/AlertMiniProfileView";
 import CustomCountryName from "../utilities/CustomCountryName";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import CommentsReply from "./CommentsReply";
@@ -15,14 +16,16 @@ import CommentsReply from "./CommentsReply";
 const MAX_TEXT_LENGTH=100
 
 export default function CommentUser({ comment: commenter, postId, setPostDetailedData }) {
-  const [isUploading, setIsUploading] = useState(false);  
-  const [replyText, setReplyText] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");  
+  const[isUploading, setIsUploading] = useState(false);  
+  const[replyText, setReplyText] = useState("");
+  const[errorMessage, setErrorMessage] = useState("");  
   const[isOpenReply,setIsOpenReply]=useState(false)
   const[isOpenReplyComments,setIsOpenReplyComments]=useState(false)
   const[isEditing,setIsEditing]=useState(false)
   const[isDeleteComment,setIsDeleteComment]=useState(false)
-  const [repliesData,setRepliesData]=useState([])
+  const[repliesData,setRepliesData]=useState([])
+  const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
+  
 
     // axios default credentials
     axios.defaults.withCredentials = true;
@@ -58,9 +61,9 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
     }
 
     // handle complete sending reply
-      const handleCompleteSendingReply=()=>{
+    const handleCompleteSendingReply=()=>{
         // extract basic current user details
-        const { avatar, name, specialisationTitle: title } = user || {};
+        const { avatar, name, county, specialisationTitle: title } = user || {};
 
         // user location
         const country = CustomCountryName(user?.country);
@@ -70,6 +73,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
           avatar,
           name,
           country,
+          county,
           title,
           parentPostId:postId,
           parentCommentId:commentId,
@@ -78,33 +82,32 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
         };
 
         setIsUploading(true);
-          // performing delete request
-          axios
-            .post(
-              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/reply/comments/`, replyCommentObject,
-              {
-                withCredentials: true,
-              }
-            )
-            .then((res) => {
-              // update passedPost with the returned post object
-             setPostDetailedData(res.data)
-            })
-            .catch(async (err) => {
+        // performing delete request
+        axios
+          .post(
+            `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/reply/comments/`, replyCommentObject,
+            {
+              withCredentials: true,
+            }
+          )
+          .then((res) => {
+            // update passedPost with the returned post object
+            setPostDetailedData(res.data)
+          })
+          .catch(async (err) => {
 
-              if (err?.code === "ERR_NETWORK") {
-                setErrorMessage("Server Unreachable");
-                return;
-              }
-      
-              setErrorMessage(err?.response.data);
+            if (err?.code === "ERR_NETWORK") {
+              setErrorMessage("Server Unreachable");
+              return;
+            }
+    
+            setErrorMessage(err?.response.data);
 
-              console.log(errorMessage)
-            })
-            .finally(() => {
-              setIsUploading(false);
-              setIsOpenReply(false)
-            });
+          })
+          .finally(() => {
+            setIsUploading(false);
+            setIsOpenReply(false)
+          });
 
         }
     
@@ -180,8 +183,6 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
               setIsUploading(false);
               setIsDeleteComment(false)
             });
-
-
     }
 
 
@@ -224,6 +225,12 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
             });
     }
 
+
+    // handle display of miniprofile
+    const handleMiniProfileView = useCallback(() => {
+      setOpenMiniProfileAlert(true);
+    }, []);
+
   return (
     <List 
     className="w-100 rounded" 
@@ -231,11 +238,11 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
     borderBottom:'1px solid', 
     borderColor:'divider' }}>
       <ListItem alignItems="flex-start">
-        <ListItemAvatar>
+        <ListItemAvatar onClick={handleMiniProfileView}>
           <Avatar
             alt=""
             src={commenter?.avatar}
-            sx={{ width: 30, height: 30 }}
+            sx={{ width: 32, height: 32 }}
           />
         </ListItemAvatar>
         <ListItemText
@@ -283,8 +290,18 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                   display={"flex"}
                   alignItems={"center"}
                 >
-                  {commenter?.title} | {CustomCountryName(commenter?.country)}
+                  {commenter?.title} 
                 </Typography>
+
+                <Typography
+                  variant={"caption"}
+                  color={"text.secondary"}
+                  display={"flex"}
+                  alignItems={"center"}
+                >
+                 {commenter?.country} | {commenter?.county}
+                </Typography>
+                
               </Box>
 
               <Box>
@@ -459,6 +476,16 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
           }
         />
       </ListItem>
+
+
+      {/* alert for showing user mini-profile details by passing the post ownerID */}
+      {openMiniProfileAlert && (
+        <AlertMiniProfileView
+        openAlert={openMiniProfileAlert}
+        setOpenAlert={setOpenMiniProfileAlert}
+        userId={parentCommenterId}
+      />
+      )}
     </List>
   );
 }

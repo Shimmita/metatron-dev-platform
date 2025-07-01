@@ -9,7 +9,7 @@ const CurrentBottomNav = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // update  user and online status to true
+    // update  the position of bottom nav
     updateCurrentBottomNav: (state, action) => {
       state.position = action.payload;
     },

@@ -323,7 +323,7 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
                   mt={1}
                   alignItems={"center"}
                 >
-                  <Typography variant="caption" mr={1}>
+                  <Typography variant="caption" mr={postBelongsCurrentUser ? 2:0.5}>
                     {getElapsedTime(post?.createdAt)}
                   </Typography>
 
@@ -336,7 +336,7 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
                       >
                         <MoreVertRounded
                           color="primary"
-                          sx={{ width: 18, height: 18 }}
+                          sx={{ width: 18, height: 17 }}
                         />
                       </IconButton>
                     </Tooltip>

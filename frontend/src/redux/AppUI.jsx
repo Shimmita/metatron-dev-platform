@@ -23,6 +23,7 @@ const initialState = {
   isPostFullDetailModal:false,
   isLogoutAlert:false,
   postEditUniqueId:"",
+  notificationPosition:0,
 
   // theme
   currentMode: "light",
@@ -102,9 +103,10 @@ const appUISliceReducerSlice = createSlice({
       };
     },
     // manage showing message and notification drawer
-    showMessagingDrawer: (state) => {
+    showMessagingDrawer: (state,action) => {
       return {
         ...state,
+        notificationPosition:action.payload,
         isOpenMessageDrawer: !state.isOpenMessageDrawer,
       };
     },
@@ -190,6 +192,8 @@ const appUISliceReducerSlice = createSlice({
         isPostFullDetailModal:false,
         postEditUniqueId:'',
         isLogoutAlert:false,
+        notificationPosition:0,
+
 
       };
     },

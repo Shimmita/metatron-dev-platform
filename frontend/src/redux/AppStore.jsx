@@ -65,7 +65,7 @@ const rootReducer = combineReducers({
   currentPostsTop: currentPostsTopReducer,
   currentConversation: currentConversationReducer,
   currentProfileView: currentProfileViewReducer,
-  currentJobFeedBack: currentJobFeedBackReducer
+  currentJobFeedBack: currentJobFeedBackReducer,
 
 });
 

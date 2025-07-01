@@ -41,14 +41,14 @@ export default function AlertGeneral({
   //  redux states
   const { isTabSideBar } = useSelector((state) => state.appUI);
 
-  // handle width of the alert
-  const handleWidthAlert=()=>{
+  // handle width of alert dialog 
+  const handleAlertGenWidth=()=>{
     if (CustomDeviceTablet() && isTabSideBar) {
-      return "60%"
+      return "36%"
     } else if(CustomLandScape()){
-      return "92%"
+      return "-8%"
     } else if(CustomLandscapeWidest()){
-      return "97.5%"
+      return "-5%"
     }
   }
 
@@ -61,9 +61,9 @@ export default function AlertGeneral({
         keepMounted
         aria-describedby="alert-dialog-slide-description"
           sx={{
-               marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
-                  width:handleWidthAlert()
-                }}
+            backdropFilter:'blur(3px)',
+           marginLeft:handleAlertGenWidth()
+          }}
       >
           <DialogTitle
           display={"flex"}

@@ -26,6 +26,7 @@ import {
 } from "../../redux/CurrentModal";
 import { updateCurrentPostsFromSearch } from "../../redux/CurrentPosts";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -115,15 +116,17 @@ export default function AlertGlobalSearch({
     navigate("/posts/search/results");
   };
 
+     // handle width of the global search width
+       const handleGlobalSearchWidth=()=>{
+        if (CustomDeviceTablet() && isTabSideBar) {
+          return "36%"
+        } else if(CustomLandScape()){
+          return "-8%"
+        } else if(CustomLandscapeWidest()){
+          return "-5%"
+        }
+      }
    
-  // handle width of the global search
-  const handleGlobalSearchWidth=()=>{
-    if (CustomDeviceTablet() && isTabSideBar) {
-      return "36%"
-    } else if(CustomLandscapeWidest()){
-      return "-5%"
-    }
-  }
   return (
       <Dialog
         className="shadow"
@@ -133,6 +136,7 @@ export default function AlertGlobalSearch({
         keepMounted
         aria-describedby="alert-dialog-slide-alering"
         sx={{
+          backdropFilter:'blur(3px)',
           marginLeft:handleGlobalSearchWidth()
         }}
       >

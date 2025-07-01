@@ -170,7 +170,7 @@ export default function PostReaction({ reaction }) {
                       {reaction?.title}
                       <br/>
                       <Typography variant="caption" color={"text.secondary"}>
-                        {CustomCountryName(reaction?.country)} | {reaction?.county}
+                        {reaction?.country} | {reaction?.county}
                       </Typography>
                       <br/>
                        {reaction?.message?.toLowerCase().includes("liked") && (

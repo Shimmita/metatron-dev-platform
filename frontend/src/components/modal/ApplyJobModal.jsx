@@ -194,6 +194,9 @@ const ApplyJobModal = ({
       onClose={handleClosingModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
+      sx={{
+        backdropFilter:'blur(3px)',
+      }}
     >
       <Box
         width={handleReturnWidthModal()}
@@ -203,7 +206,7 @@ const ApplyJobModal = ({
         color={"text.primary"}
         sx={{
           border: isDarkMode && "1px solid gray",
-          marginLeft: handleModalWidth()
+          marginLeft: handleModalWidth(),
         }}
       >
         <Box

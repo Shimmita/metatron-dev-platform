@@ -50,19 +50,12 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
 );
 
 export default function ParentNotifMessageDrawer() {
-  const [value, setValue] = useState(0);
-
-  const dispatch = useDispatch();
-
+  
   // this will define display of inbox and notif bars appropriately
   const [messageNotifClicked, setMessageNotifClicked] = useState(false);
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-
-  };
   // redux states
-  const { isOpenMessageDrawer } = useSelector((state) => state.appUI);
+  const { isOpenMessageDrawer,notificationPosition } = useSelector((state) => state.appUI);
   const { messageNotification } = useSelector((state) => state.currentSnackBar);
 
   const { post_reactions } = useSelector((state) => state.currentPostReactions);
@@ -76,7 +69,15 @@ export default function ParentNotifMessageDrawer() {
 
   const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
 
+  const [value, setValue] = useState(notificationPosition);
+  
+  const dispatch = useDispatch();
 
+ const handleChange = (event, newValue) => {
+    setValue(newValue);
+
+  };
+  
   const handleClose = () => {
     dispatch(showMessagingDrawer());
 
@@ -86,7 +87,14 @@ export default function ParentNotifMessageDrawer() {
 
   return (
     <React.Fragment>
-      <Drawer anchor={"right"} open={isOpenMessageDrawer} onClose={handleClose}>
+      <Drawer 
+      anchor={"right"} 
+      open={isOpenMessageDrawer} 
+      onClose={handleClose}
+      sx={{ 
+        backdropFilter:'blur(3px)'
+       }}
+      >
         <Box
           width={
             CustomDeviceSmallest()
@@ -117,27 +125,23 @@ export default function ParentNotifMessageDrawer() {
                   >
                     <StyledTab
                       label={
-                        <Badge  color="warning" badgeContent={post_reactions?.length +reportedPost?.length + connectNotifications?.length} className="me-5">
                           <NotificationsRounded
                             className={value === 0 && "border-bottom pb-1"}
                             variant="body2"
                             sx={{ color: "white",  width:28, height:28 }}
                           />
                         
-                        </Badge>
                       }
                     />
 
                     <StyledTab
                       label={
-                        <Badge color="warning" badgeContent={1} className="ms-3">
                           <EmailRounded
                             className={value === 1 && "border-bottom pb-1"}
                             variant="body2"
                             sx={{ color: "white", width:25, height:25 }}
                           />
                           
-                        </Badge>
                       }
                     />
                   </StyledTabs>
@@ -160,8 +164,7 @@ export default function ParentNotifMessageDrawer() {
                 </Box>
               }
             >
-              {/* display notification */}
-              {value === 0 && (
+             
                 <Box
                   height={"92vh"}
                   sx={{
@@ -175,21 +178,29 @@ export default function ParentNotifMessageDrawer() {
                     scrollbarWidth: "none",
                   }}
                 >
-                  <NotifAccordionLayout
-                    post_reactions={post_reactions}
-                    reportedPost={reportedPost}
-                    connectNotifications={connectNotifications}
-                    profile_views={profile_views}
-                    jobFeedBacks={job_feedback}
-                  />
-                </Box>
-              )}
-              {/* display messages content and passing props */}
-              {value === 1 && (
-                <ConversationContainer
+                 {value===0 ? (
+                  <React.Fragment>
+                     {/* display account notification */}
+                   <NotifAccordionLayout
+                   post_reactions={post_reactions}
+                   reportedPost={reportedPost}
+                   connectNotifications={connectNotifications}
+                   profile_views={profile_views}
+                   jobFeedBacks={job_feedback}
+                 />
+                 </React.Fragment>
+                 ):(
+                  <React.Fragment>
+                  {/* display messages content and passing props */}
+                  <ConversationContainer
                   setMessageNotifClicked={setMessageNotifClicked}
                 />
-              )}
+                  </React.Fragment>
+                 )}
+                </Box>
+              
+             
+              
             </Suspense>
           </Box>
         </Box>

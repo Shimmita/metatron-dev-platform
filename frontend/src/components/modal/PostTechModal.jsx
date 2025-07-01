@@ -356,7 +356,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     keepMounted
     open={openModalTech}
     sx={{
-      marginLeft: handleModalWidth()
+      backdropFilter:'blur(3px)',
+      marginLeft: handleModalWidth(),
     }}
     onClose={handleClosingModal}
     aria-labelledby="modal-modal-title"
@@ -499,7 +500,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   {SpecialisationTech?.filter((about) => about !== "None").map(
                       (about, index) => (
                         <MenuItem
-                          key={index}
+                          key={about}
                           value={about}
                           sx={{
                             display: "flex",
