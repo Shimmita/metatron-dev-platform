@@ -1,7 +1,6 @@
 import {
   Close,
   DarkModeRounded,
-  Google,
   PersonAddRounded,
   StarRounded,
   Visibility,
@@ -14,6 +13,7 @@ import {
   Backdrop,
   Box,
   Button,
+  CircularProgress,
   Collapse,
   FormControl,
   IconButton,
@@ -49,14 +49,12 @@ const LoginAuth = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isVerifyButton,setIsVerifyButton]=useState(false)
   // global  state from redux
   const {currentMode } = useSelector((state) => state.appUI);
   const { authMessage } = useSelector((state) => state.currentAuthMessage);
   // update is dark const
   const isDarkMode=currentMode==='dark'
-
-  // axios defaults with credentials to true
-  axios.defaults.withCredentials = true;
 
   const [messageGeneral, setMessageGeneral] = useState("");
   const [isLogin, setIsLogin] = useState(false);
@@ -116,7 +114,7 @@ const LoginAuth = () => {
                 if (res?.data?.message) {
                   // user already registered redirect them home
                   // update current user redux states + online status by passing payload
-                  // from response that's user object that was came from server firestore
+                  // from response that's user object that was came from server fire store
                   const user_payload = res?.data?.user;
                   dispatch(updateUserCurrentUserRedux(user_payload));
                   // home redirect
@@ -155,6 +153,7 @@ const LoginAuth = () => {
         setIsLogin(false);
       });
   };
+  
 
   const handleLogin = async () => {
     const user = {
@@ -164,20 +163,30 @@ const LoginAuth = () => {
     // login user without provider
     setIsLogin(true);
     axios
-      .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signin/personal`, user)
+      .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signin/personal`, user,{withCredentials:true})
       .then((res) => {
+        const user_data=res.data
+        // server returns user object if their email verified else only email is sent
+        if (user_data?.email_verified) {
         // populating the redux for the logged in user
         dispatch(updateUserCurrentUserRedux(res.data));
+        }else{
+          navigate(`/auth/verification?${user_data}`)
+        }       
       })
       .catch((err) => {
         if (err?.code === "ERR_NETWORK") {
-          setMessageGeneral("Server Unreachable");
+          setMessageGeneral("server unreachable");
           return;
         }
+        if (err?.response?.data==="verification code sent to your email") {
+          setIsVerifyButton(true)
+        }
+
         setMessageGeneral(err?.response?.data);
       })
       .finally(() => {
-        setIsLogin(false);
+        setIsLogin(false);      
       });
   };
 
@@ -186,7 +195,7 @@ const LoginAuth = () => {
     setMessageGeneral("");
     // dispatch clear auth message
     dispatch(resetClearCurrentAuthMessage());
-    // perge for complete clearance
+    // purge for complete clearance
     try {
       await persistor.purge();
     } catch (error) {
@@ -195,6 +204,10 @@ const LoginAuth = () => {
     }
   };
 
+// handle navigate to complete verification of email
+const handleEmailVerification=()=>{
+  navigate(`/auth/verification?${email}`)
+}
  
   return (
     <Box
@@ -246,6 +259,7 @@ const LoginAuth = () => {
                   onClick={handleClickMore}
                   aria-label="more"
                   id="more-button"
+                  disabled={isLogin}
                   aria-controls={openMore ? "basic-menu" : undefined}
                   aria-haspopup="true"
                   aria-expanded={openMore ? "true" : undefined}
@@ -281,39 +295,23 @@ const LoginAuth = () => {
               />
             </Menu>
           </Box>
-          <Box mb={1}>
+          <Box >
             <Box display={"flex"} justifyContent={"center"}>
               {/* logo */}
-              <Avatar alt={"logo"} sx={{ width: 70, height: 70 }} src={logo} />
+              <Avatar alt={"logo"} sx={{ width: 60, height: 60 }} src={logo} />
             </Box>
             <Box mb={3}>
               <Typography
                 textAlign={"center"}
                 fontWeight={"bold"}
-                bgcolor={!isDarkMode && "background.default"}            textTransform={"uppercase"}
+                bgcolor={!isDarkMode && "background.default"} 
+                textTransform={"uppercase"}
                 variant={CustomDeviceSmallest() ? "body1" : "h6"}
                 gutterBottom
                 color={"primary"}
               >
                 Metatron Developer
               </Typography>
-
-              <Typography
-                fontWeight={"bold"}
-                color={"text.secondary"}
-                variant="body2"
-                mb={2}
-                textTransform={"capitalize"}
-                display={"flex"}
-                gap={1}
-                alignItems={"center"}
-                justifyContent={"center"}
-              >
-                <StarRounded sx={{ width: 20, height: 20 }} />
-                Visiting The Best IT Platform{" "}
-                <StarRounded sx={{ width: 20, height: 20 }} />
-              </Typography>
-
               <Box
                 mb={2}
                 display={"flex"}
@@ -328,7 +326,7 @@ const LoginAuth = () => {
                   variant={CustomDeviceSmallest() ? "caption" : "body2"}
                   color={"text.secondary"}
                 >
-                  Enlightening Technology
+                 Ultimate Tech Platform
                 </Typography>
                 <WbIncandescentRounded
                   sx={{ width: 18, height: 18, color: "orange" }}
@@ -430,7 +428,11 @@ const LoginAuth = () => {
               </FormControl>
             </Box>
 
-            <Box display={"flex"} justifyContent={"center"} mb={2}>
+            <Box 
+            display={isLogin ? "none":"flex"} 
+            justifyContent={"center"} 
+            alignItems={'center'}
+            mb={2}>
               <Typography
                 variant="body2"
                 color={"text.secondary"}
@@ -451,12 +453,11 @@ const LoginAuth = () => {
                   >
                     reset password
                   </Typography>
-                </Link>
+                </Link> 
               </Typography>
             </Box>
 
-            <Box display={"flex"} gap={1} justifyContent={"center"} mb={2}>
-              {/* Google signin */}
+            {/* <Box display={"flex"} gap={1} justifyContent={"center"} mb={2}>
               <Tooltip arrow title="signin with google">
                 <Button
                   className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
@@ -464,16 +465,16 @@ const LoginAuth = () => {
                   disabled={isLogin || messageGeneral}
                   startIcon={<Google />}
                   onClick={handleLoginWithGoogle}
-                  sx={{ textTransform: "none", borderRadius: "20px" }}
+                  sx={{ textTransform: "none", borderRadius: "20px",display:'none' }}
                 >
                   {CustomDeviceSmallest ? "Google" : "Google Signin"}
                 </Button>
               </Tooltip>
-            </Box>
+            </Box> */}
 
             <Box mb={2} display={"flex"} justifyContent={"center"}>
-              <Tooltip arrow title="signin with email and password">
                 <Button
+                startIcon={isLogin && <CircularProgress size={13}/>}
                   variant="contained"
                   className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
                   disabled={
@@ -484,14 +485,11 @@ const LoginAuth = () => {
                   }
                   sx={{ textTransform: "none", borderRadius: "20px" }}
                   disableElevation
-                  onClick={handleLogin}
-                  type="submit"
+                  onClick={isVerifyButton ? handleEmailVerification:handleLogin}
                 >
-                  Login
+                 {isVerifyButton ? 'Verification':'Login'}
                 </Button>
-              </Tooltip>{" "}
             </Box>
-
           </Box>
         </Box>
       </Box>

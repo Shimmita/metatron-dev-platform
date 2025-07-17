@@ -2,7 +2,9 @@ import {
   EmailOutlined,
   FlagRounded,
   PersonAddRounded,
-  PersonRemoveRounded
+  PersonRemoveRounded,
+  ShareRounded,
+  StarRounded
 } from "@mui/icons-material";
 import { Box, Divider, ListItemText, MenuItem, Typography } from "@mui/material";
 import axios from "axios";
@@ -41,9 +43,6 @@ function CardFeedMore({
   const owner_post = `${ownerName?.split(" ")[0]} ${
     ownerName?.split(" ")[1]
   }`.toLowerCase();
-
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
 
   // handle showing of alert input message
@@ -155,6 +154,49 @@ function CardFeedMore({
     handleCloseMenu();
   };
 
+  // handle adding to the favorites
+  const handleAddFavorite=()=>{
+    const favoriteObject={
+      postId:post?._id,
+      userFavoriteId:currentUserId
+    }
+
+     // set is fetching to true
+    setIsFetching(true);
+
+    // performing update request
+    axios.put(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/favorite`,favoriteObject
+      )
+      .then((res) => {
+        // update the message state
+        if (res?.data && res.data) {
+          // update the message
+          setMessageMore(res.data);
+        }
+      })
+      .catch(async (err) => {
+        if (err?.code === "ERR_NETWORK") {
+          setMessageMore("server unreachable");
+          return;
+        }
+        // error message
+        setMessageMore(err?.response?.data);
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+
+        // handle closing of the more option
+        handleCloseMenu();
+      });
+
+  }
+  // handle sharing of the post
+  const handleSharePost=()=>{
+
+  }
+
   return (
       <Box borderRadius={5}>
             {isFriend ? (
@@ -190,19 +232,49 @@ function CardFeedMore({
                 primary={<Typography variant={'body2'}>{owner_post}</Typography>}
               />
             </MenuItem>
-        
-            {/* report content */}
+
+            {/* add to favorites */}
             <Divider component={"li"} />
-            <MenuItem onClick={handleShowReportAlert}>
+            <MenuItem onClick={ handleAddFavorite } disabled={isFetching}>
               <ListItemText>
-                <FlagRounded color="info" className="mx-2" />
+                <StarRounded 
+                sx={{ width:26,height:26 }}
+                color="success" 
+                className="mx-2" />
               </ListItemText>
               <ListItemText
                 sx={{ textTransform: "capitalize" }}
-                primary={<Typography variant={'body2'}>Report Content</Typography>}
+                primary={<Typography variant={'body2'}>Add to Favorites</Typography>}
               />
             </MenuItem>
 
+            {/* share post */}
+             <Divider component={"li"} />
+            <MenuItem onClick={handleSharePost} disabled={isFetching}>
+              <ListItemText>
+                <ShareRounded 
+                sx={{ width:22,height:22 }}
+                color="secondary" 
+                className="mx-2" />
+              </ListItemText>
+              <ListItemText
+                sx={{ textTransform: "capitalize" }}
+                primary={<Typography variant={'body2'}>Share this Post</Typography>}
+              />
+            </MenuItem>
+
+            {/* repost post */}
+            <Divider component={"li"} />
+            <MenuItem onClick={handleShowReportAlert} disabled={isFetching}>
+              <ListItemText>
+                <FlagRounded color="warning" className="mx-2" />
+              </ListItemText>
+              <ListItemText
+                sx={{ textTransform: "capitalize" }}
+                primary={<Typography variant={'body2'}>Report this Post</Typography>}
+              />
+            </MenuItem>
+        
             {/* alert message render */}
             {openAlertMessage && (
               <AlertInputMessage openAlert={openAlertMessage}

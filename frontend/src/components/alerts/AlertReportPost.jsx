@@ -1,11 +1,10 @@
 import {
   Close,
-  ContentCopyRounded,
   DocumentScannerRounded,
   PhishingRounded,
   PlagiarismRounded,
   PsychologyAltRounded,
-  WarningRounded,
+  WarningRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -38,8 +37,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 const reporting_about_array = [
   "Irrelevant tech content",
-  "Plagiarised tech content",
-  "Scammish and fraudulent",
+  "Plagiarized tech content",
+  "Phishing and fraudulent",
 ].sort();
 
 export default function AlertReportPost({
@@ -48,7 +47,7 @@ export default function AlertReportPost({
   post,
   currentUser,
 }) {
-  const [report_about, setReportAbout] = useState("");
+  const [reportAbout, setReportAbout] = useState("");
   const [description, setDescription] = useState("");
 
   const [isFetching, setIsFetching] = useState(false);
@@ -86,7 +85,7 @@ export default function AlertReportPost({
     reporter_name: currentUser?.name,
     reporter_speciality: currentUser?.specialisationTitle,
     reporter_avatar: currentUser?.avatar,
-    report_title: report_about,
+    report_title: reportAbout,
     report_message: description,
   };
 
@@ -136,15 +135,15 @@ export default function AlertReportPost({
     setMessage("");
   };
 
-  const handleWidthAlert=()=>{
-      if (CustomDeviceTablet() && isTabSideBar) {
-        return "60%"
-      } else if(CustomLandScape()){
-        return "92%"
-      } else if(CustomLandscapeWidest()){
-        return "97.5%"
-      }
+  const handleReportPostWidth=()=>{
+    if (CustomDeviceTablet() && isTabSideBar) {
+      return "36%"
+    } else if(CustomLandScape()){
+      return "-8%"
+    } else if(CustomLandscapeWidest()){
+      return "-5%"
     }
+  }
 
   return (
       <Dialog
@@ -153,9 +152,8 @@ export default function AlertReportPost({
         keepMounted
         aria-describedby="alert-dialog-slide-description"
         sx={{
-          marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
-
-          width:handleWidthAlert()
+          backdropFilter:'blur(3px)',
+          marginLeft:handleReportPostWidth()
         }}
       >
         <Stack mb={1}>
@@ -168,7 +166,7 @@ export default function AlertReportPost({
             alignItems={"center"}
           >
             <WarningRounded />
-            Post Reportig Center
+            Post Reporting Center
           </DialogTitle>
 
           {/* post title */}
@@ -212,7 +210,7 @@ export default function AlertReportPost({
               <TextField
                 required
                 select
-                value={report_about}
+                value={reportAbout}
                 margin="dense"
                 onChange={(e) => setReportAbout(e.target.value)}
                 id="custom_area-of-report"
@@ -233,12 +231,12 @@ export default function AlertReportPost({
                           color="primary"
                           sx={{ width: 26, height: 26 }}
                         />
-                      ) : about.includes("Scammish") ? (
+                      ) : about.includes("Phishing") ? (
                         <PhishingRounded color="info" />
-                      ) : about.includes("Plagiarised") ? (
+                      ) : about.includes("Plagiarized") ? (
                         <PlagiarismRounded color="secondary" />
                       ) : (
-                        <DocumentScannerRounded />
+                        <DocumentScannerRounded color="warning" />
                       )}{" "}
                       {about}
                     </MenuItem>
@@ -263,6 +261,10 @@ export default function AlertReportPost({
             {/* show circular progress when is loading */}
             {isFetching && <CircularProgress size={20} className="me-2" />}
 
+            <Button onClick={handleDismiss} disabled={isFetching || message}>
+              Close
+            </Button>
+
             <Button
               type="submit"
               disabled={
@@ -271,9 +273,7 @@ export default function AlertReportPost({
             >
               Submit
             </Button>
-            <Button onClick={handleDismiss} disabled={isFetching || message}>
-              Close
-            </Button>
+           
           </DialogActions>
         </form>
       </Dialog>

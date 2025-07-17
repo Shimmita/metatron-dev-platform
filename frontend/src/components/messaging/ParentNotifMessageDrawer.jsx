@@ -1,7 +1,6 @@
 import { EmailRounded, NotificationsRounded } from "@mui/icons-material";
 import {
   AppBar,
-  Badge,
   styled,
   Tab,
   Tabs,
@@ -55,7 +54,7 @@ export default function ParentNotifMessageDrawer() {
   const [messageNotifClicked, setMessageNotifClicked] = useState(false);
 
   // redux states
-  const { isOpenMessageDrawer,notificationPosition } = useSelector((state) => state.appUI);
+  const { isOpenMessageDrawer,notificationPosition,currentMode } = useSelector((state) => state.appUI);
   const { messageNotification } = useSelector((state) => state.currentSnackBar);
 
   const { post_reactions } = useSelector((state) => state.currentPostReactions);
@@ -68,6 +67,7 @@ export default function ParentNotifMessageDrawer() {
   const { profile_views } = useSelector((state) => state.currentProfileView);
 
   const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
+  const isDarkMode=currentMode==='dark'
 
   const [value, setValue] = useState(notificationPosition);
   
@@ -103,7 +103,7 @@ export default function ParentNotifMessageDrawer() {
               ? 330
               :400
           }
-          bgcolor={"background.default"}
+          bgcolor={isDarkMode ?"background.default":"#f1f1f1"}
           height={"100vh"}
         >
           {/* display when message/notif item not clicked */}

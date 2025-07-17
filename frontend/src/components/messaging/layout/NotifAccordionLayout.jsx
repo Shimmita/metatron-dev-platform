@@ -1,9 +1,9 @@
 import {
-  AccountBoxRounded,
-  CodeRounded,
-  PeopleRounded,
-  WarningRounded,
-  WorkRounded
+  FlagOutlined,
+  InsightsOutlined,
+  PersonAddOutlined,
+  PersonOutline,
+  WorkOutlineOutlined
 } from "@mui/icons-material";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import { Box, Stack } from "@mui/material";
@@ -72,9 +72,67 @@ export default function NotifAccordionLayout({
   const [openProfileViewers,setOpenProfileViewers]=useState(true)
   const[openJobFeedBack,setOpenJobFeedBack]=useState(true)
 
-
   return (
-    <Stack gap={2}>
+    <Stack>
+      
+      {/* accordion profile views */}
+      {profile_views?.length>0 && (
+         <Accordion
+         expanded={openProfileViewers}
+         onChange={() => setOpenProfileViewers((prev) => !prev)}
+       >
+         <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
+           <Box 
+           display={"flex"} 
+           alignItems={"center"} 
+           gap={1}>
+            {/* person or profile icon */}
+            <PersonOutline 
+            color='primary'/>
+             <Typography
+               variant="body2"
+               textAlign={'center'}
+               color={'primary'}
+               fontWeight={"bold"}
+               display={"flex"}
+               alignItems={"center"}
+               textTransform={'uppercase'}
+             >
+               Profile Viewers{" "}
+               <Typography
+                 variant="caption"
+                 fontWeight={"bold"}
+                 color={'primary'}
+                 ml={5}
+               >
+                 {profile_views?.length}
+               </Typography>
+             </Typography>
+           </Box>
+         </AccordionSummary>
+         <AccordionDetails>
+           <Box
+             maxHeight={"70vh"}
+             sx={{
+               overflow: "auto",
+               // Hide scrollbar for Chrome, Safari and Opera
+               "&::-webkit-scrollbar": {
+                 display: "none",
+               },
+               // Hide scrollbar for IE, Edge and Firefox
+               msOverflowStyle: "none",
+               scrollbarWidth: "none",
+             }}
+           >
+             {profile_views?.map((profile_viewer) => (
+              <ProfileViewReaction key={profile_viewer?._id} profile_view={profile_viewer}/>
+             ))}
+           </Box>
+         </AccordionDetails>
+       </Accordion>
+      )}
+
+
       {/* connect request */}
       {connectNotifications?.length > 0 && (
         <Accordion
@@ -83,10 +141,16 @@ export default function NotifAccordionLayout({
         >
           <AccordionSummary aria-controls="panel2d-content" id="panel2d-header">
             <Box display={"flex"} alignItems={"center"} gap={1}>
+             {/* person add */}
+             <PersonAddOutlined
+             color='primary'
+             />
               <Typography
                 component="span"
-                variant="body1"
+                variant="body2"
                 fontWeight={"bold"}
+                textTransform={'uppercase'}
+                color={'primary'}
                 display={"flex"}
                 alignItems={"center"}
               >
@@ -94,7 +158,7 @@ export default function NotifAccordionLayout({
                 <Typography
                   variant="caption"
                   fontWeight={"bold"}
-                  color="text.secondary"
+                  color={'primary'}
                   ml={5}
                 >
                   {connectNotifications?.length}
@@ -129,108 +193,6 @@ export default function NotifAccordionLayout({
         </Accordion>
       )}
 
-      {/* post report overview */}
-      {reportedPost?.length > 0 && (
-        <Accordion
-          expanded={openReported}
-          onChange={() => setOpenReported((prev) => !prev)}
-        >
-          <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
-            <Box display={"flex"} alignItems={"center"} gap={1}>
-              <Typography
-                component="span"
-                variant="body1"
-                fontWeight={"bold"}
-                display={"flex"}
-                alignItems={"center"}
-              >
-                Post Reported{" "}
-                <Typography
-                  variant="caption"
-                  fontWeight={"bold"}
-                  color="text.secondary"
-                  ml={5}
-                >
-                  {reportedPost?.length}
-                </Typography>
-              </Typography>
-            </Box>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Box
-              maxHeight={"70vh"}
-              sx={{
-                overflow: "auto",
-                // Hide scrollbar for Chrome, Safari and Opera
-                "&::-webkit-scrollbar": {
-                  display: "none",
-                },
-                // Hide scrollbar for IE, Edge and Firefox
-                msOverflowStyle: "none",
-                scrollbarWidth: "none",
-              }}
-            >
-              {reportedPost?.map((report, index) => (
-                <PostReported
-                  key={report}
-                  report={report}
-                  isLastItem={reportedPost?.length - 1 === index}
-                />
-              ))}
-            </Box>
-          </AccordionDetails>
-        </Accordion>
-      )}
-
-      {/* accordion profile views */}
-
-      {profile_views?.length>0 && (
-         <Accordion
-         expanded={openProfileViewers}
-         onChange={() => setOpenProfileViewers((prev) => !prev)}
-       >
-         <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
-           <Box display={"flex"} alignItems={"center"} gap={1}>
-             <Typography
-               component="span"
-               variant="body1"
-               fontWeight={"bold"}
-               display={"flex"}
-               alignItems={"center"}
-             >
-               Profile Viewers{" "}
-               <Typography
-                 variant="caption"
-                 fontWeight={"bold"}
-                 color="text.secondary"
-                 ml={5}
-               >
-                 {profile_views?.length}
-               </Typography>
-             </Typography>
-           </Box>
-         </AccordionSummary>
-         <AccordionDetails>
-           <Box
-             maxHeight={"70vh"}
-             sx={{
-               overflow: "auto",
-               // Hide scrollbar for Chrome, Safari and Opera
-               "&::-webkit-scrollbar": {
-                 display: "none",
-               },
-               // Hide scrollbar for IE, Edge and Firefox
-               msOverflowStyle: "none",
-               scrollbarWidth: "none",
-             }}
-           >
-             {profile_views?.map((profile_viewer) => (
-              <ProfileViewReaction key={profile_viewer?._id} profile_view={profile_viewer}/>
-             ))}
-           </Box>
-         </AccordionDetails>
-       </Accordion>
-      )}
 
       {/* job feedback */}
       {jobFeedBacks?.length>0 && (
@@ -240,9 +202,13 @@ export default function NotifAccordionLayout({
        >
          <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
            <Box display={"flex"} alignItems={"center"} gap={1}>
+            {/* work or job icon */}
+            <WorkOutlineOutlined color='primary'/>
              <Typography
                component="span"
-               variant="body1"
+               variant="body2"
+               textTransform={'uppercase'}
+               color={'primary'}
                fontWeight={"bold"}
                display={"flex"}
                alignItems={"center"}
@@ -251,8 +217,8 @@ export default function NotifAccordionLayout({
                <Typography
                  variant="caption"
                  fontWeight={"bold"}
-                 color="text.secondary"
-                 ml={5}
+                 color={'primary'}
+                 ml={8}
                >
                  {jobFeedBacks?.length}
                </Typography>
@@ -281,7 +247,8 @@ export default function NotifAccordionLayout({
        </Accordion>
       )}
 
-    {/* accordion post reactions notify */}
+
+      {/* accordion post reactions notify */}
     {post_reactions?.length > 0 && (
         <Accordion
           expanded={openReaction}
@@ -289,9 +256,13 @@ export default function NotifAccordionLayout({
         >
           <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
             <Box display={"flex"} alignItems={"center"} gap={1}>
+              {/* insights icon */}
+              <InsightsOutlined color='primary'/>
               <Typography
                 component="span"
-                variant="body1"
+                variant="body2"
+                textTransform={'uppercase'}
+                color={'primary'}
                 fontWeight={"bold"}
                 display={"flex"}
                 alignItems={"center"}
@@ -300,8 +271,8 @@ export default function NotifAccordionLayout({
                 <Typography
                   variant="caption"
                   fontWeight={"bold"}
-                  color="text.secondary"
-                  ml={5}
+                  color={'primary'}
+                  ml={8}
                 >
                   {post_reactions?.length}
                 </Typography>
@@ -327,6 +298,64 @@ export default function NotifAccordionLayout({
                   reaction={reaction}
                   key={reaction}
                   isLastItem={post_reactions?.length - 1 === index}
+                />
+              ))}
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+      )}
+
+      {/* post report overview */}
+      {reportedPost?.length > 0 && (
+        <Accordion
+          expanded={openReported}
+          onChange={() => setOpenReported((prev) => !prev)}
+        >
+          <AccordionSummary aria-controls="panel3d-content" id="panel3d-header">
+            <Box display={"flex"} alignItems={"center"} gap={1}>
+              {/* post report icon */}
+              <FlagOutlined color='primary'/>
+
+              <Typography
+                component="span"
+                variant="body2"
+                textTransform={'uppercase'}
+                color={'primary'}
+                fontWeight={"bold"}
+                display={"flex"}
+                alignItems={"center"}
+              >
+                Post Reported{" "}
+                <Typography
+                  variant="caption"
+                  fontWeight={"bold"}
+                  color={'primary'}
+                  ml={8}
+                >
+                  {reportedPost?.length}
+                </Typography>
+              </Typography>
+            </Box>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Box
+              maxHeight={"70vh"}
+              sx={{
+                overflow: "auto",
+                // Hide scrollbar for Chrome, Safari and Opera
+                "&::-webkit-scrollbar": {
+                  display: "none",
+                },
+                // Hide scrollbar for IE, Edge and Firefox
+                msOverflowStyle: "none",
+                scrollbarWidth: "none",
+              }}
+            >
+              {reportedPost?.map((report, index) => (
+                <PostReported
+                  key={report}
+                  report={report}
+                  isLastItem={reportedPost?.length - 1 === index}
                 />
               ))}
             </Box>

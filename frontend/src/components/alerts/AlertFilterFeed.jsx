@@ -1,14 +1,15 @@
 import { SortRounded } from "@mui/icons-material";
-import { Box, Divider, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
+import { Box, Checkbox, CircularProgress, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, Stack, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
+import axios from "axios";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import SubsectionTech from "../data/SubsectionTech";
+import { useDispatch, useSelector } from "react-redux";
+import { updateCurrentPosts } from "../../redux/CurrentPosts";
 import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
@@ -21,36 +22,85 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function AlertFilterFeed({
   openAlert,
   setOpenAlert,
-  setCustomArea,
-  body = "customize your feed content by selecting an option",
   title = "Feed Content Customization",
-  feedData=[]
-}) {
-  const [customTitle, setCustomTitle] = useState("");
-    const { isTabSideBar } = useSelector((state) => state.appUI);
+  feedData=[],
+  selectedOptions=[],
+  setSelectedOptions,
   
-
+}) {
+  const [isFetching, setIsFetching] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  
+  const dispatch=useDispatch()
+  const { isTabSideBar } = useSelector((state) => state.appUI);
+  
   const handleClose = () => {
+    // clear message
+    setErrorMessage("")
     // close alert
     setOpenAlert(false);
   };
 
-  // handle info entered by the user before closing the modal
-  const handleEnterInfo = () => {
-    // update the array then set the value of the user before close
-    if (SubsectionTech?.MachineLearning?.includes(customTitle)) {
-      return;
+  // handle change when checkbox is checked
+  const handleChange = (event) => {
+    const targetChecked = event.target.checked;
+    const value = event.target.value;
+  
+    if (targetChecked) {
+      // add the value if it doesn't already exist
+      if (!selectedOptions.includes(value)) {
+        setSelectedOptions(prev => [...prev, value]);
+      }
     } else {
-      SubsectionTech.MachineLearning.push(customTitle);
-      setCustomArea(customTitle);
-      handleClose();
+      // remove the value if it was unchecked
+      setSelectedOptions(prev => prev.filter(item => item !== value));
     }
   };
+  
 
   //   handle when user dismissed the dialog
   const handleDismiss = () => {
+    // clear the selections
+    selectedOptions.length=0
+    
+    // call close function
     handleClose();
   };
+
+  // handle enter
+  const handleEnter=()=>{
+    // set is fetching to true
+        setIsFetching(true);
+    
+        // performing get request
+        axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all`, selectedOptions,{
+            withCredentials: true,
+          })
+          .then((res) => {
+            // update the redux of current post
+            if (res?.data) {
+              // update the redux posts content
+              dispatch(updateCurrentPosts(res.data));
+
+              // close the dialog automatically
+              handleClose()
+            }
+          })
+          .catch((err) => {
+            if (err?.code === "ERR_NETWORK") {
+              setErrorMessage(
+                "server is unreachable "
+              );
+              return;
+            }
+            setErrorMessage(err?.response.data);
+          })
+          .finally(() => {
+            // set is fetching to false
+            setIsFetching(false);
+        });
+
+  }
 
      // handle width of the filter search
      const handleFilterWidth=()=>{
@@ -97,52 +147,85 @@ export default function AlertFilterFeed({
           scrollbarWidth: "none",
           }}
          >
-     
-          {/* radio button selection */}
-          <FormControl>
-          <FormLabel id="demo-radio-buttons-group-label">
-            {body}:
-          </FormLabel>
-          <Divider className="pt-2" component={'div'}/>
-          <RadioGroup
-            aria-labelledby="demo-radio-buttons-group-label"
-            defaultValue={feedData[0]}
-            name="radio-buttons-group"
-          >
-            {feedData?.map(data=>(
-              <Box key={data}>
-              <Box 
-              display={'flex'}
-              alignItems={'center'}
-              gap={2}
-              >
-                {/* icon */}
-                <CourseIcon option={data} />
-                
-                {/* radio button */}
-              <FormControlLabel 
-              key={data}
-              value={data} 
-              control={<Radio />} 
-              label={data} />
-              </Box>
-              <Divider 
-              component={'div'}/>
+          {isFetching ? (
+            <Box width={'100%'} height={'15vh'} display={'flex'} justifyContent={'center'}>
+              <Stack justifyContent={'center'} gap={2} width={'100%'}>
+                {/* loader */}
+                <Box display={'flex'} justifyContent={'center'}>
+              <CircularProgress size={30}/>
+                </Box>
+              {/* text */}
+              <Typography textAlign={'center'} variant="body2">
+               Loading Content...
+              </Typography>
+              </Stack>
             </Box>
-            ))
+          ):(
+          <FormControl component="fieldset" variant="standard">
+            {/* message helper text info, error */}
+            {errorMessage && 
+            <Box display={'flex'} justifyContent={'center'}>
+          <FormHelperText className={"mb-1 text-warning fw-bold"}>
+            {errorMessage}
+            </FormHelperText>
+            </Box>
             }
 
-          </RadioGroup>
+            {/* form data checkboxes */}
+          <FormGroup>
+          {feedData?.map(data=>(
+            <Box key={data}>
+            <Box 
+            display={'flex'}
+            alignItems={'center'}
+            gap={2}
+            >
+              {/* icon */}
+              <CourseIcon option={data} />
+              
+            {/* radio button */}
+            <FormControlLabel 
+            value={data} 
+            control={<Checkbox 
+              onChange={handleChange}
+               name={data} 
+               checked={selectedOptions.includes(data)}
+               />} 
+            label={
+              <Typography 
+              color={selectedOptions.includes(data) && 'primary'}
+              variant="body2"
+              >
+                {data}
+              </Typography>
+            } />
+            </Box>
+            <Divider 
+            component={'div'}/>
+          </Box>
+          ))
+          }
+          </FormGroup>
+          {!errorMessage &&
+           <FormHelperText className={"mt-2"}>
+           selection search results will be loaded in the feed
+            </FormHelperText>
+          }
           </FormControl>
-
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDismiss}>Back</Button>
+          <Button 
+           onClick={handleDismiss}
+           disabled={isFetching}
+           >
+            Close
+          </Button>
           <Button
-            disabled={customTitle.trim() === ""}
-            onClick={handleEnterInfo}
+          onClick={handleEnter}
+          disabled={selectedOptions?.length<1 || isFetching}
           >
-            Enter
+            Sort
           </Button>
         </DialogActions>
       </Dialog>

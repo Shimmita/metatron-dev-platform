@@ -1,10 +1,14 @@
 import {
   Diversity1Rounded,
   GradeRounded,
+  InfoOutlined,
   LaptopRounded,
   Message,
+  PeopleRounded,
   PersonAdd,
   PersonRemove,
+  Star,
+  UploadRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -22,18 +26,18 @@ import Tabs from "@mui/material/Tabs";
 import axios from "axios";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import devImage from "../../../images/dev.jpeg";
 import {
   resetClearShowMessageInput,
   resetDefaultBottomNav,
 } from "../../../redux/AppUI";
 import { updateMessageConnectRequest } from "../../../redux/CurrentSnackBar";
+import { updateUserCurrentUserRedux } from "../../../redux/CurrentUser";
+import PostDetailsInDrawer from "../../post/PostDetailsInDrawer";
 import SnackbarConnect from "../../snackbar/SnackbarConnect";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import { getImageMatch } from "../../utilities/getImageMatch";
-import UserNetwork from "../UserNetwork";
-import { updateUserCurrentUserRedux } from "../../../redux/CurrentUser";
-import PostDetailsInDrawer from "../../post/PostDetailsInDrawer";
+import UserPostFavoriteContainer from "./UserPostFavoriteContainer";
+const UserNetwork =lazy(()=>import("../UserNetwork")) ;
 const PostDetailsContainer = lazy(() =>
   import("../../post/PostDetailsContiner")
 );
@@ -63,7 +67,6 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
     fontWeight: theme.typography.caption,
     fontSize: theme.typography.pxToRem(13),
     padding: theme.typography.pxToRem(2),
-
     color: "gray",
     "&.Mui-selected": {
       color: "primary",
@@ -116,6 +119,7 @@ export default function UserProfileDrawer({ profileData }) {
     setProfileSection(newValue);
   };
 
+
   // for checking user relationships
   useEffect(() => {
     // map through ids of friends if the current user network
@@ -125,8 +129,7 @@ export default function UserProfileDrawer({ profileData }) {
     }
   }, [profileData, user]);
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
+
 
   // redux to stop showing of the speed dial
   const dispatch = useDispatch();
@@ -296,10 +299,8 @@ export default function UserProfileDrawer({ profileData }) {
     <Box
       color={"text.primary"}
       borderRadius={2} 
-      maxHeight={'90vh'}    
+      maxHeight={'90vh'}   
       sx={{
-        border: "1px solid",
-        borderColor: "divider",
         overflowX: "auto",
         // Hide scrollbar for Chrome, Safari and Opera
         "&::-webkit-scrollbar": {
@@ -535,7 +536,8 @@ export default function UserProfileDrawer({ profileData }) {
             </Box>
 
             <Divider component={"div"} />
-            <Box className="mt-1 d-flex justify-content-center align-items-center">
+            
+            <Box className="d-flex justify-content-center align-items-center">
               <StyledTabs
                 value={profileSection}
                 onChange={handleChange}
@@ -543,30 +545,89 @@ export default function UserProfileDrawer({ profileData }) {
               >
                 {/* posts made by the user */}
                 <StyledTab
-                  className="pe-5"
+                  className="pe-2"
                   label={
+                    <Box 
+                    display={'flex'}
+                    gap={0.5}
+                    alignItems={'center'}
+                    >
+                      {/* icon */}
+                      <UploadRounded 
+                      sx={{ width:22,height:22 }}/>
+                      {/* text */}
                     <Typography fontWeight={'bold'} variant="body2">
-                      Post
+                      Posted
                     </Typography>
+                    </Box>
+                  }
+                />
+
+              {/* favorite posts */}
+              <StyledTab
+                  className="ps-2"
+                  label={
+                    <Box 
+                    display={'flex'}
+                    gap={0.5}
+                    alignItems={'center'}
+                    >
+                      {/* icon */}
+                      <Star 
+                      sx={{ width:18,height:18 }}
+                      />
+                      {/* text */}
+                    <Typography
+                     fontWeight={'bold'}
+                      variant="body2">
+                      Favorite
+                    </Typography>
+                    </Box>
                   }
                 />
 
                 {/* user's connections of people */}
                 <StyledTab
-                  className="pe-3 ps-3"
+                  className="ps-2"
                   label={
-                    <Typography fontWeight={'bold'}  variant="body2">
-                      Connection
+                    <Box 
+                    display={'flex'}
+                    gap={0.5}
+                    alignItems={'center'}
+                    >
+                      {/* icon */}
+                      <PeopleRounded
+                      sx={{ width:18,height:18 }}
+                      />
+                      {/* text */}
+                    <Typography
+                     fontWeight={'bold'}
+                      variant="body2">
+                      People
                     </Typography>
+                    </Box>
                   }
                 />
 
                 {/* info more about the user */}
                 <StyledTab
                   label={
-                    <Typography fontWeight={'bold'} className="ps-5" variant="body2">
+                    <Box 
+                    display={'flex'}
+                    gap={0.5}
+                    alignItems={'center'}
+                    >
+                      {/* icon */}
+                      <InfoOutlined
+                      sx={{ width:18,height:18 }}
+                      />
+                      {/* text */}
+                    <Typography
+                     fontWeight={'bold'}
+                      variant="body2">
                       About
                     </Typography>
+                    </Box>
                   }
                 />
               </StyledTabs>
@@ -628,8 +689,10 @@ export default function UserProfileDrawer({ profileData }) {
                 {/* content of each tab goes here */}
                 <Box>
                   <Suspense fallback={<div>loading...</div>}>
-                    {/* posts made by the user */}
-                    {profileSection === 0 && (
+                    {/* posts made by the user, and also favorite posts added by 
+                    the user 
+                    */}
+                    {(profileSection === 0 ) && (
                       <UserPostContainDrawer
                         userId={profileData?._id}
                         setPostDetailedData={setPostDetailedData}
@@ -637,15 +700,26 @@ export default function UserProfileDrawer({ profileData }) {
                         setIsPostDetailedDrawer={setIsPostDetailedDrawer}
                       />
                     )}
-                    {/* user network of people */}
+
+                    {/* show user favorite */}
                     {profileSection === 1 && (
+                      <UserPostFavoriteContainer
+                      userId={profileData?._id}
+                      setPostDetailedData={setPostDetailedData}
+                      setIsPostEditMode={setIsPostEditMode}
+                      setIsPostDetailedDrawer={setIsPostDetailedDrawer}
+                      />
+                    )}
+
+                    {/* user network of people */}
+                    {profileSection === 2 && (
                       <UserNetwork
                         otherUserID={!isCurrentUser ? profileData?._id : null}
                       />
                     )}
 
                     {/* about view */}
-                    {profileSection === 2 && (
+                    {profileSection === 3 && (
                       <UserAbout profileData={profileData} />
                     )}
                   </Suspense>

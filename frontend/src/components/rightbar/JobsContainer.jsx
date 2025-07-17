@@ -1,11 +1,12 @@
-import { WorkRounded } from "@mui/icons-material";
-import { Box, Typography } from "@mui/material";
+import { InfoRounded, WorkRounded } from "@mui/icons-material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import List from "@mui/material/List";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentJobsTop } from "../../redux/CurrentJobsTop";
 import FeaturedJobs from "./layouts/FeaturedJobs";
+import AlertGeneral from "../alerts/AlertGeneral";
 
 export default function JobsContainer() {
   // screen width of the device
@@ -14,13 +15,12 @@ export default function JobsContainer() {
   const { user } = useSelector((state) => state.currentUser);
   const { jobsTop } = useSelector((state) => state.currentJobsTop);
   const [isFetching, setIsFetching] = useState(false);
+  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
   const [errorMessage, setErrorMessage] = useState("");
+  
   
   // dispatch
   const dispatch = useDispatch();
-
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   // fetch posts from the backend
   useEffect(() => {
@@ -44,14 +44,8 @@ export default function JobsContainer() {
       })
       .catch(async (err) => {
         console.log(err);
-
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage(
-            "Server is unreachable check your internet connection"
-          );
-          return;
-        }
         setErrorMessage(err?.response.data);
+        setOpenAlertGeneral(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -88,7 +82,11 @@ export default function JobsContainer() {
           <Typography fontWeight={"bold"} color={"primary"}>
             FEATURED JOBS
           </Typography>
-          <WorkRounded color="primary" sx={{ width: 20, height: 20 }} />
+          {isFetching ? (
+            <CircularProgress size={16}/>
+          ):(
+            <WorkRounded color="primary" sx={{ width: 20, height: 20 }} />
+          )}
         </Box>
       </Box>
       <List
@@ -99,13 +97,30 @@ export default function JobsContainer() {
         }}
       >
         <Box>
-          {jobsTop?.map((jobTop) => (
+          {jobsTop?.map((jobTop,index) => (
             <Box key={jobTop?._id}>
-              <FeaturedJobs isLoading={isFetching} jobTop={jobTop} />
+              <FeaturedJobs 
+              isLastIndex={index===jobsTop?.length-1}
+              isLoading={isFetching} 
+              jobTop={jobTop} />
             </Box>
           ))}
         </Box>
       </List>
+
+      {/* alert general of the error message */}
+      {errorMessage && (
+        <AlertGeneral
+        title={'something went wrong!'}
+        message={errorMessage}
+        isError={true}
+        openAlertGeneral={openAlertGeneral}
+        setOpenAlertGeneral={setOpenAlertGeneral}
+        setErrorMessage={setErrorMessage}
+        defaultIcon={<InfoRounded/>}
+        />
+      )}
+
     </React.Fragment>
   );
 }

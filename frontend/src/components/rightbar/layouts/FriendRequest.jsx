@@ -19,7 +19,6 @@ import ListItemText from "@mui/material/ListItemText";
 import axios from "axios";
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import devImage from "../../../images/dev.jpeg";
 import { updateCurrentConnectID } from "../../../redux/CurrentConnect";
 import { updateCurrentConnectNotifID } from "../../../redux/CurrentConnectNotif";
 import { updateMessageConnectRequest } from "../../../redux/CurrentSnackBar";
@@ -38,10 +37,7 @@ function FriendRequest({
 }) {
   const [showMiniProfile, setShowMiniProfile] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
-
   const dispatch = useDispatch();
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   // redux states
   const { user } = useSelector((state) => state.currentUser);
@@ -208,6 +204,9 @@ function FriendRequest({
 
   // check if the user is the current user
   const isCurrentUser = connectRequestID === currentUserId;
+
+
+
   return (
     <React.Fragment>
       {isLoadingRequest ? (
@@ -252,10 +251,13 @@ function FriendRequest({
             <ListItemAvatar onClick={handleShowMiniProfile}>
               {isAcceptFriends ? (
                 <Avatar
-                  src={devImage}
+                 variant="rounded"
+                  src={connect_request?.avatar}
                   sx={{
                     backgroundColor: "#1976D2",
                     color: "white",
+                    width: 40,
+                    height: 40,
                   }}
                   alt={connect_request?.name?.split(" ")[0]}
                   aria-label="avatar"
@@ -263,7 +265,7 @@ function FriendRequest({
               ) : (
                 <Tooltip title={'profile'} arrow>
                   <Avatar
-                  src={devImage}
+                  src={connect_request?.avatar}
                   variant="rounded"
                   sx={{
                     backgroundColor: "#1976D2",
@@ -374,7 +376,8 @@ function FriendRequest({
                             color="primary"
                             onClick={handleAcceptConnectRequestFriends}
                           >
-                            <PersonAddRounded sx={{ width: 18, height: 18 }} />
+                            <PersonAddRounded 
+                             sx={{ width: 18, height: 18 }} />
                           </IconButton>
                         </Tooltip>
 

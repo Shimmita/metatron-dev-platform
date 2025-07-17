@@ -282,28 +282,27 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
                       </Box>
               
                       {/* send comment button icon */}
-                      <Box className=" rounded ms-1 pe-1" alignContent={"center"}>
-                          {isUploading ? (
-                          <CircularProgress size={17} />
-                          ) : (
-                          <Badge badgeContent={`${MAX_TEXT_LENGTH - comment.length}`}>
-                              <IconButton
-                              disabled={comment.length > MAX_TEXT_LENGTH || comment.length<1}
-                              onClick={handleSendCommentNow}
-                              >
-                              <SendOutlined
-                                  color={comment.length <= MAX_TEXT_LENGTH ? "primary" : "inherit"}
-                                  sx={{ width: 18, height: 18 }}
-                              />
-                              </IconButton>
-                          </Badge>
-                          )}
-                      </Box>
-                      </Box>
-
+                  <Box className=" rounded ms-1 pe-1" alignContent={"center"}>
+                      {isUploading ? (
+                      <CircularProgress size={17} />
+                      ) : (
+                      <Badge badgeContent={`${MAX_TEXT_LENGTH - comment.length}`}>
+                          <IconButton
+                          disabled={comment.length > MAX_TEXT_LENGTH || comment.length<1}
+                          onClick={handleSendCommentNow}
+                          >
+                          <SendOutlined
+                              color={comment.length <= MAX_TEXT_LENGTH ? "primary" : "inherit"}
+                              sx={{ width: 18, height: 18 }}
+                          />
+                          </IconButton>
+                      </Badge>
+                      )}
+                  </Box>
+                  </Box>
 
             </Box>
-                </Box>
+            </Box>
       </StyledModalJob>
     );
   };

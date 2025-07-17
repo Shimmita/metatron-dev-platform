@@ -1,5 +1,4 @@
-import { ErrorOutline } from "@mui/icons-material";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,7 +12,6 @@ import {
   resetClearCurrentPosts,
   updateCurrentPosts,
 } from "../../redux/CurrentPosts";
-import AlertGeneral from "../alerts/AlertGeneral";
 import CardFeed from "../custom/CardFeed";
 import PostDetailsContainer from "../post/PostDetailsContiner";
 import MobileTabCorousel from "../rightbar/MobileTabCorousel";
@@ -23,15 +21,15 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 const FeedDefaultContent = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [openGeneralAlert,setOpenGeneralAlert]=useState()
+  const [pageNumber,setPageNumber]=useState(1)
+
 
   // will be used when the post is focused for full details
   const [postDetailedData, setPostDetailedData] = useState();
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   // redux states
   const dispatch = useDispatch();
+
   // redux states access
   const { posts } = useSelector((state) => state.currentPosts);
 
@@ -39,7 +37,6 @@ const FeedDefaultContent = () => {
     (state) => state.appUI
   );
   const isDarkMode=currentMode==='dark'
-
 
   // show speed dial if ain't visible
   if (!isDefaultSpeedDial) {
@@ -76,6 +73,8 @@ const FeedDefaultContent = () => {
         // update the redux of current post
         if (res?.data) {
           dispatch(updateCurrentPosts(res.data));
+        // update the page number for the next fetch
+        setPageNumber((prev)=>prev+1)
         } 
       })
       .catch((err) => {
@@ -90,7 +89,6 @@ const FeedDefaultContent = () => {
           return;
         }
         setErrorMessage(err?.response.data);
-        setOpenGeneralAlert(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -197,14 +195,20 @@ const FeedDefaultContent = () => {
               posts?.map((post, index) => {
                 return (
                   <Box key={post?._id}>
-                    <Box>
+                    <Stack justifyContent={'center'}>
                       {/* feed card detailed post */}
                       <CardFeed
                         post={post}
+                        posts={posts}
                         isLastIndex={index===posts?.length-1}
                         setPostDetailedData={setPostDetailedData}
+                        pageNumber={pageNumber}
+                        setPageNumber={setPageNumber}
+                        errorMessage={errorMessage}
+                        setErrorMessage={setErrorMessage}
                       />
-                    </Box>
+                     
+                    </Stack>
                   </Box>
                 );
               })}
@@ -212,20 +216,6 @@ const FeedDefaultContent = () => {
         </Box>
       )}
 
-      {/* alert general error */}
-
-      {openGeneralAlert && (
-        <AlertGeneral 
-        openAlertGeneral={openGeneralAlert}
-        setOpenAlertGeneral={setOpenGeneralAlert}
-        setErrorMessage={setErrorMessage}
-        isError={true}
-        title={"Error"}
-        message={errorMessage}
-        defaultIcon={<ErrorOutline/>}
-
-        />
-      )}
     
 
     </Box>

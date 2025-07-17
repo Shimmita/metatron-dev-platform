@@ -2,19 +2,24 @@ import {
   FavoriteRounded,
   ForumRounded,
   GitHub,
+  InfoRounded,
   MoreVertRounded,
+  RefreshOutlined,
   VerifiedRounded,
   WbIncandescentRounded
 } from "@mui/icons-material";
 import {
   Avatar,
+  AvatarGroup,
   Box,
+  Button,
   Card,
   CardActionArea,
   CardContent,
   CardHeader,
   Checkbox,
   CircularProgress,
+  FormHelperText,
   IconButton,
   ListItemAvatar,
   Menu,
@@ -27,7 +32,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch, useSelector } from "react-redux";
 import { handleUpdateIsPostDetailed } from "../../redux/AppUI";
-import { updateCurrentPostDetails } from "../../redux/CurrentPosts";
+import { updateCurrentPostDetails, updateCurrentPosts } from "../../redux/CurrentPosts";
+import AlertGeneral from "../alerts/AlertGeneral";
 import AlertMiniProfileView from "../alerts/AlertMiniProfileView";
 import AlertReportPost from "../alerts/AlertReportPost";
 import SnackbarConnect from "../snackbar/SnackbarConnect";
@@ -37,12 +43,20 @@ import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
 import CardFeedMore from "./CardFeedMore";
 
-const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
+const CardFeed = ({ 
+    post, 
+    posts,
+    setPostDetailedData,
+   isLastIndex=false,
+   setPageNumber,
+   pageNumber,
+   errorMessage, 
+   setErrorMessage
+  }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
   const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
@@ -52,9 +66,14 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
   const [messageMore, setMessageMore] = useState("");
   const [openAlertReport, setOpenAlertReport] = useState(false);
   const [postWholeReport, setPostWholeReport] = useState("");
+  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
   // control more option
   const handleClickMoreVertPost = (event) => setAnchorEl(event.currentTarget);
   const handleCloseMenu = () => setAnchorEl(null);
+
+  // track progress of fetching more data
+  const [isFetching,setIsFetching]=useState(false)
+  const [hasMorePosts,setHasMorePosts]=useState(true)
 
 
   // redux states
@@ -93,7 +112,7 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
   );
 
   // controls the length of description shown for each devices
-  const max_description = CustomDeviceIsSmall() || CustomLandScape() ?  230 : 250;
+  const max_description = CustomDeviceIsSmall() || CustomLandScape() ?  233 : 260;
 
   const details = post?.post_body || "";
   const detailsLong = details.length > max_description;
@@ -183,12 +202,13 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
         }
         if (res.data.reaction === "disliked") {
           // update the returned post object to reflect in the global redux
-
           dispatch(updateCurrentPostDetails(res.data.post));
         }
       })
       .catch(async (err) => {
         console.log(err);
+        setOpenAlertGeneral(true)
+        setErrorMessage(err?.response.data);
       })
       .finally(() => {
         setIsProcessingPost(false);
@@ -222,6 +242,8 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
       })
       .catch(async (err) => {
         console.log(err);
+        setOpenAlertGeneral(true)
+        setErrorMessage(err?.response.data);
       })
       .finally(() => {
         setIsProcessingPost(false);
@@ -262,20 +284,51 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
   }, []);
 
 
-    // handle max text width
-    const handleMaxTextWidth=()=>{
-      if (CustomLandscapeWidest()) {
-        return "90%"
-      }else if(CustomDeviceTablet()){
-        return "95%"
-      } else if(CustomLandScape()){
-        return "93%"
-      }
-  
-      return "98%"
-    }
+  // handle fetching of more data when load more button clicked
+  const handleFetchMoreData=()=>{
+    // fetching to true
+    setIsFetching(true)
+    // axios api call to fetch more data
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all?page=${pageNumber}&limit=10`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        // update the redux of current post
+        if (res?.data) {
+          // more data update redux
+          if (res.data.length>0) {
+          dispatch(updateCurrentPosts([...posts,...res.data]));  
+          }else{
+            // are no more posts from the backend
+            setHasMorePosts(false)
+          }
+        } 
+
+        // update the page number for the next fetch
+        setPageNumber((prev)=>prev+1)
+      })
+      .catch((err) => {
+        //  user login session expired show logout alert
+        if (err?.response?.data.login) {
+          window.location.reload();
+        }
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage(
+            "server unreachable"
+          );
+          return;
+        }
+        setErrorMessage(err?.response.data);
+        setOpenAlertGeneral(true)
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  }
 
 
+ 
     // handle image width
     const handleImageWidth=()=>{
       if(CustomDeviceIsSmall()){
@@ -291,7 +344,7 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
     <React.Fragment>
       <Box
       className={'rounded'}
-        mb={isLastIndex ? 6 :3}
+        mb={isLastIndex ? 8 :3}
         sx={{
           border:"1px solid",
           borderColor: "divider",
@@ -309,6 +362,7 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
                 sx={{
                   width: 50,
                   height: 50,
+                  color: "white",
                 }}
                 alt={''}
               >
@@ -323,10 +377,13 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
                   mt={1}
                   alignItems={"center"}
                 >
-                  <Typography variant="caption" mr={postBelongsCurrentUser ? 2:0.5}>
+                  {/* created time */}
+                  <Typography pt={0.5} variant="caption" mr={postBelongsCurrentUser ? 2:1}>
                     {getElapsedTime(post?.createdAt)}
                   </Typography>
 
+
+                  {/* more icon  */}
                   {!postBelongsCurrentUser && (
                     <Tooltip title="more" arrow>
                       <IconButton
@@ -400,16 +457,6 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
                     ? handleOccupation()
                     : `${post?.post_owner.ownertitle}`}
                 </Typography>
-                {/* skills */}
-                <Typography
-                  variant="body2"
-                  display={"flex"}
-                  alignItems={"center"}
-                >
-                  {post?.post_owner.ownerskills[0]} |{" "}
-                  {post?.post_owner.ownerskills[1]} |{" "}
-                  {post?.post_owner.ownerskills[2]}
-                </Typography>
                 {/* location */}
                 <Typography
                   variant="body2"
@@ -419,13 +466,32 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
                   {CustomCountryName(post?.post_location.country)} |{" "}
                   {post?.post_location.state}{" "}
                 </Typography>
+                {/* skills */}
+                <Box display={"flex"} mt={0.5}>
+                  <AvatarGroup max={post?.post_owner.ownerskills.length}>
+                    {/* loop through the skills and their images matched using custom fn */}
+                    {post?.post_owner.ownerskills?.map((skill) => (
+                      <Tooltip title={skill} key={skill} arrow>
+                        <Avatar
+                          alt={skill}
+                          className={!isDarkMode && 'border'}
+                          sx={{ 
+                            width: 24,
+                             height: 24,
+                            }}
+                          src={getImageMatch(skill)}
+                        />
+                      </Tooltip>
+                    ))}
+                  </AvatarGroup>
+                </Box>
               </Box>
             }
           />
 
-          <Box>
+          <Box mt={1}>
             <CardContent>
-              <Box mb={2} width={"100%"}>
+              <Box mb={1.5} width={"100%"}>
                 <Box mb={1}>
                   {/* post specialization */}
                   <Typography
@@ -463,18 +529,37 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
                     }}
                   />
                 </Box>
-
+       
               </Box>
               <CardActionArea
                 onClick={handleFullDescription}
                 disabled={!detailsLong}
               >
-                <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+                <Box display={"flex"} 
+                justifyContent={"center"}
+                 width={"100%"}
+                 flexDirection={'column'}
+                 >
+                  {/* times added to favorite */}
+                  {post?.favorite_count>0 && 
+                  <Box 
+                  display={'flex'}
+                  justifyContent={'center'}
+                  >
+                  <FormHelperText className={isDarkMode ? 'text-info':'text-success'}>
+                  {post?.favorite_count} added this to their favorite
+                  </FormHelperText>
+                  </Box>}
+                  {/* post details */}
+                  <Box 
+                  mt={1}
+                  width={'100%'}
+                  display={'flex'} 
+                  justifyContent={'center'}>
                   <Typography
                     variant={"body2"}
                     color={isDarkMode && 'text.secondary'}
-                    sx={{ fontSize:'small' }}
-                    maxWidth={handleMaxTextWidth()}
+                    sx={{ fontSize:'small',textWrap:'pretty' }}
                   >
                     {!isFullDescription && handleDetailsLength()}
                     {detailsLong && !isFullDescription && (
@@ -485,18 +570,25 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
                         color={"primary"}
                         sx={{ fontSize:'small' }}
                       >
-                        ... &nbsp;more
+                        &nbsp;... 
                       </Typography>
                     )}
                     {isFullDescription && details}
                   </Typography>
+                  </Box>
                 </Box>
               </CardActionArea>
             </CardContent>
-            <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+            <Box 
+            px={1}
+            display={"flex"} 
+            flexDirection={'column'}
+            justifyContent={"center"} 
+            width={"100%"}>
+              {/* image container */}
               <Box
                 sx={{
-                  width: "92%",
+                  width: "100%",
                   display: "flex",
                   justifyContent: "center",
                 }}
@@ -516,8 +608,7 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
                 />
               </Box>
             </Box>
-
-          
+   
           </Box>
 
           <Box
@@ -599,7 +690,55 @@ const CardFeed = ({ post, setPostDetailedData, isLastIndex=false }) => {
             ))}
           </Box>
         </Card>
+
+        {/* show button fetch more if its the last item */}
+        {isLastIndex && (
+          <Box 
+          justifyContent={'center'}
+          display={'flex'}
+          flexDirection={'column'}
+          p={1}
+          sx={{ 
+            borderTop:isDarkMode && '1px solid',
+            borderColor: "divider",
+           }}
+          >
+          <Button 
+          startIcon={isFetching ? <CircularProgress size={14}/>:<RefreshOutlined/>}
+          size="small"
+          className="fw-bold"
+          onClick={handleFetchMoreData}
+          disabled={isFetching}
+          >
+            Load More
+            </Button>
+
+            {/* displayed when no more posts are available from the backend */}
+            {!hasMorePosts && (
+              <Box 
+              justifyContent={'center'}
+              display={'flex'}>
+              <FormHelperText>
+              -- no more posts from the backend --
+              </FormHelperText>
+              </Box>
+            )}
+          </Box>
+        )}
       </Box>
+
+       {/* alert general of the error message */}
+        {errorMessage && (
+          <AlertGeneral
+          title={'something went wrong!'}
+          message={errorMessage}
+          isError={true}
+          openAlertGeneral={openAlertGeneral}
+          setOpenAlertGeneral={setOpenAlertGeneral}
+          setErrorMessage={setErrorMessage}
+          defaultIcon={<InfoRounded/>}
+          />
+        )}
 
       {/* show alert report a post  */}
       {openAlertReport && (

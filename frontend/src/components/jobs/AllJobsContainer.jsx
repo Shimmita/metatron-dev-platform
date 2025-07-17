@@ -159,7 +159,7 @@ const Drawer = styled(MuiDrawer, {
       [theme.breakpoints.up('sm')]: {
         width: '12ch',
         '&:focus': {
-          width: '20ch',
+          width: '15ch',
         },
       },
     },
@@ -182,7 +182,6 @@ export default function MiniDrawer() {
     (state) => state.appUI
   );
   const isDarkMode=currentMode==='dark'
-
 
 
   const { jobs } = useSelector((state) => state.currentJobs);
@@ -215,8 +214,6 @@ export default function MiniDrawer() {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
   
   const [openAlert, setOpenAlert] = useState(false);
 
@@ -230,6 +227,14 @@ export default function MiniDrawer() {
     setIsDrawerPane((prev) => !prev);
   };
 
+  // false right bar is no of use this route
+  useLayoutEffect(()=>{
+     // updating right bar show false
+     if (isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+  },[dispatch,isSidebarRighbar])
+  
 
   // show the notification and messaging triggered by redux
   const handleShowMessageDrawer = () => {
@@ -251,15 +256,6 @@ export default function MiniDrawer() {
     dispatch(handleShowingSpeedDial(false));
   }
 
-  // false right bar is no of use this route
-  useLayoutEffect(()=>{
-     // updating right bar show false
-     if (isSidebarRighbar) {
-      dispatch(handleSidebarRightbar());
-    }
-  },[dispatch,isSidebarRighbar])
-  
-  
 
   // use effect for fetching jobs
   // fetch job posts from the backend (all,verified,nearby,recommended etc)
@@ -307,7 +303,7 @@ export default function MiniDrawer() {
           }
           if (err?.code === "ERR_NETWORK") {
             setErrorMessage(
-              "server unreachable please try again later to complete your request"
+              "server unreachable"
             );
             return;
           }
@@ -391,7 +387,7 @@ export default function MiniDrawer() {
     }
 
     // handle getting of the recommended jobs from backend
-    if (textOption === "Recommend") {
+    if (textOption === "Recommended") {
 
       const userSkills=user?.selectedSkills
       
@@ -577,7 +573,7 @@ export default function MiniDrawer() {
         display={"flex"} 
         height={(CustomLandScape()|| CustomLandscapeWidest()) ?"86vh":"90vh"}
          sx={{
-          width:window.screen.availWidth-32,
+          width:isMyStats ? window.screen.availWidth-32:undefined,
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -616,13 +612,36 @@ export default function MiniDrawer() {
               </Box>
 
               {/* main jobs title and the current selection */}
-              <Box width={"100%"}>
+              {CustomDeviceIsSmall() ? (
+                <Box width={"100%"}>
                 <Typography
                   noWrap
                   component="div"
                   textAlign={"center"}
                   textTransform={"uppercase"}
-                  ml={open && 22}
+                >
+                  Metatron
+                </Typography>
+
+                {/* current navigation counter */}
+                <Box display={"flex"} justifyContent={"center"}>
+                  <Typography 
+                  variant="caption"
+                   textTransform={'capitalize'}
+                   >
+                    {textOption} 
+                  </Typography>
+                </Box>
+              </Box>
+              ):(
+                <Box width={"100%"}>
+                <Typography
+                  noWrap
+                  component="div"
+                  textAlign={"center"}
+                  textTransform={"uppercase"}
+                  
+                  ml={open ? 30: 24}
                 >
                   Metatron Jobs
                 </Typography>
@@ -632,13 +651,17 @@ export default function MiniDrawer() {
                   <Typography 
                   variant="caption"
                    textTransform={'capitalize'}
-                   ml={open && 22}>
+                   ml={open ? 30: 24}>
                     - {textOption} -
                   </Typography>
                 </Box>
               </Box>
-
-              <Box display={'flex'} gap={2} alignItems={'center'} justifyContent={'flex-end'}>
+              )}
+              <Box 
+               display={'flex'}
+                gap={2} 
+                alignItems={'center'} 
+                justifyContent={'flex-end'}>
                 {/* displayed on tabs and big screens */}
                 {!CustomDeviceIsSmall() && (
                    <Search>
@@ -658,7 +681,7 @@ export default function MiniDrawer() {
                   <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
                   <DarkModeRounded
                 
-                    sx={{ color: "white", height:25, width:25 }}
+                    sx={{ color: "white", height:24, width:24,}}
                   />
                 </Tooltip> 
                 </IconButton>
@@ -671,7 +694,7 @@ export default function MiniDrawer() {
                     onClick={handleShowMessageDrawer}
                   >
                     <NotificationsRounded
-                      sx={{ width: 25, height: 25, color: "white" }}
+                      sx={{ width: 24, height: 24, color: "white" }}
                     />
                   </IconButton>
                 </Tooltip>
@@ -701,7 +724,7 @@ export default function MiniDrawer() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                backgroundColor:"#1976D2"
+                backgroundColor:isDarkMode ? '#272727' :"#1976D2"
               }}
             >
               {!open && (
@@ -732,7 +755,7 @@ export default function MiniDrawer() {
              sx={{color:'white'}} 
              mb={1}
              textTransform={'uppercase'}>
-               jobseeker
+               Job Hunter
              </Typography>
              <Typography variant="caption" 
               sx={{color:'white'}} 
@@ -764,7 +787,7 @@ export default function MiniDrawer() {
                 "Search Jobs",
                 "Verified Jobs",
                 "Nearby Jobs",
-                "Recommend",
+                "Recommended",
                 "Applications",
                 "My Statistics",
               ].map((text, index) => (
@@ -922,7 +945,7 @@ export default function MiniDrawer() {
                 {(textOption === "Explore Jobs" ||
                   textOption === "Nearby Jobs" ||
                   textOption === "Verified Jobs" ||
-                  textOption === "Recommend" ||
+                  textOption === "Recommended" ||
                   textOption === "Applications"||
                   textOption === "My Statistics" ||
                   textOption === "Search Jobs") && (
@@ -940,9 +963,8 @@ export default function MiniDrawer() {
                     ) : (
                       <React.Fragment>
                         {/* rendered when are jobs greater than 1 */}
-                        {jobs &&
-                          jobs?.length > 0 &&
-                          jobs?.map((job) => (
+                        {jobs?.length > 0 &&
+                          jobs?.map((job,index) => (
                             <>
                               {/* if is stats displays different layout else job layout */}
                               {isMyStats ? (
@@ -953,19 +975,16 @@ export default function MiniDrawer() {
                                 user={user}
                               />
                               ):(
+                                <Box 
+                                mt={4} 
+                                key={job?._id}>
                                 <JobLayout
-                                key={job?._id}
                                 isDarkMode={isDarkMode}
                                 job={job}
                               />
+                              </Box>
                               )}
-                              {/* divider for small devices */}
-                              {CustomDeviceIsSmall() && (
-                                <Divider
-                                  className="mb-2 w-100"
-                                  component={"div"}
-                                />
-                              )}
+                           
                             </>
                           ))}
                       </React.Fragment>
@@ -1004,8 +1023,19 @@ export default function MiniDrawer() {
              isFullView={true}
            />
           )}
+          {/* alert general of the error message */}
+          {errorMessage && (
+            <AlertGeneral 
+            title={'something went wrong!'}
+            message={errorMessage}
+            isError={true}
+            openAlertGeneral={errorMessage}
+            setOpenAlertGeneral={setOpenAlertGeneral}
+            setErrorMessage={setErrorMessage}
+            defaultIcon={<InfoRounded/>}
+            />
+          )}
          
-
           {/* show success snackbar when redux snack state is updated */}
           {messageSnack && <SnackBarSuccess message={messageSnack} />}
         </Box>

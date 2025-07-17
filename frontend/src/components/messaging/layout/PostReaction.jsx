@@ -21,28 +21,34 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import devLogo from '../../../images/dev.jpeg';
 import { showMessagingDrawer } from "../../../redux/AppUI";
 import { deleteCurrentPostReaction } from "../../../redux/CurrentPostReactions";
 import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
-import CustomCountryName from "../../utilities/CustomCountryName";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
-import devLogo from '../../../images/dev.jpeg'
+import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
+import CustomCountryName from "../../utilities/CustomCountryName";
 
 export default function PostReaction({ reaction }) {
   const [isFetching, setIsFetching] = useState(false);
+  const [showMiniProfile, setShowMiniProfile] = useState(false);
+  
   const navigate = useNavigate();
 
   // dispatch for redux functionalities
   const dispatch = useDispatch();
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
-
   // getting the current reactionID
   const { _id } = reaction;
+
+
+  // handle showing of the user profile
+  const handleShowMiniProfile = useCallback(() => {
+    setShowMiniProfile(true);
+  }, []);
 
   // handle deletion of the current notification post_reaction
   const handleDeleteReaction = () => {
@@ -97,16 +103,19 @@ export default function PostReaction({ reaction }) {
              border: "1px solid",
              borderColor: "divider",
            }}>
-            <ListItemAvatar>
-              <Avatar variant="rounded" src={devLogo} alt="">
-                <Typography
-                  variant="body2"
-                  textTransform={"uppercase"}
-                  fontWeight={"bold"}
-                >
-                  {reaction?.name[0]}
-                </Typography>
-              </Avatar>
+            <ListItemAvatar onClick={handleShowMiniProfile}>
+            <Avatar
+                 variant="rounded"
+                  src={reaction?.avatar}
+                  sx={{
+                    backgroundColor: "#1976D2",
+                    color: "white",
+                    width: 40,
+                    height: 40,
+                  }}
+                  alt={reaction?.name?.split(" ")[0]}
+                  aria-label="avatar"
+                />
             </ListItemAvatar>
             <ListItemText
               primary={
@@ -170,7 +179,7 @@ export default function PostReaction({ reaction }) {
                       {reaction?.title}
                       <br/>
                       <Typography variant="caption" color={"text.secondary"}>
-                        {reaction?.country} | {reaction?.county}
+                        {CustomCountryName(reaction?.country)} | {reaction?.county}
                       </Typography>
                       <br/>
                        {reaction?.message?.toLowerCase().includes("liked") && (
@@ -305,6 +314,15 @@ export default function PostReaction({ reaction }) {
               }
             />
           </ListItem>
+
+           {/* show mini profile */}
+          {showMiniProfile &&
+            <AlertMiniProfileView
+            openAlert={showMiniProfile}
+            setOpenAlert={setShowMiniProfile}
+            userId={reaction?.userId}
+          />}
+
         </List>
       
   );

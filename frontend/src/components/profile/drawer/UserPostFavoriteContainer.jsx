@@ -16,7 +16,7 @@ import SnackbarConnect from "../../snackbar/SnackbarConnect";
 import "../UserPost.css";
 import UserPostCardDrawer from "./UserPostCardDrawer";
 
-function UserPostContainDrawer({
+function UserPostFavoriteContainer({
   userId,
   setPostDetailedData,
   setIsPostEditMode,
@@ -28,6 +28,9 @@ function UserPostContainDrawer({
   const [showDeleteAlert, setShowDeleteAlert] = useState(false);
   const [deletePostID, setDeletePostID] = useState();
   const [isDeleting, setIsDeleting] = useState(false);
+  // controls pagination
+  const [pageNumber,setPageNumber]=useState(1)
+  const [hasMorePosts,setHasMorePosts]=useState(true)
 
 
   // redux states
@@ -39,11 +42,14 @@ function UserPostContainDrawer({
   // dispatch for redux to emit actions and store update
   const dispatch = useDispatch();
 
-  useEffect(() => {
- 
-    // fetch details of the liked or reacted user based on their id
+  // use Effect for favorites
+  useEffect(()=>{
+  
+    // track progress
+    setIsFetching(true)
+      // user requests favorite posts
       axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/users/all/${userId}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/favorite/all/${userId}?page=${pageNumber}&limit=10`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -66,10 +72,8 @@ function UserPostContainDrawer({
         setIsFetching(false);
       });
     
-    
-  }, [userId]);
+  },[userId])
 
- 
   // handle close alert delete
   const handleClose = () => {
     // close alert
@@ -108,7 +112,7 @@ function UserPostContainDrawer({
         if (err?.code === "ERR_NETWORK") {
           dispatch(
             updateMessageConnectRequest(
-              "server is unreachable check your internet"
+              "server unreachable"
             )
           );
           return;
@@ -123,6 +127,51 @@ function UserPostContainDrawer({
         setShowDeleteAlert(false);
       });
   };
+
+
+  // handle fetching of all favorite posts
+    const handleFetchFavorites=()=>{
+      // track progress
+       setIsFetching(true)
+       // user requests favorite posts
+        axios
+        .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/favorite/all/${user?._id }?page=${pageNumber}&limit=10`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          if (res?.data) {
+            const data=res.data
+            if (data.length>0) {
+              const filteredData=data?.filter((post)=>{
+                for (const postData of postsData) {
+                  return postData?._id!==post._id
+                }
+              })
+              setPostsData([...postsData,...filteredData]);   
+            }else{
+              setHasMorePosts(false)
+            }
+          }
+
+        // update the page number for the next fetch
+        setPageNumber((prev)=>prev+1)
+        })
+        .catch((err) => {
+          // there is an error
+          if (err?.code === "ERR_NETWORK") {
+            // update the snackbar notification of the error of connection
+            setErrorMessage("Network Error");
+            return;
+          }
+          // update the snackbar notification of error from the server
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          // set is fetching to false
+          setIsFetching(false);
+        });
+    }
+
 
   return (
     <React.Fragment>
@@ -196,9 +245,15 @@ function UserPostContainDrawer({
         {/* displayed when fetching process is ongoing */}
         {isFetching && (
           <Box width={"100%"}>
-            <Box mt={8} display={"flex"} justifyContent={"center"}>
+            <Box 
+            mt={8} 
+            display={"flex"} 
+            justifyContent={"center"}
+            alignItems={'center'}
+            gap={2}
+            >
               {/* progressbar */}
-              <CircularProgress size={"20px"} />
+              <CircularProgress size={15} />
               <Typography
                 mt={1}
                 textAlign={"center"}
@@ -213,16 +268,23 @@ function UserPostContainDrawer({
         )}
 
         {/* rendered when there is data only */}
-        {postsData?.map((post,) => (
+        {postsData?.map((post,index) => (
             <Box key={post?._id}>
               <UserPostCardDrawer
                 post={post}
                 setPostDetailedData={setPostDetailedData}
                 setDeletePostID={setDeletePostID}
                 setShowDeleteAlert={setShowDeleteAlert}
-                deletePostID={deletePostID}
                 setIsPostEditMode={setIsPostEditMode}
                 setIsPostDetailedDrawer={setIsPostDetailedDrawer}
+                isFavorite={true}
+                setIsDeleting={setIsDeleting}
+                handleFetchFavorites={handleFetchFavorites}
+                hasMorePosts={hasMorePosts}
+                isFetching={isFetching}
+                isLastIndex={index===postsData?.length-1}
+
+              
               />
             </Box>
           ))}
@@ -238,4 +300,4 @@ function UserPostContainDrawer({
   );
 }
 
-export default UserPostContainDrawer;
+export default UserPostFavoriteContainer;

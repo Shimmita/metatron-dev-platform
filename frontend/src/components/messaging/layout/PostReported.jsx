@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { showMessagingDrawer } from "../../../redux/AppUI";
 import { updateCurrentReportID } from "../../../redux/CurrentPostReported";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
+import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 
 export default function PostReported({ report }) {
   const [isFetching, setIsFetching] = useState(false);
@@ -27,9 +28,6 @@ export default function PostReported({ report }) {
 
   // dispatch for redux functionalities
   const dispatch = useDispatch();
-
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   // getting the current reactionID
   const { _id } = report;
@@ -88,15 +86,18 @@ export default function PostReported({ report }) {
              borderColor: "divider",
            }}>
             <ListItemAvatar onClick={handleShowMiniProfile}>
-              <Avatar src="" alt="">
-                <Typography
-                  variant="body2"
-                  textTransform={"uppercase"}
-                  fontWeight={"bold"}
-                >
-                  {report?.reporter_name[0]}
-                </Typography>
-              </Avatar>
+            <Avatar
+            src={report?.reporter_avatar}
+            variant="rounded"
+            sx={{
+              backgroundColor: "#1976D2",
+              color: "white",
+              width: 40,
+              height: 40,
+            }}
+            alt={report?.name?.split(" ")[0]}
+            aria-label="avatar"
+                />
             </ListItemAvatar>
             <ListItemText
               primary={
@@ -125,21 +126,21 @@ export default function PostReported({ report }) {
                       </Typography>
                       &nbsp;
                       {/* delete reaction */}
-                          <Tooltip title={'clear'} arrow>
-                            <IconButton size="small" 
-                            onClick={handleDeleteReportReaction} 
-                            disabled={isFetching}
-                            sx={{ 
-                            border: "1px solid",
-                            borderColor: "divider",
-                          }}>
-                             {isFetching ? (
-                                  <CircularProgress size={13}/>
-                                ):(
-                                  <Close sx={{ width: 13, height: 13 }} />
-                                )}
-                          </IconButton>
-                          </Tooltip>
+                      <Tooltip title={'clear'} arrow>
+                        <IconButton size="small" 
+                        onClick={handleDeleteReportReaction} 
+                        disabled={isFetching}
+                        sx={{ 
+                        border: "1px solid",
+                        borderColor: "divider",
+                      }}>
+                          {isFetching ? (
+                              <CircularProgress size={13}/>
+                            ):(
+                              <Close sx={{ width: 13, height: 13 }} />
+                            )}
+                      </IconButton>
+                      </Tooltip>
                     </Box>
                   )}
                 </Box>
@@ -212,6 +213,14 @@ export default function PostReported({ report }) {
               }
             />
           </ListItem>
+
+           {/* show mini profile */}
+            {isMiniProfile &&
+              <AlertMiniProfileView
+              openAlert={isMiniProfile}
+              setOpenAlert={setIsMiniProfile}
+              userId={report?.reporterId}
+          />}
      
         </List>
   );

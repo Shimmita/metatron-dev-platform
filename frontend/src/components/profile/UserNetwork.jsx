@@ -70,7 +70,7 @@ const UserNetwork = ({ otherUserID }) => {
   ]);
 
   return (
-    <Box mt={5}>
+    <Box mt={2}>
       {/* progress dialog */}
       {isFetching && (
         <Box display={"flex"} justifyContent={"center"}>

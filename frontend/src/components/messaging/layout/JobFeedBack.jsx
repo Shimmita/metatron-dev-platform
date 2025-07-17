@@ -13,10 +13,9 @@ import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import axios from "axios";
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import devImage from "../../../images/dev.jpeg";
 import { handleSidebarRightbar, showMessagingDrawer } from "../../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../../redux/CurrentBottomNav";
 import { deleteCurrentJobFeedBack } from "../../../redux/CurrentJobFeedBack";
@@ -66,7 +65,7 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
 
     }
   
-    // handle deletion of the current notification post_reaction
+    // handle deletion of the current notification job feedback
       const handleDeleteReaction = () => {
         // set is fetching to true
         setIsFetching(true);
@@ -118,7 +117,7 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
         borderColor: "divider" }}>
           <ListItemAvatar >
             <Avatar
-            src={devImage}
+            src={jobFeedBack?.avatar}
             variant="rounded"
             sx={{
               backgroundColor: "#1976D2",

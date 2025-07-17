@@ -1,11 +1,10 @@
-import { CachedOutlined, CachedRounded, HomeOutlined, HomeRounded, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
+import { CachedOutlined, CachedRounded, HomeOutlined, HomeRounded, TvRounded, TvTwoTone, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
 import {
   BottomNavigation,
   BottomNavigationAction,
   Paper,
   Tooltip
 } from "@mui/material";
-import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -61,7 +60,16 @@ const BottomNav = () => {
     }
   };
 
-  // return learning page
+  // handle events page
+  const handleNavigateEvents=()=>{
+    navigate("/events")
+    // disable sidebar
+    if (isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+  }
+
+  // handle corses page
   const handleOpenCourses = () => {
   
      // disable sidebar
@@ -110,9 +118,9 @@ const BottomNav = () => {
               isPostSearch ? (
                 <>
                 {isDarkMode ? (
-                  <CachedOutlined color="info" sx={{ width: 28, height: 28 }} />
+                  <CachedOutlined  sx={{ width: 28, height: 28 }} />
                 ):(
-                  <CachedRounded color="info" sx={{ width: 28, height: 28 }} />
+                  <CachedRounded  sx={{ width: 28, height: 28 }} />
                 )}
                 </>
               ) : (
@@ -130,7 +138,7 @@ const BottomNav = () => {
           />
         </Tooltip>
 
-        <Tooltip title="Tech Jobs" arrow>
+        <Tooltip title="IT Jobs" arrow>
           <BottomNavigationAction
             onClick={handleJobContent}
             label="Jobs"
@@ -163,23 +171,24 @@ const BottomNav = () => {
         </Tooltip> */}
 
          {/* tech events */}
-         {/* <Tooltip 
-         title="Tech Events"
+         <Tooltip 
+         title="IT Events"
           arrow
-          sx={{ marginRight:isBeyondTablets && position===0 && 13 }}>
+          // sx={{ marginRight:isBeyondTablets && position===0 && 13 }}>
+          >
           <BottomNavigationAction
-            onClick={handleEventContent}
+            onClick={handleNavigateEvents}
             label="Events"
             icon={<>
             {isDarkMode ?(
-               <TvRounded sx={{ width: 25, height: 25 }} />
+               <TvRounded sx={{ width: 26, height: 26 }} />
             ):(
-              <TvTwoTone sx={{ width: 25, height: 25 }} />
+              <TvTwoTone sx={{ width: 26, height: 26 }} />
             )}
            
             </>}
           />
-        </Tooltip> */}
+        </Tooltip>
 
       </BottomNavigation>
 

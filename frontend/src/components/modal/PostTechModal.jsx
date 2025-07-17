@@ -11,6 +11,7 @@ import {
   Button,
   CircularProgress,
   Collapse,
+  FormHelperText,
   IconButton,
   MenuItem,
   Modal,
@@ -83,7 +84,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [category3, setCategory3] = useState("");
 
   // control opening and showing of the alert custom input
-  const [openAlert, setOpenAlert] = useState(false);
+  const [openAlertML, setOpenAlertML] = useState(false);
 
   // control showing of logout user session expired
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
@@ -320,7 +321,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
   useEffect(() => {
     if (category1?.trim() === "zero (none of the areas)") {
-      setOpenAlert(true);
+      setOpenAlertML(true);
     }
   }, [category1]);
 
@@ -432,7 +433,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     </IconButton>
                   }
                 >
-                  {errorMessage}
+                  <FormHelperText>{errorMessage}</FormHelperText>
                 </Alert>
               </Collapse>
             ) : (
@@ -1138,7 +1139,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* image and pdf for the post */}
 
               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Visual representation of your post is highly recommended on the platform please embed or upload an image/pdf file that is relevant to the post.
+                Provide main image or photo for your post that summarizes your post content on the fly.
               </Typography>
 
               {/* preview the file uploaded from storage */}
@@ -1310,21 +1311,23 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         </Box>
 
         {/* alert for preferred machine learning area input */}
+        {openAlertML && 
         <AlertInput
-          openAlert={openAlert}
-          setOpenAlert={setOpenAlert}
+          openAlert={openAlertML}
+          setOpenAlert={setOpenAlertML}
           setCustomArea={setCategory1}
           title={title_ml_area}
           body={body_ml_are}
-        />
+        /> }
 
         {/* show logout session expired alert */}
+       {openAlertLogout && 
         <LogoutAlert
           openAlertLogout={openAlertLogout}
           setOpenAlertLogout={setOpenAlertLogout}
           title="Session Expired"
-          body="Please login to complete your request,previous session has expired. We do this to deter unauthorised access on accounts that have not been logged out for a while."
-        />
+          body="please login to complete your request, your session has expired."
+        />}
       </Box>
     </StyledModalPost>
   );

@@ -1,9 +1,11 @@
 import {
   Close,
   Diversity3Rounded,
+  EmailRounded,
   GitHub,
   Language,
-  LinkedIn
+  LinkedIn,
+  MessageOutlined
 } from "@mui/icons-material";
 import {
   Alert,
@@ -31,6 +33,7 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
 import CustomLandScape from "../utilities/CustomLandscape";
 import { Link } from "react-router-dom";
+import AlertInputMessage from "./AlertInputMessage";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -76,6 +79,7 @@ export default function AlertMiniProfileView({
   const [isFetching, setIsFetching] = useState(true);
   const [message, setMessage] = useState("");
   const [isOnline, setIsOnline] = useState(false);
+  const [openAlertMessage,setOpenAlertMessage]=useState(false)
 
   // redux states
   const { user } = useSelector((state) => state.currentUser);
@@ -83,9 +87,6 @@ export default function AlertMiniProfileView({
   const {
     _id: currentUserId,
   } = user || {};
-
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   // checks for if current user is friends
   const isFriends =miniProfileData?.network?.includes(currentUserId);
@@ -157,6 +158,11 @@ export default function AlertMiniProfileView({
     }
   }
 
+  // handle showing of input alert message
+  const handleShowMessageInput=()=>{
+    // open alert to true
+    setOpenAlertMessage(true)
+  }
   
   return (
       <Dialog
@@ -372,19 +378,41 @@ export default function AlertMiniProfileView({
               <Box 
               display={'flex'} 
               alignItems={'center'} 
-              justifyContent={'flex-end'}
+              justifyContent={'space-between'}
               borderRadius={5}
               mt={1}
               gap={2}
               >
-                {/* github */}
+                {/* message add */}
+                <Box>
                 <Tooltip 
+                arrow
+                title='Message'>
+                <IconButton 
+                onClick={handleShowMessageInput}
+                disabled={userId === currentUserId}
+                >
+                  <EmailRounded
+                  color={userId === currentUserId ? 'disabled':'primary'}
+                   sx={{ width:20,height:20 }}/>
+                </IconButton>
+                </Tooltip>
+                </Box>
+                {/* other profile related links */}
+              <Box  display={'flex'} 
+              alignItems={'center'} 
+              justifyContent={'flex-end'}
+              gap={2}
+              >
+
+                {/* github */}
+              <Tooltip 
                 arrow
                 title='GitHub'>
                 <Link
                 target={miniProfileData?.gitHub?.length>2 && "_blank_"}
                  to={`${miniProfileData?.gitHub?.length>2 ? miniProfileData?.gitHub :'/'}`}>
-                  <GitHub sx={{ width:17,height:17 }}/>
+                  <GitHub color="primary" sx={{ width:19,height:19 }}/>
                 </Link>
                 </Tooltip>
 
@@ -395,7 +423,7 @@ export default function AlertMiniProfileView({
                 <Link 
                 target={miniProfileData?.linkedin?.length>2 && "_blank_"}
                 to={`${miniProfileData?.linkedin?.length>2 ? miniProfileData?.linkedin :"/"}`}>
-                  <LinkedIn sx={{ width:18,height:18 }}/>
+                  <LinkedIn color="primary" sx={{ width:20,height:20 }}/>
                 </Link>
                 </Tooltip>
 
@@ -406,14 +434,28 @@ export default function AlertMiniProfileView({
                 <Link
                 target={miniProfileData?.portfolio?.length>2 && "_blank_"}
                  to={`${miniProfileData?.portfolio?.length>2 ? miniProfileData?.portfolio :"/"}`}>
-                  <Language sx={{ width:18,height:18 }}/>
+                  <Language color="primary" sx={{ width:20,height:20 }}/>
                 </Link>
                 </Tooltip>
+                </Box>
+
               </Box>
               </Stack>
             </Box>
           </Box>
         </DialogContent>
+
+        {/* show alert input message */}
+        {openAlertMessage && (
+          <AlertInputMessage 
+          openAlert={openAlertMessage}
+          setOpenAlert={setOpenAlertMessage}
+          targetId={miniProfileData?._id}
+          targetName={miniProfileData?.name}
+          targetSpecialisation={miniProfileData?.specialisationTitle}
+          
+          />
+        )}
       </Dialog>
   );
 }

@@ -1,7 +1,6 @@
 import {
   Close,
-  PaidRounded,
-  WorkRounded
+  PeopleRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -13,7 +12,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React from "react";
 import { useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import DataAccounts from "../data/DataAccounts";
@@ -120,7 +118,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
               {/* personal account */}
               <Box mb={1}>
                 <Box display={"flex"} justifyContent={"center"}>
-                  <WorkRounded color="primary" sx={{ width: 36, height: 36 }} />
+                  <PeopleRounded color="primary" sx={{ width: 36, height: 36 }} />
                 </Box>
                 <Box>
                   <Typography
@@ -152,41 +150,6 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
               </Box>
 
               
-
-              {/* donation, affiliate programs */}
-
-              <Box>
-                <Box mb={1} display={"flex"} justifyContent={"center"} gap={1}>
-                  <PaidRounded color="success" sx={{ width: 40, height: 40 }} />
-                </Box>
-                <Box>
-                  <Typography
-                    gutterBottom
-                    fontWeight={"bold"}
-                    variant="body2"
-                    mb={1}
-                    textAlign={"center"}
-                  >
-                    Donation, Partnership and Affiliate Program
-                  </Typography>
-
-                  <ol>
-                    {
-                      DataAccounts?.Donation.map((data, index) => (
-                        <Typography
-                          key={data}
-                          variant="body2"
-                          gutterBottom
-                          component={"li"}
-                          mb={1}
-                          color={"text.secondary"}
-                        >
-                          {data}
-                        </Typography>
-                      ))}
-                  </ol>
-                </Box>
-              </Box>
             </Box>
           </Box>
         </Box>

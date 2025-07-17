@@ -159,7 +159,13 @@ const Sidebar = () => {
                         <Avatar
                           alt={''}
                           src={user?.avatar}
-                          sx={{ width: 100, height: 100, mt: 1 }}
+                          sx={{
+                            width: 100,
+                            height: 100,
+                            mt: 1,
+                            color: "white",
+                            backgroundColor: isDarkMode ? "#42A5F5":"#1976D2",
+                            }}
                         />
                       </StyledBadge>
                     <Box display={"flex"} justifyContent={"center"} >

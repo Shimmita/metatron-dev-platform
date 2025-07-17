@@ -4,6 +4,7 @@ import {
   StarRounded,
   Visibility,
   VisibilityOff,
+  WbIncandescentRounded,
   WorkRounded,
 } from "@mui/icons-material";
 import {
@@ -277,9 +278,9 @@ const RegistrationAuth = () => {
               alignItems={"center"}
               justifyContent={"center"}
             >
-              <StarRounded sx={{ width: 20, height: 20 }} />
-              The Best IT Platform{" "}
-              <StarRounded sx={{ width: 20, height: 20 }} />
+              <WbIncandescentRounded sx={{ width: 20, height: 20,color: "orange" }} />
+              Ultimate Tech Platform{" "}
+              <WbIncandescentRounded sx={{ width: 20, height: 20,color: "orange" }} />
             </Typography>
 
             <Box

@@ -10,9 +10,9 @@ const currentPosts = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadte  user and online status to true
+    // update  user and online status to true
     updateCurrentPosts: (state, action) => {
-      state.posts = action.payload;
+      state.posts =action.payload;
     },
 
     // update current posts from global search results that they be on top of
@@ -20,7 +20,7 @@ const currentPosts = createSlice({
     updateCurrentPostsFromSearch: (state, action) => {
       // update is postSearch to true for tracking searched posts and restoring states
       state.isPostSearch = true;
-      // dont add posts that already exist in redux using set
+      // don't add posts that already exist in redux using set
       state.posts = action.payload;
     },
 

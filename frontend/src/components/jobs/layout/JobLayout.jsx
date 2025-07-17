@@ -2,10 +2,13 @@ import {
   AccessTimeFilledRounded,
   BalanceRounded,
   CalendarMonthRounded,
-  LocationCityRounded,
+  Info,
+  InfoOutlined,
+  LocationOnRounded,
   OpenInBrowser,
   PaidRounded,
   PeopleRounded,
+  Share,
   VerifiedRounded,
   WorkHistoryRounded
 } from "@mui/icons-material";
@@ -15,20 +18,22 @@ import {
   Box,
   Button,
   Divider,
+  FormHelperText,
+  IconButton,
   Stack,
   Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import ApplyJobModal from "../../modal/ApplyJobModal";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../../utilities/getImageMatch";
-import { useSelector } from "react-redux";
 
 const MAX_APPLICANTS=300
 
-function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
+function JobLayout({ isDarkMode, job, isPreviewHR=false, }) {
   const [openModal, setOpenApplyJobModal] = useState(false);
 
   // redux states
@@ -88,18 +93,17 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
       justifyContent={"center"}
       alignItems={"center"}
       classes={"job-card"}
-      className="rounded"
+      className="rounded-3"
       bgcolor={!isDarkMode && "background.default"}
       maxWidth={300}
-      mb={isMyJob? 0:2}
       height={
         !(CustomDeviceIsSmall() || CustomDeviceTablet()) ? "70%" : undefined
       }
       p={2}
       width={300}
       sx={{
-        border: !CustomDeviceIsSmall() && "1px solid",
-        borderColor: !CustomDeviceIsSmall() && "divider",
+        border: "1px solid",
+        borderColor: "divider",
         "&:hover": {
           boxShadow: `4px 0px 50px -10px inset ${
             !isDarkMode ? "#3333" : "lightgreen"
@@ -107,15 +111,18 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
         },
       }}
     >
+    {/* job avatar */}
+    <Box>
       <Avatar
         alt=""
         className="border"
-        sx={{ width: 42, height: 42, mt:isMyJob ? 4:isPreviewHR? 0:6 }}
+        sx={{ width: 45, height: 45, mt:isPreviewHR ? 0:3 }}
         src={getImageMatch(job?.logo)}
       />
+      </Box>
 
       {/* job title */}
-      <Stack textAlign={"center"} gap={1} mt={1} mb={2}>
+      <Stack textAlign={"center"} gap={1} mt={1} mb={3}>
         <Box display={"flex"} justifyContent={"center"}>
           <Typography variant="body1" 
           color={"primary"} 
@@ -163,13 +170,13 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
 
         <React.Fragment>
           <Box display={"flex"} gap={1} alignItems={"center"}>
-            <LocationCityRounded sx={{ width: 22, height: 22 }} />
+            <LocationOnRounded sx={{ width: 22, height: 22 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
               {handleCountryName()} | {job.location.state}{" "}
             </Typography>
           </Box>
           <Box display={"flex"} gap={1} alignItems={"center"}>
-            <AccessTimeFilledRounded sx={{ width: 20, height: 20 }} />
+            <AccessTimeFilledRounded sx={{ width: 19, height: 19}} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
               Access {job?.jobtypeaccess?.access} | {job?.jobtypeaccess?.type}
             </Typography>
@@ -207,6 +214,31 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
               Date Uploaded {handleDateDisplay()}
             </Typography>
           </Box>
+        <Box 
+        ml={0.2}
+        display={"flex"} 
+        gap={1}
+        justifyContent={'center'}
+        width={'100%'}
+        alignItems={"center"}
+        >
+        {/* info icon */}
+        <InfoOutlined sx={{ width:17,height:17,mr:0.5 }}/>
+        {/* helper tex */}
+          <Typography 
+          color={!isDarkMode && 'primary'}
+          className={isDarkMode && 'text-info'}
+          textTransform={'capitalize'}
+           variant="caption">
+            share this job by clicking
+          </Typography>
+          {/* share icon */}
+          <Tooltip arrow title='share'>
+          <IconButton size={'small'}>
+            <Share color="primary" sx={{ width:14,height:14 }}/>
+          </IconButton>
+          </Tooltip>
+        </Box>
         </React.Fragment>
       </Stack>
 
@@ -219,7 +251,8 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
         </Box>
       ):(
         <React.Fragment>
-          {/* application  btn */}
+      
+      {/* application  btn */}
       {websiteLink === "" ? (
         <Button
           variant={isDarkMode ? "outlined" : "contained"}
@@ -235,6 +268,7 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false }) {
           {job?.currentUserApplied ? "Applied":isDeactivated ? "Paused":isMaxApplicants ? "Closed":"Apply"}
         </Button>
       ) : (
+       
         <Button
           variant={isDarkMode ? "outlined" : "contained"}
           color="primary"

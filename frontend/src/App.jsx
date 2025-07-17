@@ -3,13 +3,15 @@ import {
   Box,
   CircularProgress,
   createTheme,
+  FormHelperText,
   ThemeProvider,
   Typography,
 } from "@mui/material";
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import AppLogo from "./images/logo_sm.png";
+import { FidgetSpinner, Vortex } from "react-loader-spinner";
 const RegPersonalCompletion = lazy(() =>
   import("./components/auth/RegPersonalCompletion")
 );
@@ -21,6 +23,7 @@ const RegistrationAuthLazy = lazy(() =>
   import("./components/auth/RegistrationAuth")
 );
 const AuthCheckLazy = lazy(() => import("./components/account/AuthCheck"));
+const EmailVerificationAuth=lazy(()=>import("./components/auth/EmailVerification"))
 
 const App = () => {
   // global dark mode state from redux
@@ -45,13 +48,14 @@ const App = () => {
                 alignItems={"center"}
                 justifyContent={"center"}
                 flexDirection={"column"}
-                gap={2}
                 height={"100vh"}
               >
-                <Avatar
+               
+                
+                 <Avatar
                   sx={{ width: 100, height: 100 }}
                   src={AppLogo}
-                  alt="logo"
+                  alt=""
                 />
 
                 <Typography
@@ -62,9 +66,23 @@ const App = () => {
                 >
                   METATRON
                 </Typography>
-                <Box display={"flex"} justifyContent={"center"}>
-                  <CircularProgress size={"2rem"} />
+
+                <Box 
+                display={'flex'}
+                justifyContent={'center'}
+                >
+                <FormHelperText >
+                Ultimate Tech Platform
+                </FormHelperText>
                 </Box>
+
+                 <Box 
+                 display={"flex"} 
+                 justifyContent={"center"}>
+                  <Vortex width={50}/>
+                </Box>
+
+               
               </Box>
             </Box>
           }
@@ -94,8 +112,14 @@ const App = () => {
                 element={<RegPersonalCompletion />}
               />
 
-             
+            {/* email verification */}
+            <Route
+            exact
+            path={"/auth/verification"}
+            element={<EmailVerificationAuth/>}
+            />
 
+            {/* account recovery, forgot password route */}
               <Route
                 exact
                 path={"/auth/recover"}

@@ -12,6 +12,7 @@ import {
   CircularProgress,
   Collapse,
   Divider,
+  FormHelperText,
   IconButton,
   MenuItem,
   Modal,
@@ -553,7 +554,7 @@ const handleClosingModal=()=>{
                     </IconButton>
                   }
                 >
-                  {errorMessage}
+                  <FormHelperText>{errorMessage}</FormHelperText>
                 </Alert>
               </Collapse>
             ) : (

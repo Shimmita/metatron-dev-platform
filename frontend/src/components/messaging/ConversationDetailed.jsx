@@ -1,4 +1,4 @@
-import { Close, MoreVertRounded } from "@mui/icons-material";
+import { Close, InfoRounded, MoreVertRounded } from "@mui/icons-material";
 import {
   AppBar,
   Avatar,
@@ -16,6 +16,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import MoreMessageLayout from "./layout/MoreMessageLayout";
+import AlertGeneral from "../alerts/AlertGeneral";
 
 // input base
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -41,6 +42,8 @@ const ConversationDetailed = ({
   // api request monitors
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
+  
 
   // accessing the redux states
   const { currentMode } = useSelector((state) => state.appUI);
@@ -97,6 +100,7 @@ const ConversationDetailed = ({
           return;
         }
         setErrorMessage(err?.response.data);
+        setOpenAlertGeneral(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -138,6 +142,8 @@ const ConversationDetailed = ({
     } catch (err) {
       // error occurred during fetch query
       console.error(err);
+      setErrorMessage(err?.response.data);
+      setOpenAlertGeneral(true)
     } finally {
       // close is fetching
       setIsFetching(false);
@@ -169,6 +175,8 @@ const ConversationDetailed = ({
     } catch (err) {
       // error occurred during fetch query
       console.error(err);
+      setErrorMessage(err?.response.data);
+      setOpenAlertGeneral(true)
     } finally {
       // close is fetching
       setIsFetching(false);
@@ -195,6 +203,8 @@ const ConversationDetailed = ({
     } catch (err) {
       // error occurred during fetch query
       console.error(err);
+      setErrorMessage(err?.response.data);
+      setOpenAlertGeneral(true)
     } finally {
       // close is fetching
       setIsFetching(false);
@@ -202,7 +212,6 @@ const ConversationDetailed = ({
   };
 
 
-    
 
   return (
     <Box bgcolor={"background.default"} height={"99vh"}>
@@ -514,6 +523,21 @@ const ConversationDetailed = ({
           </Box>
         </Box>
       </Box>
+
+       {/* alert general of the error message */}
+        {errorMessage && (
+          <AlertGeneral
+          title={'something went wrong!'}
+          message={errorMessage}
+          isError={true}
+          openAlertGeneral={openAlertGeneral}
+          setOpenAlertGeneral={setOpenAlertGeneral}
+          setErrorMessage={setErrorMessage}
+          defaultIcon={<InfoRounded/>}
+          />
+        )}
+
+
     </Box>
   );
 };

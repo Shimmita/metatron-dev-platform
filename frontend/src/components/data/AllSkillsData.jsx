@@ -46,7 +46,8 @@ const AllSkills = [
         "AWS",
         "Android",
         "IOS",
-        "Linux"
+        "Linux",
+        "CSS"
       ],
     ].sort()
   ),

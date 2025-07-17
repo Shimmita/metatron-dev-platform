@@ -4,8 +4,7 @@ import {
   Close,
   CloudUploadRounded,
   DiamondRounded,
-  LinkRounded,
-  Work,
+  LinkRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -16,6 +15,7 @@ import {
   Chip,
   CircularProgress,
   Collapse,
+  FormHelperText,
   IconButton,
   MenuItem,
   Modal,
@@ -42,7 +42,6 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
-const CurrencyControl = lazy(() => import("./CurrencyControl"));
 const LocationControl = lazy(() => import("./LocationControl"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
@@ -75,21 +74,20 @@ const jobTypeAccess = {
 const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
 
 const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=false}) => {
-  const [job_title, setJobTitle] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
   const [organisationName, setOrganisationName] = useState("");
   const [county, setCounty] = useState("");
-  const [job_type, setJobType] = useState({ type: "", access: "" });
+  const [jobType, setJobType] = useState({ type: "", access: "" });
   const [country, setCountry] = useState("");
   const [location, setLocation] = useState("KE");
-  const [job_main_doc, setJobMainDoc] = useState("");
-  const [job_main_skill, setJobMainSkill] = useState([]);
-  const [job_salary, setJobSalary] = useState("");
-  const [job_entry_type, setJobEntryType] = useState("");
-  const [job_experience, setJobExperience] = useState("");
+  const [jobMainDoc, setJobMainDoc] = useState("");
+  const [jobMainSkill, setJobMainSkill] = useState([]);
+  const [jobSalary, setJobSalary] = useState("");
+  const [jobEntryType, setJobEntryType] = useState("");
+  const [jobExperience, setJobExperience] = useState("");
   const [webLink, setWebLink] = useState("");
-  const [poster_about, setPosterAbout] = useState("");
+  const [posterAbout, setPosterAbout] = useState("");
   const [showCustomTitle, setShowCustomTitle] = useState(false);
-  const [currency, setCurrency] = useState("Ksh");
   const [fileUpload, setFileUpload] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
   const [fileLink, setFileLink] = useState("");
@@ -97,7 +95,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
   const [isFreeLogo, setIsFreeLogo] = useState(false);
   const [freeLogo, setFreeLogo] = useState("");
    // To hold user input text for req
-    const [req_text, setReqText] = useState("");
+    const [reqText, setReqText] = useState("");
      // To hold checked requirements as chips
     const [requirementsQual, setRequirementsQual] = useState([]);
     // Available options to display in the Autocomplete dropdown
@@ -107,7 +105,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
     // for descriptions
     const [description, setDescription] = useState([]); 
     // To hold user input text for desc
-    const [desc_text, setDescText] = useState(""); 
+    const [descText, setDescText] = useState(""); 
 
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -165,7 +163,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
   };
 
   // handle showing of the custom title when selection is zero matched
-  if (job_title === "Zero Matched") {
+  if (jobTitle === "Zero Matched") {
     setShowCustomTitle(true);
     setJobTitle("");
   }
@@ -205,9 +203,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
 
   // Handle adding req
   const handleAddRequirement = () => {
-    if (req_text.trim() !== "") {
+    if (reqText.trim() !== "") {
       // Add the inputText as a new requirement if it's not empty
-      setRequirementsQual((prev) => [...prev, req_text.trim()]);
+      setRequirementsQual((prev) => [...prev, reqText.trim()]);
       setReqText(""); // Clear the input field
     }
   };
@@ -224,9 +222,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
 
   // Handle adding desc
   const handleAddDesc = () => {
-    if (desc_text.trim() !== "") {
+    if (descText.trim() !== "") {
       // Add the inputText as a new desc if it's not empty
-      setDescription((prev) => [...prev, desc_text.trim()]);
+      setDescription((prev) => [...prev, descText.trim()]);
       setDescText(""); // Clear the input field
     }
   };
@@ -258,7 +256,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
       setErrorMessage("provide a logo");
       return false;
     }
-    if (job_title?.trim() === "") {
+    if (jobTitle?.trim() === "") {
       setErrorMessage("job title is missing");
       return false;
     }
@@ -267,32 +265,32 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
       return false;
     }
 
-    if (!job_type.type) {
+    if (!jobType.type) {
       setErrorMessage("job type field is missing");
       return false;
     }
-    if (!job_type.access) {
+    if (!jobType.access) {
       setErrorMessage("job accessibility field is missing");
       return false;
     }
-    if (job_main_skill?.length < 1) {
+    if (jobMainSkill?.length < 1) {
       setErrorMessage("provide atleast one mandatory skill");
       return false;
     }
 
-    if (job_main_doc?.trim() === "") {
+    if (jobMainDoc?.trim() === "") {
       setErrorMessage("provide required job application docs");
       return false;
     }
-    if (job_entry_type?.trim() === "") {
+    if (jobEntryType?.trim() === "") {
       setErrorMessage("provide job level of entry");
       return false;
     }
-    if (job_experience?.trim() === "") {
+    if (jobExperience?.trim() === "") {
       setErrorMessage("provide job years of experience");
       return false;
     }
-    if (job_salary?.trim() === "") {
+    if (jobSalary?.trim() === "") {
       setErrorMessage("provide monthly salary budget");
       return false;
     }
@@ -306,11 +304,11 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
       return false;
     }
 
-    if (job_main_doc?.toLowerCase()?.includes("no") && webLink?.trim() === "") {
+    if (jobMainDoc?.toLowerCase()?.includes("no") && webLink?.trim() === "") {
       setErrorMessage("provide your website link");
       return false;
     }
-    if (poster_about?.trim() === "") {
+    if (posterAbout?.trim() === "") {
       setErrorMessage("missing about field");
       return false;
     }
@@ -329,15 +327,15 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
 
   // create job object
   const job = {
-    title: job_title,
+    title: jobTitle,
     organisation: {
       name: organisationName,
-      about: poster_about,
+      about: posterAbout,
     },
 
     jobtypeaccess: {
-      type: job_type.type,
-      access: job_type.access,
+      type: jobType.type,
+      access: jobType.access,
     },
 
     logo:
@@ -346,18 +344,18 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
         : !fileUpload && !freeLogo
         ? fileLink
         : "",
-    skills: job_main_skill,
+    skills: jobMainSkill,
     requirements: {
-      document: job_main_doc,
+      document: jobMainDoc,
       qualification: requirementsQual,
       description,
     },
     entry: {
-      level: job_entry_type,
-      years: job_experience,
+      level: jobEntryType,
+      years: jobExperience,
     },
     website: webLink,
-    salary: job_salary,
+    salary: jobSalary,
     location: {
       country: location === "KE" ? "Kenya (KE)" : country,
       state: county,
@@ -513,7 +511,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               fontWeight={"bold"}
               textAlign={"center"}
             >
-              {job_title.length===0 ? "Job Upload":job_title}
+              {jobTitle.length===0 ? "Job Upload":jobTitle}
             </Typography>
 
             {/*close icon */}
@@ -549,7 +547,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
             {errorMessage ? (
               <Collapse in={errorMessage || false}>
                 <Alert
-                  severity="warning"
+                  severity="info"
                   onClick={() => setErrorMessage("")}
                   action={
                     <IconButton aria-label="close" color="inherit" size="small">
@@ -557,7 +555,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                     </IconButton>
                   }
                 >
-                  {errorMessage}
+                   <FormHelperText>{errorMessage}</FormHelperText>
                 </Alert>
               </Collapse>
             ) : (
@@ -603,7 +601,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                       required
                       disabled={isUploading}
                       select
-                      value={job_title}
+                      value={jobTitle}
                       label="Preferred job title"
                       fullWidth
                       onChange={(e) => setJobTitle(e.target.value)}
@@ -639,7 +637,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                       fullWidth
                       disabled={isUploading}
                       required
-                      value={job_title}
+                      value={jobTitle}
                       onChange={(e) => setJobTitle(e.target.value)}
                       id="job_title"
                       label={"Preferred job title "}
@@ -682,7 +680,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   required
                   disabled={isUploading}
                   select
-                  value={job_type.type}
+                  value={jobType.type}
                   label="Job type"
                   fullWidth
                   onChange={(e) =>
@@ -710,7 +708,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   required
                   disabled={isUploading}
                   select
-                  value={job_type.access}
+                  value={jobType.access}
                   label="Job accessibility"
                   fullWidth
                   onChange={(e) =>
@@ -910,7 +908,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   multiple
                   disabled={isUploading}
                   options={AllSkills}
-                  value={job_main_skill}
+                  value={jobMainSkill}
                   onChange={handleChangeMainSkills}
                   disableCloseOnSelect
                   renderInput={(params) => (
@@ -945,7 +943,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   required
                   disabled={isUploading}
                   select
-                  value={job_main_doc}
+                  value={jobMainDoc}
                   label="Mandatory documents"
                   fullWidth
                   onChange={(e) => setJobMainDoc(e.target.value)}
@@ -962,7 +960,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
 
               {/* display website url if no is selected */}
 
-              {job_main_doc.toLowerCase().includes("no") && (
+              {jobMainDoc.toLowerCase().includes("no") && (
                 <>
                   <Typography
                     gutterBottom
@@ -1001,7 +999,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   required
                   disabled={isUploading}
                   select
-                  value={job_entry_type}
+                  value={jobEntryType}
                   label="Preferred level of entry"
                   fullWidth
                   onChange={(e) => setJobEntryType(e.target.value)}
@@ -1027,7 +1025,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   required
                   select
                   disabled={isUploading}
-                  value={job_experience}
+                  value={jobExperience}
                   label="Minimum years of experience"
                   fullWidth
                   onChange={(e) => setJobExperience(e.target.value)}
@@ -1052,40 +1050,12 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
 
               {/* Salary */}
               <Box className="w-100 mb-3">
-                <Box
-                  display={"flex"}
-                  justifyContent={"flex-end"}
-                  mb={1}
-                  alignItems={"center"}
-                >
-                  <CurrencyControl
-                    setCurrency={setCurrency}
-                    isDisabled={isUploading || errorMessage}
-                  />
-                </Box>
-
-                {currency === "Ksh" ? (
+               
                   <TextField
                     required
                     select
                     disabled={isUploading}
-                    value={job_salary}
-                    label="Monthly budget salary (Ksh)"
-                    fullWidth
-                    onChange={(e) => setJobSalary(e.target.value)}
-                  >
-                    {SubsectionJob?.SalaryKES.map((salary) => (
-                        <MenuItem key={salary} value={salary}>
-                          <small style={{ fontSize: "small" }}>{salary}</small>
-                        </MenuItem>
-                      ))}
-                  </TextField>
-                ) : (
-                  <TextField
-                    required
-                    select
-                    disabled={isUploading}
-                    value={job_salary}
+                    value={jobSalary}
                     label="Monthly budget salary (USD)"
                     fullWidth
                     onChange={(e) => setJobSalary(e.target.value)}
@@ -1096,7 +1066,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                         </MenuItem>
                       ))}
                   </TextField>
-                )}
+                
               </Box>
 
               {/* Location  */}
@@ -1238,11 +1208,11 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   multiline
                   disabled={isUploading}
                   contentEditable={false}
-                  error={poster_about.length > 500}
+                  error={posterAbout.length > 500}
                   id="About-org-required"
-                  label={`About your organisation ${500 - poster_about.length}`}
+                  label={`About your organisation ${500 - posterAbout.length}`}
                   fullWidth
-                  value={poster_about}
+                  value={posterAbout}
                   onChange={(e) => setPosterAbout(e.target.value)}
                   placeholder="We are Tech enthusiasts mainly specialized in bridging the gap between A and B..."
                 />
@@ -1269,10 +1239,10 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                       <Autocomplete
                         freeSolo
                         options={options_req} // Show available options when user types
-                        value={req_text}
+                        value={reqText}
                         onInputChange={handleTextChangeReq}
                         disableClearable
-                        inputValue={req_text}
+                        inputValue={reqText}
                         disabled={isUploading}
                         onChange={handleTextChangeReq}
                         renderInput={(params) => (
@@ -1284,7 +1254,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                           />
                         )}
                         onKeyUp={(e) => {
-                          if (e.key === "Enter" && req_text.trim() !== "") {
+                          if (e.key === "Enter" && reqText.trim() !== "") {
                             handleAddRequirement();
                           }
                         }}
@@ -1310,10 +1280,10 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                     <Autocomplete
                       freeSolo
                       options={options_req} // Show available options when user types
-                      value={req_text}
+                      value={reqText}
                       onInputChange={handleTextChangeReq}
                       disableClearable
-                      inputValue={req_text}
+                      inputValue={reqText}
                       disabled={isUploading}
                       onChange={handleTextChangeReq}
                       renderInput={(params) => (
@@ -1325,7 +1295,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                         />
                       )}
                       onKeyUp={(e) => {
-                        if (e.key === "Enter" && req_text.trim() !== "") {
+                        if (e.key === "Enter" && reqText.trim() !== "") {
                           handleAddRequirement();
                         }
                       }}
@@ -1401,11 +1371,11 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                       <Autocomplete
                         freeSolo
                         options={options_desc} // Show available options when user types
-                        value={desc_text}
+                        value={descText}
                         onInputChange={handleTextChangeDesc}
                         disableClearable
                         disabled={isUploading}
-                        inputValue={desc_text}
+                        inputValue={descText}
                         onChange={handleTextChangeDesc}
                         renderInput={(params) => (
                           <TextField
@@ -1416,7 +1386,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                           />
                         )}
                         onKeyUp={(e) => {
-                          if (e.key === "Enter" && desc_text.trim() !== "") {
+                          if (e.key === "Enter" && descText.trim() !== "") {
                             handleAddDesc();
                           }
                         }}
@@ -1442,11 +1412,11 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                     <Autocomplete
                       freeSolo
                       options={options_desc} // Show available options when user types
-                      value={desc_text}
+                      value={descText}
                       onInputChange={handleTextChangeDesc}
                       disableClearable
                       disabled={isUploading}
-                      inputValue={desc_text}
+                      inputValue={descText}
                       onChange={handleTextChangeDesc}
                       renderInput={(params) => (
                         <TextField
@@ -1457,7 +1427,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                         />
                       )}
                       onKeyUp={(e) => {
-                        if (e.key === "Enter" && desc_text.trim() !== "") {
+                        if (e.key === "Enter" && descText.trim() !== "") {
                           handleAddRequirement();
                         }
                       }}
@@ -1528,12 +1498,13 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
         </Box>
 
         {/* show logout session expired alert */}
+        {openAlertLogout && 
         <LogoutAlert
           openAlertLogout={openAlertLogout}
           setOpenAlertLogout={setOpenAlertLogout}
           title="Session Expired"
-          body="Please login to complete your request,previous session has expired. We do this to deter unauthorised access to accounts."
-        />
+          body="please login to complete your request, your session has expired."
+        />}
       </Box>
     </StyledModalJob>
   );

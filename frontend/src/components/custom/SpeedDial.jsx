@@ -4,9 +4,10 @@ import SpeedDialAction from "@mui/material/SpeedDialAction";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import React, { lazy } from "react";
 
-import { CodeRounded, PictureAsPdfRounded, SchoolRounded, Work } from "@mui/icons-material";
+import { CodeRounded, TvRounded, Work } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import { useSelector } from "react-redux";
+import EventsAddModal from "../modal/EventsAddModal";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 const PostCourseModal = lazy(() => import("../modal/PostCourseModal"));
@@ -25,11 +26,15 @@ const actions = [
     name: "PDF Upload",
   },
  */
-
+  {
+    icon: <TvRounded color="primary" sx={{ width: 26, height: 26 }} />,
+    name: "Post Your Event",
+  },
   {
     icon: <Work color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Post Your Job",
   },
+ 
   {
     icon: <CodeRounded color="primary" sx={{ width: 28, height: 28 }} />,
     name: "Post Milestone",
@@ -50,9 +55,10 @@ export default function BasicSpeedDial() {
   const [openModalTech, setOpenModalTech] = React.useState(false);
   const [openModalJob, setOpenModalJob] = React.useState(false);
   const [openModalCourse, setOpenModalCourse] = React.useState(false);
+  const [openModalEvent, setOpenModalEvent] = React.useState(false);
 
   // redux states access
-  const { isPostModalRedux, isLoadingPostLaunch } = useSelector(
+  const { isLoadingPostLaunch } = useSelector(
     (state) => state.appUI
   );
 
@@ -90,6 +96,10 @@ export default function BasicSpeedDial() {
                 setOpenModalJob(true);
               }
 
+              if (action.name==="Post Your Event") {
+                setOpenModalEvent(true)
+              }
+
               if (action.name === "Course Upload") {
                 setOpenModalCourse(true);
               }
@@ -107,21 +117,33 @@ export default function BasicSpeedDial() {
           />
         ))}
       </SpeedDial>
+
       {/* Tech Field Modal */}
+      {openModalTech && 
       <PostTechModal
-        openModalTech={openModalTech || isPostModalRedux}
+        openModalTech={openModalTech}
         setOpenModalTech={setOpenModalTech}
-      />
+      />}
+
       {/* Post Job Modal */}
+      {openModalJob && 
       <PostJobModal
         openModalJob={openModalJob}
         setOpenModalJob={setOpenModalJob}
-      />{" "}
+      />}
+
       {/* open post modal */}
+      {openModalCourse && 
       <PostCourseModal
         openModalCourse={openModalCourse}
         setOpenModalCourse={setOpenModalCourse}
-      />
+      />}
+      {/* open modal event */}
+      {openModalEvent && 
+      <EventsAddModal 
+      openModalEventAdd={openModalEvent}
+      setOpenModalEventAdd={setOpenModalEvent}
+      />}
     </Box>
   );
 }

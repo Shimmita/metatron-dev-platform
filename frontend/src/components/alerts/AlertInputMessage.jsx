@@ -110,13 +110,13 @@ export default function AlertInputMessage({
 
 
 // handle width of the alert
-const handleWidthAlert=()=>{
+const handleMessageWidth=()=>{
   if (CustomDeviceTablet() && isTabSideBar) {
-    return "60%"
+    return "36%"
   } else if(CustomLandScape()){
-    return "92%"
+    return "-8%"
   } else if(CustomLandscapeWidest()){
-    return "97.5%"
+    return "-5%"
   }
 }
 
@@ -127,8 +127,8 @@ const handleWidthAlert=()=>{
         keepMounted
         aria-describedby="alert-dialog-slide-description"
         sx={{
-          marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
-          width:handleWidthAlert()
+          backdropFilter:'blur(3px)',
+          marginLeft: handleMessageWidth()
         }}
       >
         <Box width={'100%'}>

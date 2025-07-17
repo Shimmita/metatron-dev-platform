@@ -24,6 +24,7 @@
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.5",
     "react-extract-colors": "^1.5.1",
+    "react-infinite-scroll-component": "^6.1.0",
     "react-lazy-load-image-component": "^1.6.3",
     "react-loader-spinner": "^6.1.6",
     "react-redux": "^9.1.2",

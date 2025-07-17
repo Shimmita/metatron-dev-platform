@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo } from "react";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import { Box, Button, styled, Typography } from "@mui/material";
 import { Close, Done } from "@mui/icons-material";
+import { Box, Button, styled, Typography } from "@mui/material";
+import React, { useMemo } from "react";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 
 
 

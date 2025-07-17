@@ -46,16 +46,16 @@ import { updateCurrentPostReactions } from "../../redux/CurrentPostReactions";
 import { updateCurrentReport } from "../../redux/CurrentPostReported";
 import { updateCurrentProfileViews } from "../../redux/CurrentProfileView";
 import AlertAboutMetatron from "../alerts/AlertAboutMetatron";
+import AlertFilterFeed from "../alerts/AlertFilterFeed";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertSponsorship from "../alerts/AlertSponsorship";
 import LogoutAlert from "../alerts/LogoutAlert";
+import SpecialisationTech from "../data/SpecialisationTech";
 import PostDetailedModal from "../modal/PostDetailedModal";
 import PostEditModal from "../modal/PostEditModal";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import AlertFilterFeed from "../alerts/AlertFilterFeed";
-import SpecialisationTech from "../data/SpecialisationTech";
 const PeopleModal = lazy(() => import("../modal/PeopleModal"));
 const AlertGlobalSearch = lazy(() => import("../alerts/AlertGlobalSearch"));
 const ProfileDrawer = lazy(() => import("../profile/drawer/ProfileDrawer"));
@@ -102,10 +102,9 @@ const Navbar = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [openAlertGeneral,setOpenAlertGeneral]=useState(false)
   const [openAlertFilter,setOpenAlertFilter]=useState(false)
-  const [feedOptions,setFeedOption]=useState(SpecialisationTech)
+  const [selectedOptions,setSelectedOptions]=useState([])
+  const feedOptions=SpecialisationTech || []
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
   // control opening of the events modal
   const [openModalEventAdd, setOpenModalEventAdd] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
@@ -113,7 +112,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
- 
+//  redux states
   const { isPeopleModal, peopleData } = useSelector(
     (state) => state.currentModal
   );
@@ -125,6 +124,8 @@ const Navbar = () => {
     const { profile_views } = useSelector((state) => state.currentProfileView);
     const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
     const { conversations } = useSelector((state) => state.currentConversation);
+    const { position:bottomNavPosition } = useSelector((state) => state.currentBottomNav);
+    
 
     // get count of conversation messages where target read is false
     const conversationsCount=conversations?.filter(conversation=>conversation?.isTargetRead===false && conversation?.senderName!==user?.name)?.length 
@@ -458,9 +459,15 @@ const Navbar = () => {
         });
     }, [currentUserId, dispatch]);
 
+    
+
+
   return (
     <React.Fragment>
-      <AppBar position="fixed" elevation={5}>
+      <AppBar 
+      sx={{ display:bottomNavPosition===0 ? "block":"none" }} 
+      position="fixed" 
+      elevation={5}>
         <MetatronToolBar variant="dense">
           {/* lg screen toolbar */}
           <LogoContent
@@ -544,6 +551,7 @@ const Navbar = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
+                  width:'100%'
                 }}
               >
                 <form className="d-flex" onSubmit={handleSubmitGlobalSearch}>
@@ -865,8 +873,10 @@ const Navbar = () => {
         {openAlertFilter && (
           <AlertFilterFeed 
           openAlert={openAlertFilter}
-          setOpenAlert={setOpenAlertFilter}
           feedData={feedOptions}
+          selectedOptions={selectedOptions}
+          setOpenAlert={setOpenAlertFilter}
+          setSelectedOptions={setSelectedOptions}
           />
         )}
 

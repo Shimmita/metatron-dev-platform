@@ -1,3 +1,4 @@
+import { Close } from "@mui/icons-material";
 import {
   Box,
   CircularProgress,
@@ -10,27 +11,22 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
-import React, { useCallback, useState } from "react";
-import devImage from "../../../images/dev.jpeg";
-import CustomCountryName from "../../utilities/CustomCountryName";
-import { Close } from "@mui/icons-material";
-import { getElapsedTime } from "../../utilities/getElapsedTime";
 import axios from "axios";
+import React, { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
-import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
 import { deleteCurrentProfileView } from "../../../redux/CurrentProfileView";
+import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
+import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
+import CustomCountryName from "../../utilities/CustomCountryName";
+import { getElapsedTime } from "../../utilities/getElapsedTime";
 
 function ProfileViewReaction({
   profile_view,
 }) {
 
-
 const [showMiniProfile, setShowMiniProfile] = useState(false);
 const [isFetching, setIsFetching] = useState(false);
 const dispatch=useDispatch()
-
-// axios default credentials
-axios.defaults.withCredentials = true;
 
 
   // handle showing of the user profile
@@ -56,7 +52,6 @@ axios.defaults.withCredentials = true;
           if (res?.data) {
             // update the redux of of profile view to reflect the current changes
             dispatch(deleteCurrentProfileView(profile_view));
-         
           }
         })
         .catch((err) => {
@@ -90,18 +85,17 @@ axios.defaults.withCredentials = true;
       border: "1px solid",
       borderColor: "divider" }}>
         <ListItemAvatar onClick={handleShowMiniProfile}>
-              <Avatar
-              src={devImage}
-              variant="rounded"
-              sx={{
-                backgroundColor: "#1976D2",
-                color: "white",
-                width: 40,
-                height: 40,
-              }}
-              alt={profile_view?.name?.split(" ")[0]}
-              aria-label="avatar"
-            />
+            <Avatar
+            src={profile_view?.avatar}
+            variant="rounded"
+            sx={{
+              backgroundColor: "#1976D2",
+              color: "white",
+              width: 40,
+              height: 40,
+            }}
+            aria-label="avatar"
+          />
         </ListItemAvatar>
         <ListItemText
           primary={
@@ -144,7 +138,6 @@ axios.defaults.withCredentials = true;
           }
           secondary={
             <Box>
-            
                 <React.Fragment>
                     <Typography variant="body2" color={"text.secondary"}>
                     {profile_view?.title}
@@ -164,8 +157,15 @@ axios.defaults.withCredentials = true;
             </Box>
           }
         />
-
       </ListItem>
+
+      {/* show mini profile */}
+      {showMiniProfile &&
+       <AlertMiniProfileView
+       openAlert={showMiniProfile}
+       setOpenAlert={setShowMiniProfile}
+       userId={profile_view?.senderId}
+      />}
       {/* show divider is is not last item */}
     </List>
      

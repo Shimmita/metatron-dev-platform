@@ -13,7 +13,8 @@ const AuthCheck = ({ children }) => {
   const [isAuthorised, setIsAuthorised] = useState(isOnline);
   
   const dispatch = useDispatch();
-  // axios to confirm with the server validity of the online status of frontend
+
+  // for secured API calls to and fro the backend
   axios.defaults.withCredentials = true;
 
   axios

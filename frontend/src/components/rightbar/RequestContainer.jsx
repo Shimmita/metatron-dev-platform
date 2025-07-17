@@ -1,16 +1,19 @@
-import { PeopleRounded } from "@mui/icons-material";
-import { Box, Typography } from "@mui/material";
+import { InfoRounded, PeopleRounded } from "@mui/icons-material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import List from "@mui/material/List";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentConnectTop } from "../../redux/CurrentConnect";
 import FriendRequest from "./layouts/FriendRequest";
+import AlertGeneral from "../alerts/AlertGeneral";
 
 export default function RequestContainer({ isLoadingPostLaunch }) {
   const { connectTop } = useSelector((state) => state.currentConnectRequest);
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
+  
   const { user } = useSelector((state) => state.currentUser);
 
   // tackle corner cases screen width
@@ -18,14 +21,12 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
   // dispatch action
   const dispatch = useDispatch();
 
-  // extracting current userId for locatin users aint friend with
+  // extracting current userId for locating users ain't friend with
   const { _id } = user || {};
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   // fetch from the backend the top 3 users
   useEffect(() => {
-    // if already available in redux dont fetch
+    // if already available in redux don't fetch
     if (connectTop) {
       return;
     }
@@ -36,7 +37,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
     // performing get request
     axios
       .get(
-        `http://localhost:5000/metatron/api/v1/connections/connection/users/${_id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/users/${_id}`,
         {
           withCredentials: true,
         }
@@ -57,6 +58,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
           return;
         }
         setErrorMessage(err?.response.data);
+        setOpenAlertGeneral(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -64,8 +66,8 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
       });
   }, [dispatch, _id, connectTop]);
 
-  // get the rightbar expanded appropritately
-  const rightBarExpaned = () => {
+  // get the rightbar expanded appropriately
+  const rightBarExpanded = () => {
     if (screenWidth > 1300) {
       return 360;
     }
@@ -93,14 +95,18 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
           <Typography fontWeight={"bold"} color={"primary"}>
             CONNECT SUGGESTION
           </Typography>
-          <PeopleRounded color="primary" />
+          {isFetching ? (
+            <CircularProgress size={16}/>
+          ):(
+            <PeopleRounded color="primary" />
+          )}
         </Box>
       </Box>
       <List
         className="rounded"
         sx={{
           bgcolor: "background.paper",
-          width: rightBarExpaned(),
+          width: rightBarExpanded(),
         }}
       >
         <Box>
@@ -115,6 +121,20 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
             ))}
         </Box>
       </List>
+
+       {/* alert general of the error message */}
+      {errorMessage && (
+        <AlertGeneral
+        title={'something went wrong!'}
+        message={errorMessage}
+        isError={true}
+        openAlertGeneral={openAlertGeneral}
+        setOpenAlertGeneral={setOpenAlertGeneral}
+        setErrorMessage={setErrorMessage}
+        defaultIcon={<InfoRounded/>}
+        />
+      )}
+
     </React.Fragment>
   );
 }

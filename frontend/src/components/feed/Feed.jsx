@@ -7,6 +7,7 @@ import BasicSpeedDial from "../custom/SpeedDial";
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import BottomNav from "../bottom/BottomNav";
 import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
+const EventsContainer =lazy(()=>import("../events/EventsContainer")) ;
 const SnackBarPostSuccess =lazy(()=>import("../snackbar/SnackBarPostSuccess")) ;
 const CoursesMainContainer =lazy(()=>import("../courses/CoursesMainContainer"));
 const CoursesInstrContainer =lazy(()=>import("../courses/CoursesInstrContainer")) ;
@@ -25,12 +26,9 @@ const PageNotFound = lazy(() => import("../notfound/PageNotFound"));
 const UserProfile = lazy(() => import("../profile/UserProfile"));
 const PostDetailsContainer = lazy(() => import("../post/PostDetailsContiner"));
 
-const LiveAttend = lazy(() => import("../attend/LiveAttendRender"));
 
 const FeedDefaultContent = lazy(() => import("./FeedDefaultContent"));
-const EventsLive = lazy(() => import("../events/EventsLive"));
-const EventsUpcoming = lazy(() => import("../events/EventsUpcoming"));
-const EventsBookMarks = lazy(() => import("../events/EventsBookMarks"));
+
 
 const Feed = () => {
   // redux states
@@ -84,6 +82,9 @@ const Feed = () => {
             <Routes>
               <Route path="/" element={<FeedDefaultContent />} />
 
+              {/* events */}
+               <Route path="/events" element={<EventsContainer />} />
+
               {/* under development */}
               <Route path="/courses/paid" element={<CoursePaidContainer />} />
               <Route
@@ -103,10 +104,6 @@ const Feed = () => {
               {/* hiring manager pane */}
               <Route path="/jobs/hiring" element={<AllJobsHiringManager/>}/>
 
-              <Route path="/events/live" element={<EventsLive />} />
-              <Route path="/events/bookmarks" element={<EventsBookMarks />} />
-              <Route path="/events/upcoming" element={<EventsUpcoming />} />
-              <Route path="/events/live-attending" element={<LiveAttend />} />
               <Route
                 path="/posts/search/results"
                 element={<FeedDefaultSearch />}
@@ -194,6 +191,9 @@ const Feed = () => {
               <Routes>
                 <Route path="/" element={<FeedDefaultContent />} />
 
+                {/* events */}
+                <Route path="/events" element={<EventsContainer />} />
+
                 {/* under development */}
                 <Route path="/courses/paid" element={<CoursePaidContainer />} />
                 <Route
@@ -213,10 +213,6 @@ const Feed = () => {
                 {/* hiring manager pane */}
                 <Route path="/jobs/hiring" element={<AllJobsHiringManager/>}/>
 
-                <Route path="/events/live" element={<EventsLive />} />
-                <Route path="/events/bookmarks" element={<EventsBookMarks />} />
-                <Route path="/events/upcoming" element={<EventsUpcoming />} />
-                <Route path="/events/live-attending" element={<LiveAttend />} />
                 <Route
                   path="/posts/search/results"
                   element={<FeedDefaultSearch />}
@@ -262,7 +258,6 @@ const Feed = () => {
                         }}
                       >
                         {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}
-
                         <BasicSpeedDial />
                       </Box>
                     )}

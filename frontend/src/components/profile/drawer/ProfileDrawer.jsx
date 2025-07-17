@@ -26,7 +26,7 @@ const UserProfileDrawer = lazy(() => import("./UserProfileDrawer"));
 
 export default function ProfileDrawer() {
   // redux states
-  const { isOpenDrawerProfile } = useSelector((state) => state.appUI);
+  const { isOpenDrawerProfile,currentMode } = useSelector((state) => state.appUI);
   const [temporaryProfileData, setTemporaryProfileData] = useState();
   const [isProfileUpdate, setIsProfileUpdate] = useState(false);
 
@@ -37,6 +37,7 @@ export default function ProfileDrawer() {
   const { user: nativeLoggedinUser, tempUserProfileID } = useSelector(
     (state) => state.currentUser
   );
+   const isDarkMode=currentMode==='dark'
 
   // dispatch
   const dispatch = useDispatch();
@@ -115,6 +116,7 @@ export default function ProfileDrawer() {
   }
 
   return (
+    <React.Fragment>
     <Drawer anchor={"right"} 
     open={isOpenDrawerProfile} onClose={handleClose}
     sx={{ 
@@ -125,6 +127,9 @@ export default function ProfileDrawer() {
         width={
          handleDrawerWidth()
         }
+        bgcolor={isDarkMode ?"background.default":"#f1f1f1"}
+        height={'100vh'}
+
       >
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
@@ -198,5 +203,7 @@ export default function ProfileDrawer() {
         </Box>
       </Box>
     </Drawer>
+    {/* other more components */}
+    </React.Fragment>
   );
 }

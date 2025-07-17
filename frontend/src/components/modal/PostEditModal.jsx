@@ -4,6 +4,7 @@ import {
   Box,
   CircularProgress,
   Collapse,
+  FormHelperText,
   IconButton,
   Modal,
   styled
@@ -156,7 +157,7 @@ const PostEditModal = () => {
                   </IconButton>
                 }
               >
-                {errorMessage}
+                 <FormHelperText>{errorMessage}</FormHelperText>
               </Alert>
             </Collapse>
           </Box>
@@ -169,7 +170,7 @@ const PostEditModal = () => {
             postDetailedData={postDetailedData} 
             setPostDetailedData={setPostDetailedData}/>
         )}
-  </Box>
+      </Box>
 
       </Box>
     </StyledModalJob>

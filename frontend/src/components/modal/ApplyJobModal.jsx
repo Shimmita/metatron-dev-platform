@@ -12,6 +12,7 @@ import {
   CircularProgress,
   Collapse,
   Divider,
+  FormHelperText,
   IconButton,
   Modal,
   Stack,
@@ -249,7 +250,7 @@ const ApplyJobModal = ({
                 color={"text.secondary"}
                 sx={{fontSize:'small' }}
               >
-                {salary}
+               {salary} P.M
               </Typography>
 
             <Typography
@@ -296,7 +297,7 @@ const ApplyJobModal = ({
                    </IconButton>
                  }
                >
-                 {errorMessage}
+                  <FormHelperText>{errorMessage}</FormHelperText>
                </Alert>
              </Collapse>
             )}
@@ -331,7 +332,7 @@ const ApplyJobModal = ({
           >
             <Stack gap={2}>
               {/* about org */}
-              <Stack>
+              <Stack mb={2}>
                 <Typography
                   variant="body2"
                   fontWeight={"bold"}
@@ -341,9 +342,9 @@ const ApplyJobModal = ({
                   About Us
                 </Typography>
                 {/* about text */}
-                <Typography p={1} variant="body2" color={"text.secondary"}>
+                <FormHelperText >
                   {organisation.about}
-                </Typography>
+                </FormHelperText>
               </Stack>
 
               {/* skills */}
@@ -375,7 +376,7 @@ const ApplyJobModal = ({
                       sx={{ width: 30, height: 30 }}
                       src={getImageMatch(skill)}
                     />
-                    {skill}
+                    <FormHelperText>{skill}</FormHelperText>
                   </Typography>
                 ))}
               </Stack>
@@ -394,19 +395,17 @@ const ApplyJobModal = ({
                 </Typography>
                 {/* Qualification data */}
                 {requirements?.qualification.map((data) => (
-                  <Typography
-                    component={"li"}
-                    variant="body2"
+                 
+                   <FormHelperText
                     key={data}
-                    gutterBottom
-                    color={"text.secondary"}
-                  >
-                    {data}
-                  </Typography>
+                    className="mb-1"
+                    component={'li'}>{
+                      data}
+                    </FormHelperText>
                 ))}
               </Stack>
 
-              {/* Mandatory Skills */}
+              {/* Job Description */}
               <Stack gap={1}>
                 <Typography
                   variant="body2"
@@ -420,15 +419,12 @@ const ApplyJobModal = ({
                 </Typography>
                 {/* Qualification data */}
                 {requirements?.description.map((data) => (
-                  <Typography
-                    component={"li"}
-                    variant="body2"
+                 <FormHelperText
                     key={data}
-                    gutterBottom
-                    color={"text.secondary"}
-                  >
-                    {data}
-                  </Typography>
+                    className="mb-1"
+                    component={'li'}>{
+                      data}
+                  </FormHelperText>
                 ))}
               </Stack>
 
@@ -439,17 +435,14 @@ const ApplyJobModal = ({
                   <React.Fragment>
                     {/* curriculum vitae application */}
                     <Box mb={1} mt={2}>
-                      <Typography
-                        variant="body2"
-                        gutterBottom
-                        className="px-1"
-                        color={"text.secondary"}
-                      >
-                        {" "}
-                        Upload your latest version of Curriculum Vitae (CV) in
-                        the format of PDF (.pdf) only.
-                      </Typography>
-
+                   
+                    <FormHelperText
+                    className="mb-1 px-1"
+                    >
+                     Upload your latest version of Curriculum Vitae (CV) in
+                     the format of PDF only.
+                    </FormHelperText>
+                        
                       {cvUpload && (
                         <Typography
                           gutterBottom

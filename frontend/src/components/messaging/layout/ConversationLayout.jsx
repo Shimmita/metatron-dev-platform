@@ -18,6 +18,7 @@ export default function ConversationLayout({
   currentUserName,
   currentUserID,
   setFocusedConversation,
+  isDarkMode=false
 }) {
   // function to reduce message header or summary
   const handleMessageSummary = () => {
@@ -67,7 +68,11 @@ export default function ConversationLayout({
 
 
   return (
-    <List sx={{ bgcolor: "background.paper" }}>
+    <List 
+    sx={{
+       bgcolor: "background.paper",
+       borderRadius:2
+       }}>
       <Box
         display={"flex"}
         justifyContent={"space-between"}
@@ -169,7 +174,8 @@ export default function ConversationLayout({
           </Box>
         </Box>
       </Box>
-      <Divider component={"li"} />
+      {/* divider */}
+      {isDarkMode && <Divider component={'li'}/>}
     </List>
   );
 }

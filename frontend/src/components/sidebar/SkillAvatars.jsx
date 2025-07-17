@@ -133,7 +133,7 @@ export default function SkillAvatars({ user, isDarkMode }) {
               variant="caption"
               p={1}
               width={"100%"}
-              color={isDarkMode ? "text.secondary":"inherit"}
+              color={"text.secondary"}
             >
               {user?.about}
             </Typography>
@@ -156,8 +156,8 @@ export default function SkillAvatars({ user, isDarkMode }) {
            >
           <Button 
           startIcon={<PhoneOutlined/>}
-          color="success"
           className="w-100"
+          disableElevation
            sx={{ 
             fontSize:'small', 
             textTransform:'capitalize',
@@ -173,6 +173,7 @@ export default function SkillAvatars({ user, isDarkMode }) {
             to={`mailto:[${DevAccountConfig.dev_email_1}]`}>
           <Button 
           startIcon={<EmailOutlined/>}
+          disableElevation
           className="w-100"
            sx={{ fontSize:'small',
             textTransform:'capitalize',

@@ -1,7 +1,9 @@
 import {
   Close,
+  CloseRounded,
   PageviewRounded,
   PreviewRounded,
+  TvRounded,
   WorkRounded,
 } from "@mui/icons-material";
 import {
@@ -12,8 +14,10 @@ import {
   CircularProgress,
   Collapse,
   IconButton,
+  MenuItem,
   TextField,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -31,6 +35,8 @@ import AccordionSearchOptions from "../modal/AccordionSearchOptions";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import SpecialisationTech from "../data/SpecialisationTech";
+import CourseIcon from "../utilities/CourseIcon";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -40,18 +46,18 @@ export default function AlertJobSearch({
   openAlert,
   setOpenAlert,
   isFullView,
+  isEventSearch=false
 }) {
   const [isFetching, setIsFetching] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useDispatch();
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   const [job_titles, setJobTile] = useState([]);
   const [country, setCountry] = React.useState("");
   const [entry, setJobEntry] = React.useState("");
   const [datePosted, setDatePosted] = React.useState("");
+  const [category, setCategory] = useState("");
 
   const handleCloseAlert = () => {
     // close alert
@@ -136,26 +142,35 @@ export default function AlertJobSearch({
     setSuccessMessage("");
   };
 
+   // handle width of alert dialog 
+    const handleAlertWidth=()=>{
+      if (CustomDeviceTablet() && isTabSideBar) {
+        return "36%"
+      } else if(CustomLandScape()){
+        return "-8%"
+      } else if(CustomLandscapeWidest()){
+        return "-5%"
+      }
+    }
+
   return (
     <Dialog
       open={openAlert}
       TransitionComponent={Transition}
       keepMounted
+      className="rounded"
+      onClose={handleCloseAlert}
       aria-describedby="alert-dialog-slide-description"
       sx={{
-        marginLeft:
-          CustomDeviceTablet() && isTabSideBar
-            ? !isFullView
-              ? "34%"
-              : "20%"
-            : CustomLandscapeWidest()
-            ? "-2%"
-            : CustomLandScape()
-            ? "-8%"
-            : undefined,
-      }}
+          backdropFilter:'blur(3px)',
+          marginLeft:handleAlertWidth()
+          }}
     >
-      <Box bgcolor={"background.default"} className="border rounded">
+      <Box 
+      bgcolor={"background.default"} 
+      border={'1px solid'}
+      borderColor={'divider'}
+      >
         <DialogTitle
           display={"flex"}
           alignItems={"center"}
@@ -163,10 +178,26 @@ export default function AlertJobSearch({
           width={"100%"}
         >
           <Box display={"flex"} gap={2} alignItems={"center"}>
-            {/*  icon */}
+          {isEventSearch ? (
+            <React.Fragment>
+               {/*  icon */}
+            <TvRounded />
+            {/* title */}
+            <Typography variant={'body1'}>
+            Tech Event Search
+            </Typography>
+            </React.Fragment>
+          ):(
+            <React.Fragment>
+              {/*  icon */}
             <WorkRounded />
             {/* title */}
+            <Typography variant={'body1'}>
             Job Search
+          </Typography>
+            </React.Fragment>
+          )}
+           
           </Box>
           <Box>{isFetching && <CircularProgress size={"20px"} />}</Box>
         </DialogTitle>
@@ -227,7 +258,7 @@ export default function AlertJobSearch({
         )}
         <DialogContent>
           <DialogContentText gutterBottom mb={2}>
-            provide the name(s) of the job and click on the search icon.
+            provide the name of the {isEventSearch ? "event":"job"} and click on the search icon.
           </DialogContentText>
           <Autocomplete
             multiple
@@ -239,10 +270,9 @@ export default function AlertJobSearch({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label={`Name(s)`}
-                placeholder="React Python Angular Laravel"
+                label='name'
+                placeholder="React, Angular, Python, Java"
                 fullWidth
-                required
               />
             )}
             renderTags={(value, getTagProps) =>
@@ -255,6 +285,38 @@ export default function AlertJobSearch({
               ))
             }
           />
+          {/* category */}
+
+          <Box mt={2}>
+             <TextField
+              select
+              disabled={isFetching}
+              value={category}
+              label={isEventSearch ? "event specialization":"job specialization"}
+              fullWidth
+              onChange={(e) => setCategory(e.target.value)}
+                >
+                  {SpecialisationTech?.filter((about) => about !== "None").map(
+                  (about, index) => (
+                    <MenuItem
+                      key={about}
+                      value={about}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                      }}
+                    >
+                      {/* icon */}
+                      <CourseIcon option={about} />
+                      {/* name */}
+                      <small style={{ fontSize: "small" }}>{about}</small>
+                    </MenuItem>
+                  )
+                    )}
+                </TextField>
+          </Box>
+
           {/* more search options accordion */}
           <Box mt={2}>
             <AccordionSearchOptions
@@ -267,6 +329,7 @@ export default function AlertJobSearch({
               successMessage={successMessage}
               errorMessage={errorMessage}
               isFetching={isFetching}
+              isEventSearch={isEventSearch}
             />
           </Box>
         </DialogContent>
@@ -289,25 +352,18 @@ export default function AlertJobSearch({
             </Box>
           ) : (
             <React.Fragment>
-              <Button
-                disabled={isFetching || errorMessage || successMessage}
-                onClick={handleFetchingJobsSearch}
-                startIcon={
-                  <Tooltip arrow title="search">
-                    <PageviewRounded sx={{ width: 23, height: 23 }} />
-                  </Tooltip>
-                }
-              />
-              <Button
-                disabled={isFetching || errorMessage || successMessage}
-                onClick={handleCloseAlert}
-                startIcon={
-                  <Tooltip arrow title="close">
-                    {" "}
-                    <Close sx={{ width: 18, height: 18 }} />{" "}
-                  </Tooltip>
-                }
-              />
+            {/* search button */}
+            <Box mr={2}>
+            <Tooltip arrow title="search">
+            <IconButton 
+            disabled={isFetching || errorMessage || successMessage}
+            onClick={handleFetchingJobsSearch}
+            >
+             <PageviewRounded sx={{ width: 23, height: 23 }} />
+            </IconButton>
+            </Tooltip>
+            </Box>
+
             </React.Fragment>
           )}
         </DialogActions>

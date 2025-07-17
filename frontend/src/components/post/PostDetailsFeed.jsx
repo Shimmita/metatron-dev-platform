@@ -33,9 +33,8 @@ import axios from "axios";
 import React, { lazy, useLayoutEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useSelector } from "react-redux";
-import dev from "../../images/dev.jpeg";
+import AlertReportPost from "../alerts/AlertReportPost";
 import CardFeedMore from "../custom/CardFeedMore";
-import PostData from "../data/PostData";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
@@ -45,7 +44,6 @@ import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
-import AlertReportPost from "../alerts/AlertReportPost";
 const AlertMiniProfileView = lazy(() =>
   import("../alerts/AlertMiniProfileView")
 );

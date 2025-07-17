@@ -1,11 +1,12 @@
-import { CodeRounded } from "@mui/icons-material";
-import { Box, Typography } from "@mui/material";
+import { BarChart, InfoRounded } from "@mui/icons-material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import List from "@mui/material/List";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentPostsTop } from "../../redux/CurrentPostsTop";
 import FeaturedPost from "./layouts/FeaturedPost";
+import AlertGeneral from "../alerts/AlertGeneral";
 
 const screenWidth = window.screen.availWidth;
 // get the rightbar expanded appropriately
@@ -26,6 +27,7 @@ const rightBarExpanded = () => {
 export default function FeaturedPostContainer() {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
 
   const dispatch = useDispatch();
 
@@ -61,6 +63,7 @@ export default function FeaturedPostContainer() {
           return;
         }
         setErrorMessage(err?.response.data);
+        setOpenAlertGeneral(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -81,11 +84,17 @@ export default function FeaturedPostContainer() {
           <Typography fontWeight={"bold"} color={"primary"}>
             FEATURED POST
           </Typography>
-          <CodeRounded color="primary" sx={{width:26, height:26}} />
+
+          {/* loading content when not ready */}
+          {isFetching ? (
+            <CircularProgress size={18}/>
+          ):(
+            <BarChart color="primary" sx={{width:22, height:22}} />
+          )}
         </Box>
       </Box>
       <List
-        className="rounded mt-1"
+        className="rounded mt-2"
         sx={{
           bgcolor: "background.paper",
           width: rightBarExpanded(),
@@ -94,11 +103,27 @@ export default function FeaturedPostContainer() {
         <Box>
           {postsTop?.map((post, index) => (
               <Box key={post?._id}>
-                <FeaturedPost post={post} />
+                <FeaturedPost 
+                isLastIndex={index===postsTop?.length-1}
+                post={post} />
               </Box>
             ))}
         </Box>
       </List>
+
+       {/* alert general of the error message */}
+        {errorMessage && (
+          <AlertGeneral
+          title={'something went wrong!'}
+          message={errorMessage}
+          isError={true}
+          openAlertGeneral={openAlertGeneral}
+          setOpenAlertGeneral={setOpenAlertGeneral}
+          setErrorMessage={setErrorMessage}
+          defaultIcon={<InfoRounded/>}
+          />
+        )}
+
     </React.Fragment>
   );
 }

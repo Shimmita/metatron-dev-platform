@@ -1,5 +1,4 @@
 const EducationLevel = [
-  "Secondary School",
   "Diploma Certificate",
   "Bachelors Degree",
   "Masters Degree",

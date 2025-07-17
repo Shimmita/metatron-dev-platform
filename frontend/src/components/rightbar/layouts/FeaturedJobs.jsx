@@ -24,7 +24,7 @@ import { getImageMatch } from "../../utilities/getImageMatch";
 const MAX_APPLICANTS=300
 
 
-function FeaturedJobs({ isLoading, jobTop }) {
+function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
   const [openApplyJobModal, setOpenApplyJobModal] = useState();
   // redux states
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
@@ -184,7 +184,7 @@ function FeaturedJobs({ isLoading, jobTop }) {
               </Box>
 
                 <React.Fragment>
-                  {/* button apply */}
+                {/* button apply */}
                 <Button
                   disableElevation
                   size="small"
@@ -205,10 +205,12 @@ function FeaturedJobs({ isLoading, jobTop }) {
             </Stack>
           </ListItem>
         
-          <Divider variant="inset" component="li" />
+         {/* show divider only if the job is not the last index */}
+         {!isLastIndex &&  <Divider variant="inset" component="li" />}
         </List>
       )}
       {/* show modal apply jobs */}
+      {openApplyJobModal && 
       <ApplyJobModal
         title={jobTop?.title}
         organisation={jobTop?.organisation}
@@ -221,7 +223,7 @@ function FeaturedJobs({ isLoading, jobTop }) {
         salary={jobTop?.salary}
         skills={jobTop?.skills}
         location={jobTop?.location}
-      />{" "}
+      />}
     </React.Fragment>
   );
 }

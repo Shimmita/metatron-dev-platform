@@ -1,5 +1,4 @@
 import {
-  DarkModeRounded,
   FavoriteOutlined,
   GradeOutlined,
   HighlightOffOutlined,
@@ -51,9 +50,8 @@ import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
   handleSidebarRightbar,
-  resetDarkMode,
   showMessagingDrawer,
-  showUserProfileDrawer,
+  showUserProfileDrawer
 } from "../../redux/AppUI";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertJobSearch from "../alerts/AlertJobSearch";

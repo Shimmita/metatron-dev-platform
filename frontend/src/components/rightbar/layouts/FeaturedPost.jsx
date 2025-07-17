@@ -11,9 +11,8 @@ import {
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { getImageMatch } from "../../utilities/getImageMatch";
-import DevImage from '../../../images/dev.jpeg'
 
-function FeaturedPost({ post }) {
+function FeaturedPost({ post,isLastIndex }) {
   const navigate=useNavigate()
 
     // navigate to post details routed page, else close the drawer notification
@@ -52,13 +51,10 @@ function FeaturedPost({ post }) {
     <Box display={'flex'} justifyContent={'space-around'} alignItems={'center'}>
       {/* image preview of the post */}
       <Box className={'rounded'} sx={{ border:'1px solid', borderColor:'divider' }}>
-    <Avatar alt="" src={handlePostImagePresent()} variant="rounded" sx={{ width:125, height:125 }}/>
+    <Avatar alt="" src={handlePostImagePresent()} variant="rounded" sx={{ width:80, height:80 }}/>
       </Box>
           <Stack gap={1} justifyContent={'center'}>
-            <Box display={'flex'} justifyContent={'center'} flexDirection={'column'} width={'100%'} alignItems={'center'} >
-            <Avatar alt="" src={DevImage} sx={{ width:28,height:28, mb:0.5 }}/>
-            <Typography variant="body2" textAlign={'center'} sx={{ fontSize:'small' }}>{post?.post_owner?.ownername}</Typography>
-            </Box>
+           
           <Typography variant="body2" fontWeight={'bold'} textAlign={'center'}>{post?.post_title}</Typography>
           <Typography variant="body2"  textAlign={'center'}>  {postCategoryLength()}
           </Typography>
@@ -149,8 +145,10 @@ function FeaturedPost({ post }) {
             </Box>
           </Stack>
     </Box>
-  
     </CardActionArea>
+
+      {/* show divider only if the job is not the last index */}
+      {!isLastIndex &&  <Divider variant="inset" component="li" className="m-3" />}
     </Box>
 
 

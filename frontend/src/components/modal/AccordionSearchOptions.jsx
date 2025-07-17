@@ -61,6 +61,7 @@ export default function AccordionSearchOptions({
   isFetching,
   successMessage,
   errorMessage,
+  isEventSearch=false
 }) {
   const [expanded, setExpanded] = React.useState(false);
 
@@ -80,13 +81,15 @@ export default function AccordionSearchOptions({
         <AccordionSummary aria-controls="panel1d-content" id="panel1d-header" />
         <AccordionDetails>
           <Stack gap={2} display={"flex"} justifyContent={"center"}>
-            {/* date posted */}
+           {/* if is event search show advanced options only for events */}
+           {!isEventSearch && (
+            <React.Fragment>
+             {/* date posted */}
             <TextField
-              variant="standard"
               select
               value={datePosted}
               disabled={isFetching || errorMessage || successMessage}
-              label="Period"
+              label="period"
               fullWidth
               onChange={(e) => setDatePosted(e.target.value)}
             >
@@ -99,10 +102,9 @@ export default function AccordionSearchOptions({
 
             {/* level of entry */}
             <TextField
-              variant="standard"
               select
               value={entry}
-              label="Expertise"
+              label="expertise"
               disabled={isFetching || errorMessage || successMessage}
               fullWidth
               onChange={(e) => setJobEntry(e.target.value.trim())}
@@ -113,12 +115,15 @@ export default function AccordionSearchOptions({
                   </MenuItem>
                 ))}
             </TextField>
-            {/* country */}
+            </React.Fragment>
+           ) }
+
+
+            {/* country, shown in both searches by default */}
             <TextField
-              variant="standard"
               select
               value={country}
-              label="Location"
+              label="location"
               disabled={isFetching || errorMessage || successMessage}
               fullWidth
               onChange={(e) => setCountry(e.target.value?.trim())}
@@ -129,6 +134,8 @@ export default function AccordionSearchOptions({
                   </MenuItem>
                 ))}
             </TextField>
+
+           
           </Stack>
         </AccordionDetails>
       </Accordion>

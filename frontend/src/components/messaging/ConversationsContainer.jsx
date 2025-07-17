@@ -1,15 +1,13 @@
 import { Message } from "@mui/icons-material";
-import { Box, Fab, Tooltip } from "@mui/material";
+import { Box, Fab, Stack, Tooltip } from "@mui/material";
 import axios from "axios";
 import React, { useCallback, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import ConversationDetailed from "./ConversationDetailed";
 import ConversationLayout from "./layout/ConversationLayout";
 import NewConversation from "./layout/NewConversation";
 
 export default function ConversationsContainer({ setMessageNotifClicked }) {
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
     // hold the message clicked bool
     const [messageClicked, setMessageClicked] = useState(false);
@@ -19,16 +17,20 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
 
   // api request monitors
   const [isFetching, setIsFetching] = useState(false);
-  const [focusedConveration, setFocusedConversation] = useState();
+  const [focusedConversation, setFocusedConversation] = useState();
 
   // get redux states
   const { user } = useSelector((state) => state.currentUser);
   const { conversations } = useSelector((state) => state.currentConversation);
-  const dispatch=useDispatch()
+  const { currentMode } = useSelector(
+      (state) => state.appUI
+    );
 
   // extracting user id
   const { _id: currentUserID } = user;
 
+  // controls dark theme
+  const isDarkMode=currentMode==='dark'
 
   // handle complete opening the focused conversation
   const handleOpenFocusedConversation = () => {
@@ -51,12 +53,12 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
 
   
 
-    if (focusedConveration) {
+    if (focusedConversation) {
       // update the attribute sender or target read the conversation based on the current user
       // usually the current user should not be the one updated but target,
       if (
-        currentUserID === focusedConveration?.lastSenderId ||
-        focusedConveration?.isTargetRead
+        currentUserID === focusedConversation?.lastSenderId ||
+        focusedConversation?.isTargetRead
       ) {
         // proceed to conversation details since last conversation message was read or user is the sender
         handleOpenFocusedConversation();
@@ -69,7 +71,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
 
           // api request
           const response = await axios.put(
-            `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/last/${focusedConveration?._id}`
+            `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/last/${focusedConversation?._id}`
           );
           // if response data means updated the isTargetRead thus lets now open the conversation details
           if (response.data) {
@@ -113,7 +115,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
           >
             {/* if message not clicked display all conversations summarily */}
             {!messageClicked ? (
-              <Box pt={2} pb={2}>
+              <Stack p={1} gap={1}>
                 {
                   conversations?.map((conversation, index) => (
                     <ConversationLayout
@@ -123,15 +125,16 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
                       currentUserName={user?.name}
                       currentUserID={currentUserID}
                       setFocusedConversation={setFocusedConversation}
+                      isDarkMode={isDarkMode}
                     />
                   ))}
-              </Box>
+              </Stack>
             ) : (
               // show message details and pass props for altering its state of visibility
               <Box>
                 <ConversationDetailed
                   handleConversationClicked={handleConversationClicked}
-                  focusedConveration={focusedConveration}
+                  focusedConveration={focusedConversation}
                   currentUserName={user?.name}
                   currentUserID={user?._id}
                 />
@@ -147,7 +150,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
                 aria-label="start a new message conversation"
                 disabled={isFetching}
                 onClick={handleFabClicked}
-                sx={{ left: "46%", mt: 10 }}
+                sx={{ left: "46%", mt: 8 }}
               >
                 <Message />
               </Fab>
