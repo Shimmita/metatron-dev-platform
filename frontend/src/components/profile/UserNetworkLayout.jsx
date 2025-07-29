@@ -1,11 +1,12 @@
 import { EmailOutlined, PersonRemoveOutlined } from "@mui/icons-material";
-import { AvatarGroup, Box, Divider, IconButton, Tooltip, Typography } from "@mui/material";
+import { AvatarGroup, Box, IconButton, Tooltip, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
-import React, { useState } from "react";
+import axios from "axios";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import devImage from '../../images/dev.jpeg';
@@ -17,7 +18,6 @@ import { updateTempUserIDRedux, updateUserCurrentUserRedux } from "../../redux/C
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../utilities/getImageMatch";
-import axios from "axios";
 
 export default function UserNetworkLayout({ network }) {
   // redux states

@@ -4,8 +4,7 @@ import {
   EmailRounded,
   GitHub,
   Language,
-  LinkedIn,
-  MessageOutlined
+  LinkedIn
 } from "@mui/icons-material";
 import {
   Alert,
@@ -28,11 +27,11 @@ import Slide from "@mui/material/Slide";
 import axios from "axios";
 import React, { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
-import CustomLandScape from "../utilities/CustomLandscape";
-import { Link } from "react-router-dom";
 import AlertInputMessage from "./AlertInputMessage";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -80,6 +79,7 @@ export default function AlertMiniProfileView({
   const [message, setMessage] = useState("");
   const [isOnline, setIsOnline] = useState(false);
   const [openAlertMessage,setOpenAlertMessage]=useState(false)
+  console.log(miniProfileData)
 
   // redux states
   const { user } = useSelector((state) => state.currentUser);
@@ -220,26 +220,10 @@ export default function AlertMiniProfileView({
                       anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                       variant="dot"
                     >
-                      <Avatar src="" alt="" sx={{ width: 50, height: 50 }}>
-                        <Typography
-                          variant="body2"
-                          textTransform={"uppercase"}
-                          fontWeight={"bold"}
-                        >
-                          {miniProfileData?.name[0]}
-                        </Typography>
-                      </Avatar>
+                      <Avatar src={miniProfileData?.avatar} alt="" sx={{ width: 50, height: 50 }}/>
                     </StyledBadge>
                   ) : (
-                    <Avatar src="" alt="" sx={{ width: 50, height: 50 }}>
-                      <Typography
-                        variant="body2"
-                        textTransform={"uppercase"}
-                        fontWeight={"bold"}
-                      >
-                        {miniProfileData?.name[0]}
-                      </Typography>
-                    </Avatar>
+                   <Avatar src={miniProfileData?.avatar} alt="" sx={{ width: 50, height: 50 }}/>
                   )}
                 </Box>
                 {/* name of the user */}
@@ -259,7 +243,7 @@ export default function AlertMiniProfileView({
 
                   {/* friends status */}
                   {isFriends && (
-                    <Box mb={1} display={"flex"} justifyContent={"center"}>
+                    <Box my={0.5} display={"flex"} justifyContent={"center"}>
                       <Typography variant="caption" color={"text.secondary"}>
                         ( You are friends )
                       </Typography>
@@ -268,7 +252,7 @@ export default function AlertMiniProfileView({
 
                   {/* displayed if the current user is the one being checked */}
                   {userId === currentUserId && (
-                    <Box display={"flex"} justifyContent={"center"}>
+                    <Box display={"flex"} justifyContent={"center"} my={0.5}>
                       <Typography
                         variant="caption"
                         textTransform={"capitalize"}
@@ -281,7 +265,7 @@ export default function AlertMiniProfileView({
                   )}
                 </Box>
                 {/* specialisation */}
-                <Box display={"flex"} justifyContent={"center"}>
+                <Box display={"flex"} justifyContent={"center"} mb={1}>
                   <Typography variant="body2" color={"text.secondary"}>
                     {miniProfileData?.specialisationTitle}
                   </Typography>
@@ -290,15 +274,15 @@ export default function AlertMiniProfileView({
                 <Box
                   display={"flex"}
                   justifyContent={"space-between"}
-                  gap={3}
+                  gap={2}
                   alignItems={"center"}
+                  
                 >
-                  {/* country */}
+                  {/* state or county */}
                   <Typography variant="body2" color={"text.secondary"}>
-                    {/* call this if only miniprofile data present */}
-                    {miniProfileData &&
-                      handleCountryName(miniProfileData?.country)}
+                    {miniProfileData?.county}
                   </Typography>
+                 
                   {/* divider vert */}
                   <Divider
                     component={"div"}
@@ -306,9 +290,11 @@ export default function AlertMiniProfileView({
                     orientation="vertical"
                     className="p-1"
                   />
-                  {/* state or county */}
+                 {/* country */}
                   <Typography variant="body2" color={"text.secondary"}>
-                    {miniProfileData?.county}
+                    {/* call this if only miniprofile data present */}
+                    {miniProfileData &&
+                      handleCountryName(miniProfileData?.country)}
                   </Typography>
 
                   {/* divider vert */}

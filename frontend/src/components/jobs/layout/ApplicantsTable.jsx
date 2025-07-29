@@ -8,16 +8,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import devImage from '../../../images/dev.jpeg';
+import axios from 'axios';
+import React, { useLayoutEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import AlertInputMessage from '../../alerts/AlertInputMessage';
+import AlertMiniProfileView from '../../alerts/AlertMiniProfileView';
+import CustomCountryName from '../../utilities/CustomCountryName';
 import CustomDeviceIsSmall from '../../utilities/CustomDeviceIsSmall';
 import CustomDeviceTablet from '../../utilities/CustomDeviceTablet';
 import { getImageMatch } from '../../utilities/getImageMatch';
-import React, { useState,useLayoutEffect } from 'react';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import CustomCountryName from '../../utilities/CustomCountryName';
-import AlertMiniProfileView from '../../alerts/AlertMiniProfileView';
-import AlertInputMessage from '../../alerts/AlertInputMessage';
 
 const columnsHeader = [
   { id: 'profile', label: 'Profile', minWidth: 170 },
@@ -318,7 +317,7 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                             <Tooltip title={'profile'} arrow>
                               <Avatar
                             sx={{ width: 34, height: 34 }}
-                            src={devImage}
+                            src={""}
                             alt={""}
                             />
                             </Tooltip>

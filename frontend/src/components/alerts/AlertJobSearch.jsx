@@ -1,10 +1,9 @@
 import {
   Close,
-  CloseRounded,
   PageviewRounded,
   PreviewRounded,
   TvRounded,
-  WorkRounded,
+  WorkRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -29,14 +28,15 @@ import Slide from "@mui/material/Slide";
 import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { updateCurrentEvents } from "../../redux/CurrentEvents";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
 import AllSkills from "../data/AllSkillsData";
+import SpecialisationTech from "../data/SpecialisationTech";
 import AccordionSearchOptions from "../modal/AccordionSearchOptions";
+import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import SpecialisationTech from "../data/SpecialisationTech";
-import CourseIcon from "../utilities/CourseIcon";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -45,7 +45,6 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function AlertJobSearch({
   openAlert,
   setOpenAlert,
-  isFullView,
   isEventSearch=false
 }) {
   const [isFetching, setIsFetching] = useState(false);
@@ -94,13 +93,23 @@ export default function AlertJobSearch({
       datePosted,
     };
 
+    // event search object that will be sent to the backend
+    const eventObject={
+      job_titles,
+      country,
+      category
+    }
+
     // set is fetching to true
     setIsFetching(true);
-    // performing post request
+    // performing post request, if jobs search use appropriate route
+    // else if events too
     axios
       .post(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search/${user?._id}`,
-        jobSearch,
+        isEventSearch ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/search`:
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search/${user?._id}`
+        ,
+        isEventSearch ? eventObject:jobSearch,
         {
           withCredentials: true,
         }
@@ -110,6 +119,8 @@ export default function AlertJobSearch({
         if (res?.data) {
           // update success message
           setSuccessMessage(res.data?.message);
+          // update events redux
+          isEventSearch ? dispatch(updateCurrentEvents(res.data.data)):
           // update the redux states for job search
           dispatch(updateCurrentJobs(res.data?.data));
         } else {
@@ -125,7 +136,7 @@ export default function AlertJobSearch({
         }
         if (err?.code === "ERR_NETWORK") {
           setErrorMessage(
-            "server unreachable please try again later to complete your request"
+            "server unreachable!"
           );
           return;
         }
@@ -285,6 +296,7 @@ export default function AlertJobSearch({
               ))
             }
           />
+
           {/* category */}
 
           <Box mt={2}>

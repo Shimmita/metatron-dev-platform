@@ -1,14 +1,17 @@
 import {
   Close,
   DarkModeRounded,
+  DiamondRounded,
   EmailRounded,
   ErrorOutline,
+  FilterListRounded,
+  FilterRounded,
   MenuRounded,
   NotificationsRounded,
-  SearchRounded,
-  SortRounded
+  SearchRounded
 } from "@mui/icons-material";
 import {
+  alpha,
   AppBar,
   Avatar,
   Badge,
@@ -16,6 +19,7 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  InputBase,
   styled,
   Toolbar,
   Tooltip,
@@ -92,6 +96,42 @@ const LogoContent = styled(Box)({
   justifyContent: "space-between",
   alignItems: "center",
 });
+
+
+ // search bar option
+  const Search = styled('div')(({ theme }) => ({
+    position: 'relative',
+    borderRadius: '20px',
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+      marginLeft: theme.spacing(1),
+      width: 'auto',
+    },
+  }));
+  
+
+  
+  const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: 'inherit',
+    width: '100%',
+    '& .MuiInputBase-input': {
+      padding: theme.spacing(1, 1, 1, 0),
+      // vertical padding + font size from searchIcon
+      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+      transition: theme.transitions.create('width'),
+      [theme.breakpoints.up('sm')]: {
+        width: '15ch',
+        '&:focus': {
+          width: '20ch',
+        },
+      },
+    },
+  }));
 
 const Navbar = () => {
   const [isFetching, setIsFetching] = useState(false);
@@ -209,7 +249,7 @@ const Navbar = () => {
     // activate fetching
     setIsFetching(true);
 
-    // start the put request axios
+    // start the =get request axios, global search
     axios.get(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/global/search/${searchTerm}`,
         {
@@ -459,15 +499,13 @@ const Navbar = () => {
         });
     }, [currentUserId, dispatch]);
 
-    
-
 
   return (
     <React.Fragment>
       <AppBar 
-      sx={{ display:bottomNavPosition===0 ? "block":"none" }} 
+      color={isDarkMode ? "default":"transparent"}
       position="fixed" 
-      elevation={5}>
+      elevation={0}>
         <MetatronToolBar variant="dense">
           {/* lg screen toolbar */}
           <LogoContent
@@ -485,9 +523,9 @@ const Navbar = () => {
             gap={1}>
               <Avatar alt="KE" 
               src={AppLogo} 
-              sx={{ width: 40, height: 40 }} />
+              sx={{ width: 50, height: 50 }} />
                 <Button onClick={handleHome} >
-                  <Typography variant="h6" fontWeight={"bold"} sx={{ color:'white' }}>
+                  <Typography variant="h6" fontWeight={"bold"} >
                     METATRON
                   </Typography>
                 </Button>
@@ -505,9 +543,9 @@ const Navbar = () => {
               {!CustomDeviceTablet() ? (
                 <React.Fragment>
                   <IconButton onClick={(e) => setOpenDrawer(!openDrawer)}>
-                    <MenuRounded style={{ color: "white" }} />
+                    <MenuRounded  />
                   </IconButton>
-                  <IconButton onClick={handleHome} style={{ color: "white" }}>
+                  <Button onClick={handleHome} >
                     {/* app title small devices */}
                     <Typography
                       fontWeight={"bold"}
@@ -515,7 +553,7 @@ const Navbar = () => {
                     >
                       METATRON
                     </Typography>
-                  </IconButton>
+                  </Button>
                 </React.Fragment>
               ) : (
                 <Box display={"flex"} ml={0} alignItems={"center"} gap={1}>
@@ -529,23 +567,26 @@ const Navbar = () => {
                     </IconButton>
 
                   {/* app title for tablets */}
+                  <Button>
                     <Typography
                       variant="h6"
                       fontWeight={"bold"}
-                      style={{ color: "white" }}
+                      
                     >
                       METATRON
                     </Typography>
-                  
-
+                    </Button>
+                
                 </Box>
               )}
             </LogoContent>
           )}
 
-          {/* visible on lg screens always */}
-          {window.screen.availWidth > 500 && (
-            <SearchBar>
+          {/* visible on lap and ++ screens always */}
+          {!(CustomDeviceIsSmall()||CustomDeviceTablet()) && (
+            <SearchBar sx={{ 
+              ml:10
+             }}>
               <Box
                 sx={{
                   display: "flex",
@@ -555,17 +596,21 @@ const Navbar = () => {
                 }}
               >
                 <form className="d-flex" onSubmit={handleSubmitGlobalSearch}>
-                  <Box>
-                    <input
+                    <Search>
+                    <StyledInputBase
+                      placeholder="search…"
+                      inputProps={{ 'aria-label': 'search' }}
+                      sx={{ 
+                        backgroundColor:!isDarkMode && '#F1F1F1',
+                       borderRadius:'20px',
+                       fontSize:'small'
+                        }}
                       type="text"
                       disabled={isFetching}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder={"search..."}
-                      className="form-control w-100 border-0 text-secondary rounded-5"
                     />
-                  </Box>
-                  
+                  </Search>
                   <Box 
                   display={'flex'} 
                   alignItems={'center'}
@@ -575,7 +620,7 @@ const Navbar = () => {
                     {isFetching ? (
                       <CircularProgress
                         size={18}
-                        sx={{ color: "white", ml: 1 }}
+                        sx={{  ml: 1 }}
                       />
                     ) : (
                       <React.Fragment>
@@ -585,20 +630,20 @@ const Navbar = () => {
                         type="submit"
                       >
                         <SearchRounded
-                          sx={{ width: 20, height: 20, color: "white" }}
+                          sx={{ width: 20, height: 20,}}
                         />
                       </IconButton>
                       </Tooltip>
 
                       <Tooltip
-                       title={'sort'} 
+                       title={'filter'} 
                        arrow
                         >
                       <IconButton
                       onClick={handleShowContentFilter}
                     >
-                      <SortRounded
-                        sx={{ width: 20, height: 20, color: "white" }}
+                      <FilterListRounded
+                        sx={{ width: 22, height: 22, }}
                       />
                     </IconButton>
                     </Tooltip>
@@ -612,92 +657,93 @@ const Navbar = () => {
             </SearchBar>
           )}
 
-          {/* show search bar on small devices when necessary */}
-          {showMobileSearch && (
-            <SearchBar>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <form
-                  className="d-flex gap-1 ps-5"
-                  onSubmit={handleSubmitGlobalSearch}
-                >
-                  <Box>
-                    <input
-                      type="text"
-                      disabled={isFetching}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder={"search..."}
-                      className="form-control w-100 border-0 text-secondary"
-                    />
-                  </Box>
+         
+         {/* shown in small devices and tabs */}
+            <Box 
+            justifyContent={'center'}
+            alignItems={'center'}
+            display={showMobileSearch? "block":"none"}
+            width={'100%'}
+            ml={CustomDeviceIsSmall()?2:20}
+            >
+                <SearchBar className="ms-5">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <form
+                      className="d-flex gap-1"
+                      onSubmit={handleSubmitGlobalSearch}
+                    >
+                      <Search>
+                        <StyledInputBase
+                          placeholder="search…"
+                          inputProps={{ 'aria-label': 'search' }}
+                          sx={{ 
+                            backgroundColor:!isDarkMode && '#F1F1F1',
+                          borderRadius:'20px',
+                          fontSize:'small'
+                            }}
+                          type="text"
+                          disabled={isFetching}
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </Search>
 
-                  <Box>
-                    {isFetching ? (
-                      <CircularProgress size={18} sx={{ color: "white" }} />
-                    ) : (
-                      <IconButton
-                        type="submit"
-                        disabled={searchTerm?.length < 2}
+                      <Box>
+                        {isFetching ? (
+                          <CircularProgress size={18} />
+                        ) : (
+                          <IconButton
+                            type="submit"
+                            disabled={searchTerm?.length < 2}
+                          >
+                            <SearchRounded
+                              sx={{ width: 22, height: 22,  }}
+                            />
+                          </IconButton>
+                        )}
+                      </Box>
+                    </form>
+                    <Tooltip
+                          title={'filter'} 
+                          arrow
+                          >
+                        <IconButton
+                        onClick={handleShowContentFilter}
                       >
-                        <SearchRounded
-                          sx={{ width: 20, height: 20, color: "white" }}
+                        <FilterListRounded
+                          sx={{ width: 20, height: 20}}
                         />
                       </IconButton>
-                    )}
+                      </Tooltip>
+
+                    <IconButton onClick={handleShowMobileSearch}>
+                      <Close sx={{ width: 18, height: 18,}} />
+                    </IconButton>
                   </Box>
-                </form>
-
-                {/* // filter icon */}
-                 <Tooltip
-                      title={'sort'} 
-                      arrow
-                      >
-                    <IconButton
-                    onClick={handleShowContentFilter}
-                  >
-                    <SortRounded
-                      sx={{ width: 20, height: 20, color: "white" }}
-                    />
-                  </IconButton>
-                  </Tooltip>
-
-                <IconButton onClick={handleShowMobileSearch}>
-                  <Close sx={{ width: 18, height: 18, color: "whitesmoke" }} />
-                </IconButton>
-              </Box>
-            </SearchBar>
-          )}
+                </SearchBar>
+         </Box>
 
           <IconsContainer>
-            {window.screen.availWidth < 500 && (
-              <Box>
+            {(CustomDeviceIsSmall()||CustomDeviceTablet()) && (
+              <Box 
+             
+              >
                 {/* display when search not clicked */}
                 {!showMobileSearch && (
                   <IconButton onClick={handleShowMobileSearch}>
-                    <SearchRounded style={{ color: "white" }} />
+                    <SearchRounded  />
                   </IconButton>
                 )}
-              </Box>
-            )}
+                  </Box>
+                )}
 
-            {/* change theme trigger */}
-            {!CustomDeviceIsSmall() && (
-                    <IconButton  onClick={handleShowDarkMode}> 
-                    <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
-                    <DarkModeRounded
-                  
-                      sx={{ color: "white", height:25, width:25 }}
-                    />
-                  </Tooltip> 
-                  </IconButton>
-            )}
-            
+        
             {/* display when search not clicked */}
             {!showMobileSearch && (
               <Box
@@ -711,11 +757,34 @@ const Navbar = () => {
                     : 2
                 }
               >
+
+                {!CustomDeviceIsSmall() && (
+                <React.Fragment>
+                {/* premium diamond icon */}
+                <Tooltip arrow title='premium'>
+                <IconButton>
+                <DiamondRounded 
+                sx={{ height:28, width:28,pt:0.5 }}/>
+                </IconButton>
+                </Tooltip>
+              
+                 {/* change theme trigger */}
+                <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
+                <IconButton  onClick={handleShowDarkMode}> 
+                <DarkModeRounded
+                sx={{ height:24, width:24 }}
+                />
+                </IconButton>
+                </Tooltip> 
+
+                </React.Fragment>
+                )}
+
                 {/* notifications icon */}
                 <Tooltip 
                 arrow 
                 title={"notifications"} 
-                className={CustomDeviceIsSmall() ? 'me-1':'me-3'}
+                className={CustomDeviceIsSmall() ? 'me-1':'me-2'}
                 >
                 <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
                     <IconButton
@@ -723,7 +792,7 @@ const Navbar = () => {
                       onClick={()=>handleShowMessageDrawer(0)}
                     >
                       <NotificationsRounded
-                        sx={{ width: 25, height: 25, color: "white" }}
+                        sx={{ width: 25, height: 25, }}
                       />
                     </IconButton>
                 </Badge>
@@ -736,19 +805,18 @@ const Navbar = () => {
                 >
                 <Badge 
                 badgeContent={conversationsCount} 
-                className={!CustomDeviceIsSmall() && 'me-2'}
+                className={!CustomDeviceIsSmall() && 'me-1'}
                 color="warning">
                   <IconButton
                     sx={{ padding: 0 }}
                     onClick={()=>handleShowMessageDrawer(1)}
                   >
                     <EmailRounded
-                      sx={{ width: 22, height: 22,  color: "white" }}
+                      sx={{ width: 22, height: 22, }}
                     />
                   </IconButton>
                 </Badge>
                 </Tooltip>
-
 
                 {/* avatar for profile icon */}
                 <Tooltip 
@@ -756,7 +824,7 @@ const Navbar = () => {
                 title={"profile"}>
                   <IconButton onClick={handleShowingProfileDrawer}>
                     <Avatar
-                      sx={{ width: 30, height: 30 }}
+                      sx={{ width: 32, height: 32 }}
                       src={user?.avatar}
                       alt={''}
                     />
@@ -767,7 +835,6 @@ const Navbar = () => {
           </IconsContainer>
         </MetatronToolBar>
 
-       
         {/* use suspense to cover lazy loading as fallback error boundary */}
         <Suspense
           fallback={

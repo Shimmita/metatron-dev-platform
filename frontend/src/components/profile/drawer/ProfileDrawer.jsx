@@ -132,7 +132,7 @@ export default function ProfileDrawer() {
 
       >
         <Box sx={{ flexGrow: 1 }}>
-          <AppBar position="static">
+          <AppBar position="static" elevation={0} color="info">
             <Toolbar variant="dense">
               <Typography variant={"body2"} sx={{ flexGrow: 1 }}>
                 {temporaryProfileData

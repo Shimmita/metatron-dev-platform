@@ -9,6 +9,7 @@ import {
   Menu,
   MyLocationRounded,
   NotificationsRounded,
+  Refresh,
   SearchOutlined,
   Settings,
   WorkRounded
@@ -20,6 +21,7 @@ import {
   AppBar,
   Avatar,
   Badge,
+  Button,
   CircularProgress,
   InputBase,
   Stack,
@@ -40,7 +42,6 @@ import Typography from "@mui/material/Typography";
 import axios from "axios";
 import React, { Suspense, useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
@@ -49,10 +50,11 @@ import {
   showMessagingDrawer,
   showUserProfileDrawer
 } from "../../redux/AppUI";
-import { updateCurrentJobs } from "../../redux/CurrentJobs";
+import { updateCurrentEvents } from "../../redux/CurrentEvents";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertJobSearch from "../alerts/AlertJobSearch";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
+import EventsAddModal from "../modal/EventsAddModal";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -60,7 +62,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import EventItem from "./layout/EventItem";
-import EventsAddModal from "../modal/EventsAddModal";
+import EventStatsLayout from "./layout/EventStatsLayout";
 
 const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
 
@@ -169,7 +171,10 @@ export default function EventsContainer() {
   const [generalTitle,setGeneralTitle]=useState("")
   const [messageGeneral,setMessageGeneral]=useState("")
   const [openModalEvent,setOpenModalEvent]=useState(false)
-  const [eventsData,setEventsData]=useState([{}])
+  const [isEventsStats,setIsEventsStats]=useState(false)
+  const [focusedEvent,setFocusedEvent]=useState(null)
+  const [pageNumber,setPageNumber]=useState(1)
+  
 
   // redux states
   const { 
@@ -192,6 +197,7 @@ export default function EventsContainer() {
   const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
   const { profile_views } = useSelector((state) => state.currentProfileView);
   const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
+  const { events:eventsData } = useSelector((state) => state.currentEvents);
 
 
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
@@ -260,7 +266,7 @@ export default function EventsContainer() {
   // use effect for fetching jobs
   // fetch job posts from the backend (all,verified,nearby,recommended etc)
   useEffect(() => {
-    // don't fetch any if isJob-search global to avoid overriding  data
+    // don't fetch any if isJob-search-events global to avoid overriding  data
     if (isJobSearchGlobal) {
       // false my stats
       setIsMyStats(false)
@@ -290,13 +296,12 @@ export default function EventsContainer() {
           withCredentials: true,
         })
         .then((res) => {
-          // update the redux of current post
+          // update the redux of current events
           if (res?.data) {
-            setEventsData(res.data)
+            dispatch(updateCurrentEvents(res.data))
           } 
         })
         .catch(async (err) => {
-          console.log(err);
           //  user login session expired show logout alert
           if (err?.response?.data.login) {
             window.location.reload();
@@ -327,9 +332,8 @@ export default function EventsContainer() {
 
     // performing post request and get the nearby jobs base on the country
     if (textOption === "Nearby Events") {
-      axios
-        .post(
-          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/nearby/${user?._id}`,
+      axios.post(
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/nearby/`,
           { country },
           {
             withCredentials: true,
@@ -338,7 +342,7 @@ export default function EventsContainer() {
         .then((res) => {
           // update the redux of current post
           if (res?.data) {
-            dispatch(updateCurrentJobs(res.data));
+            dispatch(updateCurrentEvents(res.data));
           } 
         })
         .catch(async (err) => {
@@ -349,7 +353,7 @@ export default function EventsContainer() {
           }
           if (err?.code === "ERR_NETWORK") {
             setErrorMessage(
-              "server unreachable please try again later to complete your request"
+              "server unreachable!"
             );
             return;
           }
@@ -363,26 +367,25 @@ export default function EventsContainer() {
     }
 
     // handle getting of the recommended jobs from backend
-    if (textOption === "Recommend") {
+    if (textOption === "Recommended") {
 
       const userSkills=user?.selectedSkills
       
       axios
         .post(
-          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/recommended/${user?._id}`,
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/recommended`,
           userSkills ,
           {
             withCredentials: true,
           }
         )
         .then((res) => {
-          // update the redux of current post
+          // update the redux of current events
           if (res?.data) {
-            dispatch(updateCurrentJobs(res.data));
+            dispatch(updateCurrentEvents(res.data));
           } 
         })
         .catch(async (err) => {
-          console.log(err);
           //  user login session expired show logout alert
           if (err?.response?.data.login) {
             window.location.reload();
@@ -403,20 +406,20 @@ export default function EventsContainer() {
 
     }
 
-   // get all job applications done by the current user /all/my/application/:userId
-   if (textOption === "Applications") {
+   // get all events rsvp done by the current user, also 
+   if (textOption === "RSVP Events" ) {
 
     axios
       .get(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/my/application/${user?._id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/rsvp/${user?._id}`,
         {
           withCredentials: true,
         }
       )
       .then((res) => {
-        // update the redux of current post
+        // update the redux of current events
         if (res?.data) {
-          dispatch(updateCurrentJobs(res.data));
+          dispatch(updateCurrentEvents(res.data));
         } 
       })
       .catch(async (err) => {
@@ -442,20 +445,21 @@ export default function EventsContainer() {
   }
 
 
-  // fetching my jobs statistics
-  if (textOption === "My Statistics") {
+  // if is events manager, fetch all user created events and
+  // can edit or delete them.
 
+  if (textOption==="Events Manager") {
     axios
       .get(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/my/statistics/${user?._id}`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/${user?._id}`,
         {
           withCredentials: true,
         }
       )
       .then((res) => {
-        // update the redux of current post
+        // update the redux of current events
         if (res?.data) {
-          dispatch(updateCurrentJobs(res.data));
+          dispatch(updateCurrentEvents(res.data));
         } 
       })
       .catch(async (err) => {
@@ -474,23 +478,26 @@ export default function EventsContainer() {
       })
       .finally(() => {
         setIsFetching(false);
-        // true myStats
-        setIsMyStats(true)
+        // false myStats
+        setIsMyStats(false)
       });
-
   }
 
   }, [dispatch, textOption, user, isJobSearchGlobal]);
 
-
-
-  
 
      // UI theme dark light tweaking effect
      const handleShowDarkMode = () => {
       // update the redux theme boolean state
       dispatch(resetDarkMode());
     };
+
+
+    // handle refresh of data
+    const handleRefreshData=()=>{
+      // set text to default explore events
+      setTextOption('Explore Events')
+    }
   
 
   return (
@@ -572,6 +579,7 @@ export default function EventsContainer() {
                 <Typography
                   noWrap
                   component="div"
+                  fontWeight={'bold'}
                   textAlign={"center"}
                   textTransform={"uppercase"}
                   
@@ -584,29 +592,30 @@ export default function EventsContainer() {
                 <Box display={"flex"} justifyContent={"center"}>
                   <Typography 
                   variant="caption"
-                   textTransform={'capitalize'}
-                   ml={open ? 30: 24}>
+                  fontWeight={'bold'}
+                  textTransform={'capitalize'}
+                  ml={open ? 30: 24}>
                     - {textOption} -
                   </Typography>
                 </Box>
               </Box>
               )}
               <Box 
-               display={'flex'}
+              display={'flex'}
                 gap={2} 
                 alignItems={'center'} 
                 justifyContent={'flex-end'}>
                 {/* displayed on tabs and big screens */}
                 {!CustomDeviceIsSmall() && (
-                   <Search>
-                   <SearchIconWrapper>
-                     <SearchOutlined />
-                   </SearchIconWrapper>
-                   <StyledInputBase
-                     placeholder="Search…"
-                     inputProps={{ 'aria-label': 'search' }}
-                   />
-                 </Search>
+                  <Search>
+                  <SearchIconWrapper>
+                    <SearchOutlined />
+                  </SearchIconWrapper>
+                  <StyledInputBase
+                    placeholder="Search…"
+                    inputProps={{ 'aria-label': 'search' }}
+                  />
+                </Search>
                 )}
 
                 {/* dark mode */}
@@ -687,11 +696,14 @@ export default function EventsContainer() {
              {/* title hiring */}
              <Typography variant="body2" 
              sx={{color:'white'}} 
+             fontWeight={'bold'}
              mb={1}
              textTransform={'uppercase'}>
                Welcome
              </Typography>
-             <Typography variant="caption" 
+             <Typography 
+             fontWeight={'bold'}
+             variant="caption" 
               sx={{color:'white'}} 
               >
               - {user?.name} -
@@ -860,9 +872,9 @@ export default function EventsContainer() {
                 {(textOption === "Explore Events" ||
                   textOption === "Nearby Events" ||
                   textOption === "Create Events" ||
-                  textOption === "Recommend" ||
-                  textOption === "Applications"||
-                  textOption === "My Statistics" ||
+                  textOption === "Recommended" ||
+                  textOption === "RSVP Events"||
+                  textOption === "Events Manager" ||
                   textOption === "Search Events") && (
                   <React.Fragment>
                     {isFetching ? (
@@ -878,26 +890,65 @@ export default function EventsContainer() {
                     ) : (
                       <React.Fragment>
                         {/* rendered when are jobs greater than 1 */}
-                        {eventsData?.length > 0 &&
-                          eventsData?.map((event) => (
-                            <>
-                              {/* if is stats displays different layout else job layout */}
-                              {isMyStats ? (
-                              <EventItem
-                              key={event?._id}
-                               isDarkMode={isDarkMode}/>
-                              ):(
-                                <Box 
-                                mt={CustomDeviceIsSmall() && 2} 
-                                key={event?._id}>
-                                <EventItem 
-                                event={event}
-                                isDarkMode={isDarkMode}/>
-                              </Box>
-                              )}
+                        {eventsData?.length > 0 && !isEventsStats &&
+                          eventsData?.map((event,index) => (
+                          
+                            <Box 
+                              mt={CustomDeviceIsSmall() && 2} 
+                              key={event?._id}>
+                              <EventItem 
+                              isLastIndex={index===eventsData?.length-1}
+                              pageNumber={pageNumber}
+                              setPageNumber={setPageNumber}
+                              event={event}
+                              eventsData={eventsData}
+                              isDarkMode={isDarkMode}
+                              setErrorMessage={setErrorMessage}
+                              isEventsManager={textOption==="Events Manager"}
+                              isRSVP={textOption === "RSVP Events"}
+                              setIsEventsStats={setIsEventsStats}
+                              setFocusedEvent={setFocusedEvent}
+                              />
+                            </Box>
                            
-                            </>
                           ))}
+
+                          {/* rendered if events stats is true */}
+                          {isEventsStats && focusedEvent && (
+                           <Box>
+                            <EventStatsLayout 
+                            setIsEventsStats={setIsEventsStats}
+                            focusedEvent={focusedEvent}/>
+                           </Box>
+                          )}
+
+                          {/* rendered if are no events  */}
+                          {eventsData?.length<1 && (
+                            <Box 
+                            height={'70vh'}
+                            display={'flex'}
+                            justifyContent={'center'}
+                            color={'text.secondary'}
+                            flexDirection={'column'}
+                            gap={2}
+                            alignItems={'center'}
+                            >
+                            {/* no events */}
+                            <Typography variant="body2">
+                              no more events posted
+                            </Typography>
+                            {/* show refresh button */}
+                            <Button 
+                            disableElevation
+                            onClick={handleRefreshData}
+                            size="small"
+                            variant="outlined"
+                            sx={{ borderRadius:3 }}
+                            startIcon={<Refresh/>}
+                            >refresh</Button>
+                            </Box>
+                          )}
+
                       </React.Fragment>
                     )}
                   </React.Fragment>

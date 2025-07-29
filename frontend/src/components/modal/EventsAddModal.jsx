@@ -34,6 +34,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import AllSkills from "../data/AllSkillsData";
+import { updateCurrentEvents } from "../../redux/CurrentEvents";
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
 // styled modal
@@ -76,6 +77,8 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
   // get redux states
   const dispatch=useDispatch()
   const { user } = useSelector((state) => state.currentUser);
+  const { events:eventsData } = useSelector((state) => state.currentEvents);
+  
   // destructuring user
   const {
     _id:ownerId,
@@ -216,7 +219,11 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
         })
         .then((res) => {
           // update the snack bar message
-          dispatch(updateCurrentSnackBar(res?.data))
+          dispatch(updateCurrentSnackBar(res?.data?.message))   
+          
+          // update the current events redux with the latest one on top
+          dispatch(updateCurrentEvents([res.data.data,...eventsData]))
+          
           // close the modal
           setOpenModalEventAdd(false)
         })

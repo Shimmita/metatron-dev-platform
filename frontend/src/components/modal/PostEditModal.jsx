@@ -92,6 +92,17 @@ const PostEditModal = () => {
 
   };
 
+
+    // handle return width modal
+    const handleReturnWidthModal=()=>{
+      if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+        return "35%"
+      } else if (CustomDeviceTablet()){
+        return "90%"
+      } 
+      return "100%"
+    }
+
    // handle width of the global search
     const handleModalWidth=()=>{
       if (CustomDeviceTablet() && isTabSideBar) {
@@ -110,9 +121,12 @@ const PostEditModal = () => {
        onClose={handleClosingModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
+        sx={{
+        backdropFilter:'blur(3px)',
+      }}
     >
       <Box
-        width={CustomDeviceIsSmall() ? "100%":CustomDeviceTablet()?"80%":"40%"}
+        width={handleReturnWidthModal()}
         p={1}
         borderRadius={4}
         bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}

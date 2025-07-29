@@ -1,9 +1,10 @@
-import { OpenInBrowser, Verified } from "@mui/icons-material";
+import { Add } from "@mui/icons-material";
 import {
   Avatar,
   AvatarGroup,
   Box,
   Button,
+  CircularProgress,
   Divider,
   IconButton,
   Skeleton,
@@ -15,47 +16,96 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
+import axios from "axios";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import ApplyJobModal from "../../modal/ApplyJobModal";
+import { useDispatch, useSelector } from "react-redux";
+import { updateCurrentEventsTop } from "../../../redux/CurrentEventsTop";
+import { updateCurrentSnackBar } from "../../../redux/CurrentSnackBar";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
-const MAX_APPLICANTS=300
 
-
-function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
-  const [openApplyJobModal, setOpenApplyJobModal] = useState();
+function FeaturedEvent({ isLoading, eventTop,isLastIndex,setErrorMessage }) {
+  const [isFetching, setIsFetching] = useState(false);
+  
   // redux states
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
     (state) => state.appUI
   );
-  // redux states
-    const { user } = useSelector((state) => state.currentUser);
+  const { user } = useSelector((state) => state.currentUser);
+  const { eventsTop } = useSelector((state) => state.currentEventsTop);
+  
+  const dispatch=useDispatch()
 
-  // extract user email, for checks if job posted by the user or not
-  const {email}=user
 
   // if not true the false is default
-  const isMyJob=email===jobTop?.my_email || false
+  const isMyEvent=eventTop?.ownerId===user?._id || false
+  const isUserMadeRSVP=eventTop?.users?.value.some((currentId)=>currentId===user?._id)
 
-  const handleCountryName = (job) => {
-    const parent = job.location.country.split(" ");
+
+  const handleCountryName = (eventTop) => {
+    const parent = eventTop.location.country.split(" ");
     const finalName =
       parent.length > 2 ? `${parent[0]} ${parent[1]}` : parent[0];
 
     return finalName;
   };
 
-  // handle opening of apply job modal
-  const handleOpeningApplyJob = () => {
-    setOpenApplyJobModal(true);
-  };
 
-  // job has been paused or deactivated by the poster
-  const isDeactivated=jobTop?.status==="inactive"
-    // check if job reached maxima number of applicants
-    const isMaxApplicants=jobTop?.applicants?.total>=MAX_APPLICANTS
+// handle creating of rsvp
+  const handleCreateRSVP = () => {
+    // eventRSVP object
+    const rsvpObject={
+      userId:user?._id,
+      eventId:eventTop?._id,
+      userName:user?.name,
+      userEmail:user?.email,
+      userGender:user?.gender,
+      userCountry:handleCountryName(eventTop),
+      userAvatar:user?.avatar
+
+    }
+
+    // is fetching true
+    setIsFetching(true)
+
+    // performing post request to make a reservation
+    axios.post(
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/create/rsvp/`,
+          rsvpObject,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          // update the redux of current post
+          if (res?.data) {
+            dispatch(updateCurrentSnackBar(res.data.message));
+            // server event object
+            let serverEventObject=res.data.data;
+            // update the events top redux payload to reflect the changes.
+            let filteredEvents=eventsTop?.filter((currentItem)=>currentItem._id!==eventTop?._id)
+            // update the redux now
+            dispatch(updateCurrentEventsTop([serverEventObject,...filteredEvents]))
+          } 
+        })
+        .catch(async (err) => {
+          //  user login session expired show logout alert
+          if (err?.response?.data.login) {
+            window.location.reload();
+          }
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage(
+              "server unreachable!"
+            );
+            return;
+          }
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          setIsFetching(false);
+        });
+  };
 
   return (
     <React.Fragment>
@@ -94,25 +144,26 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
             <ListItemAvatar>
               <Avatar
                 variant="rounded"
-                src={getImageMatch(jobTop.logo)}
+                src={eventTop?.ownerAvatar}
                 sx={{
                   backgroundColor: "#1976D2",
                 }}
-                alt={jobTop?.title[0]}
+                alt={eventTop?.title[0]}
                 aria-label="avatar"
               />
             </ListItemAvatar>
             <ListItemText
               primary={
+                // title of the event
                 <Typography fontWeight={"bold"} variant="body2">
-                  {jobTop?.title}
+                  {eventTop?.title}
                 </Typography>
               }
               secondary={
                 <Box>
-                  {/* poster */}
+                  {/* event category */}
                   <Typography variant="body2" color={"text.secondary"}>
-                    {jobTop?.organisation?.name}
+                    {eventTop?.category} Event
                   </Typography>
 
                   {/* location, state, access */}
@@ -122,7 +173,7 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                       variant="caption"
                       color={"text.secondary"}
                     >
-                      {jobTop?.location?.state}
+                      {eventTop?.location?.state}
                     </Typography>
 
                      {/* divider */}
@@ -134,16 +185,17 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                     />
                     {/* country */}
                     <Typography ml={1} variant="caption" color={"text.secondary"}>
-                      {handleCountryName(jobTop && jobTop)}
+                      {handleCountryName(eventTop && eventTop)}
                     </Typography>
+                   
                    
                   </Box>
 
-                  {/* job skills */}
+                  {/* event skills */}
                   <Box display={"flex"} mt={"2px"}>
-                    <AvatarGroup max={jobTop?.skills?.length}>
+                    <AvatarGroup max={eventTop?.skills?.length}>
                       {/* loop through the skills and their images matched using custom fn */}
-                      {jobTop?.skills?.map((skill) => (
+                      {eventTop?.skills?.map((skill) => (
                         <Tooltip title={skill} key={skill} arrow>
                           <Avatar
                             alt={skill}
@@ -156,22 +208,6 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                     </AvatarGroup>
                   </Box>
 
-                  {/* description if is job belongs to the current user */}
-                 {isMyJob && (
-                   <Box 
-                   display={'flex'}
-                   justifyContent={'center'}
-                   mt={1}
-                   >
-                   <Typography 
-                   textAlign={'center'}
-                    variant="caption"
-                   sx={{ color:'text.secondary', 
-                   textTransform:'lowercase' }}> - you posted this job -
-                   </Typography>
-                   </Box>
-                 )}
-
                 </Box>
               }
             />
@@ -180,7 +216,7 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
               {/* applicants counter */}
               <Box>
                 <Typography variant="caption" color={"text.secondary"} fontWeight={'bold'}>
-                   {!(jobTop?.website==="") ? "(N/A)" :`${jobTop?.applicants?.total}/300 `}
+                {eventTop?.users?.count} rsvp
                 </Typography>
               </Box>
 
@@ -189,17 +225,17 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                 <Button
                   disableElevation
                   size="small"
-                  onClick={handleOpeningApplyJob}
+                  onClick={handleCreateRSVP}
                   variant="contained"
-                  startIcon={!(jobTop?.website==="") ? <OpenInBrowser /> :<Verified />}
-                  disabled={jobTop?.currentUserApplied||isDeactivated || isMyJob||isMaxApplicants}
+                  startIcon={isFetching?<CircularProgress size={13}/>:<Add/>}
+                  disabled={isUserMadeRSVP || isMyEvent || isFetching}
                   sx={{
                     textTransform: "capitalize",
-                    borderRadius: "20px",
+                    borderRadius: 3,
                     fontSize:!CustomDeviceIsSmall() && 'x-small'
                   }}
                 >
-                  {jobTop?.currentUserApplied ? "Applied":isDeactivated ? "Paused":isMaxApplicants ? "Closed":"Apply"}
+                  {isUserMadeRSVP ? "Saved":"RSVP"}
                 </Button>
                 </React.Fragment>
               
@@ -210,23 +246,8 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
          {!isLastIndex &&  <Divider variant="inset" component="li" />}
         </List>
       )}
-      {/* show modal apply jobs */}
-      {openApplyJobModal && 
-      <ApplyJobModal
-        title={jobTop?.title}
-        organisation={jobTop?.organisation}
-        requirements={jobTop?.requirements}
-        websiteLink={jobTop?.website}
-        openApplyJobModal={openApplyJobModal}
-        setOpenApplyJobModal={setOpenApplyJobModal}
-        jobID={jobTop?._id}
-        jobaccesstype={jobTop?.jobtypeaccess}
-        salary={jobTop?.salary}
-        skills={jobTop?.skills}
-        location={jobTop?.location}
-      />}
     </React.Fragment>
   );
 }
 
-export default React.memo(FeaturedJobs);
+export default React.memo(FeaturedEvent);

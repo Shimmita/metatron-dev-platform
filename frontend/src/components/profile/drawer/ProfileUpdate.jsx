@@ -18,9 +18,8 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
-import DevImage from "../../../images/dev.jpeg";
 import { updateUserCurrentUserRedux } from "../../../redux/CurrentUser";
 import AllCountries from "../../data/AllCountries";
 import AllSkills from "../../data/AllSkillsData";

@@ -19,6 +19,8 @@ import currentChatBot from "./CurrentChatBot";
 import currentConnectRequestReducer from "./CurrentConnect";
 import currentConnectNotifReducer from "./CurrentConnectNotif";
 import currentConversationReducer from './CurrentConversations';
+import currentEventsReducer from './CurrentEvents';
+import currentEventsTopReducer from './CurrentEventsTop';
 import currentGlobalSearchReducer from "./CurrentGlobalSearch";
 import currentJobFeedBackReducer from './CurrentJobFeedBack';
 import currentJobsReducer from "./CurrentJobs";
@@ -34,10 +36,10 @@ import currentPostsTopReducer from "./CurrentPostsTop";
 import currentProfileViewReducer from './CurrentProfileView';
 import currentSnackReducer from "./CurrentSnackBar";
 import currentUserReducer from "./CurrentUser";
-
 // Configure persist settings
 const persistConfig = {
-  key: "root", // Key to identify persisted data
+  // Key to identify persisted data
+  key: "root", 
   storage,
 };
 
@@ -66,6 +68,9 @@ const rootReducer = combineReducers({
   currentConversation: currentConversationReducer,
   currentProfileView: currentProfileViewReducer,
   currentJobFeedBack: currentJobFeedBackReducer,
+  currentEvents:currentEventsReducer,
+  currentEventsTop:currentEventsTopReducer
+
 
 });
 

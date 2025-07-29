@@ -10,6 +10,7 @@ import {
   Menu,
   MyLocationRounded,
   NotificationsRounded,
+  Refresh,
   SearchOutlined,
   VerifiedRounded,
   WorkRounded
@@ -170,6 +171,7 @@ export default function MiniDrawer() {
   const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
   const [generalTitle,setGeneralTitle]=useState("")
   const [messageGeneral,setMessageGeneral]=useState("")
+  const [pageNumber,setPageNumber]=useState(-1)
   // redux states
   const { 
     currentMode, 
@@ -294,9 +296,12 @@ export default function MiniDrawer() {
           if (res?.data) {
             dispatch(updateCurrentJobs(res.data));
           } 
+
+        // update the page number for the next fetch
+        setPageNumber((prev)=>prev+1)
+
         })
         .catch(async (err) => {
-          console.log(err);
           //  user login session expired show logout alert
           if (err?.response?.data.login) {
             window.location.reload();
@@ -525,7 +530,7 @@ export default function MiniDrawer() {
               } else{
                 // don't navigate alert you have not posted any jobs
                 setGeneralTitle("Hiring Manager")
-                setMessageGeneral("Currently you have not posted any jobs as a hiring manager, kindly post your job(s) and this page will be ready.")
+                setMessageGeneral("currently you have not posted any jobs as a hiring manager, kindly post your job and this page will be ready.")
                 setOpenAlertGeneral(true)
               }
             })
@@ -558,6 +563,12 @@ export default function MiniDrawer() {
       dispatch(resetDarkMode());
     };
   
+
+    // handle refresh of data
+    const handleRefreshData=()=>{
+      // set text to default explore events
+      setTextOption('Explore Jobs')
+    }
 
   return (
       <Suspense
@@ -618,6 +629,7 @@ export default function MiniDrawer() {
                   noWrap
                   component="div"
                   textAlign={"center"}
+                  fontWeight={'bold'}
                   textTransform={"uppercase"}
                 >
                   Metatron
@@ -627,6 +639,7 @@ export default function MiniDrawer() {
                 <Box display={"flex"} justifyContent={"center"}>
                   <Typography 
                   variant="caption"
+                  fontWeight={'bold'}
                    textTransform={'capitalize'}
                    >
                     {textOption} 
@@ -639,6 +652,7 @@ export default function MiniDrawer() {
                   noWrap
                   component="div"
                   textAlign={"center"}
+                  fontWeight={'bold'}
                   textTransform={"uppercase"}
                   
                   ml={open ? 30: 24}
@@ -650,6 +664,7 @@ export default function MiniDrawer() {
                 <Box display={"flex"} justifyContent={"center"}>
                   <Typography 
                   variant="caption"
+                  fontWeight={'bold'}
                    textTransform={'capitalize'}
                    ml={open ? 30: 24}>
                     - {textOption} -
@@ -753,11 +768,14 @@ export default function MiniDrawer() {
              {/* title hiring */}
              <Typography variant="body2" 
              sx={{color:'white'}} 
+             fontWeight={'bold'}
              mb={1}
              textTransform={'uppercase'}>
                Job Hunter
              </Typography>
-             <Typography variant="caption" 
+             <Typography
+             fontWeight={'bold'}
+              variant="caption" 
               sx={{color:'white'}} 
               >
               - {user?.name} -
@@ -976,17 +994,50 @@ export default function MiniDrawer() {
                               />
                               ):(
                                 <Box 
-                                mt={4} 
                                 key={job?._id}>
                                 <JobLayout
+                                isLastIndex={index===jobs?.length-1}
+                                pageNumber={pageNumber}
+                                setPageNumber={setPageNumber}
                                 isDarkMode={isDarkMode}
                                 job={job}
+                                jobs={jobs}
+                                setErrorMessage={setErrorMessage}
                               />
                               </Box>
                               )}
                            
                             </>
                           ))}
+
+
+                           {/* rendered if are no jobs  */}
+                          {jobs?.length<1 && (
+                            <Box 
+                            height={'70vh'}
+                            display={'flex'}
+                            justifyContent={'center'}
+                            color={'text.secondary'}
+                            flexDirection={'column'}
+                            gap={2}
+                            alignItems={'center'}
+                            >
+                            {/* no events */}
+                            <Typography variant="body2">
+                              no more jobs posted
+                            </Typography>
+                            {/* show refresh button */}
+                            <Button 
+                            disableElevation
+                            onClick={handleRefreshData}
+                            size="small"
+                            variant="outlined"
+                            sx={{ borderRadius:3 }}
+                            startIcon={<Refresh/>}
+                            >refresh</Button>
+                            </Box>
+                          )}
+
                       </React.Fragment>
                     )}
                   </React.Fragment>

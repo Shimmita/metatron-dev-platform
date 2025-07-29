@@ -69,6 +69,7 @@ function JobLayoutHiring({ isDarkMode, job, textOption = "",setIsApplicantsTable
       justifyContent={"center"}
       alignItems={"center"}
       classes={"job-card"}
+      bgcolor={'background.default'}
       className="rounded"
       maxWidth={300}
       mb={2}

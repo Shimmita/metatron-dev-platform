@@ -64,8 +64,7 @@ export default function SkillAvatars({ user, isDarkMode }) {
           <AvatarGroup max={user?.selectedSkills?.length}>
             {/* loop through the skills and their images matched using custom fn */}
             {user?.selectedSkills?.map((skill, index) => (
-              <Tooltip title={skill} arrow  key={index}
->
+              <Tooltip title={skill} arrow  key={index}>
                 <Avatar
                   alt={skill}
                   className="border"
@@ -129,11 +128,10 @@ export default function SkillAvatars({ user, isDarkMode }) {
 
           {user?.about && user?.about && (
             <Typography
-              textTransform={"capitalize"}
+              textTransform={"lowercase"}
               variant="caption"
               p={1}
               width={"100%"}
-              color={"text.secondary"}
             >
               {user?.about}
             </Typography>

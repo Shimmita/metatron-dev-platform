@@ -1,4 +1,4 @@
-import { CachedOutlined, CachedRounded, HomeOutlined, HomeRounded, TvRounded, TvTwoTone, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
+import { CachedOutlined, CachedRounded, HomeOutlined, HomeRounded, SchoolOutlined, SchoolRounded, TvRounded, TvTwoTone, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
 import {
   BottomNavigation,
   BottomNavigationAction,
@@ -31,9 +31,6 @@ const BottomNav = () => {
 
     // accessing the redux state values
     const { isTabSideBar } = useSelector((state) => state.appUI);
-  
-    // larger devices, beyond tablet
-    const isBeyondTablets=CustomLandScape() || CustomLandscapeWidest()
 
   // return home or default card page
   const handleReturnHome = () => {
@@ -108,9 +105,7 @@ const BottomNav = () => {
       >
         <Tooltip title="Home" arrow  
         style={{
-              marginLeft:CustomDeviceTablet() && isTabSideBar ? "30%":
-              // under development, when courses and events done clear
-              (CustomLandscapeWidest() || CustomLandScape()) && "-7%",
+              marginLeft:CustomDeviceTablet() && isTabSideBar && "30%"
             }}>
           <BottomNavigationAction
             label="Home"
@@ -153,28 +148,11 @@ const BottomNav = () => {
           />
         </Tooltip>
 
-        
-        {/* online courses */}
-        {/* <Tooltip title="Tech Courses" arrow>
-          <BottomNavigationAction
-            onClick={handleOpenCourses}
-            label="Courses"
-            icon={<>
-            {isDarkMode ? (
-              <SchoolOutlined sx={{ width: 30, height: 30 }} />
-            ):(
-              <SchoolRounded sx={{ width: 30, height: 30 }} />
-            )}
-            
-            </>}
-          />
-        </Tooltip> */}
 
-         {/* tech events */}
+           {/* tech events */}
          <Tooltip 
          title="IT Events"
           arrow
-          // sx={{ marginRight:isBeyondTablets && position===0 && 13 }}>
           >
           <BottomNavigationAction
             onClick={handleNavigateEvents}
@@ -186,6 +164,23 @@ const BottomNav = () => {
               <TvTwoTone sx={{ width: 26, height: 26 }} />
             )}
            
+            </>}
+          />
+        </Tooltip>
+
+        
+        {/* online courses */}
+        <Tooltip title="Tech Courses" arrow>
+          <BottomNavigationAction
+            onClick={handleOpenCourses}
+            label="Courses"
+            icon={<>
+            {isDarkMode ? (
+              <SchoolOutlined sx={{ width: 30, height: 30 }} />
+            ):(
+              <SchoolRounded sx={{ width: 30, height: 30 }} />
+            )}
+            
             </>}
           />
         </Tooltip>

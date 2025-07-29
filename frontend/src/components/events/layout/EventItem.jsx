@@ -1,5 +1,8 @@
 import {
   Add,
+  ArrowCircleRightRounded,
+  BarChart,
+  Delete,
   Share
 } from "@mui/icons-material";
 import {
@@ -9,23 +12,188 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
   IconButton,
   Tooltip,
   Typography
 } from "@mui/material";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateCurrentEvents } from "../../../redux/CurrentEvents";
+import { updateCurrentSnackBar } from "../../../redux/CurrentSnackBar";
+import CustomCountryName from "../../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
-function EventItem({isDarkMode=false,event}) {
+import { resetClearCurrentEventsTop } from "../../../redux/CurrentEventsTop";
+function EventItem({
+  isDarkMode=false,
+  event,
+  setErrorMessage,
+  isEventsManager=false,
+  setIsEventsStats,
+  setFocusedEvent,
+  isRSVP=false,
+  isLastIndex=false,
+  setPageNumber,
+  pageNumber,
+}) {
 
-  const navigate = useNavigate();
-  // handle navigation to the live attending
-  const handleNavigateLiveAttend = () => {
-    navigate("/events/live-attending");
+  const [isFetching, setIsFetching] = useState(false);
+  
+  // redux states
+  const { user } = useSelector((state) => state.currentUser);
+  const { events:eventsData } = useSelector((state) => state.currentEvents);
+  const isUserMadeRSVP=event?.users?.value.some((currentId)=>currentId===user?._id)
+  const isMyOwnEvent=event?.ownerId===user?._id
+  
+  const dispatch=useDispatch()
+
+  // handle creating of rsvp
+  const handleCreateRSVP = () => {
+    // eventRSVP object
+    const rsvpObject={
+      userId:user?._id,
+      eventId:event?._id,
+      userName:user?.name,
+      userEmail:user?.email,
+      userGender:user?.gender,
+      userCountry:CustomCountryName(user?.country),
+      userAvatar:user?.avatar
+
+    }
+
+    // is fetching true
+    setIsFetching(true)
+
+    // performing post request to make a reservation
+    axios.post(
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/create/rsvp/`,
+          rsvpObject,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          // update the redux of current post
+          if (res?.data) {
+            dispatch(updateCurrentSnackBar(res.data.message));
+            // server event object
+            let serverEventObject=res.data.data;
+            // update the events redux payload to reflect the changes.
+            let filteredEvents=eventsData?.filter((currentItem)=>currentItem._id!==event?._id)
+            // update the redux now
+            dispatch(updateCurrentEvents([serverEventObject,...filteredEvents]))
+          } 
+        })
+        .catch(async (err) => {
+          //  user login session expired show logout alert
+          if (err?.response?.data.login) {
+            window.location.reload();
+          }
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage(
+              "server unreachable!"
+            );
+            return;
+          }
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          setIsFetching(false);
+        });
   };
 
-  const { user } = useSelector((state) => state.currentUser);
+
+  // handle deletion of rsvp
+  const handleDeleteRSVP=()=>{
+ 
+    // is fetching true
+    setIsFetching(true)
+
+    // performing post request to make a reservation
+    axios.delete(
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/delete/rsvp/${user?._id}/${event?._id}`,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          // update the redux of current post
+          if (res?.data) {
+            // update status data and message from backend
+            dispatch(updateCurrentSnackBar(res.data.message));
+            dispatch(updateCurrentEvents(res.data.data))
+          
+          } 
+        })
+        .catch(async (err) => {
+          //  user login session expired show logout alert
+          if (err?.response?.data.login) {
+            window.location.reload();
+          }
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage(
+              "server unreachable!"
+            );
+            return;
+          }
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          setIsFetching(false);
+        });
+  }
+
+  // handle deletion of my posted event
+  const handleDeleteMyEvent=()=>{
+     // is fetching true
+    setIsFetching(true)
+
+    // performing post request to make a reservation
+    axios.delete(
+          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/delete/event/${user?._id}/${event?._id}`,
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          // update the redux of current post
+          if (res?.data) {
+            // update status data and message from backend
+            dispatch(updateCurrentSnackBar(res.data.message));
+            dispatch(updateCurrentEvents(res.data.data))
+            // reset the events for refresh
+            dispatch(resetClearCurrentEventsTop())
+          } 
+        })
+        .catch(async (err) => {
+          //  user login session expired show logout alert
+          if (err?.response?.data.login) {
+            window.location.reload();
+          }
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage(
+              "server unreachable!"
+            );
+            return;
+          }
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          setIsFetching(false);
+        });
+  }
+
+  // handle setting of events stats true, only for events manager
+  const handleEventsStats=()=>{
+    if (isEventsManager) {
+      // update the focused event
+      setFocusedEvent(event)
+      // for display of event stats
+      setIsEventsStats(true)
+    }
+  }
 
   // get date from the event
   const handleGetDate=()=>{
@@ -38,13 +206,52 @@ function EventItem({isDarkMode=false,event}) {
   
   }
 
+  const handleFetchMoreData=()=>{
+      // fetching to true
+      setIsFetching(true)
+      // axios api call to fetch more data
+      axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/?page=${pageNumber}&limit=6`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          // update the redux of current post
+          if (res?.data) {
+            // more data update redux
+            if (res.data.length>0) {
+            dispatch(updateCurrentEvents([...eventsData,...res.data]));  
+            }
+          } 
   
+          // update the page number for the next fetch
+          setPageNumber((prev)=>prev+1)
+        })
+        .catch((err) => {
+          //  user login session expired show logout alert
+          if (err?.response?.data.login) {
+            window.location.reload();
+          }
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage(
+              "server unreachable"
+            );
+            return;
+          }
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          // set is fetching to false
+          setIsFetching(false);
+        });
+    }
 
   return (
       <Box 
       display={"flex"} 
       justifyContent={"center"}
+      gap={3}
+      flexDirection={CustomDeviceIsSmall() ? 'column':'row'}
       >
+      {/* card events details */}
         <Card
           elevation={0}
           className="rounded-3"
@@ -65,13 +272,28 @@ function EventItem({isDarkMode=false,event}) {
               <Box
               width={'100%'}
               display={'flex'} 
-              px={1}
+              gap={1.5}
+              px={1}alignItems={'center'}
               justifyContent={'flex-end'}>
+
+              {/* if current user created the event display helper text */}
+              {isMyOwnEvent &&   
+              <Typography
+                textTransform={"lowercase"}
+                variant="caption"
+                className="text-info"
+                sx={{ color:'white' }}
+                >
+                yours
+                </Typography>}
+              
+              {/* share icon */}
               <Tooltip arrow title='share'>
               <IconButton
               size="small">
               <Share 
-              sx={{ width:16,height:16, color:'white' }}/>
+              className="text-info"
+              sx={{ width:16,height:16, }}/>
               </IconButton>
               </Tooltip>
               </Box>
@@ -244,8 +466,9 @@ function EventItem({isDarkMode=false,event}) {
                 >
                 <Typography
                 variant="caption"
+                className={isUserMadeRSVP && 'text-success fw-bold'}
                 sx={{ fontSize:'x-small' }}>
-                  ~ 200 users done RSVP~
+                 {isUserMadeRSVP ? `You and ${event?.users?.count} others made rsvp`:`~ ${event?.users?.count} users done RSVP ~`}
                 </Typography>
                 </Box> 
 
@@ -261,29 +484,122 @@ function EventItem({isDarkMode=false,event}) {
                 </Typography>
                 </Box>  
 
-                {/* button add rsvp */}
+                {/* button add rsvp, depending on if is eventsManager */}
+                {isRSVP ? (
+                  <Box
+                display={"flex"}
+                mt={0.5}
+                gap={1}
+                justifyContent={"center"}>
+                  <Button
+                    disableElevation
+                    variant={isDarkMode ?'outlined':'contained'}
+                    disabled={isFetching}
+                    color="warning"
+                    size="small"
+                    sx={{ 
+                    fontSize:'x-small',
+                    borderRadius:3
+                    }}
+                    onClick={handleDeleteRSVP}
+                    startIcon={isFetching ? <CircularProgress size={13}/>:<Delete />}
+                  >
+                    Delete RSVP
+                  </Button>
+                </Box>  
+                ):isEventsManager ? (
+                  <Box
+                display={"flex"}
+                mt={0.5}
+                gap={3}
+                justifyContent={"center"}>
 
-                <Box
+                {/* event stats button */}
+                <Button
+                    disableElevation
+                    variant={isDarkMode ?'outlined':'contained'}
+                    disabled={isFetching}
+                    color="success"
+                    size="small"
+                    sx={{ 
+                    fontSize:'x-small',
+                    borderRadius:3
+                    }}
+                    onClick={handleEventsStats}
+                    startIcon={isFetching ? <CircularProgress size={13}/>:<BarChart />}
+                  >
+                    Statistics
+                  </Button>
+
+                {/* delete event button */}
+                  <Button
+                    disableElevation
+                    variant={isDarkMode ?'outlined':'contained'}
+                    disabled={isFetching}
+                    color="warning"
+                    size="small"
+                    sx={{ 
+                    fontSize:'x-small',
+                    borderRadius:3
+                    }}
+                    onClick={handleDeleteMyEvent}
+                    startIcon={isFetching ? <CircularProgress size={13}/>:<Delete />}
+                  >
+                    Delete Now
+                  </Button>
+
+                </Box> 
+                ):(
+                  <Box
                  display={"flex"}
                  mt={0.5}
                  justifyContent={"center"}>
                   <Button
                     disableElevation
                     variant={isDarkMode ?'outlined':'contained'}
+                    disabled={isFetching || isUserMadeRSVP}
                     size="small"
                     sx={{ 
                     borderRadius: 3,
                     fontSize:'x-small'
                     }}
-                    onClick={handleNavigateLiveAttend}
-                    startIcon={<Add  />}
+                    onClick={handleCreateRSVP}
+                    startIcon={isFetching ? <CircularProgress size={13}/>:<Add />}
                   >
                     RSVP EVENT
                   </Button>
                 </Box>  
-
+                )}
           </CardContent>
         </Card>
+
+        {/* button next */}
+
+         {/* next button zone, only if item is last index */}
+           {isLastIndex && (
+             <Box 
+            alignItems={'center'}
+            justifyContent={'center'}
+            display={'flex'}>
+            <IconButton 
+            disabled={isFetching}
+             onClick={handleFetchMoreData}
+             size="small"
+             sx={{ 
+              border:'1px solid',
+              borderColor:'divider'
+              }}
+             >
+             {isFetching ? 
+             <CircularProgress size={20}/>: 
+             <ArrowCircleRightRounded
+              color="primary"
+               sx={{ width:28,height:28}}/>}
+            </IconButton>
+            </Box>
+           )}
+
+
       </Box>
         );
 }

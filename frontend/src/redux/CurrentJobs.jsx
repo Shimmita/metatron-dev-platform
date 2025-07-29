@@ -9,7 +9,7 @@ const CurrentJobs = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadate the job by the feed from the payload
+    // update the job by the feed from the payload
     updateCurrentJobs: (state, action) => {
       state.jobs = action.payload;
     },

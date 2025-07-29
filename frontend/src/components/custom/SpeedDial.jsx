@@ -2,42 +2,37 @@ import Box from "@mui/material/Box";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import React, { lazy } from "react";
+import React from "react";
 
-import { CodeRounded, TvRounded, Work } from "@mui/icons-material";
+import { PostAddRounded, SchoolRounded, TvRounded, Work } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import EventsAddModal from "../modal/EventsAddModal";
+import PostCourseModal from "../modal/PostCourseModal";
+import PostJobModal from "../modal/PostJobModal";
+import PostTechModal from "../modal/PostTechModal";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-const PostCourseModal = lazy(() => import("../modal/PostCourseModal"));
-const PostTechModal = lazy(() => import("../modal/PostTechModal"));
-const PostJobModal = lazy(() => import("../modal/PostJobModal"));
 
 const actions = [
   // under development
-  /* {
+  {
     icon: <SchoolRounded color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Course Upload",
   },
 
   {
-    icon: <PictureAsPdfRounded color="primary" sx={{ width: 26, height: 26 }} />,
-    name: "PDF Upload",
-  },
- */
-  {
     icon: <TvRounded color="primary" sx={{ width: 26, height: 26 }} />,
-    name: "Post Your Event",
+    name: "Upload Event",
   },
   {
     icon: <Work color="primary" sx={{ width: 26, height: 26 }} />,
-    name: "Post Your Job",
+    name: "Upload Job",
   },
  
   {
-    icon: <CodeRounded color="primary" sx={{ width: 28, height: 28 }} />,
-    name: "Post Milestone",
+    icon: <PostAddRounded color="primary" sx={{ width: 33, height: 33}} />,
+    name: "Upload Milestone",
   },
 ];
 
@@ -51,7 +46,7 @@ export default function BasicSpeedDial() {
     setOpen(false);
   };
 
-  // control showing opening of the post modal
+  // control showing opening of the Upload modal
   const [openModalTech, setOpenModalTech] = React.useState(false);
   const [openModalJob, setOpenModalJob] = React.useState(false);
   const [openModalCourse, setOpenModalCourse] = React.useState(false);
@@ -89,14 +84,14 @@ export default function BasicSpeedDial() {
             icon={action.icon}
             className="shadow border"
             onClick={(e) => {
-              if (action.name === "Post Milestone") {
+              if (action.name === "Upload Milestone") {
                 setOpenModalTech(true);
               }
-              if (action.name === "Post Your Job") {
+              if (action.name === "Upload Job") {
                 setOpenModalJob(true);
               }
 
-              if (action.name==="Post Your Event") {
+              if (action.name==="Upload Event") {
                 setOpenModalEvent(true)
               }
 

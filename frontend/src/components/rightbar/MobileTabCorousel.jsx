@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { handleSidebarRightbar } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
-import CoursesContainer from "./CoursesContainer";
+import FeaturedEventsContainer from "./FeaturedEventsContainer";
 import FeaturedPostContainer from "./FeaturedPostContainer";
 import JobsContainer from "./JobsContainer";
 import RequestContainer from "./RequestContainer";
@@ -15,9 +15,11 @@ const MobileTabCorousel = () => {
   // backdrop state
   const [corouselCounter, setCorouselCounter] = React.useState(0);
    // redux states
-    const {  isSidebarRighbar } = useSelector(
+    const {  isSidebarRighbar, currentMode} = useSelector(
       (state) => state.appUI
     );
+    const isDarkMode=currentMode==='dark'
+
 
     const dispatch=useDispatch()
     const navigate=useNavigate()
@@ -37,12 +39,14 @@ const MobileTabCorousel = () => {
      color={"text.primary"}
      className={'rounded'}
      sx={{ 
-      border: "1px solid",
+      border:isDarkMode && "1px solid",
       borderColor:"divider",
       }}
      >
-      {/* connect suggestion  */}
-      <Box bgcolor={"background.default"} >
+      <Box
+       className={'rounded'}
+       bgcolor={"background.default"} 
+      >
         <Box>
           {/*  top jobs */}
           <Box gap={1}  display={corouselCounter === 0 ? "block" : "none"}>
@@ -58,8 +62,13 @@ const MobileTabCorousel = () => {
             <RequestContainer />
           </Box>
 
+           {/* featured events */}
+            <Box display={corouselCounter === 2 ? "block" : "none"}>
+            <FeaturedEventsContainer />
+          </Box>
+
           {/* featured posts */}
-          <Box display={corouselCounter === 2 ? "block" : "none"}>
+          <Box display={corouselCounter === 3 ? "block" : "none"}>
             <FeaturedPostContainer />
           </Box>
 

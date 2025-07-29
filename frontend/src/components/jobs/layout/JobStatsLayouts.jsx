@@ -18,7 +18,6 @@ function JobStatsLayout({ isDarkMode, job,user }) {
    // track axios progress
     const [isFetching, setIsFetching] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const [messageResponse,setMessageResponse]=useState("")
     const dispatch=useDispatch()
 
     // handle date display

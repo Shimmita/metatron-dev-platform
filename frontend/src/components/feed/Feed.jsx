@@ -7,6 +7,8 @@ import BasicSpeedDial from "../custom/SpeedDial";
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import BottomNav from "../bottom/BottomNav";
 import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 const EventsContainer =lazy(()=>import("../events/EventsContainer")) ;
 const SnackBarPostSuccess =lazy(()=>import("../snackbar/SnackBarPostSuccess")) ;
 const CoursesMainContainer =lazy(()=>import("../courses/CoursesMainContainer"));
@@ -56,7 +58,7 @@ const Feed = () => {
       {isTabSideBar ? (
         // displayed when sidebar is on when full screen toggle not clicked
         <Box
-          marginRight={CustomFeedEquidstance()}
+          mr={CustomFeedEquidstance()}
           flex={3}
           p={1}
           mt={1}
@@ -134,7 +136,6 @@ const Feed = () => {
             </Box>
 
             {/* display speed dial in feed section only for mobile and no landscape */}
-            {window.screen.availWidth <= 900 && (
               <Box>
                 {/* decide speed dial being shown or is floating button to refresh posts or  */}
                 {isDefaultBottomNav &&
@@ -144,8 +145,8 @@ const Feed = () => {
                       position={"fixed"}
                       sx={{
                         left: 0,
-                        right: window.screen.availWidth < 600 ? "40%" : "31%",
-                        bottom: 50,
+                        right: CustomDeviceIsSmall()? "40%" : CustomDeviceTablet() ? "31%" : "47%",
+                        bottom: 55,
                       }}
                     >
                       {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}
@@ -154,7 +155,6 @@ const Feed = () => {
                     </Box>
                   )}
               </Box>
-            )}
           </Suspense>
         </Box>
       ) : (
@@ -238,12 +238,11 @@ const Feed = () => {
               )}
 
               {/* decide bottom nav is to be show or not */}
-              <Box>
+              <Box >
                 {isDefaultBottomNav && !isLoadingPostLaunch && <BottomNav />}
               </Box>
 
               {/* display speed dial in feed section only for mobile and no landscape */}
-              {window.screen.availWidth <= 900 && (
                 <Box>
                   {/* decide speed dial being shown or not */}
                   {isDefaultBottomNav &&
@@ -253,7 +252,7 @@ const Feed = () => {
                         position={"fixed"}
                         sx={{
                           left: 0,
-                          right: window.screen.availWidth < 600 ? "40%" : "31%",
+                          right: CustomDeviceIsSmall() < 600 ? "40%" : "47%",
                           bottom: 50,
                         }}
                       >
@@ -262,7 +261,6 @@ const Feed = () => {
                       </Box>
                     )}
                 </Box>
-              )}
             </Suspense>
           </Box>
         </Box>

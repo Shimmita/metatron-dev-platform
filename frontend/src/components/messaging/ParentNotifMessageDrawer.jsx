@@ -108,7 +108,9 @@ export default function ParentNotifMessageDrawer() {
         >
           {/* display when message/notif item not clicked */}
           {!messageNotifClicked && (
-            <AppBar position="sticky">
+            <AppBar position="sticky" 
+            color={'info'}
+            elevation={0}>
               <Toolbar
                 variant="dense"
                 sx={{ display: "flex", justifyContent: "center" }}

@@ -206,11 +206,7 @@ export default function AlertFilterFeed({
           ))
           }
           </FormGroup>
-          {!errorMessage &&
-           <FormHelperText className={"mt-2"}>
-           selection search results will be loaded in the feed
-            </FormHelperText>
-          }
+        
           </FormControl>
           )}
         </DialogContent>

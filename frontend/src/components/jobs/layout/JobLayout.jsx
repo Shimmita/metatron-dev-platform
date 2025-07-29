@@ -1,14 +1,12 @@
 import {
   AccessTimeFilledRounded,
+  ArrowCircleRightRounded,
   BalanceRounded,
   CalendarMonthRounded,
-  Info,
-  InfoOutlined,
   LocationOnRounded,
   OpenInBrowser,
   PaidRounded,
   PeopleRounded,
-  Share,
   VerifiedRounded,
   WorkHistoryRounded
 } from "@mui/icons-material";
@@ -17,27 +15,44 @@ import {
   AvatarGroup,
   Box,
   Button,
+  Card,
+  CircularProgress,
   Divider,
-  FormHelperText,
   IconButton,
   Stack,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ApplyJobModal from "../../modal/ApplyJobModal";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+import CustomDeviceSmallest from "../../utilities/CustomDeviceSmallest";
+import axios from "axios";
+import { updateCurrentJobs } from "../../../redux/CurrentJobs";
 
 const MAX_APPLICANTS=300
 
-function JobLayout({ isDarkMode, job, isPreviewHR=false, }) {
+function JobLayout_2({ 
+  isDarkMode, 
+  job,
+  jobs,
+  isPreviewHR=false,
+  isLastIndex=false,
+  setPageNumber,
+  pageNumber,
+  setErrorMessage
+
+ }) {
   const [openModal, setOpenApplyJobModal] = useState(false);
+  const [isFetching,setIsFetching]=useState(false)
+  
 
   // redux states
-    const { user } = useSelector((state) => state.currentUser);
+  const { user } = useSelector((state) => state.currentUser);
+  const dispatch=useDispatch()
+
 
   // extract user email, for checks if job posted by the user or not
   const {email}=user
@@ -88,31 +103,67 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false, }) {
   // check if job reached maxima number of applicants
   const isMaxApplicants=job?.applicants?.total>=MAX_APPLICANTS
 
+ const handleFetchMoreData=()=>{
+    // fetching to true
+    setIsFetching(true)
+    // axios api call to fetch more data
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/${user?._id}?page=${pageNumber}&limit=6`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        // update the redux of current post
+        if (res?.data) {
+          // more data update redux
+          if (res.data.length>0) {
+          dispatch(updateCurrentJobs([...jobs,...res.data]));  
+          }
+        } 
+
+        // update the page number for the next fetch
+        setPageNumber((prev)=>prev+1)
+      })
+      .catch((err) => {
+        //  user login session expired show logout alert
+        if (err?.response?.data.login) {
+          window.location.reload();
+        }
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage(
+            "server unreachable"
+          );
+          return;
+        }
+        setErrorMessage(err?.response.data);
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  }
+
   return (
-    <Stack
+    <Box 
+      display={"flex"} 
+      gap={3}
+      // small devices should have column
+      flexDirection={CustomDeviceIsSmall() ? 'column':'row'}
       justifyContent={"center"}
-      alignItems={"center"}
-      classes={"job-card"}
-      className="rounded-3"
-      bgcolor={!isDarkMode && "background.default"}
-      maxWidth={300}
-      height={
-        !(CustomDeviceIsSmall() || CustomDeviceTablet()) ? "70%" : undefined
-      }
-      p={2}
-      width={300}
-      sx={{
-        border: "1px solid",
-        borderColor: "divider",
-        "&:hover": {
-          boxShadow: `4px 0px 50px -10px inset ${
-            !isDarkMode ? "#3333" : "lightgreen"
-          }`,
-        },
-      }}
-    >
-    {/* job avatar */}
-    <Box>
+      mt={CustomDeviceIsSmall()?2:0.5}
+      >
+      {/* card, for job content */}
+      <Card
+        elevation={0}
+        className="rounded-3"
+        sx={{ 
+        border:'1px solid',
+        borderColor:'divider',
+        width:CustomDeviceIsSmall() && !CustomDeviceSmallest() ? 320:300, 
+        }}
+      >
+      {/* job avatar */}
+    <Box 
+    justifyContent={'center'}
+    display={'flex'}>
       <Avatar
         alt=""
         className="border"
@@ -121,21 +172,22 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false, }) {
       />
       </Box>
 
+      <Stack 
+      gap={1} 
+      mt={1} 
+      >
       {/* job title */}
-      <Stack textAlign={"center"} gap={1} mt={1} mb={3}>
-        <Box display={"flex"} justifyContent={"center"}>
           <Typography variant="body1" 
           color={"primary"} 
+          textAlign={'center'}
           fontWeight={"bold"} 
           sx={{ fontSize:'small' }}>
             {job?.title}
           </Typography>
-        </Box>
 
-        {/* hiring org */}
-        <Box textAlign={"center"}
-        >
+  
           <Typography
+          textAlign={'center'}
             variant="body2"
             fontWeight={"bold"}
             textTransform={"capitalize"}
@@ -145,7 +197,6 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false, }) {
             {" "}
             {job?.organisation?.name}
           </Typography>
-        </Box>
 
         <Box display={"flex"} justifyContent={"center"}>
           <AvatarGroup max={mandatorySkills?.length}>
@@ -168,90 +219,70 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false, }) {
         <Divider className="p-1 w-75" component={'div'}/>
         </Box>
 
-        <React.Fragment>
-          <Box display={"flex"} gap={1} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
             <LocationOnRounded sx={{ width: 22, height: 22 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
-              {handleCountryName()} | {job.location.state}{" "}
+             {job.location.state} | {handleCountryName()}{" "}
             </Typography>
           </Box>
-          <Box display={"flex"} gap={1} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
             <AccessTimeFilledRounded sx={{ width: 19, height: 19}} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
               Access {job?.jobtypeaccess?.access} | {job?.jobtypeaccess?.type}
             </Typography>
           </Box>
-          <Box display={"flex"} gap={1} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
             <PaidRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" textTransform={"uppercase"} sx={{ fontSize:'small' }}>
               {job?.salary}
             </Typography>
           </Box>
 
-          <Box display={"flex"} gap={1} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
             <WorkHistoryRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" textTransform={"capitalize"} sx={{ fontSize:'small' }}>
               {job?.entry?.years}
             </Typography>
           </Box>
 
-          <Box display={"flex"} gap={1} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
             <BalanceRounded sx={{ width: 22, height: 22 }} />
             <Typography variant="body2" textTransform={"capitalize"} sx={{ fontSize:'small' }}>
               {handleEntryPosition()} Position Level
             </Typography>
           </Box>
 
-          <Box display={"flex"} gap={1} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
             <PeopleRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
               Current Applications {!(job?.website==="") ? "(N/A)":`${job?.applicants?.total}/300`}
             </Typography>
           </Box>
-          <Box display={"flex"} gap={1} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
             <CalendarMonthRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }} >
               Date Uploaded {handleDateDisplay()}
             </Typography>
           </Box>
-        <Box 
-        ml={0.2}
-        display={"flex"} 
-        gap={1}
-        justifyContent={'center'}
-        width={'100%'}
-        alignItems={"center"}
-        >
-        {/* info icon */}
-        <InfoOutlined sx={{ width:17,height:17,mr:0.5 }}/>
-        {/* helper tex */}
-          <Typography 
-          color={!isDarkMode && 'primary'}
-          className={isDarkMode && 'text-info'}
-          textTransform={'capitalize'}
-           variant="caption">
-            share this job by clicking
-          </Typography>
-          {/* share icon */}
-          <Tooltip arrow title='share'>
-          <IconButton size={'small'}>
-            <Share color="primary" sx={{ width:14,height:14 }}/>
-          </IconButton>
-          </Tooltip>
-        </Box>
-        </React.Fragment>
+       
       </Stack>
 
       {/* displayed is not previewHR, probably hr definitely their jobs*/}
       {!isPreviewHR && (
         <React.Fragment>
            {isMyJob ?(
-        <Box display={'flex'} justifyContent={'center'}>
-          <Typography textAlign={'center'} variant="caption" sx={{ color:'text.secondary', textTransform:'capitalize' }}> - you posted this job -</Typography>
+        <Box 
+        mt={0.5}
+        display={'flex'} 
+        justifyContent={'center'}>
+          <Typography textAlign={'center'} className="text-info" variant="caption" sx={{ textTransform:'capitalize' }}> - You Posted -</Typography>
         </Box>
       ):(
-        <React.Fragment>
       
+      <Box
+      mt={1}
+      justifyContent={'center'}
+       display={'flex'}>
       {/* application  btn */}
       {websiteLink === "" ? (
         <Button
@@ -287,11 +318,39 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false, }) {
         >
           {isDeactivated ? "paused":"apply"}
         </Button>
+        
       )}
-        </React.Fragment>
+      </Box>
       )}
+    </React.Fragment>
+      )}
+    </Card>
 
-      {/* show modal apply jobs */}
+    {/* next button zone, only if item is last index */}
+   {isLastIndex && (
+     <Box 
+    alignItems={'center'}
+    justifyContent={'center'}
+    display={'flex'}>
+    <IconButton 
+    disabled={isFetching}
+     onClick={handleFetchMoreData}
+     size="small"
+     sx={{ 
+      border:'1px solid',
+      borderColor:'divider'
+      }}
+     >
+     {isFetching ? 
+     <CircularProgress size={20}/>: 
+     <ArrowCircleRightRounded
+      color="primary"
+       sx={{ width:28,height:28}}/>}
+    </IconButton>
+    </Box>
+   )}
+
+     {/* show modal apply jobs */}
       {openModal && (
         <ApplyJobModal
         title={job.title}
@@ -308,11 +367,8 @@ function JobLayout({ isDarkMode, job, isPreviewHR=false, }) {
         isFullView={true}
       />
       )}
-        </React.Fragment>
-      )}
-     
-    </Stack>
+    </Box>
   );
 }
 
-export default JobLayout;
+export default JobLayout_2;

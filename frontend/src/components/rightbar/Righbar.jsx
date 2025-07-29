@@ -1,30 +1,31 @@
 import { InsightsRounded } from "@mui/icons-material";
-import { Backdrop, Box, Button, Stack } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { handleSidebarRightbar } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
-import BasicSpeedDial from "../custom/SpeedDial";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import FeaturedEventsContainer from "./FeaturedEventsContainer";
 import FeaturedPostContainer from "./FeaturedPostContainer";
 import JobsContainer from "./JobsContainer";
 import RequestContainer from "./RequestContainer";
 import RightBarStepper from "./RightBarStepper";
-import "./Rightbar.css";
 
 const RightbarAll = () => {
   // backdrop state
-  const [openBackdrop, setOpenBackdrop] = React.useState(false);
   const [corouselCounter, setCorouselCounter] = React.useState(0);
   const navigate=useNavigate()
   const dispatch=useDispatch()
 
   // redux states
-  const {isDefaultBottomNav, isSidebarRighbar } = useSelector(
+  const {currentMode, isSidebarRighbar } = useSelector(
     (state) => state.appUI
   );
+     const isDarkMode=currentMode==='dark'
+
 
   const handleNavigateJobs=()=>{
     navigate("/jobs"); 
@@ -40,7 +41,7 @@ const RightbarAll = () => {
     <Box
       height={"90vh"}
       flex={2}
-      marginRight={window.screen.availWidth > 1200 ? "5%" : "0"}
+      marginRight={CustomLandscapeWidest() ? "5%" : "0"}
       p={2}
       sx={{
         display: {
@@ -52,11 +53,8 @@ const RightbarAll = () => {
     >
       <Box
         position={"fixed"}
-        className={'rounded'}
         maxHeight={"80vh"}
         sx={{
-          border: "1px solid",
-          borderColor:"divider",
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -68,7 +66,13 @@ const RightbarAll = () => {
         }}
       >
         {/* connect suggestion  */}
-        <Box bgcolor={"background.default"} className=" rounded  ">
+        <Box 
+        sx={{ 
+          border:isDarkMode && "1px solid",
+          borderColor:"divider",
+         }}
+        bgcolor={"background.default"} 
+        className="rounded-4">
           <Box>
             {/*  top jobs */}
             <Stack gap={1}  display={corouselCounter === 0 ? "block" : "none"}>
@@ -86,8 +90,13 @@ const RightbarAll = () => {
               <RequestContainer />
             </Box>
 
+            {/* featured events */}
+             <Box display={corouselCounter === 2 ? "block" : "none"}>
+              <FeaturedEventsContainer />
+            </Box>
+
             {/* featured posts */}
-            <Box display={corouselCounter === 2 ? "block" : "none"}>
+            <Box display={corouselCounter === 3 ? "block" : "none"}>
               <FeaturedPostContainer />
             </Box>
 
@@ -104,24 +113,7 @@ const RightbarAll = () => {
             />
           </Box>
         </Box>
-
-        
-      </Box>
-
-      {/* display speed dial in feed section only for mobile and no landscape */}
-      {window.screen.availWidth > 900 && (
-        <Box>
-          {/* show speed dial if not scrolling down */}
-          {isDefaultBottomNav && (
-            <React.Fragment>
-              <Backdrop open={openBackdrop} />
-              <Box position={"fixed"} sx={{ left: 0, right: 1, bottom: 55 }}>
-                <BasicSpeedDial setOpenBackdrop={setOpenBackdrop} />
-              </Box>
-            </React.Fragment>
-          )}
-        </Box>
-      )}
+      </Box>     
     </Box>
   );
 };

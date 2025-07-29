@@ -2,7 +2,6 @@ import {
   Close,
   DarkModeRounded,
   PersonAddRounded,
-  StarRounded,
   Visibility,
   VisibilityOff,
   WbIncandescentRounded

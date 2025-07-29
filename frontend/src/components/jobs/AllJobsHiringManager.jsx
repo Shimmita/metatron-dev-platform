@@ -7,6 +7,7 @@ import {
   ListRounded,
   Menu,
   NotificationsRounded,
+  Refresh,
   SearchOutlined,
   SettingsRounded,
   WorkRounded
@@ -385,6 +386,12 @@ const handleShowingProfileDrawer = () => {
     setIsDrawerPane((prev) => !prev);
   };
 
+   // handle refresh of data
+    const handleRefreshData=()=>{
+      // set text to default explore events
+      setTextOption('Your Jobs')
+    }
+
 
   return (
       <Suspense
@@ -444,6 +451,7 @@ const handleShowingProfileDrawer = () => {
                   noWrap
                   component="div"
                   textAlign={"center"}
+                  fontWeight={'bold'}
                   textTransform={"uppercase"}
                   ml={open && 22}
                   
@@ -455,6 +463,7 @@ const handleShowingProfileDrawer = () => {
                 <Box display={"flex"} justifyContent={"center"} >
                   <Typography
                    variant="caption" 
+                   fontWeight={'bold'}
                    textTransform={'capitalize'}
                    ml={open && 22}>
                     - {textOption} -
@@ -552,11 +561,14 @@ const handleShowingProfileDrawer = () => {
                   <Typography variant="body2" 
                   sx={{color:'white'}} 
                   mb={1}
+                  fontWeight={'bold'}
                   textTransform={'uppercase'}>
                     hiring Manager
                   </Typography>
                   {/* name of the current user */}
-                  <Typography variant="caption" 
+                  <Typography 
+                  fontWeight={'bold'}
+                  variant="caption" 
                   sx={{color:'white'}} 
                   >
                    - {user?.name} -
@@ -790,6 +802,34 @@ const handleShowingProfileDrawer = () => {
                               )}
                             </>
                           ))}
+
+                            {/* rendered if are no jobs  */}
+                            {jobs?.length<1 && (
+                              <Box 
+                              height={'70vh'}
+                              display={'flex'}
+                              justifyContent={'center'}
+                              color={'text.secondary'}
+                              flexDirection={'column'}
+                              gap={2}
+                              alignItems={'center'}
+                              >
+                              {/* no events */}
+                              <Typography variant="body2">
+                                no more jobs posted
+                              </Typography>
+                              {/* show refresh button */}
+                              <Button 
+                              disableElevation
+                              onClick={handleRefreshData}
+                              size="small"
+                              variant="outlined"
+                              sx={{ borderRadius:3 }}
+                              startIcon={<Refresh/>}
+                              >refresh</Button>
+                              </Box>
+                            )}
+
                       </React.Fragment>
                     )}
                   </React.Fragment>

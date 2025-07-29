@@ -9,6 +9,8 @@ import process from "process";
 import App from "./App";
 import { persistor, store } from "./redux/AppStore"; // Import the modified store and persistor
 import reportWebVitals from "./reportWebVitals";
+import "@fontsource/poppins"; 
+
 
 window.process = process;
 

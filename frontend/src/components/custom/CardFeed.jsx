@@ -344,9 +344,9 @@ const CardFeed = ({
     <React.Fragment>
       <Box
       className={'rounded'}
-        mb={isLastIndex ? 8 :3}
+        mb={isLastIndex ? 10 :3}
         sx={{
-          border:"1px solid",
+          border:isDarkMode && "1px solid",
           borderColor: "divider",
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
         }}

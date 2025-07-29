@@ -28,6 +28,7 @@ import { updateCurrentPostsFromSearch } from "../../redux/CurrentPosts";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import { updateCurrentEvents } from "../../redux/CurrentEvents";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -83,8 +84,6 @@ export default function AlertGlobalSearch({
     // set is search jobs global in redux ui to true
     dispatch(handleIsJobsGlobalResults(true));
 
-    // navigate to jobs page for full display
-    navigate("/jobs");
     // update the bottom nav bar index position to jobs
     dispatch(updateCurrentBottomNav(1));
 
@@ -92,6 +91,9 @@ export default function AlertGlobalSearch({
     if (isSidebarRighbar) {
       dispatch(handleSidebarRightbar());
     }
+
+    // navigate to jobs page for full display
+    navigate("/jobs");
   };
 
   // handle showing of the people modal
@@ -116,16 +118,38 @@ export default function AlertGlobalSearch({
     navigate("/posts/search/results");
   };
 
+  // handle showing of events results
+  const handleShowEventsResults=()=>{
+    // update the redux state for global events into the search results
+    dispatch(updateCurrentEvents(globalSearchResults?.events?.data))
+
+    // set is search job-events global in redux ui to true
+    dispatch(handleIsJobsGlobalResults(true));
+    // close the modal
+    handleClose()
+    
+    // update the bottom nav bar index position to events
+    dispatch(updateCurrentBottomNav(2));
+
+    // disable sidebar
+    if (isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+
+    // navigate to the events
+    navigate("/events")
+  }
+
      // handle width of the global search width
-       const handleGlobalSearchWidth=()=>{
-        if (CustomDeviceTablet() && isTabSideBar) {
-          return "36%"
-        } else if(CustomLandScape()){
-          return "-8%"
-        } else if(CustomLandscapeWidest()){
-          return "-5%"
-        }
-      }
+    const handleGlobalSearchWidth=()=>{
+    if (CustomDeviceTablet() && isTabSideBar) {
+      return "36%"
+    } else if(CustomLandScape()){
+      return "-8%"
+    } else if(CustomLandscapeWidest()){
+      return "-5%"
+    }
+  }
    
   return (
       <Dialog
@@ -284,7 +308,9 @@ export default function AlertGlobalSearch({
                   borderColor: "divider",
                 }}
               >
-                <CardActionArea disabled={eventsCount < 1}>
+                <CardActionArea 
+                onClick={handleShowEventsResults}
+                disabled={eventsCount < 1}>
                   <Box display={"flex"} justifyContent={"center"}>
                     <LiveTvRounded color="action" />
                   </Box>

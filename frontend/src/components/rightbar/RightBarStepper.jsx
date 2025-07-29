@@ -10,7 +10,7 @@ export default function RightBarStepper({
   corouselCounter,
   setCorouselCounter,
 }) {
-  const maxStep = 3;
+  const maxStep = 4;
 
   const handleNext = () => {
     setCorouselCounter((prevActiveStep) => prevActiveStep + 1);
