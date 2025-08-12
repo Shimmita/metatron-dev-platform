@@ -24,13 +24,12 @@ import axios from "axios";
 import React, { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import devLogo from '../../../images/dev.jpeg';
 import { showMessagingDrawer } from "../../../redux/AppUI";
 import { deleteCurrentPostReaction } from "../../../redux/CurrentPostReactions";
 import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
-import { getElapsedTime } from "../../utilities/getElapsedTime";
 import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 import CustomCountryName from "../../utilities/CustomCountryName";
+import { getElapsedTime } from "../../utilities/getElapsedTime";
 
 export default function PostReaction({ reaction }) {
   const [isFetching, setIsFetching] = useState(false);

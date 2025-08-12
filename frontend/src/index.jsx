@@ -10,6 +10,7 @@ import App from "./App";
 import { persistor, store } from "./redux/AppStore"; // Import the modified store and persistor
 import reportWebVitals from "./reportWebVitals";
 import "@fontsource/poppins"; 
+import { Box, FormHelperText } from "@mui/material";
 
 
 window.process = process;
@@ -19,7 +20,16 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       {/*  PersistGate to handle rehydration */}
-      <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
+      <PersistGate loading={
+        <Box 
+        width={'100%'}
+        justifyContent={'center'}
+        display={'flex'}>
+        <FormHelperText>
+          loading...
+        </FormHelperText>
+        </Box>
+      } persistor={persistor}>
         <Router>
           <App />
         </Router>

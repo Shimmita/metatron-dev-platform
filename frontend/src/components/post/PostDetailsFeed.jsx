@@ -4,10 +4,10 @@ import {
   FavoriteRounded,
   ForumRounded,
   GitHub,
+  GradeOutlined,
   MoreVertRounded,
   UpdateRounded,
-  VerifiedRounded,
-  WbIncandescentRounded,
+  VerifiedRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -379,8 +379,8 @@ const PostDetailsFeed = ({
           sx={{ padding: 0, margin: 0 }}
           avatar={
               <IconButton onClick={() => setOpenMiniProfileAlert(true)}>
+              <Tooltip arrow title='profile'>
                 <Avatar
-                  // src={post.post_owner.owner-avatar}
                   src={postDetailedData?.post_owner?.owneravatar}
                   variant="rounded"
                   sx={{
@@ -390,6 +390,7 @@ const PostDetailsFeed = ({
                   alt=""
                 >
                 </Avatar>
+                </Tooltip>
               </IconButton>
           }
           action={
@@ -491,7 +492,7 @@ const PostDetailsFeed = ({
                 alignItems={"center"}
                 gap={2}
               >
-                <WbIncandescentRounded
+                <GradeOutlined
                   sx={{
                     width: 18,
                     height: 18,
@@ -503,7 +504,7 @@ const PostDetailsFeed = ({
                   {postDetailedData.post_title}
                 </Typography>
 
-                <WbIncandescentRounded
+                <GradeOutlined
                   sx={{
                     width: 18,
                     height: 18,

@@ -14,6 +14,7 @@ import {
   CardContent,
   CircularProgress,
   IconButton,
+  ListItemAvatar,
   Tooltip,
   Typography
 } from "@mui/material";
@@ -21,11 +22,12 @@ import axios from "axios";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentEvents } from "../../../redux/CurrentEvents";
+import { resetClearCurrentEventsTop } from "../../../redux/CurrentEventsTop";
 import { updateCurrentSnackBar } from "../../../redux/CurrentSnackBar";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
-import { resetClearCurrentEventsTop } from "../../../redux/CurrentEventsTop";
+import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 function EventItem({
   isDarkMode=false,
   event,
@@ -40,6 +42,7 @@ function EventItem({
 }) {
 
   const [isFetching, setIsFetching] = useState(false);
+  const [openMiniProfile,setOpenMiniProfile]=useState(false)
   
   // redux states
   const { user } = useSelector((state) => state.currentUser);
@@ -244,11 +247,17 @@ function EventItem({
         });
     }
 
+    // handle showing of mini profile
+    const handleShowMiniProfile=()=>{
+      setOpenMiniProfile(true)
+    }
+
   return (
       <Box 
       display={"flex"} 
       justifyContent={"center"}
-      gap={3}
+      gap={2}
+      mb={isLastIndex && CustomDeviceIsSmall() && 5}
       flexDirection={CustomDeviceIsSmall() ? 'column':'row'}
       >
       {/* card events details */}
@@ -308,7 +317,7 @@ function EventItem({
                     <Avatar
                       alt={skill}
                       className="border"
-                      sx={{ width: 25, height: 25 }}
+                      sx={{ width: 26, height: 26 }}
                       src={getImageMatch(skill)}
                     />
                     </Tooltip>
@@ -404,15 +413,19 @@ function EventItem({
                    
                   <Typography
                     variant="caption"
-                    gap={1}
                     fontWeight={"bold"}
                     alignItems={"center"}
                     display={"flex"}
                   >
                     <Box>
-                      <Avatar src="" 
+                    <Tooltip arrow title='profile'>
+                    <ListItemAvatar onClick={handleShowMiniProfile}>
+                      <Avatar 
+                      src={event?.ownerAvatar}
                       alt=""
-                      sx={{ width:32,height:32 }}  />
+                      />
+                      </ListItemAvatar>
+                      </Tooltip>
                     </Box>
 
                     <Box>
@@ -438,13 +451,6 @@ function EventItem({
                   </Box>
                   {/* profile part B */}
                   <Box display={'flex'} flexDirection={'column'}>
-                  {/* country */}
-                   <Typography
-                        textTransform={"capitalize"}
-                        variant="caption"
-                      >
-                        {event?.location?.country?.split("(")[0]}
-                      </Typography>
 
                       {/* state */}
                       <Typography
@@ -452,6 +458,15 @@ function EventItem({
                         variant="caption"
                       >
                         {event?.location?.state}
+                      </Typography>
+
+                  {/* country */}
+                   <Typography
+                        textTransform={"capitalize"}
+                        variant="caption"
+                      >
+                        {event?.location?.country?.includes("+") ? CustomCountryName(event?.location?.country)  :event?.location?.country?.split("(")[0]}
+                        
                       </Typography>
 
                   </Box>
@@ -573,7 +588,6 @@ function EventItem({
           </CardContent>
         </Card>
 
-        {/* button next */}
 
          {/* next button zone, only if item is last index */}
            {isLastIndex && (
@@ -599,6 +613,15 @@ function EventItem({
             </Box>
            )}
 
+
+          {/* mini profile alert  */}
+          {openMiniProfile && (
+            <AlertMiniProfileView
+              openAlert={openMiniProfile}
+              setOpenAlert={setOpenMiniProfile}
+              userId={event?.ownerId}
+            />
+          )}
 
       </Box>
         );

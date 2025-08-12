@@ -1,15 +1,13 @@
 import {
   ArrowBackIosNewRounded,
   CheckCircle,
-  StarRounded,
   Visibility,
   VisibilityOff,
   WbIncandescentRounded,
-  WorkRounded,
+  WorkRounded
 } from "@mui/icons-material";
 import {
   Autocomplete,
-  Avatar,
   Box,
   Button,
   Chip,
@@ -20,13 +18,14 @@ import {
   MenuItem,
   OutlinedInput,
   TextField,
-  Typography,
+  Typography
 } from "@mui/material";
 import React, { lazy, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import logo from "../../images/logo_sm.png";
 import AlertCountry from "../alerts/AlertCountry";
+import AlertGeneral from "../alerts/AlertGeneral";
+import AlertProfileCompletion from "../alerts/AlertProfileCompletion";
 import AllSkills from "../data/AllSkillsData";
 import CountiesInKenya from "../data/Counties";
 import EducationLevel from "../data/EducationLevel";
@@ -34,8 +33,6 @@ import GenderData from "../data/GenderData";
 import Institutions from "../data/Institution";
 import SpecialisationJobs from "../data/SpecialisationJobs";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-import AlertProfileCompletion from "../alerts/AlertProfileCompletion";
-import AlertGeneral from "../alerts/AlertGeneral";
 const RegisterAlertTitle = lazy(() => import("./RegisterAlertTitle"));
 
 const RegistrationAuth = () => {
@@ -45,11 +42,11 @@ const RegistrationAuth = () => {
   const [gender, setGender] = useState("");
   const [specialisationTitle, setSpecialisationTitle] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState();
   const [password, setPassword] = useState("");
   const [country, setCountry] = useState("");
   const [county, setCounty] = useState("");
-  const [missing_field_msg, setMissinFieldMsg] = useState("");
+  const [missingFieldMessage, setMissingFieldMessage] = useState("");
   const [openAlertGenral, setOpenAlertGenral] = useState(false);
   const [titleAlert, setTitleAlert] = useState();
   const [selectedSkills, setSelectedSkills] = useState([]);
@@ -57,6 +54,7 @@ const RegistrationAuth = () => {
   const [eduInstitution, setEduInstitution] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState(Institutions);
+
   // user object
   const [user, setUser] = useState({});
 
@@ -117,68 +115,68 @@ const RegistrationAuth = () => {
 
   const handleMissingField = () => {
     if (
-      name.trim().split(" ").length < 1 ||
-      name.trim().split(" ").length > 2
+      name.trim()?.split(" ").length < 1 ||
+      name.trim()?.split(" ").length > 3
     ) {
       setTitleAlert("Name Field");
-      setMissinFieldMsg("Please provide two names");
+      setMissingFieldMessage("Please provide two names");
       setOpenAlertGenral(true);
       return true;
     }
 
-    if (name.trim() === "") {
+    if (name?.trim() === "") {
       setTitleAlert("Missing Field");
-      setMissinFieldMsg(
+      setMissingFieldMessage(
         "Please fill all the missing fields, your name is missing !"
       );
       setOpenAlertGenral(true);
       return true;
     }
-    if (email.trim() === "") {
+    if (email?.trim() === "") {
       setTitleAlert("Missing Field");
-      setMissinFieldMsg(
+      setMissingFieldMessage(
         "Please fill all the missing fields, your email is missing !"
       );
       return true;
     }
-    if (password.trim() === "") {
+    if (password?.trim() === "") {
       setTitleAlert("Missing Field");
-      setMissinFieldMsg(
+      setMissingFieldMessage(
         "Please fill all the missing fields, your password is missing !"
       );
       return true;
     }
-    if (educationLevel.trim() === "") {
+    if (educationLevel?.trim() === "") {
       setTitleAlert("Missing Field");
-      setMissinFieldMsg(
+      setMissingFieldMessage(
         "Please fill all the missing fields, field level of education is missing !"
       );
       return true;
     }
-    if (eduInstitution.trim() === "") {
+    if (eduInstitution?.trim() === "") {
       setTitleAlert("Missing Field");
-      setMissinFieldMsg(
+      setMissingFieldMessage(
         "Please fill all the missing fields, your education institution is missing !"
       );
       return true;
     }
-    if (phone.trim() === "") {
+    if (phone?.trim() === "") {
       setTitleAlert("Missing Field");
-      setMissinFieldMsg(
+      setMissingFieldMessage(
         "Please fill all the missing fields, your phone is missing !"
       );
       return true;
     }
-    if (county.trim() === "") {
+    if (county?.trim() === "") {
       setTitleAlert("Missing Field");
-      setMissinFieldMsg(
+      setMissingFieldMessage(
         "Please fill all the missing fields, your county or location is missing !"
       );
       return true;
     }
-    if (gender.trim() === "") {
+    if (gender?.trim() === "") {
       setTitleAlert("Missing Field");
-      setMissinFieldMsg(
+      setMissingFieldMessage(
         "Please fill all the missing fields, your gender is missing !"
       );
       return true;
@@ -186,14 +184,14 @@ const RegistrationAuth = () => {
 
     if (specialisationTitle.trim() === "") {
       setTitleAlert("Missing Field");
-      setMissinFieldMsg(
+      setMissingFieldMessage(
         "Please fill all the missing fields, your preferred title is missing !"
       );
       return true;
     }
     if (!selectedSkills.length > 0) {
       setTitleAlert("Missing Field");
-      setMissinFieldMsg(
+      setMissingFieldMessage(
         "Please fill all the missing fields, your skills missing atleast provide one skill or at most five !"
       );
       return true;
@@ -319,7 +317,7 @@ const RegistrationAuth = () => {
                     className="w-75"
                     onChange={(e) => setName(e.target.value.toUpperCase())}
                     value={name}
-                    placeholder="Firstname Lastname"
+                    placeholder="FirstName LastName"
                   />
                 </Box>
 
@@ -345,7 +343,7 @@ const RegistrationAuth = () => {
                     className="w-75"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+254xyz"
+                    placeholder={`${country?.split(" ")[0]}xyz`}
                   />
                 </Box>
 
@@ -415,7 +413,10 @@ const RegistrationAuth = () => {
                         <MenuItem
                           key={specialisation_title}
                           value={specialisation_title}
+                         
                         >
+                      
+                        {/* skill name */}
                           {specialisation_title}
                         </MenuItem>
                       ))}
@@ -497,7 +498,7 @@ const RegistrationAuth = () => {
                       className="w-75"
                       value={eduInstitution}
                       onChange={(e) => setEduInstitution(e.target.value)}
-                      placeholder="Education Instistution"
+                      placeholder="Education Institution"
                     />
                   </Box>
                 )}
@@ -634,35 +635,43 @@ const RegistrationAuth = () => {
       </Box>
 
       {/* show alert for custom title when zero selection is matched */}
-      <RegisterAlertTitle
+     {openAlert && (
+       <RegisterAlertTitle
         openAlert={openAlert}
         setOpenAlert={setOpenAlert}
         setSpecialisationTitle={setSpecialisationTitle}
       />
+     )}
 
       {/* alert general */}
-      <AlertGeneral
+      {openAlertGenral && (
+        <AlertGeneral
         openAlertGeneral={openAlertGenral}
         setOpenAlertGeneral={setOpenAlertGenral}
         title={titleAlert}
-        message={missing_field_msg}
-        setErrorMessage={setMissinFieldMsg}
-
+        message={missingFieldMessage}
+        setErrorMessage={setMissingFieldMessage}
       />
+      )}
 
       {/* alert profile picture completion */}
-      <AlertProfileCompletion
+      {openAlertProfile && (
+        <AlertProfileCompletion
         openAlertProfile={openAlertProfile}
         setOpenAlertProfile={setOpenAlertProfile}
         user={user}
       />
+      )}
+
       {/* alert country of the user */}
-      <AlertCountry
+      {openAlertCountry && (
+        <AlertCountry
         openAlertCountry={openAlertCountry}
         setOpenAlertCountry={setOpenAlertCountry}
         country={country}
         setCountry={setCountry}
       />
+      )}
     </Box>
   );
 };

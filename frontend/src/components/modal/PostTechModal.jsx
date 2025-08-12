@@ -1,8 +1,7 @@
 import {
   Close,
   CloudUploadRounded,
-  DiamondRounded,
-  UploadRounded,
+  DiamondRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -21,7 +20,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import React, { lazy, useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import AppLogo from "../../images/logo_sm.png";
@@ -338,7 +337,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       } else if (CustomDeviceTablet()){
         return "90%"
       } 
-      return "100%"
+      return "95%"
     }
 
   // handle width of the modal, margin
@@ -346,9 +345,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         if (CustomDeviceTablet() && isTabSideBar) {
           return "36%"
         } else if(CustomLandScape()){
-          return "-8%"
+          return "-1%"
         } else if(CustomLandscapeWidest()){
-          return "-5%"
+          return "0%"
         }
       }
 
@@ -366,25 +365,30 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   >
     <Box
       width={handleReturnWidthModal()}
-      p={1}
-      borderRadius={5}
+      borderRadius={3}
       bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
       color={"text.primary"}
       sx={{
-        border: isDarkMode && "1px solid gray",
+        border:"1px solid gray",
+        borderColor:'divider',
         marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
       }}
     >
       <Box
         bgcolor={"background.default"}
-        borderRadius={5}
+        borderRadius={3}
         className="shadow-lg"
+        sx={{ 
+          border:  "1px solid gray",
+          borderColor:'divider',
+         }}
       >
           {/* toolbar like box */}
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
+            mr={1.5}
           >
             {/* logo */}
             <Box>
@@ -405,9 +409,17 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             <IconButton
               disabled={isUploading || errorMessage}
               onClick={handleClosingModal}
+              sx={{
+                border:'1px solid',
+                borderColor:'divider',
+              }}
             >
               <Tooltip title={"close"}>
-                <Close />
+                <Close  
+                sx={{ 
+                  width:12,
+                  height:12,
+                 }}/>
               </Tooltip>{" "}
             </IconButton>
           </Box>
@@ -460,15 +472,15 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               opacity: isUploading && ".3",
             }}
           >
-            <Box display={"flex"} flexDirection={"column"} gap={3}>
+            <Box mt={3} display={"flex"} flexDirection={"column"} gap={3}>
               <Box>
-                <Typography variant="body2" mt={3} color={"text.secondary"}>
+                <Typography variant="body2" color={"text.secondary"}>
                   Provide relevant title for this post to help target users on
                   the platform to bootstrap your objectives or motives at
                   glance.
                 </Typography>
 
-                <Box mt={4} className="w-100 mb-2">
+                <Box mt={2} className="w-100 mb-2">
                   <TextField
                     required
                     disabled={isUploading}
@@ -488,7 +500,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 your post is aimed to address in particular.
               </Typography>
 
-              <Box className="w-100 mt-2 mb-2 ">
+              <Box className="w-100 
+               mb-2 ">
                 <TextField
                   required
                   select
@@ -499,7 +512,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   onChange={(e) => setPostCategory(e.target.value)}
                 >
                   {SpecialisationTech?.filter((about) => about !== "None").map(
-                      (about, index) => (
+                      (about) => (
                         <MenuItem
                           key={about}
                           value={about}
@@ -522,7 +535,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* Containerization  */}
               {postCategory === "Containerization and Orchestration" && (
                 <Box>
-                  <Typography variant="body2" color={"text.secondary"} p={1}>
+                  <Typography    variant="body2" color={"text.secondary"} p={1}>
                     Containerization and Orchestration option that your post
                     aims to enlighten to other potential users on the platform.
                   </Typography>
@@ -560,10 +573,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* machine learning and artificial intelligence */}
               {postCategory === "Artificial Intelligence" && (
                 <Box>
-                  <Typography variant="body2" color={"text.secondary"} p={1}>
+                  <Typography    variant="body2" color={"text.secondary"} p={1}>
                     Provide specific area of focus in the field of Machine
                     Learning and Artificial Intelligence, select option zero if
-                    none matches to privide your preference.
+                    none matches to provide your preference.
                   </Typography>
                   <Box className="w-100 mb-2 ">
                     <TextField
@@ -596,7 +609,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* data science */}
               {postCategory === "Data Science and Analytics" && (
                 <Box>
-                  <Typography variant="body2" color={"text.secondary"} p={1}>
+                  <Typography    variant="body2" color={"text.secondary"} p={1}>
                     Select the area of focus in the field of data science and
                     analysis in particular.
                   </Typography>
@@ -631,7 +644,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* cybersecurity */}
               {postCategory === "Cybersecurity Engineering" && (
                 <Box>
-                  <Typography variant="body2" color={"text.secondary"} p={1}>
+                  <Typography    variant="body2" color={"text.secondary"} p={1}>
                     Select the area of focus in the field of cybersecurity
                     engineering.This prevents being too general in broader
                     fields.
@@ -667,7 +680,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* Desktop App */}
               {postCategory === "Desktop App Development" && (
                 <Box>
-                  <Typography variant="body2" color={"text.secondary"} mt={3}>
+                  <Typography    variant="body2" color={"text.secondary"} mt={3}>
                     Desktop development stack used in your project. Desktop
                     applications usually runs on high-end devices such as
                     Laptops and PCs.
@@ -704,7 +717,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* Game dev */}
               {postCategory === "Game App Development" && (
                 <Box>
-                  <Typography variant="body2" color={"text.secondary"}>
+                  <Typography    variant="body2" color={"text.secondary"}>
                     Provide game application development technology that your
                     post is aimed to address in particular from the provided
                     options.
@@ -743,7 +756,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* programming Language */}
               {postCategory === "Programming Languages" && (
                 <Box>
-                  <Typography variant="body2" color={"text.secondary"}>
+                  <Typography    variant="body2" color={"text.secondary"}>
                     Select programming language that you are interested to post
                     about from the options provided below.
                   </Typography>
@@ -784,12 +797,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {postCategory === "Cloud Computing" && (
                 <Box>
                   <Typography
+                    
                     gutterBottom
                     variant="body2"
                     color={"text.secondary"}
                     p={1}
                   >
-                    Select cloud provider in particualar that you are interested
+                    Select cloud provider in particular that you are interested
                     to address in your post.
                   </Typography>
                   <Box className="w-100 mb-3 ">
@@ -1061,7 +1075,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {postCategory === "Native IOS App Development" && (
                 <Box>
                   <Typography variant="body2" color={"text.secondary"}>
-                    Provide the stack used in the developement of your native
+                    Provide the stack used in the development of your native
                     IOS application which your post is aimed to address.
                   </Typography>
                   <Box mt={4} className="w-100 mb-2 ">
@@ -1097,7 +1111,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* Multiplatform Android+IOS */}
               {postCategory === "Multiplatform Mobile Development" && (
                 <Box>
-                  <Typography variant="body2" color={"text.secondary"}>
+                  <Typography    variant="body2" color={"text.secondary"}>
                     Provide multiplatform or cross-platform development
                     technology that you are interested in. Allows writing of a
                     single code base that runs on both Android and IOS devices.
@@ -1138,7 +1152,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
               {/* image and pdf for the post */}
 
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+              <Typography    gutterBottom variant="body2" color={"text.secondary"}>
                 Provide main image or photo for your post that summarizes your post content on the fly.
               </Typography>
 
@@ -1246,7 +1260,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
               {/* Github link */}
 
-              <Typography variant="body2" color={"text.secondary"}>
+              <Typography    variant="body2" color={"text.secondary"}>
                 Suppose your post is about a particular project you worked on
                 and aiming to display your technicalities, please provide GiHub
                 or Gitlab link to promote your project.
@@ -1266,13 +1280,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
               {/* description */}
 
-              <Typography variant="body2" color={"text.secondary"}>
+              <Typography    variant="body2" color={"text.secondary"}>
                 Description about your post highlighting the technical concepts
                 you are excited to share with many users platform. Let your
                 audience visualize your concepts.
               </Typography>
 
-              <Box mb={3}>
+              <Box mb={2}>
                 <TextField
                   minRows={window.screen.availWidth <= 320 ? 5 : 10}
                   multiline

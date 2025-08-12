@@ -2,25 +2,28 @@ import { Stack, StepLabel, Typography } from '@mui/material';
 import Step from '@mui/material/Step';
 import Stepper from '@mui/material/Stepper';
 import CustomLandscapeWidest from '../utilities/CustomLandscapeWidest';
+import CustomDeviceIsSmall from '../utilities/CustomDeviceIsSmall';
 
-export default function StepperStats({dataInsights,isDarkMode,isFetching,errorMessage}) {
+
+export default function StepperStats({dataInsights}) {
+  
   return (
     <Stack  
     px={!CustomLandscapeWidest() && 1 }
     sx={{ width: '100%' }}>
 
-      <Stepper  orientation='vertical'>
+      <Stepper  
+      orientation='vertical'>
         {dataInsights?.map((insight) => (
-          <Step key={insight} completed={2}>
+          <Step 
+          key={insight.title} 
+          completed={2}>
           {/* stepper title */}
-          <StepLabel>
+          <StepLabel >
           <Typography 
           variant='body2'
-          color={!isDarkMode && 'primary'}
-          fontWeight={'bold'}
-          fontSize={'small'}
           >
-            {insight.title}
+            {insight.title.substring(0,!CustomDeviceIsSmall() ? 30:undefined)}
           </Typography>
           </StepLabel>
 
@@ -28,7 +31,7 @@ export default function StepperStats({dataInsights,isDarkMode,isFetching,errorMe
           <Typography 
           variant='caption'
            color={'text.secondary'}>
-            {insight.details}
+            {insight.details.substring(0,!CustomDeviceIsSmall() ? 41:undefined)}
           </Typography>
           </Step>
         ))}

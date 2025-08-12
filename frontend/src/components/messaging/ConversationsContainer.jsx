@@ -1,5 +1,5 @@
-import { Message } from "@mui/icons-material";
-import { Box, Fab, Stack, Tooltip } from "@mui/material";
+import { Add } from "@mui/icons-material";
+import { Box, Fab, Stack } from "@mui/material";
 import axios from "axios";
 import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
@@ -144,17 +144,18 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
 
           {/* display a floating action btn */}
           {!messageClicked && (
-            <Tooltip arrow title={"new conversation"}>
               <Fab
                 color="primary"
-                aria-label="start a new message conversation"
+                variant="extended"
+                aria-label="floating button"
+                size="small"
                 disabled={isFetching}
                 onClick={handleFabClicked}
-                sx={{ left: "46%", mt: 8 }}
+                sx={{ left: "35%", paddingRight:1}}
               >
-                <Message />
+                <Add sx={{ mr: 1 }}/>
+                Compose
               </Fab>
-            </Tooltip>
           )}
         </React.Fragment>
       )}

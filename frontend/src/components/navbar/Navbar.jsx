@@ -1,11 +1,9 @@
 import {
   Close,
   DarkModeRounded,
-  DiamondRounded,
   EmailRounded,
   ErrorOutline,
   FilterListRounded,
-  FilterRounded,
   MenuRounded,
   NotificationsRounded,
   SearchRounded
@@ -58,6 +56,7 @@ import SpecialisationTech from "../data/SpecialisationTech";
 import PostDetailedModal from "../modal/PostDetailedModal";
 import PostEditModal from "../modal/PostEditModal";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 const PeopleModal = lazy(() => import("../modal/PeopleModal"));
@@ -164,7 +163,6 @@ const Navbar = () => {
     const { profile_views } = useSelector((state) => state.currentProfileView);
     const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
     const { conversations } = useSelector((state) => state.currentConversation);
-    const { position:bottomNavPosition } = useSelector((state) => state.currentBottomNav);
     
 
     // get count of conversation messages where target read is false
@@ -503,7 +501,7 @@ const Navbar = () => {
   return (
     <React.Fragment>
       <AppBar 
-      color={isDarkMode ? "default":"transparent"}
+      color={isDarkMode ? "default":"primary"}
       position="fixed" 
       elevation={0}>
         <MetatronToolBar variant="dense">
@@ -524,8 +522,9 @@ const Navbar = () => {
               <Avatar alt="KE" 
               src={AppLogo} 
               sx={{ width: 50, height: 50 }} />
+
                 <Button onClick={handleHome} >
-                  <Typography variant="h6" fontWeight={"bold"} >
+                  <Typography variant="h6" fontWeight={"bold"} color={'white'} >
                     METATRON
                   </Typography>
                 </Button>
@@ -543,17 +542,34 @@ const Navbar = () => {
               {!CustomDeviceTablet() ? (
                 <React.Fragment>
                   <IconButton onClick={(e) => setOpenDrawer(!openDrawer)}>
-                    <MenuRounded  />
+                    <MenuRounded  sx={{ color:'white' }} />
                   </IconButton>
-                  <Button onClick={handleHome} >
-                    {/* app title small devices */}
+                  {/* app tile on smallest devices won't show 
+                  only medium sized. show app logo on smallest devices
+                  */}
+                  {!CustomDeviceSmallest() ? (
+                    <Button onClick={handleHome} >
                     <Typography
                       fontWeight={"bold"}
+                      color={'white'}
                       sx={{ fontsize:'medium' }}
                     >
                       METATRON
                     </Typography>
                   </Button>
+                  ):(
+                    <IconButton 
+                    size="small"
+                    onClick={handleHome} >
+                      <Avatar alt="KE" 
+                      src={AppLogo} 
+                      sx={{ 
+                        width:30,height:30
+                       }}
+                      />
+                    </IconButton>
+                  )}
+
                 </React.Fragment>
               ) : (
                 <Box display={"flex"} ml={0} alignItems={"center"} gap={1}>
@@ -569,6 +585,7 @@ const Navbar = () => {
                   {/* app title for tablets */}
                   <Button>
                     <Typography
+                    color={'white'}
                       variant="h6"
                       fontWeight={"bold"}
                       
@@ -601,7 +618,6 @@ const Navbar = () => {
                       placeholder="search…"
                       inputProps={{ 'aria-label': 'search' }}
                       sx={{ 
-                        backgroundColor:!isDarkMode && '#F1F1F1',
                        borderRadius:'20px',
                        fontSize:'small'
                         }}
@@ -630,7 +646,7 @@ const Navbar = () => {
                         type="submit"
                       >
                         <SearchRounded
-                          sx={{ width: 20, height: 20,}}
+                          sx={{ width: 20, height: 20,color:'white'}}
                         />
                       </IconButton>
                       </Tooltip>
@@ -643,7 +659,7 @@ const Navbar = () => {
                       onClick={handleShowContentFilter}
                     >
                       <FilterListRounded
-                        sx={{ width: 22, height: 22, }}
+                        sx={{ width: 22, height: 22, color:'white' }}
                       />
                     </IconButton>
                     </Tooltip>
@@ -683,7 +699,6 @@ const Navbar = () => {
                           placeholder="search…"
                           inputProps={{ 'aria-label': 'search' }}
                           sx={{ 
-                            backgroundColor:!isDarkMode && '#F1F1F1',
                           borderRadius:'20px',
                           fontSize:'small'
                             }}
@@ -703,7 +718,7 @@ const Navbar = () => {
                             disabled={searchTerm?.length < 2}
                           >
                             <SearchRounded
-                              sx={{ width: 22, height: 22,  }}
+                              sx={{ width: 22, height: 22, color:'white' }}
                             />
                           </IconButton>
                         )}
@@ -717,13 +732,13 @@ const Navbar = () => {
                         onClick={handleShowContentFilter}
                       >
                         <FilterListRounded
-                          sx={{ width: 20, height: 20}}
+                          sx={{ width: 20, height: 20, color:'white'}}
                         />
                       </IconButton>
                       </Tooltip>
 
                     <IconButton onClick={handleShowMobileSearch}>
-                      <Close sx={{ width: 18, height: 18,}} />
+                      <Close sx={{ width: 18, height: 18, color:'white'}} />
                     </IconButton>
                   </Box>
                 </SearchBar>
@@ -737,7 +752,7 @@ const Navbar = () => {
                 {/* display when search not clicked */}
                 {!showMobileSearch && (
                   <IconButton onClick={handleShowMobileSearch}>
-                    <SearchRounded  />
+                    <SearchRounded sx={{ color:'white'}} />
                   </IconButton>
                 )}
                   </Box>
@@ -760,19 +775,12 @@ const Navbar = () => {
 
                 {!CustomDeviceIsSmall() && (
                 <React.Fragment>
-                {/* premium diamond icon */}
-                <Tooltip arrow title='premium'>
-                <IconButton>
-                <DiamondRounded 
-                sx={{ height:28, width:28,pt:0.5 }}/>
-                </IconButton>
-                </Tooltip>
               
                  {/* change theme trigger */}
                 <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
                 <IconButton  onClick={handleShowDarkMode}> 
                 <DarkModeRounded
-                sx={{ height:24, width:24 }}
+                sx={{ height:24, width:24, color:'white' }}
                 />
                 </IconButton>
                 </Tooltip> 
@@ -792,7 +800,7 @@ const Navbar = () => {
                       onClick={()=>handleShowMessageDrawer(0)}
                     >
                       <NotificationsRounded
-                        sx={{ width: 25, height: 25, }}
+                        sx={{ width: 25, height: 25,color:'white' }}
                       />
                     </IconButton>
                 </Badge>
@@ -812,7 +820,7 @@ const Navbar = () => {
                     onClick={()=>handleShowMessageDrawer(1)}
                   >
                     <EmailRounded
-                      sx={{ width: 22, height: 22, }}
+                      sx={{ width: 22, height: 22,color:'white' }}
                     />
                   </IconButton>
                 </Badge>
@@ -952,7 +960,7 @@ const Navbar = () => {
       </AppBar>
 
       {/* fix the contents to be shown fully */}
-      <Box mb={5.5}/>
+      <Box pb={CustomDeviceTablet()? 7:5.5}/>
     </React.Fragment>
   );
 };

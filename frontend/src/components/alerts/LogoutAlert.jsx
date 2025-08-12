@@ -81,6 +81,18 @@ export default function LogoutAlert() {
         return "97.5%"
       }
     }
+
+      const handleAlertGenWidth=()=>{
+        if (CustomDeviceTablet() && isTabSideBar) {
+          return "36%"
+        } else if(CustomLandScape()){
+          return "-1%"
+        } else if(CustomLandscapeWidest()){
+          return "0%"
+        }
+      }
+
+
   return (
       <Dialog
         open={isLogoutAlert}
@@ -88,9 +100,8 @@ export default function LogoutAlert() {
         keepMounted
         aria-describedby="alert-dialog-slide-description"
         sx={{
-          marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
-
-          width:handleWidthAlert()
+          backdropFilter:'blur(3px)',
+          marginLeft: handleAlertGenWidth()
         }}
       >
         <DialogTitle

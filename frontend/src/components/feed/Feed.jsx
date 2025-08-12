@@ -146,7 +146,7 @@ const Feed = () => {
                       sx={{
                         left: 0,
                         right: CustomDeviceIsSmall()? "40%" : CustomDeviceTablet() ? "31%" : "47%",
-                        bottom: 55,
+                        bottom: CustomDeviceIsSmall() ? 30:5,
                       }}
                     >
                       {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}
@@ -253,7 +253,7 @@ const Feed = () => {
                         sx={{
                           left: 0,
                           right: CustomDeviceIsSmall() < 600 ? "40%" : "47%",
-                          bottom: 50,
+                          bottom: CustomDeviceIsSmall() ? 30:25,
                         }}
                       >
                         {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}

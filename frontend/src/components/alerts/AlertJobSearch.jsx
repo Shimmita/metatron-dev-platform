@@ -57,6 +57,8 @@ export default function AlertJobSearch({
   const [entry, setJobEntry] = React.useState("");
   const [datePosted, setDatePosted] = React.useState("");
   const [category, setCategory] = useState("");
+  const [expanded, setExpanded] = useState(false);
+
 
   const handleCloseAlert = () => {
     // close alert
@@ -91,6 +93,7 @@ export default function AlertJobSearch({
       country,
       entry,
       datePosted,
+      category
     };
 
     // event search object that will be sent to the backend
@@ -123,9 +126,13 @@ export default function AlertJobSearch({
           isEventSearch ? dispatch(updateCurrentEvents(res.data.data)):
           // update the redux states for job search
           dispatch(updateCurrentJobs(res.data?.data));
+          // close expansion of accordion after any results
+          setExpanded(false)
         } else {
           // no jobs
           setErrorMessage("no matching results");
+          // close expansion of accordion after any results
+          setExpanded(false)
         }
       })
       .catch(async (err) => {
@@ -158,9 +165,9 @@ export default function AlertJobSearch({
       if (CustomDeviceTablet() && isTabSideBar) {
         return "36%"
       } else if(CustomLandScape()){
-        return "-8%"
+        return "-1%"
       } else if(CustomLandscapeWidest()){
-        return "-5%"
+        return "-0%"
       }
     }
 
@@ -171,7 +178,7 @@ export default function AlertJobSearch({
       keepMounted
       className="rounded"
       onClose={handleCloseAlert}
-      aria-describedby="alert-dialog-slide-description"
+      aria-describedby="alert-dialog-job-search"
       sx={{
           backdropFilter:'blur(3px)',
           marginLeft:handleAlertWidth()
@@ -181,6 +188,17 @@ export default function AlertJobSearch({
       bgcolor={"background.default"} 
       border={'1px solid'}
       borderColor={'divider'}
+      maxHeight={"80vh"}
+        sx={{
+          overflow: "auto",
+          // Hide scrollbar for Chrome, Safari and Opera
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          // Hide scrollbar for IE, Edge and Firefox
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+        }}
       >
         <DialogTitle
           display={"flex"}
@@ -304,12 +322,12 @@ export default function AlertJobSearch({
               select
               disabled={isFetching}
               value={category}
-              label={isEventSearch ? "event specialization":"job specialization"}
+              label={"specialization"}
               fullWidth
               onChange={(e) => setCategory(e.target.value)}
                 >
                   {SpecialisationTech?.filter((about) => about !== "None").map(
-                  (about, index) => (
+                  (about) => (
                     <MenuItem
                       key={about}
                       value={about}
@@ -342,6 +360,8 @@ export default function AlertJobSearch({
               errorMessage={errorMessage}
               isFetching={isFetching}
               isEventSearch={isEventSearch}
+              expanded={expanded}
+              setExpanded={setExpanded}
             />
           </Box>
         </DialogContent>

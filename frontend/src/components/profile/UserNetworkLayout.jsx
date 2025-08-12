@@ -1,4 +1,4 @@
-import { EmailOutlined, PersonRemoveOutlined } from "@mui/icons-material";
+import { PersonRemoveOutlined } from "@mui/icons-material";
 import { AvatarGroup, Box, IconButton, Tooltip, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
@@ -8,20 +8,13 @@ import ListItemText from "@mui/material/ListItemText";
 import axios from "axios";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import devImage from '../../images/dev.jpeg';
-import {
-  showProfileDrawerMessageInput,
-  showUserProfileDrawer,
-} from "../../redux/AppUI";
-import { updateTempUserIDRedux, updateUserCurrentUserRedux } from "../../redux/CurrentUser";
+import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import CustomCountryName from "../utilities/CustomCountryName";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../utilities/getImageMatch";
+import { updateCurrentNetworkID } from "../../redux/CurrentNetwork";
 
 export default function UserNetworkLayout({ network }) {
   // redux states
-  const { isOpenDrawerProfile } = useSelector((state) => state.appUI);
   const [isFetching, setIsFetching] = useState(false);
   const [messageResponse,setMessageResponse]=useState('')
 
@@ -30,38 +23,10 @@ export default function UserNetworkLayout({ network }) {
       _id: currentUserId,
     } = user || {};
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
-  // for navigation to a route
-  const navigate = useNavigate();
+
   // for effective actions of redux
   const dispatch = useDispatch();
-  // handle sending of the message
-  const handleSendMessage = () => {
-    if (CustomDeviceIsSmall()) {
-      // navigate user profile specially smaller devices + messaging true
-      // update the message shown input when drawer is opened
-      dispatch(showProfileDrawerMessageInput(true));
-
-      //close the drawer if is open for small devices
-      if (isOpenDrawerProfile) {
-        dispatch(showUserProfileDrawer());
-      }
-      navigate("users/profile/" + network?._id);
-    } else {
-      // update the temp user state in redux with the userID passed
-      dispatch(updateTempUserIDRedux(network?._id));
-
-      // update the message shown input when drawer is opened
-      dispatch(showProfileDrawerMessageInput(true));
-
-      //  open drawer profile if is not open for large screens and tabs ++
-      if (!isOpenDrawerProfile) {
-        dispatch(showUserProfileDrawer());
-      }
-    }
-  };
-
+  
   // handle unfriending the user, like remove them from the network
     const handleUnfriendFriend = () => {
       // set is fetching to true
@@ -80,6 +45,9 @@ export default function UserNetworkLayout({ network }) {
   
             // update the redux state of the currently logged in user from backend who is sender user
             dispatch(updateUserCurrentUserRedux(res.data.senderUser));
+
+            // update the user friend network by removing the deleted userId
+            dispatch(updateCurrentNetworkID(network?._id))
           }
         })
         .catch(async (err) => {
@@ -89,6 +57,9 @@ export default function UserNetworkLayout({ network }) {
           }
           // error message
           setMessageResponse(err?.response?.data);
+
+          // log the message
+          console.log(messageResponse)
         })
         .finally(() => {
           // set is fetching to false
@@ -114,18 +85,20 @@ export default function UserNetworkLayout({ network }) {
       <ListItem
       >
         <ListItemAvatar>
-        <Avatar
-        src={devImage}
-        variant="rounded"
-        sx={{
-          backgroundColor: "#1976D2",
-          color: "white",
-          width: 40,
-          height: 40,
-        }}
-        alt={network?.name?.split(" ")[0]}
-        aria-label="avatar"
-                />
+        <Tooltip title={'profile'} arrow>
+          <Avatar
+          src={network?.avatar}
+          variant="rounded"
+          sx={{
+            backgroundColor: "#1976D2",
+            color: "white",
+            width: 40,
+            height: 40,
+          }}
+          alt={network?.name?.split(" ")[0]}
+          aria-label="avatar"
+        />
+        </Tooltip>
         </ListItemAvatar>
         <ListItemText
           primary={
@@ -153,7 +126,7 @@ export default function UserNetworkLayout({ network }) {
                   >
                     {/* loop through the skills and their images matched using custom fn */}
                     {network?.selectedSkills?.map(
-                      (skill, index) => (
+                      (skill) => (
                         <Tooltip title={skill} arrow key={skill}>
                           <Avatar
                             alt={skill}
@@ -174,20 +147,21 @@ export default function UserNetworkLayout({ network }) {
         flexDirection={'column'} 
         justifyContent={'flex-end'} 
         alignItems={'center'}
+        mr={1}
         >
-          {/* message button */}
-        <IconButton onClick={handleSendMessage}>
-            <Tooltip title={"message"} arrow>
-              <EmailOutlined color="primary" sx={{ width:20,height:20 }} />
-            </Tooltip>
-          </IconButton>  
-
           {/* unfollow button */}
-          <IconButton onClick={handleUnfriendFriend} >
-            <Tooltip title={"unfollow"} arrow  sx={{ width:22,height:22 }}>
-            <PersonRemoveOutlined color="warning"  />
-            </Tooltip>
+            <Tooltip title={"remove"} arrow >
+          <IconButton
+          disabled={isFetching}
+          sx={{ 
+            border:'1px solid',
+            borderColor:'divider'
+           }}
+           onClick={handleUnfriendFriend} >
+            <PersonRemoveOutlined 
+            color="warning" sx={{ width:22,height:22}} />
           </IconButton>  
+            </Tooltip>
           </Box>
 
          </List>

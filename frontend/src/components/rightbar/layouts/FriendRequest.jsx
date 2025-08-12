@@ -316,8 +316,8 @@ function FriendRequest({
                       </Typography>
 
                       <Typography variant="caption" color={"text.secondary"}>
-                        {CustomCountryName(connect_request?.country)} |{" "}
-                        {connect_request?.county}
+                        {connect_request?.county} |{" "}
+                        {CustomCountryName(connect_request?.country)} 
                       </Typography>
 
                       {/* skills of the user */}

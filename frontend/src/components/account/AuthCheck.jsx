@@ -1,6 +1,5 @@
 import axios from "axios";
-import { getAuth, signOut } from "firebase/auth";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { persistor } from "../../redux/AppStore";
 import { updateCurrentAuthMessage } from "../../redux/CurrentAuthMessages";
@@ -29,13 +28,6 @@ const AuthCheck = ({ children }) => {
 
         // update authMessage error in redux for display on auth pages
         dispatch(updateCurrentAuthMessage(err?.response?.data));
-
-      // clear any firebase authentication details
-      const auth = getAuth();
-      const firebaseUser = auth?.currentUser;
-      if (firebaseUser) {
-        await signOut(auth);
-      }
 
       //final clearance of any persisted storage
       await persistor.purge();

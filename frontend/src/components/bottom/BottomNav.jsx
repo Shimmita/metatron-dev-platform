@@ -1,4 +1,4 @@
-import { CachedOutlined, CachedRounded, HomeOutlined, HomeRounded, SchoolOutlined, SchoolRounded, TvRounded, TvTwoTone, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
+import { HomeOutlined, HomeRounded, SchoolOutlined, SchoolRounded, TvRounded, TvTwoTone, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
 import {
   BottomNavigation,
   BottomNavigationAction,
@@ -13,8 +13,6 @@ import {
 } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const BottomNav = () => {
   // redux states
@@ -24,6 +22,7 @@ const BottomNav = () => {
 
   const { position } = useSelector((state) => state.currentBottomNav);
   const { isPostSearch } = useSelector((state) => state.currentPosts);
+  console.log(isPostSearch)
 
 
   const navigate = useNavigate();
@@ -110,24 +109,13 @@ const BottomNav = () => {
           <BottomNavigationAction
             label="Home"
             icon={
-              isPostSearch ? (
-                <>
-                {isDarkMode ? (
-                  <CachedOutlined  sx={{ width: 28, height: 28 }} />
-                ):(
-                  <CachedRounded  sx={{ width: 28, height: 28 }} />
-                )}
-                </>
-              ) : (
-                <>
-                {isDarkMode ? (
+           
+                isDarkMode ? (
                   <HomeOutlined sx={{ width: 29, height: 29}} />
                 ):(
                   <HomeRounded sx={{ width: 29, height: 29}} />
-                )}
+                )
                 
-                </>
-              )
             }
             onClick={handleReturnHome}
           />

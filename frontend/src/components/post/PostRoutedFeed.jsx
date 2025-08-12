@@ -12,10 +12,8 @@ import {
 import { Close, SendOutlined } from "@mui/icons-material";
 
 import axios from "axios";
-import React, { lazy, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { handleShowingSpeedDial } from "../../redux/AppUI";
+import { lazy, useState } from "react";
+import { useSelector } from "react-redux";
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
 
@@ -23,15 +21,13 @@ const CommentContainer = lazy(() => import("./CommentContainer"));
 function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate();
-
   const [comment, setComment] = useState("");
 
   // axios default credentials
   axios.defaults.withCredentials = true;
+  
   // redux states
   const { user } = useSelector((state) => state.currentUser);
-  const dispatch = useDispatch();
   // extract basic current user details
   const { _id, avatar, name,county, specialisationTitle: title } = user || {};
 
@@ -89,31 +85,18 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
       });
   };
 
-  // handle clearing of the post data so that the userprofile defaults also restore the speed dial
-  const handleClearPostDetailedData = () => {
-    setPostDetailedData();
-    // restore the speed dial
-    dispatch(handleShowingSpeedDial(true));
-    // navigate home and show the drawer again where the user was
-    navigate("/");
-  };
+
 
   return (
     <Stack gap={1}>
-      {/* close button */}
-      <Box display={"flex"} justifyContent={"flex-end"}>
-        <IconButton onClick={handleClearPostDetailedData}>
-          <Close sx={{ width: 15, height: 15 }} color="primary" />
-        </IconButton>
-      </Box>
 
       {/* display error */}
       {errorMessage && (
         <Box p={1} display={"flex"} justifyContent={"center"} gap={2}>
           <Collapse in={errorMessage || false}>
             <Alert
-              severity="warning"
-              className="rounded-5"
+              severity="info"
+              className="rounded"
               onClick={() => setErrorMessage("")}
               action={
                 <IconButton aria-label="close" color="inherit" size="small">
@@ -129,7 +112,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
       )}
 
       {/* card container */}
-      <Box p={2}>
+      <Box p={0}>
         {/* render post details feed here */}
         <PostDetailsFeed
           postDetailedData={postDetailedData}
@@ -137,31 +120,32 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
         />
 
         {/* all user comments container pass the comments of the post */}
-        <Box>
+        <Box mt={1}>
           <CommentContainer
             post_comments={postDetailedData?.post_comments.comments}
           />
         </Box>
-      </Box>
 
-      {/* comment input text  */}
+        {/* comment input text  */}
       <Box
         display={"flex"}
         justifyContent={"space-between"}
         alignItems={"center"}
         width={"100%"}
+        className='rounded'
         p={2}
+        mt={1}
         bgcolor={"background.default"}
       >
         {/* input for comment */}
-        <Box width={"100%"}>
+        <Box className='rounded' width={"100%"}>
           <InputBase
             multiline
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             maxRows={2}
             disabled={isUploading}
-            className="w-100"
+            className="w-100 rounded"
             placeholder="comment here..."
             sx={{
               fontSize: "small",
@@ -188,6 +172,9 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
           )}
         </Box>
       </Box>
+
+      </Box>
+
     </Stack>
   );
 }

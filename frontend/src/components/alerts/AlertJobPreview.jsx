@@ -37,6 +37,15 @@ export default function AlertJobPreview({
     }
   }
 
+  const handleAlertGenWidth=()=>{
+      if (CustomDeviceTablet() && isTabSideBar) {
+        return "36%"
+      } else if(CustomLandScape()){
+        return "-1%"
+      } else if(CustomLandscapeWidest()){
+        return "0%"
+      }
+    }
   return (
       <Dialog
         open={openAlert}
@@ -45,16 +54,16 @@ export default function AlertJobPreview({
         keepMounted
         aria-describedby="alert-dialog-slide-description"
           sx={{
-               marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
-               width:handleWidthAlert()
-           }}
+              marginLeft:handleAlertGenWidth(),
+              width:handleWidthAlert()
+          }}
       >
-         
+      
         <DialogContent dividers >
         {/* show layout job hiring */}
      
         {job && (
-         <JobLayout job={job} isPreviewHR={true} isDarkMode={currentMode==='dark'}/>
+        <JobLayout job={job} isPreviewHR={true} isDarkMode={currentMode==='dark'}/>
        )}
         </DialogContent>
       </Dialog>

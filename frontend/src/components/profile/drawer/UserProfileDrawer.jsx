@@ -1,14 +1,10 @@
 import {
-  Diversity1Rounded,
   GradeRounded,
-  InfoOutlined,
   LaptopRounded,
   Message,
   PeopleRounded,
   PersonAdd,
-  PersonRemove,
-  Star,
-  UploadRounded
+  PersonRemove
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -41,7 +37,6 @@ const UserNetwork =lazy(()=>import("../UserNetwork")) ;
 const PostDetailsContainer = lazy(() =>
   import("../../post/PostDetailsContiner")
 );
-const UserAbout = lazy(() => import("../UserAbout"));
 const UserPostContainDrawer = lazy(() => import("./UserPostContainDrawer"));
 const StyledTabs = styled((props) => (
   <Tabs
@@ -416,7 +411,7 @@ export default function UserProfileDrawer({ profileData }) {
                   </Typography>
 
                   {/* diversity network icon */}
-                  <Diversity1Rounded sx={{ width: 20, height: 20 }} />
+                  <PeopleRounded sx={{ width: 20, height: 20 }} />
                 </Box>
               </Box>
 
@@ -545,16 +540,12 @@ export default function UserProfileDrawer({ profileData }) {
               >
                 {/* posts made by the user */}
                 <StyledTab
-                  className="pe-2"
                   label={
                     <Box 
                     display={'flex'}
-                    gap={0.5}
                     alignItems={'center'}
                     >
-                      {/* icon */}
-                      <UploadRounded 
-                      sx={{ width:22,height:22 }}/>
+                 
                       {/* text */}
                     <Typography fontWeight={'bold'} variant="body2">
                       Posted
@@ -565,17 +556,12 @@ export default function UserProfileDrawer({ profileData }) {
 
               {/* favorite posts */}
               <StyledTab
-                  className="ps-2"
                   label={
                     <Box 
                     display={'flex'}
-                    gap={0.5}
                     alignItems={'center'}
                     >
-                      {/* icon */}
-                      <Star 
-                      sx={{ width:18,height:18 }}
-                      />
+                
                       {/* text */}
                     <Typography
                      fontWeight={'bold'}
@@ -588,17 +574,12 @@ export default function UserProfileDrawer({ profileData }) {
 
                 {/* user's connections of people */}
                 <StyledTab
-                  className="ps-2"
                   label={
                     <Box 
                     display={'flex'}
-                    gap={0.5}
                     alignItems={'center'}
                     >
-                      {/* icon */}
-                      <PeopleRounded
-                      sx={{ width:18,height:18 }}
-                      />
+                 
                       {/* text */}
                     <Typography
                      fontWeight={'bold'}
@@ -609,27 +590,6 @@ export default function UserProfileDrawer({ profileData }) {
                   }
                 />
 
-                {/* info more about the user */}
-                <StyledTab
-                  label={
-                    <Box 
-                    display={'flex'}
-                    gap={0.5}
-                    alignItems={'center'}
-                    >
-                      {/* icon */}
-                      <InfoOutlined
-                      sx={{ width:18,height:18 }}
-                      />
-                      {/* text */}
-                    <Typography
-                     fontWeight={'bold'}
-                      variant="body2">
-                      About
-                    </Typography>
-                    </Box>
-                  }
-                />
               </StyledTabs>
             </Box>
 
@@ -716,11 +676,6 @@ export default function UserProfileDrawer({ profileData }) {
                       <UserNetwork
                         otherUserID={!isCurrentUser ? profileData?._id : null}
                       />
-                    )}
-
-                    {/* about view */}
-                    {profileSection === 3 && (
-                      <UserAbout profileData={profileData} />
                     )}
                   </Suspense>
                 </Box>

@@ -19,8 +19,8 @@ import React, { useState } from "react";
 import GoogleLogo from "../../images/google.png";
 import MpesaLogo from "../../images/mpesa.png";
 import PaypalLogo from "../../images/paypal2.png";
-import PayTm from "../../images/paytm.png";
 import StripeLogo from "../../images/stripe.jpeg";
+import PayTm from "../../images/paytm.png";
 import VisaCard from "../../images/visa.png";
 
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";

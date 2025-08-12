@@ -61,9 +61,10 @@ export default function AccordionSearchOptions({
   isFetching,
   successMessage,
   errorMessage,
-  isEventSearch=false
+  isEventSearch=false,
+  expanded,
+  setExpanded
 }) {
-  const [expanded, setExpanded] = React.useState(false);
 
   // countries
   const countriesOption = AllCountries.map((val) => {

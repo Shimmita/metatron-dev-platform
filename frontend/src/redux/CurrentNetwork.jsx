@@ -9,12 +9,20 @@ const CurrentNetwork = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadate the networks of friends by the feed from the payload
+    // update the networks of friends by the feed from the payload
     updateCurrentNetwork: (state, action) => {
       state.myNetwork = action.payload;
     },
 
-    // nullify job and
+     // update the recent change in network based on the ID
+    updateCurrentNetworkID: (state, action) => {
+      const networkId = action.payload;
+      state.myNetwork = state.myNetwork.filter((network) => {
+        return network._id !== networkId;
+      });
+    },
+
+    // nullify network and
     resetClearCurrentNetwork: (state) => {
       state.myNetwork = null;
     },
@@ -22,7 +30,7 @@ const CurrentNetwork = createSlice({
 });
 
 // exporting actions
-export const { updateCurrentNetwork, resetClearCurrentNetwork } =
+export const { updateCurrentNetwork, updateCurrentNetworkID, resetClearCurrentNetwork } =
   CurrentNetwork.actions;
 
 // exporting the main fun reducer

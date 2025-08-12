@@ -1,4 +1,4 @@
-import { Close, Done, DownloadRounded, EmailOutlined, QuestionMark } from '@mui/icons-material';
+import { CheckCircleRounded, Close, QuestionMark } from '@mui/icons-material';
 import { Avatar, Box, Button, IconButton, MenuItem, TextField, Tooltip, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -19,7 +19,7 @@ import CustomDeviceTablet from '../../utilities/CustomDeviceTablet';
 import { getImageMatch } from '../../utilities/getImageMatch';
 
 const columnsHeader = [
-  { id: 'profile', label: 'Profile', minWidth: 170 },
+  { id: 'profile', label: 'Profile', minWidth: 100 },
 
   { id: 'name', label: 'Name', minWidth: 200 },
 
@@ -160,11 +160,12 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                 return;
               }
               setErrorMessage(err?.response.data);
+              console.log(errorMessage)
             })
             .finally(() => {
               setIsFetching(false);
             });
-  },[focusedJob,user,currentJob])
+  },[focusedJob,user,currentJob,errorMessage])
 
 
   // handle showing of mini profile of the job applicant
@@ -196,6 +197,8 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
               if (res?.data) {
                 setMessageResponse(res.data)
               } 
+
+              console.log(messageResponse)
             })
             .catch(async (err) => {
 
@@ -234,28 +237,33 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
     className={'rounded'}
     sx={{ 
     maxWidth: window.screen.availWidth, 
+    maxHeight:!CustomDeviceIsSmall() ? '75vh':undefined,
     border:'1px solid',
     color:'divider',  
     overflow:'auto',
      }}>
 
-    <Box width={'100%'} display={'flex'} justifyContent={'space-between'} alignItems={'center'} gap={2}>
+    <Box 
+    width={'100%'} 
+    display={'flex'} 
+    justifyContent={'space-between'}
+     alignItems={'center'} gap={2}>
     
     {/* job logo */}
     <Box p={1}>
     <Avatar
         alt=""
         className="border"
-        sx={{ width: 25, height: 25,}}
+        sx={{ width: 30, height: 30,}}
         src={getImageMatch(focusedJob?.logo)}
       />
     </Box>
    
-    
+
     {/* job applicants */}
       <Box display={'flex'} justifyContent={'center'} flexDirection={'column'} >
-        <Typography color={'primary'} textAlign={'center'} variant='body2' mt={1}> {focusedJob?.title} Assessment</Typography>
-        <Typography  textAlign={'center'} variant='caption' mt={1} sx={{ color:'text.secondary' }}> {focusedJob?.applicants?.total} {focusedJob?.applicants?.total===1?"candidate":"candidates"} applied &nbsp;|&nbsp; 0 candidate assessed</Typography>
+        <Typography color={'primary'} fontWeight={'bold'} textAlign={'center'} variant='body2' mt={1}> {focusedJob?.title} Assessment</Typography>
+        <Typography  textAlign={'center'} variant='caption' mt={1} sx={{ color:'text.secondary' }}> {focusedJob?.applicants?.total} {focusedJob?.applicants?.total===1?"candidate":"candidates"} applied</Typography>
 
       </Box>
 
@@ -313,7 +321,7 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                           {column.id==="profile" && (
                           <Box display={'flex'} alignItems={'center'} gap={2}>
                             {`${index+1}.`}
-                              <IconButton onClick={()=>{handleShowProfile(job_applicant?.applicant?.applicantID)}}>   
+                            <IconButton  onClick={()=>{handleShowProfile(job_applicant?.applicant?.applicantID)}}>   
                             <Tooltip title={'profile'} arrow>
                               <Avatar
                             sx={{ width: 34, height: 34 }}
@@ -332,8 +340,8 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                           {column.id==='name' && (
                             <Box display={'flex'} gap={1} alignItems={'center'}>
                               {/* tic or x status or question */}
-                              {job_applicant?.status.toLowerCase()==='proceed' && (<Done color='success' sx={{width:17,height:17}}/>)}
-                              {job_applicant?.status.toLowerCase()==='rejected' && (<Close color='warning' sx={{width:17,height:17}}/>)}
+                              {job_applicant?.status.toLowerCase()==='proceed' && (<CheckCircleRounded color='success' sx={{width:18,height:18}}/>)}
+                              {job_applicant?.status.toLowerCase()==='rejected' && (<Close color='warning' sx={{width:18,height:18}}/>)}
                               {job_applicant?.status.toLowerCase()==='pending' && (<QuestionMark color='info' sx={{width:17,height:17}}/>)}
 
                               {/* name of the applicant */}
@@ -354,7 +362,12 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                               select
                               variant='standard'
                               value={job_applicant.status}
-                              sx={{ fontSize:'small'}}
+                              sx={{ 
+                                fontSize:'small',
+                               border:'1px solid',
+                               borderColor:'divider',
+                               borderRadius:5,
+                               px:1}}
                               onChange={(e)=>{
                               // update the function fo text status and main job iD
                               handleUpdateStateApplicant(e.target.value,job_applicant)
@@ -376,17 +389,24 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                           {/* cv part is download button */}
                           {column.id==='resume' && (
                             <Button size='small'
+                            variant='outlined'
+                            color={job_applicant?.status.toLowerCase()==='proceed' ? "success":job_applicant?.status.toLowerCase()==='rejected'? "warning":"primary"}
                              sx={{ borderRadius:5 }}
-                              endIcon={<DownloadRounded/>} 
                               disabled={isFetching}
                               onClick={()=>handleDownload(job_applicant?.cvName,job_applicant?.jobID)
 
-                              }>{isFetching ? "wait...":"download"}</Button>
+                              }>Download</Button>
                           )}
-
                           {/* message the applicant */}
                           {column.id==='message' && (
-                            <Button size='small' sx={{ borderRadius:5 }} endIcon={<EmailOutlined/>} onClick={()=>handleOpenAlertMessage(job_applicant)}>message </Button>
+                            <Button size='small' 
+                            color={job_applicant?.status.toLowerCase()==='proceed' ? "success":job_applicant?.status.toLowerCase()==='rejected'? "warning":"primary"}
+                            disabled={isFetching}
+                            variant='outlined' 
+                            sx={{ borderRadius:5 }} 
+                            onClick={()=>handleOpenAlertMessage(job_applicant)}>
+                            message
+                            </Button>
                           )}
 
                         </TableCell>
@@ -399,7 +419,7 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[4,5,10,20,25,50,100,150,200,250]}
+        rowsPerPageOptions={[4,5,10,20,25,50,100,150,200,250,300]}
         component="div"
         count={jobApplicants.length}
         rowsPerPage={rowsPerPage}

@@ -1,17 +1,20 @@
-import { BarChartRounded, VerifiedRounded } from "@mui/icons-material";
+import { DeleteRounded, VerifiedRounded } from "@mui/icons-material";
 import {
   Avatar,
   Box,
   Button,
+  Divider,
+  IconButton,
   Stack,
+  Tooltip,
   Typography
 } from "@mui/material";
-import React, { useState } from "react";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import { getImageMatch } from "../../utilities/getImageMatch";
 import axios from "axios";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { resetClearCurrentJobs } from "../../../redux/CurrentJobs";
+import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+import { getImageMatch } from "../../utilities/getImageMatch";
 
 function JobStatsLayout({ isDarkMode, job,user }) {
 
@@ -55,59 +58,53 @@ function JobStatsLayout({ isDarkMode, job,user }) {
       setIsFetching(true)
       // delete request
       axios.delete(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/delete/my/application/${user?._id}/${job?._id}`,{
-               withCredentials: true,
-             })
-             .then((res) => {
+              withCredentials: true,
+            })
+            .then((res) => {
                // reset and clear current jobs redux, this triggers api call to fetch 
               //  data from the backend since useEffect will be invoked
               dispatch(resetClearCurrentJobs())
-             })
-             .catch(async (err) => {
+            })
+            .catch(async (err) => {
  
                //  user login session expired show logout alert
-               if (err?.response?.data.login) {
-                 window.location.reload();
-               }
-               if (err?.code === "ERR_NETWORK") {
-                 setErrorMessage(
-                   "server unreachable"
-                 );
-                 return;
-               }
-               setErrorMessage(err?.response.data);
-             })
-             .finally(() => {
-               setIsFetching(false);
-             });
+              if (err?.response?.data.login) {
+                window.location.reload();
+              }
+              if (err?.code === "ERR_NETWORK") {
+                setErrorMessage(
+                  "server unreachable"
+                );
+                return;
+              }
+              setErrorMessage(err?.response.data);
+              //  log the error
+              console.log(errorMessage)
+            })
+            .finally(() => {
+              setIsFetching(false);
+            });
     }
+
 
   return (
     <Box  
-    className={`${handleBorderColor(job)} rounded`}
-    height={
-      '64%'
-    }
+    className={`${handleBorderColor(job)} rounded-3`}
+    height={CustomDeviceIsSmall() ? '57%':'81%'}
+    mt={CustomDeviceIsSmall()?2:0.5}
     width={300}
     maxWidth={300}
-
+    bgcolor={'background.default'}
     sx={{
-      border: !CustomDeviceIsSmall() && "1px solid",
-      borderColor: !CustomDeviceIsSmall() && "divider",
-      "&:hover": {
-        boxShadow: `4px 0px 50px -10px inset ${
-          !isDarkMode ? "#3333" : "lightgreen"
-        }`,
-      },
+      border: "1px solid",
+      borderColor:"divider",
     }}>
 
-      <Box display={'flex'} justifyContent={'flex-end'} mb={1}>
-        <BarChartRounded sx={{ width:20,height:20 }}/>
-      </Box>
 
     <Stack
       alignItems={"center"}
       classes={"job-card"}
-      className="rounded mb-2"     
+      className="rounded my-3"     
     >
       <Avatar
         alt=""
@@ -168,12 +165,10 @@ function JobStatsLayout({ isDarkMode, job,user }) {
     
     >
       <Typography 
-      textAlign={'center'}
       className={`${handleTextColor(job)}`} 
       variant="caption" 
       sx={{ fontSize:'small', color:!job?.viewedCV && 'text.secondary' }}>
-        {job?.viewedCV ? "- recruiter viewed your c.v -":"- c.v not yet viewed -"} <br/>
-        {}
+        {job?.viewedCV ? "C.V viewed":"C.V not viewed"} | {job?.status}
       </Typography>
     </Box>
 
@@ -217,29 +212,18 @@ function JobStatsLayout({ isDarkMode, job,user }) {
 
     </Box>
 
-    </Box>
-    {/* conclusion results here */}
-    <Box display={'flex'} justifyContent={'space-around'} alignItems={'center'}>
-      {!job?.isAvailable ? (
-            <Typography mt={1} variant="caption" fontSize={'small'} sx={{ color:'text.secondary' }}>-job no longer available -</Typography>
-      ):(
-        <Typography mt={1} variant="caption" fontSize={'small'} sx={{ color:'text.secondary' }}>- results are :&nbsp;{job?.status} -</Typography>
-      )}    
-    {/* status rejected or !isAvailable show delete button */}
-    {(job?.status==="rejected" || !job?.isAvailable) && (
-      <Button variant="text"
-       size="small"
-       onClick={handleDeleteJobApplication}
-       color="warning"
-       disable={isFetching}
-       className="rounded-5"
-        sx={{mt:1,
-          textTransform:'lowercase',
-           fontSize:'small'}}>{isFetching?"deleting...":"delete"}</Button>
-    )}
-    </Box>
+    <Divider component={'div'} />
 
-    
+    {/* delete job */}
+    <Box display={'flex'} justifyContent={'center'} mt={2}> 
+    <Button size="small"
+    disabled={isFetching}
+    onClick={handleDeleteJobApplication}
+     color="warning"
+      variant="outlined" 
+      sx={{ textTransform:'capitalize',borderRadius:5 }}>delete application</Button>
+    </Box>
+    </Box>
     </Box>
 
   );

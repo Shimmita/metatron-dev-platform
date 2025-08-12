@@ -35,8 +35,10 @@ import AllCountries from "../data/AllCountries";
 import AllSkills from "../data/AllSkillsData";
 import CountiesInKenya from "../data/Counties";
 import SpecialisationJobs from "../data/SpecialisationJobs";
+import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionJob from "../data/SubsectionJobs";
 import BrowserCompress from "../utilities/BrowserCompress";
+import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
@@ -76,6 +78,7 @@ const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
 const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=false}) => {
   const [jobTitle, setJobTitle] = useState("");
   const [organisationName, setOrganisationName] = useState("");
+  const [category, setCategory] = useState("");
   const [county, setCounty] = useState("");
   const [jobType, setJobType] = useState({ type: "", access: "" });
   const [country, setCountry] = useState("");
@@ -265,6 +268,11 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
       return false;
     }
 
+     if (category?.trim() === "") {
+      setErrorMessage("job specialization field is missing");
+      return false;
+    }
+
     if (!jobType.type) {
       setErrorMessage("job type field is missing");
       return false;
@@ -328,6 +336,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
   // create job object
   const job = {
     title: jobTitle,
+    category,
     organisation: {
       name: organisationName,
       about: posterAbout,
@@ -440,7 +449,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
       if(isHiring)
       {
       // avoid blank page by populating jobs default
-      setTextOption("Your Jobs")
+      setTextOption("My Posted Jobs")
       }
   }
 
@@ -451,7 +460,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
       } else if (CustomDeviceTablet()){
         return "90%"
       } 
-      return "100%"
+      return "95%"
     }
 
     // handle width of the modal, margin
@@ -459,9 +468,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
         if (CustomDeviceTablet() && isTabSideBar) {
           return "36%"
         } else if(CustomLandScape()){
-          return "-8%"
+          return "-1%"
         } else if(CustomLandscapeWidest()){
-          return "-5%"
+          return "0%"
         }
       }
 
@@ -479,25 +488,30 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
     >
       <Box
         width={handleReturnWidthModal()}
-        p={1}
-        borderRadius={5}
+        borderRadius={2}
         bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
-          border: isDarkMode && "1px solid gray",
+          border:  "1px solid gray",
+          borderColor:'divider',
           marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
         }}
       >
         <Box
           bgcolor={"background.default"}
-          borderRadius={5}
+          borderRadius={2}
           className="shadow-lg"
+          sx={{ 
+          border:  "1px solid gray",
+          borderColor:'divider',
+           }}
         >
           {/* toolbar like box */}
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
+            mr={1.5}
           >
             {/* logo */}
             <Box>
@@ -518,9 +532,18 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
             <IconButton
               onClick={handleClosingJobPostModal}
               disabled={isUploading || errorMessage}
+              sx={{
+                border:'1px solid',
+                borderColor:'divider',
+              }}
             >
               <Tooltip title={"close"}>
-                <Close />
+                <Close
+                sx={{ 
+                  width:12,
+                  height:12,
+                 }}
+                 />
               </Tooltip>
             </IconButton>
           </Box>
@@ -581,18 +604,40 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               scrollbarWidth: "none",
             }}
           >
-            <Box display={"flex"} flexDirection={"column"} gap={3} mt={3}>
+             {/* job poster/organisation */}
+              <Typography mt={3} gutterBottom variant="body2" color={"text.secondary"}>
+                Provide the name of your business, organisation or company
+                which will be seen by the potential job applicants.
+              </Typography>
+              <Box className="mb-4 mt-3 ">
+                <TextField
+                  fullWidth
+                  disabled={isUploading}
+                  value={organisationName}
+                  onChange={(e) => setOrganisationName(e.target.value)}
+                  required
+                  id="poster_organisation"
+                  label={"Organisation name"}
+                  placeholder="organisation name"
+                />
+              </Box>
+
+            <Box 
+            display={"flex"}
+            flexDirection={"column"} 
+            gap={3}>
               {/* job title */}
               {!showCustomTitle ? (
                 <>
                   <Typography
+                   
                     gutterBottom
                     variant="body2"
                     color={"text.secondary"}
                   >
                     Select relevant job title from the options provided.If none
-                    matches select option ( zero matched ) and provide your
-                    custom title for the role.
+                    matches select option ( zero matched ) to provide your
+                    custom title.
                   </Typography>
 
                   {/* preset job titles */}
@@ -650,27 +695,46 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                 </>
               )}
 
-              {/* poster/organisation */}
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Provide the name of your business, organisation or company
-                which will be seen by the potential job applicants on the
-                platform.
+
+              {/* job specialization */}
+              <Typography variant="body2" color={"text.secondary"}>
+                Provide job specialisation in the Tech or IT Industry to facilitate categorization of the job posts.
               </Typography>
-              <Box className="mb-3 mt-2 ">
+
+              <Box className="w-100 
+                mb-2 ">
                 <TextField
-                  fullWidth
-                  disabled={isUploading}
-                  value={organisationName}
-                  onChange={(e) => setOrganisationName(e.target.value)}
                   required
-                  id="poster_organisation"
-                  label={"Organisation name"}
-                  placeholder="Intrasoft Solutions"
-                />
+                  select
+                  disabled={isUploading}
+                  value={category}
+                  label="Specialisation"
+                  fullWidth
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  {SpecialisationTech?.filter((about) => about !== "None").map(
+                      (about) => (
+                        <MenuItem
+                          key={about}
+                          value={about}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                          }}
+                        >
+                          {/* icon */}
+                          <CourseIcon option={about} />
+                          {/* name */}
+                          <small style={{ fontSize: "small" }}>{about}</small>
+                        </MenuItem>
+                      )
+                    )}
+                </TextField>
               </Box>
 
               {/* job type */}
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+              <Typography   gutterBottom variant="body2" color={"text.secondary"}>
                 Provide the type of this job or role in reference to it being
                 contract or full-time position based on your organisation
                 requirements.
@@ -698,10 +762,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               </Box>
 
               {/* job accessibility */}
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+              <Typography   gutterBottom variant="body2" color={"text.secondary"}>
                 Provide job accessibility preference in reference to it being
-                remote, hybrid or onsite to help the potential applicants
-                analyze their commuting capacity.
+                remote, hybrid or onsite to filter applicants commuting capacity.
               </Typography>
               <Box className="mb-3 mt-2 ">
                 <TextField
@@ -726,8 +789,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               </Box>
 
               {/* logo or image */}
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Provide organisation job logo for visibility. you may
+              <Typography   gutterBottom variant="body2" color={"text.secondary"}>
+                Provide organisation job logo for elegance and visibility. you may
                 use the default freely provided images.
               </Typography>
 
@@ -895,7 +958,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                 </Box>
               )}
 
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+              <Typography   gutterBottom variant="body2" color={"text.secondary"}>
                 What technical skills are{" "}
                 <span className="fw-bold">a must have </span> by the potential
                 applicants before instinctive considerations of making an
@@ -931,7 +994,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                 />
               </Box>
 
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+              <Typography   gutterBottom variant="body2" color={"text.secondary"}>
                 Select the mandatory documents applicants should provide during
                 the application process. The documents sent by the applicants
                 will be in the format of (pdf or docx)
@@ -964,6 +1027,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                 <>
                   <Typography
                     gutterBottom
+                     
                     variant="body2"
                     color={"text.secondary"}
                   >
@@ -987,7 +1051,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                 </>
               )}
 
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+              <Typography   gutterBottom variant="body2" color={"text.secondary"}>
                 Select the level of entry for this job: This helps the
                 applicants to evaluate their current position and deciding
                 conclusively if they are fit for the role or not.
@@ -1014,10 +1078,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                 </TextField>
               </Box>
 
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Select the minimum years of experience, years of experience is a
-                factor of determining the level of exposure and expertise the
-                applicant has to the role or such related role.
+              <Typography   gutterBottom variant="body2" color={"text.secondary"}>
+                Select the range for minimum number of years of experience the applicant is expected to have. 
+                for this role.
               </Typography>
               {/* Experience Years */}
               <Box className="w-100 mb-3">
@@ -1042,10 +1105,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                 </TextField>
               </Box>
 
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Select your monthly budget salary for this role, default salary
-                provided is in Kenyan Shillings (KES) and can be switched to
-                Dollars as the currency of payment.
+              <Typography   gutterBottom variant="body2" color={"text.secondary"}>
+                What's your monthly budget salary range for this role in (USD). 
+                This helps applicants analyze if the job is within their budget or not.
               </Typography>
 
               {/* Salary */}
@@ -1070,7 +1132,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               </Box>
 
               {/* Location  */}
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+              <Typography   gutterBottom variant="body2" color={"text.secondary"}>
                 Where is your organisation workplace based, default location is
                 Kenya and can be switched to another location supposed you are
                 based in a different country.
@@ -1172,6 +1234,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                     {inputValue && (
                       <React.Fragment>
                         <Typography
+                         
                           variant="body2"
                           gutterBottom
                           color={"text.secondary"}
@@ -1197,7 +1260,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               </Box>
 
               {/* About your Org */}
-              <Typography variant="body2" color={"text.secondary"}>
+              <Typography   variant="body2" color={"text.secondary"}>
                 Provide an about summary to the applicants concerning your
                 organisation what kind of people you are, business specialisation and objectives.
               </Typography>
@@ -1220,7 +1283,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
 
               {/* job req */}
 
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+              <Typography    gutterBottom variant="body2" color={"text.secondary"}>
                 Provide job qualification requirements in the text field below.
                 Each qualification point will be added in the list of
                 requirements when you click the add qualification button.
@@ -1350,6 +1413,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
 
               {/* job desc */}
               <Typography
+               
                 mt={3}
                 gutterBottom
                 variant="body2"
@@ -1482,7 +1546,10 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               </Box>
 
               {/*  button for posting */}
-              <Box mb={2} display={"flex"} justifyContent={"center"}>
+              <Box 
+              mb={2} 
+              display={"flex"} 
+              justifyContent={"center"}>
                 <Button
                   className="w-75 rounded-5 shadow-sm"
                   variant="contained"

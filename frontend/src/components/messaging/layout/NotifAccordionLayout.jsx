@@ -74,10 +74,10 @@ export default function NotifAccordionLayout({
 
   return (
     <Stack>
-      
       {/* accordion profile views */}
       {profile_views?.length>0 && (
          <Accordion
+         className='rounded'
          expanded={openProfileViewers}
          onChange={() => setOpenProfileViewers((prev) => !prev)}
        >
@@ -136,6 +136,7 @@ export default function NotifAccordionLayout({
       {/* connect request */}
       {connectNotifications?.length > 0 && (
         <Accordion
+         className='rounded mt-2'
           expanded={openConnect}
           onChange={() => setOpenConnect((prev) => !prev)}
         >
@@ -197,6 +198,7 @@ export default function NotifAccordionLayout({
       {/* job feedback */}
       {jobFeedBacks?.length>0 && (
          <Accordion
+         className='rounded mt-2'
          expanded={openJobFeedBack}
          onChange={() => setOpenJobFeedBack((prev) => !prev)}
        >
@@ -251,6 +253,7 @@ export default function NotifAccordionLayout({
       {/* accordion post reactions notify */}
     {post_reactions?.length > 0 && (
         <Accordion
+          className='rounded mt-2'
           expanded={openReaction}
           onChange={() => setOpenReaction((prev) => !prev)}
         >
@@ -308,6 +311,7 @@ export default function NotifAccordionLayout({
       {/* post report overview */}
       {reportedPost?.length > 0 && (
         <Accordion
+          className='rounded mt-2'
           expanded={openReported}
           onChange={() => setOpenReported((prev) => !prev)}
         >

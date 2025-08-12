@@ -1,4 +1,4 @@
-import { Close, Delete, Info, UpdateRounded } from '@mui/icons-material';
+import { Close, Delete, Info, RemoveRedEye, UpdateRounded } from '@mui/icons-material';
 import { Avatar, Badge, Box, IconButton, MenuItem, styled, TextField, Tooltip, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -11,14 +11,14 @@ import TableRow from '@mui/material/TableRow';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import devImage from '../../../images/dev.jpeg';
+import { resetClearCurrentJobsTop } from '../../../redux/CurrentJobsTop';
+import AlertJobPreview from '../../alerts/AlertJobPreview';
 import DeleteJobAlert from '../../alerts/DeleteJobAlert';
 import JobPostUpdateModal from '../../modal/update/JobPostUpdateModal';
 import CustomDeviceIsSmall from '../../utilities/CustomDeviceIsSmall';
 import CustomDeviceTablet from '../../utilities/CustomDeviceTablet';
 import { getImageMatch } from '../../utilities/getImageMatch';
-import AlertJobPreview from '../../alerts/AlertJobPreview';
-import { resetClearCurrentJobsTop } from '../../../redux/CurrentJobsTop';
+import ApplyJobModal from '../../modal/ApplyJobModal';
 
 const columnsHeader = [
   { id: 'logo', label: 'Logo', minWidth: 170 },
@@ -104,6 +104,7 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
   const [isUpdateJobModal,setIsUpdateJobModal]=useState(false)
   const [currentFocusedJob,setCurrentFocusedJob]=useState()
   const[openJobAlertPreview,setOpenJobAlertPreview]=useState(false)
+  const [openModalJobReview,setOpenModalJobReview]=useState(false)
 
   // redux user HR manager
   const { user } = useSelector((state) => state.currentUser);
@@ -196,11 +197,18 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
   }
 
 
+  // handle show job review, apply modal without action btns
+  const handleShowJobReview=(job)=>{
+    setCurrentFocusedJob(job)
+    setOpenModalJobReview(true)
+  }
+
   return (
     <Paper elevation={0} 
     className={'rounded'}
     sx={{ 
     maxWidth: window.screen.availWidth, 
+    maxHeight:!CustomDeviceIsSmall() ? '75vh':undefined,
     border:'1px solid',
     color:'divider',  
     overflow:'auto',
@@ -210,17 +218,17 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
         {/* avatar current user */}
          <Box p={1}>
             <Avatar
-                alt=""
-                className="border"
-                sx={{ width: 25, height: 25,}}
-                src={devImage}
+            src={user?.avatar}
+            alt=""
+            className="border"
+            sx={{ width: 30, height: 30,}}
               />
             </Box>
     
     {/* Title */}
       <Box display={'flex'} justifyContent={'center'} flexDirection={'column'} >
-        <Typography color={'primary'} textAlign={'center'} variant='body2' mt={1}>Jobs Management Center</Typography>
-        <Typography  textAlign={'center'} variant='caption' mt={1} sx={{ color:'text.secondary' }}>You Posted {MyPostedJobs?.length} Job(s)</Typography>
+        <Typography color={'primary'} fontWeight={'bold'} textAlign={'center'} variant='body2' mt={1}>Jobs Management Center</Typography>
+        <Typography  textAlign={'center'} variant='caption' mt={1} sx={{ color:'text.secondary' }}>You Posted {MyPostedJobs?.length} {MyPostedJobs?.length>1 ? "Jobs":"Job"}</Typography>
 
       </Box>
 
@@ -337,7 +345,7 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
                               `${job?.title}`
                             )}
                           {/* applicants column */}
-                          {column.id==='applicants' && (`${job?.applicants?.total}`)}
+                          {column.id==='applicants' && (`${job?.applicants?.total}/300`)}
 
                           {/* job status column */}
                           {column.id==='status' && (
@@ -366,10 +374,19 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
                         {column.id==='action' && (
                           <Box display={'flex'} 
                           alignItems={'center'}
-                           gap={2}
-                           width={'100%'}
-                           justifyContent={'flex-end'}
-                           >
+                          gap={2}
+                          width={'100%'}
+                          justifyContent={'flex-end'}
+                          >
+
+
+                             {/* full view icon */}
+                            <Tooltip title={'review'} arrow>
+                            <IconButton onClick={()=>{handleShowJobReview(job)}}>
+                              <RemoveRedEye color='secondary' sx={{width:22,height:22}}/> 
+                              </IconButton>
+                            </Tooltip>
+
                           {/* update icon */}
                           <Tooltip title={'update'} arrow>
                           <IconButton onClick={()=>{handleShowUpdateJobModal(job)}}>
@@ -380,9 +397,10 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
                             {/* delete icon */}
                             <Tooltip title={'delete'} arrow>
                             <IconButton onClick={()=>{handleShowDeleteAlert(job)}}>
-                              <Delete color='inherit' sx={{width:22,height:22}}/> 
+                              <Delete color='primary' sx={{width:22,height:22}}/> 
                               </IconButton>
                             </Tooltip>
+
                           </Box>
                         )}
 
@@ -404,6 +422,24 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+
+      {/* show modal job review */}
+      {openModalJobReview && (
+        <ApplyJobModal 
+        openApplyJobModal={openModalJobReview}
+        setOpenApplyJobModal={setOpenModalJobReview}
+        isPreview={true}
+        jobID={currentFocusedJob?._id}
+        title={currentFocusedJob?.title}
+        skills={currentFocusedJob?.skills}
+        websiteLink={currentFocusedJob?.website}
+        jobaccesstype={currentFocusedJob?.jobtypeaccess}
+        location={currentFocusedJob?.location}
+        organisation={currentFocusedJob?.organisation}
+        requirements={currentFocusedJob?.requirements}
+        salary={currentFocusedJob?.salary} 
+        />
+      )}
 
       {/* show alert job preview */}
       {openJobAlertPreview && (

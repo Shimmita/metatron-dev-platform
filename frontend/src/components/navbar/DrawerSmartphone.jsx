@@ -131,21 +131,42 @@ const DrawerSmartphone = ({
   return (
     <Drawer open={openDrawer} onClose={(e) => setOpenDrawer(false)}>
       <Box 
-      px={2}
+      px={0.5}
       maxWidth={350} 
       height={"100%"} 
-      bgcolor={"background.default"}>
+      bgcolor={isDarkMode ?"background.default":"#E6F7FF"}>
+
+      <Box 
+      mt={0.5}
+      p={1}
+      bgcolor={'background.default'} 
+      className='rounded-2'>
 
         {/* theme changer */}
         <Box
         mt={0.5}
+        display={'flex'}
+        alignItems={'center'}
+        textAlign={'center'}
+        justifyContent={'space-between'}
         >
-           <IconButton onClick={handleShowDarkMode}> 
+        
+          {/* title be shown in smallest devices */}
+          <Typography
+          fontWeight={'bold'}
+           textAlign={'center'} variant="body2"
+           textTransform={'uppercase'}>Metatron</Typography>
+
+           {/* icon button */}
+          <IconButton onClick={handleShowDarkMode}> 
             <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
             <DarkModeRounded/>
           </Tooltip> 
           </IconButton>
         </Box>
+
+        {/* divider */}
+        <Divider component={'div'} className="p-1"/>
 
         {/* avatar and its subsequent content */}
         <BoxAvatarContent>
@@ -347,6 +368,7 @@ const DrawerSmartphone = ({
                         </Box>
                       </Box>
                      ))}
+                      </Box>
                       </Box>
                       </Box>
       </Box>

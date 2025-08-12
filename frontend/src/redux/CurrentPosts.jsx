@@ -38,7 +38,7 @@ const currentPosts = createSlice({
     },
 
     
-    // nullify user and fale online
+    // nullify user and false online
     resetClearCurrentPosts: (state) => {
       state.posts = [];
       state.isPostSearch = false;

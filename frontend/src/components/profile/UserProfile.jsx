@@ -36,7 +36,6 @@ import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../utilities/getImageMatch";
 const UserNetwork = lazy(() => import("./UserNetwork"));
 const UserPostContainer = lazy(() => import("./UserPostContainer"));
-const UserAbout = lazy(() => import("./UserAbout"));
 const StyledTabs = styled((props) => (
   <Tabs
     {...props}
@@ -694,10 +693,6 @@ export default function UserProfile() {
                         {/* user network of people */}
                         {profileSection === 1 && <UserNetwork />}
 
-                        {/* about view */}
-                        {profileSection === 2 && (
-                          <UserAbout profileData={profileData} />
-                        )}
                       </Suspense>
                     </Box>
                   </React.Fragment>

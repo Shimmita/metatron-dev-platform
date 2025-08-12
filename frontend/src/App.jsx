@@ -1,17 +1,16 @@
 import {
   Avatar,
   Box,
-  CircularProgress,
   createTheme,
   FormHelperText,
   ThemeProvider,
-  Typography,
+  Typography
 } from "@mui/material";
 import { lazy, Suspense } from "react";
+import { Vortex } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import AppLogo from "./images/logo_sm.png";
-import { FidgetSpinner, Vortex } from "react-loader-spinner";
 const RegPersonalCompletion = lazy(() =>
   import("./components/auth/RegPersonalCompletion")
 );
@@ -37,7 +36,7 @@ const App = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <Box
-      bgcolor={currentMode==='dark' ? "background.default" :"#f1f1f1"} 
+      bgcolor={currentMode==='dark' ? "background.default" :"#E6F7FF"} 
       color={"text.primary"}>
         {/* error boundary to catch errors from lazily loaded components */}
         <Suspense
@@ -50,9 +49,8 @@ const App = () => {
                 flexDirection={"column"}
                 height={"100vh"}
               >
-               
-                
-                 <Avatar
+              
+                <Avatar
                   sx={{ width: 100, height: 100 }}
                   src={AppLogo}
                   alt=""
@@ -98,8 +96,7 @@ const App = () => {
                   </AuthCheckLazy>
                 }
               />
-
-             
+              
               <Route
                 exact
                 path={"/auth/register/personal"}

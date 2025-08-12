@@ -34,7 +34,6 @@ import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import CustomModalHeight from "../utilities/CustomModalHeight";
 import { getImageMatch } from "../utilities/getImageMatch";
 import VideoPreviewComponent from "./VideoPreviewComponent";
 
@@ -301,6 +300,11 @@ const PostCourseModal =({ openModalCourse, setOpenModalCourse }) => {
     // handle the value fo backend
     const updatePostCategoryValue = () => {
 
+      // if programming language is the category
+       if (postCategory.toLowerCase().includes("languages")) {
+        setCategory1(progLanguage)
+      }
+
       // for frontend  category 1 will be tool, category 2 will be UI library
       if (postCategory.toLowerCase().includes("frontend")) {
         setCategory1(frontend)
@@ -324,30 +328,8 @@ const PostCourseModal =({ openModalCourse, setOpenModalCourse }) => {
     };
 
     updatePostCategoryValue();
-  }, [postCategory, backend, database, frontend,frontendUI]);
+  }, [postCategory, backend, database, frontend,frontendUI,progLanguage]);
 
-
-
-  // handle return width modal
-  const handleReturnWidthModal=()=>{
-    if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
-      return "35%"
-    } else if (CustomDeviceTablet()){
-      return "90%"
-    } 
-    return "100%"
-  }
-
-  // handle width of the global search
-    const handleModalWidth=()=>{
-      if (CustomDeviceTablet() && isTabSideBar) {
-        return "36%"
-      } else if(CustomLandScape()){
-        return "-8%"
-      } else if(CustomLandscapeWidest()){
-        return "-5%"
-      }
-    }
 
   
 // handle closing of the modal
@@ -413,8 +395,14 @@ const handleClosingModal=()=>{
   };
 
 
+
+
   // handle posting of data to the backend
   const handleUploadCourse = () => {
+
+    console.log(courseObject)
+
+
      // clear any message errors
      setErrorMessage("")
      
@@ -477,39 +465,53 @@ const handleClosingModal=()=>{
     }
   };
 
-  
 
+  // handle return width modal
+  const handleReturnWidthModal=()=>{
+    if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+      return "35%"
+    } else if (CustomDeviceTablet()){
+      return "90%"
+    } 
+    return "95%"
+  }
+
+  
   return (
     <StyledModalPost
-      keepMounted
-      sx={{
-        marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
-      }}
-      open={openModalCourse}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
+    keepMounted
+    open={openModalCourse}
+    onClose={handleClosingModal}
+    aria-labelledby="modal-modal-title"
+    aria-describedby="modal-modal-description"
+  >
       <Box
-        width={handleReturnWidthModal()}
-        p={1}
-        borderRadius={5}
-        bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
-        color={"text.primary"}
-        sx={{
-          border: isDarkMode && "1px solid gray",
-          marginLeft: handleModalWidth(),
-        }}
-      >
+      width={handleReturnWidthModal()}
+      borderRadius={3}
+      bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
+      color={"text.primary"}
+      sx={{
+        border:"1px solid gray",
+        borderColor:'divider',
+        marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
+        
+      }}
+    >
         <Box
           bgcolor={"background.default"}
-          borderRadius={5}
+          borderRadius={3}
           className="shadow-lg"
+          sx={{ 
+          border:"1px solid gray",
+          borderColor:'divider',
+           }}
         >
           {/* toolbar like box */}
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
+            mr={1.5}
           >
             {/* logo */}
             <Box>
@@ -529,9 +531,19 @@ const handleClosingModal=()=>{
               </Typography>
 
             {/*close icon */}
-            <IconButton onClick={handleClosingModal}>
+            <IconButton 
+            sx={{
+                border:'1px solid',
+                borderColor:'divider',
+              }}
+            onClick={handleClosingModal}>
               <Tooltip title={"close"}>
-                <Close />
+                <Close 
+                  sx={{ 
+                  width:12,
+                  height:12,
+                 }}
+                />
               </Tooltip>{" "}
             </IconButton>
           </Box>
@@ -574,7 +586,7 @@ const handleClosingModal=()=>{
           </Box>
 
           <Box
-            maxHeight={CustomModalHeight()}
+            maxHeight={'78vh'}
             className="px-3"
             sx={{
               overflow: "auto",
@@ -597,11 +609,8 @@ const handleClosingModal=()=>{
                   - Courses: Courses uploaded should not be someone's else intellectual property 
                   and shall be continuously reviewed for approval. <br/>
                   - Payment: Currently we do not sell or buy courses but rather providing learning 
-                  resources freely to the end users. Certificate of completion will be issued with 
+                  resources freely to the end users. Certificates of completion will be issued with 
                   your name printed on them as Instructor. <br/>
-                  - Appreciation: Instructors with high ratings will be offered a chance to work as Software, 
-                  Machine learning, or DevOps engineers at Metatron and also awarded recommendation letters as 
-                  best instructors in their field to boost their profile.
                 </Typography>
               
                 <Divider component={'div'} className={'p-2'}/>

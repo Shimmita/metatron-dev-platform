@@ -1,13 +1,10 @@
-import { Settings, UndoRounded } from "@mui/icons-material";
+import { PowerSettingsNewRounded, Settings, UndoRounded } from "@mui/icons-material";
 import {
   AppBar,
   Button,
   CircularProgress,
-  IconButton,
   Stack,
-  Toolbar,
-  Tooltip,
-  Typography
+  Toolbar
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -23,6 +20,20 @@ import CustomDeviceSmallest from "../../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 const ProfileUpdate = lazy(() => import("./ProfileUpdate"));
 const UserProfileDrawer = lazy(() => import("./UserProfileDrawer"));
+
+
+  // handle the width of the drawer
+  const handleDrawerWidth=()=>{
+    if (CustomDeviceSmallest()) {
+      return 275
+    }else if(CustomDeviceIsSmall()){
+      return 330
+    } else if (CustomDeviceTablet()){
+      return 400
+    }
+
+    return 370
+  }
 
 export default function ProfileDrawer() {
   // redux states
@@ -102,18 +113,6 @@ export default function ProfileDrawer() {
     setIsProfileUpdate((prev) => !prev);
   };
 
-  // handle the width of the drawer
-  const handleDrawerWidth=()=>{
-    if (CustomDeviceSmallest()) {
-      return 275
-    }else if(CustomDeviceIsSmall()){
-      return 330
-    }else if (CustomDeviceTablet()) {
-      return 450
-    }
-
-    return 400
-  }
 
   return (
     <React.Fragment>
@@ -129,42 +128,57 @@ export default function ProfileDrawer() {
         }
         bgcolor={isDarkMode ?"background.default":"#f1f1f1"}
         height={'100vh'}
-
       >
         <Box sx={{ flexGrow: 1 }}>
-          <AppBar position="static" elevation={0} color="info">
-            <Toolbar variant="dense">
-              <Typography variant={"body2"} sx={{ flexGrow: 1 }}>
-                {temporaryProfileData
-                  ? temporaryProfileData?.name
-                  : nativeLoggedinUser?.name}
-              </Typography>
+          <AppBar
+          position="static" 
+          elevation={0} 
+          >
+            <Toolbar variant="dense" >
               {!temporaryProfileData && (
-                <Stack direction={"row"} gap={1} alignItems={"center"}>
+                <Box
+                display={'flex'}
+                justifyContent={'space-between'}
+                width={'100%'}
+                alignItems={'center'}
+                >
+
+                {/* settings*/}
+                 <Button 
+                 disableElevation
+                  startIcon={isProfileUpdate ? <UndoRounded/>:<Settings/>}
+                  size="small"
+                  sx={{ 
+                    borderRadius:'20px',
+                    fontSize:'x-small',
+                    color:'white'
+                   }}
+                  onClick={handleShowingProfileUpdate}>
+                    Settings
+                  </Button>
+
                   {/* logout */}
-                  <Button color="inherit" onClick={handleShowLogoutAlert}>
+                  <Button 
+                  disableElevation
+                  startIcon={<PowerSettingsNewRounded/>}
+                  size="small"
+                  sx={{ 
+                    borderRadius:'20px',
+                    fontSize:'x-small',
+                    color:'white'
+                   }}
+                  onClick={handleShowLogoutAlert}>
                     Logout
                   </Button>
-                  {/* divider */}|{/* profile setting */}
-                  <IconButton onClick={handleShowingProfileUpdate}>
-                    {isProfileUpdate ? (
-                      <Tooltip arrow title={"back"}>
-                        <UndoRounded sx={{ color: "white" }} />
-                      </Tooltip>
-                    ) : (
-                      <Tooltip arrow title={"settings"}>
-                        <Settings sx={{ color: "white" }} />
-                      </Tooltip>
-                    )}
-                  </IconButton>
-                </Stack>
+
+                </Box>
               )}
             </Toolbar>
           </AppBar>
         </Box>
  
         {/* content */}
-        <Box>
+        <Box bgcolor={'background.default'}>
           <Suspense
             fallback={
               <Box height={"89vh"} display={"flex"} justifyContent={"center"}>

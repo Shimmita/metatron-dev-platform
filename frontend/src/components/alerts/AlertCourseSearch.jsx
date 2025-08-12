@@ -131,6 +131,18 @@ export default function AlertCourseSearch({
     setSuccessMessage("");
   };
 
+
+  // width of the alert
+   const handleFilterWidth=()=>{
+        if (CustomDeviceTablet() && isTabSideBar) {
+          return "36%"
+        } else if(CustomLandScape()){
+          return "-1%"
+        } else if(CustomLandscapeWidest()){
+          return "0%"
+        }
+      }
+
   return (
     <Dialog
       open={openSearchCourse}
@@ -138,14 +150,8 @@ export default function AlertCourseSearch({
       keepMounted
       aria-describedby="alert-dialog-slide-description"
       sx={{
-        marginLeft:
-          CustomDeviceTablet() && isTabSideBar
-            ? "34%"
-            : CustomLandscapeWidest()
-            ? "-2%"
-            : CustomLandScape()
-            ? "-8%"
-            : undefined,
+        marginLeft:handleFilterWidth(),
+        backdropFilter:'blur(3px)',
       }}
     >
       <Box bgcolor={"background.default"} className="border rounded">

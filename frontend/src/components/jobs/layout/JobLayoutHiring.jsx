@@ -22,7 +22,7 @@ import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
-function JobLayoutHiring({ isDarkMode, job, textOption = "",setIsApplicantsTable,setFocusedJob }) {
+function JobLayoutHiring({ job, textOption = "",setIsApplicantsTable,setFocusedJob }) {
  
   // extracting contents in job
   const mandatorySkills = [...job?.skills];
@@ -67,6 +67,7 @@ function JobLayoutHiring({ isDarkMode, job, textOption = "",setIsApplicantsTable
   return (
     <Stack
       justifyContent={"center"}
+      mt={CustomDeviceIsSmall()?2:0.5}
       alignItems={"center"}
       classes={"job-card"}
       bgcolor={'background.default'}
@@ -74,24 +75,19 @@ function JobLayoutHiring({ isDarkMode, job, textOption = "",setIsApplicantsTable
       maxWidth={300}
       mb={2}
       height={
-        !(CustomDeviceIsSmall() || CustomDeviceTablet()) ? "70%" : undefined
+        !(CustomDeviceIsSmall() || CustomDeviceTablet()) ? "80%" : undefined
       }
       p={2}
       width={300}
       sx={{
-        border: !CustomDeviceIsSmall() && "1px solid",
-        borderColor: !CustomDeviceIsSmall() && "divider",
-        "&:hover": {
-          boxShadow: `4px 0px 50px -10px inset ${
-            !isDarkMode ? "#3333" : "lightgreen"
-          }`,
-        },
+        border: "1px solid",
+        borderColor: "divider",
       }}
     >
       <Avatar
         alt=""
         className="border"
-        sx={{ width: 42, height: 42,  }}
+        sx={{ width: 42, height: 42, }}
         src={getImageMatch(job?.logo)}
       />
 
@@ -193,14 +189,14 @@ function JobLayoutHiring({ isDarkMode, job, textOption = "",setIsApplicantsTable
 
       {/* control assessment */}
 
-      {textOption === "Assess Jobs" && (
+      {textOption === "Jobs Assessment" && (
         <Button
         variant={"contained"}
         color="primary"
         size="small"
         onClick={handleOpenApplicantsTable}
         disableElevation
-        sx={{ borderRadius: "20px", mb:1, width: "60%",fontSize:'x-small', textTransform:'capitalize', }}
+        sx={{ borderRadius: "20px", fontWeight:'bold', my:1, width: "60%",fontSize:'x-small', textTransform:'capitalize', }}
         >
         Assess {job?.applicants?.total-job?.applicants?.assessed}
     </Button>

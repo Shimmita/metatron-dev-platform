@@ -42,7 +42,8 @@ function JobLayout_2({
   isLastIndex=false,
   setPageNumber,
   pageNumber,
-  setErrorMessage
+  setErrorMessage,
+  isJobSearchGlobal
 
  }) {
   const [openModal, setOpenApplyJobModal] = useState(false);
@@ -144,7 +145,8 @@ function JobLayout_2({
   return (
     <Box 
       display={"flex"} 
-      gap={3}
+      gap={2}
+      mb={isLastIndex && CustomDeviceIsSmall() && 5}
       // small devices should have column
       flexDirection={CustomDeviceIsSmall() ? 'column':'row'}
       justifyContent={"center"}
@@ -167,7 +169,7 @@ function JobLayout_2({
       <Avatar
         alt=""
         className="border"
-        sx={{ width: 45, height: 45, mt:isPreviewHR ? 0:3 }}
+        sx={{ width: 45, height: 45, mt:isPreviewHR ? 0:1 }}
         src={getImageMatch(job?.logo)}
       />
       </Box>
@@ -272,10 +274,10 @@ function JobLayout_2({
         <React.Fragment>
            {isMyJob ?(
         <Box 
-        mt={0.5}
+        my={1}
         display={'flex'} 
         justifyContent={'center'}>
-          <Typography textAlign={'center'} className="text-info" variant="caption" sx={{ textTransform:'capitalize' }}> - You Posted -</Typography>
+          <Typography textAlign={'center'}  fontWeight={'bold'} variant="caption" sx={{ textTransform:'capitalize' }}> - You Posted -</Typography>
         </Box>
       ):(
       
@@ -327,7 +329,7 @@ function JobLayout_2({
     </Card>
 
     {/* next button zone, only if item is last index */}
-   {isLastIndex && (
+   {isLastIndex && !isJobSearchGlobal && (
      <Box 
     alignItems={'center'}
     justifyContent={'center'}

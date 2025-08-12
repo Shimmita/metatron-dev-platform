@@ -1,30 +1,25 @@
 import {
   AssignmentTurnedInRounded,
+  AutoAwesome,
   BarChartRounded,
   DarkModeRounded,
+  DocumentScannerRounded,
   FindInPageRounded,
   HighlightOffOutlined,
   InfoRounded,
-  InsightsRounded,
-  LibraryBooksRounded,
   Menu,
   MyLocationRounded,
-  NotificationsRounded,
   Refresh,
-  SearchOutlined,
   VerifiedRounded,
   WorkRounded
 } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
-  alpha,
   AppBar,
   Avatar,
-  Badge,
   Button,
   CircularProgress,
-  InputBase,
   Stack,
   Toolbar,
   Tooltip
@@ -49,8 +44,7 @@ import {
   handleShowingSpeedDial,
   handleSidebarRightbar,
   resetDarkMode,
-  showMessagingDrawer,
-  showUserProfileDrawer,
+  showUserProfileDrawer
 } from "../../redux/AppUI";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
 import AlertGeneral from "../alerts/AlertGeneral";
@@ -123,50 +117,6 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 
- // search bar option
-  const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto',
-    },
-  }));
-  
-  const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }));
-  
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    width: '100%',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      [theme.breakpoints.up('sm')]: {
-        width: '12ch',
-        '&:focus': {
-          width: '15ch',
-        },
-      },
-    },
-  }));
-
-
 export default function MiniDrawer() {
   const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
   const [generalTitle,setGeneralTitle]=useState("")
@@ -188,12 +138,6 @@ export default function MiniDrawer() {
 
   const { jobs } = useSelector((state) => state.currentJobs);
   const { user } = useSelector((state) => state.currentUser);
-  const { post_reactions } = useSelector((state) => state.currentPostReactions);
-  const { reportedPost } = useSelector((state) => state.currentReportedPost);
-  const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
-  const { profile_views } = useSelector((state) => state.currentProfileView);
-  const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
-
 
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
   const theme = useTheme();
@@ -238,11 +182,6 @@ export default function MiniDrawer() {
   },[dispatch,isSidebarRighbar])
   
 
-  // show the notification and messaging triggered by redux
-  const handleShowMessageDrawer = () => {
-    dispatch(showMessagingDrawer());
-  };
-
   // open drawer
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -264,6 +203,8 @@ export default function MiniDrawer() {
   useEffect(() => {
     // don't fetch any if isJob-search global to avoid overriding  data
     if (isJobSearchGlobal) {
+      // increase page number for bypassing similar jobs in the array of next fetch
+      setPageNumber(prev=>prev+1)
       // false my stats
       setIsMyStats(false)
       return;
@@ -392,7 +333,7 @@ export default function MiniDrawer() {
     }
 
     // handle getting of the recommended jobs from backend
-    if (textOption === "Recommended") {
+    if (textOption === "AI Selection") {
 
       const userSkills=user?.selectedSkills
       
@@ -529,8 +470,8 @@ export default function MiniDrawer() {
                 navigate('/jobs/hiring')
               } else{
                 // don't navigate alert you have not posted any jobs
-                setGeneralTitle("Hiring Manager")
-                setMessageGeneral("currently you have not posted any jobs as a hiring manager, kindly post your job and this page will be ready.")
+                setGeneralTitle("Metatron H.R")
+                setMessageGeneral("seems you have not posted any jobs for evaluation. post and the system will help you in assessment!")
                 setOpenAlertGeneral(true)
               }
             })
@@ -672,23 +613,13 @@ export default function MiniDrawer() {
                 </Box>
               </Box>
               )}
+
               <Box 
                display={'flex'}
                 gap={2} 
                 alignItems={'center'} 
                 justifyContent={'flex-end'}>
-                {/* displayed on tabs and big screens */}
-                {!CustomDeviceIsSmall() && (
-                   <Search>
-                   <SearchIconWrapper>
-                     <SearchOutlined />
-                   </SearchIconWrapper>
-                   <StyledInputBase
-                     placeholder="Search…"
-                     inputProps={{ 'aria-label': 'search' }}
-                   />
-                 </Search>
-                )}
+
 
                 {/* dark mode */}
                 <IconButton  
@@ -700,20 +631,7 @@ export default function MiniDrawer() {
                   />
                 </Tooltip> 
                 </IconButton>
-                
-              {/* notification and messaging */}
-              <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
-                <Tooltip arrow title={"notifications"}>
-                  <IconButton
-                    sx={{ padding: 0 }}
-                    onClick={handleShowMessageDrawer}
-                  >
-                    <NotificationsRounded
-                      sx={{ width: 24, height: 24, color: "white" }}
-                    />
-                  </IconButton>
-                </Tooltip>
-              </Badge>
+
 
               {/* profile */}
               <Tooltip arrow title={"profile"}>
@@ -771,7 +689,7 @@ export default function MiniDrawer() {
              fontWeight={'bold'}
              mb={1}
              textTransform={'uppercase'}>
-               Job Hunter
+               Job Applicant
              </Typography>
              <Typography
              fontWeight={'bold'}
@@ -802,10 +720,10 @@ export default function MiniDrawer() {
             <List>
               {[
                 "Explore Jobs",
+                "AI Selection",
                 "Search Jobs",
                 "Verified Jobs",
                 "Nearby Jobs",
-                "Recommended",
                 "Applications",
                 "My Statistics",
               ].map((text, index) => (
@@ -856,7 +774,7 @@ export default function MiniDrawer() {
                           color={text === textOption ? "primary" : "inherit"}
                           sx={{width:22,height:22}}
                         />
-                      ) : index === 1 ? (
+                      ) : index === 4 ? (
                         <FindInPageRounded
                           color={text === textOption ? "primary" : "inherit"}
                         />
@@ -868,8 +786,8 @@ export default function MiniDrawer() {
                         <MyLocationRounded
                           color={text === textOption ? "primary" : "inherit"}
                         />
-                      ) : index === 4 ? (
-                        <InsightsRounded
+                      ) : index === 1 ? (
+                        <AutoAwesome
                         color={text === textOption ? "primary" : "inherit"}
                       />
                        
@@ -911,18 +829,24 @@ export default function MiniDrawer() {
               ))}
             </List>
 
-            {/* divider */}
-            <Divider component={'div'} className={'p-1'}/>
             {open ? (
-              <>
+              <Box display={'flex'} justifyContent={'center'}>
               {/* hiring section */}
-            <Button size="small" sx={{mt:1,}} onClick={handleNavigateHiring}>Hiring Manager</Button>
-              </>
+            <Button 
+            size="small" 
+            startIcon={<DocumentScannerRounded/>}
+            color="secondary"
+            disableElevation
+            sx={{my:1, px:1, borderRadius:5, fontWeight:'bold', border:'1px solid', borderColor:'divider'}}
+             onClick={handleNavigateHiring}>
+             Metatron H.R
+             </Button>
+              </Box>
             ):(
               <ListItemButton size="small" >
-              <Tooltip title={"i'm hiring"} arrow>
+              <Tooltip title={"Metatron H.R"} arrow>
               <ListItemIcon onClick={handleNavigateHiring}>
-              <LibraryBooksRounded sx={{width:24,height:24}}/>
+              <DocumentScannerRounded color="secondary" sx={{width:24,height:24}}/>
               </ListItemIcon>
               </Tooltip>
             </ListItemButton>
@@ -963,7 +887,7 @@ export default function MiniDrawer() {
                 {(textOption === "Explore Jobs" ||
                   textOption === "Nearby Jobs" ||
                   textOption === "Verified Jobs" ||
-                  textOption === "Recommended" ||
+                  textOption === "AI Selection" ||
                   textOption === "Applications"||
                   textOption === "My Statistics" ||
                   textOption === "Search Jobs") && (
@@ -1003,6 +927,7 @@ export default function MiniDrawer() {
                                 job={job}
                                 jobs={jobs}
                                 setErrorMessage={setErrorMessage}
+                                isJobSearchGlobal={isJobSearchGlobal}
                               />
                               </Box>
                               )}

@@ -1,27 +1,22 @@
 import {
   Add,
-  BarChartRounded,
+  ArrowCircleLeftRounded,
+  DarkModeRounded,
+  DocumentScannerRounded,
   HighlightOffOutlined,
   InfoRounded,
-  LibraryBooksRounded,
-  ListRounded,
   Menu,
-  NotificationsRounded,
   Refresh,
-  SearchOutlined,
   SettingsRounded,
   WorkRounded
 } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
-  alpha,
   AppBar,
   Avatar,
-  Badge,
   Button,
   CircularProgress,
-  InputBase,
   Stack,
   Toolbar,
   Tooltip
@@ -45,10 +40,11 @@ import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
   handleSidebarRightbar,
-  showMessagingDrawer,
+  resetDarkMode,
   showUserProfileDrawer
 } from "../../redux/AppUI";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
+import AlertGeneral from "../alerts/AlertGeneral";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 import PostJobModal from "../modal/PostJobModal";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
@@ -61,9 +57,8 @@ import ApplicantsTable from "./layout/ApplicantsTable";
 import JobLayoutHiring from "./layout/JobLayoutHiring";
 import JobStatsLayout from "./layout/JobStatsLayouts";
 import ManageJobsTable from "./layout/ManageJobsTable";
-import AlertGeneral from "../alerts/AlertGeneral";
 
-const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
+const drawerWidth = CustomDeviceIsSmall ? 200 : 270;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -121,49 +116,6 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 
-// search bar option
-  const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto',
-    },
-  }));
-  
-  const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }));
-  
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    width: '100%',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      [theme.breakpoints.up('sm')]: {
-        width: '12ch',
-        '&:focus': {
-          width: '20ch',
-        },
-      },
-    },
-  }));
-
 
 export default function AllJobsHiringManager() {
     // track axios progress
@@ -191,11 +143,6 @@ export default function AllJobsHiringManager() {
 
   const { jobs } = useSelector((state) => state.currentJobs);
   const { user } = useSelector((state) => state.currentUser);
-  const { post_reactions } = useSelector((state) => state.currentPostReactions);
-  const { reportedPost } = useSelector((state) => state.currentReportedPost);
-  const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
-  const { profile_views } = useSelector((state) => state.currentProfileView);
-  const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
 
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
 
@@ -213,7 +160,7 @@ export default function AllJobsHiringManager() {
 
   // selected option
   const [textOption, setTextOption] = useState(
-    isJobSearchGlobal ? "Search Jobs" : "Your Jobs"
+    isJobSearchGlobal ? "Search Jobs" : "My Posted Jobs"
   );
 
   // false right bar is no of use this route
@@ -238,11 +185,6 @@ export default function AllJobsHiringManager() {
   // navigate to other routes
   const navigate=useNavigate()
 
-
-   // show the notification and messaging triggered by redux
-    const handleShowMessageDrawer = () => {
-      dispatch(showMessagingDrawer());
-    };
 
    // handle navigation to hiring pane
    const handleNavigateJobSeeker=()=>{
@@ -289,13 +231,13 @@ const handleShowingProfileDrawer = () => {
     }
 
       // open jobs creation modal
-      if (textOption === "Create Jobs") {
+      if (textOption === "Create New Job") {
         setOpenJobPostModal(true)
         return
       }
 
       // show the manage jobs table
-      if (textOption==="Manage Jobs") {
+      if (textOption==="Jobs Management") {
         setIsManageJobsTable(true)
         return
       }
@@ -305,7 +247,7 @@ const handleShowingProfileDrawer = () => {
     setIsFetching(true);
 
     // fetch all jobs if the request is so
-    if (textOption === "Your Jobs" || textOption === "Assess Jobs") {
+    if (textOption === "My Posted Jobs" || textOption === "Jobs Assessment") {
 
       axios
         .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/posted/${user?.email}`, {
@@ -340,44 +282,7 @@ const handleShowingProfileDrawer = () => {
         });
     }
 
-    // fetch all jobs that have been verified
-    if (textOption === "Assess applicants") {
-
-
-      axios
-        .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/verified/${user?._id}`, {
-          withCredentials: true,
-        })
-        .then((res) => {
-          // update the redux of current post
-          if (res?.data) {
-            dispatch(updateCurrentJobs(res.data));
-          } 
-        })
-        .catch(async (err) => {
-          console.log(err);
-          //  user login session expired show logout alert
-          if (err?.response?.data.login) {
-            window.location.reload();
-          }
-          if (err?.code === "ERR_NETWORK") {
-            setErrorMessage(
-              "server unreachable"
-            );
-            return;
-          }
-          setErrorMessage(err?.response.data);
-          setOpenAlertGeneral(true)
-
-        })
-        .finally(() => {
-          setIsFetching(false);
-          // false myStats
-          setIsMyStats(false)
-        });
-    }
-
-
+  
   }, [dispatch, textOption, user, isJobSearchGlobal]);
 
 
@@ -389,9 +294,14 @@ const handleShowingProfileDrawer = () => {
    // handle refresh of data
     const handleRefreshData=()=>{
       // set text to default explore events
-      setTextOption('Your Jobs')
+      setTextOption('My Posted Jobs')
     }
-
+  
+      // UI theme dark light tweaking effect
+      const handleShowDarkMode = () => {
+      // update the redux theme boolean state
+      dispatch(resetDarkMode());
+    };
 
   return (
       <Suspense
@@ -446,62 +356,72 @@ const handleShowingProfileDrawer = () => {
               </Box>
 
               {/* main jobs title and the current selection */}
-              <Box width={"100%"}>
+              {CustomDeviceIsSmall() ? (
+                <Box width={"100%"}>
                 <Typography
                   noWrap
                   component="div"
                   textAlign={"center"}
                   fontWeight={'bold'}
                   textTransform={"uppercase"}
-                  ml={open && 22}
-                  
                 >
-                  Metatron Jobs
+                  Metatron
                 </Typography>
 
                 {/* current navigation counter */}
-                <Box display={"flex"} justifyContent={"center"} >
-                  <Typography
-                   variant="caption" 
-                   fontWeight={'bold'}
+                <Box display={"flex"} justifyContent={"center"}>
+                  <Typography 
+                  variant="caption"
+                  fontWeight={'bold'}
                    textTransform={'capitalize'}
-                   ml={open && 22}>
+                   >
+                    {textOption} 
+                  </Typography>
+                </Box>
+              </Box>
+              ):(
+                <Box width={"100%"}>
+                <Typography
+                  noWrap
+                  component="div"
+                  textAlign={"center"}
+                  fontWeight={'bold'}
+                  textTransform={"uppercase"}
+                  
+                  ml={open ? 30: 24}
+                >
+                  Metatron HR
+                </Typography>
+
+                {/* current navigation counter */}
+                <Box display={"flex"} justifyContent={"center"}>
+                  <Typography 
+                  variant="caption"
+                  fontWeight={'bold'}
+                   textTransform={'capitalize'}
+                   ml={open ? 30: 24}>
                     - {textOption} -
                   </Typography>
                 </Box>
               </Box>
+              )}
 
               <Box display={'flex'}
                gap={2}
                 alignItems={'center'} 
                 justifyContent={'flex-end'}>
 
-              {/* displayed on tabs and big screens */}
-              {!CustomDeviceIsSmall() && (
-                  <Search>
-                  <SearchIconWrapper>
-                    <SearchOutlined />
-                  </SearchIconWrapper>
-                  <StyledInputBase
-                    placeholder="Search…"
-                    inputProps={{ 'aria-label': 'search' }}
-                  />
-                </Search>
-              )}
 
-              {/* notification and messaging */}
-              <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
-                <Tooltip arrow title={"notifications"}>
-                  <IconButton
-                    sx={{ padding: 0 }}
-                    onClick={handleShowMessageDrawer}
-                  >
-                    <NotificationsRounded
-                      sx={{ width: 25, height: 25, color: "white" }}
-                    />
-                  </IconButton>
-                </Tooltip>
-              </Badge>
+                {/* dark mode */}
+                <IconButton  
+                onClick={handleShowDarkMode}> 
+                  <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
+                  <DarkModeRounded
+                
+                    sx={{ color: "white", height:24, width:24,}}
+                  />
+                </Tooltip> 
+                </IconButton>
 
               {/* profile avatar */}
             <Tooltip arrow title={"profile"}>
@@ -597,11 +517,10 @@ const handleShowingProfileDrawer = () => {
             {/* job seeker options */}
             <List>
               {[
-                "Your Jobs",
-                "Assess Jobs",
-                "Create Jobs",
-                "Manage Jobs",
-                "Job Statistics",
+                "My Posted Jobs",
+                "Create New Job",
+                "Jobs Assessment",
+                "Jobs Management",
               ].map((text, index) => (
                 <ListItem
                   key={text}
@@ -648,27 +567,23 @@ const handleShowingProfileDrawer = () => {
                       {index === 0 ? (
                         <WorkRounded
                           color={text === textOption ? "primary" : "inherit"}
-                          sx={{width:22,height:22}}
-                        />
-                      ) : index === 1 ? (
-                        <ListRounded
-                          color={text === textOption ? "primary" : "inherit"}
+                          sx={{width:20,height:20}}
                         />
                       ) : index === 2 ? (
+                        <DocumentScannerRounded
+                          color={text === textOption ? "primary" : "inherit"}
+                        />
+                      ) : index === 1 ? (
                         <Add
                           color={text === textOption ? "primary" : "inherit"}
                         />
-                      ) : index === 3 ? (
+                      ) : (
                         <SettingsRounded
+                        sx={{width:22,height:22}}
                         color={text === textOption ? "primary" : "inherit"}
                       />
                        
-                      ) : (
-                        <BarChartRounded
-                        color={text === textOption ? "primary" : "inherit"}
-                      />
-                        
-                      )}
+                      ) }
                       </Tooltip>
                     </ListItemIcon>
                     <ListItemText
@@ -696,26 +611,21 @@ const handleShowingProfileDrawer = () => {
                 </ListItem>
               ))}
             </List>
-          
-            {/* divider */}
-            <Divider component={'div'} className={'p-1'}/>
-            {open ? (
-              <>
+        
               {/* hiring section */}
-            <Button size="small" sx={{mt:1}} onClick={handleNavigateJobSeeker}> jobseeker </Button>
-              </>
-            ):(
-              <ListItemButton size="small" onClick={handleNavigateJobSeeker}>
-              <Tooltip title={"i'm hiring"} arrow>
-              <ListItemIcon>
-              <LibraryBooksRounded sx={{width:24,height:24}}/>
-              </ListItemIcon>
-              </Tooltip>
-            </ListItemButton>
-            )}
-         
+              <Box my={1} display={'flex'} justifyContent={'center'}>
+
+              <Tooltip title='back' arrow>
+            <IconButton 
+            onClick={handleNavigateJobSeeker}
+            size="small">
+            <ArrowCircleLeftRounded />
+            </IconButton> 
+            </Tooltip>
+            
+            </Box>
              {/* divider */}
-             <Divider component={'div'} className={'p-1'}/>
+            <Divider component={'div'} className={'p-1'}/>
 
           </Drawer>
           {/* body of the jobs */}
@@ -754,9 +664,8 @@ const handleShowingProfileDrawer = () => {
                 ) :(
                   <React.Fragment>
                   {/* all jobs and verified jobs and Nearby that have no external link */}
-                {(textOption === "Your Jobs" ||
-                  textOption === "Assess Jobs" ||
-                  textOption === "My Statistics" ||
+                {(textOption === "My Posted Jobs" ||
+                  textOption === "Jobs Assessment" ||
                   textOption === "Search Jobs") && (
                   <React.Fragment>
                     {isFetching ? (

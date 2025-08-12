@@ -1,5 +1,6 @@
 import {
   Add,
+  AutoAwesome,
   CheckCircle,
   DarkModeRounded,
   FindInPageRounded,
@@ -8,7 +9,6 @@ import {
   InsightsRounded,
   Menu,
   MyLocationRounded,
-  NotificationsRounded,
   Refresh,
   SearchOutlined,
   Settings,
@@ -20,7 +20,6 @@ import {
   alpha,
   AppBar,
   Avatar,
-  Badge,
   Button,
   CircularProgress,
   InputBase,
@@ -168,8 +167,6 @@ const Drawer = styled(MuiDrawer, {
 
 export default function EventsContainer() {
   const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
-  const [generalTitle,setGeneralTitle]=useState("")
-  const [messageGeneral,setMessageGeneral]=useState("")
   const [openModalEvent,setOpenModalEvent]=useState(false)
   const [isEventsStats,setIsEventsStats]=useState(false)
   const [focusedEvent,setFocusedEvent]=useState(null)
@@ -192,11 +189,6 @@ export default function EventsContainer() {
   const isDarkMode=currentMode==='dark'
 
   const { user } = useSelector((state) => state.currentUser);
-  const { post_reactions } = useSelector((state) => state.currentPostReactions);
-  const { reportedPost } = useSelector((state) => state.currentReportedPost);
-  const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
-  const { profile_views } = useSelector((state) => state.currentProfileView);
-  const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
   const { events:eventsData } = useSelector((state) => state.currentEvents);
 
 
@@ -234,10 +226,6 @@ export default function EventsContainer() {
   };
 
 
-  // show the notification and messaging triggered by redux
-  const handleShowMessageDrawer = () => {
-    dispatch(showMessagingDrawer());
-  };
 
   // open drawer
   const handleDrawerOpen = () => {
@@ -367,7 +355,7 @@ export default function EventsContainer() {
     }
 
     // handle getting of the recommended jobs from backend
-    if (textOption === "Recommended") {
+    if (textOption === "AI Selection") {
 
       const userSkills=user?.selectedSkills
       
@@ -628,20 +616,7 @@ export default function EventsContainer() {
                   />
                 </Tooltip> 
                 </IconButton>
-                
-              {/* notification and messaging */}
-              <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
-                <Tooltip arrow title={"notifications"}>
-                  <IconButton
-                    sx={{ padding: 0 }}
-                    onClick={handleShowMessageDrawer}
-                  >
-                    <NotificationsRounded
-                      sx={{ width: 24, height: 24, color: "white" }}
-                    />
-                  </IconButton>
-                </Tooltip>
-              </Badge>
+
 
               {/* profile */}
               <Tooltip arrow title={"profile"}>
@@ -733,7 +708,7 @@ export default function EventsContainer() {
                 "Search Events",
                 "Create Events",
                 "Nearby Events",
-                "Recommended",
+                "AI Selection",
                 "RSVP Events",
                 "Events Manager",
               ].map((text, index) => (
@@ -797,7 +772,7 @@ export default function EventsContainer() {
                           color={text === textOption ? "primary" : "inherit"}
                         />
                       ) : index === 4 ? (
-                        <InsightsRounded
+                        <AutoAwesome
                         color={text === textOption ? "primary" : "inherit"}
                       />
                        
@@ -872,7 +847,7 @@ export default function EventsContainer() {
                 {(textOption === "Explore Events" ||
                   textOption === "Nearby Events" ||
                   textOption === "Create Events" ||
-                  textOption === "Recommended" ||
+                  textOption === "AI Selection" ||
                   textOption === "RSVP Events"||
                   textOption === "Events Manager" ||
                   textOption === "Search Events") && (
@@ -964,15 +939,6 @@ export default function EventsContainer() {
             setOpenModalEventAdd={setOpenModalEvent}
             />}
 
-          {/* open alert general for no jobs */}
-          {openAlertGeneral && (
-            <AlertGeneral openAlertGeneral={openAlertGeneral} 
-            setOpenAlertGeneral={setOpenAlertGeneral}
-            title={generalTitle}
-            message={messageGeneral}
-            defaultIcon={<InfoRounded/>}
-            />
-          )}
 
             {/* holds the notification and messaging drawer */}
             {isOpenMessageDrawer && (

@@ -111,7 +111,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
       >
         <Box>
           {connectTop &&
-            connectTop.slice(0, 4).map((connection, index) => (
+            connectTop?.map((connection, index) => (
               <Box key={index}>
                 <FriendRequest
                   isLoadingRequest={isFetching}

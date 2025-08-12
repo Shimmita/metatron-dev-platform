@@ -5,15 +5,14 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import Slide from "@mui/material/Slide";
+import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import devImage from '../../images/dev.jpeg';
+import { resetClearConversations } from "../../redux/CurrentConversations";
+import { updateMessageConnectRequest } from "../../redux/CurrentSnackBar";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import axios from "axios";
-import { updateMessageConnectRequest } from "../../redux/CurrentSnackBar";
-import { resetClearConversations } from "../../redux/CurrentConversations";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -35,6 +34,7 @@ export default function AlertInputMessage({
   setOpenAlert,
   targetId,
   targetName,
+  targetAvatar,
   targetSpecialisation
 }) {
 
@@ -114,9 +114,9 @@ const handleMessageWidth=()=>{
   if (CustomDeviceTablet() && isTabSideBar) {
     return "36%"
   } else if(CustomLandScape()){
-    return "-8%"
+    return "-1%"
   } else if(CustomLandscapeWidest()){
-    return "-5%"
+    return "0%"
   }
 }
 
@@ -132,13 +132,16 @@ const handleMessageWidth=()=>{
         }}
       >
         <Box width={'100%'}>
-        <Box display={'flex'} gap={2} p={1} alignItems={'center'} justifyContent={'space-between'}>
+        <Box
+        display={'flex'} gap={2} 
+        p={1}
+        alignItems={'center'} 
+        justifyContent={'space-between'}>
             {/* avatar */}
              <Avatar
-            src={devImage}
+            src={targetAvatar}
             sx={{
-                backgroundColor: "#1976D2",
-                color: "white",
+              
                 width: 30,
                 height: 30,
             }}

@@ -1,23 +1,21 @@
-import { Box } from "@mui/material";
-import axios from "axios";
-import React, { useState } from "react";
+import { RefreshRounded } from "@mui/icons-material";
+import { Box, Fab } from "@mui/material";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import CardFeed from "../custom/CardFeed";
 import PostDetailsContainer from "../post/PostDetailsContiner";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 const FeedDefaultSearch = () => {
   // will be used when the post is focused for full details
   const [postDetailedData, setPostDetailedData] = useState();
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   // redux states
   const dispatch = useDispatch();
   // redux states access
-  const { posts } = useSelector((state) => state.currentPosts);
+  const { posts,isPostSearch } = useSelector((state) => state.currentPosts);
+  const navigate=useNavigate()
 
   const { currentMode, isDefaultSpeedDial } = useSelector(
     (state) => state.appUI
@@ -25,27 +23,28 @@ const FeedDefaultSearch = () => {
   const isDarkMode=currentMode==='dark'
 
 
-  // show speed dial if aint visible
+  // show speed dial if ain't visible
   if (isDefaultSpeedDial) {
     dispatch(handleShowingSpeedDial(false));
   }
 
+
+   // handle refresh of the content
+    const handleRefreshHome=()=>{
+      navigate('/')
+    }
+
   return (
-    <Box height={CustomDeviceIsSmall() ? "91.7vh" : "91vh"}>
+    <Box height={'85vh'}>
       {/* render the post is focused for full viewing and that post detailed
       data is no null */}
       {postDetailedData && postDetailedData ? (
         <Box
           height={"85vh"}
-          className={
-            CustomDeviceTablet() ? "shadow rounded p-2" : "rounded p-2"
-          }
+          p={1}
           sx={{
-            border:
-              !CustomDeviceIsSmall() && isDarkMode ? "1px solid" : "1px solid",
-            borderColor:
-              !CustomDeviceIsSmall() && isDarkMode ? "divider" : "divider",
-
+            border:isDarkMode && '1px solid',
+            borderColor:'divider',
             overflowX: "auto",
             // Hide scrollbar for Chrome, Safari and Opera
             "&::-webkit-scrollbar": {
@@ -75,17 +74,33 @@ const FeedDefaultSearch = () => {
             "scrollbar-width": "none",
           }}
         >
+
+            {/* fab for refresh, for post search results or like such */}
+            {isPostSearch && (
+              <Box
+                mb={1}
+                display={'flex'} 
+                justifyContent={'center'}>
+              <Fab
+              variant="extended" 
+              size="small" 
+              color="primary" 
+              onClick={handleRefreshHome}>
+              <RefreshRounded sx={{ mr: 1, }} />
+              Refresh
+              </Fab>
+            </Box>
+            )}
+
           {/* map through the posts and display them to the user */}
-          {posts?.map((post) => {
+          {posts?.map((post,index) => {
               return (
-                <Box key={post}>
-                  <Box>
+                <Box key={post._id} mb={index===posts?.length-1 ? 5:3}>
                     {/* feed card detailed post */}
                     <CardFeed
                       post={post}
                       setPostDetailedData={setPostDetailedData}
                     />
-                  </Box>
                 </Box>
               );
             })}

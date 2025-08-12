@@ -1,10 +1,10 @@
-import { useEffect, useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   handleSidebarRightbar,
   resetDefaultBottomNav,
 } from "../../redux/AppUI";
-import { useNavigate } from "react-router-dom";
 
 const PageNotFound = ({ mesage = "" }) => {
   // redux to stop showing of the speed dial

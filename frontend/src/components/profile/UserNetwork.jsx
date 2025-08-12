@@ -16,15 +16,13 @@ const UserNetwork = ({ otherUserID }) => {
   const { _id: currentUserIdValue, network: networks } = user;
 
   const dispatch = useDispatch();
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   const currentUserID = otherUserID != null ? otherUserID : currentUserIdValue;
 
   //use effect to fetch all the data of the friends of the user.
   useEffect(() => {
     // if there are posts and userId is matched current user don't network request
-    if (myNetwork?.length > 0 && otherUserID === currentUserIdValue) {
+    if (myNetwork?.length > 0 || otherUserID === currentUserIdValue) {
       return;
     }
     // set is fetching to true
@@ -103,7 +101,7 @@ const UserNetwork = ({ otherUserID }) => {
       {myNetwork && (
         <Box>
           {myNetwork?.map((network, index) => (
-            <Box key={index}>
+            <Box key={index} mb={2}>
               <UserNetworkLayout network={network} />
             </Box>
           ))}

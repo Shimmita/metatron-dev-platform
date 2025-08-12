@@ -1,6 +1,7 @@
 import { EmailRounded, NotificationsRounded } from "@mui/icons-material";
 import {
   AppBar,
+  CircularProgress,
   styled,
   Tab,
   Tabs,
@@ -103,13 +104,13 @@ export default function ParentNotifMessageDrawer() {
               ? 330
               :400
           }
-          bgcolor={isDarkMode ?"background.default":"#f1f1f1"}
+          bgcolor={isDarkMode ?"background.default":"#E6F7FF"}
           height={"100vh"}
         >
           {/* display when message/notif item not clicked */}
           {!messageNotifClicked && (
-            <AppBar position="sticky" 
-            color={'info'}
+            <AppBar 
+            position="sticky" 
             elevation={0}>
               <Toolbar
                 variant="dense"
@@ -128,9 +129,14 @@ export default function ParentNotifMessageDrawer() {
                     <StyledTab
                       label={
                           <NotificationsRounded
-                            className={value === 0 && "border-bottom pb-1"}
                             variant="body2"
-                            sx={{ color: "white",  width:28, height:28 }}
+                            sx={{  
+                            color:'white',
+                            width:30,
+                            height:30,
+                            borderBottom:value===0 && '1px solid',
+                            borderColor:'white'
+                             }}
                           />
                         
                       }
@@ -139,9 +145,14 @@ export default function ParentNotifMessageDrawer() {
                     <StyledTab
                       label={
                           <EmailRounded
-                            className={value === 1 && "border-bottom pb-1"}
                             variant="body2"
-                            sx={{ color: "white", width:25, height:25 }}
+                            sx={{
+                            width:27, 
+                            height:27,
+                            color:'white',
+                            borderBottom:value===1 && '1px solid',
+                            borderColor:'white'
+                             }}
                           />
                           
                       }
@@ -161,7 +172,7 @@ export default function ParentNotifMessageDrawer() {
                     justifyContent={"center"}
                     alignItems={"center"}
                   >
-                    loading...
+                    <CircularProgress/>
                   </Box>
                 </Box>
               }
@@ -169,6 +180,8 @@ export default function ParentNotifMessageDrawer() {
              
                 <Box
                   height={"92vh"}
+                  p={0.4}
+                  borderRadius={5}
                   sx={{
                     overflow: "auto",
                     // Hide scrollbar for Chrome, Safari and Opera
@@ -182,7 +195,7 @@ export default function ParentNotifMessageDrawer() {
                 >
                  {value===0 ? (
                   <React.Fragment>
-                     {/* display account notification */}
+                  {/* display account notification */}
                    <NotifAccordionLayout
                    post_reactions={post_reactions}
                    reportedPost={reportedPost}
@@ -200,9 +213,7 @@ export default function ParentNotifMessageDrawer() {
                   </React.Fragment>
                  )}
                 </Box>
-              
-             
-              
+
             </Suspense>
           </Box>
         </Box>

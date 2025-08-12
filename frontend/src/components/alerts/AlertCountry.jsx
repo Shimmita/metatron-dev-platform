@@ -1,8 +1,7 @@
 import {
-  BusinessRounded,
   CheckCircle,
   Close,
-  PublicRounded,
+  PublicRounded
 } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -10,9 +9,8 @@ import {
   Chip,
   Divider,
   IconButton,
-  MenuItem,
   TextField,
-  Typography,
+  Typography
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -25,7 +23,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ModalPolicyTerms from "../auth/ModalPolicyTerms";
 import AllCountries from "../data/AllCountries";
-import BusinessData from "../data/BusinessData";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -36,21 +33,8 @@ export default function AlertCountry({
   setOpenAlertCountry,
   setCountry,
   country = "",
-  isBusiness,
-  setEmployees,
-  setSize,
-  setDesignation,
-  setApply,
-  setOwnership,
-  size,
-  designation,
-  apply,
-  ownership,
-  employees,
-  permitted,
   terms = "",
-  setPermitted,
-  setTerms,
+ 
 }) {
   const navigate = useNavigate();
   //   control the country selection
@@ -90,32 +74,7 @@ export default function AlertCountry({
 
   // handle submission
   const handleSubmission = () => {
-    // business a/c
-    if (isBusiness) {
-      if (
-        country &&
-        employees &&
-        size &&
-        designation &&
-        apply &&
-        ownership &&
-        terms &&
-        permitted
-      ) {
-        // check if terms is show and reject since must be yes
-        if (terms?.trim().toLowerCase() === "show") {
-          setError("please confirm terms of service");
-        } else {
-          // clear error message if any
-          setError("");
-          // close dialog
-          handleClose();
-        }
-      } else {
-        // fields not filled all
-        setError("please fill all the missing fields");
-      }
-    } else {
+   
       // this is personal account we needs only country field
       if (country) {
         // clear error message if any
@@ -126,12 +85,12 @@ export default function AlertCountry({
         // country empty
         setError("please select your country");
       }
-    }
+    
   };
 
   const handleFlagCountry = (option) => {
-    let split_res = option.split(" ");
-    return split_res[split_res.length - 1].substring(1, 3).toLowerCase();
+    let split_res = option?.split(" ");
+    return split_res[split_res?.length - 1].substring(1, 3).toLowerCase();
   };
 
   // const return to login when close icon on alert country clicked
@@ -149,9 +108,9 @@ export default function AlertCountry({
         TransitionComponent={Transition}
         keepMounted
         aria-describedby="alert-dialog-slide-description"
-        sx={{ display: "flex", justifyContent: "center" }}
+        sx={{ display: "flex", justifyContent: "center",backdropFilter:'blur(3px)', }}
       >
-        <Box height={isBusiness ? "65vh" : undefined} width={"100%"}>
+        <Box width={"100%"}>
           <DialogTitle
             display={"flex"}
             justifyContent={"space-between"}
@@ -159,34 +118,29 @@ export default function AlertCountry({
           >
             {/* logo+ title  */}
             <Box display={"flex"} gap={2} alignItems={"center"}>
-              {isBusiness ? (
-                <>
-                  <BusinessRounded
-                    sx={{ width: 30, height: 30 }}
-                    color="primary"
-                  />
-                  <Typography variant="body1">Business Details</Typography>
-                </>
-              ) : (
-                <>
+              
                   <PublicRounded
                     sx={{ width: 30, height: 30 }}
                     color="primary"
                   />
                   <Typography variant="body1">Country?</Typography>
-                </>
-              )}
+              
             </Box>
             {/* close button */}
-            <IconButton onClick={handleBackLogin}>
-              <Close sx={{ width: 20, height: 20 }} />
+            <IconButton 
+             sx={{ 
+                  border:'1px solid',
+                  borderColor:'divider'
+                }}
+            onClick={handleBackLogin}>
+              <Close sx={{ width: 15, height: 15 }} />
             </IconButton>
           </DialogTitle>
 
           {/* error present should be displayed */}
           {error && (
             <Box mb={1} display={"flex"} justifyContent={"center"}>
-              <Typography variant="caption" color={"orangered"}>
+              <Typography variant="caption" color={"orange"}>
                 {error}
               </Typography>
             </Box>
@@ -196,7 +150,6 @@ export default function AlertCountry({
           <Divider component={"div"} />
 
           <Box
-            maxHeight={isBusiness ? "48vh" : undefined}
             sx={{
               overflow: "auto",
               // Hide scrollbar for Chrome, Safari and Opera
@@ -222,7 +175,7 @@ export default function AlertCountry({
                   gutterBottom
                   id="alert-dialog-slide-description"
                 >
-                  Please select or provide your country of residence from the
+                  Please select your country of residence from the
                   drop-down options below.
                 </DialogContentText>
 
@@ -240,7 +193,7 @@ export default function AlertCountry({
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="country"
+                      label="Country"
                       variant="standard"
                       fullWidth
                     />
@@ -282,171 +235,7 @@ export default function AlertCountry({
                     />
                   }
                 />
-                {isBusiness && (
-                  <React.Fragment>
-                    <DialogContentText variant="body2">
-                      Are you authorised by the local or federal government to
-                      run your business or organsation.
-                    </DialogContentText>
-
-                    <TextField
-                      required
-                      select
-                      id="authorised"
-                      variant="standard"
-                      value={permitted}
-                      fullWidth
-                      onChange={(e) => setPermitted(e.target.value)}
-                      label="authorised"
-                    >
-                      {BusinessData &&
-                        BusinessData?.permitted.map((data) => (
-                          <MenuItem key={data} value={data}>
-                            <Typography variant="body2">{data}</Typography>
-                          </MenuItem>
-                        ))}
-                    </TextField>
-
-                    <DialogContentText variant="body2">
-                      Have you read Metatron terms of service to ensure your
-                      activities are within the platform requirements
-                    </DialogContentText>
-
-                    <TextField
-                      required
-                      select
-                      id="terms"
-                      variant="standard"
-                      value={terms}
-                      fullWidth
-                      onChange={(e) => setTerms(e.target.value)}
-                      label="have read terms "
-                    >
-                      {BusinessData &&
-                        BusinessData.terms.map((data) => (
-                          <MenuItem key={data} value={data}>
-                            <Typography variant="body2">{data}</Typography>
-                          </MenuItem>
-                        ))}
-                    </TextField>
-
-                    <DialogContentText variant="body2">
-                      What's the appropriate designation from the choices below
-                      would you regard for your business or organisation
-                    </DialogContentText>
-
-                    <TextField
-                      required
-                      select
-                      id="designation"
-                      variant="standard"
-                      value={designation}
-                      fullWidth
-                      onChange={(e) => setDesignation(e.target.value)}
-                      label="designation"
-                    >
-                      {BusinessData &&
-                        BusinessData.designation.map((data) => (
-                          <MenuItem key={data} value={data}>
-                            <Typography variant="body2">{data}</Typography>
-                          </MenuItem>
-                        ))}
-                    </TextField>
-
-                    <DialogContentText variant="body2">
-                      Whats the size of your business or organisation in terms
-                      of outreach, premises and infrastructure
-                    </DialogContentText>
-
-                    <TextField
-                      required
-                      select
-                      id="size_business"
-                      variant="standard"
-                      fullWidth
-                      value={size}
-                      onChange={(e) => setSize(e.target.value)}
-                      label="business size"
-                    >
-                      {BusinessData &&
-                        BusinessData.size.map((data) => (
-                          <MenuItem key={data} value={data}>
-                            <Typography variant="body2">{data}</Typography>
-                          </MenuItem>
-                        ))}
-                    </TextField>
-
-                    <DialogContentText variant="body2">
-                      What's the approximate range of employees working in your
-                      business or organisation
-                    </DialogContentText>
-
-                    <TextField
-                      required
-                      select
-                      id="employees"
-                      variant="standard"
-                      fullWidth
-                      value={employees}
-                      onChange={(e) => setEmployees(e.target.value)}
-                      label="employees"
-                    >
-                      {BusinessData &&
-                        BusinessData.employees.map((data) => (
-                          <MenuItem key={data} value={data}>
-                            <Typography variant="body2">{data}</Typography>
-                          </MenuItem>
-                        ))}
-                    </TextField>
-
-                    <DialogContentText variant="body2">
-                      Whats the ownership or proprietorship of your business or
-                      organisation in terms of individualism and
-                      company/corporate
-                    </DialogContentText>
-
-                    <TextField
-                      required
-                      select
-                      id="business_own"
-                      variant="standard"
-                      fullWidth
-                      value={ownership}
-                      onChange={(e) => setOwnership(e.target.value)}
-                      label="business ownership"
-                    >
-                      {BusinessData &&
-                        BusinessData.ownership.map((data) => (
-                          <MenuItem key={data} value={data}>
-                            <Typography variant="body2">{data}</Typography>
-                          </MenuItem>
-                        ))}
-                    </TextField>
-
-                    <DialogContentText variant="body2">
-                      Would you like to apply for IT related job opportunities
-                      provided on the platform from a diverse pool of sources.
-                    </DialogContentText>
-
-                    <TextField
-                      required
-                      select
-                      id="business_apply_jobs"
-                      variant="standard"
-                      fullWidth
-                      value={apply}
-                      onChange={(e) => setApply(e.target.value)}
-                      label="apply jobs"
-                    >
-                      {BusinessData &&
-                        BusinessData.jobs_apply.map((data) => (
-                          <MenuItem key={data} value={data}>
-                            <Typography variant="body2">{data}</Typography>
-                          </MenuItem>
-                        ))}
-                    </TextField>
-                  </React.Fragment>
-                )}
+                
               </>
             </DialogContent>
           </Box>

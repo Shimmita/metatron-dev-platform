@@ -1,5 +1,5 @@
 import { SortRounded } from "@mui/icons-material";
-import { Box, Checkbox, CircularProgress, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, Stack, Typography } from "@mui/material";
+import { Box, Checkbox, CircularProgress, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -107,9 +107,9 @@ export default function AlertFilterFeed({
       if (CustomDeviceTablet() && isTabSideBar) {
         return "36%"
       } else if(CustomLandScape()){
-        return "-8%"
+        return "-1%"
       } else if(CustomLandscapeWidest()){
-        return "-5%"
+        return "0%"
       }
     }
 
@@ -147,20 +147,7 @@ export default function AlertFilterFeed({
           scrollbarWidth: "none",
           }}
          >
-          {isFetching ? (
-            <Box width={'100%'} height={'15vh'} display={'flex'} justifyContent={'center'}>
-              <Stack justifyContent={'center'} gap={2} width={'100%'}>
-                {/* loader */}
-                <Box display={'flex'} justifyContent={'center'}>
-              <CircularProgress size={30}/>
-                </Box>
-              {/* text */}
-              <Typography textAlign={'center'} variant="body2">
-               Loading Content...
-              </Typography>
-              </Stack>
-            </Box>
-          ):(
+        
           <FormControl component="fieldset" variant="standard">
             {/* message helper text info, error */}
             {errorMessage && 
@@ -208,7 +195,6 @@ export default function AlertFilterFeed({
           </FormGroup>
         
           </FormControl>
-          )}
         </DialogContent>
         <DialogActions>
           <Button 
@@ -217,7 +203,9 @@ export default function AlertFilterFeed({
            >
             Close
           </Button>
+
           <Button
+          startIcon={isFetching ? <CircularProgress size={15}/> :undefined}
           onClick={handleEnter}
           disabled={selectedOptions?.length<1 || isFetching}
           >

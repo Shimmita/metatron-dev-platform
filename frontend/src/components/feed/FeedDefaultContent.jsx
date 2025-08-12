@@ -1,4 +1,5 @@
-import { Box, CircularProgress, Stack, Typography } from "@mui/material";
+import { AutoAwesomeRounded, DiamondRounded, HelpOutlineOutlined, PeopleRounded, SmartphoneRounded } from "@mui/icons-material";
+import { Box, CircularProgress, IconButton, Stack, Typography } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,17 +13,26 @@ import {
   resetClearCurrentPosts,
   updateCurrentPosts,
 } from "../../redux/CurrentPosts";
+import AlertForYou from "../alerts/AlertForYou";
 import CardFeed from "../custom/CardFeed";
+import PeopleModal from "../modal/PeopleModal";
 import PostDetailsContainer from "../post/PostDetailsContiner";
 import MobileTabCorousel from "../rightbar/MobileTabCorousel";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 const FeedDefaultContent = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [pageNumber,setPageNumber]=useState(1)
-
+  const [isHelp,setIsHelp]=useState(false)
+  const [isRecommend,setIsRecommend]=useState(false)
+  const [isPremium,setIsPremium]=useState(false)
+  const [isApp,setIsApp]=useState(false)
+  const [messageBody,setMessageBody]=useState("")
+  const [title,setTitle]=useState("")
+  const [showPeople,setShowPeople]=useState()
 
   // will be used when the post is focused for full details
   const [postDetailedData, setPostDetailedData] = useState();
@@ -32,7 +42,8 @@ const FeedDefaultContent = () => {
 
   // redux states access
   const { posts } = useSelector((state) => state.currentPosts);
-
+  const { connectTop } = useSelector((state) => state.currentConnectRequest);
+  
   const { currentMode, isDefaultSpeedDial } = useSelector(
     (state) => state.appUI
   );
@@ -98,8 +109,62 @@ const FeedDefaultContent = () => {
       });
   }, [dispatch, posts]);
 
+  // handle opening of help alert
+  const handleOpenHelp=()=>{
+    setIsHelp(true)
+    setIsPremium(false)
+    setIsRecommend(false)
+    setIsApp(false)
+    setTitle("Get Help and Support")
+    setMessageBody("Facing any issues within the platform's rendered services? reach out.")
+  }
 
- 
+  // handle open of recommend
+  const handleOpenRecommend=()=>{
+    setIsRecommend(true)
+    setIsPremium(false)
+    setIsHelp(false)
+    setIsApp(false)
+    setTitle("View Recommendations")
+    setMessageBody("Insights tailored based on your specialization and skills.")
+
+  }
+
+  // handle opening of premium  
+  const handleOpenPremium=()=>{
+    setIsPremium(true)
+    setIsHelp(false)
+    setIsRecommend(false)
+    setIsApp(false)
+    setTitle("Upgrade To Premium (Cheap)")
+    setMessageBody("")
+  }
+
+  // handle is mobile app option
+  const handleMobileApp=()=>{
+    setIsApp(true)
+    setIsPremium(false)
+    setIsHelp(false)
+    setIsRecommend(false)
+    setTitle("Mobile App Download")
+    setMessageBody("Our esteemed software engineers are working on the development of the mobile application, once completed all the users on the platform will be notified.")
+  }
+
+  // handle closing of all info
+  const handleCloseAll=()=>{
+    setIsPremium(false)
+    setIsHelp(false)
+    setIsRecommend(false)
+    setIsApp(false)
+    setMessageBody("")
+    setTitle("")
+  }
+
+
+ // handle show people connect modal
+ const handleShowPeopleSuggest=()=>{
+  setShowPeople(prev=>!prev)
+ }
 
   return (
     <Box
@@ -109,11 +174,8 @@ const FeedDefaultContent = () => {
       data is no null */}
       {postDetailedData ? (
         <Box
-          className={
-            CustomDeviceTablet() ? "shadow rounded p-2" : "rounded p-2"
-          }
           sx={{
-            border: "1px solid",
+            border: isDarkMode && "1px solid",
             borderColor:"divider",
 
             overflowX: "auto",
@@ -152,7 +214,7 @@ const FeedDefaultContent = () => {
                   color={"text.secondary"}
                   variant="body2"
                 >
-                  posts ...
+                  loading ...
                 </Typography>
               </Box>
             </Box>
@@ -172,6 +234,99 @@ const FeedDefaultContent = () => {
               "scrollbar-width": "none",
             }}
           >
+
+          {/* For your Page Content */}
+          <Box
+          width={'100%'} 
+          border={isDarkMode && '1px solid'}
+          bgcolor={'background.default'}
+          borderRadius={2}
+          mb={1} 
+          borderColor={'divider'}>
+          <Box p={1} >
+          <Box 
+          display={'flex'}
+          alignItems={'center'}
+          justifyContent={CustomDeviceIsSmall()? 'space-between':"space-around"}
+          px={1}
+          >
+          {/* help and support */}
+          <Stack 
+          justifyContent={'center'}
+          alignItems={'center'}
+          display={'flex'}>
+          <IconButton color="primary" onClick={handleOpenHelp}>
+            <HelpOutlineOutlined sx={{ 
+            width:27,
+            height:27
+           }}/>
+          </IconButton>
+         {!CustomDeviceSmallest() &&  <Typography variant="caption" >Help</Typography>}
+          </Stack>
+
+          {/* insights */}
+           <Stack
+           justifyContent={'center'}
+           alignItems={'center'}
+            display={'flex'}>
+          <IconButton color="success" onClick={handleOpenRecommend}>
+            <AutoAwesomeRounded sx={{ 
+            width:25,
+            height:25
+           }}/>
+          </IconButton>
+          {!CustomDeviceSmallest() && <Typography variant="caption">Insights</Typography> }
+          
+          </Stack>
+
+          {/* people suggestions */}
+           <Stack
+           justifyContent={'center'}
+           alignItems={'center'}
+            display={'flex'}>
+          <IconButton color="primary" onClick={handleShowPeopleSuggest}>
+            <PeopleRounded sx={{ 
+            width:25,
+            height:25
+           }}/>
+          </IconButton>
+          {!CustomDeviceSmallest() && <Typography variant="caption">People</Typography> }
+          
+          </Stack>
+
+          {/* premium */}
+           {/* <Stack 
+           justifyContent={'center'}
+           alignItems={'center'}
+            display={'flex'}>
+          <IconButton color="secondary" onClick={handleOpenPremium}>
+            <DiamondRounded sx={{ 
+            width:25,
+            height:25
+           }}/>
+          </IconButton>
+   { !CustomDeviceSmallest() &&  <Typography variant="caption">Premium</Typography>}
+          </Stack> */}
+          
+
+          {/* mobile app */}
+           <Stack 
+           justifyContent={'center'}
+           alignItems={'center'}
+            display={'flex'}>
+          <IconButton color="success" onClick={handleMobileApp}>
+            <SmartphoneRounded sx={{ 
+            width:25,
+            height:25
+          }}/>
+          </IconButton>
+       { !CustomDeviceSmallest() &&  <Typography variant="caption">App</Typography>}
+          </Stack>
+
+          </Box>
+          </Box>
+          </Box>
+          
             {/* display the overview posts on tablets(portrait) and mobiles only */}
             {!isFetching && (
               <React.Fragment>
@@ -207,7 +362,7 @@ const FeedDefaultContent = () => {
                         errorMessage={errorMessage}
                         setErrorMessage={setErrorMessage}
                       />
-                     
+                    
                     </Stack>
                   </Box>
                 );
@@ -216,7 +371,31 @@ const FeedDefaultContent = () => {
         </Box>
       )}
 
-    
+      {/* show modal people connect feed */}
+      {showPeople && (
+        <PeopleModal 
+        openPeopleModal={showPeople} 
+        PeopleConnect={connectTop}
+        isFeed={true}
+        setOpenPeopleModal={handleShowPeopleSuggest}
+
+        />
+      )}
+
+      {/* show alert for help,recommend,analytics */}
+      {(isHelp || isRecommend || isPremium||isApp) && (
+        <AlertForYou 
+        defaultIcon={isHelp? <HelpOutlineOutlined color="info"/> :isRecommend ? <AutoAwesomeRounded color='success'/>:isPremium ?<DiamondRounded color="secondary"/>:<SmartphoneRounded color="success"/>}
+        openAlertGeneral={isHelp||isRecommend||isPremium||isApp}
+        title={title}
+        message={messageBody}
+        isPremium={isPremium}
+        isHelp={isHelp}
+        isRecommend={isRecommend}
+        isApp={isApp}
+        handleCloseAll={handleCloseAll}
+        />    
+        )}
 
     </Box>
   );

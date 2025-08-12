@@ -1,18 +1,24 @@
 import {
+  AddAPhotoRounded,
+  ArrowBackIos,
+  CheckCircleRounded,
   Close,
   CloudUploadRounded,
   Done,
   ErrorRounded,
+  HomeRounded,
+  KeyRounded,
+  RefreshRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
   Box,
   CircularProgress,
-  Divider,
+  FormHelperText,
   IconButton,
   styled,
   TextField,
-  Typography,
+  Typography
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -76,6 +82,7 @@ export default function AlertProfileCompletion({
 
   //   handle click agree
   const handleClickAgree = () => {
+    setError("")
     setErrorPosting("");
     setShowInput(true);
   };
@@ -142,7 +149,7 @@ export default function AlertProfileCompletion({
       })
       .catch((error) => {
         if (error?.code === "ERR_NETWORK") {
-          setErrorPosting("Server is unreacheable, kindly try again later ");
+          setErrorPosting("Server is unreachable, kindly try again later ");
           return;
         }
 
@@ -174,7 +181,7 @@ export default function AlertProfileCompletion({
     const formData = new FormData();
     formData.append("user", JSON.stringify(user));
 
-    // post to the backend using axios for tokenized user using google providr
+    // post to the backend using axios for tokenized user using google provider
     axios
       .post(
         token
@@ -183,14 +190,14 @@ export default function AlertProfileCompletion({
         formData
       )
       .then((res) => {
-        // set success messge
+        // set success message
         setSuccessMsg(res?.data?.message);
         // clear error msg
         setErrorPosting("");
       })
       .catch((error) => {
         if (error?.code === "ERR_NETWORK") {
-          setErrorPosting("server is unreacheable, kindly try again later ");
+          setErrorPosting("server is unreachable, kindly try again later ");
           return;
         }
 
@@ -252,30 +259,52 @@ export default function AlertProfileCompletion({
                       color="warning"
                       sx={{ width: 30, height: 30 }}
                     />
-                    Error
+                     <Typography>
+                     Error
+                    </Typography>
                   </React.Fragment>
                 ) : successMsg ? (
                   <React.Fragment>
-                    <Avatar alt="" src={logo} />
+                    <Avatar alt="" src={avatarPath ? avatarPath:logo} />
+                    <Typography>
                     Signup Successful
+                    </Typography>
                   </React.Fragment>
                 ) : (
                   <React.Fragment>
                     <Avatar alt="" src={avatarPath} />
-                    About + Avatar?
+                    <Typography >
+                      {showInputs ? "My Avatar" :"About Me"} 
+                    </Typography>
                   </React.Fragment>
                 )}
               </Box>
               {/* close btn */}
               {!successMsg && (
-                <IconButton onClick={handleClose}>
-                  <Close sx={{ width: 20, height: 20 }} />
+                <IconButton
+                sx={{ 
+                  border:'1px solid',
+                  borderColor:'divider'
+                 }} 
+                onClick={handleClose}>
+                  <Close sx={{ width: 15, height: 15 }} />
                 </IconButton>
               )}
             </DialogTitle>
+            {/* helper text */}
+           
+           {!error && !errorPosting && (
+             <Box 
+            alignItems={'center'}
+            justifyContent={'center'}
+            display={'flex'}>
+           <FormHelperText className="text-info">
+            verification code will be sent to your email
+            </FormHelperText>
+            </Box>
+           )}
 
-            <Divider component={"div"} />
-            <DialogContent>
+            <DialogContent dividers>
               {showInputs ? (
                 <React.Fragment>
                   {errorPosting ? (
@@ -290,7 +319,7 @@ export default function AlertProfileCompletion({
                         gutterBottom
                         id="alert-dialog-slide-description"
                       >
-                        Choose your favourite avatar icon from your device storage, it should not exceed the threshold size of
+                        Choose your favorite avatar icon from your local storage, file should not exceed the threshold size of
                         5MB
                       </DialogContentText>{" "}
                       {/* Display error message if file exceeds 2MB */}
@@ -382,7 +411,7 @@ export default function AlertProfileCompletion({
                         gutterBottom
                         id="alert-dialog-slide-description-about"
                       >
-                        Briefly tell us more about yourself to facilitate
+                        Tell us briefly about yourself to facilitate
                         articulation of your technical experience or aspirations to
                         the fellow tech enthusiasts.
                       </DialogContentText>
@@ -400,7 +429,7 @@ export default function AlertProfileCompletion({
                           value={about}
                           focused
                           label={`About ${MAX_ABOUT - about.length}`}
-                          placeholder="passionate software engineer....."
+                          placeholder="write here....."
                           onChange={(e) => setAbout(e.target.value)}
                           fullWidth
                           multiline
@@ -411,9 +440,7 @@ export default function AlertProfileCompletion({
                         gutterBottom
                         id="alert-dialog-slide-description"
                       >
-                        Suppose you are Interested in updating 
-                        profile picture then click update to upload your custom
-                        picture or avatar.
+                        Provide your preferred avatar or image for your profile by clicking on the avatar button. (optional but recommended)
                       </DialogContentText>
                     </React.Fragment>
                   )}
@@ -424,8 +451,15 @@ export default function AlertProfileCompletion({
               {!showInputs ? (
                 <>
                   {errorPosting ? (
-                    <React.Fragment>
+                    <Box 
+                    display={'flex'}
+                    alignItems={'center'}
+                    gap={5}
+                    >
                       <Button
+                      startIcon={<HomeRounded/>}
+                      size="small"
+                      variant="outlined"
                         sx={{
                           textTransform: "capitalize",
                           borderRadius: "20px",
@@ -436,6 +470,9 @@ export default function AlertProfileCompletion({
                       </Button>
 
                       <Button
+                      size="small"
+                      variant="outlined"
+                      startIcon={<RefreshRounded/>}
                         sx={{
                           textTransform: "capitalize",
                           borderRadius: "20px",
@@ -444,11 +481,13 @@ export default function AlertProfileCompletion({
                       >
                         Retry
                       </Button>
-                    </React.Fragment>
+                    </Box>
                   ) : successMsg ? (
                     <Button
-                      color="success"
-                      variant="outlined"
+                    size="small"
+                    color="success"
+                    variant="outlined"
+                    startIcon={<KeyRounded/>}
                       sx={{
                         textTransform: "capitalize",
                         borderRadius: "20px",
@@ -458,9 +497,35 @@ export default function AlertProfileCompletion({
                       Login
                     </Button>
                   ) : (
-                    <React.Fragment>
+                    <Box 
+                    width={'100%'}
+                    py={1}
+                    justifyContent={'space-around'}
+                    alignItems={'center'}
+                    display={'flex'}>
+                     {/* avatar btn */}
                       <Button
+                        variant="outlined"
+                        disableElevation
                         disabled={!about}
+                        startIcon={<AddAPhotoRounded/>}
+                        size="small"
+                        sx={{
+                          textTransform: "capitalize",
+                          borderRadius: "20px",
+                        }}
+                        onClick={handleClickAgree}
+                      >
+                        Avatar
+                      </Button>
+
+                      {/* later button */}
+                       <Button
+                        disabled={!about}
+                        disableElevation
+                        size="small"
+                        variant="contained"
+                        startIcon={<CheckCircleRounded/>}
                         sx={{
                           textTransform: "capitalize",
                           borderRadius: "20px",
@@ -469,27 +534,21 @@ export default function AlertProfileCompletion({
                       >
                         Later
                       </Button>
-                      <Button
-                        variant="outlined"
-                        disabled={!about}
-                        size="small"
-                        sx={{
-                          textTransform: "capitalize",
-                          borderRadius: "20px",
-                          ml: 2,
-                        }}
-                        onClick={handleClickAgree}
-                      >
-                        Update
-                      </Button>
-                    </React.Fragment>
+                    </Box>
                   )}
                 </>
               ) : (
                 <>
                   {errorPosting ? (
-                    <React.Fragment>
+                    <Box
+                    gap={5}
+                    alignItems={'center'}
+                    display={'flex'}>
                       <Button
+                      disableElevation
+                       size="small"
+                       variant="outlined"
+                       startIcon={<HomeRounded/>}
                         sx={{
                           textTransform: "capitalize",
                           borderRadius: "20px",
@@ -500,6 +559,10 @@ export default function AlertProfileCompletion({
                       </Button>
 
                       <Button
+                      disableElevation
+                      variant="outlined"
+                      size="small"
+                      startIcon={<RefreshRounded/>}
                         sx={{
                           textTransform: "capitalize",
                           borderRadius: "20px",
@@ -508,10 +571,14 @@ export default function AlertProfileCompletion({
                       >
                         Retry
                       </Button>
-                    </React.Fragment>
+                    </Box>
                   ) : successMsg ? (
                     <Button
-                      color="success"
+                    size="small"
+                    variant="outlined"
+                    disableElevation
+                    color="success"
+                    startIcon={<KeyRounded/>}
                       sx={{
                         textTransform: "capitalize",
                         borderRadius: "20px",
@@ -521,8 +588,14 @@ export default function AlertProfileCompletion({
                       Login
                     </Button>
                   ) : (
-                    <React.Fragment>
+                    <Box 
+                    display='flex'
+                    disableElevation
+                    gap={5} 
+                    alignItems={'center'}>
                       <Button
+                      size="small"
+                      startIcon={<ArrowBackIos/>}
                         sx={{
                           textTransform: "capitalize",
                           borderRadius: "20px",
@@ -531,7 +604,12 @@ export default function AlertProfileCompletion({
                       >
                         Back
                       </Button>
+
                       <Button
+                      disableElevation
+                      size="small"
+                      variant="contained"
+                      startIcon={<CheckCircleRounded/>}
                         sx={{
                           textTransform: "capitalize",
                           borderRadius: "20px",
@@ -541,7 +619,7 @@ export default function AlertProfileCompletion({
                       >
                         Complete
                       </Button>
-                    </React.Fragment>
+                      </Box>
                   )}
                 </>
               )}

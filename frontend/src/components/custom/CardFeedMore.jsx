@@ -1,14 +1,14 @@
 import {
   EmailOutlined,
   FlagRounded,
+  LinkRounded,
   PersonAddRounded,
   PersonRemoveRounded,
-  ShareRounded,
   StarRounded
 } from "@mui/icons-material";
 import { Box, Divider, ListItemText, MenuItem, Typography } from "@mui/material";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import AlertInputMessage from "../alerts/AlertInputMessage";
@@ -26,6 +26,11 @@ function CardFeedMore({
   const [isFriend, setIsFriend] = useState();
   const [isFetching, setIsFetching] = useState(false);
   const [openAlertMessage,setOpenAlertMessage]=useState(false)
+  const [isCopiedStatus, setIsCopiedStatus] = useState(false);
+  const textToCopy=`${window.location.href}posts/details/${post?._id}`;
+
+  
+
 
   // redux states
   const dispatch = useDispatch();
@@ -142,6 +147,7 @@ function CardFeedMore({
       });
   };
 
+
   // handle show of report post alert
   const handleShowReportAlert = () => {
     // activate the parent state controlling alert report
@@ -190,11 +196,19 @@ function CardFeedMore({
         // handle closing of the more option
         handleCloseMenu();
       });
-
   }
-  // handle sharing of the post
-  const handleSharePost=()=>{
 
+  // handle sharing of the post
+  const handleSharePost=async()=>{
+      try {
+      await navigator.clipboard.writeText(textToCopy);
+      setIsCopiedStatus(true);
+      setTimeout(() => {
+      setIsCopiedStatus(false)
+      }, 2000); 
+    } catch (err) {
+      console.error('Failed to Copy: ', err);
+    }
   }
 
   return (
@@ -251,15 +265,18 @@ function CardFeedMore({
             {/* share post */}
              <Divider component={"li"} />
             <MenuItem onClick={handleSharePost} disabled={isFetching}>
-              <ListItemText>
-                <ShareRounded 
-                sx={{ width:22,height:22 }}
-                color="secondary" 
+              <ListItemText>              
+                 <LinkRounded 
+                sx={{ width:24,height:24 }}
+                color={isCopiedStatus ? "success":"secondary"} 
                 className="mx-2" />
+               
               </ListItemText>
               <ListItemText
                 sx={{ textTransform: "capitalize" }}
-                primary={<Typography variant={'body2'}>Share this Post</Typography>}
+                primary={<Typography variant={'body2'} >
+                  {isCopiedStatus ? "Link Copied":"Share this Post"}
+                </Typography>}
               />
             </MenuItem>
 
@@ -282,6 +299,7 @@ function CardFeedMore({
                targetId={ownerId} 
                targetName={ownerName}
                targetSpecialisation={post?.post_owner?.ownertitle}
+               targetAvatar={post?.post_owner?.owneravatar}
                />
             )}
       </Box>

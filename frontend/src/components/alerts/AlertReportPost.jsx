@@ -139,9 +139,9 @@ export default function AlertReportPost({
     if (CustomDeviceTablet() && isTabSideBar) {
       return "36%"
     } else if(CustomLandScape()){
-      return "-8%"
+      return "-1%"
     } else if(CustomLandscapeWidest()){
-      return "-5%"
+      return "0%"
     }
   }
 

@@ -154,15 +154,21 @@ function NewConversation({ handleFabClicked }) {
     <Box width={"100%"}>
       <Box display={"flex"} alignItems={"center"}>
         {/* icon button */}
-        <Box ml={3}>
-          <IconButton onClick={handleFabClicked}>
-            <Close sx={{ width: 17, height: 17 }} />
+        <Box ml={3} p={1}>
+          <IconButton 
+          sx={{ border:'1px solid', borderColor:'divider' }}
+          onClick={handleFabClicked}>
+            <Close sx={{ width: 15, height: 15 }} />
           </IconButton>
         </Box>
         {/* info */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+        <Box 
+        mr={5}
+        display={"flex"} 
+        justifyContent={"center"} 
+        width={"100%"}>
           <Typography variant="caption" textAlign={"center"}>
-            New Conversation
+            Compose New Conversation
           </Typography>
         </Box>
       </Box>
@@ -189,16 +195,18 @@ function NewConversation({ handleFabClicked }) {
         {/* user search entry */}
         <Box p={2}>
           <TextField
-            label="search users"
+            label="search user"
             fullWidth
+            variant="filled"
             value={searchTerm}
             disabled={isUploading}
             className="ms-3"
             onChange={handleSearch}
             autoComplete="off"
-            style={{ marginBottom: "1rem", width: "85%" }}
+            style={{ 
+            marginBottom: "1rem",
+            width: "90%" }}
           />
-
           {isFetching ? (
             <CircularProgress size={18} />
           ) : (
@@ -236,8 +244,11 @@ function NewConversation({ handleFabClicked }) {
                       }}
                     >
                       {suggestions.map((availableuser) => (
+                        <Box
+                         key={availableuser._id}
+                         >
                         <MenuItem
-                          key={availableuser._id}
+                          disabled={availableuser._id === user._id}
                           onClick={() => {
                             // extract the name of the currently selected user
                             setSearchTerm(`${availableuser?.name}`);
@@ -245,15 +256,7 @@ function NewConversation({ handleFabClicked }) {
                             // update the value of user being searched
                             if (availableuser._id !== user._id) {
                               setUserSearched(availableuser);
-                            } else {
-                              // clear search term
-                              setSearchTerm("");
-                              // clear user
-                              setUserSearched();
-                              // alert the user
-                              alert("you can't send message to yourself!");
-                            }
-
+                            } 
                             // set show message area since user wants to write message
                             setShowMessageArea((prev) => !prev);
                           }}
@@ -293,6 +296,9 @@ function NewConversation({ handleFabClicked }) {
                             />
                           </ListItem>
                         </MenuItem>
+                        {/* divider */}
+                        <Divider component='div' variant="middle"/>
+                        </Box>
                       ))}
                       {/* close or hide dropdown panel */}
                       {suggestions && suggestions.length > 0 && (

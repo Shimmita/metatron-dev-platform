@@ -1,19 +1,25 @@
-import { Close } from "@mui/icons-material";
+import { Add, Close, PeopleRounded } from "@mui/icons-material";
 import {
   Avatar,
   Box,
-  Divider,
+  Button,
+  CircularProgress,
   IconButton,
   Modal,
   Stack,
   styled,
+  Tab,
+  Tabs,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
-import React from "react";
+import axios from "axios";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
+import { updateCurrentConnectTop } from "../../redux/CurrentConnect";
 import { resetClearPeopleData } from "../../redux/CurrentModal";
+import UserNetwork from "../profile/UserNetwork";
 import FriendRequest from "../rightbar/layouts/FriendRequest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
@@ -28,22 +34,46 @@ const StyledModalPeople = styled(Modal)({
   margin: "5px",
 });
 
-const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
+const PeopleModal = ({
+  openPeopleModal, 
+  PeopleConnect, 
+  isFeed=false,
+  setOpenPeopleModal,
+ }) => {
+  
+  const [isFetching, setIsFetching] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [hasMorePosts,setHasMorePosts]=useState(true) 
+  const [pageNumber,setPageNumber]=useState(2)
+  const [value, setValue] = useState(0);
+
+  const handleChangeTab = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  
+
   // redux states
   const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
   const isDarkMode=currentMode==='dark'
+  const { user } = useSelector((state) => state.currentUser);
+  
 
   const dispatch = useDispatch();
 
   // close the modal from redux by altering states to false and null data
   const handleCloseModalPeople = () => {
+    // modal opened from the feed default content
+    if (isFeed) {
+      setOpenPeopleModal()
+    }
     dispatch(resetClearPeopleData());
   };
 
 
    // handle return width modal
     const handleReturnWidthModal=()=>{
-      if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+      if (CustomLandScape() || CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
         return "35%"
       } else if (CustomDeviceTablet()){
         return "90%"
@@ -52,21 +82,71 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
     }
 
   // handle width of the global search
-        const handleModalWidth=()=>{
-          if (CustomDeviceTablet() && isTabSideBar) {
-            return "36%"
-          } else if(CustomLandScape()){
-            return "-8%"
-          } else if(CustomLandscapeWidest()){
-            return "-5%"
-          }
-        }
+    const handleModalWidth=()=>{
+      if (CustomDeviceTablet() && isTabSideBar) {
+        return "36%"
+      } else if(CustomLandScape()){
+        return "-1%"
+      } else if(CustomLandscapeWidest()){
+        return "0%"
+      }
+    }
     
+     // handle loading of more data
+  const handleLoadMore=()=>{
+
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing get request
+    axios.get(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/users/${user?._id}?page=${pageNumber}&limit=4`,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        // update the redux of connect request suggestion
+        if (res.data.length>0) {
+          dispatch(updateCurrentConnectTop([...PeopleConnect, ...res.data]));
+        }else{
+          // no more posts
+          setHasMorePosts(false)
+        }
+        // update the page number
+        setPageNumber(prev=>prev+1)
+
+      })
+      .catch(async (err) => {
+
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage(
+            "server is unreachable check your internet connection"
+          );
+          return;
+        }
+        setErrorMessage(err?.response.data);
+        
+        // log error
+        console.log(errorMessage)
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+      }
+
+  // control showing of friends
+  const handleShowFriends=()=>{
+
+
+  }
+
   return (
     <StyledModalPeople
       keepMounted
       sx={{
-        marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
+        marginLeft:handleModalWidth()
       }}
       open={openPeopleModal}
       onClose={handleCloseModalPeople}
@@ -78,8 +158,10 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
         bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         display={"flex"}
-        className="rounded-1 border"
+        className="rounded-3"
         justifyContent={"center"}
+        border={isDarkMode &&'1px solid'}
+        borderColor={'divider'}
         alignItems={"center"}
         sx={{
           marginLeft:handleModalWidth() ,
@@ -88,7 +170,6 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
         <Box
           width={"100%"}
           bgcolor={"background.default"}
-          className="shadow-lg rounded-1"
         >
           {/* toolbar  */}
           <Box
@@ -111,26 +192,42 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
               </Box>
 
               <Typography
-                variant="body1"
+                variant="body2"
                 fontWeight={"bold"}
-                textTransform={"capitalize"}
+                textTransform={"uppercase"}
               >
-                Search Suggestion
+                {isFeed ? "People Suggestions":"Search Suggestion"}
               </Typography>
             </Stack>
 
-            <Box>
+            <Box mr={3}>
               {/*close icon */}
-              <IconButton onClick={handleCloseModalPeople}>
-                <Tooltip title={"close"}>
-                  <Close sx={{ width: 20, height: 20 }} />
-                </Tooltip>{" "}
+                <Tooltip 
+                title={"close"}>
+              <IconButton 
+              sx={{ 
+                  border:'1px solid',
+                  borderColor:'divider'
+                 }}
+              onClick={handleCloseModalPeople}>
+              
+                  <Close sx={{ width: 10, height: 10 }} />
               </IconButton>
+                </Tooltip>
             </Box>
           </Box>
 
-          {/* divider */}
-          <Divider component={"div"} className="p-2" />
+          {/* Tabs centered */}
+          {isFeed && (
+            <Box display={'flex'} justifyContent={'center'}>
+            <Box >
+            <Tabs  value={value} onChange={handleChangeTab} aria-label="people_tab">
+              <Tab label="Connect" className="me-4" icon={<Add />} iconPosition="start"/>
+              <Tab label="Friends" onClick={handleShowFriends} icon={<PeopleRounded/>} iconPosition="start" />
+            </Tabs>
+          </Box>
+          </Box>
+          )}
 
           <Box
             maxHeight={CustomModalHeight()}
@@ -146,10 +243,34 @@ const PeopleModal = ({ openPeopleModal, PeopleConnect }) => {
               scrollbarWidth: "none",
             }}
           >
-            <Box display={"flex"} flexDirection={"column"} >
+            <Box 
+            display={"flex"} 
+            flexDirection={"column"} 
+            justifyContent={'center'}
+            >
+
+            {/* display friends */}
+            {value===1 ? (
+              <UserNetwork/>
+            ):(
+              <>
+              {/* map over the peoples */}
               {PeopleConnect?.map((person) => (
                   <FriendRequest key={person?._id} connect_request={person} />
                 ))}
+              
+              {/* if last item show see more button */}
+              {isFeed && (
+                <Button 
+                startIcon={isFetching?<CircularProgress size={16}/> :undefined}
+                disabled={isFetching || !hasMorePosts} 
+                onClick={handleLoadMore}>
+                {!hasMorePosts ? "no more":"see more"}
+                </Button>
+              )}
+              </>
+            )}
+              
             </Box>
           </Box>
         </Box>

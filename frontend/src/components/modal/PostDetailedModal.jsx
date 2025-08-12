@@ -171,9 +171,9 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
         if (CustomDeviceTablet() && isTabSideBar) {
           return "36%"
         } else if(CustomLandScape()){
-          return "-8%"
+          return "-1%"
         } else if(CustomLandscapeWidest()){
-          return "-5%"
+          return "0%"
         }
       }
 
@@ -188,7 +188,7 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
         <Box
           width={CustomDeviceIsSmall() ? "100%":CustomDeviceTablet()?"80%":"40%"}
           p={1}
-          borderRadius={4}
+          borderRadius={3}
           bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
           color={"text.primary"}
           sx={{
@@ -197,7 +197,7 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
           }}
         >
           <Box
-           maxHeight={"80vh"}
+           maxHeight={"78vh"}
            sx={{
              overflow: "auto",
              // Hide scrollbar for Chrome, Safari and Opera

@@ -9,7 +9,7 @@ const CurrentConnect = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadate the connect by the feed from the payload
+    // update the connect by the feed from the payload
     updateCurrentConnectTop: (state, action) => {
       state.connectTop = action.payload;
     },

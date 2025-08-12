@@ -145,9 +145,9 @@ export default function AlertGlobalSearch({
     if (CustomDeviceTablet() && isTabSideBar) {
       return "36%"
     } else if(CustomLandScape()){
-      return "-8%"
+      return "-1%"
     } else if(CustomLandscapeWidest()){
-      return "-5%"
+      return "0%"
     }
   }
    
@@ -209,7 +209,7 @@ export default function AlertGlobalSearch({
 
               <Box
                 width={100}
-                className={"shadow rounded p-2"}
+                className={"shadow rounded p-3"}
                 sx={{
                   border: "1px solid",
                   borderColor: "divider",

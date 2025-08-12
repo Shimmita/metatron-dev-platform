@@ -140,7 +140,7 @@ const Sidebar = () => {
   
   const correctWidthInPercentage = () => {
     if (screenWidth > 1200 && screenWidth <= 1400) {
-      return "24%";
+      return "25%";
     }
   };
 
@@ -151,8 +151,6 @@ const Sidebar = () => {
       return "8%";
     }
   };
-
-
   
   return (
     <Box
@@ -192,7 +190,7 @@ const Sidebar = () => {
       {/* section profile and insights */}
         <Box
         bgcolor={"background.default"} 
-        className=" rounded-4"
+        className=" rounded-2"
         sx={{ 
           border:isDarkMode && "1px solid",
           borderColor:"divider",
@@ -329,13 +327,18 @@ const Sidebar = () => {
                       </Box>
 
                      {/* divider */}
-                      <Root className="my-1 px-3">
-                      <Divider>
-                      <Box display={'flex'} justifyContent={'center'}>
+                      <Root className="my-2 px-3">
+                      <Divider variant="middle" className="px-3">
+                      <Box 
+                      display={'flex'} 
+                      justifyContent={'center'}>
                       <Typography 
-                      color={'text.primary'}
+                      fontWeight={'bold'}
+                      color={'primary'}
                       variant="caption"
-                       >Top Insights</Typography>
+                       >
+                       Top Insights
+                       </Typography>
                       </Box>
                       </Divider>
                       </Root>
@@ -349,68 +352,67 @@ const Sidebar = () => {
                       errorMessage={errorMessage}
                       isFetching={isFetching}
                       dataInsights={dataInsights}/>}
+                    </Box>
 
-                      {/* <SkillAvatars user={user} isDarkMode={isDarkMode} /> */}
+                  {/* section more insights */}
+                  <Box
+                  mt={0.5}
+                  p={0.1}
+                  >
+                  <Root className="mt-1">
+                    <Divider>
+                    <Box display={'flex'} justifyContent={'center'}>
+                    <Typography 
+                    fontWeight={'bold'}
+                    color={'primary'}
+                    variant="caption"
+                    >
+                    Top Tools
+                    </Typography>
+                    </Box>
+                    </Divider>
+                  </Root>
+                  
+                  {/* Tools */}
+                  <Box
+                  alignItems={'center'}
+                  gap={2}
+                  mt={0.5}
+                  justifyContent={'center'}
+                  display={'flex'}>
+                {dataTools.map(tool=>(
+                  <Box 
+                  key={tool.title}
+                  justifyContent={'center'}
+                  flexDirection={'column'}
+                  display={'flex'}>
+                  {/* avatar */}
+                  <Avatar 
+                  sx={{ width:28,height:28}}
+                  src={getImageMatch(tool.title)}
+                  />
+
+                  {/* title */}
+                  <Box 
+                  pb={0.2}
+                   display={'flex'}
+                   justifyContent={'center'}>
+                    <FormHelperText 
+                    className={isDarkMode && 'text-info'}
+                    sx={{ fontSize:'x-small' }}>{tool.title?.substring(0,10)}</FormHelperText>
                     </Box>
                   </Box>
+                ))}
+                  </Box>
+                  </Box>
+
                 </Box>
-              </BoxAvatarContent>
+              </Box>
+        </BoxAvatarContent>
             )}
           </Box>
         </Box>
 
-        {/* section more insights */}
-        <Box
-        mt={1.2}
-        py={0.1}
-        bgcolor={"background.default"}
-        className=" rounded-4"
-        sx={{ 
-          border:isDarkMode && "1px solid",
-          borderColor:"divider",
-      
-         }}
-        >
-         <Root className="px-3 mt-1">
-          <Divider>
-          <Box display={'flex'} justifyContent={'center'}>
-          <Typography 
-          color={'text.primary'}
-          variant="caption"
-          >Top Tools</Typography>
-          </Box>
-          </Divider>
-        </Root>
-        
-        {/* Tools */}
-        <Box
-        alignItems={'center'}
-        gap={2}
-        mt={0.5}
-        justifyContent={'center'}
-        display={'flex'}>
-       {dataTools.map(tool=>(
-        <Box 
-        justifyContent={'center'}
-        flexDirection={'column'}
-        display={'flex'}>
-        {/* avatar */}
-        <Avatar 
-        sx={{ width:28,height:28}}
-        src={getImageMatch(tool.title)}
-
-        />
-
-        {/* title */}
-         <Box display={'flex'} justifyContent={'center'}>
-          <FormHelperText 
-          className={isDarkMode && 'text-info'}
-          sx={{ fontSize:'x-small' }}>{tool.title?.substring(0,10)}</FormHelperText>
-          </Box>
-        </Box>
-       ))}
-        </Box>
-        </Box>
       </Box>
 
       {/* alert General for mobile app under development */}

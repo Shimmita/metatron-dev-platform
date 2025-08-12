@@ -64,7 +64,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
    // To hold user input text for req
     const [reqText, setReqText] = useState("");
      // To hold checked requirements as chips
-    const [topicsRequirement, setRequirementsQual] = useState([]);
+    const [topicsRequirement, setTopicsRequirement] = useState([]);
     // Available options to display in the Autocomplete dropdown
     const options_req = []; 
 
@@ -138,18 +138,26 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
     setReqText(value);
   };
 
-  // Handle adding req
+  // Handle adding req max 4 total
   const handleAddTopicRequirement = () => {
+   
     if (reqText.trim() !== "" || !reqText.trim().length>MAX_TOPIC_LENGTH) {
-      // Add the inputText as a new requirement if it's not empty
-      setRequirementsQual((prev) => [...prev, reqText.trim()]);
+      if (topicsRequirement.length<=3) {
+          // Add the inputText as a new requirement if it's not empty
+      setTopicsRequirement((prev) => [...prev, reqText.trim()]);
       setReqText(""); // Clear the input field
+      }
+      else{
+        // topics should not exceed 4 in length
+        setErrorMessage("4 main topics max")
+      }
+    
     }
   };
 
   // Handle req removal
   const handleDeleteReq = (req) => {
-    setRequirementsQual((prev) => prev.filter((val) => val !== req));
+    setTopicsRequirement((prev) => prev.filter((val) => val !== req));
   };
 
   // handle core missing fields
@@ -175,10 +183,12 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
     }
  
 
-    if (topicsRequirement?.length < 1) {
-      setErrorMessage("provide at least one topic");
+    if (topicsRequirement?.length <=3) {
+      setErrorMessage("provide 4 main topics");
       return false;
     }
+
+    
 
     return true;
   };
@@ -268,7 +278,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
       } else if (CustomDeviceTablet()){
         return "90%"
       } 
-      return "100%"
+      return "95%"
     }
 
     // handle width of the modal, margin
@@ -276,9 +286,9 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
         if (CustomDeviceTablet() && isTabSideBar) {
           return "36%"
         } else if(CustomLandScape()){
-          return "-8%"
+          return "-1%"
         } else if(CustomLandscapeWidest()){
-          return "-5%"
+          return "0%"
         }
       }
 
@@ -296,25 +306,30 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
     >
       <Box
         width={handleReturnWidthModal()}
-        p={1}
-        borderRadius={5}
+        borderRadius={3}
         bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
-          border: isDarkMode && "1px solid gray",
+           border:  "1px solid gray",
+          borderColor:'divider',
           marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
         }}
       >
         <Box
           bgcolor={"background.default"}
-          borderRadius={5}
+          borderRadius={3}
           className="shadow-lg"
+          sx={{ 
+          border:  "1px solid gray",
+          borderColor:'divider',
+           }}
         >
           {/* toolbar like box */}
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
+            mr={1.5}
           >
             {/* logo */}
             <Box>
@@ -335,9 +350,17 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
             <IconButton
               onClick={handleClosingEventPostModal}
               disabled={isUploading || errorMessage}
+              sx={{
+                border:'1px solid',
+                borderColor:'divider',
+              }}
             >
               <Tooltip title={"close"}>
-                <Close />
+                <Close 
+                sx={{ 
+                  width:12,
+                  height:12,
+                 }}/>
               </Tooltip>
             </IconButton>
           </Box>

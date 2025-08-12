@@ -24,13 +24,12 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
-import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import { getImageMatch } from "../utilities/getImageMatch";
 import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
+import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
+import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import { getImageMatch } from "../utilities/getImageMatch";
 
 // styled modal
 const StyledModalJob = styled(Modal)({
@@ -65,6 +64,7 @@ const ApplyJobModal = ({
   salary,
   skills,
   location,
+  isPreview=false,
   
 }) => {
   const [cvUpload, setCvUpload] = useState(null);
@@ -163,7 +163,7 @@ const ApplyJobModal = ({
     const countryCode = parent?.pop();
     const finalName = parent?.length > 2? `${parent[0]} ${parent[1]} ${countryCode}` : location?.country;
     
-    return finalName;
+    return finalName.split("(")[0];
   };
 
 
@@ -174,7 +174,7 @@ const ApplyJobModal = ({
     } else if (CustomDeviceTablet()){
       return "90%"
     } 
-    return "100%"
+    return "95%"
   }
 
    // handle width of the global search
@@ -182,9 +182,9 @@ const ApplyJobModal = ({
       if (CustomDeviceTablet() && isTabSideBar) {
         return "36%"
       } else if(CustomLandScape()){
-        return "-8%"
+        return "-1%"
       } else if(CustomLandscapeWidest()){
-        return "-5%"
+        return "0%"
       }
     }
 
@@ -201,25 +201,30 @@ const ApplyJobModal = ({
     >
       <Box
         width={handleReturnWidthModal()}
-        p={1}
-        borderRadius={5}
+        borderRadius={3}
         bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
-          border: isDarkMode && "1px solid gray",
+          border:  "1px solid gray",
+          borderColor:'divider',
           marginLeft: handleModalWidth(),
         }}
       >
         <Box
           bgcolor={"background.default"}
-          borderRadius={5}
+          borderRadius={3}
           className="shadow-lg pt-2"
+          sx={{ 
+          border:  "1px solid gray",
+          borderColor:'divider',
+           }}
         >
           {/* toolbar like box */}
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
+            mr={0.8}
           >
             {/* logo */}
             <Box>
@@ -259,7 +264,7 @@ const ApplyJobModal = ({
                 gutterBottom
                 color={"text.secondary"}
               >
-                {jobaccesstype?.type} | {jobaccesstype?.access} | {handleCountryName()} | {location.state}
+                {jobaccesstype?.type} | {jobaccesstype?.access} |  {location.state} | {handleCountryName()}
               </Typography>
 
             </Box>
@@ -268,9 +273,19 @@ const ApplyJobModal = ({
             <IconButton
               onClick={handleClosingModal}
               disabled={isUploading || errorMessage}
+               sx={{
+                border:'1px solid',
+                borderColor:'divider',
+              }}
             >
-              <Tooltip title={"close"}>
-                <Close  sx={{width:20, height:20}}/>
+              <Tooltip 
+              title={"close"}>
+                <Close  
+                sx={{ 
+                  width:12,
+                  height:12,
+                 }}
+                />
               </Tooltip>
             </IconButton>
           </Box>
@@ -317,7 +332,7 @@ const ApplyJobModal = ({
 
           <Box
             mt={2}
-            maxHeight={"65vh"}
+            maxHeight={"70vh"}
             className={"px-3"}
             sx={{
               overflow: "auto",
@@ -332,11 +347,10 @@ const ApplyJobModal = ({
           >
             <Stack gap={2}>
               {/* about org */}
-              <Stack mb={2}>
+              <Stack >
                 <Typography
-                  variant="body2"
+                 variant="caption"
                   fontWeight={"bold"}
-                  color={"text.secondary"}
                 >
                   {" "}
                   About Us
@@ -347,12 +361,14 @@ const ApplyJobModal = ({
                 </FormHelperText>
               </Stack>
 
+              {/* divider */}
+              <Divider component={'div'} className="p-1"/>
+
               {/* skills */}
               <Stack gap={1}>
                 <Typography
-                  variant="body2"
+                  variant="caption"
                   fontWeight={"bold"}
-                  color={"text.secondary"}
                 >
                   {" "}
                   Skills
@@ -369,6 +385,7 @@ const ApplyJobModal = ({
                     gutterBottom
                     color={"text.secondary"}
                   >
+                  {/* avatar */}
                     <Avatar
                       key={index}
                       alt={skill}
@@ -376,19 +393,21 @@ const ApplyJobModal = ({
                       sx={{ width: 30, height: 30 }}
                       src={getImageMatch(skill)}
                     />
+                    {/* text */}
                     <FormHelperText>{skill}</FormHelperText>
                   </Typography>
                 ))}
               </Stack>
 
+               {/* divider */}
+              <Divider component={'div'} className="p-1"/>
+
               {/* qualifications */}
               <Stack gap={1}>
                 <Typography
-                  variant="body2"
-                  textAlign={"center"}
+                  variant="caption"
                   gutterBottom
                   fontWeight={"bold"}
-                  color={"text.secondary"}
                 >
                   {" "}
                   Qualification
@@ -405,14 +424,15 @@ const ApplyJobModal = ({
                 ))}
               </Stack>
 
+               {/* divider */}
+              <Divider component={'div'} className="p-1"/>
+
               {/* Job Description */}
               <Stack gap={1}>
                 <Typography
-                  variant="body2"
-                  textAlign={"center"}
+                  variant="caption"
                   gutterBottom
                   fontWeight={"bold"}
-                  color={"text.secondary"}
                 >
                   {" "}
                   Job Description
@@ -428,13 +448,19 @@ const ApplyJobModal = ({
                 ))}
               </Stack>
 
-              {/* application section */}
+              {/* don't show action btns in preview mode */}
 
+              {!isPreview && (
+                <React.Fragment>
+                  {/* divider */}
+              <Divider component={'div'} className="p-1"/>
+
+              {/* application section */}
               <Stack gap={1} mb={2}>
                 {websiteLink === "" ? (
                   <React.Fragment>
                     {/* curriculum vitae application */}
-                    <Box mb={1} mt={2}>
+                    <Box mb={1} >
                    
                     <FormHelperText
                     className="mb-1 px-1"
@@ -534,6 +560,9 @@ const ApplyJobModal = ({
                   </React.Fragment>
                 )}
               </Stack>
+                </React.Fragment>
+              )}
+             
             </Stack>
           </Box>
         </Box>

@@ -36,6 +36,8 @@ import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import CustomLandScape from "../../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import SpecialisationTech from "../../data/SpecialisationTech";
+import CourseIcon from "../../utilities/CourseIcon";
 const LocationControl = lazy(() => import("../LocationControl"));
 const LogoutAlert = lazy(() => import("../../alerts/LogoutAlert"));
 
@@ -57,6 +59,7 @@ const jobTypeAccess = {
 
 const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCurrentJobs}) => {
   const [jobTitle, setJobTitle] = useState(job_updated?.title);
+  const [category, setCategory] = useState(job_updated?.category);
   const [organisationName, setOrganisationName] = useState(job_updated?.organisation?.name);
   const [county, setCounty] = useState(job_updated?.location?.state);
   const [jobType, setJobType] = useState({ type: job_updated?.jobtypeaccess?.type, access: job_updated?.jobtypeaccess?.access });
@@ -211,6 +214,11 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
       return false;
     }
 
+     if (category?.trim() === "") {
+      setErrorMessage("job specialization is missing");
+      return false;
+    }
+
     if (!jobType.type) {
       setErrorMessage("job type field is missing");
       return false;
@@ -272,12 +280,6 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
   };
 
 
-  // close freeLogo
-  const handleCloseFreeLogo = () => {
-    setFreeLogo("");
-    setIsFreeLogo(false);
-  };
-
  
   // close the modal
   const handleClosingJobPostModal=()=>{
@@ -287,6 +289,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
   // create job object
   const jobObject = {
     title: jobTitle,
+    category,
     organisation: {
       name: organisationName,
       about: posterAbout,
@@ -577,8 +580,45 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
                   required
                   id="poster_organisation"
                   label={"Organisation name"}
-                  placeholder="Intrasoft Solutions"
+                  placeholder="organisation name"
                 />
+              </Box>
+
+               {/* job specialization */}
+              <Typography variant="body2" color={"text.secondary"}>
+                Provide job specialisation in the Tech or IT Industry to facilitate categorization of the job posts.
+              </Typography>
+
+              <Box className="w-100 
+                mb-2 ">
+                <TextField
+                  required
+                  select
+                  disabled={isUploading}
+                  value={category}
+                  label="Specialisation"
+                  fullWidth
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  {SpecialisationTech?.filter((about) => about !== "None").map(
+                      (about) => (
+                        <MenuItem
+                          key={about}
+                          value={about}
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 2,
+                          }}
+                        >
+                          {/* icon */}
+                          <CourseIcon option={about} />
+                          {/* name */}
+                          <small style={{ fontSize: "small" }}>{about}</small>
+                        </MenuItem>
+                      )
+                    )}
+                </TextField>
               </Box>
 
               {/* job type */}

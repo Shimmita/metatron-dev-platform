@@ -72,7 +72,7 @@ function UserPostFavoriteContainer({
         setIsFetching(false);
       });
     
-  },[userId])
+  },[userId,pageNumber])
 
   // handle close alert delete
   const handleClose = () => {

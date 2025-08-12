@@ -10,11 +10,10 @@ import {
   styled
 } from "@mui/material";
 import axios from "axios";
-import React, { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleSetPostEditIdModal, handleShowPostEditModal } from "../../redux/AppUI";
 import PostDetailsFeed from "../post/PostDetailsFeed";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -100,7 +99,7 @@ const PostEditModal = () => {
       } else if (CustomDeviceTablet()){
         return "90%"
       } 
-      return "100%"
+      return "95%"
     }
 
    // handle width of the global search
@@ -108,9 +107,9 @@ const PostEditModal = () => {
       if (CustomDeviceTablet() && isTabSideBar) {
         return "36%"
       } else if(CustomLandScape()){
-        return "-8%"
+        return "-1%"
       } else if(CustomLandscapeWidest()){
-        return "-5%"
+        return "0%"
       }
     }
 
@@ -128,7 +127,7 @@ const PostEditModal = () => {
       <Box
         width={handleReturnWidthModal()}
         p={1}
-        borderRadius={4}
+        borderRadius={3}
         bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
@@ -137,7 +136,7 @@ const PostEditModal = () => {
         }}
       >
         <Box
-         maxHeight={"70vh"}
+         maxHeight={"75vh"}
          sx={{
            overflow: "auto",
            // Hide scrollbar for Chrome, Safari and Opera

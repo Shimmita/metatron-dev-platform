@@ -24,7 +24,7 @@ const RightbarAll = () => {
   const {currentMode, isSidebarRighbar } = useSelector(
     (state) => state.appUI
   );
-     const isDarkMode=currentMode==='dark'
+    const isDarkMode=currentMode==='dark'
 
 
   const handleNavigateJobs=()=>{
@@ -72,7 +72,7 @@ const RightbarAll = () => {
           borderColor:"divider",
          }}
         bgcolor={"background.default"} 
-        className="rounded-4">
+        className="rounded-2">
           <Box>
             {/*  top jobs */}
             <Stack gap={1}  display={corouselCounter === 0 ? "block" : "none"}>

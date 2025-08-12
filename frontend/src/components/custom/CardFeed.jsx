@@ -2,11 +2,11 @@ import {
   FavoriteRounded,
   ForumRounded,
   GitHub,
+  GradeOutlined,
   InfoRounded,
   MoreVertRounded,
-  RefreshOutlined,
-  VerifiedRounded,
-  WbIncandescentRounded
+  RefreshRounded,
+  VerifiedRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -32,7 +32,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch, useSelector } from "react-redux";
 import { handleUpdateIsPostDetailed } from "../../redux/AppUI";
-import { updateCurrentPostDetails, updateCurrentPosts } from "../../redux/CurrentPosts";
+import { resetClearCurrentPosts, updateCurrentPostDetails, updateCurrentPosts } from "../../redux/CurrentPosts";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertMiniProfileView from "../alerts/AlertMiniProfileView";
 import AlertReportPost from "../alerts/AlertReportPost";
@@ -43,6 +43,7 @@ import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
+import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
 import CardFeedMore from "./CardFeedMore";
@@ -112,7 +113,7 @@ const CardFeed = ({
   );
 
   // controls the length of description shown for each devices
-  const max_description = CustomDeviceIsSmall() || CustomLandScape() ?  233 : 260;
+  const max_description = CustomDeviceIsSmall() ?  125 : 250;
 
   const details = post?.post_body || "";
   const detailsLong = details.length > max_description;
@@ -286,6 +287,11 @@ const CardFeed = ({
 
   // handle fetching of more data when load more button clicked
   const handleFetchMoreData=()=>{
+    // if are no more posts, reset to page 1 and refresh content
+    if (!hasMorePosts) {
+      setPageNumber(1)
+      dispatch(resetClearCurrentPosts())
+    }
     // fetching to true
     setIsFetching(true)
     // axios api call to fetch more data
@@ -306,6 +312,7 @@ const CardFeed = ({
 
         // update the page number for the next fetch
         setPageNumber((prev)=>prev+1)
+        
       })
       .catch((err) => {
         //  user login session expired show logout alert
@@ -327,7 +334,6 @@ const CardFeed = ({
       });
   }
 
-
  
     // handle image width
     const handleImageWidth=()=>{
@@ -340,10 +346,24 @@ const CardFeed = ({
       } 
     }
 
+  
+      // handle max text width
+      const handleMaxTextWidth=()=>{
+        if (CustomLandscapeWidest()) {
+          return "90%"
+        }else if(CustomDeviceTablet()){
+          return "95%"
+        } else if(CustomLandScape()){
+          return "93%"
+        }
+    
+        return "98%"
+      }
+
   return (
     <React.Fragment>
       <Box
-      className={'rounded'}
+      className="rounded"
         mb={isLastIndex ? 10 :3}
         sx={{
           border:isDarkMode && "1px solid",
@@ -351,11 +371,12 @@ const CardFeed = ({
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
         }}
       >
-        <Card elevation={0}>
+        <Card elevation={0} className="rounded">
           <CardHeader
             sx={{ ml: 1, p: 0 }}
             avatar={
             <ListItemAvatar onClick={handleMiniProfileView}>
+            <Tooltip arrow title='profile'>
               <Avatar
                 src={post?.post_owner?.owneravatar}
                 variant="rounded"
@@ -367,6 +388,7 @@ const CardFeed = ({
                 alt={''}
               >
               </Avatar>
+              </Tooltip>
             </ListItemAvatar>
             }
             action={
@@ -421,7 +443,7 @@ const CardFeed = ({
 
                 {/* if post edited */}
                 {post?.post_edited && (
-                  <Box display={"flex"} justifyContent={"flex-end"} mr={2}>
+                  <Box display={"flex"} justifyContent={"flex-end"} mr={4}>
                     <Typography 
                     color={"text.secondary"} 
                     variant="caption"
@@ -463,8 +485,7 @@ const CardFeed = ({
                   display={"flex"}
                   alignItems={"center"}
                 >
-                  {CustomCountryName(post?.post_location.country)} |{" "}
-                  {post?.post_location.state}{" "}
+                {post?.post_location.state} | {CustomCountryName(post?.post_location.country)}{" "}
                 </Typography>
                 {/* skills */}
                 <Box display={"flex"} mt={0.5}>
@@ -509,7 +530,7 @@ const CardFeed = ({
                   alignItems={"center"}
                   gap={2}
                 >
-                  <WbIncandescentRounded
+                  <GradeOutlined
                     sx={{
                       width: 18,
                       height: 18,
@@ -521,7 +542,7 @@ const CardFeed = ({
                     {post?.post_title}
                   </Typography>
 
-                  <WbIncandescentRounded
+                  <GradeOutlined
                     sx={{
                       width: 18,
                       height: 18,
@@ -529,17 +550,17 @@ const CardFeed = ({
                     }}
                   />
                 </Box>
-       
               </Box>
+
               <CardActionArea
                 onClick={handleFullDescription}
                 disabled={!detailsLong}
               >
                 <Box display={"flex"} 
                 justifyContent={"center"}
-                 width={"100%"}
-                 flexDirection={'column'}
-                 >
+                width={"100%"}
+                flexDirection={'column'}
+                >
                   {/* times added to favorite */}
                   {post?.favorite_count>0 && 
                   <Box 
@@ -550,31 +571,29 @@ const CardFeed = ({
                   {post?.favorite_count} added this to their favorite
                   </FormHelperText>
                   </Box>}
+
                   {/* post details */}
-                  <Box 
-                  mt={1}
-                  width={'100%'}
-                  display={'flex'} 
-                  justifyContent={'center'}>
-                  <Typography
-                    variant={"body2"}
+                  <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+                    <Typography
                     color={isDarkMode && 'text.secondary'}
-                    sx={{ fontSize:'small',textWrap:'pretty' }}
-                  >
-                    {!isFullDescription && handleDetailsLength()}
-                    {detailsLong && !isFullDescription && (
-                      <Typography
-                        variant="body2"
-                        component={"span"}
-                        fontWeight={"bold"}
-                        color={"primary"}
-                        sx={{ fontSize:'small' }}
-                      >
-                        &nbsp;... 
-                      </Typography>
-                    )}
-                    {isFullDescription && details}
-                  </Typography>
+                    sx={{ fontSize:'small' }}
+                      variant={"body2"}
+                      maxWidth={handleMaxTextWidth()}
+                    >
+                      {!isFullDescription && handleDetailsLength()}
+                      {detailsLong && !isFullDescription && (
+                        <Typography
+                          variant="body2"
+                          component={"span"}
+                          fontWeight={"bold"}
+                          color={"primary"}
+                          sx={{ fontSize:'small' }}
+                        >
+                          &nbsp; more
+                        </Typography>
+                      )}
+                      {isFullDescription && details}
+                    </Typography>
                   </Box>
                 </Box>
               </CardActionArea>
@@ -704,13 +723,13 @@ const CardFeed = ({
            }}
           >
           <Button 
-          startIcon={isFetching ? <CircularProgress size={14}/>:<RefreshOutlined/>}
+          startIcon={isFetching ? <CircularProgress size={14}/>:<RefreshRounded/>}
           size="small"
           className="fw-bold"
           onClick={handleFetchMoreData}
           disabled={isFetching}
           >
-            Load More
+            {hasMorePosts ? "Load More":"Refresh Now"}
             </Button>
 
             {/* displayed when no more posts are available from the backend */}

@@ -1,12 +1,10 @@
 import { Box, CircularProgress } from "@mui/material";
 import axios from "axios";
-import React, { useLayoutEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useLayoutEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import PageNotFound from "../notfound/PageNotFound";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import PostRoutedFeed from "./PostRoutedFeed";
 
 function PostDetailsRouted() {
@@ -15,12 +13,17 @@ function PostDetailsRouted() {
   const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useDispatch();
 
+  const {currentMode} = useSelector((state) => state.appUI);
+
+    // updating the isDark mode 
+  const isDarkMode=currentMode==='dark'
+
   const [isError, setIsError] = useState();
   //   getting the id of the post route using useParams hook
   const { id: postId } = useParams();
   // axios default credentials
   axios.defaults.withCredentials = true;
-  // use layout effect to prefetch the data of the post before being renderd component
+  // use layout effect to prefetch the data of the post before being rendered component
   useLayoutEffect(() => {
     // close the showing of the speed dial
     dispatch(handleShowingSpeedDial(false));
@@ -38,7 +41,6 @@ function PostDetailsRouted() {
         setPostDetailedData(res.data);
       })
       .catch((err) => {
-        console.log(err);
         // set is error true for display page not found
         setIsError(true);
 
@@ -54,19 +56,12 @@ function PostDetailsRouted() {
   }, [postId, dispatch]);
 
   return (
-    <Box
-      height={CustomDeviceIsSmall() ? "91.7vh" : "91vh"}
-      color={"text.primary"}
-    >
+    <Box height={'88vh'}>
       <Box
-        height={"85vh"}
-        className={
-          CustomDeviceIsSmall() || CustomDeviceTablet()
-            ? "shadow rounded p-2"
-            : "rounded"
-        }
+        maxHeight={"80vh"}
+        className={'rounded'}
         sx={{
-          border: "1px solid",
+          border: isDarkMode && "1px solid",
           borderColor:"divider",
           overflowX: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
@@ -101,7 +96,7 @@ function PostDetailsRouted() {
           </Box>
         )}
       </Box>
-    </Box>
+      </Box>
   );
 }
 

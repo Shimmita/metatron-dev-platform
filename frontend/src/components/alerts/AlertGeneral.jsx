@@ -46,9 +46,9 @@ export default function AlertGeneral({
     if (CustomDeviceTablet() && isTabSideBar) {
       return "36%"
     } else if(CustomLandScape()){
-      return "-8%"
+      return "-1%"
     } else if(CustomLandscapeWidest()){
-      return "-5%"
+      return "0%"
     }
   }
 
@@ -76,7 +76,7 @@ export default function AlertGeneral({
           {title}
         </DialogTitle>
         <DialogContent dividers>
-          <DialogContentText id="alert-dialog-slide-description">
+          <DialogContentText maxWidth={400} id="alert-dialog-slide-description">
             {message}
           </DialogContentText>
         </DialogContent>

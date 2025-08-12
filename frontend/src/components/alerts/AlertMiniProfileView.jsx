@@ -1,10 +1,10 @@
 import {
   Close,
-  Diversity3Rounded,
   EmailRounded,
   GitHub,
   Language,
-  LinkedIn
+  LinkedIn,
+  PeopleRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -12,6 +12,7 @@ import {
   AvatarGroup,
   Badge,
   Box,
+  Button,
   CircularProgress,
   Collapse,
   Divider,
@@ -79,7 +80,6 @@ export default function AlertMiniProfileView({
   const [message, setMessage] = useState("");
   const [isOnline, setIsOnline] = useState(false);
   const [openAlertMessage,setOpenAlertMessage]=useState(false)
-  console.log(miniProfileData)
 
   // redux states
   const { user } = useSelector((state) => state.currentUser);
@@ -152,7 +152,7 @@ export default function AlertMiniProfileView({
     if (CustomDeviceTablet() && isTabSideBar) {
       return "36%"
     } else if(CustomLandScape()){
-      return "-8%"
+      return "-1%"
     } else if(CustomLandscapeWidest()){
       return "-5%"
     }
@@ -316,7 +316,7 @@ export default function AlertMiniProfileView({
                     </Typography>
 
                     {/* diversity network icon */}
-                    <Diversity3Rounded sx={{ width: 20, height: 20 }} />
+                    <PeopleRounded sx={{ width: 20, height: 20 }} />
                   </Box>
                 </Box>
 
@@ -380,51 +380,65 @@ export default function AlertMiniProfileView({
                 >
                   <EmailRounded
                   color={userId === currentUserId ? 'disabled':'primary'}
-                   sx={{ width:20,height:20 }}/>
+                  sx={{ width:20,height:20 }}/>
                 </IconButton>
                 </Tooltip>
                 </Box>
+
                 {/* other profile related links */}
               <Box  display={'flex'} 
               alignItems={'center'} 
               justifyContent={'flex-end'}
-              gap={2}
+              gap={1}
               >
 
                 {/* github */}
-              <Tooltip 
+                <Tooltip 
                 arrow
                 title='GitHub'>
+                <IconButton
+                disabled={miniProfileData?.gitHub?.length<2}>
                 <Link
                 target={miniProfileData?.gitHub?.length>2 && "_blank_"}
-                 to={`${miniProfileData?.gitHub?.length>2 ? miniProfileData?.gitHub :'/'}`}>
-                  <GitHub color="primary" sx={{ width:19,height:19 }}/>
+                to={`${miniProfileData?.gitHub }`}>
+                  <GitHub  
+                  color={miniProfileData?.gitHub?.length<2? 'disabled':'primary'}
+                  sx={{ width:19,height:19 }}/>
                 </Link>
+                </IconButton>
                 </Tooltip>
 
                 {/* linkedin */}
                 <Tooltip 
                 arrow
                 title='Linkedin'>
+                <IconButton
+                disabled={miniProfileData?.linkedin?.length<2}>
                 <Link 
                 target={miniProfileData?.linkedin?.length>2 && "_blank_"}
-                to={`${miniProfileData?.linkedin?.length>2 ? miniProfileData?.linkedin :"/"}`}>
-                  <LinkedIn color="primary" sx={{ width:20,height:20 }}/>
+                to={`${miniProfileData?.linkedin}`}>
+                  <LinkedIn
+                  color={miniProfileData?.linkedin?.length<2? 'disabled':'primary'}
+                  sx={{ width:20,height:20 }}/>
                 </Link>
+                </IconButton>
                 </Tooltip>
 
                 {/* website */}
-                <Tooltip 
+                  <Tooltip 
                 arrow
                 title='portfolio'>
+                <IconButton 
+                disabled={miniProfileData?.portfolio?.length<2}>
                 <Link
                 target={miniProfileData?.portfolio?.length>2 && "_blank_"}
-                 to={`${miniProfileData?.portfolio?.length>2 ? miniProfileData?.portfolio :"/"}`}>
-                  <Language color="primary" sx={{ width:20,height:20 }}/>
+                to={`${miniProfileData?.portfolio }`}>
+                  <Language color={miniProfileData?.portfolio?.length<2? 'disabled':'primary'} sx={{ width:20,height:20 }}/>
                 </Link>
+                </IconButton>
                 </Tooltip>
-                </Box>
 
+                </Box>
               </Box>
               </Stack>
             </Box>
@@ -439,6 +453,7 @@ export default function AlertMiniProfileView({
           targetId={miniProfileData?._id}
           targetName={miniProfileData?.name}
           targetSpecialisation={miniProfileData?.specialisationTitle}
+          targetAvatar={miniProfileData?.avatar}
           
           />
         )}

@@ -41,9 +41,7 @@ function PostDetailsContainer({
   const [errorMessage, setErrorMessage] = useState("");
 
   const [comment, setComment] = useState("");
-
-  // axios default credentials
-  axios.defaults.withCredentials = true;
+  
   // redux states
   const { user } = useSelector((state) => state.currentUser);
 
@@ -177,9 +175,14 @@ function PostDetailsContainer({
 
             {/* close  the post */}
             <Tooltip arrow title={"close"}>
-              <IconButton onClick={handleClearPostDetailedData}>
+              <IconButton 
+              sx={{ 
+              border:'1px solid',
+              borderColor:'divider'
+             }}
+              onClick={handleClearPostDetailedData}>
                 <Close 
-                sx={{ width: 14, height: 14 }}
+                sx={{ width: 10, height: 10 }}
                  color="primary" />
               </IconButton>
             </Tooltip>
@@ -220,9 +223,14 @@ function PostDetailsContainer({
           <Box display={"flex"} justifyContent={"flex-end"} alignItems={'center'}>
            
           {/* close button */}
-            <IconButton onClick={handleClearPostDetailedData}>
+            <IconButton 
+            sx={{ 
+              border:'1px solid',
+              borderColor:'divider'
+             }}
+            onClick={handleClearPostDetailedData}>
               <Close 
-              sx={{ width: 15, height: 15 }} 
+              sx={{ width: 10, height: 10 }} 
               color="primary" />
             </IconButton>
           </Box>
@@ -275,7 +283,6 @@ function PostDetailsContainer({
             mb={2}
             bgcolor={"background.default"}
             className={'rounded'}
-            sx={{ border:'1px solid', borderColor:'divider' }}
           >
             {/* input for comment */}
             <Box width={"100%"} mx={1}>
