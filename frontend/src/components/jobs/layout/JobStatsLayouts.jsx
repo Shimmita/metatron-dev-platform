@@ -1,12 +1,10 @@
-import { DeleteRounded, VerifiedRounded } from "@mui/icons-material";
+import { VerifiedRounded } from "@mui/icons-material";
 import {
   Avatar,
   Box,
   Button,
   Divider,
-  IconButton,
   Stack,
-  Tooltip,
   Typography
 } from "@mui/material";
 import axios from "axios";

@@ -1,31 +1,26 @@
 import {
-  FavoriteOutlined,
-  GradeOutlined,
+  AccountCircleOutlined,
+  AutoAwesomeOutlined,
+  DarkModeRounded,
   HighlightOffOutlined,
   InfoRounded,
   LocalLibraryOutlined,
-  ManageAccountsOutlined,
   ManageSearchOutlined,
   Menu,
-  NotificationsRounded,
   PictureAsPdfOutlined,
   SchoolOutlined,
-  SearchOutlined,
-  SupportAgentOutlined,
+  SupportAgentRounded,
   VideoLibraryOutlined,
   WavesOutlined
 } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
-  alpha,
   AppBar,
   Avatar,
-  Badge,
   Button,
   CircularProgress,
   Grid,
-  InputBase,
   Stack,
   Toolbar,
   Tooltip
@@ -45,12 +40,11 @@ import axios from "axios";
 import React, { Suspense, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import devImage from '../../images/dev.jpeg';
 import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
   handleSidebarRightbar,
-  showMessagingDrawer,
+  resetDarkMode,
   showUserProfileDrawer
 } from "../../redux/AppUI";
 import AlertGeneral from "../alerts/AlertGeneral";
@@ -122,51 +116,7 @@ import CourseLayout from "./layout/CourseLayout";
   }));
 
 
-  // search bar option
-  const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto',
-    },
-  }));
-  
-  const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }));
-  
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    width: '100%',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      [theme.breakpoints.up('sm')]: {
-        width: '12ch',
-        '&:focus': {
-          width: '20ch',
-        },
-      },
-    },
-  }));
-
-
-  
+    
   export default function CoursesMainContainer() {
     const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
     const [generalTitle,setGeneralTitle]=useState("")
@@ -178,19 +128,17 @@ import CourseLayout from "./layout/CourseLayout";
       isSidebarRighbar,
       isOpenDrawerProfile,
       isOpenMessageDrawer,
+      currentMode
      } = useSelector(
       (state) => state.appUI
     );
 
+    const isDarkMode=currentMode==='dark'
+
     // array for simulation of courses
     const items = Array.from({ length: 12 }, (_, i) => i);
     const { user } = useSelector((state) => state.currentUser);
-    const { post_reactions } = useSelector((state) => state.currentPostReactions);
-    const { reportedPost } = useSelector((state) => state.currentReportedPost);
-    const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
-    const { profile_views } = useSelector((state) => state.currentProfileView);
-    const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
-  
+
   
     const { messageSnack } = useSelector((state) => state.currentSnackBar);
     const theme = useTheme();
@@ -227,10 +175,12 @@ import CourseLayout from "./layout/CourseLayout";
     };
   
   
-    // show the notification and messaging triggered by redux
-    const handleShowMessageDrawer = () => {
-      dispatch(showMessagingDrawer());
-    };
+  
+       // UI theme dark light tweaking effect
+       const handleShowDarkMode = () => {
+        // update the redux theme boolean state
+        dispatch(resetDarkMode());
+      };
   
     // open drawer
     const handleDrawerOpen = () => {
@@ -311,6 +261,7 @@ import CourseLayout from "./layout/CourseLayout";
                   <Typography
                     noWrap
                     component="div"
+                    fontWeight={'bold'}
                     textAlign={"center"}
                     textTransform={"uppercase"}
                     ml={open && 22}
@@ -322,6 +273,7 @@ import CourseLayout from "./layout/CourseLayout";
                   <Box display={"flex"} justifyContent={"center"}>
                     <Typography 
                     variant="caption" 
+                    fontWeight={'bold'}
                     textTransform={'capitalize'}
                      ml={open && 22}>
                       - {textOption} -
@@ -330,40 +282,24 @@ import CourseLayout from "./layout/CourseLayout";
                 </Box>
   
                 <Box display={'flex'} gap={2} alignItems={'center'} justifyContent={'flex-end'}>
-
-                  {/* search */}
-                  <Search>
-                  <SearchIconWrapper>
-                    <SearchOutlined />
-                  </SearchIconWrapper>
-                  <StyledInputBase
-                    placeholder="Search…"
-                    inputProps={{ 'aria-label': 'search' }}
+                {/* dark mode */}
+                <IconButton  
+                onClick={handleShowDarkMode}> 
+                  <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
+                  <DarkModeRounded
+                
+                    sx={{ color: "white", height:24, width:24,}}
                   />
-                </Search>
-
-
-                {/* notification and messaging */}
-                <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
-                  <Tooltip arrow title={"notifications"}>
-                    <IconButton
-                      sx={{ padding: 0 }}
-                      onClick={handleShowMessageDrawer}
-                    >
-                      <NotificationsRounded
-                        sx={{ width: 25, height: 25, color: "white" }}
-                      />
-                    </IconButton>
-                  </Tooltip>
-                </Badge>
+                </Tooltip> 
+                </IconButton>
   
                 {/* profile */}
                 <Tooltip arrow title={"profile"}>
                   <IconButton onClick={handleShowingProfileDrawer}>
                   <Avatar
-                      sx={{ width: 26, height: 26 }}
-                      src={devImage}
-                      alt={"user image"}
+                      sx={{ width: 30, height: 30 }}
+                      src={user?.avatar}
+                      alt={""}
                   />
                   </IconButton>
                 </Tooltip>
@@ -410,6 +346,7 @@ import CourseLayout from "./layout/CourseLayout";
                 {/* title */}
                <Typography variant="body2" 
                sx={{color:'white'}} 
+               fontWeight={'bold'}
                textTransform={'uppercase'}
                display={'flex'}
                alignItems={'center'}
@@ -417,11 +354,12 @@ import CourseLayout from "./layout/CourseLayout";
                mb={1}
                >
                 <LocalLibraryOutlined/>
-                Tech Guru
+                Tech Student
                </Typography>
 
                {/* user name */}
                <Typography
+               fontWeight={'bold'}
                 variant="caption"
                 sx={{color:'white'}} 
                 >
@@ -451,9 +389,7 @@ import CourseLayout from "./layout/CourseLayout";
                   "Explore Courses",
                   "Advanced Search",
                   "Popular Courses",
-                  "Best Instructors",
-                  "Recommended",
-                  "Favorite Courses",
+                  "AI Selection",
                   "PDF Resources",
                   "Enrolled Courses",
                   "Student Manager",
@@ -515,30 +451,20 @@ import CourseLayout from "./layout/CourseLayout";
                             color={text === textOption ? "primary" : "inherit"}
                             sx={{width:20,height:20}}
                           />
-                        ) : index === 3 ? (
-                          <SupportAgentOutlined
-                          color={text === textOption ? "primary" : "inherit"}
-                          sx={{width:22,height:22}}
-                        />
-                         
-                        ) :index===4 ? (
-                          <GradeOutlined
+                        ) :index===3 ? (
+                          <AutoAwesomeOutlined
                           color={text === textOption ? "primary" : "inherit"}
                           sx={{width:26,height:26}}
                         />
                           
-                        ):index===5 ? (
-                          <FavoriteOutlined
-                          color={text === textOption ? "primary" : "inherit"}
-                          sx={{width:21,height:21}}
-                        />) :index===6 ? (
+                        ):index===4 ? (
                           <PictureAsPdfOutlined
                           color={text === textOption ? "primary" : "inherit"}
-                        />) :index===7 ? (
+                        />) :index===5 ? (
                           <VideoLibraryOutlined
                           color={text === textOption ? "primary" : "inherit"}
                         />): (
-                          <ManageAccountsOutlined
+                          <AccountCircleOutlined
                           color={text === textOption ? "primary" : "inherit"}
                         />
                         )}
@@ -570,15 +496,32 @@ import CourseLayout from "./layout/CourseLayout";
                 ))}
               </List>
   
-              {/* divider */}
-            <Divider component={'div'} className={'p-1'}/>
             {/* navigates to instructor page */}
-           {open && (
-             <Button
-             startIcon={<SupportAgentOutlined/>}
-             size="small" 
-             sx={{mt:1,}} 
-             onClick={handleNavigateInstructor}>Instructor Page</Button>
+           {open ? (
+                  <Button 
+                size="small" 
+                startIcon={<SupportAgentRounded/>}
+                color="secondary"
+                disableElevation
+                sx={{my:1, px:1,
+                 borderRadius:5,
+                  fontWeight:'bold', 
+                  border:'1px solid', 
+                  borderColor:'divider'}}
+                onClick={handleNavigateInstructor}>
+                 Instructor Page
+                </Button>
+           ):(
+              <ListItemButton size="small" >
+                <Tooltip title={"Instructor Page"} arrow>
+                <ListItemIcon 
+                onClick={handleNavigateInstructor}>
+                <SupportAgentRounded 
+                color="secondary" 
+                sx={{width:24,height:24}}/>
+                </ListItemIcon>
+                </Tooltip>
+              </ListItemButton>
            )}
 
         {/* divider */}
@@ -592,6 +535,7 @@ import CourseLayout from "./layout/CourseLayout";
               width={'100%'}
               justifyContent={'center'}
               sx={{
+                p:2,
                 overflow: "auto",
                 // Hide scrollbar for Chrome, Safari and Opera
                 "&::-webkit-scrollbar": {
@@ -626,9 +570,9 @@ import CourseLayout from "./layout/CourseLayout";
                         <React.Fragment>
                       {/* content will go here */}
                       {items?.map((val)=>(
-                        <CourseLayout key={val} />
+                        <CourseLayout key={val} 
+                        isDarkMode={isDarkMode} />
                       ))}
-                          
                         </React.Fragment>
                       )}
                     </React.Fragment>

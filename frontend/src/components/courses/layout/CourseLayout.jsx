@@ -1,31 +1,24 @@
 import {
-  Add,
-  BarChartOutlined,
   BarChartRounded,
-  FavoriteBorderOutlined,
-  FavoriteRounded,
   PersonAdd,
-  SchoolRounded
+  SchoolRounded,
+  VideoLibraryRounded
 } from "@mui/icons-material";
 import {
   Avatar,
   Box,
   Button,
-  Checkbox,
   Divider,
+  FormHelperText,
   Paper,
   Rating,
   styled,
-  Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
 import React, { lazy, useState } from "react";
-import { useDispatch } from "react-redux";
 import pythonLogo from "../../../images/python.jpeg";
-import video from "../../../video.mp4";
 import CourseData from "../../data/CourseData";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import AccordionInstructor from "./AccordionInstructor";
 const CourseStatsEditAlert = lazy(() =>
   import("../../alerts/CourseStatsEditAlert")
 );
@@ -48,8 +41,7 @@ const labels = {
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: '#fff',
     marginInline:!CustomDeviceIsSmall() && 6,
-    marginTop:12,
-    marginBottom:20,
+    marginBottom:17,
     ...theme.typography.body2,
     padding: theme.spacing(0.5),
     textAlign: 'center',
@@ -59,15 +51,9 @@ const labels = {
     }),
   }));
 
-function CourseLayout({ isUploadedRequest }) {
+function CourseLayout({ isUploadedRequest,isDarkMode=false }) {
   const [openAlertCourseStats, setOpenAlertCourseStats] = useState(false);
-  // track video play state
-  const [isPlay, setPlay] = useState(false);
 
-  // handle playing state
-  const handlePlay = () => {
-    setPlay(true);
-  };
 
   // handle showing of course Statistics
   const handleShowingCourseStats = () => {
@@ -79,59 +65,81 @@ function CourseLayout({ isUploadedRequest }) {
     style={{
       display:'flex',
       flexDirection:'column',
-      maxWidth:350,
+      width:350, 
       justifyContent:'center',
+      border:'1px solid',
+      borderColor:isDarkMode ? '#2F2F2F' :'#E0E0E0' 
     }}>
-      <Box>
-        <video
-          className="rounded w-100"
-          src={video}
-          controls
-          onPlay={handlePlay}
-          poster={pythonLogo}
-          playsInline
-          preload="none"
-        >
-        <Typography 
-          color={"error"}>video not supported</Typography>
-        </video>
-      </Box>
+    
       {/* title */}
       <Box
         display={"flex"}
         justifyContent={"center"}
         alignItems={"center"}
+        flexDirection={'column'}
         gap={1}
-        mb={1}
+        p={1}
       >
         <Avatar alt="image" 
         src={pythonLogo} 
-        sx={{ width: 26, height: 26 }} />
+        />
+        {/* title */}
         <Typography 
-        variant="body2" 
         color={'primary'}
+        variant="body2"
+        textTransform={'uppercase'}
         fontWeight={"bold"}>
           Python Django Full Course
         </Typography>
+
+           {/* rating */}
+        <Box 
+        display={"flex"} 
+        gap={3} 
+        mb={1}
+        justifyContent={'space-around'}
+        alignItems={"center"}>
+
+        {/* rating value */}
+        <FormHelperText>
+          {CourseData.rating}
+          </FormHelperText>
+      
+        {/* stars */}
+          <Rating
+            name="feedback"
+            size="small"
+            value={CourseData.rating}
+            readOnly
+            precision={0.5}
+          />
+          {/* label */}
+          <Box>
+          <FormHelperText>
+          {labels[CourseData.rating]}
+          </FormHelperText>
+          </Box>
+        </Box>
       </Box>
 
-      {/* lectures + student */}
+        {/* lectures + student */}
       <Box
         className="px-1"
         mb={1}
         display={"flex"}
         alignItems={"center"}
         gap={1}
-        justifyContent={"space-between"}
+        justifyContent={"space-around"}
       >
         {/* lectures */}
         <Box 
         display={"flex"}
         gap={1} 
+        justifyContent={'space-around'}
         alignItems={"center"}>
           <SchoolRounded 
           color="primary" 
-          sx={{ width: 15, height: 15 }} />
+          sx={{ width: 17, height: 17 }} />
           <Typography
             variant="caption"
             color="text.secondary"
@@ -141,12 +149,14 @@ function CourseLayout({ isUploadedRequest }) {
           </Typography>
         </Box>
 
+        <div/>
+
         {/* students */}
         <Box
         display={"flex"}
         gap={1} 
         alignItems={"center"}>
-          <PersonAdd color="primary" sx={{ width: 16, height: 16 }} />
+          <PersonAdd color="primary" sx={{ width: 18, height: 18 }} />
           <Typography
             variant="caption"
             color="text.secondary"
@@ -155,26 +165,35 @@ function CourseLayout({ isUploadedRequest }) {
             10,000 students
           </Typography>
         </Box>
+      </Box>   
+    
+    <Divider component={"div"} />
 
-        {/* rating */}
-        <Box display={"flex"} alignItems={"center"}>
-          <Rating
-            name="feedback"
-            size="small"
-            value={CourseData.rating}
-            readOnly
-            precision={0.5}
-          />
+      {/* instructor details */}
+        <Box 
+      display={'flex'} 
+      alignItems={'center'}
+      justifyContent={'space-around'}
+      my={1}
+      >
+      <Box display={'flex'} alignItems={'center'} gap={1} mr={4}>
+        {/* avatar */}
+          <Avatar src="" alt="" sx={{ width:27,height:27 }}/>
+        {/* instructor name */}
+        <Box display={'flex'} justifyContent={'center'}>
+        <Typography variant="caption" color={'text.primary'}> Alexis Damian</Typography>   
+        </Box> 
+      </Box>
+
+      <div/>
+
+        {/* occupation */}
+        <Box display={'flex'} justifyContent={'center'}>
+        <Typography variant="caption" color={'text.primary'}> Software Engineer</Typography> 
         </Box>
       </Box>
 
-      <Divider component={"div"} />
-      {/* accordion instructor */}
-      <Box>
-        <AccordionInstructor
-         instructor={CourseData.inst}
-         />
-      </Box>
+     
 
       <Divider component={"div"} />
       {/* description */}
@@ -189,8 +208,6 @@ function CourseLayout({ isUploadedRequest }) {
       </Box>
 
       <Divider component={"div"} />
-
-  
 
       {/* layout inquiry is an instructor checking their uploaded course */}
       {isUploadedRequest ? (
@@ -209,7 +226,6 @@ function CourseLayout({ isUploadedRequest }) {
       ) : (
         <React.Fragment>
         
-          {/* purchase */}
           <Box
             mt={1}
             width={"100%"}
@@ -217,65 +233,51 @@ function CourseLayout({ isUploadedRequest }) {
             justifyContent={"space-between"}
             alignItems={"center"}
           >
-            {/* add to favorite button */}
-            <Box display={'flex'} alignItems={'center'} gap={0.5}>
-            <Tooltip arrow title="favorite">
-              <Checkbox
-                icon={<FavoriteBorderOutlined
-                  sx={{ width: 22, height: 22 }} />}
-                  checkedIcon={
-                  <FavoriteRounded
-                    color="primary"
-                    sx={{ width: 22, height: 22 }}
-                  />
-                }
-              />
-            </Tooltip>
-
-            {/* counter of favorites */}
-            <Typography
-            variant="caption">
-              3.5k
-            </Typography>
-            </Box>
+          
 
             {/* enroll course button control */}
             <Box
               display={"flex"}
               justifyContent={"center"}
+              flexDirection={'column'}
               width={"100%"}
+              gap={1}
+              p={1}
+            >
+            {/* helper text for certification */}
+            <Box
+            display={'flex'} 
+            justifyContent={'center'}>
+            <FormHelperText className={isDarkMode ? "text-info":"text-success"}>
+              Unlock Certificate of Completion at $2
+            </FormHelperText>
+            </Box>
+            {/* btn */}
+            <Box
+             display={'flex'} 
+            justifyContent={'center'}
             >
               <Button
                 className="rounded-5"
-                variant={'contained'}
-                startIcon={<Add />}
+                variant={isDarkMode ? "outlined":"contained"}
+                startIcon={<VideoLibraryRounded />}
                 size="small"
                 sx={{ 
+                width:'80%', 
                 fontWeight: "bold",
                 fontSize:'small' }}
                 disableElevation
               >
-                Enroll Free
+                Enroll Course
               </Button>
+              </Box>
+
             </Box>
 
-            {/* statistics */}
-            <Tooltip arrow title="statistics">
-              <Checkbox
-                icon={<BarChartOutlined sx={{ width: 22, height: 22 }} />}
-                checkedIcon={
-                  <BarChartRounded
-                    color="primary"
-                    sx={{ width: 22, height: 22 }}
-                  />
-                }
-              />
-            </Tooltip>
           </Box>
           {/* empty box for spacing */}
         </React.Fragment>
       )}
-
 
       {/* show all course statistics alert */}
       {openAlertCourseStats && (

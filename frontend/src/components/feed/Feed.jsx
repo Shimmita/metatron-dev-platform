@@ -1,28 +1,25 @@
 import { Box, CircularProgress } from "@mui/material";
-import React, { lazy, Suspense, useLayoutEffect } from "react";
+import { lazy, Suspense, useLayoutEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import BasicSpeedDial from "../custom/SpeedDial";
 
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import BottomNav from "../bottom/BottomNav";
-import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
 const EventsContainer =lazy(()=>import("../events/EventsContainer")) ;
 const SnackBarPostSuccess =lazy(()=>import("../snackbar/SnackBarPostSuccess")) ;
 const CoursesMainContainer =lazy(()=>import("../courses/CoursesMainContainer"));
 const CoursesInstrContainer =lazy(()=>import("../courses/CoursesInstrContainer")) ;
 const FeedDefaultSearch = lazy(() => import("./FeedDefaultSearch"));
 const PostDetailsRouted = lazy(() => import("../post/PostDetailsRouted"));
-const CourseDetailed = lazy(() => import("../courses/layout/CourseDetailed"));
 
 const AllJobsHiringManager=lazy(()=>import("../jobs/AllJobsHiringManager")) ;
 const AllJobsContainer = lazy(() => import("../jobs/AllJobsContainer"));
 
-const CoursePaidContainer = lazy(() =>
-  import("../courses/CoursePaidContainer")
-);
+
 const PageNotFound = lazy(() => import("../notfound/PageNotFound"));
 
 const UserProfile = lazy(() => import("../profile/UserProfile"));
@@ -35,7 +32,6 @@ const FeedDefaultContent = lazy(() => import("./FeedDefaultContent"));
 const Feed = () => {
   // redux states
   const {
-    isTabSideBar,
     isDefaultBottomNav,
     isDefaultSpeedDial,
     isLoadingPostLaunch,
@@ -53,10 +49,7 @@ const Feed = () => {
     dispatch(handleShowingSpeedDial(true));
   }, [dispatch]);
 
-  return (
-    <React.Fragment>
-      {isTabSideBar ? (
-        // displayed when sidebar is on when full screen toggle not clicked
+  return (      
         <Box
           mr={CustomFeedEquidstance()}
           flex={3}
@@ -87,12 +80,7 @@ const Feed = () => {
               {/* events */}
                <Route path="/events" element={<EventsContainer />} />
 
-              {/* under development */}
-              <Route path="/courses/paid" element={<CoursePaidContainer />} />
-              <Route
-                path="/courses/paid/detailed"
-                element={<CourseDetailed />}
-              />
+             
 
               {/* final selection route for courses */}
               <Route path="/courses/available" element={<CoursesMainContainer />} />
@@ -145,127 +133,18 @@ const Feed = () => {
                       position={"fixed"}
                       sx={{
                         left: 0,
-                        right: CustomDeviceIsSmall()? "40%" : CustomDeviceTablet() ? "31%" : "47%",
+                        right: CustomDeviceIsSmall()? "39.5%" : CustomDeviceTablet() ? "31%" : "47%",
                         bottom: CustomDeviceIsSmall() ? 30:5,
                       }}
                     >
                       {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}
-
                       <BasicSpeedDial />
                     </Box>
                   )}
               </Box>
           </Suspense>
         </Box>
-      ) : (
-        // displayed when sidebar is off when full screen toggle clicked
-        <Box
-          display={"flex"}
-          justifyContent={"center"}
-          className="container-lg"
-        >
-          <Box
-            marginRight={CustomFeedEquidstance()}
-            flex={3}
-            mt={1}
-            p={1}
-            color={"text.primary"}
-          >
-            <Suspense
-              fallback={
-                <Box
-                  bgcolor={"background.default"}
-                  color={"text.primary"}
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "98vh",
-                  }}
-                >
-                  {/* loader be shown before actual loading of content */}
-                  <CircularProgress size={"2rem"} />
-                </Box>
-              }
-            >
-              <Routes>
-                <Route path="/" element={<FeedDefaultContent />} />
-
-                {/* events */}
-                <Route path="/events" element={<EventsContainer />} />
-
-                {/* under development */}
-                <Route path="/courses/paid" element={<CoursePaidContainer />} />
-                <Route
-                  path="/courses/paid/detailed"
-                  element={<CourseDetailed />}
-                />
-
-                {/* final selection route for courses */}
-              <Route path="/courses/available" element={<CoursesMainContainer />} />
-
-              {/* instructor */}
-              <Route path="/courses/instructor" element={<CoursesInstrContainer />} />
-
-                {/* jobseeker pane */}
-                <Route path="/jobs" element={<AllJobsContainer />} />
-
-                {/* hiring manager pane */}
-                <Route path="/jobs/hiring" element={<AllJobsHiringManager/>}/>
-
-                <Route
-                  path="/posts/search/results"
-                  element={<FeedDefaultSearch />}
-                />
-                <Route
-                  path="/posts/details/:id"
-                  element={<PostDetailsRouted />}
-                />
-                <Route path="/users/profile/:id" element={<UserProfile />} />
-                <Route
-                  path="/users/profile/posts/details"
-                  element={<PostDetailsContainer />}
-                />
-                {/* page not found; no urls matched */}
-                <Route path="*" element={<PageNotFound />} />
-              </Routes>
-
-              {/* snack bar success shown when tech post uploaded  */}
-              {messageSnackPostTech && (
-                <SnackBarPostSuccess
-                  messageSnackPostTech={messageSnackPostTech}
-                />
-              )}
-
-              {/* decide bottom nav is to be show or not */}
-              <Box >
-                {isDefaultBottomNav && !isLoadingPostLaunch && <BottomNav />}
-              </Box>
-
-              {/* display speed dial in feed section only for mobile and no landscape */}
-                <Box>
-                  {/* decide speed dial being shown or not */}
-                  {isDefaultBottomNav &&
-                    isDefaultSpeedDial &&
-                    !isPostDetailed && (
-                      <Box
-                        position={"fixed"}
-                        sx={{
-                          left: 0,
-                          right: CustomDeviceIsSmall() < 600 ? "40%" : "47%",
-                          bottom: CustomDeviceIsSmall() ? 30:25,
-                        }}
-                      >
-                        {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}
-                        <BasicSpeedDial />
-                      </Box>
-                    )}
-                </Box>
-            </Suspense>
-          </Box>
-        </Box>
-      )}
-    </React.Fragment>
+      
   );
 };
 

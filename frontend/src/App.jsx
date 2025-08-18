@@ -2,7 +2,6 @@ import {
   Avatar,
   Box,
   createTheme,
-  FormHelperText,
   ThemeProvider,
   Typography
 } from "@mui/material";
@@ -69,9 +68,11 @@ const App = () => {
                 display={'flex'}
                 justifyContent={'center'}
                 >
-                <FormHelperText >
+                <Typography 
+                variant="caption" 
+                color={'primary'} >
                 Ultimate Tech Platform
-                </FormHelperText>
+                </Typography>
                 </Box>
 
                  <Box 

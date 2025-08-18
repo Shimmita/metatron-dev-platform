@@ -1,4 +1,4 @@
-import { AddOutlined, ArrowForwardRounded, Check, Remove, SchoolRounded } from "@mui/icons-material";
+import { AddOutlined, ArrowForwardRounded, Remove, SchoolRounded } from "@mui/icons-material";
 import { Box, Fade, Stack } from "@mui/material";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -46,7 +46,7 @@ export default function AccordionLectures({ lectures }) {
           id="panel2-header"
         >
           <Box display={"flex"} gap={2} alignItems={"center"}>
-            <SchoolRounded sx={{ width: 23, height: 23 }} />{" "}
+            <SchoolRounded sx={{ width: 25, height: 25 }} />{" "}
             <Typography variant="body2">Course Topics Outline</Typography>
           </Box>
         </AccordionSummary>
@@ -64,18 +64,6 @@ export default function AccordionLectures({ lectures }) {
                 <Typography variant="caption">{val}</Typography>
               </Stack>
             ))}
-
-          {/* bonus certs and internship links */}
-          <Box mt={2}>
-            <Stack direction={"row"} gap={2} alignItems={"center"}>
-              <Check sx={{ width: 20, height: 20 }} color="success" />
-              <Typography variant="caption">Certificate of Completion</Typography>
-            </Stack>
-            <Stack direction={"row"} gap={2} alignItems={"center"}>
-              <Check sx={{ width: 20, height: 20 }} color="success" />
-              <Typography variant="caption">Internship Connections</Typography>
-            </Stack>
-          </Box>
         </AccordionDetails>
       </Accordion>
     </Box>

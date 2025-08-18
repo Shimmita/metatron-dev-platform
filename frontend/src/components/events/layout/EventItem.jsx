@@ -267,7 +267,7 @@ function EventItem({
           sx={{ 
           border:'1px solid',
           borderColor:'divider',
-          maxWidth: CustomDeviceIsSmall() ? 380:320, 
+          maxWidth: CustomDeviceIsSmall() ? 380:330, 
           }}
         >
           <CardContent>

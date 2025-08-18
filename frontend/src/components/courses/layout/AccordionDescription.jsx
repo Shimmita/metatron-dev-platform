@@ -46,7 +46,7 @@ export default function AccordionDescription({ description }) {
           id="panel2-header"
         >
           <Box display={"flex"} gap={2} alignItems={"center"}>
-            <DescriptionRounded sx={{ width: 22, height: 22 }} />{" "}
+            <DescriptionRounded sx={{ width: 25, height: 25 }} />{" "}
             <Typography variant="body2">Course Description</Typography>
           </Box>
         </AccordionSummary>

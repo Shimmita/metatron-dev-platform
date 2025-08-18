@@ -292,7 +292,7 @@ const Sidebar = () => {
                                 <Avatar
                                   alt={skill}
                                   className="border"
-                                  sx={{ width: 21, height: 21 }}
+                                  sx={{ width: 22, height: 22 }}
                                   src={getImageMatch(skill)}
                                 />
                               </Tooltip>

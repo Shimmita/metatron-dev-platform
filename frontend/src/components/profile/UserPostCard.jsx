@@ -88,7 +88,7 @@ export default function UserPostCard({
           {/* post subcategory */}
           <Box display={"flex"} justifyContent={"center"} mt={1}>
             <Typography variant="caption" textAlign={"center"}>
-              {post?.post_category?.main?.substring(0, 20)}
+              {post?.post_category?.main}
             </Typography>
           </Box>
           <Box

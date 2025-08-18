@@ -32,7 +32,7 @@ const UserProfileDrawer = lazy(() => import("./UserProfileDrawer"));
       return 400
     }
 
-    return 370
+    return 360
   }
 
 export default function ProfileDrawer() {
@@ -199,11 +199,11 @@ export default function ProfileDrawer() {
               <React.Fragment>
                 {/* show default profile if is no update setting clicked */}
                 {isProfileUpdate ? (
-                  <Box height={CustomDeviceTablet()||CustomDeviceIsSmall() ? "94vh":"88.8vh"}>
+                  <Box height={CustomDeviceTablet()||CustomDeviceIsSmall() ? "94vh":"92vh"}>
                     <ProfileUpdate user={nativeLoggedinUser} />
                   </Box>
                 ) : (
-                  <Box height={CustomDeviceTablet()||CustomDeviceIsSmall() ? "94vh":"88.8vh"} p={"5px"}>
+                  <Box height={CustomDeviceTablet()||CustomDeviceIsSmall() ? "94vh":"92vh"} p={"5px"}>
                     {temporaryProfileData ? (
                       <UserProfileDrawer profileData={temporaryProfileData} />
                     ) : (

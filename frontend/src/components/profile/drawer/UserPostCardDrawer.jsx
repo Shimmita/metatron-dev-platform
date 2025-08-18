@@ -130,7 +130,7 @@ export default function UserPostCardDrawer({
   return (
     <Card 
     elevation={0}
-     className="rounded" 
+     className="rounded m-1" 
       sx={{ border:'1px solid',
        color:'divider' }}>
         {/* more icon shown when post belongs to the user
@@ -183,21 +183,22 @@ export default function UserPostCardDrawer({
          )}
          
         {/* image */}
+      <CardContent>
+      <CardActionArea onClick={handlePostDetails}>
         <Box
         width={'100'}
+        mb={1}
         display={'flex'}
         justifyContent={'center'}>
         <CardMedia
           component="img"
           className="rounded"
-          sx={{ height: 70, width:70}}
+          sx={{ maxHeight: 60, maxWidth:60}}
           image={handlePostImagePresent()}
           alt=""
         />
         </Box>
   
-        <CardContent>
-        <CardActionArea onClick={handlePostDetails}>
           {/* post title */}
           <Box display={"flex"} justifyContent={"center"}>
             <Typography
@@ -206,7 +207,7 @@ export default function UserPostCardDrawer({
               textAlign={"center"}
               sx={{ color:'text.primary' }}
             >
-              {post?.post_title.substring(0, !CustomDeviceIsSmall() ? 20:undefined)}
+              {post?.post_title.substring(0, !CustomDeviceIsSmall() ? 15:undefined)}
             </Typography>
           </Box>
           {/* post subcategory */}
@@ -216,23 +217,27 @@ export default function UserPostCardDrawer({
             textAlign={"center"}
             sx={{ color:'text.primary' }}
             >
-              {post?.post_category.main?.substring(0, !CustomDeviceIsSmall() ?20:undefined)}
+              {post?.post_category.main?.substring(0, !CustomDeviceIsSmall() ?17:undefined)}
             </Typography>
           </Box>
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
-            mt={1}
             width={"100%"}
-            sx={{ 
-              borderTop:'1px solid',
-              color:'divider',
-              pt:0.5
-             }}
+            sx={{
+        overflowX: "auto",
+        // Hide scrollbar for Chrome, Safari and Opera
+        "&::-webkit-scrollbar": {
+          display: "none",
+        },
+        // Hide scrollbar for IE, Edge and Firefox
+        "-ms-overflow-style": "none",
+        "scrollbar-width": "none",
+      }}
           >
             {/* post likes */}
-            <Box display={"flex"} alignItems={"center"} gap={"4px"}>
+            <Box display={"flex"} alignItems={"center"}  gap={"2px"}>
               <FavoriteRounded 
               color="primary"
                sx={{ width: 15, height: 15 }} />{" "}
@@ -241,16 +246,17 @@ export default function UserPostCardDrawer({
                 color={"text.secondary"}
                 variant="caption"
               >
-                {post?.post_liked?.clicks}
+                {post?.post_liked?.clicks} 
               </Typography>
             </Box>
 
             {/* github visits */}
             <Box
+             mx={1}
               display={"flex"}
               justifyContent={"center"}
               alignItems={"center"}
-              gap={"4px"}
+              gap={"2px"}
             >
               <GitHub 
               color="primary"
@@ -260,19 +266,22 @@ export default function UserPostCardDrawer({
                 color={"text.secondary"}
                 variant="caption"
               >
-                {post?.post_github?.clicks}
+                {post?.post_github?.clicks} 
               </Typography>
             </Box>
 
             {/* post comments */}
-            <Box display={"flex"} alignItems={"center"} gap={"4px"}>
+            <Box 
+            display={"flex"} 
+            alignItems={"center"} 
+            gap={"2px"}>
               <ForumRounded color="primary" sx={{ width: 15, height: 15 }} />{" "}
               <Typography
                 fontWeight={"bold"}
                 color={"text.secondary"}
                 variant="caption"
               >
-                {post?.post_comments?.count}
+                {post?.post_comments?.count} 
               </Typography>
             </Box>
           </Box>

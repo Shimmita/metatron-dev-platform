@@ -27,7 +27,7 @@ const PageNotFound = ({ mesage = "" }) => {
     // navigate back to home
     navigate("/")
     
-  },[]);
+  },[isSidebarRighbar, user,dispatch,navigate]);
  
   
 };

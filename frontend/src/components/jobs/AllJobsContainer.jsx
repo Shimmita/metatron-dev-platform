@@ -935,7 +935,6 @@ export default function MiniDrawer() {
                             </>
                           ))}
 
-
                            {/* rendered if are no jobs  */}
                           {jobs?.length<1 && (
                             <Box 

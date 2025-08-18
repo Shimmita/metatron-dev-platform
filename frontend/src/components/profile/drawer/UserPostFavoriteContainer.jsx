@@ -142,12 +142,7 @@ function UserPostFavoriteContainer({
           if (res?.data) {
             const data=res.data
             if (data.length>0) {
-              const filteredData=data?.filter((post)=>{
-                for (const postData of postsData) {
-                  return postData?._id!==post._id
-                }
-              })
-              setPostsData([...postsData,...filteredData]);   
+              setPostsData([...data]);   
             }else{
               setHasMorePosts(false)
             }

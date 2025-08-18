@@ -1,8 +1,5 @@
 import {
-  GradeRounded,
-  LaptopRounded,
   Message,
-  PeopleRounded,
   PersonAdd,
   PersonRemove
 } from "@mui/icons-material";
@@ -132,14 +129,7 @@ export default function UserProfileDrawer({ profileData }) {
     dispatch(resetDefaultBottomNav(true));
   });
 
-  // handle country length to only two names
-  const handleCountryName = (country) => {
-    const parent = country?.split(" ");
-    const parentName =
-      parent?.length < 4 ? parent[1] : `${parent[1]} ${parent[2]}`;
 
-    return parentName;
-  };
 
   // check if is current user and manoeuver the display of follow and send message btb
   const isCurrentUser = user._id === profileData?._id;
@@ -294,7 +284,7 @@ export default function UserProfileDrawer({ profileData }) {
     <Box
       color={"text.primary"}
       borderRadius={2} 
-      maxHeight={'90vh'}   
+      maxHeight={'91vh'}   
       sx={{
         overflowX: "auto",
         // Hide scrollbar for Chrome, Safari and Opera
@@ -335,15 +325,55 @@ export default function UserProfileDrawer({ profileData }) {
         </React.Fragment>
         
       ) : (
-        <Box p={2}>
+        <Box px={2} mt={1}>
           {/* shown when there is profile info */}
             <Box>
               <Box display={"flex"} justifyContent={"center"}>
                 <Avatar 
                 src={user?.avatar}
                 alt="" 
-                sx={{ width: 90, height: 90 }} />
+                sx={{ width: 80, height: 80 }} />
               </Box>
+
+              {/* skills */}
+              <Box
+                display={"flex"}
+                justifyContent={"center"}
+                mb={1}
+                mt={1}
+                gap={1}
+                alignItems={"center"}
+              >
+                {/* skills avatars */}
+                <Box display={"flex"} justifyContent={"center"}>
+                  <AvatarGroup max={profileData?.selectedSkills?.length}>
+                    {/* loop through the skills and their images matched using custom fn */}
+                    {profileData?.selectedSkills?.map((skill, index) => (
+                      <Tooltip title={skill} arrow key={skill}>
+                        <Avatar
+                          alt={skill}
+                          className="border"
+                          sx={{ width: 25, height: 25 }}
+                          src={getImageMatch(skill)}
+                        />
+                      </Tooltip>
+                    ))}
+                  </AvatarGroup>
+                </Box>
+              </Box>
+
+              {/* specialisation */}
+              <Box
+                display={"flex"}
+                justifyContent={"center"}
+                gap={1}
+                alignItems={"center"}
+              >
+                <Typography color={"text.secondary"} variant="body2">
+                  {profileData?.specialisationTitle}
+                </Typography>
+              </Box>
+
               {/* name of the user */}
               <Box display={"flex"} justifyContent={"center"} mb={1}>
                 <Typography
@@ -355,66 +385,7 @@ export default function UserProfileDrawer({ profileData }) {
                   {profileData?.name}
                 </Typography>
               </Box>
-              {/* specialisation */}
-              <Box
-                display={"flex"}
-                justifyContent={"center"}
-                mb={1}
-                gap={1}
-                alignItems={"center"}
-              >
-                <LaptopRounded sx={{ width: 17, height: 17 }} />
-                <Typography color={"text.secondary"} variant="body2">
-                  {profileData?.specialisationTitle}
-                </Typography>
-              </Box>
-
-              {/* location of the user */}
-              <Box
-                display={"flex"}
-                justifyContent={"space-around"}
-                alignItems={"center"}
-              >
-                {/* country */}
-                <Typography variant="body2" color={"text.secondary"}>
-                  {/* call this if only miniprofile data present */}
-                  {handleCountryName(profileData?.country)}
-                </Typography>
-                {/* divider vert */}
-                <Divider
-                  component={"div"}
-                  variant="middle"
-                  orientation="vertical"
-                  className="p-1"
-                />
-                {/* state or county */}
-                <Typography variant="body2" color={"text.secondary"}>
-                  {profileData?.county}
-                </Typography>
-
-                {/* divider vert */}
-                <Divider
-                  component={"div"}
-                  variant="middle"
-                  orientation="vertical"
-                  className="p-1"
-                />
-
-                <Box display={"flex"} gap={1} alignItems={"center"}>
-                  {/* network connection count */}
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ pt: "2px" }}
-                  >
-                    {profileData?.network_count}
-                  </Typography>
-
-                  {/* diversity network icon */}
-                  <PeopleRounded sx={{ width: 20, height: 20 }} />
-                </Box>
-              </Box>
-
+            
               {!isCurrentUser && (
                 <React.Fragment>
                   <Divider component={"div"} />
@@ -492,37 +463,7 @@ export default function UserProfileDrawer({ profileData }) {
                   </Box>
                 </React.Fragment>
               )}
-
-              <Divider component={"div"} />
-              <Box
-                display={"flex"}
-                justifyContent={"center"}
-                mb={1}
-                mt={1}
-                gap={1}
-                alignItems={"center"}
-              >
-                <GradeRounded sx={{ width: 20, height: 20 }} color="warning" />
-                {/* skills avatars */}
-                <Box display={"flex"} justifyContent={"center"}>
-                  <AvatarGroup max={profileData?.selectedSkills?.length}>
-                    {/* loop through the skills and their images matched using custom fn */}
-                    {profileData?.selectedSkills?.map((skill, index) => (
-                      <Tooltip title={skill} arrow key={skill}>
-                        <Avatar
-                          alt={skill}
-                          className="border"
-                          sx={{ width: 30, height: 30 }}
-                          src={getImageMatch(skill)}
-                        />
-                      </Tooltip>
-                    ))}
-                  </AvatarGroup>
-                </Box>
-              </Box>
             </Box>
-            {/* divider */}
-            <Divider component={"div"} />
 
             <Box display={"flex"} justifyContent={"center"} py={1}>
               <Typography variant="caption" color="text.secondary">
@@ -541,52 +482,35 @@ export default function UserProfileDrawer({ profileData }) {
                 {/* posts made by the user */}
                 <StyledTab
                   label={
-                    <Box 
-                    display={'flex'}
-                    alignItems={'center'}
-                    >
+                
                  
-                      {/* text */}
                     <Typography fontWeight={'bold'} variant="body2">
-                      Posted
+                      Posts
                     </Typography>
-                    </Box>
                   }
                 />
 
               {/* favorite posts */}
               <StyledTab
                   label={
-                    <Box 
-                    display={'flex'}
-                    alignItems={'center'}
-                    >
-                
-                      {/* text */}
+                                
                     <Typography
                      fontWeight={'bold'}
                       variant="body2">
                       Favorite
                     </Typography>
-                    </Box>
                   }
                 />
 
                 {/* user's connections of people */}
                 <StyledTab
                   label={
-                    <Box 
-                    display={'flex'}
-                    alignItems={'center'}
-                    >
-                 
-                      {/* text */}
+             
                     <Typography
                      fontWeight={'bold'}
                       variant="body2">
                       People
                     </Typography>
-                    </Box>
                   }
                 />
 

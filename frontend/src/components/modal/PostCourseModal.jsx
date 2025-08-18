@@ -106,7 +106,6 @@ const PostCourseModal =({ openModalCourse, setOpenModalCourse }) => {
 
   // store selected video files
   const [videoFiles,setVideoFiles]=useState([])
-  const [uploadProgress, setUploadProgress] = useState(0);
  
 
   // handle video change and update the videoFiles array
@@ -197,67 +196,56 @@ const PostCourseModal =({ openModalCourse, setOpenModalCourse }) => {
     })
 
     if (title?.trim() === "") {
-      setErrorMessage("Title field required");
+      setErrorMessage("Title field is required");
       return false;
     }
     if (description?.trim() === "") {
-      setErrorMessage("Description field required");
+      setErrorMessage("Description field is required");
       return false;
     }
-   
-    if (postCategory?.trim === "" || category1.toLowerCase().trim() === "") {
-      setErrorMessage("specialisation field required");
+    if (postCategory?.trim === "") {
+      setErrorMessage("specialisation field is required");
       return false;
     }
-    if (postCategory?.toLowerCase().includes("frontend") && category1.toLowerCase().trim() === "") {
-      setErrorMessage("frontend framework or library required")
-    }
-    if (postCategory?.toLowerCase().includes("frontend") &&
-     (category4.toLowerCase().trim() === "" || category2.toLowerCase().trim() === "") ) {
-      setErrorMessage("frontend UI styling library required")
-    }
-    if (postCategory?.toLowerCase().includes("backend") && category1.toLowerCase().trim() === "") {
-      setErrorMessage("backend field required");
+    if (postCategory?.includes("Backend") && category1.trim() === "") {
+      setErrorMessage("backend field is required");
       return false;
     }
-    if (postCategory?.toLowerCase().includes("backend") && category2.toLowerCase().trim() === "") {
-      setErrorMessage("Database field required");
+    if (postCategory?.includes("Developer") && category1.trim() === "") {
+      setErrorMessage("DevOps Tool field is required");
       return false;
     }
-
-    if (postCategory?.toLowerCase().includes("devops") && category1.toLowerCase().trim() === "") {
-      setErrorMessage("DevOps Tool field required");
+    if (postCategory?.includes("Backend") && category2.trim() === "") {
+      setErrorMessage("Database field is required");
       return false;
     }
-   
-    if (postCategory?.toLowerCase().includes("machine") && category1.toLowerCase().trim() === "") {
-      setErrorMessage("ML/AI area of focus required");
+    if (postCategory?.includes("Machine") && category1.trim() === "") {
+      setErrorMessage("ML/AI area of focus is required");
       return false;
     }
-    if (postCategory?.toLowerCase().includes("cybersecurity") && category1.toLowerCase().trim() === "") {
-      setErrorMessage("Cybersecurity area field required");
+    if (postCategory?.includes("Cybersecurity") && category1.trim() === "") {
+      setErrorMessage("Cybersecurity area field is required");
       return false;
     }
     if (
-      postCategory?.toLowerCase().includes("data science") &&
-      category1.toLowerCase().trim() === ""
+      postCategory?.includes("Data Science and Analytics") &&
+      category1.trim() === ""
     ) {
-      setErrorMessage("Data science area field required");
+      setErrorMessage("Data science area field is required");
       return false;
     }
 
     if (
-      postCategory?.toLowerCase().includes("fullstack") &&
-      (category1.toLowerCase().trim() === "" ||
-        category2.toLowerCase().trim() === "" ||
-        category3.toLowerCase().trim() === "" ||
-        category4.toLowerCase().trim() ===  ""
-      ) 
-        
+      postCategory?.includes("Fullstack") &&
+      (category1.trim() === "" ||
+        category2.trim() === "" ||
+        category3.trim() === "")
     ) {
-      setErrorMessage("Frontend, UI Styling Library, Backend and Database required");
+      setErrorMessage("Frontend, Backend and Database field all required");
       return false;
     }
+
+
     if (!imageUpload) {
       if (freeLogo?.toLowerCase().trim() === " ") {
         setErrorMessage("provide course logo");
@@ -297,7 +285,7 @@ const PostCourseModal =({ openModalCourse, setOpenModalCourse }) => {
 
   // useEffect hook for updating category values
   useEffect(() => {
-    // handle the value fo backend
+    // handle the value for backend
     const updatePostCategoryValue = () => {
 
       // if programming language is the category
@@ -355,26 +343,14 @@ const handleClosingModal=()=>{
   const instructorId=user?._id
   const instructorName = user?.name;
   const instructorTitle = user?.specialisationTitle;
-  const instructorSkills = user?.selectedSkills;
   const instructorAvatar = user?.avatar;
-  const instructorEmail=user?.email
-  const instructorPhone=user?.phone
-  const instructorGitHub=user?.gitHub
-  const instructorLinkedIn=user?.linkedin
-  const instructorWebsite=user?.portfolio
 
   const courseObject = {
-    instructor: {
+    course_instructor: {
       instructorId,
       instructorName,
       instructorTitle,
-      instructorAvatar,
-      instructorEmail,
-      instructorSkills,
-      instructorPhone,
-      instructorGitHub,
-      instructorLinkedIn,
-      instructorWebsite
+      instructorAvatar
     },
     course_title: title,
     course_description: description,
@@ -400,12 +376,9 @@ const handleClosingModal=()=>{
   // handle posting of data to the backend
   const handleUploadCourse = () => {
 
-    console.log(courseObject)
-
-
      // clear any message errors
-     setErrorMessage("")
-     
+    setErrorMessage("")
+
     // core fields not empty
     if (handleAnyErrors()) {
       // create a form which will facilitate parsing of the file for upload to cloud
@@ -419,7 +392,7 @@ const handleClosingModal=()=>{
           formData.append("videos",element)
         });
       }
-     
+    
       // holds image logo if present
       if (imageUpload) {
         // append image logo for the course
@@ -435,9 +408,6 @@ const handleClosingModal=()=>{
           formData,
           {
             withCredentials: true,
-            onUploadProgress: (progressEvent) => {
-              setUploadProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
-            }
           },
           
         )
@@ -465,7 +435,6 @@ const handleClosingModal=()=>{
     }
   };
 
-
   // handle return width modal
   const handleReturnWidthModal=()=>{
     if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
@@ -481,7 +450,7 @@ const handleClosingModal=()=>{
     <StyledModalPost
     keepMounted
     open={openModalCourse}
-    onClose={handleClosingModal}
+    onClose={!isUploading && handleClosingModal}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
   >
@@ -574,12 +543,10 @@ const handleClosingModal=()=>{
                 <Box 
                 display={'flex'}
                  alignItems={'center'}
-                 gap={1}
+                 mb={1}                 
                  >
                   {/* progress circle */}
                   <CircularProgress size={"25px"} />
-                  {/* progress percentage */}
-                  {uploadProgress}%
                 </Box>
               )
             )}

@@ -12,7 +12,6 @@ import {
   AvatarGroup,
   Badge,
   Box,
-  Button,
   CircularProgress,
   Collapse,
   Divider,
@@ -20,7 +19,7 @@ import {
   Stack,
   styled,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
@@ -391,7 +390,6 @@ export default function AlertMiniProfileView({
               justifyContent={'flex-end'}
               gap={1}
               >
-
                 {/* github */}
                 <Tooltip 
                 arrow

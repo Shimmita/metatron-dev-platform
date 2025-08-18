@@ -132,14 +132,13 @@ const DrawerSmartphone = ({
     <Drawer open={openDrawer} onClose={(e) => setOpenDrawer(false)}>
       <Box 
       px={0.5}
-      maxWidth={350} 
+      maxWidth={320} 
       height={"100%"} 
-      bgcolor={isDarkMode ?"background.default":"#E6F7FF"}>
-
+      bgcolor={'background.default'} 
+      >
       <Box 
       mt={0.5}
       p={1}
-      bgcolor={'background.default'} 
       className='rounded-2'>
 
         {/* theme changer */}
