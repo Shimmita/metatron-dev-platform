@@ -24,7 +24,6 @@ import FriendRequest from "../rightbar/layouts/FriendRequest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import CustomModalHeight from "../utilities/CustomModalHeight";
 
 // styled modal
 const StyledModalPeople = styled(Modal)({
@@ -149,7 +148,6 @@ const PeopleModal = ({
         marginLeft:handleModalWidth()
       }}
       open={openPeopleModal}
-      onClose={handleCloseModalPeople}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -158,8 +156,8 @@ const PeopleModal = ({
         bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         display={"flex"}
-        className="rounded-3"
         justifyContent={"center"}
+        borderRadius={3}
         border={isDarkMode &&'1px solid'}
         borderColor={'divider'}
         alignItems={"center"}
@@ -168,6 +166,7 @@ const PeopleModal = ({
         }}
       >
         <Box
+          borderRadius={3}
           width={"100%"}
           bgcolor={"background.default"}
         >
@@ -230,8 +229,8 @@ const PeopleModal = ({
           )}
 
           <Box
-            maxHeight={CustomModalHeight()}
-            className="px-3 mt-2"
+            maxHeight={'70vh'}
+            className="px-3 mt-1"
             sx={{
               overflow: "auto",
               // Hide scrollbar for Chrome, Safari and Opera

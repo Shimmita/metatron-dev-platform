@@ -29,7 +29,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDispatch, useSelector } from "react-redux";
 import { handleUpdateIsPostDetailed } from "../../redux/AppUI";
 import { resetClearCurrentPosts, updateCurrentPostDetails, updateCurrentPosts } from "../../redux/CurrentPosts";
@@ -612,19 +611,16 @@ const CardFeed = ({
                   justifyContent: "center",
                 }}
               >
-                {/* smart 300,350 */}
-                <LazyLoadImage
+                  <img 
+                  style={{ 
+                    height:CustomDeviceScreenSize(),
+                    width:handleImageWidth(),
+                    objectFit:'fill',
+                    borderRadius:5,
+                   }}
                   src={handlePostImagePresent()}
-                  alt=""
-                  height={CustomDeviceScreenSize()}
-                  width={handleImageWidth()}
-                  style={{
-                    objectFit: "fill",
-                    borderRadius: 10,
-                    border: "1px solid",
-                    borderColor: "gray",
-                  }}
-                />
+                   loading="lazy"
+                  alt="" />
               </Box>
             </Box>
    

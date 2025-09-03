@@ -16,6 +16,10 @@ export default function StepperStats({dataInsights}) {
       orientation='vertical'>
         {dataInsights?.map((insight) => (
           <Step 
+          sx={{
+            m:0,
+            p:0
+          }}
           key={insight.title} 
           completed={2}>
           {/* stepper title */}
@@ -30,7 +34,7 @@ export default function StepperStats({dataInsights}) {
           {/* stepper body */}
           <Typography 
           variant='caption'
-           color={'text.secondary'}>
+          color={'text.secondary'}>
             {insight.details.substring(0,!CustomDeviceIsSmall() ? 41:undefined)}
           </Typography>
           </Step>

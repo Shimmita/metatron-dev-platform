@@ -61,23 +61,23 @@ export default function AlertGeneral({
         keepMounted
         aria-describedby="alert-dialog-slide-description"
           sx={{
-            backdropFilter:'blur(3px)',
+            backdropFilter:'blur(5px)',
            marginLeft:handleAlertGenWidth()
           }}
       >
           <DialogTitle
           display={"flex"}
           alignItems={"center"}
-          variant="body1"
+          variant="body2"
           fontWeight={"bold"}
           gap={2}
         >
           {defaultIcon}
-          {title}
+          {`${title}`}
         </DialogTitle>
         <DialogContent dividers>
-          <DialogContentText maxWidth={400} id="alert-dialog-slide-description">
-            {message}
+          <DialogContentText variant="body2" maxWidth={400} id="alert-dialog-slide-description">
+            {`${message}`}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

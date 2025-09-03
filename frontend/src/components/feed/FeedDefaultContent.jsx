@@ -146,8 +146,8 @@ const FeedDefaultContent = () => {
     setIsPremium(false)
     setIsHelp(false)
     setIsRecommend(false)
-    setTitle("Mobile App Download")
-    setMessageBody("Our esteemed software engineers are working on the development of the mobile application, once completed all the users on the platform will be notified.")
+    setTitle("Mobile and Desktop App")
+    setMessageBody("under development, our esteemed software engineers are working on the development of the application.")
   }
 
   // handle closing of all info

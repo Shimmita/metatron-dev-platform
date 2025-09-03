@@ -3,6 +3,7 @@ import {
   Avatar,
   Box,
   Button,
+  CircularProgress,
   Divider,
   Stack,
   Typography
@@ -11,6 +12,8 @@ import axios from "axios";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { resetClearCurrentJobs } from "../../../redux/CurrentJobs";
+import { resetClearCurrentJobsTop } from "../../../redux/CurrentJobsTop";
+import { updateCurrentSnackBar } from "../../../redux/CurrentSnackBar";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
@@ -55,13 +58,20 @@ function JobStatsLayout({ isDarkMode, job,user }) {
       // track progress of the request
       setIsFetching(true)
       // delete request
-      axios.delete(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/delete/my/application/${user?._id}/${job?._id}`,{
+      axios.delete(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/delete/my/application/${user?._id}/${user?.gender}/${job?._id}`,{
               withCredentials: true,
             })
             .then((res) => {
                // reset and clear current jobs redux, this triggers api call to fetch 
               //  data from the backend since useEffect will be invoked
               dispatch(resetClearCurrentJobs())
+
+              // reset the current featured jobs for refetch to effect
+            dispatch(resetClearCurrentJobsTop())
+    
+            // snackbar success message from the backend update redux state
+            dispatch(updateCurrentSnackBar('Deleted'));
+            
             })
             .catch(async (err) => {
  
@@ -216,6 +226,7 @@ function JobStatsLayout({ isDarkMode, job,user }) {
     <Box display={'flex'} justifyContent={'center'} mt={2}> 
     <Button size="small"
     disabled={isFetching}
+    startIcon={isFetching && <CircularProgress size={12}/>}
     onClick={handleDeleteJobApplication}
      color="warning"
       variant="outlined" 

@@ -23,7 +23,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { lazy, Suspense, useLayoutEffect, useState } from "react";
+import React, { Suspense, useLayoutEffect, useState } from "react";
 
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,24 +50,20 @@ import { updateCurrentProfileViews } from "../../redux/CurrentProfileView";
 import AlertAboutMetatron from "../alerts/AlertAboutMetatron";
 import AlertFilterFeed from "../alerts/AlertFilterFeed";
 import AlertGeneral from "../alerts/AlertGeneral";
+import AlertGlobalSearch from "../alerts/AlertGlobalSearch";
 import AlertSponsorship from "../alerts/AlertSponsorship";
 import LogoutAlert from "../alerts/LogoutAlert";
 import SpecialisationTech from "../data/SpecialisationTech";
+import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
+import PeopleModal from "../modal/PeopleModal";
 import PostDetailedModal from "../modal/PostDetailedModal";
 import PostEditModal from "../modal/PostEditModal";
+import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-const PeopleModal = lazy(() => import("../modal/PeopleModal"));
-const AlertGlobalSearch = lazy(() => import("../alerts/AlertGlobalSearch"));
-const ProfileDrawer = lazy(() => import("../profile/drawer/ProfileDrawer"));
-const EventsAddModal = lazy(() => import("../modal/EventsAddModal"));
-const ParentNotifMessageDrawer = lazy(() =>
-  import("../messaging/ParentNotifMessageDrawer")
-);
-const DrawerSmartphone = lazy(() => import("./DrawerSmartphone"));
-
+import DrawerSmartphone from './DrawerSmartphone';
 
 const MetatronToolBar = styled(Toolbar)({
   display: "flex",
@@ -145,7 +141,6 @@ const Navbar = () => {
   const feedOptions=SpecialisationTech || []
 
   // control opening of the events modal
-  const [openModalEventAdd, setOpenModalEventAdd] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
 
   const dispatch = useDispatch();
@@ -618,8 +613,8 @@ const Navbar = () => {
                       placeholder="search…"
                       inputProps={{ 'aria-label': 'search' }}
                       sx={{ 
-                       borderRadius:'20px',
-                       fontSize:'small'
+                      borderRadius:'20px',
+                      fontSize:'small'
                         }}
                       type="text"
                       disabled={isFetching}
@@ -873,14 +868,6 @@ const Navbar = () => {
           {isOpenDrawerProfile && (
           <ProfileDrawer />
           )}
-
-          {/* EventsAdd Modal to be displayed if toggled */}
-         {openModalEventAdd && (
-           <EventsAddModal
-           openModalEventAdd={openModalEventAdd}
-           setOpenModalEventAdd={setOpenModalEventAdd}
-         />
-         )}
 
          {/* show logout alert */}
          {isLogoutAlert && (

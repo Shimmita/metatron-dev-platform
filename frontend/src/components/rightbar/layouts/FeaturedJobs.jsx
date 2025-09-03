@@ -1,4 +1,4 @@
-import { OpenInBrowser, Verified } from "@mui/icons-material";
+import { LockRounded, OpenInBrowser, Verified } from "@mui/icons-material";
 import {
   Avatar,
   AvatarGroup,
@@ -21,7 +21,7 @@ import ApplyJobModal from "../../modal/ApplyJobModal";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
-const MAX_APPLICANTS=300
+const MAX_APPLICANTS=500
 
 
 function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
@@ -55,7 +55,7 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
   // job has been paused or deactivated by the poster
   const isDeactivated=jobTop?.status==="inactive"
     // check if job reached maxima number of applicants
-    const isMaxApplicants=jobTop?.applicants?.total>=MAX_APPLICANTS
+    const isMaxApplicants=jobTop?.applicants?.total===MAX_APPLICANTS || jobTop?.applicants?.total===jobTop?.applicants_max
 
   return (
     <React.Fragment>
@@ -157,20 +157,20 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                   </Box>
 
                   {/* description if is job belongs to the current user */}
-                 {isMyJob && (
-                   <Box 
-                   display={'flex'}
-                   justifyContent={'center'}
-                   mt={1}
-                   >
-                   <Typography 
-                   textAlign={'center'}
-                    variant="caption"
-                   sx={{ color:'text.secondary', 
-                   textTransform:'lowercase' }}> - you posted this job -
-                   </Typography>
-                   </Box>
-                 )}
+                {isMyJob && (
+                  <Box 
+                  display={'flex'}
+                  justifyContent={'center'}
+                  mt={1}
+                  >
+                  <Typography 
+                  textAlign={'center'}
+                  variant="caption"
+                  sx={{ color:'text.secondary', 
+                  textTransform:'lowercase' }}> - you posted this job -
+                  </Typography>
+                  </Box>
+                )}
 
                 </Box>
               }
@@ -180,7 +180,7 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
               {/* applicants counter */}
               <Box>
                 <Typography variant="caption" color={"text.secondary"} fontWeight={'bold'}>
-                   {!(jobTop?.website==="") ? "(N/A)" :`${jobTop?.applicants?.total}/300 `}
+                   {!(jobTop?.website==="") ? "website" :`${jobTop?.applicants?.total}/${jobTop?.applicants_max || MAX_APPLICANTS} `}
                 </Typography>
               </Box>
 
@@ -191,7 +191,7 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                   size="small"
                   onClick={handleOpeningApplyJob}
                   variant="contained"
-                  startIcon={!(jobTop?.website==="") ? <OpenInBrowser /> :<Verified />}
+                  startIcon={isDeactivated || isMaxApplicants ? <LockRounded/>: !(jobTop?.website==="") ? <OpenInBrowser /> :<Verified />}
                   disabled={jobTop?.currentUserApplied||isDeactivated || isMyJob||isMaxApplicants}
                   sx={{
                     textTransform: "capitalize",

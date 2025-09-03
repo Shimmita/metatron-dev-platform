@@ -9,7 +9,7 @@ const CurrentGlobalSearch = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadate the search results by the feed from the payload
+    // update the search results by the feed from the payload
     updateCurrentGlobalSearchResults: (state, action) => {
       state.globalSearchResults = action.payload;
     },

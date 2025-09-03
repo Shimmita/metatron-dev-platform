@@ -2,6 +2,7 @@ import {
   Close,
   PageviewRounded,
   PreviewRounded,
+  SchoolRounded,
   TvRounded,
   WorkRounded
 } from "@mui/icons-material";
@@ -37,6 +38,7 @@ import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import { updateCurrentCourses } from "../../redux/CurrentCourses";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -45,7 +47,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function AlertJobSearch({
   openAlert,
   setOpenAlert,
-  isEventSearch=false
+  isEventSearch=false,
+  isCourseSearch=false
 }) {
   const [isFetching, setIsFetching] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -87,6 +90,7 @@ export default function AlertJobSearch({
 
   // fetch the matching jobs from the backend
   const handleFetchingJobsSearch = () => {
+    
     // create job search object that will be sent to the backend
     const jobSearch = {
       job_titles,
@@ -103,6 +107,12 @@ export default function AlertJobSearch({
       category
     }
 
+    // course search object
+    const courseSearchObject={
+      job_titles,
+      category
+    }
+
     // set is fetching to true
     setIsFetching(true);
     // performing post request, if jobs search use appropriate route
@@ -110,9 +120,9 @@ export default function AlertJobSearch({
     axios
       .post(
         isEventSearch ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/search`:
-          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search/${user?._id}`
+         isCourseSearch ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/search/${user?._id}`  : `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search/${user?._id}`
         ,
-        isEventSearch ? eventObject:jobSearch,
+        isEventSearch ? eventObject:isCourseSearch ? courseSearchObject: jobSearch,
         {
           withCredentials: true,
         }
@@ -124,6 +134,8 @@ export default function AlertJobSearch({
           setSuccessMessage(res.data?.message);
           // update events redux
           isEventSearch ? dispatch(updateCurrentEvents(res.data.data)):
+          // update redux courses
+          isCourseSearch ? dispatch(updateCurrentCourses(res.data.data)) :
           // update the redux states for job search
           dispatch(updateCurrentJobs(res.data?.data));
           // close expansion of accordion after any results
@@ -180,7 +192,7 @@ export default function AlertJobSearch({
       onClose={handleCloseAlert}
       aria-describedby="alert-dialog-job-search"
       sx={{
-          backdropFilter:'blur(3px)',
+          backdropFilter:'blur(5px)',
           marginLeft:handleAlertWidth()
           }}
     >
@@ -216,13 +228,22 @@ export default function AlertJobSearch({
             Tech Event Search
             </Typography>
             </React.Fragment>
+          ): isCourseSearch ? (
+            <React.Fragment>
+               {/*  icon */}
+            <SchoolRounded />
+            {/* title */}
+            <Typography variant={'body1'}>
+              Tech Course Search
+            </Typography>
+            </React.Fragment>
           ):(
             <React.Fragment>
               {/*  icon */}
             <WorkRounded />
             {/* title */}
             <Typography variant={'body1'}>
-            Job Search
+            Tech Job Search
           </Typography>
             </React.Fragment>
           )}
@@ -287,7 +308,7 @@ export default function AlertJobSearch({
         )}
         <DialogContent>
           <DialogContentText gutterBottom mb={2}>
-            provide the name of the {isEventSearch ? "event":"job"} and click on the search icon.
+            provide the name of the {isEventSearch ? "event": isCourseSearch ? "course":"job"} and click on the search icon.
           </DialogContentText>
           <Autocomplete
             multiple
@@ -347,8 +368,9 @@ export default function AlertJobSearch({
                 </TextField>
           </Box>
 
-          {/* more search options accordion */}
-          <Box mt={2}>
+          {/* more search options accordion, not for courses */}
+          {!isCourseSearch && (
+            <Box mt={2}>
             <AccordionSearchOptions
               country={country}
               setCountry={setCountry}
@@ -364,6 +386,8 @@ export default function AlertJobSearch({
               setExpanded={setExpanded}
             />
           </Box>
+          )}
+          
         </DialogContent>
 
         <DialogActions>

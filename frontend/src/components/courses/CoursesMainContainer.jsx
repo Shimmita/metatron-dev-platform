@@ -1,5 +1,4 @@
 import {
-  AccountCircleOutlined,
   AutoAwesomeOutlined,
   DarkModeRounded,
   HighlightOffOutlined,
@@ -8,6 +7,8 @@ import {
   ManageSearchOutlined,
   Menu,
   PictureAsPdfOutlined,
+  PrintRounded,
+  Refresh,
   SchoolOutlined,
   SupportAgentRounded,
   VideoLibraryOutlined,
@@ -20,10 +21,10 @@ import {
   Avatar,
   Button,
   CircularProgress,
-  Grid,
   Stack,
   Toolbar,
-  Tooltip
+  Tooltip,
+  useMediaQuery
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -47,6 +48,7 @@ import {
   resetDarkMode,
   showUserProfileDrawer
 } from "../../redux/AppUI";
+import { updateCurrentCourses } from "../../redux/CurrentCourses";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertJobSearch from "../alerts/AlertJobSearch";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
@@ -54,9 +56,9 @@ import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import CertificatesTable from "./layout/CertificatesTable";
 import CourseLayout from "./layout/CourseLayout";
+import CoursePlayer from "./layout/CoursePlayer";
   
   const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
   
@@ -121,6 +123,10 @@ import CourseLayout from "./layout/CourseLayout";
     const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
     const [generalTitle,setGeneralTitle]=useState("")
     const [messageGeneral,setMessageGeneral]=useState("")
+    const [focusedCourse,setFocusedCourse]=useState(null)
+    const [isCert,setIsCert]=useState(false)
+    const [certData,setCertData]=useState(null)
+
     // redux states
     const {  
       isDefaultSpeedDial, 
@@ -136,21 +142,22 @@ import CourseLayout from "./layout/CourseLayout";
     const isDarkMode=currentMode==='dark'
 
     // array for simulation of courses
-    const items = Array.from({ length: 12 }, (_, i) => i);
     const { user } = useSelector((state) => state.currentUser);
+    const {courses}=useSelector((state)=>state.currentCourses);
 
-  
     const { messageSnack } = useSelector((state) => state.currentSnackBar);
     const theme = useTheme();
-      // trigger redux update
-      const dispatch = useDispatch();
+   
+    // smartphones and below
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm")); 
     
     const navigate=useNavigate()
+      const dispatch = useDispatch();
   
     const [textOption, setTextOption] = useState(
-      isJobSearchGlobal ? "Search Courses" : "Explore Courses"
+      isJobSearchGlobal ? "Course Search" : "Explore Courses"
     );
-    const [isDrawerPane, setIsDrawerPane] = useState(true);
+    const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
     const [open, setOpen] = useState(
       !(CustomDeviceIsSmall() || CustomDeviceTablet()) && true
     );
@@ -165,7 +172,7 @@ import CourseLayout from "./layout/CourseLayout";
     const [openAlert, setOpenAlert] = useState(false);
   
      //   handle opening of drawer profile
-     const handleShowingProfileDrawer = () => {
+    const handleShowingProfileDrawer = () => {
         dispatch(showUserProfileDrawer());
       };
   
@@ -175,9 +182,8 @@ import CourseLayout from "./layout/CourseLayout";
     };
   
   
-  
        // UI theme dark light tweaking effect
-       const handleShowDarkMode = () => {
+      const handleShowDarkMode = () => {
         // update the redux theme boolean state
         dispatch(resetDarkMode());
       };
@@ -199,17 +205,289 @@ import CourseLayout from "./layout/CourseLayout";
   
     // false right bar is no of use this route
     useLayoutEffect(()=>{
-       // updating right bar show false
-       if (isSidebarRighbar) {
-        dispatch(handleSidebarRightbar());
-      }
+      // true tem, and the redux will reverse
+        dispatch(handleSidebarRightbar(true));
     },[dispatch,isSidebarRighbar])
     
+
+
+    // fetch courses on launch
+    useLayoutEffect(() => {
+      // set is certificate to false default
+      setIsCert(false)
+
+      // search query was global thus, no pop-up and prevent
+      // data overriding from search refetch
+      if (isJobSearchGlobal) {
+        setOpenAlert(false)
+        return
+      }
+        // show search courses alert when its the one focused
+        if (textOption === "Course Search") {
+          setOpenAlert(true);
+          return;
+        }
+    
+        // set is fetching to true
+        setIsFetching(true);
+    
+        // fetch all courses, governed by pagination of 12 each fetch
+        if (textOption === "Explore Courses") {
+    
+          axios
+            .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/${user?._id}`, {
+              withCredentials: true,
+            })
+            .then((res) => {
+              // update the redux of current events
+              if (res?.data) {
+                dispatch(updateCurrentCourses(res.data))
+              } 
+            })
+            .catch(async (err) => {
+              //  user login session expired show logout alert
+              if (err?.response?.data.login) {
+                window.location.reload();
+              }
+              if (err?.code === "ERR_NETWORK") {
+                setErrorMessage(
+                  "server unreachable"
+                );
+                return;
+              }
+              setErrorMessage(err?.response.data);
+            })
+            .finally(() => {
+              setIsFetching(false);
+            });
+        }
+    
+        // performing post request for popular courses
+        if (textOption === "Popular Courses") {
+          axios.post(
+              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/popular/`,
+              {
+                withCredentials: true,
+              }
+            )
+            .then((res) => {
+              // update the redux of current post
+              if (res?.data) {
+                dispatch(updateCurrentCourses(res.data));
+              } 
+            })
+            .catch(async (err) => {
+              console.log(err);
+              //  user login session expired show logout alert
+              if (err?.response?.data.login) {
+                window.location.reload();
+              }
+              if (err?.code === "ERR_NETWORK") {
+                setErrorMessage(
+                  "server unreachable!"
+                );
+                return;
+              }
+              setErrorMessage(err?.response.data);
+            })
+            .finally(() => {
+              setIsFetching(false);
+            });
+        }
+
       
-    // navigate to the instructor page
-    const handleNavigateInstructor=()=>{
-      navigate("/courses/instructor")
-    }
+    
+        // handle getting of the recommended courses
+        if (textOption === "AI Selection") {
+    
+          const userSkills=user?.selectedSkills
+          
+          axios
+            .post(
+              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/recommended/${user?._id}`,
+              userSkills ,
+              {
+                withCredentials: true,
+              }
+            )
+            .then((res) => {
+              // update the redux of current events
+              if (res?.data) {
+                dispatch(updateCurrentCourses(res.data));
+              } 
+            })
+            .catch(async (err) => {
+              //  user login session expired show logout alert
+              if (err?.response?.data.login) {
+                window.location.reload();
+              }
+              if (err?.code === "ERR_NETWORK") {
+                setErrorMessage(
+                  "server unreachable"
+                );
+                return;
+              }
+              setErrorMessage(err?.response.data);
+            })
+            .finally(() => {
+              setIsFetching(false);
+            });
+    
+        }
+
+                
+       // get all pdf resources on courses
+      if (textOption === "PDF Resources" ) {
+    
+        axios
+          .get(
+            `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/pdf/resources}`,
+            {
+              withCredentials: true,
+            }
+          )
+          .then((res) => {
+            // update the redux of current events
+            if (res?.data) {
+              dispatch(updateCurrentCourses(res.data));
+            } 
+          })
+          .catch(async (err) => {
+            console.log(err);
+            //  user login session expired show logout alert
+            if (err?.response?.data.login) {
+              window.location.reload();
+            }
+            if (err?.code === "ERR_NETWORK") {
+              setErrorMessage(
+                "server unreachable"
+              );
+              return;
+            }
+            setErrorMessage(err?.response.data);
+          })
+          .finally(() => {
+            setIsFetching(false);
+          });
+    
+      }
+    
+      // fetch enrolled courses only
+      if (textOption==="Enrolled Courses") {
+        axios
+          .get(
+            `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/enrolled/${user?._id}`,
+            {
+              withCredentials: true,
+            }
+          )
+          .then((res) => {
+            // update the redux of current events
+            if (res?.data) {
+              dispatch(updateCurrentCourses(res.data));
+            } 
+          })
+          .catch(async (err) => {
+            console.log(err);
+            //  user login session expired show logout alert
+            if (err?.response?.data.login) {
+              window.location.reload();
+            }
+            if (err?.code === "ERR_NETWORK") {
+              setErrorMessage(
+                "server unreachable"
+              );
+              return;
+            }
+            setErrorMessage(err?.response.data);
+          })
+          .finally(() => {
+            setIsFetching(false);
+          });
+      }
+
+
+      // courses enrolled fetching
+      if (textOption==="My Certifications") {
+        axios
+          .get(
+            `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/certs/${user?._id}`,
+            {
+              withCredentials: true,
+            }
+          )
+          .then((res) => {
+            if (res?.data) {
+              // populate cert data
+              setCertData(res.data)
+
+              // true certificate
+              setIsCert(true)
+            } 
+          })
+          .catch(async (err) => {
+            //  user login session expired show logout alert
+            if (err?.response?.data.login) {
+              window.location.reload();
+            }
+            if (err?.code === "ERR_NETWORK") {
+              setErrorMessage(
+                "server unreachable"
+              );
+              return;
+            }
+            setErrorMessage(err?.response.data);
+          })
+          .finally(() => {
+            setIsFetching(false);
+          });
+      }
+
+      }, [dispatch, textOption, user, isJobSearchGlobal]);
+
+
+
+      // handle navigate to instructor page
+      const handleNavigateInstructor=()=>{
+          // set is fetching true
+          setIsFetching(true)
+      
+          axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/instructor/${user?._id}`, {
+                    withCredentials: true,
+                  })
+                  .then((res) => {
+                    // if the length is greater than 0 then navigate hiring pane since 
+                    // are jobs user posted
+                    if (res?.data?.length>0) {
+                      navigate("/courses/instructor")
+                    } else{
+                      // don't navigate alert you have not posted any jobs
+                      setGeneralTitle("Metatron Instructor Page")
+                      setMessageGeneral("you have not posted any courses yet, upload your course and the page will be ready!")
+                      setOpenAlertGeneral(true)
+                    }
+                  })
+                  .catch(async (err) => {
+                      console.log(err)
+
+                    //  user login session expired show logout alert
+                    if (err?.response?.data.login) {
+                      window.location.reload();
+                    }
+                    if (err?.code === "ERR_NETWORK") {
+                      setErrorMessage(
+                        "server unreachable please try again later to complete your request"
+                      );
+                      return;
+                    }
+                    setErrorMessage(err?.response.data);
+                  })
+                  .finally(() => {
+                    setIsFetching(false);
+                    
+                  });
+        }
+
   
     return (
         <Suspense
@@ -226,7 +504,6 @@ import CourseLayout from "./layout/CourseLayout";
         >
           <Box 
           display={"flex"} 
-          maxHeight={(CustomLandScape()|| CustomLandscapeWidest()) ?"82vh":"90vh"}
           width={window.screen.availWidth-18}
           >
             <AppBar position="fixed" open={open}>
@@ -317,7 +594,7 @@ import CourseLayout from "./layout/CourseLayout";
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  backgroundColor:"#1976D2"
+                  backgroundColor:isDarkMode ? '#272727' :"#1976D2"
                 }}
               >
                 {!open && (
@@ -328,31 +605,31 @@ import CourseLayout from "./layout/CourseLayout";
                   </Box>
                 )}
   
-                {open && (
-                 <Box display={'flex'} gap={1} alignItems={'center'}>
-                 {/* icon right or left arrow */}
-               <IconButton onClick={handleDrawerClose}>
-                 {theme.direction === "rtl" ? (
-                   <ChevronRightIcon  sx={{ color:'white' }}/>
-                 ) : (
-                   <ChevronLeftIcon sx={{ color:'white' }} />
-                 )}
-               </IconButton>
-               <Box 
-               display={'flex'} 
-               flexDirection={'column'} 
-               justifyContent={'center'} 
-               alignItems={'center'}>
-                {/* title */}
-               <Typography variant="body2" 
-               sx={{color:'white'}} 
-               fontWeight={'bold'}
-               textTransform={'uppercase'}
-               display={'flex'}
-               alignItems={'center'}
-               gap={0.3}
-               mb={1}
-               >
+              {open && (
+                <Box display={'flex'} gap={1} alignItems={'center'}>
+                {/* icon right or left arrow */}
+              <IconButton onClick={handleDrawerClose}>
+                {theme.direction === "rtl" ? (
+                  <ChevronRightIcon  sx={{ color:'white' }}/>
+                ) : (
+                  <ChevronLeftIcon sx={{ color:'white' }} />
+                )}
+              </IconButton>
+              <Box 
+              display={'flex'} 
+              flexDirection={'column'} 
+              justifyContent={'center'} 
+              alignItems={'center'}>
+              {/* title */}
+              <Typography variant="body2" 
+              sx={{color:'white'}} 
+              fontWeight={'bold'}
+              textTransform={'uppercase'}
+              display={'flex'}
+              alignItems={'center'}
+              gap={0.3}
+              mb={1}
+              >
                 <LocalLibraryOutlined/>
                 Tech Student
                </Typography>
@@ -387,12 +664,12 @@ import CourseLayout from "./layout/CourseLayout";
               <List>
                 {[
                   "Explore Courses",
-                  "Advanced Search",
-                  "Popular Courses",
+                  "Course Search",
+                 // "Popular Courses",
                   "AI Selection",
-                  "PDF Resources",
+                  //"PDF Resources",
                   "Enrolled Courses",
-                  "Student Manager",
+                  "My Certifications",
                 ].map((text, index) => (
                   <ListItem
                     key={text}
@@ -446,27 +723,27 @@ import CourseLayout from "./layout/CourseLayout";
                             color={text === textOption ? "primary" : "inherit"}
                             sx={{width:24,height:24}}
                           />
-                        ) : index === 2 ? (
+                        ) : index === 10 ? (
                           <WavesOutlined
                             color={text === textOption ? "primary" : "inherit"}
                             sx={{width:20,height:20}}
                           />
-                        ) :index===3 ? (
+                        ) :index===2 ? (
                           <AutoAwesomeOutlined
                           color={text === textOption ? "primary" : "inherit"}
                           sx={{width:26,height:26}}
                         />
                           
-                        ):index===4 ? (
+                        ):index===11 ? (
                           <PictureAsPdfOutlined
                           color={text === textOption ? "primary" : "inherit"}
-                        />) :index===5 ? (
+                        />) :index===3 ? (
                           <VideoLibraryOutlined
                           color={text === textOption ? "primary" : "inherit"}
                         />): (
-                          <AccountCircleOutlined
+                          <PrintRounded 
                           color={text === textOption ? "primary" : "inherit"}
-                        />
+                          />
                         )}
                         </Tooltip>
                       </ListItemIcon>
@@ -498,19 +775,25 @@ import CourseLayout from "./layout/CourseLayout";
   
             {/* navigates to instructor page */}
            {open ? (
-                  <Button 
+             <Box 
+             width={'100%'}
+             display={'flex'} 
+             justifyContent={'center'}>
+                <Button 
                 size="small" 
                 startIcon={<SupportAgentRounded/>}
                 color="secondary"
                 disableElevation
                 sx={{my:1, px:1,
                  borderRadius:5,
+                  width:'90%',
                   fontWeight:'bold', 
                   border:'1px solid', 
                   borderColor:'divider'}}
                 onClick={handleNavigateInstructor}>
-                 Instructor Page
+                 I'M Instructor
                 </Button>
+                </Box>
            ):(
               <ListItemButton size="small" >
                 <Tooltip title={"Instructor Page"} arrow>
@@ -522,20 +805,25 @@ import CourseLayout from "./layout/CourseLayout";
                 </ListItemIcon>
                 </Tooltip>
               </ListItemButton>
-           )}
+          )}
 
-        {/* divider */}
-        <Divider component={'div'} className={'p-1'}/>
   
         </Drawer>
-            {/* body of the jobs */}
-            <Grid 
-              container 
-              size={'grow'}
-              width={'100%'}
-              justifyContent={'center'}
+        <Box 
+        height={'88vh'} 
+        width={"100%"}
+        display={"flex"}
+          justifyContent={"center"}
+          >
+        
+            <Box
+              p={2}
+              display={"flex"}
+              gap={2}
+              maxHeight={CustomDeviceIsSmall() || CustomDeviceTablet() ?"88vh":"80vh"}
+              flexWrap={"wrap"}
+              justifyContent={"center"}
               sx={{
-                p:2,
                 overflow: "auto",
                 // Hide scrollbar for Chrome, Safari and Opera
                 "&::-webkit-scrollbar": {
@@ -543,18 +831,17 @@ import CourseLayout from "./layout/CourseLayout";
                 },
                 // Hide scrollbar for IE, Edge and Firefox
                 msOverflowStyle: "none",
-                scrollbarWidth: "none", 
-               }}
-                >
+                scrollbarWidth: "none",
+              }}
+            >
                 <React.Fragment>
                   {/* all jobs and verified jobs and Nearby that have no external link */}
                   {(textOption === "Explore Courses" ||
-                    textOption === "Nearby Jobs" ||
-                    textOption === "Verified Jobs" ||
-                    textOption === "Recommend" ||
-                    textOption === "Applications"||
-                    textOption === "My Statistics" ||
-                    textOption === "Search Jobs") && (
+                    textOption === "Course Search" ||
+                    //textOption === "Popular Courses" ||
+                    textOption === "AI Selection" ||
+                    textOption === "Enrolled Courses"||
+                    textOption === "My Certifications") && (
                     <React.Fragment>
                       {isFetching ? (
                         <Box
@@ -568,18 +855,74 @@ import CourseLayout from "./layout/CourseLayout";
                         </Box>
                       ) : (
                         <React.Fragment>
+
+                      {!isCert  ? (
+                      <>
+                      {/* focused course */}
+                      {focusedCourse && (
+                        <CoursePlayer 
+                        openPlayer={focusedCourse}
+                        course={focusedCourse}
+                        setFocusedCourse={setFocusedCourse}
+                        />
+                      )}
+
                       {/* content will go here */}
-                      {items?.map((val)=>(
-                        <CourseLayout key={val} 
-                        isDarkMode={isDarkMode} />
+                      {courses?.length>0 && !focusedCourse && courses?.map((course)=>(
+                        <CourseLayout 
+                        key={course?._id} 
+                        isDarkMode={isDarkMode}
+                        courseItem={course}
+                        setFocusedCourse={setFocusedCourse}
+                        />
                       ))}
+
+                      {/* rendered if are no events  */}
+                        {courses?.length<1 && (
+                          <Box 
+                          height={'70vh'}
+                          display={'flex'}
+                          justifyContent={'center'}
+                          color={'text.secondary'}
+                          flexDirection={'column'}
+                          gap={2}
+                          alignItems={'center'}
+                          >
+                          {/* no events */}
+                          <Typography variant="body2">
+                            no more courses posted
+                          </Typography>
+                          {/* show refresh button */}
+                          <Button 
+                          disableElevation
+                          onClick={()=>setTextOption("Explore Courses")}
+                          size="small"
+                          variant="outlined"
+                          sx={{ borderRadius:3 }}
+                          startIcon={<Refresh/>}
+                          >refresh</Button>
+                          </Box>
+                        )}
+                        </>
+                      ):(
+                        <>
+                        {/* certs table */}
+                        {isCert && (
+                          <CertificatesTable  
+                            certsData={certData}
+                          />
+                        )}
+                        </>
+                      )}
+
+                        
                         </React.Fragment>
                       )}
                     </React.Fragment>
                   )}
                 </React.Fragment>
-              </Grid>
-
+              </Box>
+              </Box>
            
   
             {/* open alert general for no courses */}
@@ -608,6 +951,7 @@ import CourseLayout from "./layout/CourseLayout";
                openAlert={openAlert}
                setOpenAlert={setOpenAlert}
                isFullView={true}
+               isCourseSearch={true}
              />
             )}
            

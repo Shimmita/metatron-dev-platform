@@ -167,7 +167,7 @@ export default function RecommendStepper() {
       </Stepper>
       {activeStep === dataRecommend.length && (
         <>
-          <Typography variant='caption'>you have reached the end of recommendation</Typography> 
+          <Typography variant='caption'>you have reached the end of insights</Typography> 
           <br/>
           <Button disableElevation size='small' onClick={handleReset} sx={{ mt: 1, mr: 1,fontSize:'x-small' }}>
             Refresh

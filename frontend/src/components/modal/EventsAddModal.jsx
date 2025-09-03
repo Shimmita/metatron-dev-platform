@@ -1,7 +1,8 @@
 import {
   Add,
   CheckCircle,
-  Close
+  Close,
+  TvRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -107,7 +108,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState(
     AllCountries.map((val) => {
-      let country = `${val.label} (${val.code})`;
+      let country = `+${val.phone} ${val.label} (${val.code})`;
       return country
     }).sort((a,b)=>a.localeCompare(b))
   );
@@ -274,7 +275,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
         CustomLandScape() 
         ||CustomLandscapeWidest() || 
         (CustomDeviceTablet() && !isTabSideBar)) {
-        return "35%"
+        return "40%"
       } else if (CustomDeviceTablet()){
         return "90%"
       } 
@@ -297,10 +298,9 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
       keepMounted
       open={openModalEventAdd}
       sx={{
-        backdropFilter:'blur(3px)',
+        backdropFilter:'blur(5px)',
         marginLeft:handleModalWidth(),
       }}
-      onClose={handleClosingEventPostModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -335,7 +335,6 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
             <Box>
               <Avatar sx={{ width: 50, height: 50 }} src={AppLogo} alt="" />
             </Box>
-
             {/* job title */}
             <Typography
               variant="body2"
@@ -411,9 +410,14 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
               scrollbarWidth: "none",
             }}
           >
-            <Box display={"flex"} flexDirection={"column"} gap={3} mt={3}>
+            <Box display={"flex"} flexDirection={"column"} gap={2} mt={3}>
                 {/*event title */}
                 <Box className="w-100 mb-2">
+                <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                  Provide the name or title of the event. Should be concise and self explanatory 
+                  without complexities.
+                </Typography>
+
                   <TextField
                     required
                     disabled={isUploading}
@@ -426,6 +430,10 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                 </Box>
                 {/* event category */}
                <Box className="w-100 mb-2 ">
+               <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                  Provide the category or area of specialization of the event. Makes it easier for searching algorithm to locate your event instantly.
+                </Typography>
+
                 <TextField
                   required
                   select
@@ -458,6 +466,9 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
 
                {/*event hosting link */}
                 <Box className="w-100 mb-3">
+                <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                  Please share the event link from zoom, google meet, calendly etc. currently we do not support video conferencing.
+                </Typography>
                   <TextField
                     required
                     disabled={isUploading}
@@ -472,11 +483,14 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
 
                 {/* date */}
               <Box className="w-100 mb-3">
+              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                Please select the date when your planned event is going to take place. Your timezone shall be shown to the 
+                potential users.
+                </Typography>
                   <TextField
                     required
                     disabled={isUploading}
                     value={eventDate}
-                    label="when shall the event take place"
                     fullWidth
                     type="datetime-local"
                     onChange={(e) => setEventDate(e.target.value)}
@@ -484,7 +498,12 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                 </Box>
 
               <Box className="mb-3">
-                  <Stack gap={4}>
+                  <Stack gap={3}>
+                  <Box>
+                    <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                    Please select your country of residence from the drop-down list below. Your country makes it easier in
+                    tracking timezones.
+                    </Typography>
                     <Autocomplete
                       value={country}
                       disabled={isUploading}
@@ -543,7 +562,13 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                         />
                       }
                     />
+                    </Box>
                     {/* state or county */}
+                    <Box>
+                    <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                    Provide your city or state to facilitate easier recommendation of close or nearby tech friends to 
+                    attend your event.
+                    </Typography>
                      <TextField
                       required
                       id="state-country"
@@ -553,13 +578,18 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                       fullWidth
                       onChange={(e) => setCounty(e.target.value)}
                     />
+                    </Box>
                   </Stack>
                 
               </Box>
 
               {/* skills covered */}
 
-               <Box mb={2}>
+                <Box mb={2}>
+                    <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                    What skills or technical areas is your event purposed to explore. select the most 
+                    appropriate ones from the options below.
+                    </Typography>
                     <Autocomplete
                       multiple
                       disabled={isUploading}
@@ -589,9 +619,11 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
 
 
               <Box className="mb-3">
-               
                   <React.Fragment>
-                    {/* Autocomplete Text Field */}
+                  <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                    Provide atleast four topics which you intend to cover.This may help 
+                    the potential individuals in estimating worthiness of attending event. 
+                    </Typography>
                     <Autocomplete
                       freeSolo
                       options={options_req} 
@@ -604,6 +636,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                       renderInput={(params) => (
                         <TextField
                           {...params}
+                          error={reqText.length>MAX_TOPIC_LENGTH}
                           label={`topic explored ${MAX_TOPIC_LENGTH-reqText.length} *`}
                           placeholder="introduction to machine learning"
                           fullWidth
@@ -660,8 +693,11 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
 
 
               {/* about your event */}
-
               <Box mb={3}>
+              <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                  Write a brief description about your event highlighting the importance and the impact 
+                  your event is aimed to address.
+                  </Typography>
                 <TextField
                   minRows={window.screen.availWidth <= 320 ? 3 : 5}
                   multiline
@@ -670,7 +706,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                   contentEditable={false}
                   error={about.length > MAX_ABOUT}
                   id="about-meeting-required"
-                  label={`briefly about your event ${MAX_ABOUT - about.length}`}
+                  label={`tell us about your event ${MAX_ABOUT - about.length}`}
                   fullWidth
                   value={about}
                   onChange={(e) => setAbout(e.target.value)}
@@ -681,11 +717,15 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
               {/*  button for posting */}
               <Box mb={2} display={"flex"} justifyContent={"center"}>
                 <Button
-                  className="w-75 rounded-5 shadow-sm"
+                  className="rounded-5"
                   variant="contained"
                   onClick={handleEventPost}
-                  disabled={isUploading || errorMessage}
-                  size="small"
+                  disabled={
+                  isUploading || errorMessage ||
+                  reqText.length>MAX_TOPIC_LENGTH || 
+                  about.length>MAX_ABOUT}
+                  startIcon={isUploading ? <CircularProgress/>:<TvRounded/>}
+                  size='medium'
                 >
                   Upload Event
                 </Button>

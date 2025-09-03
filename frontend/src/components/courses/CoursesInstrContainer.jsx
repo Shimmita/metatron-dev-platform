@@ -1,19 +1,13 @@
 import {
   DarkModeRounded,
-  FavoriteOutlined,
-  FiberNewOutlined,
-  FlagOutlined,
   HighlightOffOutlined,
   InfoRounded,
-  LocalLibraryOutlined,
-  ManageAccountsOutlined,
-  ManageSearchOutlined,
   Menu,
-  MoneyOffOutlined,
   NotificationsRounded,
-  SchoolOutlined,
-  SubscriptionsOutlined,
-  WavesOutlined
+  Refresh,
+  Settings,
+  SupportAgentRounded,
+  UploadFileRounded
 } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -25,7 +19,8 @@ import {
   CircularProgress,
   Stack,
   Toolbar,
-  Tooltip
+  Tooltip,
+  useMediaQuery
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -42,7 +37,6 @@ import axios from "axios";
 import React, { Suspense, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import devImage from '../../images/dev.jpeg';
 import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
@@ -51,6 +45,7 @@ import {
   showMessagingDrawer,
   showUserProfileDrawer,
 } from "../../redux/AppUI";
+import { updateCurrentCourses } from "../../redux/CurrentCourses";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertJobSearch from "../alerts/AlertJobSearch";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
@@ -58,6 +53,9 @@ import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import CourseLayout from "./layout/CourseLayout";
+import CoursePlayer from "./layout/CoursePlayer";
+import ManageCoursesTable from "./layout/ManageCoursesTable";
   
   const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
   
@@ -121,11 +119,13 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
     const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
     const [generalTitle,setGeneralTitle]=useState("")
     const [messageGeneral,setMessageGeneral]=useState("")
+    const [focusedCourse,setFocusedCourse]=useState(null)
+    const [isCourseManager,setIsCourseManager]=useState(false)
+    
     // redux states
     const { 
       currentMode, 
       isDefaultSpeedDial, 
-      isJobSearchGlobal,
       isSidebarRighbar,
       isOpenDrawerProfile,
       isOpenMessageDrawer
@@ -137,28 +137,27 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
   const isDarkMode=currentMode==='dark'
   
   
-    const { jobs } = useSelector((state) => state.currentJobs);
     const { user } = useSelector((state) => state.currentUser);
     const { post_reactions } = useSelector((state) => state.currentPostReactions);
     const { reportedPost } = useSelector((state) => state.currentReportedPost);
     const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
     const { profile_views } = useSelector((state) => state.currentProfileView);
     const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
+    const {courses}=useSelector((state)=>state.currentCourses);
+    
   
   
     const { messageSnack } = useSelector((state) => state.currentSnackBar);
     const theme = useTheme();
       // trigger redux update
       const dispatch = useDispatch();
-  
-    const[isMyStats,setIsMyStats]=useState(false)
-  
+    
     const navigate=useNavigate()
+      // smartphones and below
+        const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   
-    const [textOption, setTextOption] = useState(
-      isJobSearchGlobal ? "Search Jobs" : "Explore Jobs"
-    );
-    const [isDrawerPane, setIsDrawerPane] = useState(true);
+    const [textOption, setTextOption] = useState("Uploaded Courses");
+    const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
     const [open, setOpen] = useState(
       !(CustomDeviceIsSmall() || CustomDeviceTablet()) && true
     );
@@ -166,9 +165,6 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
   
     const [isFetching, setIsFetching] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-  
-    // axios default credentials
-    axios.defaults.withCredentials = true;
     
     const [openAlert, setOpenAlert] = useState(false);
   
@@ -182,12 +178,6 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
       setIsDrawerPane((prev) => !prev);
     };
   
-    // UI theme dark light tweaking effect
-    const handleShowDarkMode = () => {
-      // update the redux theme boolean state
-      dispatch(resetDarkMode());
-    };
-    
   
     // show the notification and messaging triggered by redux
     const handleShowMessageDrawer = () => {
@@ -211,18 +201,56 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
   
     // false right bar is no of use this route
     useLayoutEffect(()=>{
-       // updating right bar show false
-       if (isSidebarRighbar) {
-        dispatch(handleSidebarRightbar());
-      }
+       // true tem, and the redux will reverse
+        dispatch(handleSidebarRightbar(true));
     },[dispatch,isSidebarRighbar])
     
     
     // navigate back to student courses
-
     const handleNavigateAvailableCourses=()=>{
         navigate("/courses/available")
     }
+
+
+    useLayoutEffect(()=>{
+        // set is fetching true
+          setIsFetching(true)
+          setIsCourseManager(false)
+
+          if (textOption==="Manage Courses") {
+            setIsCourseManager(true)
+            setIsFetching(false)
+            return
+          }
+
+          if(textOption==="Uploaded Courses"){
+            axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/instructor/${user?._id}`, {
+                    withCredentials: true,
+                  })
+                  .then((res) => {
+                    // update the redux with the current jobs
+                  dispatch(updateCurrentCourses(res.data))
+                  })
+                  .catch(async (err) => {
+                    //  user login session expired show logout alert
+                    if (err?.response?.data.login) {
+                      window.location.reload();
+                    }
+                    if (err?.code === "ERR_NETWORK") {
+                      setErrorMessage(
+                        "server unreachable please try again later to complete your request"
+                      );
+                      return;
+                    }
+                    setErrorMessage(err?.response.data);
+                  })
+                  .finally(() => {
+                    setIsFetching(false);
+                    
+                  });
+
+          }
+    },[dispatch,user?._id,textOption])
     
   
     return (
@@ -282,6 +310,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
                   <Typography
                     noWrap
                     component="div"
+                    fontWeight={'bold'}
                     textAlign={"center"}
                     textTransform={"uppercase"}
                     ml={open && 22}
@@ -290,26 +319,19 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
                   </Typography>
   
                   {/* current navigation counter */}
-                  <Box display={"flex"} justifyContent={"center"}>
-                    <Typography variant="caption" textTransform={'lowercase'} ml={open && 22}>
+                 <Box display={"flex"} justifyContent={"center"}>
+                    <Typography 
+                    variant="caption" 
+                    fontWeight={'bold'}
+                    textTransform={'capitalize'}
+                     ml={open && 22}>
                       - {textOption} -
                     </Typography>
                   </Box>
                 </Box>
   
                 <Box display={'flex'} gap={2} alignItems={'center'} justifyContent={'flex-end'}>
-                {/* alter theme */}
-                <Box>
-                  <IconButton onClick={handleShowDarkMode}>
-                    <Tooltip arrow title={isDarkMode ? "Light" : "Dark"}>
-                      <DarkModeRounded
-                        sx={{ color:'white'}}
-                      />
-                    </Tooltip>
-                  </IconButton>
-                </Box>
-  
-  
+          
                 {/* notification and messaging */}
                 <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
                   <Tooltip arrow title={"notifications"}>
@@ -329,8 +351,8 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
                   <IconButton onClick={handleShowingProfileDrawer}>
                   <Avatar
                       sx={{ width: 26, height: 26 }}
-                      src={devImage}
-                      alt={"user image"}
+                      src={user?.avatar}
+                      alt={""}
                   />
                   </IconButton>
                 </Tooltip>
@@ -359,39 +381,41 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
                   </Box>
                 )}
   
-                {open && (
-                 <Box display={'flex'} gap={1} alignItems={'center'}>
-                 {/* icon right or left arrow */}
-               <IconButton onClick={handleDrawerClose}>
-                 {theme.direction === "rtl" ? (
-                   <ChevronRightIcon  sx={{ color:'white' }}/>
-                 ) : (
-                   <ChevronLeftIcon sx={{ color:'white' }} />
-                 )}
-               </IconButton>
-               <Box 
-               display={'flex'} 
-               flexDirection={'column'} 
-               justifyContent={'center'} 
-               alignItems={'center'}>
+              {open && (
+                <Box display={'flex'} gap={1} alignItems={'center'}>
+                {/* icon right or left arrow */}
+              <IconButton onClick={handleDrawerClose}>
+                {theme.direction === "rtl" ? (
+                  <ChevronRightIcon  sx={{ color:'white' }}/>
+                ) : (
+                  <ChevronLeftIcon sx={{ color:'white' }} />
+                )}
+              </IconButton>
+              <Box 
+              display={'flex'} 
+              flexDirection={'column'} 
+              justifyContent={'center'} 
+              alignItems={'center'}>
 
-               <Typography variant="body2" 
-               sx={{color:'white'}} 
-               textTransform={'uppercase'}
-               display={'flex'}
-               alignItems={'center'}
-               gap={1}
-               >
-                <LocalLibraryOutlined/>
-                Student
-               </Typography>
-               <Typography variant="caption" 
+              <Typography variant="body2" 
+              sx={{color:'white'}} 
+              textTransform={'uppercase'}
+              display={'flex'}
+              alignItems={'center'}
+              fontWeight={'bold'}
+              gap={1}
+              >
+              <SupportAgentRounded/>
+              Instructor
+              </Typography>
+                 <Typography
+               fontWeight={'bold'}
+                variant="caption"
                 sx={{color:'white'}} 
                 >
                 - {user?.name} -
                 </Typography>
                 </Box>
-  
              </Box>
                 )}
               </DrawerHeader>
@@ -411,15 +435,8 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
   
               <List>
                 {[
-                  "Explore Courses",
-                  "Search Courses",
-                  "Popular Courses",
-                  "Recent Courses",
-                  "Free Courses",
-                  "Report Courses",
-                  "Favorite Courses",
-                  "Enrolled Courses",
-                  "Student Manager",
+                  "Uploaded Courses",
+                  "Manage Courses",
                 ].map((text, index) => (
                   <ListItem
                     key={text}
@@ -464,47 +481,15 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
                       >
                         <Tooltip title={text} arrow>
                         {index === 0 ? (
-                          <SchoolOutlined
+                          <UploadFileRounded
                             color={text === textOption ? "primary" : "inherit"}
                             sx={{width:25,height:25}}
                           />
-                        ) : index === 1 ? (
-                          <ManageSearchOutlined
+                        ) :  (
+                          <Settings
                             color={text === textOption ? "primary" : "inherit"}
                             sx={{width:25,height:25}}
                           />
-                        ) : index === 2 ? (
-                          <WavesOutlined
-                            color={text === textOption ? "primary" : "inherit"}
-                            sx={{width:20,height:20}}
-                          />
-                        ) : index === 3 ? (
-                          <FiberNewOutlined
-                            color={text === textOption ? "primary" : "inherit"}
-                            sx={{width:26,height:26}}
-                          />
-                        ) : index === 4 ? (
-                          <MoneyOffOutlined
-                          color={text === textOption ? "primary" : "inherit"}
-                          sx={{width:24,height:24}}
-                        />
-                         
-                        ) :index===5 ? (
-                          <FlagOutlined
-                          color={text === textOption ? "primary" : "inherit"}
-                        />
-                          
-                        ):index===6 ? (
-                          <FavoriteOutlined
-                          color={text === textOption ? "primary" : "inherit"}
-                          sx={{width:21,height:21}}
-                        />) :index===7 ? (
-                          <SubscriptionsOutlined
-                          color={text === textOption ? "primary" : "inherit"}
-                        />) :(
-                          <ManageAccountsOutlined
-                          color={text === textOption ? "primary" : "inherit"}
-                        />
                         )}
                         </Tooltip>
                       </ListItemIcon>
@@ -572,13 +557,8 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
               >
                 <React.Fragment>
                   {/* all jobs and verified jobs and Nearby that have no external link */}
-                  {(textOption === "Explore Jobs" ||
-                    textOption === "Nearby Jobs" ||
-                    textOption === "Verified Jobs" ||
-                    textOption === "Recommend" ||
-                    textOption === "Applications"||
-                    textOption === "My Statistics" ||
-                    textOption === "Search Jobs") && (
+                  {(textOption === "Uploaded Courses" ||
+                    textOption === "Manage Courses") && (
                     <React.Fragment>
                       {isFetching ? (
                         <Box
@@ -592,8 +572,62 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
                         </Box>
                       ) : (
                         <React.Fragment>
+                        {!isCourseManager ? (
+                          <>
+                            {/* focused course */}
+                          {focusedCourse && (
+                            <CoursePlayer 
+                            openPlayer={focusedCourse}
+                            course={focusedCourse}
+                            setFocusedCourse={setFocusedCourse}
+                            />
+                          )} 
 
-                          {/* content will go here */}
+                        {/* content will go here */}
+                        {courses?.length>0 && !focusedCourse && courses?.map((course)=>(
+                          <CourseLayout 
+                          key={course?._id} 
+                          isDarkMode={isDarkMode}
+                          courseItem={course}
+                          setFocusedCourse={setFocusedCourse}
+                          />
+                        ))}
+
+                      {/* rendered if are no events  */}
+                        {courses?.length<1 && (
+                          <Box 
+                          height={'70vh'}
+                          display={'flex'}
+                          justifyContent={'center'}
+                          color={'text.secondary'}
+                          flexDirection={'column'}
+                          gap={2}
+                          alignItems={'center'}
+                          >
+                          {/* no events */}
+                          <Typography variant="body2">
+                            no more courses posted
+                          </Typography>
+                          {/* show refresh button */}
+                          <Button 
+                          disableElevation
+                          onClick={()=>setTextOption("Explore Courses")}
+                          size="small"
+                          variant="outlined"
+                          sx={{ borderRadius:3 }}
+                          startIcon={<Refresh/>}
+                          >refresh</Button>
+                          </Box>
+                        )}
+                          </>
+                        ):(
+                          <ManageCoursesTable 
+                            coursesData={courses}
+                            setCourseManager={setIsCourseManager}
+                            setTextOption={setTextOption}
+                          />
+                        )}
+                        
                           
                         </React.Fragment>
                       )}

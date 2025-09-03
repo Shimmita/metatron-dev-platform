@@ -63,6 +63,7 @@ const StyledInput = styled("input")({
 const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
 
 const MAX_DESCRIPTION=500
+const MAX_COURSE=600
 const FILE_MAX=50000000
 const MB_CONVERSION=1024*1024
 
@@ -254,9 +255,9 @@ const PostCourseModal =({ openModalCourse, setOpenModalCourse }) => {
     }
 
     
-    // if file  size exceed 1GB alert courses max is 1GB
-    if (sum>1000) {
-      setErrorMessage("Course exceeded 1GB !")
+    // file size exceed 60MB alert courses max is 600MB
+    if (sum>MAX_COURSE) {
+      setErrorMessage("whole course exceeded 600MB !")
       // clear the videos by setting the length 0
       videoFiles.length=0
       return
@@ -438,7 +439,7 @@ const handleClosingModal=()=>{
   // handle return width modal
   const handleReturnWidthModal=()=>{
     if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
-      return "35%"
+      return "40%"
     } else if (CustomDeviceTablet()){
       return "90%"
     } 
@@ -573,11 +574,21 @@ const handleClosingModal=()=>{
                   mb={2}
                   variant="caption"
                 >
-                  - Courses: Courses uploaded should not be someone's else intellectual property 
-                  and shall be continuously reviewed for approval. <br/>
-                  - Payment: Currently we do not sell or buy courses but rather providing learning 
-                  resources freely to the end users. Certificates of completion will be issued with 
-                  your name printed on them as Instructor. <br/>
+                  - Course uploaded should be your own intellectual property. The full course should not exceed 600MB in size. 
+                    Course should be uploaded in lectures or parts of 50MB Max and labeled in the format of "lecture_1_introduction", 
+                    "lecture_2_variables" etc. This will ease the algorithm in sorting your overall course and maintaining the flow of 
+                    concepts as intended.
+                    <br/>
+                  - We do not buy or sell courses on the platform but rather providing learning 
+                  resources freely to the technocrats. Interested users will get enrolled and learn for free. Only certificate of completion 
+                  is paid for and your name shall be printed on the certificate as the chief instructor. <br/>
+                  - Certificate of completion is optional and cannot limit the user from learning the 
+                  uploaded course. Only when the user is satisfied to download the certificate for reference they shall have 
+                    to pay for it.
+                   <br/>
+                  - Certificate of completion minimum price is $1 and max is $10. Course uploaded shall be reviewed continuously 
+                  to determine its genuineness to the end users. Rogue courses are prohibited and shall lead to permanent deletion of your account
+                  with or without your consent.
                 </Typography>
               
                 <Divider component={'div'} className={'p-2'}/>
@@ -604,7 +615,7 @@ const handleClosingModal=()=>{
 
               {/* post about */}
               <Typography variant="body2" color={"text.secondary"}>
-                Select the area of specialisation that your course is going to cover.
+                Select area of specialisation your course is going to cover.
                 For pure programming language concepts select programming languages.
               </Typography>
 
@@ -1067,7 +1078,7 @@ const handleClosingModal=()=>{
 
                 <Box 
                 display={"flex"}
-                justifyContent={"flex-end"}
+                justifyContent={"space-around"}
                 gap={1}
                 alignItems={'center'}
                 >
@@ -1085,7 +1096,7 @@ const handleClosingModal=()=>{
                     Free
                   </Button>
 
-                  |
+                  
 
                   <Button
                     component="label"
@@ -1114,14 +1125,14 @@ const handleClosingModal=()=>{
               {/* upload video  */}
               <React.Fragment>
               <Typography
-                  gutterBottom
                   variant="body2"
                   mt={1}
-                  mb={2}
+                  mb={1}
                   color={"text.secondary"}
                 >
-                  Upload course video lectures in parts. Max 50MB each; Ensure that each video part is named according to 
-                  the topic or context its going to cover. For example (Introduction, Variables, React_Hooks, MySQL_Database)
+                  Upload the course video lectures in chunks. max size 50MB each. 
+                  adhere to the naming convention "lecture_1_intro". Overall course should not exceed 600MB.
+                  lectures once uploaded cannot be edited!
                 </Typography>
 
 
@@ -1137,7 +1148,7 @@ const handleClosingModal=()=>{
 
                 <Box 
                 display={"flex"} 
-                justifyContent={"flex-end"} 
+                justifyContent={"space-around"} 
                 width={"100%"}>
                   <Button
                     component="label"
@@ -1170,7 +1181,7 @@ const handleClosingModal=()=>{
                 Clear description could convince many enrolling to your course.
               </Typography>
 
-              <Box mb={3}>
+              <Box >
                 <TextField
                   minRows={window.screen.availWidth <= 320 ? 5 : 8}
                   multiline
@@ -1191,20 +1202,30 @@ const handleClosingModal=()=>{
 
               {/*  button for posting */}
               <Box 
-              display={"flex"} 
-              justifyContent={"center"}
-              width={'100%'}
                mb={2}>
+               <Box
+               display={'flex'}
+              justifyContent={'center'}
+               >
+                <Typography gutterBottom variant="caption" color={"text.secondary"}>
+                {videoFiles.length<3 ? "Please upload atleast 3 video lectures":"Please ensure you have a stable internet connection "}
+              </Typography>
+              </Box>
+              <Box 
+              display={'flex'}
+              justifyContent={'center'}
+              >
                 <Button
                   onClick={handleUploadCourse}
                   startIcon={<SchoolRounded />}
                   variant="contained"
                   className="rounded-5"
-                  disabled={isUploading || errorMessage}
-                  size="small"
+                  size='medium'
+                  disabled={isUploading || errorMessage || videoFiles.length<3}
                 >
-                  Begin Uploading Your Course
+                  Begin Course Upload
                 </Button>
+                </Box>
               </Box>
             </Box>
           </Box>

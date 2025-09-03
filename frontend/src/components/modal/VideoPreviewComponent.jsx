@@ -1,7 +1,8 @@
-import { Close, Done } from "@mui/icons-material";
-import { Box, Button, styled, Typography } from "@mui/material";
-import React, { useMemo } from "react";
+import { Close, Done, InfoOutlined } from "@mui/icons-material";
+import { Box, Button, IconButton, styled, Tooltip, Typography } from "@mui/material";
+import React, { useMemo, useState } from "react";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
+import AlertGeneral from "../alerts/AlertGeneral";
 
 
 
@@ -23,12 +24,16 @@ const MB_CONVERSION=1024*1024
 
 const VideoPreviewComponent = React.memo(({ video, index, handleVideoReplace }) => {
     
-    const videoSrc = useMemo(() => URL.createObjectURL(video), [video]);
-  
-  
-    const isOversized = video?.size > FILE_MAX;
+    const [showTips,setShowTips]=useState(false)
 
+    const videoSrc = useMemo(() => URL.createObjectURL(video), [video]);
+    const isOversized = video?.size > FILE_MAX;
     const videoName = video?.name?.split(".")[0].substring(0, CustomDeviceIsSmall() ? 23 : 35);
+
+    // handle showing of lecture tips
+    const handleShowModalLectureTips=()=>{
+      setShowTips(true)
+    }
   
     return (
       <Box key={video?.name + index}>
@@ -49,8 +54,9 @@ const VideoPreviewComponent = React.memo(({ video, index, handleVideoReplace }) 
           </video>
         </Box>
   
-        {/* video name */}
-        <Box display={"flex"} justifyContent={"center"}>
+        <Box 
+        display={"flex"} 
+        justifyContent={"center"}>
           <Typography
             className={isOversized ? " text text-danger" : " text text-success"}
             variant="caption"
@@ -97,6 +103,45 @@ const VideoPreviewComponent = React.memo(({ video, index, handleVideoReplace }) 
             )}
           </Typography>
         </Box>
+        {/* displayed when video size greater than 50MB */}
+          { isOversized && (
+            <Box 
+            display={'flex'} 
+            justifyContent={'center'}
+            alignItems={'center'}
+             my={0.2}>
+             {/* text */}
+              <Typography variant="caption">- lecture exceeds 50MB in size -</Typography>
+            </Box>
+          )}
+
+         {/* displayed when video does not have lecture labelled */}
+          {!videoName?.toLowerCase()?.includes('lecture') && (
+            <Box 
+            display={'flex'} 
+            justifyContent={'center'}
+            alignItems={'center'}>
+             {/* text */}
+              <Typography variant="caption">- lecture not labelled accordingly for sorting -</Typography>
+              {/* info btn */}
+              <Tooltip arrow title='info'>
+              <IconButton onClick={handleShowModalLectureTips}>
+                <InfoOutlined sx={{width:18,height:18}}/>
+              </IconButton>
+              </Tooltip>
+            </Box>
+          )}
+
+          {/* show alert general with video name for ordering */}
+          {showTips && (
+            <AlertGeneral
+              openAlertGeneral={showTips}
+              setOpenAlertGeneral={setShowTips}
+              defaultIcon={<InfoOutlined/>}
+              title={'Lecture Labelling'}
+              message={`Please label this lecture in the format " lecture_${index+1}_${videoName.toLowerCase()} " for accessibility and making it easier for sorting. This will ensure it conforms to the pattern of " lecture_part_name "`}
+            />
+          )}
       </Box>
     );
   });

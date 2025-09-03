@@ -29,6 +29,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { updateCurrentEvents } from "../../redux/CurrentEvents";
+import { updateCurrentCourses } from "../../redux/CurrentCourses";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -139,6 +140,30 @@ export default function AlertGlobalSearch({
     // navigate to the events
     navigate("/events")
   }
+
+  // handle showing of courses results
+   const handleShowingCoursesResults=()=>{
+    // update the redux state for global events into the search results
+    dispatch(updateCurrentCourses(globalSearchResults?.courses?.data))
+
+    // set is search job-courses global in redux ui to true
+    dispatch(handleIsJobsGlobalResults(true));
+
+    // close the modal
+    handleClose()
+    
+    // update the bottom nav bar index position to events
+    dispatch(updateCurrentBottomNav(3));
+
+    // disable sidebar
+    if (isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+
+    // navigate to the events
+    navigate("/courses/available")
+  }
+
 
      // handle width of the global search width
     const handleGlobalSearchWidth=()=>{
@@ -285,7 +310,7 @@ export default function AlertGlobalSearch({
                   borderColor: "divider",
                 }}
               >
-                <CardActionArea disabled={coursesCount < 1}>
+                <CardActionArea onClick={handleShowingCoursesResults} disabled={coursesCount < 1}>
                   <Box display={"flex"} justifyContent={"center"}>
                     <SchoolRounded color="info" />
                   </Box>

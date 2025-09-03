@@ -336,9 +336,9 @@ const Sidebar = () => {
                       fontWeight={'bold'}
                       color={'primary'}
                       variant="caption"
-                       >
-                       Top Insights
-                       </Typography>
+                      >
+                      Top Insights
+                      </Typography>
                       </Box>
                       </Divider>
                       </Root>
@@ -357,7 +357,7 @@ const Sidebar = () => {
                   {/* section more insights */}
                   <Box
                   mt={0.5}
-                  p={0.1}
+                  p={0.2}
                   >
                   <Root className="mt-1">
                     <Divider>
@@ -395,8 +395,8 @@ const Sidebar = () => {
                   {/* title */}
                   <Box 
                   pb={0.2}
-                   display={'flex'}
-                   justifyContent={'center'}>
+                  display={'flex'}
+                  justifyContent={'center'}>
                     <FormHelperText 
                     className={isDarkMode && 'text-info'}
                     sx={{ fontSize:'x-small' }}>{tool.title?.substring(0,10)}</FormHelperText>

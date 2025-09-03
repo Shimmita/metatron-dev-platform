@@ -22,7 +22,8 @@ import {
   CircularProgress,
   Stack,
   Toolbar,
-  Tooltip
+  Tooltip,
+  useMediaQuery
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -141,8 +142,12 @@ export default function MiniDrawer() {
 
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
   const theme = useTheme();
+
     // trigger redux update
     const dispatch = useDispatch();
+
+  // smartphones and below
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const[isMyStats,setIsMyStats]=useState(false)
 
@@ -151,16 +156,14 @@ export default function MiniDrawer() {
   const [textOption, setTextOption] = useState(
     isJobSearchGlobal ? "Search Jobs" : "Explore Jobs"
   );
-  const [isDrawerPane, setIsDrawerPane] = useState(true);
+  const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
   const [open, setOpen] = useState(
-    !(CustomDeviceIsSmall() || CustomDeviceTablet()) && true
+    !(CustomDeviceIsSmall() || CustomDeviceTablet()) 
   );
  
-
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  
   const [openAlert, setOpenAlert] = useState(false);
 
    //   handle opening of drawer profile
@@ -175,10 +178,9 @@ export default function MiniDrawer() {
 
   // false right bar is no of use this route
   useLayoutEffect(()=>{
-     // updating right bar show false
-     if (isSidebarRighbar) {
-      dispatch(handleSidebarRightbar());
-    }
+     // true tem, and the redux will reverse
+    dispatch(handleSidebarRightbar(true));
+
   },[dispatch,isSidebarRighbar])
   
 
@@ -774,15 +776,15 @@ export default function MiniDrawer() {
                           color={text === textOption ? "primary" : "inherit"}
                           sx={{width:22,height:22}}
                         />
-                      ) : index === 4 ? (
+                      ) : index === 2 ? (
                         <FindInPageRounded
                           color={text === textOption ? "primary" : "inherit"}
                         />
-                      ) : index === 2 ? (
+                      ) : index === 3 ? (
                         <VerifiedRounded
                           color={text === textOption ? "primary" : "inherit"}
                         />
-                      ) : index === 3 ? (
+                      ) : index === 4 ? (
                         <MyLocationRounded
                           color={text === textOption ? "primary" : "inherit"}
                         />
@@ -790,7 +792,7 @@ export default function MiniDrawer() {
                         <AutoAwesome
                         color={text === textOption ? "primary" : "inherit"}
                       />
-                       
+                      
                       ) :index===5 ? (
                         <AssignmentTurnedInRounded
                         color={text === textOption ? "primary" : "inherit"}
@@ -838,9 +840,9 @@ export default function MiniDrawer() {
             color="secondary"
             disableElevation
             sx={{my:1, px:1, borderRadius:5, fontWeight:'bold', border:'1px solid', borderColor:'divider'}}
-             onClick={handleNavigateHiring}>
-             Metatron H.R
-             </Button>
+            onClick={handleNavigateHiring}>
+            Metatron H.R
+            </Button>
               </Box>
             ):(
               <ListItemButton size="small" >
@@ -851,9 +853,9 @@ export default function MiniDrawer() {
               </Tooltip>
             </ListItemButton>
             )}
-         
+        
              {/* divider */}
-             <Divider component={'div'} className={'p-1'}/>
+            <Divider component={'div'} className={'p-1'}/>
 
           </Drawer>
           {/* body of the jobs */}
@@ -931,7 +933,7 @@ export default function MiniDrawer() {
                               />
                               </Box>
                               )}
-                           
+                          
                             </>
                           ))}
 

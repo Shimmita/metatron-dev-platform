@@ -172,7 +172,7 @@ export default function AlertMiniProfileView({
         keepMounted
         aria-describedby="alert-dialog-slide-alering"
         sx={{
-          backdropFilter:'blur(3px)',
+          backdropFilter:'blur(5px)',
           marginLeft:handleMiniProfileWidth()
         }}
       >

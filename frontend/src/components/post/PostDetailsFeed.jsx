@@ -31,7 +31,6 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import React, { lazy, useLayoutEffect, useState } from "react";
-import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useSelector } from "react-redux";
 import AlertReportPost from "../alerts/AlertReportPost";
 import CardFeedMore from "../custom/CardFeedMore";
@@ -108,8 +107,6 @@ const PostDetailsFeed = ({
     `${postDetailedData?.post_body}`
   );
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
 
   // redux states
   const { currentMode } = useSelector(
@@ -314,6 +311,7 @@ const PostDetailsFeed = ({
     // close alert
     setMessageResponse("");
   };
+
  
   // handle max text width
   const handleMaxTextWidth=()=>{
@@ -367,6 +365,8 @@ const PostDetailsFeed = ({
         </Collapse>
       )}
 
+  
+      
       <Card
       className="rounded"
         style={{
@@ -609,19 +609,16 @@ const PostDetailsFeed = ({
                   justifyContent: "center",
                 }}
               >
-                {/* smart 300,350 */}
-                <LazyLoadImage
+                 <img 
+                  style={{ 
+                    height:CustomDeviceScreenSize(),
+                    width:handleImageWidth(),
+                    objectFit:'fill',
+                    borderRadius:5,
+                   }}
                   src={handlePostImagePresent()}
-                  alt=""
-                  height={CustomDeviceScreenSize()}
-                  width={handleImageWidth()}
-                  style={{
-                    objectFit: "fill",
-                    borderRadius: 10,
-                    border: "1px solid",
-                    borderColor: "grey",
-                  }}
-                />
+                   loading="lazy"
+                  alt="" />
               </Box>
             </Box>
           )}

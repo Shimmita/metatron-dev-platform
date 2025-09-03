@@ -1,9 +1,9 @@
 import {
-  Add,
   ArrowCircleRightRounded,
   BarChart,
+  CheckCircleRounded,
   Delete,
-  Share
+  SmartDisplayRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -15,6 +15,7 @@ import {
   CircularProgress,
   IconButton,
   ListItemAvatar,
+  Stack,
   Tooltip,
   Typography
 } from "@mui/material";
@@ -24,10 +25,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentEvents } from "../../../redux/CurrentEvents";
 import { resetClearCurrentEventsTop } from "../../../redux/CurrentEventsTop";
 import { updateCurrentSnackBar } from "../../../redux/CurrentSnackBar";
+import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
+import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../../utilities/getImageMatch";
-import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 function EventItem({
   isDarkMode=false,
   event,
@@ -49,6 +51,18 @@ function EventItem({
   const { events:eventsData } = useSelector((state) => state.currentEvents);
   const isUserMadeRSVP=event?.users?.value.some((currentId)=>currentId===user?._id)
   const isMyOwnEvent=event?.ownerId===user?._id
+
+  // format date
+    const certDate = new Date(event?.dateHosted);
+  const formattedDate = certDate.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday:'long',
+    hour:'2-digit',
+    minute:"2-digit",
+    hour12:true
+  });
   
   const dispatch=useDispatch()
 
@@ -198,16 +212,6 @@ function EventItem({
     }
   }
 
-  // get date from the event
-  const handleGetDate=()=>{
-    return event?.dateHosted?.split("T")[0]
-  }
-
-  // handle get time
-  const handleGetTime=()=>{
-  return event?.dateHosted?.split("T")[1]?.split("+")[0]?.split(".")[0]
-  
-  }
 
   const handleFetchMoreData=()=>{
       // fetching to true
@@ -252,63 +256,42 @@ function EventItem({
       setOpenMiniProfile(true)
     }
 
+  // handle streaming of the event
+  const handleStreamEvent=()=>{
+    // open the link to the meeting, separate tab
+    window.open(event?.hostLink,'_blank_')
+  }
+
+
+
   return (
       <Box 
       display={"flex"} 
       justifyContent={"center"}
       gap={2}
-      mb={isLastIndex && CustomDeviceIsSmall() && 5}
+      marginInline={!CustomDeviceIsSmall()?1:undefined}
+      mb={isLastIndex && CustomDeviceIsSmall()? 5:undefined}
       flexDirection={CustomDeviceIsSmall() ? 'column':'row'}
       >
       {/* card events details */}
         <Card
           elevation={0}
-          className="rounded-3"
+          className="rounded-2 shadow"
           sx={{ 
           border:'1px solid',
           borderColor:'divider',
-          maxWidth: CustomDeviceIsSmall() ? 380:330, 
+          width:CustomDeviceIsSmall() ? 330: CustomDeviceTablet() ? 300:320, 
           }}
         >
           <CardContent>
-            <Box 
-            className='rounded'
+            <Stack
+            className='rounded-1'
             bgcolor={isDarkMode ? '#3333':'black'}
-            sx={{ 
-              }}>
-
-              {/* share icon */}
-              <Box
-              width={'100%'}
-              display={'flex'} 
-              gap={1.5}
-              px={1}alignItems={'center'}
-              justifyContent={'flex-end'}>
-
-              {/* if current user created the event display helper text */}
-              {isMyOwnEvent &&   
-              <Typography
-                textTransform={"lowercase"}
-                variant="caption"
-                className="text-info"
-                sx={{ color:'white' }}
-                >
-                yours
-                </Typography>}
-              
-              {/* share icon */}
-              <Tooltip arrow title='share'>
-              <IconButton
-              size="small">
-              <Share 
-              className="text-info"
-              sx={{ width:16,height:16, }}/>
-              </IconButton>
-              </Tooltip>
-              </Box>
+            gap={0.5}
+           >
 
               {/* skills panel */}
-              <Box display={"flex"} justifyContent={"center"}>
+              <Box display={"flex"} pt={1.5} justifyContent={"center"}>
                 <AvatarGroup max={user?.selectedSkills?.length}>
                   {/* loop through the skills and their images matched using custom fn */}
                   {event?.skills?.map((skill, index) => (
@@ -325,25 +308,9 @@ function EventItem({
                     </AvatarGroup>
                   </Box>
 
-                {/* date */}
-                <Box 
-                mt={0.5}
-                display={'flex'} 
-                justifyContent={'center'}>
-                  <Typography
-                    variant="caption"
-                    textTransform={"capitalize"}
-                    textAlign={"center"}
-                    className="text-info"
-                    fontWeight="bold"
-                  >
-                   {handleGetDate()} | {handleGetTime()}
-                  </Typography>
-                  </Box>
 
               {/* title */}
               <Box 
-              
               display={'flex'} 
               alignItems={'center'}
               justifyContent={'center'}>
@@ -359,7 +326,7 @@ function EventItem({
               </Typography>
               </Box>
 
-                {/* category */}
+            {/* category */}
             <Box 
               display={'flex'} 
               alignItems={'center'}
@@ -374,8 +341,25 @@ function EventItem({
               {event?.category}
               </Typography>
               </Box>
+
+
+                {/* date */}
+                <Box 
+                display={'flex'} 
+                justifyContent={'center'}>
+                  <Typography
+                    variant="caption"
+                    textTransform={"capitalize"}
+                    textAlign={"center"}
+                    className="text-info"
+                    fontWeight="bold"
+                  >
+                   {formattedDate}
+                  </Typography>
+                  </Box>
+
    
-                </Box>
+                </Stack>
               {/* scrollable overflow content */}
 
                 {/* about */}
@@ -475,7 +459,7 @@ function EventItem({
 
                 {/* number of rsvp */}
                 <Box
-                mt={0.5}
+                pt={0.8}
                 display={'flex'}
                 justifyContent={'center'}
                 >
@@ -483,7 +467,7 @@ function EventItem({
                 variant="caption"
                 className={isUserMadeRSVP && 'text-success fw-bold'}
                 sx={{ fontSize:'x-small' }}>
-                 {isUserMadeRSVP ? `You and ${event?.users?.count} others made rsvp`:`~ ${event?.users?.count} users done RSVP ~`}
+                 {isUserMadeRSVP ? `You and ${event?.users?.count} others made rsvp`:` ${event?.users?.count} Users Done RSVP`}
                 </Typography>
                 </Box> 
 
@@ -495,7 +479,7 @@ function EventItem({
                 <Typography
                 variant="caption"
                 sx={{ fontSize:'x-small' }}>
-                  ~ Timezones {event?.location?.state}, {event?.location?.country?.split("(")[0]} ~
+                  timezones {event?.location?.state}, {CustomCountryName(event?.location?.country)}
                 </Typography>
                 </Box>  
 
@@ -503,9 +487,28 @@ function EventItem({
                 {isRSVP ? (
                   <Box
                 display={"flex"}
-                mt={0.5}
-                gap={1}
+                mt={0.7}
+                gap={2}
                 justifyContent={"center"}>
+
+                {/* stream */}
+                <Button
+                  disableElevation
+                  variant={isDarkMode ?'outlined':'contained'}
+                  disabled={isFetching}
+                  color="success"
+                  size="small"
+                  sx={{ 
+                  fontSize:'x-small',
+                  borderRadius:3
+                  }}
+                  onClick={handleStreamEvent}
+                  startIcon={isFetching ? <CircularProgress size={13}/>:<SmartDisplayRounded />}
+                >
+                  Stream
+                </Button>
+
+                {/* delete */}
                   <Button
                     disableElevation
                     variant={isDarkMode ?'outlined':'contained'}
@@ -519,7 +522,7 @@ function EventItem({
                     onClick={handleDeleteRSVP}
                     startIcon={isFetching ? <CircularProgress size={13}/>:<Delete />}
                   >
-                    Delete RSVP
+                    Delete
                   </Button>
                 </Box>  
                 ):isEventsManager ? (
@@ -534,7 +537,7 @@ function EventItem({
                     disableElevation
                     variant={isDarkMode ?'outlined':'contained'}
                     disabled={isFetching}
-                    color="success"
+                    color="primary"
                     size="small"
                     sx={{ 
                     fontSize:'x-small',
@@ -567,7 +570,7 @@ function EventItem({
                 ):(
                   <Box
                  display={"flex"}
-                 mt={0.5}
+                 mt={0.6}
                  justifyContent={"center"}>
                   <Button
                     disableElevation
@@ -575,11 +578,10 @@ function EventItem({
                     disabled={isFetching || isUserMadeRSVP}
                     size="small"
                     sx={{ 
-                    borderRadius: 3,
-                    fontSize:'x-small'
+                    borderRadius: 5,
                     }}
                     onClick={handleCreateRSVP}
-                    startIcon={isFetching ? <CircularProgress size={13}/>:<Add />}
+                    startIcon={isFetching ? <CircularProgress size={13}/>:<CheckCircleRounded />}
                   >
                     RSVP EVENT
                   </Button>

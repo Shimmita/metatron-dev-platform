@@ -427,6 +427,39 @@ const handleEmailVerification=()=>{
               </FormControl>
             </Box>
 
+            {/* verify certificate */}
+             <Box 
+            display={isLogin ? "none":"flex"} 
+            justifyContent={"center"} 
+            alignItems={'center'}
+            mb={2}>
+              <Typography
+                variant="body2"
+                color={"text.secondary"}
+                display={"flex"}
+                gap={1}
+                alignItems={"center"}
+              >
+                 <Typography
+                    variant="body2"
+                  >
+                  Certificate Verification?
+                  </Typography>
+                |
+                <Link to={"/cert/verify"} className="text-decoration-none">
+                  <Typography
+                    variant="body2"
+                    sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
+                  >
+                    verification
+                  </Typography>
+                </Link> 
+              </Typography>
+            </Box>
+
+
+            {/* forgot password */}
+
             <Box 
             display={isLogin ? "none":"flex"} 
             justifyContent={"center"} 

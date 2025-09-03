@@ -1,5 +1,5 @@
 import { RefreshRounded } from "@mui/icons-material";
-import { Box, Fab } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -76,19 +76,21 @@ const FeedDefaultSearch = () => {
         >
 
             {/* fab for refresh, for post search results or like such */}
-            {isPostSearch && (
+            {isPostSearch &&  (
               <Box
-                mb={1}
+                my={1}
                 display={'flex'} 
                 justifyContent={'center'}>
-              <Fab
-              variant="extended" 
-              size="small" 
-              color="primary" 
+             <Button
+             size="small"
+             variant="contained"
+             startIcon={<RefreshRounded/>}
+             sx={{
+              borderRadius:3
+            }}
               onClick={handleRefreshHome}>
-              <RefreshRounded sx={{ mr: 1, }} />
               Refresh
-              </Fab>
+            </Button>
             </Box>
             )}
 

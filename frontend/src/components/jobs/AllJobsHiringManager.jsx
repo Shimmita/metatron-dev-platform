@@ -19,7 +19,8 @@ import {
   CircularProgress,
   Stack,
   Toolbar,
-  Tooltip
+  Tooltip,
+  useMediaQuery
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -123,10 +124,12 @@ export default function AllJobsHiringManager() {
     const [errorMessage, setErrorMessage] = useState("");
     const [openJobPostModal,setOpenJobPostModal]=useState(false)
     const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
-    
 
   // track theme
   const theme = useTheme();
+
+// smartphones and below
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // redux states
   const { 
@@ -165,18 +168,16 @@ export default function AllJobsHiringManager() {
 
   // false right bar is no of use this route
   useLayoutEffect(()=>{
-     // updating right bar show false
-     if (isSidebarRighbar) {
-      dispatch(handleSidebarRightbar());
-    }
+    // true tem, and the redux will reverse
+     dispatch(handleSidebarRightbar(true));
   },[dispatch,isSidebarRighbar])
   
 
   // holds drawer status
-  const [isDrawerPane, setIsDrawerPane] = useState(true);
+  const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
   
   const [open, setOpen] = useState(
-    !(CustomDeviceIsSmall() || CustomDeviceTablet()) &&  true
+    !(CustomDeviceIsSmall() || CustomDeviceTablet())
   );
 
   // focused job for assessment and fetch prospective applicants

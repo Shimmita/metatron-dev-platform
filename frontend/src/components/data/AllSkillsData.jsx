@@ -26,6 +26,8 @@ const AllSkills = [
         "PyTorch",
         "Keras",
         "Scikit-Learn",
+        "Machine Learning",
+        "Artificial Intelligence",
         "NLTK",
         "SpaCy",
         "Gensim",

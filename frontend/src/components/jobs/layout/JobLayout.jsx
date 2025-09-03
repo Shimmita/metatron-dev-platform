@@ -4,6 +4,7 @@ import {
   BalanceRounded,
   CalendarMonthRounded,
   LocationOnRounded,
+  LockRounded,
   OpenInBrowser,
   PaidRounded,
   PeopleRounded,
@@ -23,16 +24,16 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
+import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { updateCurrentJobs } from "../../../redux/CurrentJobs";
 import ApplyJobModal from "../../modal/ApplyJobModal";
-import { getImageMatch } from "../../utilities/getImageMatch";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../../utilities/CustomDeviceSmallest";
-import axios from "axios";
-import { updateCurrentJobs } from "../../../redux/CurrentJobs";
+import { getImageMatch } from "../../utilities/getImageMatch";
 
-const MAX_APPLICANTS=300
+const MAX_APPLICANTS=500
 
 function JobLayout_2({ 
   isDarkMode, 
@@ -102,7 +103,7 @@ function JobLayout_2({
   const isDeactivated=job?.status==="inactive"
 
   // check if job reached maxima number of applicants
-  const isMaxApplicants=job?.applicants?.total>=MAX_APPLICANTS
+  const isMaxApplicants=job?.applicants?.total===MAX_APPLICANTS
 
  const handleFetchMoreData=()=>{
     // fetching to true
@@ -155,7 +156,7 @@ function JobLayout_2({
       {/* card, for job content */}
       <Card
         elevation={0}
-        className="rounded-3"
+        className="rounded-3 shadow"
         sx={{ 
         border:'1px solid',
         borderColor:'divider',
@@ -257,7 +258,7 @@ function JobLayout_2({
           <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
             <PeopleRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
-              Current Applications {!(job?.website==="") ? "(N/A)":`${job?.applicants?.total}/300`}
+              Current Applications {!(job?.website==="") ? "(N/A)":`${job?.applicants?.total}/${job?.applicants_max || MAX_APPLICANTS}`}
             </Typography>
           </Box>
           <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
@@ -293,7 +294,7 @@ function JobLayout_2({
           size="small"
           disableElevation
           className={"w-50"}
-          endIcon={<VerifiedRounded />}
+          endIcon={isDeactivated || isMaxApplicants ? <LockRounded/> :<VerifiedRounded />}
           disabled={job?.currentUserApplied || isMaxApplicants}
           onClick={handleShowingApply}
           sx={{ borderRadius: "20px", mb: 1, width: "80%",fontSize:'small', textTransform:'capitalize' }}
@@ -309,7 +310,7 @@ function JobLayout_2({
           size="small"
           disabled={isDeactivated}
           disableElevation
-          endIcon={<OpenInBrowser />}
+          endIcon={isDeactivated ? <LockRounded/> :<OpenInBrowser />}
           onClick={handleShowingApply}
           sx={{ 
             borderRadius: "20px",

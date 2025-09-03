@@ -130,12 +130,9 @@ const appUISliceReducerSlice = createSlice({
     },
 
     // manage showing of sidebar and rightbar appropriately when invoked
-    handleSidebarRightbar: (state) => {
-      return {
-        ...state,
-
-        isSidebarRighbar: !state.isSidebarRighbar,
-      };
+    handleSidebarRightbar: (state,action) => {
+     state.isSidebarRighbar=action.payload;
+     state.isSidebarRighbar=!state.isSidebarRighbar;
     },
 
     // handle job search results from global search bar, routing to jobs page

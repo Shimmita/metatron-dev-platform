@@ -9,7 +9,7 @@ const CustomDeviceScreenSize = () => {
   }
   // typical smartphone portrait
   if (CustomDeviceIsSmall()) {
-    return "270px";
+    return "280px";
   }
   // tablet landscape
   if (screen > 1000 && screen <= 1300) {
@@ -17,7 +17,7 @@ const CustomDeviceScreenSize = () => {
   }
   // large screens
   if (screen > 1300) {
-    return "350px";
+    return "340px";
   }
 
   return;

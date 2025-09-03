@@ -152,7 +152,7 @@ export default function AlertReportPost({
         keepMounted
         aria-describedby="alert-dialog-slide-description"
         sx={{
-          backdropFilter:'blur(3px)',
+          backdropFilter:'blur(5px)',
           marginLeft:handleReportPostWidth()
         }}
       >

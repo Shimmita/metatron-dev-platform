@@ -36,6 +36,8 @@ import currentPostsTopReducer from "./CurrentPostsTop";
 import currentProfileViewReducer from './CurrentProfileView';
 import currentSnackReducer from "./CurrentSnackBar";
 import currentUserReducer from "./CurrentUser";
+import currentCoursesReducer from "./CurrentCourses"
+
 // Configure persist settings
 const persistConfig = {
   // Key to identify persisted data
@@ -69,7 +71,8 @@ const rootReducer = combineReducers({
   currentProfileView: currentProfileViewReducer,
   currentJobFeedBack: currentJobFeedBackReducer,
   currentEvents:currentEventsReducer,
-  currentEventsTop:currentEventsTopReducer
+  currentEventsTop:currentEventsTopReducer,
+  currentCourses:currentCoursesReducer
 
 
 });

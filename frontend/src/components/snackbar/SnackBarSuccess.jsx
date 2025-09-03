@@ -53,7 +53,7 @@ const SnackBarSuccess = ({ message }) => {
         key={state.Transition.name}
       >
         <Alert onClose={handleClose} severity="success" variant="filled">
-          {message}
+          {`${message}`}
         </Alert>
       </Snackbar>
     </Box>

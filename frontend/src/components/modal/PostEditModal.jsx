@@ -95,7 +95,7 @@ const PostEditModal = () => {
     // handle return width modal
     const handleReturnWidthModal=()=>{
       if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "35%"
+        return "40%"
       } else if (CustomDeviceTablet()){
         return "90%"
       } 
@@ -121,7 +121,7 @@ const PostEditModal = () => {
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
         sx={{
-        backdropFilter:'blur(3px)',
+        backdropFilter:'blur(5px)',
       }}
     >
       <Box

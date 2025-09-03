@@ -1,5 +1,5 @@
 import {
-  BarChartRounded,
+  CastForEducationRounded,
   PersonAdd,
   SchoolRounded,
   VideoLibraryRounded
@@ -15,15 +15,13 @@ import {
   styled,
   Typography
 } from "@mui/material";
-import React, { lazy, useState } from "react";
+import { lazy, useState } from "react";
 import pythonLogo from "../../../images/python.jpeg";
-import CourseData from "../../data/CourseData";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-const CourseStatsEditAlert = lazy(() =>
-  import("../../alerts/CourseStatsEditAlert")
-);
+import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
+import CoursePlayer from "./CoursePlayer";
+import { useSelector } from "react-redux";
 const AccordionDescription = lazy(() => import("./AccordionDescription"));
-const AccordionLectures = lazy(() => import("./AccordionLectures"));
 
 const labels = {
   0.5: "poor",
@@ -38,255 +36,272 @@ const labels = {
   5: "Excellent+",
 };
 
-  const Item = styled(Paper)(({ theme }) => ({
-    backgroundColor: '#fff',
-    marginInline:!CustomDeviceIsSmall() && 6,
-    marginBottom:17,
-    ...theme.typography.body2,
-    padding: theme.spacing(0.5),
-    textAlign: 'center',
-    color: (theme.vars ?? theme).palette.text.secondary,
-    ...theme.applyStyles('dark', {
-      backgroundColor: '#1A2027',
-    }),
-  }));
+const Item = styled(Paper)(({ theme }) => ({
+  // gradient card background
+  background: theme.palette.mode === "dark"
+    ? "linear-gradient(145deg, #1a1a1a, #2c2c2c)"
+    : "linear-gradient(145deg, #ffffff, #f5f7fa)",
 
-function CourseLayout({ isUploadedRequest,isDarkMode=false }) {
-  const [openAlertCourseStats, setOpenAlertCourseStats] = useState(false);
+  marginInline: !CustomDeviceIsSmall() && 6,
+  marginBottom: 17,
+  ...theme.typography.body2,
+  padding: theme.spacing(0.5),
+  textAlign: "center",
+  color: (theme.vars ?? theme).palette.text.secondary,
+  borderRadius: 16,
+  boxShadow:
+    theme.palette.mode === "dark"
+      ? "0px 4px 12px rgba(0,0,0,0.6)"
+      : "0px 4px 12px rgba(0,0,0,0.15)",
+}));
 
-
-  // handle showing of course Statistics
-  const handleShowingCourseStats = () => {
-    setOpenAlertCourseStats(true);
+function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
+  
+  // redux state manager
+  const { user } = useSelector((state) => state.currentUser);
+  const isMyCourse=user?._id===courseItem?.course_instructor?.instructorId
+  
+  const handleOpenPlayer = () => {
+   setFocusedCourse(courseItem)
   };
-
+  
   return (
-    <Item 
-    style={{
-      display:'flex',
-      flexDirection:'column',
-      width:350, 
-      justifyContent:'center',
-      border:'1px solid',
-      borderColor:isDarkMode ? '#2F2F2F' :'#E0E0E0' 
-    }}>
-    
-      {/* title */}
+    <Item
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        width: CustomDeviceIsSmall()
+          ? 360
+          : CustomDeviceTablet()
+          ? 300
+          : 340,
+        justifyContent: "center",
+        border: "1px solid",
+        borderColor: isDarkMode ? "#2F2F2F" : "#E0E0E0",
+      }}
+    >
+      {/* title + avatar with gradient overlay */}
       <Box
         display={"flex"}
         justifyContent={"center"}
+        bgcolor={'background.default'}
         alignItems={"center"}
-        flexDirection={'column'}
+        flexDirection={"column"}
         gap={1}
+        mb={1}
         p={1}
+        sx={{
+          background: !isDarkMode &&  "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          
+          borderRadius: 3,
+          pb: 2,
+        }}
       >
-        <Avatar alt="image" 
-        src={pythonLogo} 
+        <Avatar
+          alt="image"
+          sx={{
+            width: 60,
+            height: 60,
+            border: "3px solid white",
+            boxShadow: "0px 4px 12px rgba(0,0,0,0.3)",
+          }}
+          src={pythonLogo}
         />
         {/* title */}
-        <Typography 
-        color={'primary'}
-        variant="body2"
-        textTransform={'uppercase'}
-        fontWeight={"bold"}>
-          Python Django Full Course
+        <Typography
+          variant="body2"
+          fontWeight={"bold"}
+        >
+          {courseItem?.course_title}
         </Typography>
 
-           {/* rating */}
-        <Box 
-        display={"flex"} 
-        gap={3} 
-        mb={1}
-        justifyContent={'space-around'}
-        alignItems={"center"}>
-
-        {/* rating value */}
-        <FormHelperText>
-          {CourseData.rating}
+        {/* rating */}
+        <Box
+          display={"flex"}
+          gap={3}
+          mb={1}
+          justifyContent={"space-around"}
+          alignItems={"center"}
+        >
+          {/* rating value */}
+          <FormHelperText>
+            {courseItem?.course_rate_count}
           </FormHelperText>
-      
-        {/* stars */}
+
+          {/* stars */}
           <Rating
             name="feedback"
             size="small"
-            value={CourseData.rating}
+            value={courseItem?.course_rate_count}
             readOnly
             precision={0.5}
           />
+
           {/* label */}
           <Box>
-          <FormHelperText>
-          {labels[CourseData.rating]}
-          </FormHelperText>
+            <FormHelperText>
+              {labels[courseItem?.course_rate_count]}
+            </FormHelperText>
           </Box>
         </Box>
       </Box>
 
-        {/* lectures + student */}
+      <Divider component={"div"} />
+
+      {/* lectures + student */}
       <Box
         className="px-1"
         mb={1}
+        mt={2}
         display={"flex"}
         alignItems={"center"}
         gap={1}
         justifyContent={"space-around"}
       >
         {/* lectures */}
-        <Box 
-        display={"flex"}
-        gap={1} 
-        justifyContent={'space-around'}
-        alignItems={"center"}>
-          <SchoolRounded 
-          color="primary" 
-          sx={{ width: 17, height: 17 }} />
+        <Box
+          display={"flex"}
+          gap={1}
+          justifyContent={"space-around"}
+          alignItems={"center"}
+        >
+          <SchoolRounded color="primary" sx={{ width: 17, height: 17 }} />
           <Typography
             variant="caption"
             color="text.secondary"
             fontWeight={"bold"}
           >
-            10 lectures
+            {courseItem?.course_video_lectures?.length} lectures
           </Typography>
         </Box>
 
-        <div/>
+        <div />
 
         {/* students */}
-        <Box
-        display={"flex"}
-        gap={1} 
-        alignItems={"center"}>
+        <Box display={"flex"} gap={1} alignItems={"center"}>
           <PersonAdd color="primary" sx={{ width: 18, height: 18 }} />
           <Typography
             variant="caption"
             color="text.secondary"
             fontWeight={"bold"}
           >
-            10,000 students
+            {courseItem?.student_count} students
           </Typography>
         </Box>
-      </Box>   
-    
-    <Divider component={"div"} />
-
-      {/* instructor details */}
-        <Box 
-      display={'flex'} 
-      alignItems={'center'}
-      justifyContent={'space-around'}
-      my={1}
-      >
-      <Box display={'flex'} alignItems={'center'} gap={1} mr={4}>
-        {/* avatar */}
-          <Avatar src="" alt="" sx={{ width:27,height:27 }}/>
-        {/* instructor name */}
-        <Box display={'flex'} justifyContent={'center'}>
-        <Typography variant="caption" color={'text.primary'}> Alexis Damian</Typography>   
-        </Box> 
       </Box>
 
-      <div/>
+      <Divider component={"div"} />
+
+      {/* instructor details */}
+      <Box
+        display={"flex"}
+        alignItems={"center"}
+        justifyContent={"space-around"}
+        my={1.4}
+      >
+        <Box display={"flex"} alignItems={"center"} gap={1.5}>
+          {/* avatar */}
+          <Avatar
+            src={courseItem?.course_instructor?.instructorAvatar}
+            alt=""
+            sx={{ width: 28, height: 28 }}
+          />
+          {/* instructor name */}
+          <Box
+            display={"flex"}
+            justifyContent={"center"}
+            alignItems={"center"}
+          >
+            <Typography
+              variant="caption"
+              color={"text.primary"}
+              sx={{ textTransform: "capitalize" }}
+            >
+              {courseItem?.course_instructor?.instructorName}
+            </Typography>
+          </Box>
+        </Box>
 
         {/* occupation */}
-        <Box display={'flex'} justifyContent={'center'}>
-        <Typography variant="caption" color={'text.primary'}> Software Engineer</Typography> 
+        <Box
+          display={"flex"}
+          justifyContent={"center"}
+          gap={1}
+          alignItems={"center"}
+        >
+          <Typography variant="caption" color={"text.primary"}>
+            {courseItem?.course_instructor?.instructorTitle}
+          </Typography>
         </Box>
       </Box>
 
-     
-
       <Divider component={"div"} />
+
       {/* description */}
       <Box>
-        <AccordionDescription description={CourseData.description} />
-      </Box>
-
-      <Divider component={"div"} />
-      {/* what lectures accordion */}
-      <Box>
-        <AccordionLectures lectures={CourseData.leactures} />
+        <AccordionDescription description={courseItem?.course_description} />
       </Box>
 
       <Divider component={"div"} />
 
-      {/* layout inquiry is an instructor checking their uploaded course */}
-      {isUploadedRequest ? (
-          <Box display={"flex"} justifyContent={"center"} mb={1}>
-            <Button
-              size="small"
-              startIcon={<BarChartRounded />}
-              variant="outlined"
-              className="rounded-5"
-              onClick={handleShowingCourseStats}
-              sx={{ textTransform: "capitalize" }}
-            >
-              View Course Statistics
-            </Button>
-          </Box>
-      ) : (
-        <React.Fragment>
-        
-          <Box
-            mt={1}
-            width={"100%"}
-            display={"flex"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-          >
-          
-
-            {/* enroll course button control */}
-            <Box
-              display={"flex"}
-              justifyContent={"center"}
-              flexDirection={'column'}
-              width={"100%"}
-              gap={1}
-              p={1}
-            >
-            {/* helper text for certification */}
-            <Box
-            display={'flex'} 
-            justifyContent={'center'}>
-            <FormHelperText className={isDarkMode ? "text-info":"text-success"}>
-              Unlock Certificate of Completion at $2
+        {/* enroll course button control */}
+        <Box
+          display={"flex"}
+          justifyContent={"center"}
+          flexDirection={'column'}
+          width={"100%"}
+          mt={1.5}
+          p={1}
+        >
+          {/* helper text, if they enrolled to continue learn */}
+          {courseItem?.currentUserEnrolled? (
+            <Box display={'flex'} justifyContent={'center'}>
+            <FormHelperText className="text-success fw-bold">continue learning</FormHelperText>
+            </Box>
+          ):(
+            <Box display={'flex'} justifyContent={'center'}>
+            <FormHelperText>
+            {isMyCourse ? 'you uploaded this course':'preview and enroll free'}
             </FormHelperText>
             </Box>
-            {/* btn */}
-            <Box
-             display={'flex'} 
-            justifyContent={'center'}
-            >
+          )}
+          
+          {/* btn */}
+          <Box display={"flex"} justifyContent={"center"}>
+            {isMyCourse ? (
               <Button
-                className="rounded-5"
-                variant={isDarkMode ? "outlined":"contained"}
-                startIcon={<VideoLibraryRounded />}
-                size="small"
-                sx={{ 
-                width:'80%', 
-                fontWeight: "bold",
-                fontSize:'small' }}
-                disableElevation
-              >
-                Enroll Course
-              </Button>
-              </Box>
-
-            </Box>
-
+              onClick={handleOpenPlayer}
+              size="medium"
+              className="rounded-5"
+              variant={isDarkMode ? "outlined" : "contained"}
+              startIcon={ courseItem?.currentUserEnrolled ? <VideoLibraryRounded/> : <CastForEducationRounded />}
+              sx={{
+                textTransform: "capitalize",
+                background: !isDarkMode && "linear-gradient(180deg, #42a5f5,rgb(41, 99, 146))",
+              }}
+              disableElevation
+            >
+              Preview Your Course
+            </Button>
+            ):(
+              <Button
+              onClick={handleOpenPlayer}
+              size="medium"
+              className="rounded-5"
+              variant={isDarkMode ? "outlined" : "contained"}
+              startIcon={ courseItem?.currentUserEnrolled ? <VideoLibraryRounded/> : <CastForEducationRounded />}
+              sx={{
+                textTransform: "capitalize",
+                background: !isDarkMode && "linear-gradient(180deg, #42a5f5,rgb(41, 99, 146))",
+              }}
+              disableElevation
+            >
+              {courseItem?.currentUserEnrolled ? "You Enrolled Learn":"Preview Course Free"}
+            </Button>
+            )}
           </Box>
-          {/* empty box for spacing */}
-        </React.Fragment>
-      )}
-
-      {/* show all course statistics alert */}
-      {openAlertCourseStats && (
-        <CourseStatsEditAlert
-        openAlertCourseStats={openAlertCourseStats}
-        setOpenAlertCourseStats={setOpenAlertCourseStats}
-      />
-      )}
-      
+        </Box>
+    
     </Item>
   );
 }

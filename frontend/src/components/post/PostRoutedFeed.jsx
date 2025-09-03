@@ -2,6 +2,7 @@ import {
   Alert,
   Badge,
   Box,
+  Button,
   CircularProgress,
   Collapse,
   IconButton,
@@ -9,20 +10,22 @@ import {
   Stack,
 } from "@mui/material";
 
-import { Close, SendOutlined } from "@mui/icons-material";
+import { Close, RefreshRounded, SendOutlined } from "@mui/icons-material";
 
 import axios from "axios";
 import { lazy, useState } from "react";
 import { useSelector } from "react-redux";
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
+import { useNavigate } from "react-router-dom";
 
 const CommentContainer = lazy(() => import("./CommentContainer"));
+
 function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [comment, setComment] = useState("");
-
+  const navigate=useNavigate()
   // axios default credentials
   axios.defaults.withCredentials = true;
   
@@ -85,6 +88,10 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
       });
   };
 
+  // handle home navigation
+    const handleRefreshHome=()=>{
+      navigate('/')
+    }
 
 
   return (
@@ -110,6 +117,18 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
           </Collapse>
         </Box>
       )}
+
+         {/* refresh btn */}
+          <Box 
+          display={'flex'} 
+          justifyContent={'center'}>
+          <Button
+          onClick={handleRefreshHome}
+          startIcon={<RefreshRounded/>} 
+          size="small" variant="contained" sx={{borderRadius:3}}>
+            refresh
+          </Button>
+          </Box>
 
       {/* card container */}
       <Box p={0}>

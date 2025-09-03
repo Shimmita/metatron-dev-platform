@@ -14,25 +14,23 @@ import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 const actions = [
-  // under development
   {
-    icon: <SchoolRounded color="primary" sx={{ width: 26, height: 26 }} />,
-    name: "Course Upload",
-  },
-
-  {
-    icon: <TvRounded color="primary" sx={{ width: 26, height: 26 }} />,
-    name: "Upload Event",
+    icon: <PostAddRounded color="primary" sx={{ width: 33, height: 33}} />,
+    name: "Upload Milestone",
   },
   {
     icon: <Work color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Upload Job",
   },
- 
-  {
-    icon: <PostAddRounded color="primary" sx={{ width: 33, height: 33}} />,
-    name: "Upload Milestone",
+   {
+    icon: <TvRounded color="primary" sx={{ width: 26, height: 26 }} />,
+    name: "Upload Event",
   },
+  {
+    icon: <SchoolRounded color="primary" sx={{ width: 26, height: 26 }} />,
+    name: "Course Upload",
+  },
+ 
 ];
 
 export default function BasicSpeedDial() {
@@ -81,7 +79,6 @@ export default function BasicSpeedDial() {
           <SpeedDialAction
             key={action.name}
             icon={action.icon}
-            className="shadow border"
             onClick={(e) => {
               if (action.name === "Upload Milestone") {
                 setOpenModalTech(true);
@@ -101,7 +98,6 @@ export default function BasicSpeedDial() {
             tooltipTitle={
               <Typography
                 p={1}
-                className="shadow rounded"
                 fontWeight={"bold"}
                 variant="body2"
               >

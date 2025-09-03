@@ -2,6 +2,7 @@ import {
   Alert,
   Badge,
   Box,
+  Button,
   CircularProgress,
   Collapse,
   IconButton,
@@ -10,7 +11,7 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import { Close, FullscreenOutlined, SendOutlined } from "@mui/icons-material";
+import { Close, FullscreenOutlined, RefreshRounded, SendOutlined } from "@mui/icons-material";
 
 import axios from "axios";
 import React, { lazy, useState } from "react";
@@ -24,6 +25,7 @@ import {
 } from "../../redux/AppUI";
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
+import { useNavigate } from "react-router-dom";
 
 const MAX_TEXT_LENGTH=100
 
@@ -39,6 +41,8 @@ function PostDetailsContainer({
   // hold temporarily the post param, could mutate its values
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const navigate=useNavigate()
 
   const [comment, setComment] = useState("");
   
@@ -136,6 +140,12 @@ function PostDetailsContainer({
     // close drawer profile
     dispatch(showUserProfileDrawer())
 
+  }
+
+
+  // handle navigate home
+  const handleNavigateHome=()=>{
+    navigate("/")
   }
 
   return (
@@ -254,7 +264,7 @@ function PostDetailsContainer({
               </Collapse>
             </Box>
           )}
-
+           
           {/* card container */}
           <Box >
             {/* render post details feed here */}
@@ -280,7 +290,7 @@ function PostDetailsContainer({
             alignItems={"center"}
             width={"100%"}
             p={1}
-            mb={2}
+            mb={3}
             bgcolor={"background.default"}
             className={'rounded'}
           >

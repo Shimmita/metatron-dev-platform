@@ -21,7 +21,8 @@ import {
   CircularProgress,
   Stack,
   Toolbar,
-  Tooltip
+  Tooltip,
+  useMediaQuery
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
@@ -150,13 +151,15 @@ export default function EventsContainer() {
 
     // trigger redux update
     const dispatch = useDispatch();
+  // smartphones and below
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const[isMyStats,setIsMyStats]=useState(false)
 
   const [textOption, setTextOption] = useState(
     isJobSearchGlobal ? "Search Events" : "Explore Events"
   );
-  const [isDrawerPane, setIsDrawerPane] = useState(true);
+  const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
   const [open, setOpen] = useState(
     !(CustomDeviceIsSmall() || CustomDeviceTablet()) && true
   );
@@ -197,10 +200,8 @@ export default function EventsContainer() {
 
    // false right bar is no of use this route
     useLayoutEffect(()=>{
-       // updating right bar show false
-       if (isSidebarRighbar) {
-        dispatch(handleSidebarRightbar());
-      }
+     // true tem, and the redux will reverse
+      dispatch(handleSidebarRightbar(true));
     },[dispatch,isSidebarRighbar])
 
 
@@ -287,7 +288,6 @@ export default function EventsContainer() {
           } 
         })
         .catch(async (err) => {
-          console.log(err);
           //  user login session expired show logout alert
           if (err?.response?.data.login) {
             window.location.reload();
@@ -758,19 +758,18 @@ export default function EventsContainer() {
 
 
           </Drawer>
-          {/* body of the jobs */}
-          <Box
-            width={"100%"}
-            display={"flex"}
-            height={"90vh"}
-            justifyContent={"center"}
+             <Box 
+        height={'88vh'} 
+        width={"100%"}
+        display={"flex"}
+          justifyContent={"center"}
           >
-            {/* centering the content */}
+         
             <Box
-              p={!CustomDeviceIsSmall() ? 2 : undefined}
               display={"flex"}
+              mt={!CustomDeviceIsSmall() ? 2:undefined}
               gap={2}
-              maxHeight={"85vh"}
+              maxHeight={CustomDeviceIsSmall() || CustomDeviceTablet() ?"88vh":"80vh"}
               flexWrap={"wrap"}
               justifyContent={"center"}
               sx={{
@@ -871,7 +870,7 @@ export default function EventsContainer() {
                   </React.Fragment>
                 )}
               </React.Fragment>
-            </Box>
+              </Box>
           </Box>
 
            {/* open modal event */}

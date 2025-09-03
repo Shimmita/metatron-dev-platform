@@ -1,7 +1,8 @@
 import {
   Close,
   CloudUploadRounded,
-  DiamondRounded
+  DiamondRounded,
+  PostAddRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -333,7 +334,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   // handle return width modal
     const handleReturnWidthModal=()=>{
       if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "35%"
+        return "40%"
       } else if (CustomDeviceTablet()){
         return "90%"
       } 
@@ -356,10 +357,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     keepMounted
     open={openModalTech}
     sx={{
-      backdropFilter:'blur(3px)',
+      backdropFilter:'blur(5px)',
       marginLeft: handleModalWidth(),
     }}
-    onClose={handleClosingModal}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
   >
@@ -1212,7 +1212,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
                 <Box
                   display={"flex"}
-                  justifyContent={"flex-end"}
+                  justifyContent={"space-around"}
                   alignItems={"center"}
                   gap={1}
                 >
@@ -1311,10 +1311,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 <Button
                   onClick={handlePost}
                   variant="contained"
-                  size="small"
-                  className={
-                    CustomDeviceIsSmall() ? "w-75 rounded-5" : "w-50 rounded-5"
-                  }
+                  size='medium'
+                  className='rounded-5'
+                  startIcon={isUploading ? <CircularProgress/>:<PostAddRounded/>}
                   disabled={isUploading || errorMessage}
                 >
                   Upload Your Post

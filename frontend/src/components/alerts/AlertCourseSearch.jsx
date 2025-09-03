@@ -151,7 +151,7 @@ export default function AlertCourseSearch({
       aria-describedby="alert-dialog-slide-description"
       sx={{
         marginLeft:handleFilterWidth(),
-        backdropFilter:'blur(3px)',
+        backdropFilter:'blur(5px)',
       }}
     >
       <Box bgcolor={"background.default"} className="border rounded">

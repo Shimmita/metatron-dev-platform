@@ -10,6 +10,7 @@ import { Vortex } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import AppLogo from "./images/logo_sm.png";
+const CertificateVerification=lazy(()=>import("./components/auth/CertificateVerification")) ;
 const RegPersonalCompletion = lazy(() =>
   import("./components/auth/RegPersonalCompletion")
 );
@@ -122,6 +123,15 @@ const App = () => {
                 exact
                 path={"/auth/recover"}
                 element={<RecoverAuthLazy />}
+              />
+
+              {/* cert verification */}
+              <Route
+                exact
+                path="/cert/verify"
+                element={
+                  <CertificateVerification/>
+                }
               />
             </Routes>
         </Suspense>

@@ -4,7 +4,8 @@ import {
   Close,
   CloudUploadRounded,
   DiamondRounded,
-  LinkRounded
+  LinkRounded,
+  WorkRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -456,7 +457,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
   // handle return width modal
     const handleReturnWidthModal=()=>{
       if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "35%"
+        return "40%"
       } else if (CustomDeviceTablet()){
         return "90%"
       } 
@@ -479,10 +480,9 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
       keepMounted
       open={openModalJob}
       sx={{
-        backdropFilter:'blur(3px)',
+        backdropFilter:'blur(5px)',
         marginLeft:handleModalWidth(),
       }}
-      onClose={handleClosingJobPostModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
@@ -857,7 +857,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               {!isFileLink && !isFreeLogo ? (
                 <Box
                   display={"flex"}
-                  justifyContent={"flex-end"}
+                  justifyContent={"space-around"}
                   alignItems={"center"}
                   width={"100%"}
                   gap={3}
@@ -1551,11 +1551,12 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
               display={"flex"} 
               justifyContent={"center"}>
                 <Button
-                  className="w-75 rounded-5 shadow-sm"
+                  className="rounded-5"
                   variant="contained"
                   onClick={handleJobPost}
                   disabled={isUploading || errorMessage}
-                  size="small"
+                  startIcon={isUploading ? <CircularProgress/>:<WorkRounded/>}
+                  size="medium"
                 >
                   Upload Job Now
                 </Button>

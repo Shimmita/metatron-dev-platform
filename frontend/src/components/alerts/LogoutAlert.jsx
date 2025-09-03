@@ -71,16 +71,6 @@ export default function LogoutAlert() {
     }
   };
 
- // handle width of the alert
-    const handleWidthAlert=()=>{
-      if (CustomDeviceTablet() && isTabSideBar) {
-        return "60%"
-      } else if(CustomLandScape()){
-        return "92%"
-      } else if(CustomLandscapeWidest()){
-        return "97.5%"
-      }
-    }
 
       const handleAlertGenWidth=()=>{
         if (CustomDeviceTablet() && isTabSideBar) {
@@ -100,7 +90,7 @@ export default function LogoutAlert() {
         keepMounted
         aria-describedby="alert-dialog-slide-description"
         sx={{
-          backdropFilter:'blur(3px)',
+          backdropFilter:'blur(5px)',
           marginLeft: handleAlertGenWidth()
         }}
       >

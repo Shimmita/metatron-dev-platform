@@ -1,8 +1,10 @@
 import {
   BoltRounded,
+  CheckCircleRounded,
   Close,
   CloudUploadRounded,
   Done,
+  DownloadForOfflineRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -26,6 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
 import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
+import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -67,58 +70,138 @@ const ApplyJobModal = ({
   isPreview=false,
   
 }) => {
-  const [cvUpload, setCvUpload] = useState(null);
+  const { user } = useSelector((state) => state.currentUser);
+  const [cvUpload, setCvUpload] = useState();
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [currentButton,setCurrentButton]=useState(user?.cvLink==="" ? 0:1)
 
+  // extract cvLink and name it cvName
+  const {cvLink:cvName}=user
   // redux states
   const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
   const isDarkMode=currentMode==='dark'
-
-  const { user } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
-
-  // handle cv file change
+  // handle cv file change, upload it to the backend
   const handleCVFile = (event) => {
+    // updating file for state tracking
     setCvUpload(event.target.files[0]);
+    // formData
+    const formData=new FormData()
+    formData.append("file",event.target.files[0])
+
+    // uploading status
+    setIsUploading(true)
+
+     // performing post request
+    axios
+      .post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/cv/upload/${user?._id}`,
+        formData,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+
+        // update user details in redux, to reflect updated cv
+        dispatch(updateUserCurrentUserRedux(res.data))
+
+        // snackbar success message from the backend update redux state
+        dispatch(updateCurrentSnackBar("c.v uploaded"));
+      })
+      .catch(async (err) => {
+        //  user login session expired show logout alert
+        if (err?.response?.data.login) {
+          // reload the window for it will be redirected to logout
+          window.location.reload();
+        }
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("Server Unreachable");
+          return;
+        }
+
+        setErrorMessage(err?.response.data);
+      })
+      .finally(() => {
+        setIsUploading(false);
+        // set current button 
+        setCurrentButton(0)
+        // nullify cv upload state
+        setCvUpload(null);
+      });
   };
 
-  // creating a jobItem object
-  const jobItem = {
-    jobID,
-    applicant: {
-      name: user.name,
-      applicantID: user._id,
-      gender: user.gender,
-      country: user.country,
-    },
-  };
+  // handle current cv btn selection
+  const handleCurrentCv=()=>{
+    setCurrentButton(1)
+  }
 
+  // handle current btn view cv
+  const handleDownloadCv=()=>{
+    // update focused btn
+    setCurrentButton(2)
+
+    // uploading status
+    setIsUploading(true)
+    
+      axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/cv/my/download`,{cvName}, {
+                  withCredentials: true,
+          })
+          .then((res) => {
+            // open new window to download the pdf separately
+            window.open(res.data,"_blank_")
+          })
+          .catch(async (err) => {
+
+            //  user login session expired show logout alert
+            if (err?.response?.data.login) {
+              window.location.reload();
+            }
+            if (err?.code === "ERR_NETWORK") {
+              setErrorMessage(
+                "server unreachable"
+              );
+              return;
+            }
+            setErrorMessage(err?.response.data);
+          })
+          .finally(() => {
+            setIsUploading(false);
+          });
+
+  }
+
+ 
   // handle uploading of the application document
-  const handleUploadDocuments = () => {
-    // clear any error message
+  const handleJobApplication = () => {
+
+      // clear any error message
     setErrorMessage("");
 
+    // creating a jobItem object
+      const jobItem = {
+        jobID,
+        cvName,
+        applicant: {
+          name: user.name,
+          applicantID: user._id,
+          gender: user.gender,
+          country: user.country,
+        },
+      };
+
+ 
     // set is uploading true
     setIsUploading(true);
-    // create a form which will facilitate parsing of the file for upload to cloud
-    const formData = new FormData();
-    // append post body after stringify it due to form data
-    formData.append("jobItem", JSON.stringify(jobItem));
-
-    //  check if document CV, Cover Letter or both present and append
-    if (cvUpload) {
-      formData.append("file", cvUpload);
-    }
-
+   
+ 
     // performing post request
     axios
       .post(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/application/apply`,
-        formData,
+        jobItem,
         {
           withCredentials: true,
         }
@@ -167,10 +250,18 @@ const ApplyJobModal = ({
   };
 
 
+  // handle showing of website iframe
+  const handleShowWebsite=()=>{
+    window.open(websiteLink, "_blank")
+    // close the modal
+    setOpenApplyJobModal(false)
+  }
+
+
   // handle return width modal
   const handleReturnWidthModal=()=>{
     if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
-      return "35%"
+      return "40%"
     } else if (CustomDeviceTablet()){
       return "90%"
     } 
@@ -192,11 +283,10 @@ const ApplyJobModal = ({
     <StyledModalJob
       keepMounted
       open={openApplyJobModal}
-      onClose={handleClosingModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
       sx={{
-        backdropFilter:'blur(3px)',
+        backdropFilter:'blur(5px)',
       }}
     >
       <Box
@@ -333,7 +423,7 @@ const ApplyJobModal = ({
           <Box
             mt={2}
             maxHeight={"70vh"}
-            className={"px-3"}
+            px={2}
             sx={{
               overflow: "auto",
               // Hide scrollbar for Chrome, Safari and Opera
@@ -345,11 +435,12 @@ const ApplyJobModal = ({
               scrollbarWidth: "none",
             }}
           >
+
             <Stack gap={2}>
               {/* about org */}
               <Stack >
                 <Typography
-                 variant="caption"
+                variant="caption"
                   fontWeight={"bold"}
                 >
                   {" "}
@@ -469,10 +560,13 @@ const ApplyJobModal = ({
                      the format of PDF only.
                     </FormHelperText>
                         
-                      {cvUpload && (
+                      {cvUpload ? (
+                        <Box 
+                        display={'flex'}
+                        justifyContent={'center'}>
                         <Typography
                           gutterBottom
-                          variant="body2"
+                          variant="caption"
                           width={"100%"}
                           display={"flex"}
                           gap={2}
@@ -488,44 +582,119 @@ const ApplyJobModal = ({
                             sx={{ width: 17, height: 17 }}
                           />
                         </Typography>
-                      )}
+                        </Box>
+                      ):user?.cvLink!=="" ?(
+                         <Box 
+                        display={'flex'}
+                        justifyContent={'center'}>
+                        <Typography
+                          gutterBottom
+                          variant="caption"
+                          width={"100%"}
+                          display={"flex"}
+                          gap={2}
+                          alignItems={"center"}
+                          justifyContent={"center"}
+                          fontWeight={"bold"}
+                          color={"text.secondary"}
+                        >
+                         {user?.cvLink?.split("-")[1]}
+                          <Done
+                            color="success"
+                            sx={{ width: 17, height: 17 }}
+                          />
+                        </Typography>
+                        </Box>
+                      ):null}
 
-                      <Box mt={1}>
+                      <Divider className="pt-2"/>
+
+                      <Box pt={2} 
+                      display={'flex'}
+                      justifyContent={'space-around'}
+                      gap={2}
+                       alignItems={'center'}>
+                       {/* upload cv */}
                         <Button
                           component="label"
                           role={undefined}
-                          variant="text"
+                          variant={currentButton===0 ? "outlined":"text"}
                           disabled={errorMessage || isUploading}
                           disableElevation
                           tabIndex={-1}
-                          color="success"
                           size="medium"
                           sx={{
                             textTransform: "none",
                             fontWeight: "bold",
+                            fontSize:'x-small',
+                            borderRadius:5
                           }}
                           startIcon={<CloudUploadRounded />}
                         >
-                          Upload CV
+                          {user?.cvLink==="" ? "Upload":"Update"}
+
                           <StyledInput
                             type="file"
                             accept="application/pdf"
                             onChange={handleCVFile}
-                            multiple
+                            single
                           />
+                        </Button>
+
+                        {/* current cv */}
+                        <Button
+                          component="label"
+                          onClick={handleCurrentCv}
+                          variant={currentButton===1 ? "outlined":"text"}
+                          disabled={errorMessage || isUploading || user?.cvLink===""}
+                          disableElevation
+                          tabIndex={-1}
+                          size="medium"
+                          sx={{
+                            textTransform: "none",
+                            fontWeight: "bold",
+                            fontSize:'x-small',
+                            borderRadius:5
+                          }}
+                          startIcon={<CheckCircleRounded />}
+                        >
+                          Current
+                        
+                        </Button>
+
+                        {/* check current */}
+                        <Button
+                          component="label"
+                          variant={currentButton===2 ? "outlined":"text"}
+                          onClick={handleDownloadCv}
+                          disabled={errorMessage || isUploading || user?.cvLink===""}
+                          disableElevation
+                          tabIndex={-1}
+                          size="medium"
+                          sx={{
+                            textTransform: "none",
+                            fontWeight: "bold",
+                            fontSize:'x-small',
+                             borderRadius:5
+                          }}
+                          startIcon={<DownloadForOfflineRounded />}
+                        >
+                          View
                         </Button>
                       </Box>
                     </Box>
+
+                      {/* divider */}
+              <Divider component={'div'} className="pb-1"/>
 
                     {/* application btn */}
                     <Box mt={1} display={"flex"} justifyContent={"center"}>
                       <Button
                         variant="contained"
                         disableElevation
-                        disabled={!cvUpload || isUploading || errorMessage}
+                        disabled={ user?.cvLink==="" || isUploading || errorMessage}
                         size="small"
-                        color="success"
-                        onClick={handleUploadDocuments}
+                        onClick={handleJobApplication}
                         endIcon={<BoltRounded />}
                         sx={{ borderRadius: "20px" }}
                       >
@@ -551,6 +720,7 @@ const ApplyJobModal = ({
                       <Button
                         variant="contained"
                         disableElevation
+                        onClick={handleShowWebsite}
                         size="small"
                         sx={{ borderRadius: "20px" }}
                       >
@@ -564,6 +734,8 @@ const ApplyJobModal = ({
               )}
              
             </Stack>
+          
+            
           </Box>
         </Box>
       </Box>
