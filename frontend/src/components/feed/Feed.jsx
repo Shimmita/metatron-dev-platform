@@ -74,18 +74,18 @@ const Feed = () => {
               </Box>
             }
           >
+          
             <Routes>
               <Route path="/" element={<FeedDefaultContent />} />
 
               {/* events */}
-               <Route path="/events" element={<EventsContainer />} />
+              <Route path="/events" element={<EventsContainer />} />
 
-             
-
+            
               {/* final selection route for courses */}
               <Route path="/courses/available" element={<CoursesMainContainer />} />
                {/* instructor */}
-               <Route path="/courses/instructor" element={<CoursesInstrContainer />} />
+              <Route path="/courses/instructor" element={<CoursesInstrContainer />} />
 
 
               {/* jobseeker pane */}

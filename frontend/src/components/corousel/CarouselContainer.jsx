@@ -14,8 +14,11 @@ const images = [
 function CarouselContainer() {
   
   return (
-    <div className="box">
-    <Carousel useKeyboardArrows={true} >
+    <div className="box" style={{
+      width:350,
+      height:300
+    }}>
+    <Carousel>
       {images.map((URL, index) => (
         <div className="slide" key={index}>
           <img alt="" src={URL} key={index} />

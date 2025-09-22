@@ -5,12 +5,12 @@ import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 import { PersistGate } from "redux-persist/integration/react";
 
+import "@fontsource/poppins";
+import { Box, FormHelperText } from "@mui/material";
 import process from "process";
 import App from "./App";
 import { persistor, store } from "./redux/AppStore"; // Import the modified store and persistor
 import reportWebVitals from "./reportWebVitals";
-import "@fontsource/poppins"; 
-import { Box, FormHelperText } from "@mui/material";
 
 
 window.process = process;

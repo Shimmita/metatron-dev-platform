@@ -54,6 +54,7 @@ const RightbarAll = () => {
       <Box
         position={"fixed"}
         maxHeight={"80vh"}
+        className='shadow'
         sx={{
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera

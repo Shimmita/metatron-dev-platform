@@ -1,5 +1,5 @@
 import { Close } from "@mui/icons-material";
-import { Avatar, Box, DialogContentText, IconButton, InputBase, styled, Typography } from "@mui/material";
+import { Avatar, Box, DialogContentText, IconButton, InputBase, styled, Tooltip, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -10,9 +10,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetClearConversations } from "../../redux/CurrentConversations";
 import { updateMessageConnectRequest } from "../../redux/CurrentSnackBar";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -44,11 +41,11 @@ export default function AlertInputMessage({
     const dispatch=useDispatch()
 
     // redux states
-    const { isTabSideBar } = useSelector((state) => state.appUI);
+    const { currentMode } = useSelector((state) => state.appUI);
     const { user } = useSelector((state) => state.currentUser);
-    
-      // axios default credentials
-      axios.defaults.withCredentials = true;
+
+    const isDarkMode=currentMode==='dark'
+
 
   const handleClose = () => {
     // close alert
@@ -109,26 +106,17 @@ export default function AlertInputMessage({
     };
 
 
-// handle width of the alert
-const handleMessageWidth=()=>{
-  if (CustomDeviceTablet() && isTabSideBar) {
-    return "36%"
-  } else if(CustomLandScape()){
-    return "-1%"
-  } else if(CustomLandscapeWidest()){
-    return "0%"
-  }
-}
+
 
   return (
       <Dialog
         open={openAlert}
         TransitionComponent={Transition}
         keepMounted
+        maxWidth={400}
         aria-describedby="alert-dialog-slide-description"
         sx={{
           backdropFilter:'blur(3px)',
-          marginLeft: handleMessageWidth()
         }}
       >
         <Box width={'100%'}>
@@ -136,14 +124,19 @@ const handleMessageWidth=()=>{
         display={'flex'} gap={2} 
         p={1}
         alignItems={'center'} 
-        justifyContent={'space-between'}>
+        justifyContent={'space-between'}
+        sx={{
+        background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+        }}
+        >
             {/* avatar */}
-             <Avatar
+            <Avatar
             src={targetAvatar}
             sx={{
               
-                width: 30,
-                height: 30,
+                width: 34,
+                height: 34,
             }}
             alt={targetName?.split(" ")[0]}
             aria-label="avatar"
@@ -163,14 +156,18 @@ const handleMessageWidth=()=>{
             </Box>
 
             {/* close icon button */}
-            <IconButton onClick={handleDismiss} >
-                <Close sx={{width:15,height:15}}/>
+            <Tooltip title={'close'} arrow>
+            <IconButton 
+            sx={{border:'1px solid', borderColor:"divider"}}
+            onClick={handleDismiss} >
+                <Close sx={{width:12,height:12}}/>
             </IconButton>
+            </Tooltip>
         </Box>
     
         <DialogContent dividers>
         <DialogContentText variant="body2" fontSize={'small'} pl={1} pr={1}>
-           write your message and send it instantly by clicking send
+          write your message and send it instantly by clicking send
         </DialogContentText>
         <StyledInputBase
             sx={{ padding: "10px", 
@@ -178,8 +175,8 @@ const handleMessageWidth=()=>{
                 border:'1px solid', 
                 borderColor:'divider',
                 fontSize:'small'
-             }}
-             multiline
+            }}
+            multiline
             fullWidth
             value={textMessage}
             onChange={(e) => setTextMessage(e.target.value)}

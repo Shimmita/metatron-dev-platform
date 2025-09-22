@@ -36,6 +36,7 @@ import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import AllSkills from "../data/AllSkillsData";
 import { updateCurrentEvents } from "../../redux/CurrentEvents";
+import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
 // styled modal
@@ -223,14 +224,16 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
     if (handleEmptyFields()) {
       // set is uploading true
       setIsUploading(true);
-     
       // performing post request, passing current userId
       axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/create`, eventObject, {
           withCredentials: true,
         })
         .then((res) => {
           // update the snack bar message
-          dispatch(updateCurrentSnackBar(res?.data?.message))   
+          dispatch(updateCurrentSnackBar(res?.data?.message))  
+
+          // redux success to trigger success alert
+          dispatch(updateCurrentSuccessRedux({title:'Event Uploaded',message:`${res.data.message} track your uploaded event status in the events section and be able to interact with users who made rsvp.`}))
           
           // update the current events redux with the latest one on top
           dispatch(updateCurrentEvents([res.data.data,...eventsData]))
@@ -282,16 +285,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
       return "95%"
     }
 
-    // handle width of the modal, margin
-      const handleModalWidth=()=>{
-        if (CustomDeviceTablet() && isTabSideBar) {
-          return "36%"
-        } else if(CustomLandScape()){
-          return "-1%"
-        } else if(CustomLandscapeWidest()){
-          return "0%"
-        }
-      }
+ 
 
   return (
     <StyledModalEvent
@@ -299,7 +293,6 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
       open={openModalEventAdd}
       sx={{
         backdropFilter:'blur(5px)',
-        marginLeft:handleModalWidth(),
       }}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
@@ -307,12 +300,10 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
       <Box
         width={handleReturnWidthModal()}
         borderRadius={3}
-        bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
-           border:  "1px solid gray",
+          border:  "1px solid gray",
           borderColor:'divider',
-          marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
         }}
       >
         <Box
@@ -322,14 +313,20 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
           sx={{ 
           border:  "1px solid gray",
           borderColor:'divider',
-           }}
+          }}
         >
           {/* toolbar like box */}
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
-            mr={1.5}
+            borderRadius={3}
+            pt={1}
+            pr={0.8}
+            sx={{
+              background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+            }}
           >
             {/* logo */}
             <Box>
@@ -457,7 +454,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                           {/* icon */}
                           <CourseIcon option={about} />
                           {/* name */}
-                          <small style={{ fontSize: "small" }}>{about}</small>
+                        <Typography variant="body2">{about}</Typography>
                         </MenuItem>
                       )
                     )}
@@ -467,14 +464,15 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                {/*event hosting link */}
                 <Box className="w-100 mb-3">
                 <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                  Please share the event link from zoom, google meet, calendly etc. currently we do not support video conferencing.
+                  Please share the event link from zoom, google meet, calendly etc. 
+                  currently we do not support video conferencing.
                 </Typography>
                   <TextField
                     required
                     disabled={isUploading}
                     value={eventLink}
                     label="event meeting link"
-                    placeholder="zoom, google meet, calendly, jitsi..."
+                    placeholder="zoom, google meet, calendly..."
                     fullWidth
                     onChange={(e) => setEventLink(e.target.value)}
                   />

@@ -70,6 +70,10 @@ export default function AlertProfileCompletion({
   const [successMsg, setSuccessMsg] = useState("");
   const [about, setAbout] = useState("");
 
+  // redux state
+  const { currentMode } = useSelector((state) => state.appUI);
+    const isDarkMode=currentMode==='dark'
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -233,6 +237,7 @@ export default function AlertProfileCompletion({
         TransitionComponent={Transition}
         keepMounted
         aria-describedby="alert-dialog-slide-description"
+        sx={{backdropFilter:'blur(5px)'}}
       >
         {isPosting ? (
           <React.Fragment>
@@ -249,6 +254,10 @@ export default function AlertProfileCompletion({
               display={"flex"}
               alignItems={"center"}
               justifyContent={"space-between"}
+              sx={{
+              background: !isDarkMode && 
+              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          }}
             >
               {/* icon and title */}
               <Box display={"flex"} alignItems={"center"} gap={2}>
@@ -316,11 +325,11 @@ export default function AlertProfileCompletion({
                   ) : (
                     <React.Fragment>
                       <DialogContentText
+                       maxWidth={400}
                         gutterBottom
-                        id="alert-dialog-slide-description"
+                        id="alert-dialog-slide-description-icon_select"
                       >
-                        Choose your favorite avatar icon from your local storage, file should not exceed the threshold size of
-                        5MB
+                        Choose your favorite avatar icon from your local storage, file should not exceed 5MB in size
                       </DialogContentText>{" "}
                       {/* Display error message if file exceeds 2MB */}
                       {error && (
@@ -411,9 +420,9 @@ export default function AlertProfileCompletion({
                         gutterBottom
                         id="alert-dialog-slide-description-about"
                       >
-                        Tell us briefly about yourself to facilitate
-                        articulation of your technical experience or aspirations to
-                        the fellow tech enthusiasts.
+                        Provide a brief introduction about yourself which will 
+                        be associated with your profile and can be viewed by 
+                        like-minded individuals on the platform.
                       </DialogContentText>
                       <Box
                         display={"flex"}
@@ -438,9 +447,10 @@ export default function AlertProfileCompletion({
                       </Box>
                       <DialogContentText
                         gutterBottom
-                        id="alert-dialog-slide-description"
+                        id="alert-dialog-slide-description-avatar"
                       >
-                        Provide your preferred avatar or image for your profile by clicking on the avatar button. (optional but recommended)
+                        Upload your preferred avatar for your profile by clicking on the avatar button. 
+                        (optional but recommended).
                       </DialogContentText>
                     </React.Fragment>
                   )}
@@ -507,7 +517,7 @@ export default function AlertProfileCompletion({
                       <Button
                         variant="outlined"
                         disableElevation
-                        disabled={!about}
+                        disabled={!about || about.length>MAX_ABOUT}
                         startIcon={<AddAPhotoRounded/>}
                         size="small"
                         sx={{
@@ -521,7 +531,7 @@ export default function AlertProfileCompletion({
 
                       {/* later button */}
                        <Button
-                        disabled={!about}
+                        disabled={!about || about.length>MAX_ABOUT}
                         disableElevation
                         size="small"
                         variant="contained"
@@ -615,7 +625,7 @@ export default function AlertProfileCompletion({
                           borderRadius: "20px",
                         }}
                         onClick={handleCompleteRegistration}
-                        disabled={avatarFile === null || error.trim() !== ""}
+                        disabled={avatarFile === null || error.trim() !== "" || about.length>MAX_ABOUT}
                       >
                         Complete
                       </Button>

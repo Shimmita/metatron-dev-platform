@@ -5,9 +5,9 @@ import {
   CalendarMonthRounded,
   LocationOnRounded,
   LockRounded,
-  OpenInBrowser,
   PaidRounded,
   PeopleRounded,
+  TravelExploreRounded,
   VerifiedRounded,
   WorkHistoryRounded
 } from "@mui/icons-material";
@@ -147,9 +147,9 @@ function JobLayout_2({
     <Box 
       display={"flex"} 
       gap={2}
-      mb={isLastIndex && CustomDeviceIsSmall() && 5}
+      mb={isLastIndex && 3}
       // small devices should have column
-      flexDirection={CustomDeviceIsSmall() ? 'column':'row'}
+      flexDirection={'column'}
       justifyContent={"center"}
       mt={CustomDeviceIsSmall()?2:0.5}
       >
@@ -273,73 +273,64 @@ function JobLayout_2({
       {/* displayed is not previewHR, probably hr definitely their jobs*/}
       {!isPreviewHR && (
         <React.Fragment>
-           {isMyJob ?(
-        <Box 
-        my={1}
-        display={'flex'} 
-        justifyContent={'center'}>
-          <Typography textAlign={'center'}  fontWeight={'bold'} variant="caption" sx={{ textTransform:'capitalize' }}> - You Posted -</Typography>
-        </Box>
-      ):(
       
       <Box
-      mt={1}
+      mt={2}
+      pb={2}
       justifyContent={'center'}
-       display={'flex'}>
-      {/* application  btn */}
+      width={'100%'}
+      display={'flex'}>
+      {/* application  btns */}
+      <Box >
       {websiteLink === "" ? (
         <Button
           variant={isDarkMode ? "outlined" : "contained"}
           color="primary"
           size="small"
           disableElevation
-          className={"w-50"}
-          endIcon={isDeactivated || isMaxApplicants ? <LockRounded/> :<VerifiedRounded />}
+          startIcon={isDeactivated || isMaxApplicants ? <LockRounded/> :<VerifiedRounded />}
           disabled={job?.currentUserApplied || isMaxApplicants}
           onClick={handleShowingApply}
-          sx={{ borderRadius: "20px", mb: 1, width: "80%",fontSize:'small', textTransform:'capitalize' }}
+          sx={{ borderRadius: "20px", fontSize:'small', textTransform:'capitalize' }}
         >
-          {job?.currentUserApplied ? "Applied":isDeactivated ? "Paused":isMaxApplicants ? "Closed":"Apply"}
+          {job?.currentUserApplied ? "Applied":isDeactivated ? "Paused":isMaxApplicants ? "Closed":"Apply Job"}
         </Button>
       ) : (
        
         <Button
           variant={isDarkMode ? "outlined" : "contained"}
           color="primary"
-          className={"w-50"}
           size="small"
           disabled={isDeactivated}
           disableElevation
-          endIcon={isDeactivated ? <LockRounded/> :<OpenInBrowser />}
+          startIcon={isDeactivated ? <LockRounded/> :<TravelExploreRounded />}
           onClick={handleShowingApply}
           sx={{ 
             borderRadius: "20px",
-             mb: 1, 
-             width: "80%",
-             fontSize:'small',
-             textTransform:'capitalize' }}
+            fontSize:'small',
+            textTransform:'capitalize' }}
         >
-          {isDeactivated ? "paused":"apply"}
+          {isDeactivated ? "paused":"apply job"}
         </Button>
         
       )}
       </Box>
-      )}
+      </Box>
     </React.Fragment>
       )}
     </Card>
 
     {/* next button zone, only if item is last index */}
    {isLastIndex && !isJobSearchGlobal && (
-     <Box 
+    <Box 
     alignItems={'center'}
     justifyContent={'center'}
     display={'flex'}>
     <IconButton 
     disabled={isFetching}
-     onClick={handleFetchMoreData}
-     size="small"
-     sx={{ 
+    onClick={handleFetchMoreData}
+    size="small"
+    sx={{ 
       border:'1px solid',
       borderColor:'divider'
       }}
@@ -368,6 +359,8 @@ function JobLayout_2({
         jobaccesstype={job?.jobtypeaccess}
         location={job?.location}
         isFullView={true}
+        isMyJob={isMyJob}
+        whitelist={job?.whitelist}
       />
       )}
     </Box>

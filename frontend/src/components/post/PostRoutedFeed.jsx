@@ -139,7 +139,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
         />
 
         {/* all user comments container pass the comments of the post */}
-        <Box mt={1}>
+        <Box className='shadow-sm' mt={1}>
           <CommentContainer
             post_comments={postDetailedData?.post_comments.comments}
           />
@@ -151,7 +151,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
         justifyContent={"space-between"}
         alignItems={"center"}
         width={"100%"}
-        className='rounded'
+        className='rounded shadow-sm'
         p={2}
         mt={1}
         bgcolor={"background.default"}

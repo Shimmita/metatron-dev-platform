@@ -25,17 +25,14 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { signInWithPopup } from "firebase/auth";
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
 import { persistor } from "../../redux/AppStore";
 import { resetDarkMode } from "../../redux/AppUI";
-import { updateTempUserDetails } from "../../redux/CompleteSigning";
 import { resetClearCurrentAuthMessage } from "../../redux/CurrentAuthMessages";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
-import { auth, providerGoogle } from "../gcp/FirebaseConfig";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import OptionsMoreLogin from "./OptionsMoreLogin";
@@ -82,76 +79,6 @@ const LoginAuth = () => {
     dispatch(resetDarkMode());
   };
 
-  // handle login  with google
-  const handleLoginWithGoogle = () => {
-    const googleFailedError =
-      "Google authentication failed!";
-
-    setIsLogin(true);
-    // creating empty form data since the backend parses JSON from  the
-    // body before processing
-    const emptyForm = new FormData();
-    const user = {};
-
-    emptyForm.append("user", JSON.stringify(user));
-    signInWithPopup(auth, providerGoogle)
-      .then((response) =>
-        //  getting the access token
-        response.user
-          .getIdToken()
-          .then((token) => {
-            // use axios to fetch user details and if they exist from msg resp
-            // else redirect them to complete reg page
-            axios
-              .post(
-                `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/google/${token}`,
-                emptyForm
-              )
-              .then((res) => {
-                console.log(res);
-                // in the res message can be true or false if user registered
-                if (res?.data?.message) {
-                  // user already registered redirect them home
-                  // update current user redux states + online status by passing payload
-                  // from response that's user object that was came from server fire store
-                  const user_payload = res?.data?.user;
-                  dispatch(updateUserCurrentUserRedux(user_payload));
-                  // home redirect
-                  navigate("/");
-                } else if (res?.data?.incomplete) {
-                  // not yet completed registration/signin/signup redirect complete page
-                  // update the name,email and avatar for temp user in the redux
-                  dispatch(
-                    updateTempUserDetails({
-                      username: response.user.displayName,
-                      email: response.user.email,
-                      avatar: response.user.photoURL,
-                      token: token,
-                    })
-                  );
-
-                  // navigate to personal account completion
-                  navigate("/auth/register/personal/completion");
-                }
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          })
-          .catch((error) => {
-            // set error message
-            setMessageGeneral(googleFailedError);
-          })
-      )
-      .catch((err) => {
-        // set error message
-        setMessageGeneral(googleFailedError);
-      })
-      .finally(() => {
-        // set is login to false to close the progress
-        setIsLogin(false);
-      });
-  };
   
 
   const handleLogin = async () => {
@@ -428,7 +355,7 @@ const handleEmailVerification=()=>{
             </Box>
 
             {/* verify certificate */}
-             <Box 
+            <Box 
             display={isLogin ? "none":"flex"} 
             justifyContent={"center"} 
             alignItems={'center'}
@@ -443,15 +370,14 @@ const handleEmailVerification=()=>{
                  <Typography
                     variant="body2"
                   >
-                  Certificate Verification?
+                  Verify Course Cert
                   </Typography>
-                |
                 <Link to={"/cert/verify"} className="text-decoration-none">
                   <Typography
                     variant="body2"
                     sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
                   >
-                    verification
+                    click here
                   </Typography>
                 </Link> 
               </Typography>
@@ -472,12 +398,11 @@ const handleEmailVerification=()=>{
                 gap={1}
                 alignItems={"center"}
               >
-                 <Typography
+                <Typography
                     variant="body2"
                   >
-                   Forgot Password?
+                  Forgot Password
                   </Typography>
-                |
                 <Link to={"/auth/recover"} className="text-decoration-none">
                   <Typography
                     variant="body2"

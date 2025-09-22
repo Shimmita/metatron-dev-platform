@@ -2,16 +2,15 @@ import {
   Alert,
   Badge,
   Box,
-  Button,
   CircularProgress,
   Collapse,
   IconButton,
   InputBase,
   Stack,
-  Tooltip,
+  Tooltip
 } from "@mui/material";
 
-import { Close, FullscreenOutlined, RefreshRounded, SendOutlined } from "@mui/icons-material";
+import { Close, FullscreenOutlined, SendOutlined } from "@mui/icons-material";
 
 import axios from "axios";
 import React, { lazy, useState } from "react";
@@ -25,7 +24,6 @@ import {
 } from "../../redux/AppUI";
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
-import { useNavigate } from "react-router-dom";
 
 const MAX_TEXT_LENGTH=100
 
@@ -41,8 +39,6 @@ function PostDetailsContainer({
   // hold temporarily the post param, could mutate its values
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const navigate=useNavigate()
 
   const [comment, setComment] = useState("");
   
@@ -143,11 +139,6 @@ function PostDetailsContainer({
   }
 
 
-  // handle navigate home
-  const handleNavigateHome=()=>{
-    navigate("/")
-  }
-
   return (
   
     <Stack 
@@ -170,30 +161,28 @@ function PostDetailsContainer({
           display={"flex"} 
           justifyContent={"flex-end"} 
           alignItems={'center'} 
+          gap={2}
           p={1}>
             {/* full screen */}
           {isDrawerFocused && (
-             <Tooltip arrow title={"wide"}>
-             <IconButton 
-             onClick={handleShowPostDetailedNoDrawer}>
-               <FullscreenOutlined 
-               sx={{ width: 15, height: 15 }} 
-               color="primary" />
-             </IconButton>
-           </Tooltip>
+              <Tooltip arrow title={"wide"}>
+              <IconButton 
+              onClick={handleShowPostDetailedNoDrawer}>
+                <FullscreenOutlined 
+                sx={{ width: 18, height: 18 }} 
+                color="primary" />
+              </IconButton>
+            </Tooltip>
           )}
 
             {/* close  the post */}
             <Tooltip arrow title={"close"}>
               <IconButton 
-              sx={{ 
-              border:'1px solid',
-              borderColor:'divider'
-             }}
+          
               onClick={handleClearPostDetailedData}>
                 <Close 
-                sx={{ width: 10, height: 10 }}
-                 color="primary" />
+                sx={{ width: 15, height: 15 }}
+                color="primary" />
               </IconButton>
             </Tooltip>
           </Box>
@@ -274,7 +263,7 @@ function PostDetailsContainer({
             />
 
             {/* all user comments container pass the comments of the post */}
-            <Box mt={1}>
+            <Box className='shadow-sm' mt={1}>
               <CommentContainer
                 post_comments={postDetailedData?.post_comments?.comments}
                 postId={postDetailedData?._id}
@@ -292,7 +281,7 @@ function PostDetailsContainer({
             p={1}
             mb={3}
             bgcolor={"background.default"}
-            className={'rounded'}
+            className={'rounded shadow-sm'}
           >
             {/* input for comment */}
             <Box width={"100%"} mx={1}>

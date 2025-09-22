@@ -165,9 +165,7 @@ import CoursePlayer from "./layout/CoursePlayer";
   
     const [isFetching, setIsFetching] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-  
-    // axios default credentials
-    axios.defaults.withCredentials = true;
+
     
     const [openAlert, setOpenAlert] = useState(false);
   
@@ -443,7 +441,7 @@ import CoursePlayer from "./layout/CoursePlayer";
           });
       }
 
-      }, [dispatch, textOption, user, isJobSearchGlobal]);
+      }, [dispatch, textOption, user,isJobSearchGlobal]);
 
 
 
@@ -463,7 +461,7 @@ import CoursePlayer from "./layout/CoursePlayer";
                     } else{
                       // don't navigate alert you have not posted any jobs
                       setGeneralTitle("Metatron Instructor Page")
-                      setMessageGeneral("you have not posted any courses yet, upload your course and the page will be ready!")
+                      setMessageGeneral("You have not posted any courses yet, upload your course and the page will be ready!")
                       setOpenAlertGeneral(true)
                     }
                   })
@@ -493,7 +491,7 @@ import CoursePlayer from "./layout/CoursePlayer";
         <Suspense
           fallback={
             <Box 
-            MaxHeight={"90vh"} 
+            maxHeight={"88vh"} 
             display={"flex"} 
             justifyContent={"center"}>
               <Box display={"flex"} justifyContent={"center"}>
@@ -502,7 +500,8 @@ import CoursePlayer from "./layout/CoursePlayer";
             </Box>
           }
         >
-          <Box 
+          <Box
+          maxHeight={'85vh'} 
           display={"flex"} 
           width={window.screen.availWidth-18}
           >
@@ -863,6 +862,7 @@ import CoursePlayer from "./layout/CoursePlayer";
                         <CoursePlayer 
                         openPlayer={focusedCourse}
                         course={focusedCourse}
+                        setText={setTextOption}
                         setFocusedCourse={setFocusedCourse}
                         />
                       )}
@@ -947,14 +947,24 @@ import CoursePlayer from "./layout/CoursePlayer";
   
             {/* show job search alert */}
             {openAlert && (
-               <AlertJobSearch
-               openAlert={openAlert}
-               setOpenAlert={setOpenAlert}
-               isFullView={true}
-               isCourseSearch={true}
-             />
+              <AlertJobSearch
+              openAlert={openAlert}
+              setOpenAlert={setOpenAlert}
+              isFullView={true}
+              isCourseSearch={true}
+            />
             )}
-           
+          
+          {/* alert error message */}
+          {errorMessage && (
+              <AlertGeneral openAlertGeneral={errorMessage} 
+              title={'something went wrong'}
+              setErrorMessage={setErrorMessage}
+              message={messageGeneral}
+              defaultIcon={<InfoRounded/>}
+              isError={true}
+              />
+          )}
   
             {/* show success snackbar when redux snack state is updated */}
             {messageSnack && <SnackBarSuccess message={messageSnack} />}

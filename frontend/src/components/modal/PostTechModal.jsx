@@ -2,7 +2,8 @@ import {
   Close,
   CloudUploadRounded,
   DiamondRounded,
-  PostAddRounded
+  PostAddRounded,
+  Settings
 } from "@mui/icons-material";
 import {
   Alert,
@@ -28,11 +29,11 @@ import AppLogo from "../../images/logo_sm.png";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import { resetClearCurrentPosts } from "../../redux/CurrentPosts";
 import { updateCurrentSnackPostSuccess } from "../../redux/CurrentSnackBar";
+import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionTech from "../data/SubsectionTech";
 import BrowserCompress from "../utilities/BrowserCompress";
 import CourseIcon from "../utilities/CourseIcon";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -77,11 +78,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [isFreeLogo, setIsFreeLogo] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  const [frontendUI,setFrontendUI]=useState("")
+  const [group,setGroup]=useState("")
+  
   // for category 1, 2 and 3
   const [category1, setCategory1] = useState("");
   const [category2, setCategory2] = useState("");
   const [category3, setCategory3] = useState("");
+  const [category4, setCategory4] = useState("");
 
   // control opening and showing of the alert custom input
   const [openAlertML, setOpenAlertML] = useState(false);
@@ -94,6 +98,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
    const isDarkMode=currentMode==='dark'
 
   const { user } = useSelector((state) => state.currentUser);
+  const { groups:groupData } = useSelector((state) => state.currentGroups);
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -120,11 +126,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     post_title: title,
     post_url: freeLogo && freeLogo,
     post_body: description,
+    group,
     post_category: {
       main: postCategory,
       sub1: category1,
       sub2: category2,
       sub3: category3,
+      sub4: category4,
     },
     post_location: {
       country,
@@ -139,6 +147,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   useEffect(() => {
     // handle the value fo backend
     const updatePostCategoryValue = () => {
+
+       // for frontend  category 1 will be tool, category 2 will be UI library
+      if (postCategory.toLowerCase().includes("frontend")) {
+        setCategory1(frontend)
+        setCategory2(frontendUI)
+      }
+
       if (postCategory.includes("Backend")) {
         setCategory1(backend);
         setCategory2(database);
@@ -151,11 +166,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         setCategory1(frontend);
         setCategory2(backend);
         setCategory3(database);
+        setCategory4(frontendUI)
+        
       }
     };
 
     updatePostCategoryValue();
-  }, [postCategory, backend, database, frontend]);
+  }, [postCategory, backend, database, frontend,frontendUI]);
 
 
    // handle showing free logo menu
@@ -287,6 +304,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         .then((res) => {
           // show success post snack controlled by redux
           dispatch(updateCurrentSnackPostSuccess(res.data));
+           // redux success to trigger success alert
+          dispatch(updateCurrentSuccessRedux({title:'Post Milestone Uploaded',message:`${res.data} your post is now visible to everyone on the platform for ${gitHub.length>3 ? "likes, comments and GitHub review from users":"likes and comments from users"} `}))
           // close the current modal
           setOpenModalTech(false);
           // navigate to home route by default
@@ -333,7 +352,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
   // handle return width modal
     const handleReturnWidthModal=()=>{
-      if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+      if (CustomLandScape() ||CustomLandscapeWidest() ||
+      (CustomDeviceTablet() && !isTabSideBar)) {
         return "40%"
       } else if (CustomDeviceTablet()){
         return "90%"
@@ -341,16 +361,6 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       return "95%"
     }
 
-  // handle width of the modal, margin
-      const handleModalWidth=()=>{
-        if (CustomDeviceTablet() && isTabSideBar) {
-          return "36%"
-        } else if(CustomLandScape()){
-          return "-1%"
-        } else if(CustomLandscapeWidest()){
-          return "0%"
-        }
-      }
 
   return (
     <StyledModalPost
@@ -358,7 +368,6 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     open={openModalTech}
     sx={{
       backdropFilter:'blur(5px)',
-      marginLeft: handleModalWidth(),
     }}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
@@ -366,12 +375,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     <Box
       width={handleReturnWidthModal()}
       borderRadius={3}
-      bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
       color={"text.primary"}
       sx={{
         border:"1px solid gray",
         borderColor:'divider',
-        marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
       }}
     >
       <Box
@@ -381,14 +388,20 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         sx={{ 
           border:  "1px solid gray",
           borderColor:'divider',
-         }}
+        }}
       >
           {/* toolbar like box */}
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
-            mr={1.5}
+            borderRadius={3}
+            pt={1}
+            pr={0.8}
+            sx={{
+              background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+            }}
           >
             {/* logo */}
             <Box>
@@ -525,7 +538,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                           {/* icon */}
                           <CourseIcon option={about} />
                           {/* name */}
-                          <small style={{ fontSize: "small" }}>{about}</small>
+                          <Typography variant="body2">{about}</Typography>
                         </MenuItem>
                       )
                     )}
@@ -914,13 +927,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               {/* frontend */}
               {(postCategory === "Frontend App Development" ||
                 postCategory === "Fullstack App Development") && (
-                <Box Box>
+                <Box>
                   <Typography variant="body2" color={"text.secondary"}>
                     Which frontend technology are you interested in? If your post
                     is based on a bare HTML/CSS/Js version of a project, select
                     the option with (HTML).
                   </Typography>
-                  <Box mt={4} className="w-100">
+                  <Box my={3} className="w-100">
                     <TextField
                       required
                       select
@@ -944,6 +957,28 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                                 {frontend}
                               </small>
                             </Box>
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Box>
+
+                   {/* frontend UI library */}
+                  <Typography variant="body2" color={"text.secondary"} p={1}>
+                    Which frontend UI/UX design library have you used in styling your {!frontend.includes("none") && frontend} 
+                    components for your project or milestone post.
+                  </Typography>
+                  <Box className="w-100 mb-2 ">
+                    <TextField
+                      required
+                      select
+                      value={frontendUI}
+                      label="UI Styling Library"
+                      fullWidth
+                      onChange={(e) => setFrontendUI(e.target.value)}
+                    >
+                      {SubsectionTech?.FrontendUI.map((frontend) => (
+                          <MenuItem key={frontend} value={frontend}>
+                            <Typography variant="body2">{frontend}</Typography>
                           </MenuItem>
                         ))}
                     </TextField>
@@ -1127,7 +1162,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                       onChange={(e) => setCategory1(e.target.value)}
                     >
                       {
-                        SubsectionTech?.Multiplatfotm.map((multiplatform) => (
+                        SubsectionTech?.Multiplatform.map((multiplatform) => (
                           <MenuItem key={multiplatform} value={multiplatform}>
                             <Box display={"flex"} gap={2}>
                               {/* image */}
@@ -1152,8 +1187,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
               {/* image and pdf for the post */}
 
-              <Typography    gutterBottom variant="body2" color={"text.secondary"}>
-                Provide main image or photo for your post that summarizes your post content on the fly.
+              <Typography 
+              gutterBottom 
+              variant="body2" 
+              color={"text.secondary"}>
+                Provide or embed an main image for your post. Images tend to summarizes your post 
+                content more than verbose statements without graphical representations.
               </Typography>
 
               {/* preview the file uploaded from storage */}
@@ -1171,44 +1210,44 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               )}
 
                {/* shown if free logo is true */}
-               {isFreeLogo && (
-                 <Box
-                 mt={1}
-                 className="w-100 mb-4"
-                 display={"flex"}
-                 alignItems={"center"}
-                 gap={1}
-               >
-                 <TextField
-                   required
-                   disabled={isUploading || errorMessage}
-                   select
-                   value={freeLogo}
-                   variant="standard"
-                   label="Free logos"
-                   fullWidth
-                   onChange={handleFreeLogoPicked}
-                 >
-                   {
-                     logoNamesOptions?.map((name, index) => (
-                       <MenuItem
-                         key={name}
-                         value={name}
-                         sx={{ display: "flex", gap: 2 }}
-                       >
-                         {/* logo */}
-                         <Avatar
-                           src={logoValueOptions[index]}
-                           sx={{ width: 32, height: 32 }}
-                           alt=""
-                         />
-                         {/* name */}
-                         <Typography variant="body2">{name}</Typography>
-                       </MenuItem>
-                     ))}
-                 </TextField>
-               </Box>
-               )}
+                  {isFreeLogo && (
+                    <Box
+                    mt={1}
+                    className="w-100 mb-4"
+                    display={"flex"}
+                    alignItems={"center"}
+                    gap={1}
+                  >
+                    <TextField
+                      required
+                      disabled={isUploading || errorMessage}
+                      select
+                      value={freeLogo}
+                      variant="standard"
+                      label="Free logos"
+                      fullWidth
+                      onChange={handleFreeLogoPicked}
+                    >
+                      {
+                        logoNamesOptions?.map((name, index) => (
+                          <MenuItem
+                            key={name}
+                            value={name}
+                            sx={{ display: "flex", gap: 2 }}
+                          >
+                            {/* logo */}
+                            <Avatar
+                              src={logoValueOptions[index]}
+                              sx={{ width: 32, height: 32 }}
+                              alt=""
+                            />
+                            {/* name */}
+                            <Typography variant="body2">{name}</Typography>
+                          </MenuItem>
+                        ))}
+                    </TextField>
+                  </Box>
+                  )}
 
                 <Box
                   display={"flex"}
@@ -1256,14 +1295,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                     />
                   </Button>
                 </Box>
-             
+            
 
               {/* Github link */}
-
-              <Typography    variant="body2" color={"text.secondary"}>
-                Suppose your post is about a particular project you worked on
-                and aiming to display your technicalities, please provide GiHub
-                or Gitlab link to promote your project.
+              <Typography 
+                variant="body2" 
+                color={"text.secondary"}>
+                Suppose you posting about a project you worked on and aiming for future 
+                contribution and collaboration, provide GitHub or Gitlab link.
               </Typography>
 
               <Box className="mb-2">
@@ -1273,14 +1312,57 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   value={gitHub}
                   onChange={(e) => setGitHub(e.target.value)}
                   id="github-gitlab"
-                  label={"Version control link (optional)"}
+                  label={"GitHub or GitLab link (optional)"}
                   placeholder=" https://github.com/username/project-name.git"
                 />
               </Box>
 
-              {/* description */}
 
-              <Typography    variant="body2" color={"text.secondary"}>
+              {/* group tagging */}
+              <Typography 
+              variant="body2" 
+              color={"text.secondary"}>
+                Group tagging (optional) is a feature which allows your post to reach many tech 
+                users enrolled in a particular group or community. Tag a possible group.
+              </Typography>
+
+              <Box className="mb-2">
+                  <TextField
+                      disabled={isUploading || errorMessage || groupData?.filter(group=>group.isMember).length===0}
+                      select
+                      value={group}
+                      variant="standard"
+                      label={`${groupData?.filter(group=>group.isMember).length ? "Tag Group or Community":"Join a group or community"}`}
+                      fullWidth
+                      onChange={(e)=>setGroup(e.target.value)}
+                        >
+                      {
+                        groupData?.filter(group=>group.isMember)?.map((group) => (
+                          <MenuItem
+                            key={group.name}
+                            value={group.name}
+                            sx={{ display: "flex", gap: 2 }}
+                          >
+                            {group.name.includes("System Design and Principles") ? 
+                              (<Settings sx={{width:34,height:34}}/>):
+                              <Avatar 
+                              sx={{
+                                width:34,height:34
+                              }}
+                              src={getImageMatch(group.name.split(","),false,true)}
+                              alt=""/>}
+                            {/* name */}
+                            <Typography variant="body2">{group.name}</Typography>
+                          </MenuItem>
+                        ))}
+
+                    </TextField>
+              </Box>
+
+              {/* description */}
+              <Typography  
+              variant="body2" 
+              color={"text.secondary"}>
                 Description about your post highlighting the technical concepts
                 you are excited to share with many users platform. Let your
                 audience visualize your concepts.
@@ -1334,13 +1416,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         /> }
 
         {/* show logout session expired alert */}
-       {openAlertLogout && 
-        <LogoutAlert
-          openAlertLogout={openAlertLogout}
-          setOpenAlertLogout={setOpenAlertLogout}
-          title="Session Expired"
-          body="please login to complete your request, your session has expired."
-        />}
+          {openAlertLogout && 
+          <LogoutAlert
+            openAlertLogout={openAlertLogout}
+            setOpenAlertLogout={setOpenAlertLogout}
+            title="Session Expired"
+            body="please login to complete your request, your session has expired."
+          />}
       </Box>
     </StyledModalPost>
   );

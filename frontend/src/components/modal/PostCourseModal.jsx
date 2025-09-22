@@ -36,6 +36,7 @@ import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
 import VideoPreviewComponent from "./VideoPreviewComponent";
+import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 
 
 // styled modal
@@ -43,7 +44,6 @@ const StyledModalPost = styled(Modal)({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  margin: "5px",
 });
 
 // styled input
@@ -415,6 +415,10 @@ const handleClosingModal=()=>{
         .then((res) => {
           // show success post snack controlled by redux
           dispatch(updateCurrentSnackPostSuccess(res.data));
+
+           // redux success to trigger success alert
+          dispatch(updateCurrentSuccessRedux({title:'Course Uploaded',message:`${res.data} track your course status in the courses section and be able to interact with enrolled students.`}))
+          
           // close the current modal
           setOpenModalCourse(false);
           // navigate to home route by default
@@ -438,7 +442,8 @@ const handleClosingModal=()=>{
 
   // handle return width modal
   const handleReturnWidthModal=()=>{
-    if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+    if (CustomLandScape() || CustomLandscapeWidest() || 
+    (CustomDeviceTablet() && !isTabSideBar)) {
       return "40%"
     } else if (CustomDeviceTablet()){
       return "90%"
@@ -451,43 +456,48 @@ const handleClosingModal=()=>{
     <StyledModalPost
     keepMounted
     open={openModalCourse}
-    onClose={!isUploading && handleClosingModal}
     aria-labelledby="modal-modal-title"
     aria-describedby="modal-modal-description"
+    sx={{
+      backdropFilter:'blur(5px)'
+    }}
   >
       <Box
       width={handleReturnWidthModal()}
       borderRadius={3}
-      bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
       color={"text.primary"}
       sx={{
         border:"1px solid gray",
-        borderColor:'divider',
-        marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
-        
+        borderColor:'divider',        
       }}
     >
         <Box
-          bgcolor={"background.default"}
+        
           borderRadius={3}
-          className="shadow-lg"
           sx={{ 
           border:"1px solid gray",
           borderColor:'divider',
-           }}
+          }}
+          bgcolor={"background.default"}
         >
           {/* toolbar like box */}
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
-            mr={1.5}
+            borderRadius={3}
+            sx={{
+              background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+            }}
+            pt={1}
+            pr={0.8}
           >
             {/* logo */}
             <Box>
               <Avatar
-               sx={{ width: 60, height: 60 }} 
-               src={AppLogo} alt="logo" />
+              sx={{ width: 60, height: 60 }} 
+              src={AppLogo} alt="" />
             </Box>
 
              {/* title */}
@@ -512,7 +522,7 @@ const handleClosingModal=()=>{
                   sx={{ 
                   width:12,
                   height:12,
-                 }}
+                }}
                 />
               </Tooltip>{" "}
             </IconButton>
@@ -531,7 +541,10 @@ const handleClosingModal=()=>{
                   className="rounded"
                   onClick={() => setErrorMessage("")}
                   action={
-                    <IconButton aria-label="close" color="inherit" size="small">
+                    <IconButton 
+                    aria-label="close" 
+                    color="inherit" 
+                    size="small">
                       <Close fontSize="inherit" />
                     </IconButton>
                   }
@@ -542,10 +555,10 @@ const handleClosingModal=()=>{
             ) : (
               isUploading && (
                 <Box 
-                display={'flex'}
-                 alignItems={'center'}
-                 mb={1}                 
-                 >
+                  display={'flex'}
+                  alignItems={'center'}
+                  mb={1}                 
+                  >
                   {/* progress circle */}
                   <CircularProgress size={"25px"} />
                 </Box>
@@ -567,7 +580,9 @@ const handleClosingModal=()=>{
               scrollbarWidth: "none",
             }}
           >
-            <Box display={"flex"} flexDirection={"column"} gap={3}>
+            <Box display={"flex"} 
+            flexDirection={"column"}
+            gap={3}>
               <Box >
                 <Typography
                   gutterBottom
@@ -585,7 +600,7 @@ const handleClosingModal=()=>{
                   - Certificate of completion is optional and cannot limit the user from learning the 
                   uploaded course. Only when the user is satisfied to download the certificate for reference they shall have 
                     to pay for it.
-                   <br/>
+                  <br/>
                   - Certificate of completion minimum price is $1 and max is $10. Course uploaded shall be reviewed continuously 
                   to determine its genuineness to the end users. Rogue courses are prohibited and shall lead to permanent deletion of your account
                   with or without your consent.
@@ -703,7 +718,7 @@ const handleClosingModal=()=>{
 
                   {/* frontend UI library */}
                   <Typography variant="body2" color={"text.secondary"} p={1}>
-                    Which frontend UI Library have you used in styling your {!frontend.includes("none") && frontend} components in your course.
+                    Which frontend UI/UX design library have you used in styling your {!frontend.includes("none") && frontend} components in your course.
                   </Typography>
                   <Box className="w-100 mb-2 ">
                     <TextField
@@ -976,7 +991,7 @@ const handleClosingModal=()=>{
                       fullWidth
                       onChange={(e) => setMultiplatform(e.target.value)}
                     >
-                      {SubsectionTech?.Multiplatfotm.map((multiplatform) => (
+                      {SubsectionTech?.Multiplatform.map((multiplatform) => (
                           <MenuItem key={multiplatform} value={multiplatform}>
                             <Typography variant="body2">
                               {multiplatform}

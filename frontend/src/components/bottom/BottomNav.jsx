@@ -21,9 +21,6 @@ const BottomNav = () => {
   const isDarkMode=currentMode==='dark'
 
   const { position } = useSelector((state) => state.currentBottomNav);
-  const { isPostSearch } = useSelector((state) => state.currentPosts);
-  console.log(isPostSearch)
-
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -121,7 +118,7 @@ const BottomNav = () => {
           />
         </Tooltip>
 
-        <Tooltip title="IT Jobs" arrow>
+        <Tooltip title="Tech Jobs" arrow>
           <BottomNavigationAction
             onClick={handleJobContent}
             label="Jobs"
@@ -139,7 +136,7 @@ const BottomNav = () => {
 
            {/* tech events */}
          <Tooltip 
-         title="IT Events"
+         title="Tech Events"
           arrow
           >
           <BottomNavigationAction

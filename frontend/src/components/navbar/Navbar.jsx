@@ -47,11 +47,10 @@ import { updateCurrentJobFeedBack } from "../../redux/CurrentJobFeedBack";
 import { updateCurrentPostReactions } from "../../redux/CurrentPostReactions";
 import { updateCurrentReport } from "../../redux/CurrentPostReported";
 import { updateCurrentProfileViews } from "../../redux/CurrentProfileView";
-import AlertAboutMetatron from "../alerts/AlertAboutMetatron";
 import AlertFilterFeed from "../alerts/AlertFilterFeed";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertGlobalSearch from "../alerts/AlertGlobalSearch";
-import AlertSponsorship from "../alerts/AlertSponsorship";
+import AlertSuccess from "../alerts/AlertSuccess";
 import LogoutAlert from "../alerts/LogoutAlert";
 import SpecialisationTech from "../data/SpecialisationTech";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
@@ -64,7 +63,7 @@ import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import DrawerSmartphone from './DrawerSmartphone';
-
+import { updateCurrentGroupsCommunities } from "../../redux/CurrentGroups";
 const MetatronToolBar = styled(Toolbar)({
   display: "flex",
   justifyContent: "space-between",
@@ -158,6 +157,7 @@ const Navbar = () => {
     const { profile_views } = useSelector((state) => state.currentProfileView);
     const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
     const { conversations } = useSelector((state) => state.currentConversation);
+    const { groups:groupData } = useSelector((state) => state.currentGroups);
     
 
     // get count of conversation messages where target read is false
@@ -171,8 +171,6 @@ const Navbar = () => {
     currentMode,
     isSidebarRighbar,
     isDefaultSpeedDial,
-    isOpenSponsorAlert,
-    isOpenAboutMetatron,
     isOpenDrawerProfile,
     isOpenMessageDrawer,
     isPostEditModal,
@@ -254,7 +252,9 @@ const Navbar = () => {
           // set response message to total number of results
           setResponseMessage(
             `${
-              res.data.users.count + res.data.posts.count + res.data.jobs.count
+              res.data.users.count + res.data.posts.count 
+              + res.data.jobs.count + res.data.events.count
+              +res.data.courses.count
             } results found`
           );
 
@@ -491,6 +491,46 @@ const Navbar = () => {
           setIsFetching(false);
         });
     }, [currentUserId, dispatch]);
+
+
+     // useLayout effect, fetch data of groups
+        useLayoutEffect(()=>{
+          // redux data present
+          if (groupData) {
+            return
+          }
+    
+          // fetch to populate the redux groups
+          axios.get(
+                `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/groups/all/${user?._id}`,
+                {
+                    withCredentials: true,
+                }
+                )
+                .then((res) => {
+                // update groups and communities data
+                if (res?.data) {
+                    dispatch(updateCurrentGroupsCommunities(res.data))
+                } 
+                })
+                .catch(async (err) => {
+                console.log(err);
+                //  user login session expired show logout alert
+                if (err?.response?.data.login) {
+                    window.location.reload();
+                }
+                if (err?.code === "ERR_NETWORK") {
+                    setErrorMessage(
+                    "server unreachable!"
+                    );
+                    return;
+                }
+                setErrorMessage(err?.response.data);
+                })
+                .finally(() => {
+                setIsFetching(false);
+                });
+        },[user?._id,dispatch,groupData])
 
 
   return (
@@ -887,20 +927,8 @@ const Navbar = () => {
            />
         )}
 
-        {/* control showing of the about us alert */}
-        {isOpenAboutMetatron && (
-          <AlertAboutMetatron openAboutMetatron={isOpenAboutMetatron} />
-        )}
 
-        {/* control showing of sponsorship alert */}
-        {isOpenSponsorAlert && (
-          <AlertSponsorship
-            openSponsorAlert={isOpenSponsorAlert}
-            isLaunchPage={true}
-          />
-        )}
 
-     
         {/* show modal connect with people or people search results */}
         {isPeopleModal && (
           <PeopleModal
@@ -941,6 +969,10 @@ const Navbar = () => {
           setSelectedOptions={setSelectedOptions}
           />
         )}
+
+
+        {/* display success alert */}
+        <AlertSuccess/>
 
 
         </Suspense>

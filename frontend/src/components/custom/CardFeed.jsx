@@ -23,6 +23,7 @@ import {
   IconButton,
   ListItemAvatar,
   Menu,
+  Paper,
   Stack,
   Tooltip,
   Typography
@@ -158,7 +159,6 @@ const CardFeed = ({
   };
 
 
-
   // check if the current userID matches the ownerID of the post
   // means belongs to current user thus no need for options menu
   useEffect(() => {
@@ -239,6 +239,7 @@ const CardFeed = ({
         dispatch(updateCurrentPostDetails(res.data));
 
         // navigate to github page
+        window.open(post?.post_github?.link,'__blank__')
       })
       .catch(async (err) => {
         console.log(err);
@@ -360,17 +361,22 @@ const CardFeed = ({
       }
 
   return (
-    <React.Fragment>
+    <Paper  
+    elevation={3}
+    square={false}
+    sx={{
+      marginBottom:isLastIndex ? 10 :3
+    }}
+    >
       <Box
-      className="rounded"
-        mb={isLastIndex ? 10 :3}
+      pt={1}
         sx={{
           border:isDarkMode && "1px solid",
           borderColor: "divider",
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
         }}
       >
-        <Card elevation={0} className="rounded">
+        <Card elevation={0}>
           <CardHeader
             sx={{ ml: 1, p: 0 }}
             avatar={
@@ -509,7 +515,7 @@ const CardFeed = ({
             }
           />
 
-          <Box mt={1}>
+          <Box >
             <CardContent>
               <Box mb={1.5} width={"100%"}>
                 <Box mb={1}>
@@ -549,6 +555,23 @@ const CardFeed = ({
                     }}
                   />
                 </Box>
+
+                {/* sub2 and 3 if present */}
+               {post?.post_category?.sub1  && (
+                  <Box 
+                display={'flex'} 
+                mt={1}
+                justifyContent={'center'}
+                gap={2}
+                alignItems={'center'}>
+                <Typography variant="caption">
+                  #{post?.post_category?.sub1}
+                  {post?.post_category?.sub2 && !post?.post_category?.sub2?.includes('other') && `#${post?.post_category?.sub2}`}
+                  {post?.post_category?.sub3 && !post?.post_category?.sub3?.includes('other') && `#${post?.post_category?.sub3}`}
+                  {post?.post_category?.sub4 && !post?.post_category?.sub4?.includes('other') && `#${post?.post_category?.sub4}`}
+                </Typography>
+                </Box>
+                ) }
               </Box>
 
               <CardActionArea
@@ -740,7 +763,8 @@ const CardFeed = ({
             )}
           </Box>
         )}
-      </Box>
+
+
 
        {/* alert general of the error message */}
         {errorMessage && (
@@ -776,7 +800,9 @@ const CardFeed = ({
         userId={post.post_owner.ownerId}
       />
       )}
-    </React.Fragment>
+
+      </Box>
+</Paper>
   );
 };
 

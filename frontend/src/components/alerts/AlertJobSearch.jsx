@@ -29,16 +29,13 @@ import Slide from "@mui/material/Slide";
 import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { updateCurrentCourses } from "../../redux/CurrentCourses";
 import { updateCurrentEvents } from "../../redux/CurrentEvents";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
 import AllSkills from "../data/AllSkillsData";
 import SpecialisationTech from "../data/SpecialisationTech";
 import AccordionSearchOptions from "../modal/AccordionSearchOptions";
 import CourseIcon from "../utilities/CourseIcon";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import { updateCurrentCourses } from "../../redux/CurrentCourses";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -56,11 +53,12 @@ export default function AlertJobSearch({
   const dispatch = useDispatch();
 
   const [job_titles, setJobTile] = useState([]);
-  const [country, setCountry] = React.useState("");
-  const [entry, setJobEntry] = React.useState("");
-  const [datePosted, setDatePosted] = React.useState("");
+  const [country, setCountry] = useState("");
+  const [entry, setJobEntry] = useState("");
+  const [datePosted, setDatePosted] = useState("");
   const [category, setCategory] = useState("");
-  const [expanded, setExpanded] = useState(false);
+  const [access, setAccess] = useState("");
+  const [expanded, setExpanded] = useState(true);
 
 
   const handleCloseAlert = () => {
@@ -71,8 +69,9 @@ export default function AlertJobSearch({
   };
 
   // redux states
-  const { isTabSideBar } = useSelector((state) => state.appUI);
   const { user } = useSelector((state) => state.currentUser);
+  const { currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
   
 
   const handleChangeTitles = (_, newValue) => {
@@ -97,7 +96,8 @@ export default function AlertJobSearch({
       country,
       entry,
       datePosted,
-      category
+      category,
+      access:access.split(" ")[0]
     };
 
     // event search object that will be sent to the backend
@@ -172,28 +172,17 @@ export default function AlertJobSearch({
     setSuccessMessage("");
   };
 
-   // handle width of alert dialog 
-    const handleAlertWidth=()=>{
-      if (CustomDeviceTablet() && isTabSideBar) {
-        return "36%"
-      } else if(CustomLandScape()){
-        return "-1%"
-      } else if(CustomLandscapeWidest()){
-        return "-0%"
-      }
-    }
-
   return (
     <Dialog
       open={openAlert}
       TransitionComponent={Transition}
       keepMounted
+      fullWidth
       className="rounded"
       onClose={handleCloseAlert}
       aria-describedby="alert-dialog-job-search"
       sx={{
           backdropFilter:'blur(5px)',
-          marginLeft:handleAlertWidth()
           }}
     >
       <Box 
@@ -217,6 +206,10 @@ export default function AlertJobSearch({
           alignItems={"center"}
           justifyContent={"space-between"}
           width={"100%"}
+          sx={{
+              background: !isDarkMode && 
+              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          }}
         >
           <Box display={"flex"} gap={2} alignItems={"center"}>
           {isEventSearch ? (
@@ -306,8 +299,8 @@ export default function AlertJobSearch({
             </Collapse>
           </Box>
         )}
-        <DialogContent>
-          <DialogContentText gutterBottom mb={2}>
+        <DialogContent dividers>
+          <DialogContentText gutterBottom mb={2} >
             provide the name of the {isEventSearch ? "event": isCourseSearch ? "course":"job"} and click on the search icon.
           </DialogContentText>
           <Autocomplete
@@ -379,6 +372,8 @@ export default function AlertJobSearch({
               datePosted={datePosted}
               setDatePosted={setDatePosted}
               successMessage={successMessage}
+              setAccess={setAccess}
+              access={access}
               errorMessage={errorMessage}
               isFetching={isFetching}
               isEventSearch={isEventSearch}

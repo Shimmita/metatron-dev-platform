@@ -21,9 +21,11 @@ import axios from "axios";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { updateUserCurrentUserRedux } from "../../../redux/CurrentUser";
+import RegisterAlertTitle from "../../auth/RegisterAlertTitle";
 import AllCountries from "../../data/AllCountries";
 import AllSkills from "../../data/AllSkillsData";
 import CountiesInKenya from "../../data/Counties";
+import SpecialisationJobs from "../../data/SpecialisationJobs";
 import BrowserCompress from "../../utilities/BrowserCompress";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
@@ -46,6 +48,7 @@ function ProfileUpdate({ user }) {
   const [imagePreview, setImagePreview] = useState(user?.avatar);
   const [responseMessage, setResponseMessage] = useState("");
   const [avatarFile, setAvatarFile] = useState(null);
+  const [openCustomTitle,setOpenCustomTitle]=useState(false)
   // for monitoring api request status
   const [isConnecting, setIsConnecting] = useState(false);
   const [about, setAbout] = useState(`${user?.about || ""}`);
@@ -198,6 +201,15 @@ function ProfileUpdate({ user }) {
     setTogglePassword(prev=>!prev)
   }
 
+
+  // handle update of the specialization change
+  const handleSpecialization=(e)=>{
+    setSpecialisationTitle(e.target.value)
+    if (e.target.value==="Zero Matched") {
+      setOpenCustomTitle(true)
+    }
+  }
+
   return (
     <Box
       p={1}
@@ -315,7 +327,7 @@ function ProfileUpdate({ user }) {
         {/* user name disabled from editing */}
         <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
           <TextField
-            label={"name"}
+            label={"Name"}
             id="filled-basic-user-name"
             disabled
             fullWidth
@@ -326,7 +338,7 @@ function ProfileUpdate({ user }) {
         {/* display email */}
         <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
           <TextField
-            label={"email"}
+            label={"Email"}
             id="filled-basic-user-email"
             disabled
             fullWidth
@@ -337,7 +349,7 @@ function ProfileUpdate({ user }) {
         {/* phone */}
         <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
           <TextField
-            label={"phone"}
+            label={"Phone"}
             id="filled-basic-user-phone"
             fullWidth
             disabled={isConnecting || responseMessage}
@@ -350,6 +362,7 @@ function ProfileUpdate({ user }) {
         {/* country */}
         <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
           <Autocomplete
+            disabled
             value={country}
             onChange={(event, newValue) => {
               setCountry(newValue);
@@ -364,8 +377,8 @@ function ProfileUpdate({ user }) {
             renderInput={(params) => (
               <TextField
                 {...params}
-                disabled={isConnecting || responseMessage}
-                label="select country"
+                disabled
+                label="Country"
                 sx={{ width: "100%" }}
                 fullWidth
               />
@@ -391,6 +404,7 @@ function ProfileUpdate({ user }) {
             renderTags={() =>
               country ? (
                 <Chip
+                  disabled
                   label={country}
                   onDelete={handleDeleteCountry}
                   deleteIcon={<CheckCircle />}
@@ -399,6 +413,7 @@ function ProfileUpdate({ user }) {
             }
             noOptionsText={
               <Chip
+                disabled
                 label={`Add "${inputValue}"`}
                 onClick={handleAddNewCountry}
                 icon={<CheckCircle />}
@@ -410,21 +425,24 @@ function ProfileUpdate({ user }) {
         </Box>
 
         {/* county */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
+        <Box 
+        display={"flex"} 
+        justifyContent={"center"}
+        width={"100%"} mt={1}>
           {/* show this if country is contains kenya */}
           {country?.trim().toLowerCase().includes("kenya") ? (
             <TextField
               required
               select
-              disabled={isConnecting || responseMessage}
-              id="county"
+              disabled
+              id="County"
               value={county}
-              label="county"
+              label="County"
               fullWidth
               onChange={(e) => setCounty(e.target.value)}
             >
               {CountiesInKenya?.map((county) => (
-                  <MenuItem key={county} value={county}>
+                  <MenuItem disabled key={county} value={county}>
                     {county}
                   </MenuItem>
                 ))}
@@ -433,7 +451,7 @@ function ProfileUpdate({ user }) {
             <TextField
               required
               id="county_state_other"
-              label="city or state"
+              label="City"
               fullWidth
               disabled={isConnecting || responseMessage}
               value={county}
@@ -446,19 +464,26 @@ function ProfileUpdate({ user }) {
         {/* specialisation */}
         <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
           <TextField
-            label={"expertise"}
+            label={"Expertise"}
             id="filled-basic-user-expertise"
             fullWidth
+            select
             disabled={isConnecting || responseMessage}
-            value={specialisationTitle}
-            onChange={(e) => setSpecialisationTitle(e.target.value)}
-          />
+            value={SpecialisationJobs.filter(specialization=>specialization.includes(specialisationTitle))[0]}
+            onChange={handleSpecialization}
+          >
+            {SpecialisationJobs?.map((specialisation) => (
+                  <MenuItem key={specialisation} value={specialisation}>
+                    {specialisation}
+                  </MenuItem>
+                ))}
+          </TextField>
         </Box>
 
         {/* old password */}
         <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
           <TextField
-            label={"old password"}
+            label={"Old Password"}
             id="filled-basic-user-old-password"
             fullWidth
             disabled={isConnecting || responseMessage || togglePassword}
@@ -470,7 +495,7 @@ function ProfileUpdate({ user }) {
           {/* new password */}
         <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
           <TextField
-            label={"new password"}
+            label={"New Password"}
             id="filled-basic-user-new-password"
             fullWidth
             disabled={isConnecting || responseMessage || togglePassword}
@@ -483,7 +508,7 @@ function ProfileUpdate({ user }) {
         {/* Github */}
         <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
           <TextField
-            label={"gitHub link"}
+            label={"GitHub"}
             id="filled-basic-user-github"
             fullWidth
             disabled={isConnecting || responseMessage}
@@ -495,7 +520,7 @@ function ProfileUpdate({ user }) {
         {/* linkedin */}
         <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
           <TextField
-            label={"linkedin link"}
+            label={"Linkedin"}
             id="filled-basic-user-linkedin"
             fullWidth
             disabled={isConnecting || responseMessage}
@@ -507,7 +532,7 @@ function ProfileUpdate({ user }) {
         {/* portfolio */}
         <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
           <TextField
-            label={"website portfolio link"}
+            label={"Website"}
             id="filled-basic-user-portfolio"
             fullWidth
             disabled={isConnecting || responseMessage}
@@ -531,7 +556,7 @@ function ProfileUpdate({ user }) {
                 {...params}
                 variant="outlined"
                 fullWidth
-                label="skills"
+                label="Skills"
               />
             )}
             renderTags={(value, getTagProps) =>
@@ -554,7 +579,7 @@ function ProfileUpdate({ user }) {
             maxRows={3}
             error={about.length > MAX_ABOUT}
             value={about}
-            label={`about me ${MAX_ABOUT - about.length}`}
+            label={`About Me ${MAX_ABOUT - about.length}`}
             onChange={(e) => setAbout(e.target.value)}
             fullWidth
             disabled={isConnecting || responseMessage}
@@ -585,6 +610,15 @@ function ProfileUpdate({ user }) {
           </Button>
         </Box>
       </Box>
+
+      {/* trigger show alert for custom title specialization */}
+      {openCustomTitle && (
+        <RegisterAlertTitle
+          openAlert={openCustomTitle}
+          setOpenAlert={setOpenCustomTitle}
+          setSpecialisationTitle={setSpecialisationTitle}
+        />
+      )}
     </Box>
   );
 }

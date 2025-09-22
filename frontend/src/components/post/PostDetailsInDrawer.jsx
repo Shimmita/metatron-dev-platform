@@ -13,7 +13,7 @@ import {
 import { Close, FullscreenOutlined, SendOutlined } from "@mui/icons-material";
 
 import axios from "axios";
-import React, { lazy, useState } from "react";
+import { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   handleSetPostEditIdModal,
@@ -22,7 +22,6 @@ import {
   handleUpdateIsPostDetailed,
   showUserProfileDrawer
 } from "../../redux/AppUI";
-import { resetClearCurrentPostReactions } from "../../redux/CurrentPostReactions";
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
 
@@ -150,7 +149,7 @@ function PostDetailsInDrawer({
       <Tooltip arrow title={"wide"}>
         {/* full screen toggle, close drawer show modal */}
         <IconButton onClick={handleShowPostDetailedNoDrawer}>
-        <FullscreenOutlined sx={{ width: 15, height: 15 }} color="primary" />
+        <FullscreenOutlined sx={{ width: 18, height: 18 }} color="primary" />
         </IconButton>
     </Tooltip>
 

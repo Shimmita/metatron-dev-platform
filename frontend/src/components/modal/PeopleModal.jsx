@@ -30,7 +30,6 @@ const StyledModalPeople = styled(Modal)({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  margin: "5px",
 });
 
 const PeopleModal = ({
@@ -80,16 +79,7 @@ const PeopleModal = ({
       return "100%"
     }
 
-  // handle width of the global search
-    const handleModalWidth=()=>{
-      if (CustomDeviceTablet() && isTabSideBar) {
-        return "36%"
-      } else if(CustomLandScape()){
-        return "-1%"
-      } else if(CustomLandscapeWidest()){
-        return "0%"
-      }
-    }
+ 
     
      // handle loading of more data
   const handleLoadMore=()=>{
@@ -144,26 +134,22 @@ const PeopleModal = ({
   return (
     <StyledModalPeople
       keepMounted
-      sx={{
-        marginLeft:handleModalWidth()
-      }}
       open={openPeopleModal}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
+      sx={{
+        backdropFilter:'blur(5px)',
+      }}
     >
       <Box
         width={handleReturnWidthModal()}
-        bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         display={"flex"}
         justifyContent={"center"}
-        borderRadius={3}
+        borderRadius={2}
         border={isDarkMode &&'1px solid'}
         borderColor={'divider'}
         alignItems={"center"}
-        sx={{
-          marginLeft:handleModalWidth() ,
-        }}
       >
         <Box
           borderRadius={3}
@@ -177,7 +163,12 @@ const PeopleModal = ({
             width={"100%"}
             alignItems={"center"}
             gap={2}
-            p={1}
+            borderRadius={2}
+            pt={1}
+            sx={{
+             background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+        }}
           >
             <Stack
               direction={"row"}

@@ -70,9 +70,9 @@ export default function ConversationLayout({
   return (
     <List 
     sx={{
-       bgcolor: "background.paper",
-       borderRadius:2
-       }}>
+        bgcolor: "background.paper",
+        borderRadius:2
+        }}>
       <Box
         display={"flex"}
         justifyContent={"space-between"}

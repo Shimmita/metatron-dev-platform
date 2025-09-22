@@ -368,7 +368,7 @@ const PostDetailsFeed = ({
   
       
       <Card
-      className="rounded"
+      className="rounded shadow-sm"
         style={{
           opacity: openMenu && !isDarkMode ? "0.8" : undefined,
           borderColor:'divider'
@@ -555,11 +555,10 @@ const PostDetailsFeed = ({
                         postDetailedData?.post_body?.trim()?.length
                     }
                     onClick={completePostUpdating}
-                    variant="text"
+                    variant="outlined"
                     color="success"
                     sx={{
                       borderRadius: 5,
-                      textTransform: "capitalize",
                       fontWeight: "bold",
                     }}
                   >
@@ -609,15 +608,15 @@ const PostDetailsFeed = ({
                   justifyContent: "center",
                 }}
               >
-                 <img 
+                <img 
                   style={{ 
                     height:CustomDeviceScreenSize(),
                     width:handleImageWidth(),
                     objectFit:'fill',
                     borderRadius:5,
-                   }}
+                  }}
                   src={handlePostImagePresent()}
-                   loading="lazy"
+                  loading="lazy"
                   alt="" />
               </Box>
             </Box>

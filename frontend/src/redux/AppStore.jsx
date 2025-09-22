@@ -19,6 +19,7 @@ import currentChatBot from "./CurrentChatBot";
 import currentConnectRequestReducer from "./CurrentConnect";
 import currentConnectNotifReducer from "./CurrentConnectNotif";
 import currentConversationReducer from './CurrentConversations';
+import currentCoursesReducer from "./CurrentCourses";
 import currentEventsReducer from './CurrentEvents';
 import currentEventsTopReducer from './CurrentEventsTop';
 import currentGlobalSearchReducer from "./CurrentGlobalSearch";
@@ -35,8 +36,9 @@ import currentPostsReducer from "./CurrentPosts";
 import currentPostsTopReducer from "./CurrentPostsTop";
 import currentProfileViewReducer from './CurrentProfileView';
 import currentSnackReducer from "./CurrentSnackBar";
+import currentSuccessReducer from './CurrentSuccess';
 import currentUserReducer from "./CurrentUser";
-import currentCoursesReducer from "./CurrentCourses"
+import currentGroupsReducer from './CurrentGroups'
 
 // Configure persist settings
 const persistConfig = {
@@ -72,7 +74,9 @@ const rootReducer = combineReducers({
   currentJobFeedBack: currentJobFeedBackReducer,
   currentEvents:currentEventsReducer,
   currentEventsTop:currentEventsTopReducer,
-  currentCourses:currentCoursesReducer
+  currentCourses:currentCoursesReducer,
+  currentSuccess:currentSuccessReducer,
+  currentGroups:currentGroupsReducer,
 
 
 });

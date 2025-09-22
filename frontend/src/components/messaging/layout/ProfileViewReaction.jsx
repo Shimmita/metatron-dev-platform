@@ -85,6 +85,7 @@ const dispatch=useDispatch()
       border: "1px solid",
       borderColor: "divider" }}>
         <ListItemAvatar onClick={handleShowMiniProfile}>
+          <Tooltip title='profile' arrow>
             <Avatar
             src={profile_view?.avatar}
             variant="rounded"
@@ -96,6 +97,7 @@ const dispatch=useDispatch()
             }}
             aria-label="avatar"
           />
+          </Tooltip>
         </ListItemAvatar>
         <ListItemText
           primary={
@@ -143,7 +145,7 @@ const dispatch=useDispatch()
                     {profile_view?.title}
                   </Typography>
                   <Typography variant="caption" color={"text.secondary"}>
-                    {CustomCountryName(profile_view?.country)} | {profile_view?.state}
+                    {profile_view?.state} | {CustomCountryName(profile_view?.country)} 
                   </Typography>
                   <br/>
                   <Typography

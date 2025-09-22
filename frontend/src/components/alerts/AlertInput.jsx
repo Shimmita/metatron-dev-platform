@@ -7,11 +7,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import React, { useState } from "react";
-import SubsectionTech from "../data/SubsectionTech";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { useSelector } from "react-redux";
+import SubsectionTech from "../data/SubsectionTech";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -24,6 +21,10 @@ export default function AlertInput({
   body = "",
   title = "",
 }) {
+  // redux states
+  const {currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
+  
   const [customTitle, setCustomTitle] = useState("");
 
   const handleClose = () => {
@@ -48,35 +49,33 @@ export default function AlertInput({
     setCustomArea("");
     handleClose();
   };
-  // redux states
-  const { isTabSideBar } = useSelector((state) => state.appUI);
 
-  // handle width of the alert
-      const handleWidthAlert=()=>{
-        if (CustomDeviceTablet() && isTabSideBar) {
-          return "60%"
-        } else if(CustomLandScape()){
-          return "92%"
-        } else if(CustomLandscapeWidest()){
-          return "97.5%"
-        }
-      }
+
 
   return (
       <Dialog
         open={openAlert}
         TransitionComponent={Transition}
         keepMounted
-        aria-describedby="alert-dialog-slide-description"
+        maxWidth={400}
+        aria-describedby="alert-dialog-slide-input"
         sx={{
-          marginLeft: CustomDeviceTablet() && isTabSideBar ? "36%" : undefined,
-
-          width:handleWidthAlert()
+          backdropFilter:'blur(5px)'
         }}
       >
-        <DialogTitle variant="body1">{title}</DialogTitle>
+        <DialogTitle
+         variant="body2"
+          sx={{
+              background: !isDarkMode && 
+              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          }}
+         >
+         {title}
+         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
+          <DialogContentText 
+          variant="body2"
+           id="alert-dialog-slide-input">
             {body}
           </DialogContentText>
 

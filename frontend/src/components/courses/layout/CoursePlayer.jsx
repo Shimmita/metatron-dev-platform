@@ -4,7 +4,6 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Avatar,
   Box,
   Button,
   Card,
@@ -46,24 +45,26 @@ const labels = {
   4.5: "Excellent",
   5: "Excellent+",
 };
+const certUnderDev=true
 
-const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
+const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse, setText }) => {
 
   // redux states
   const { user } = useSelector((state) => state.currentUser);
-  
+  const { currentMode} = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
   const dispatch=useDispatch()
 
   const [course,setCourse]=useState(courseItem)
 
   const isMyCourse=user?._id===course?.course_instructor?.instructorId
 
-
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   
   const [openMobileRate,setOpenMobileRate]=useState(false)
   const [openPaymentCertDialog,setOpenPaymentCertDialog]=useState(false)
+  const [title,setTitle]=useState('')
 
   const [currentVideo, setCurrentVideo] = useState(
     course.course_video_lectures?.[0] || null
@@ -74,7 +75,7 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
   // handle screen responsiveness
   const theme = useTheme();
   const isMobileTab = useMediaQuery(theme.breakpoints.down("md")); // tabs and below
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // smartphones and below
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // smart and below
 
   const handleClose = () => setFocusedCourse(null);
 
@@ -83,10 +84,12 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
 
   // handle course enrollment
   const handleEnrollCourse=()=>{
-    
+
+   
     // user must pre-rate the course before enrollment
     if (ratingValue===0) {
-      setErrorMessage(`Please pre-rate the course to unlock the full ${course.course_video_lectures.length} course lectures intended to get enrolled.`)
+      setTitle("Course Pre-Rating")
+      setErrorMessage(`Please pre-rate the course to unlock the full ${course.course_video_lectures.length} video lectures associated with this course.`)
       setOpenMobileRate(true)
       return
     }
@@ -111,11 +114,25 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
           // update the success status
           dispatch(updateCurrentSnackBar(res.data.message))
 
+
           // update the course Item, with the item from the backend
           setCourse(res.data.data)
 
           // update the redux for course current courses, 12 items returned from backend
           dispatch(updateCurrentCourses(res.data.results))
+
+
+            // currently module under development
+          if (certUnderDev) {
+            setTitle("Course Certificate")
+            setErrorMessage("we are working on the certificate printing module, once ready we will notify all users on the platform")
+
+            // close the dialog
+            handleClose()
+            return
+          }
+
+
 
           // open payment dialog
           setOpenPaymentCertDialog(true)
@@ -167,9 +184,18 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
   // handle get certificate, let users pay via paypal or any 
   // supported payment gateways.
   const handleGetCertificate=()=>{
+
+
+    // currently module under development
+    if (certUnderDev) {
+      setTitle("Course Certificate")
+      setErrorMessage("we are working on the certificate printing module, once ready we will notify all users on the platform")
+      return
+    }
     
     // let the users must final rating of the course
     if (ratingValue===0) {
+      setTitle('Course Final Rating')
       setErrorMessage("Please complete final rating of the course to help us in improving our tech courses offered to the community.")
       setOpenMobileRate(true)
       return
@@ -277,8 +303,8 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
         
       >
       <Box
-      bgcolor={'background.default'}
       sx={{
+        background: !isDarkMode &&  "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
         overflow: "auto",
         // Hide scrollbar for Chrome, Safari and Opera
         "&::-webkit-scrollbar": {
@@ -291,9 +317,18 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
       >
 
         <DialogTitle>
-        <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+        <Box display={'flex'} 
+        justifyContent={'space-between'}
+        alignItems={'center'}>
         {/* course title */}
-          <Typography width={'100%'} textAlign={'center'}  variant={isMobile ? "body1":"h6"} textTransform={'capitalize'} fontWeight={'bold'} color={'primary'}>{course.course_title}</Typography>
+          <Typography width={isMobile ?'100%':'70%'} 
+          textAlign={'center'}  
+          variant={isMobile ? 'body1':'h6'}
+          textTransform={'capitalize'} 
+           fontWeight={'bold'} 
+           >{course.course_title}
+
+           </Typography>
 
           {/* close icon */}
           <Tooltip title='close' arrow>
@@ -311,32 +346,20 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
           </IconButton>
           </Tooltip>
           </Box>
-          <Box display="flex" alignItems="center" mt={1} gap={1}>
-              <Avatar
-                src={course.course_instructor.instructorAvatar}
-                alt={course.course_instructor.instructorName}
-              />
-            
-            <Typography 
-            variant="body2" 
-            color="text.secondary" 
-            textTransform={'uppercase'}
-           > 
-              Instructor | {course.course_instructor.instructorName} | {isMobileTab && <br/>} {" "}
-              {course.course_instructor.instructorTitle} 
-            </Typography>
-          </Box>
+        
         </DialogTitle>
     
         <DialogContent dividers={isMobileTab} >
           <Box
             display="flex"
             flexDirection={isMobileTab ? "column" : "row"}
-            gap={3}
+            gap={isMobileTab ? 1: 2}
       
           >
             {/* Left: Video Player */}
-            <Box flex={3} p={1} border={'1px solid'} borderColor={'divider'} borderRadius={2}>
+            <Box 
+            flex={3} 
+             borderRadius={2}>
               {currentVideo ? (
                 <video
                   key={currentVideo.video_lectureID}
@@ -351,7 +374,7 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
 
               {/* topics on large devices only */}
               {!isMobileTab && (
-                <Stack gap={1}>
+                <Stack mt={1} gap={1}>
                  {/* accordion lectures */}
                 <Accordion>
                   <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -439,8 +462,7 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
 
             {/* Right: Lecture List */}
             <Box
-            flex={1} border={'1px solid'} 
-            borderColor={'divider'} 
+            flex={1}
             borderRadius={2} >
               {!isMobileTab ? (
                 <React.Fragment>
@@ -578,7 +600,7 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
                   endIcon={isFetching ? <CircularProgress size={14}/>:<PrintRounded/>}
                   variant="contained"
                   color="success"
-                  size="large"
+                  size={'medium'}
                   sx={{ borderRadius:3 }}>
                   print certificate
                   </Button>
@@ -589,7 +611,7 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
                   endIcon={isFetching ? <CircularProgress size={14}/>:!course?.currentUserEnrolled?<VideoLibraryRounded/>:undefined}
                   variant="contained"
                   color={course?.currentUserEnrolled ? "secondary":"primary"} 
-                  size="large"
+                  size={'medium'}
                   sx={{ borderRadius:3 }}>
                   {course?.currentUserEnrolled ? `Get Certificate $${course?.price} `: "Enroll Now Free"}
                   </Button>
@@ -603,7 +625,7 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
                   >
                     <Typography variant="caption"> All Digital Certificates are Verifiable</Typography>
                   </Box>
-                   </Box>
+                  </Box>
                   )}
 
                   </CardContent>
@@ -825,7 +847,7 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
                   endIcon={isFetching ? <CircularProgress size={14}/>:<PrintRounded/>}
                   variant="contained"
                   color="success"
-                  size="large"
+                  size="medium"
                   sx={{ borderRadius:3 }}>
                   print certificate
                   </Button>
@@ -836,7 +858,7 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
                   endIcon={isFetching ? <CircularProgress size={14}/>:!course?.currentUserEnrolled?<VideoLibraryRounded/>:undefined}
                   variant="contained"
                   color={course?.currentUserEnrolled ? "secondary":"primary"} 
-                  size="large"
+                  size="medium"
                   sx={{ borderRadius:3 }}>
                   {course?.currentUserEnrolled ? `Get Certificate $${course?.price} `: "Enroll Now Free"}
                   </Button>
@@ -864,7 +886,6 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
       </Dialog>
 
       
-
       {/* alert error  */}
       {errorMessage && (
         <AlertGeneral
@@ -872,9 +893,9 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
         defaultIcon={<InfoRounded/>}
         setErrorMessage={setErrorMessage}
         isError={true}
-        title={"Course Rating"}
+        title={title}
         message={errorMessage}
-         />
+        />
       )}
 
       {/* payment alert */}
@@ -882,6 +903,7 @@ const CoursePlayer = ({ course:courseItem, openPlayer, setFocusedCourse }) => {
         <PaymentCertDialog 
         openCertDialog={openPaymentCertDialog}
         setOpenCertDialog={setOpenPaymentCertDialog}
+        setText={setText}
         course={course}
         />
       )}

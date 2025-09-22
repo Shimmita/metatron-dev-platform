@@ -212,11 +212,14 @@ const ConversationDetailed = ({
   };
 
 
-
   return (
-    <Box bgcolor={"background.default"} height={"99vh"}>
+    <Box 
+    bgcolor={"background.default"} 
+    height={"99vh"}>
       {/* toolbar like */}
-      <AppBar position="sticky" color="transparent">
+      <AppBar 
+      position="sticky" 
+      color="transparent">
         <Toolbar
           variant="dense"
           sx={{
@@ -229,7 +232,7 @@ const ConversationDetailed = ({
           <Avatar
             sx={{ height: 34, width: 34 }}
             src={handleTopBarNameAvatar()[1]}
-            alt={handleTopBarNameAvatar()[0]}
+            alt={handleTopBarNameAvatar()[0]?.split(" ")[1]}
           />
           {/* name of the sender */}
           <Typography
@@ -536,7 +539,6 @@ const ConversationDetailed = ({
           defaultIcon={<InfoRounded/>}
           />
         )}
-
 
     </Box>
   );

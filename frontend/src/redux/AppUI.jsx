@@ -17,8 +17,6 @@ const initialState = {
   isJobSearchGlobal: false,
   isPostDetailed: false,
   isOpenSupportAlert: false,
-  isOpenSponsorAlert: false,
-  isOpenAboutMetatron: false,
   isPostEditModal:false,
   isPostFullDetailModal:false,
   isLogoutAlert:false,
@@ -153,17 +151,7 @@ const appUISliceReducerSlice = createSlice({
       state.isOpenSupportAlert = action.payload;
     },
 
-    // manage showing of the sponsor alert
-    showSponsorAlert: (state, action) => {
-      state.isOpenSponsorAlert = action.payload;
-    },
 
-    // manage showing of the about metatron alert
-    showAboutMetatron: (state, action) => {
-      state.isOpenAboutMetatron = action.payload;
-    },
-
-   
     // reset all UI states to default
     resetAll: (state) => {
       return {
@@ -182,7 +170,6 @@ const appUISliceReducerSlice = createSlice({
         isMessageProfile: false,
         isJobSearchGlobal: false,
         isPostDetailed: false,
-        isOpenSponsorAlert: false,
         isOpenSupportAlert: false,
         isOpenAboutMetatron: false,
         isPostEditModal:false,

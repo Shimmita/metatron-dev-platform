@@ -1,5 +1,5 @@
 import { SortRounded } from "@mui/icons-material";
-import { Box, Checkbox, CircularProgress, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, Typography } from "@mui/material";
+import { Box, Checkbox, CircularProgress, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, Typography, useMediaQuery, useTheme } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -11,9 +11,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentPosts } from "../../redux/CurrentPosts";
 import CourseIcon from "../utilities/CourseIcon";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -30,9 +27,13 @@ export default function AlertFilterFeed({
 }) {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const theme=useTheme()
+
+  const isMobile=useMediaQuery(theme.breakpoints.down('sm'))
   
   const dispatch=useDispatch()
-  const { isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
   
   const handleClose = () => {
     // clear message
@@ -102,41 +103,35 @@ export default function AlertFilterFeed({
 
   }
 
-     // handle width of the filter search
-     const handleFilterWidth=()=>{
-      if (CustomDeviceTablet() && isTabSideBar) {
-        return "36%"
-      } else if(CustomLandScape()){
-        return "-1%"
-      } else if(CustomLandscapeWidest()){
-        return "0%"
-      }
-    }
 
   return (
       <Dialog
         open={openAlert}
+        fullWidth={isMobile}
         TransitionComponent={Transition}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
+        aria-describedby="alert-dialog-filter"
         sx={{
           backdropFilter:'blur(5px)',
-          marginLeft:handleFilterWidth()
         }}
       >
-       <DialogTitle
+      <DialogTitle
         display={"flex"}
         alignItems={"center"}
         variant="body1"
         fontWeight={"bold"}
         gap={2}
+        sx={{
+          background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+        }}
         >
           <SortRounded/>
           {title}
         </DialogTitle>       
-         <DialogContent 
-         dividers 
-         sx={{ 
+          <DialogContent 
+          dividers 
+          sx={{ 
+          width:!isMobile && 400,
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -146,7 +141,7 @@ export default function AlertFilterFeed({
           msOverflowStyle: "none",
           scrollbarWidth: "none",
           }}
-         >
+        >
         
           <FormControl component="fieldset" variant="standard">
             {/* message helper text info, error */}
@@ -175,13 +170,13 @@ export default function AlertFilterFeed({
             value={data} 
             control={<Checkbox 
               onChange={handleChange}
-               name={data} 
-               checked={selectedOptions.includes(data)}
-               />} 
+              name={data} 
+              checked={selectedOptions.includes(data)}
+              />} 
             label={
               <Typography 
               color={selectedOptions.includes(data) && 'primary'}
-              variant="body2"
+              variant={'body2'}
               >
                 {data}
               </Typography>

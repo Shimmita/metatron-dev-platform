@@ -1,5 +1,5 @@
-import { Close } from '@mui/icons-material';
-import { Avatar, AvatarGroup, Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { Close, InfoRounded } from '@mui/icons-material';
+import { Avatar, AvatarGroup, Box, Button, IconButton, Tooltip, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -11,6 +11,7 @@ import TableRow from '@mui/material/TableRow';
 import axios from 'axios';
 import React, { useLayoutEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import AlertGeneral from '../../alerts/AlertGeneral';
 import AlertInputMessage from '../../alerts/AlertInputMessage';
 import AlertMiniProfileView from '../../alerts/AlertMiniProfileView';
 import CustomDeviceIsSmall from '../../utilities/CustomDeviceIsSmall';
@@ -33,6 +34,13 @@ const columnsHeader = [
     align: 'right',
   },
 
+   {
+    id: 'message',
+    label: 'Message',
+    minWidth: 170,
+    align: 'right',
+  },
+
 
 ];
 
@@ -48,11 +56,9 @@ export default function EventStatsLayout({setIsEventsStats, focusedEvent}) {
   // display of message alert
   const [openAlertMessage,setOpenAlertMessage]=useState(false)
 
-  // redux user HR manager
+  // redux user 
   const { user } = useSelector((state) => state.currentUser);
 
-  // track the applicant status and Id on change; default pending
-  const[currentJob,setCurrentJob]=useState({})
   const[applicantId,setApplicantId]=useState("")
   const[applicantName,setApplicantName]=useState('')
 
@@ -75,6 +81,14 @@ export default function EventStatsLayout({setIsEventsStats, focusedEvent}) {
     setIsEventsStats(false)
   }
 
+    // handle opening of alert message to send message to the event applicant
+  const handleOpenAlertMessage=(eventStat)=>{
+    setApplicantName(eventStat?.userName)
+    setApplicantId(eventStat?.userId)
+
+    // set open alert message 
+    setOpenAlertMessage(true)
+  }
 
 
   // use layout effect to fetch the data of job applicants
@@ -133,7 +147,7 @@ export default function EventStatsLayout({setIsEventsStats, focusedEvent}) {
 
   return (
     <Paper elevation={0} 
-    className={'rounded'}
+    className={'rounded shadow-sm mt-1'}
     sx={{ 
     maxWidth: window.screen.availWidth, 
     border:'1px solid',
@@ -141,7 +155,12 @@ export default function EventStatsLayout({setIsEventsStats, focusedEvent}) {
     overflow:'auto',
      }}>
 
-    <Box width={'100%'} display={'flex'} justifyContent={'space-between'} alignItems={'center'} gap={2}>
+    <Box width={'100%'} 
+    display={'flex'} 
+    mt={1}
+    justifyContent={'space-between'} 
+    alignItems={'center'} 
+    gap={2}>
     
     <Box p={1}>
     <Box>
@@ -183,7 +202,10 @@ export default function EventStatsLayout({setIsEventsStats, focusedEvent}) {
     {/* close table  */}
     <Box display={'flex'} justifyContent={'flex-end'} p={1}>
       <Tooltip title={'close'} arrow>
-      <IconButton className='border' onClick={handleCloseApplicantsTable}>
+      <IconButton 
+      className='border' 
+      disabled={isFetching} 
+       onClick={handleCloseApplicantsTable}>
         <Close sx={{ width:10,height:10 }}/>
       </IconButton>
       </Tooltip>
@@ -262,8 +284,16 @@ export default function EventStatsLayout({setIsEventsStats, focusedEvent}) {
                           )}
 
                           {/* email of the applicant */}
-                           {column.id==='email' && (`
+                          {column.id==='email' && (`
                           ${eventStat?.userEmail}`
+                          )}
+
+                          {/* send message btn */}
+                          {column.id==="message" && (
+                            <Button  sx={{borderRadius:5}}
+                            onClick={()=>handleOpenAlertMessage(eventStat)}
+                            disableElevation
+                            variant='outlined' size='small'>message</Button>
                           )}
 
                         </TableCell>
@@ -301,7 +331,21 @@ export default function EventStatsLayout({setIsEventsStats, focusedEvent}) {
         openAlert={openMiniProfile} 
         setOpenAlert={setOpenMiniProfile}
          userId={applicantId}/>
-      )}    
+      )}  
+
+
+      {/* alert error */}
+      {errorMessage && (
+      <AlertGeneral
+      isError={true}
+      openAlertGeneral={errorMessage}
+      setErrorMessage={setErrorMessage}
+      defaultIcon={<InfoRounded/>}
+      title={'something went wrong'}
+      message={errorMessage}
+      />)}
+      
+
     </Paper>
   );
 }

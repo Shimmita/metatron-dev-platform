@@ -36,7 +36,7 @@ const App = () => {
   return (
     <ThemeProvider theme={darkTheme}>
       <Box
-      bgcolor={currentMode==='dark' ? "background.default" :"#E6F7FF"} 
+      bgcolor={currentMode==='dark' ? "background.default" :"#f2f2f2"} 
       color={"text.primary"}>
         {/* error boundary to catch errors from lazily loaded components */}
         <Suspense

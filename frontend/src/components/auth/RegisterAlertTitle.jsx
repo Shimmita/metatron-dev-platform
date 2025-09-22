@@ -7,6 +7,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import SpecialisationJobs from "../data/SpecialisationJobs";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -20,8 +21,12 @@ export default function RegisterAlertTitle({
 }) {
   const [customTitle, setCustomTitle] = useState("");
 
+   // redux states
+  const { currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
+
+  // close alert
   const handleClose = () => {
-    // close alert
     setOpenAlert(false);
   };
 
@@ -45,13 +50,23 @@ export default function RegisterAlertTitle({
         open={openAlert}
         TransitionComponent={Transition}
         keepMounted
-        onClose={handleClose}
+        maxWidth={500}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle>Preferred Title</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            Please provide specialisation title that is relevant to the Tech or
+        <DialogTitle 
+        variant="body2"
+        sx={{
+              background: !isDarkMode && 
+              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          }}
+        >
+        Preferred Title
+        </DialogTitle>
+        <DialogContent dividers>
+          <DialogContentText 
+          variant="body2"
+          id="alert-dialog-slide-text">
+            Provide your specialisation title that is relevant to the
             IT Industry.
           </DialogContentText>
 
@@ -69,7 +84,7 @@ export default function RegisterAlertTitle({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDismiss}>Back</Button>
-          <Button onClick={handleEnterInfo}>Enter</Button>
+          <Button disabled={!customTitle} onClick={handleEnterInfo}>Enter</Button>
         </DialogActions>
       </Dialog>
     </React.Fragment>

@@ -237,7 +237,7 @@ const SubsectionTech = {
     "Data Quality Assessment",
     "Data Ethics",
     "Data Governance",
-
+    
     // Statistical Foundations
     "Descriptive Statistics",
     "Inferential Statistics",
@@ -308,6 +308,29 @@ const SubsectionTech = {
     "Monitoring and Logging in ML",
     "Pipeline Automation",
 
+    // more
+    "JavaScript for ML/AI",
+    "Java for ML/AI",
+    "Jax",
+    "Hugging Face",
+    "Cursor",
+    "Sonnet",
+    "Loveable",
+    "Grok",
+    "Chat GPT",
+    "Windsurf",
+    "Perplexity",
+    "llama",
+    "Meta AI",
+    "Copilot",
+    "DeepSeek",
+    "Bayes Theorem",
+    "Markov Model",
+    "Weights and Bias",
+    "Feature Extraction",
+    "Value Encoding",
+    "Model Training",
+    "TensorBoard",
     // Types of Machine Learning
     "Supervised Learning",
     "Unsupervised Learning",
@@ -402,7 +425,7 @@ const SubsectionTech = {
   Backend: [
     // JavaScript/TypeScript
     "Node",
-    "Expressjs",
+    "Express",
     "NestJS",
     "Koajs",
     "Fastify",
@@ -610,7 +633,7 @@ const SubsectionTech = {
     "TrueHost",
     "Zero none (other)",
   ].sort(),
-  Multiplatfotm: [
+  Multiplatform: [
     "Flutter",
     "Kotlin Multiplatform",
     "Xamarin",
@@ -620,6 +643,7 @@ const SubsectionTech = {
     "MAUI",
     "Ionic",
     "Native Script",
+    "Capacitor",
     "Framework7",
     "Zero none (other)",
   ].sort(),

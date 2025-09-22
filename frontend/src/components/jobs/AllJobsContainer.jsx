@@ -1,7 +1,7 @@
 import {
-  AssignmentTurnedInRounded,
   AutoAwesome,
   BarChartRounded,
+  CloudDoneRounded,
   DarkModeRounded,
   DocumentScannerRounded,
   FindInPageRounded,
@@ -10,6 +10,7 @@ import {
   Menu,
   MyLocationRounded,
   Refresh,
+  TravelExploreRounded,
   VerifiedRounded,
   WorkRounded
 } from "@mui/icons-material";
@@ -55,8 +56,6 @@ import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import JobLayout from "./layout/JobLayout";
 import JobStatsLayout from "./layout/JobStatsLayouts";
 
@@ -295,7 +294,42 @@ export default function MiniDrawer() {
           // false myStats
           setIsMyStats(false)
         });
-    }
+    } 
+
+
+    // get external jobs, jobs with external websites 
+
+    if (textOption === "External Jobs") {
+      axios
+        .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/external/${user?._id}`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          // update the redux of current post
+          if (res?.data) {
+            dispatch(updateCurrentJobs(res.data));
+          } 
+        })
+        .catch(async (err) => {
+          console.log(err);
+          //  user login session expired show logout alert
+          if (err?.response?.data.login) {
+            window.location.reload();
+          }
+          if (err?.code === "ERR_NETWORK") {
+            setErrorMessage(
+              "server unreachable please try again later to complete your request"
+            );
+            return;
+          }
+          setErrorMessage(err?.response.data);
+        })
+        .finally(() => {
+          setIsFetching(false);
+          // false myStats
+          setIsMyStats(false)
+        });
+    } 
 
     // performing post request and get the nearby jobs base on the country
     if (textOption === "Nearby Jobs") {
@@ -516,7 +550,7 @@ export default function MiniDrawer() {
   return (
       <Suspense
         fallback={
-          <Box height={"90vh"} display={"flex"} justifyContent={"center"}>
+          <Box height={"88vh"} display={"flex"} justifyContent={"center"}>
             <Box display={"flex"} justifyContent={"center"}>
               <CircularProgress size={20} />
             </Box>
@@ -525,7 +559,7 @@ export default function MiniDrawer() {
       >
         <Box 
         display={"flex"} 
-        height={(CustomLandScape()|| CustomLandscapeWidest()) ?"86vh":"90vh"}
+        maxHeight={'85vh'}
          sx={{
           width:isMyStats ? window.screen.availWidth-32:undefined,
           overflow: "auto",
@@ -725,6 +759,7 @@ export default function MiniDrawer() {
                 "AI Selection",
                 "Search Jobs",
                 "Verified Jobs",
+                "External Jobs",
                 "Nearby Jobs",
                 "Applications",
                 "My Statistics",
@@ -785,16 +820,21 @@ export default function MiniDrawer() {
                           color={text === textOption ? "primary" : "inherit"}
                         />
                       ) : index === 4 ? (
+                        <TravelExploreRounded
+                          color={text === textOption ? "primary" : "inherit"}
+                        />
+                      ): index === 5 ? (
                         <MyLocationRounded
                           color={text === textOption ? "primary" : "inherit"}
                         />
-                      ) : index === 1 ? (
+                      ) 
+                       : index === 1 ? (
                         <AutoAwesome
                         color={text === textOption ? "primary" : "inherit"}
                       />
                       
-                      ) :index===5 ? (
-                        <AssignmentTurnedInRounded
+                      ) :index===6 ? (
+                        <CloudDoneRounded
                         color={text === textOption ? "primary" : "inherit"}
                       />
                         
@@ -892,6 +932,7 @@ export default function MiniDrawer() {
                   textOption === "AI Selection" ||
                   textOption === "Applications"||
                   textOption === "My Statistics" ||
+                  textOption === "External Jobs" ||
                   textOption === "Search Jobs") && (
                   <React.Fragment>
                     {isFetching ? (

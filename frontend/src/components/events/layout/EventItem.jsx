@@ -3,6 +3,7 @@ import {
   BarChart,
   CheckCircleRounded,
   Delete,
+  LockRounded,
   SmartDisplayRounded
 } from "@mui/icons-material";
 import {
@@ -53,8 +54,8 @@ function EventItem({
   const isMyOwnEvent=event?.ownerId===user?._id
 
   // format date
-    const certDate = new Date(event?.dateHosted);
-  const formattedDate = certDate.toLocaleDateString("en-US", {
+    const dateFormat = new Date(event?.dateHosted);
+  const formattedDate = dateFormat.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -270,8 +271,8 @@ function EventItem({
       justifyContent={"center"}
       gap={2}
       marginInline={!CustomDeviceIsSmall()?1:undefined}
-      mb={isLastIndex && CustomDeviceIsSmall()? 5:undefined}
-      flexDirection={CustomDeviceIsSmall() ? 'column':'row'}
+      mb={isLastIndex && 3}
+      flexDirection={'column'}
       >
       {/* card events details */}
         <Card
@@ -316,7 +317,7 @@ function EventItem({
               justifyContent={'center'}>
               
                 <Typography
-                variant="caption"
+                variant="body2"
                 textTransform={"capitalize"}
                 fontWeight="bold"
                 sx={{ color:'white' }}
@@ -332,7 +333,7 @@ function EventItem({
               alignItems={'center'}
               justifyContent={'center'}>
               <Typography
-                variant="caption"
+                variant="body2"
                 textAlign={"center"}
                 textTransform={"capitalize"}
                 fontWeight="bold"
@@ -406,6 +407,10 @@ function EventItem({
                     <ListItemAvatar onClick={handleShowMiniProfile}>
                       <Avatar 
                       src={event?.ownerAvatar}
+                      sx={{
+                        width:34,
+                        height:34
+                      }}
                       alt=""
                       />
                       </ListItemAvatar>
@@ -537,7 +542,7 @@ function EventItem({
                     disableElevation
                     variant={isDarkMode ?'outlined':'contained'}
                     disabled={isFetching}
-                    color="primary"
+                    color="success"
                     size="small"
                     sx={{ 
                     fontSize:'x-small',
@@ -546,7 +551,7 @@ function EventItem({
                     onClick={handleEventsStats}
                     startIcon={isFetching ? <CircularProgress size={13}/>:<BarChart />}
                   >
-                    Statistics
+                    Stats
                   </Button>
 
                 {/* delete event button */}
@@ -563,27 +568,27 @@ function EventItem({
                     onClick={handleDeleteMyEvent}
                     startIcon={isFetching ? <CircularProgress size={13}/>:<Delete />}
                   >
-                    Delete Now
+                    Delete
                   </Button>
 
                 </Box> 
                 ):(
                   <Box
-                 display={"flex"}
-                 mt={0.6}
-                 justifyContent={"center"}>
+                display={"flex"}
+                mt={0.5}
+                justifyContent={"center"}>
                   <Button
                     disableElevation
                     variant={isDarkMode ?'outlined':'contained'}
-                    disabled={isFetching || isUserMadeRSVP}
+                    disabled={isFetching || isUserMadeRSVP || isMyOwnEvent}
                     size="small"
                     sx={{ 
                     borderRadius: 5,
                     }}
                     onClick={handleCreateRSVP}
-                    startIcon={isFetching ? <CircularProgress size={13}/>:<CheckCircleRounded />}
+                    startIcon={isFetching ? <CircularProgress size={13}/>:isMyOwnEvent ? <LockRounded/>: <CheckCircleRounded />}
                   >
-                    RSVP EVENT
+                    {isMyOwnEvent ? "Your Event":"RSVP EVENT"}
                   </Button>
                 </Box>  
                 )}

@@ -1,4 +1,4 @@
-import { Close, Delete, Info, RemoveRedEye, UpdateRounded } from '@mui/icons-material';
+import { Close, Delete, Info, InfoRounded, RemoveRedEye, UpdateRounded } from '@mui/icons-material';
 import { Avatar, Badge, Box, IconButton, MenuItem, styled, TextField, Tooltip, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -19,6 +19,8 @@ import CustomDeviceIsSmall from '../../utilities/CustomDeviceIsSmall';
 import CustomDeviceTablet from '../../utilities/CustomDeviceTablet';
 import { getImageMatch } from '../../utilities/getImageMatch';
 import ApplyJobModal from '../../modal/ApplyJobModal';
+import { updateCurrentSuccessRedux } from '../../../redux/CurrentSuccess';
+import AlertGeneral from '../../alerts/AlertGeneral';
 
 const columnsHeader = [
   { id: 'logo', label: 'Logo', minWidth: 170 },
@@ -44,6 +46,7 @@ const columnsHeader = [
 
 
 ];
+
 
 
 const jobStatus=["active", "inactive"]
@@ -172,6 +175,10 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
             if (res?.data) {
             setMyJobsPosted(res.data)
 
+            // alert success 
+            dispatch(updateCurrentSuccessRedux({title:'Job Update',message: statusText==="active" ? `Your job has been successfully update to ${statusText}, potential applicants are now able to continue making applications`:
+              `Your job has now been updated to ${statusText}, potential applicants won't be able to make any applications.` }))
+            
             // clear current jobs for fresh
               dispatch(resetClearCurrentJobsTop())
             } 
@@ -205,7 +212,7 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
 
   return (
     <Paper elevation={0} 
-    className={'rounded'}
+    className={'rounded shadow'}
     sx={{ 
     maxWidth: window.screen.availWidth, 
     maxHeight:!CustomDeviceIsSmall() ? '75vh':undefined,
@@ -214,14 +221,19 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
     overflow:'auto',
      }}>
 
-    <Box width={'100%'} display={'flex'} justifyContent={'space-between'} alignItems={'center'} gap={2}>
+    <Box 
+    mt={1}
+    width={'100%'} 
+    display={'flex'} 
+    justifyContent={'space-between'}
+     alignItems={'center'} gap={2}>
         {/* avatar current user */}
          <Box p={1}>
             <Avatar
             src={user?.avatar}
             alt=""
             className="border"
-            sx={{ width: 30, height: 30,}}
+            sx={{ width: 32, height: 32,}}
               />
             </Box>
     
@@ -336,7 +348,7 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
                             )}
 
                             </Tooltip>
-                             </IconButton>
+                            </IconButton>
                             </Box>
                           )}
 
@@ -345,13 +357,16 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
                               `${job?.title}`
                             )}
                           {/* applicants column */}
-                          {column.id==='applicants' && (`${job?.applicants?.total}/300`)}
+                          {column.id==='applicants' && 
+                          <Typography sx={{textTransform:'capitalize'}} variant='caption'>{`${job?.website!=="" ? "external website": 
+                          `${job?.applicants?.total}/${job?.applicants_max}  ------ ${Math.ceil(job?.applicants?.total/job?.applicants_max*100)}%`}`}</Typography>}
 
                           {/* job status column */}
                           {column.id==='status' && (
                             <TextField
                             required
                             select
+                            disabled={isFetching}
                             variant='standard'
                             value={job?.status || "active" }
                             sx={{ fontSize:'small'}}
@@ -438,6 +453,7 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
         organisation={currentFocusedJob?.organisation}
         requirements={currentFocusedJob?.requirements}
         salary={currentFocusedJob?.salary} 
+        whitelist={currentFocusedJob?.whitelist}
         />
       )}
 
@@ -464,15 +480,28 @@ export default function ManageJobsTable({setIsManageJobsTable,MyPostedJobs}) {
       {/* delete job */}
       {isAlertDelete && currentFocusedJob && (
         <DeleteJobAlert
-         openAlert={isAlertDelete} 
-         setOpenAlert={setIsAlertDelete}
+        openAlert={isAlertDelete} 
+        setOpenAlert={setIsAlertDelete}
           my_email={user?.email}
           job_id={currentFocusedJob?._id}
           title={currentFocusedJob?.title}
           applicants={currentFocusedJob?.applicants?.total}
-          message={'This job will be deleted with all its application data'}
+          message={'This job will be permanently deleted with all its associated information including application details.'}
           />
       )}
+
+      {/* alert error */}
+      {errorMessage && (
+        <AlertGeneral
+        isError={true}
+        openAlertGeneral={errorMessage}
+        title={'something went wrong'}
+        defaultIcon={<InfoRounded/>}
+        message={errorMessage}
+        setErrorMessage={setErrorMessage}
+      />
+      )}
+    
   
     </Paper>
   );

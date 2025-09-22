@@ -30,7 +30,7 @@ const CurrentSnackBar = createSlice({
       state.messageConnectRequestSent = action.payload;
     },
 
-    // nullify user and fale online
+    // nullify user and false online
     resetClearCurrentSnack: (state) => {
       state.messageSnack = null;
       state.messageSnackPostTech = null;

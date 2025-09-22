@@ -1,17 +1,18 @@
 import {
+  Close,
   GroupsRounded,
-  LiveTvRounded,
   PeopleRounded,
   PostAddRounded,
   SchoolRounded,
   SearchRounded,
-  WorkRounded,
+  TvRounded,
+  WorkRounded
 } from "@mui/icons-material";
-import { Box, CardActionArea, DialogTitle, Typography } from "@mui/material";
+import { Box, CardActionArea, DialogTitle, IconButton, Tooltip, Typography } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import Slide from "@mui/material/Slide";
-import React from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -19,17 +20,15 @@ import {
   handleSidebarRightbar,
 } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import { updateCurrentCourses } from "../../redux/CurrentCourses";
+import { updateCurrentEvents } from "../../redux/CurrentEvents";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
 import {
   updateCurrentPeopleData,
   updateCurrentPeopleModal,
 } from "../../redux/CurrentModal";
 import { updateCurrentPostsFromSearch } from "../../redux/CurrentPosts";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import { updateCurrentEvents } from "../../redux/CurrentEvents";
-import { updateCurrentCourses } from "../../redux/CurrentCourses";
+import AlertGroupCommunity from "./AlertGroupCommunity";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -44,12 +43,17 @@ export default function AlertGlobalSearch({
   setMessage,
 }) {
   // redux states
-  const { isTabSideBar, isSidebarRighbar } = useSelector(
+  const { isSidebarRighbar,currentMode } = useSelector(
     (state) => state.appUI
   );
   const { globalSearchResults } = useSelector(
     (state) => state.currentGlobalSearch
   );
+
+  const[showGroups,setShowGroups]=useState(false)
+  const [groupNames,setGroupNames]=useState([])
+
+  const isDarkMode=currentMode==='dark'
   const navigate = useNavigate();
 
   // handle clearing of the message
@@ -165,48 +169,80 @@ export default function AlertGlobalSearch({
   }
 
 
-     // handle width of the global search width
-    const handleGlobalSearchWidth=()=>{
-    if (CustomDeviceTablet() && isTabSideBar) {
-      return "36%"
-    } else if(CustomLandScape()){
-      return "-1%"
-    } else if(CustomLandscapeWidest()){
-      return "0%"
-    }
+  // handle show matched results
+  const handleShowGroup=()=>{
+    setGroupNames(globalSearchResults?.groups.data)
+    setShowGroups(true)
   }
-   
+
   return (
       <Dialog
         className="shadow"
         open={openAlert}
         TransitionComponent={Transition}
-        onClose={handleClose}
         keepMounted
         aria-describedby="alert-dialog-slide-alering"
         sx={{
-          backdropFilter:'blur(3px)',
-          marginLeft:handleGlobalSearchWidth()
+          backdropFilter:'blur(5px)',
+          display:showGroups ? 'none':'block'
         }}
       >
-        <DialogTitle
-          variant="body1"
+        <Box
           display={"flex"}
-          gap={2}
+          pr={1}
           alignItems={"center"}
+          justifyContent={'space-between'}
+          sx={{
+          background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+        }}
         >
-          <SearchRounded />
+        <DialogTitle 
+        variant="body1"
+        display={'flex'}
+        alignItems={'center'}
+        gap={2}
+        >
+        <SearchRounded />
           Search Results
         </DialogTitle>
+
+        <Box>
+          <Tooltip 
+          title='close'
+          arrow
+          >
+          <IconButton
+          onClick={handleClose}
+          sx={{
+            border:'1px solid',
+            borderColor:'divider'
+          }}
+          >
+            <Close sx={{
+            width:12,
+            height:12
+            }}/>
+          </IconButton>
+          </Tooltip>
+        </Box>
+          
+        </Box>
         {/* search term */}
         <Box display={"flex"} justifyContent={"center"}>
-          <Typography variant="caption" textAlign={"center"}>
-            ' {searchTerm} '
+          <Typography 
+          variant="caption" 
+          color={'text.secondary'} 
+          textAlign={"center"}>
+            {searchTerm}
           </Typography>
         </Box>
         <DialogContent dividers>
           {/* message from backend present display this */}
-          <Box display={"flex"} justifyContent={"center"} maxWidth={300}>
+          <Box 
+          display={"flex"} 
+          justifyContent={"center"}
+          maxWidth={400}>
             <Typography
               variant="caption"
               color="text.secondary"
@@ -217,7 +253,7 @@ export default function AlertGlobalSearch({
           </Box>
 
           <Box
-            width={300}
+            maxWidth={400}
             mt={2}
             display={"flex"}
             justifyContent={"center"}
@@ -234,7 +270,7 @@ export default function AlertGlobalSearch({
 
               <Box
                 width={100}
-                className={"shadow rounded p-3"}
+                className={"shadow rounded p-2"}
                 sx={{
                   border: "1px solid",
                   borderColor: "divider",
@@ -337,7 +373,7 @@ export default function AlertGlobalSearch({
                 onClick={handleShowEventsResults}
                 disabled={eventsCount < 1}>
                   <Box display={"flex"} justifyContent={"center"}>
-                    <LiveTvRounded color="action" />
+                    <TvRounded color="action" />
                   </Box>
                   <Box display={"flex"} justifyContent={"center"}>
                     <Typography variant="body2">
@@ -358,7 +394,9 @@ export default function AlertGlobalSearch({
                   borderColor: "divider",
                 }}
               >
-                <CardActionArea disabled={groupsCount < 1}>
+                <CardActionArea 
+                onClick={handleShowGroup}
+                disabled={groupsCount < 1}>
                   <Box display={"flex"} justifyContent={"center"}>
                     <GroupsRounded />
                   </Box>
@@ -373,6 +411,17 @@ export default function AlertGlobalSearch({
             </Box>
           </Box>
         </DialogContent>
+
+        {/* show matched group and community alert */}
+        {showGroups && (
+          <AlertGroupCommunity
+            isDarkMode={isDarkMode}
+            openGroup={showGroups}
+            setOpenGroup={setShowGroups}
+            search={groupNames}
+          />
+        )}
+        
       </Dialog>
   );
 }

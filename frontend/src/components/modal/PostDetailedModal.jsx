@@ -184,12 +184,14 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
          onClose={handleClosingModal}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+        sx={{
+        backdropFilter:'blur(5px)',
+      }}
       >
         <Box
           width={CustomDeviceIsSmall() ? "100%":CustomDeviceTablet()?"80%":"40%"}
           p={1}
           borderRadius={3}
-          bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
           color={"text.primary"}
           sx={{
             border: isDarkMode && "1px solid gray",
@@ -245,7 +247,8 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
           )}
 
            {/* all user comments container pass the comments of the post */}
-              <Box>
+              <Box 
+              m={0.5}>
                   <CommentContainer
                   post_comments={postDetailedData?.post_comments?.comments}
                   postId={postDetailedData?._id}
@@ -260,13 +263,14 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
                     alignItems={"center"}
                     width={"100%"}
                     p={1}
-                    mb={5}
+                    mb={3}
                     bgcolor={"background.default"}
                     className={'rounded'}
                     sx={{ border:'1px solid', borderColor:'divider' }}
                     >
                     {/* input for comment */}
-                    <Box width={"100%"} mx={1}>
+                    <Box 
+                    width={"100%"} >
                         <InputBase
                         multiline
                         value={comment}

@@ -10,6 +10,7 @@ import {
   Divider,
   IconButton,
   TextField,
+  Tooltip,
   Typography
 } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -23,6 +24,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ModalPolicyTerms from "../auth/ModalPolicyTerms";
 import AllCountries from "../data/AllCountries";
+import { useSelector } from "react-redux";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -46,6 +48,10 @@ export default function AlertCountry({
       return country;
     }).sort()
   );
+
+   // redux state
+    const { currentMode } = useSelector((state) => state.appUI);
+      const isDarkMode=currentMode==='dark'
 
   // control showing of terms alert
   const [openTerms, setOpenTerms] = useState(false);
@@ -107,6 +113,7 @@ export default function AlertCountry({
         open={openAlertCountry && !openTerms}
         TransitionComponent={Transition}
         keepMounted
+        max
         aria-describedby="alert-dialog-slide-description"
         sx={{ display: "flex", justifyContent: "center",backdropFilter:'blur(3px)', }}
       >
@@ -115,26 +122,32 @@ export default function AlertCountry({
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
+            sx={{
+              background: !isDarkMode && 
+              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          }}
           >
             {/* logo+ title  */}
             <Box display={"flex"} gap={2} alignItems={"center"}>
               
                   <PublicRounded
-                    sx={{ width: 30, height: 30 }}
+                    sx={{ width: 32, height: 32 }}
                     color="primary"
                   />
-                  <Typography variant="body1">Country?</Typography>
+                  <Typography variant="body1">Country Selection</Typography>
               
             </Box>
             {/* close button */}
+            <Tooltip title='close' arrow>
             <IconButton 
              sx={{ 
                   border:'1px solid',
                   borderColor:'divider'
                 }}
             onClick={handleBackLogin}>
-              <Close sx={{ width: 15, height: 15 }} />
+              <Close sx={{ width: 14, height: 14 }} />
             </IconButton>
+            </Tooltip>
           </DialogTitle>
 
           {/* error present should be displayed */}

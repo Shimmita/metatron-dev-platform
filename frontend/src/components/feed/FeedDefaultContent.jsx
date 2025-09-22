@@ -1,4 +1,4 @@
-import { AutoAwesomeRounded, DiamondRounded, HelpOutlineOutlined, PeopleRounded, SmartphoneRounded } from "@mui/icons-material";
+import { AutoAwesomeRounded, DiamondRounded, Diversity3Rounded, HelpOutlineOutlined, PeopleRounded, SmartphoneRounded } from "@mui/icons-material";
 import { Box, CircularProgress, IconButton, Stack, Typography } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -14,6 +14,8 @@ import {
   updateCurrentPosts,
 } from "../../redux/CurrentPosts";
 import AlertForYou from "../alerts/AlertForYou";
+import AlertGroupCommunity from "../alerts/AlertGroupCommunity";
+import AlertTutorial from "../alerts/AlertTutorial";
 import CardFeed from "../custom/CardFeed";
 import PeopleModal from "../modal/PeopleModal";
 import PostDetailsContainer from "../post/PostDetailsContiner";
@@ -34,12 +36,7 @@ const FeedDefaultContent = () => {
   const [title,setTitle]=useState("")
   const [showPeople,setShowPeople]=useState()
 
-  // will be used when the post is focused for full details
-  const [postDetailedData, setPostDetailedData] = useState();
-
-  // redux states
-  const dispatch = useDispatch();
-
+   
   // redux states access
   const { posts } = useSelector((state) => state.currentPosts);
   const { connectTop } = useSelector((state) => state.currentConnectRequest);
@@ -47,6 +44,22 @@ const FeedDefaultContent = () => {
   const { currentMode, isDefaultSpeedDial } = useSelector(
     (state) => state.appUI
   );
+
+  const { user } = useSelector((state) => state.currentUser);
+
+  // will be used when the post is focused for full details
+  const [postDetailedData, setPostDetailedData] = useState();
+
+
+  // for about tutorial
+  const isAboutShowTutorial=user?.isTutorial||false
+
+  // will trigger alert for groups and community by default from
+  // redux state of the user.
+  const [openGroup,setOpenGroup]=useState(user?.isGroupTutorial || false)
+
+  const dispatch = useDispatch();
+
   const isDarkMode=currentMode==='dark'
 
   // show speed dial if ain't visible
@@ -147,7 +160,7 @@ const FeedDefaultContent = () => {
     setIsHelp(false)
     setIsRecommend(false)
     setTitle("Mobile and Desktop App")
-    setMessageBody("under development, our esteemed software engineers are working on the development of the application.")
+    setMessageBody("Feature under development, our esteemed software engineers are working on the development of the applications.")
   }
 
   // handle closing of all info
@@ -165,6 +178,11 @@ const FeedDefaultContent = () => {
  const handleShowPeopleSuggest=()=>{
   setShowPeople(prev=>!prev)
  }
+
+  //  handle showing of the groups
+  const handleShowGroups=()=>{
+  setOpenGroup(true)
+  }
 
   return (
     <Box
@@ -236,19 +254,16 @@ const FeedDefaultContent = () => {
           >
 
           {/* For your Page Content */}
-          <Box
-          width={'100%'} 
-          border={isDarkMode && '1px solid'}
-          bgcolor={'background.default'}
-          borderRadius={2}
-          mb={1} 
-          borderColor={'divider'}>
-          <Box p={1} >
+    
           <Box 
           display={'flex'}
+          borderRadius={2}
+          mb={2}
+          bgcolor={'background.default'}
+          className='shadow-sm'
           alignItems={'center'}
           justifyContent={CustomDeviceIsSmall()? 'space-between':"space-around"}
-          px={1}
+          py={1}
           >
           {/* help and support */}
           <Stack 
@@ -259,60 +274,83 @@ const FeedDefaultContent = () => {
             <HelpOutlineOutlined sx={{ 
             width:27,
             height:27
-           }}/>
+          }}/>
           </IconButton>
-         {!CustomDeviceSmallest() &&  <Typography variant="caption" >Help</Typography>}
+        {!CustomDeviceSmallest() &&  <Typography variant="caption" >Help</Typography>}
           </Stack>
 
           {/* insights */}
-           <Stack
-           justifyContent={'center'}
-           alignItems={'center'}
+            <Stack
+            justifyContent={'center'}
+            alignItems={'center'}
             display={'flex'}>
           <IconButton color="success" onClick={handleOpenRecommend}>
             <AutoAwesomeRounded sx={{ 
             width:25,
             height:25
-           }}/>
+            }}/>
           </IconButton>
-          {!CustomDeviceSmallest() && <Typography variant="caption">Insights</Typography> }
+          {!CustomDeviceSmallest() 
+          && <Typography variant="caption">Insights</Typography> }
           
           </Stack>
 
           {/* people suggestions */}
-           <Stack
-           justifyContent={'center'}
-           alignItems={'center'}
+            <Stack
+            justifyContent={'center'}
+            alignItems={'center'}
             display={'flex'}>
           <IconButton color="primary" onClick={handleShowPeopleSuggest}>
             <PeopleRounded sx={{ 
             width:25,
             height:25
-           }}/>
+          }}/>
           </IconButton>
-          {!CustomDeviceSmallest() && <Typography variant="caption">People</Typography> }
+          {!CustomDeviceSmallest() && 
+          <Typography variant="caption">People</Typography> }
           
           </Stack>
 
+          {/* people groups and community */}
+          <Stack
+            justifyContent={'center'}
+            alignItems={'center'}
+            display={'flex'}>
+          <IconButton 
+          color="primary" 
+          onClick={handleShowGroups}>
+            <Diversity3Rounded sx={{ 
+            width:25,
+            height:25
+          }}/>
+          </IconButton>
+          {!CustomDeviceSmallest() 
+          && <Typography variant="caption">
+            Groups
+          </Typography> }
+          
+          </Stack>
+
+
           {/* premium */}
-           {/* <Stack 
-           justifyContent={'center'}
-           alignItems={'center'}
+            {/* <Stack 
+            justifyContent={'center'}
+            alignItems={'center'}
             display={'flex'}>
           <IconButton color="secondary" onClick={handleOpenPremium}>
             <DiamondRounded sx={{ 
             width:25,
             height:25
-           }}/>
+            }}/>
           </IconButton>
    { !CustomDeviceSmallest() &&  <Typography variant="caption">Premium</Typography>}
           </Stack> */}
           
 
           {/* mobile app */}
-           <Stack 
-           justifyContent={'center'}
-           alignItems={'center'}
+            <Stack 
+            justifyContent={'center'}
+            alignItems={'center'}
             display={'flex'}>
           <IconButton color="success" onClick={handleMobileApp}>
             <SmartphoneRounded sx={{ 
@@ -320,11 +358,8 @@ const FeedDefaultContent = () => {
             height:25
           }}/>
           </IconButton>
-       { !CustomDeviceSmallest() &&  <Typography variant="caption">App</Typography>}
+          { !CustomDeviceSmallest() &&  <Typography variant="caption">App</Typography>}
           </Stack>
-
-          </Box>
-          </Box>
           </Box>
           
             {/* display the overview posts on tablets(portrait) and mobiles only */}
@@ -332,7 +367,7 @@ const FeedDefaultContent = () => {
               <React.Fragment>
                 {(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
                   <Box
-                    className="mb-3 rounded p-1"
+                    className="mb-2 rounded p-1"
                     sx={{
                       border: isDarkMode && "1px solid",
                       borderColor: isDarkMode && "divider",
@@ -349,22 +384,17 @@ const FeedDefaultContent = () => {
             {
               posts?.map((post, index) => {
                 return (
-                  <Box key={post?._id}>
-                    <Stack justifyContent={'center'}>
-                      {/* feed card detailed post */}
-                      <CardFeed
-                        post={post}
-                        posts={posts}
-                        isLastIndex={index===posts?.length-1}
-                        setPostDetailedData={setPostDetailedData}
-                        pageNumber={pageNumber}
-                        setPageNumber={setPageNumber}
-                        errorMessage={errorMessage}
-                        setErrorMessage={setErrorMessage}
-                      />
-                    
-                    </Stack>
-                  </Box>
+                    <CardFeed
+                      key={index}
+                      post={post}
+                      posts={posts}
+                      isLastIndex={index===posts?.length-1}
+                      setPostDetailedData={setPostDetailedData}
+                      pageNumber={pageNumber}
+                      setPageNumber={setPageNumber}
+                      errorMessage={errorMessage}
+                      setErrorMessage={setErrorMessage}
+                    />
                 );
               })}
           </Box>
@@ -385,7 +415,10 @@ const FeedDefaultContent = () => {
       {/* show alert for help,recommend,analytics */}
       {(isHelp || isRecommend || isPremium||isApp) && (
         <AlertForYou 
-        defaultIcon={isHelp? <HelpOutlineOutlined color="info"/> :isRecommend ? <AutoAwesomeRounded color='success'/>:isPremium ?<DiamondRounded color="secondary"/>:<SmartphoneRounded color="success"/>}
+        defaultIcon={isHelp? <HelpOutlineOutlined color="info"/> 
+        :isRecommend ? <AutoAwesomeRounded color='success'/>:
+        isPremium ?<DiamondRounded color="secondary"/>
+        :<SmartphoneRounded color="success"/>}
         openAlertGeneral={isHelp||isRecommend||isPremium||isApp}
         title={title}
         message={messageBody}
@@ -396,6 +429,23 @@ const FeedDefaultContent = () => {
         handleCloseAll={handleCloseAll}
         />    
         )}
+
+        {/* open tutorial based on the user profile status*/}
+
+        {isAboutShowTutorial && (
+          <AlertTutorial
+          isDarkMode={isDarkMode}
+          />
+        )}
+  
+      {/* show alert groups and communities */}
+      {openGroup && (
+        <AlertGroupCommunity
+          openGroup={openGroup}
+          setOpenGroup={setOpenGroup}
+          isDarkMode={isDarkMode}
+        />
+      )}
 
     </Box>
   );

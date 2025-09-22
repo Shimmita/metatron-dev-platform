@@ -128,7 +128,6 @@ const PostEditModal = () => {
         width={handleReturnWidthModal()}
         p={1}
         borderRadius={3}
-        bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
           border: isDarkMode && "1px solid gray",

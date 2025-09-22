@@ -7,9 +7,6 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import React from "react";
 import { useSelector } from "react-redux";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -39,18 +36,10 @@ export default function AlertGeneral({
   };
 
   //  redux states
-  const { isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
 
-  // handle width of alert dialog 
-  const handleAlertGenWidth=()=>{
-    if (CustomDeviceTablet() && isTabSideBar) {
-      return "36%"
-    } else if(CustomLandScape()){
-      return "-1%"
-    } else if(CustomLandscapeWidest()){
-      return "0%"
-    }
-  }
+
 
 
   return (
@@ -62,7 +51,6 @@ export default function AlertGeneral({
         aria-describedby="alert-dialog-slide-description"
           sx={{
             backdropFilter:'blur(5px)',
-           marginLeft:handleAlertGenWidth()
           }}
       >
           <DialogTitle
@@ -71,12 +59,21 @@ export default function AlertGeneral({
           variant="body2"
           fontWeight={"bold"}
           gap={2}
+          sx={{
+            background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          }}
         >
           {defaultIcon}
           {`${title}`}
         </DialogTitle>
-        <DialogContent dividers>
-          <DialogContentText variant="body2" maxWidth={400} id="alert-dialog-slide-description">
+        <DialogContent 
+        sx={{
+          maxWidth:500
+        }}
+        dividers>
+          <DialogContentText variant="body2"
+           id="alert-dialog-slide-general">
             {`${message}`}
           </DialogContentText>
         </DialogContent>

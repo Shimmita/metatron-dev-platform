@@ -3,11 +3,13 @@ import {
   ArrowCircleLeftRounded,
   DarkModeRounded,
   DocumentScannerRounded,
+  HelpRounded,
   HighlightOffOutlined,
   InfoRounded,
   Menu,
   Refresh,
   SettingsRounded,
+  TipsAndUpdatesRounded,
   WorkRounded
 } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -124,6 +126,9 @@ export default function AllJobsHiringManager() {
     const [errorMessage, setErrorMessage] = useState("");
     const [openJobPostModal,setOpenJobPostModal]=useState(false)
     const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
+    const[openAlertAbout,setOpenAlertAbout]=useState(false)
+    const [messageAbout,setMessageAbout]=useState("")
+    const [title,setTitle]=useState("")
 
   // track theme
   const theme = useTheme();
@@ -232,10 +237,52 @@ const handleShowingProfileDrawer = () => {
     }
 
       // open jobs creation modal
-      if (textOption === "Create New Job") {
+      if (textOption === "Upload New Job") {
         setOpenJobPostModal(true)
         return
       }
+
+      // show alert general, displays about page
+      if (textOption==="About H.R Page") {
+        setTitle(textOption)
+        setMessageAbout(
+          `Metatron H.R Page helps you the recruiter to easily manage your job applicants 
+          on a click of a button. Assess your potential job applicants and get the exceptional candidates. 
+          Jobs with external job application links or those jobs which have an external website where potential candidates shall be 
+          redirected to complete their job application will not contain this feature since candidates will be managed externally from Metatron Developer 
+          Platform.
+
+          Rogue job posts are not allowed on the platform and when found, your account shall be deleted permanently with or 
+          without your consent in order to secure our reputation. Be advised to post genuine jobs to our esteemed end users on the platform to avoid 
+          permanent loss of your account.
+
+          `)
+        setOpenAlertAbout(true)
+        // refetch jobs
+        setTextOption("My Posted Jobs")
+        return
+      }
+
+      // examine HR tips 
+      if (textOption==="Examine H.R Tips") {
+        setTitle(textOption)
+        setMessageAbout(
+          `Explore Posted Jobs window displays all of your jobs posted on the platform. This includes verified jobs and external jobs. 
+          Verified Jobs are those which applications shall be conducted and managed within the platform while external jobs are those which potential 
+          applicants shall be redirected to the external website link to complete their application. 
+          Jobs Assessment window applies for all verified jobs i.e jobs without external website link and within this window Metatron Developer Platform has 
+          availed all the assessment tools to aid you the recruiter in managing your potential applicants. some of the tools includes: 
+          downloading applicants C.V, messaging applicants, previewing applicant's profile and updating application status (Pending, Proceed, Reject). It's therefore
+          recommended that after downloading applicant C.V and updating their application status, you message them to keep them posted.
+          Jobs Management window facilitates you to easily manage your uploaded jobs i.e editing and updating jobs, updating job status (active, inactive) and deleting jobs suppose 
+          they no longer open for applications
+          `)
+        setOpenAlertAbout(true)
+        // refetch jobs
+        setTextOption("My Posted Jobs")
+        return
+      }
+
 
       // show the manage jobs table
       if (textOption==="Jobs Management") {
@@ -374,8 +421,8 @@ const handleShowingProfileDrawer = () => {
                   <Typography 
                   variant="caption"
                   fontWeight={'bold'}
-                   textTransform={'capitalize'}
-                   >
+                  textTransform={'capitalize'}
+                  >
                     {textOption} 
                   </Typography>
                 </Box>
@@ -399,8 +446,8 @@ const handleShowingProfileDrawer = () => {
                   <Typography 
                   variant="caption"
                   fontWeight={'bold'}
-                   textTransform={'capitalize'}
-                   ml={open ? 30: 24}>
+                  textTransform={'capitalize'}
+                  ml={open ? 30: 24}>
                     - {textOption} -
                   </Typography>
                 </Box>
@@ -408,7 +455,7 @@ const handleShowingProfileDrawer = () => {
               )}
 
               <Box display={'flex'}
-               gap={2}
+              gap={2}
                 alignItems={'center'} 
                 justifyContent={'flex-end'}>
 
@@ -519,9 +566,11 @@ const handleShowingProfileDrawer = () => {
             <List>
               {[
                 "My Posted Jobs",
-                "Create New Job",
+                "Upload New Job",
                 "Jobs Assessment",
                 "Jobs Management",
+                "About H.R Page",
+                "Examine H.R Tips"
               ].map((text, index) => (
                 <ListItem
                   key={text}
@@ -578,12 +627,21 @@ const handleShowingProfileDrawer = () => {
                         <Add
                           color={text === textOption ? "primary" : "inherit"}
                         />
-                      ) : (
+                      ) :index===3 ? (
                         <SettingsRounded
                         sx={{width:22,height:22}}
                         color={text === textOption ? "primary" : "inherit"}
                       />
-                       
+                      ) : index===4 ? (
+                        <HelpRounded
+                        sx={{width:22,height:22}}
+                        color={text === textOption ? "primary" : "inherit"}
+                      />
+                      ) :(
+                        <TipsAndUpdatesRounded
+                        sx={{width:22,height:22}}
+                        color={text === textOption ? "primary" : "inherit"}
+                      />
                       ) }
                       </Tooltip>
                     </ListItemIcon>
@@ -781,6 +839,17 @@ const handleShowingProfileDrawer = () => {
             setOpenAlertGeneral={setOpenAlertGeneral}
             setErrorMessage={setErrorMessage}
             defaultIcon={<InfoRounded/>}
+            />
+          )}
+
+          {/* alert show about  */}
+          {openAlertAbout && (
+            <AlertGeneral 
+            title={title}
+            message={messageAbout}
+            openAlertGeneral={openAlertAbout}
+            setOpenAlertGeneral={setOpenAlertAbout}
+            defaultIcon={title.includes('Examine') ? <TipsAndUpdatesRounded color="primary"/> :<HelpRounded color="info"/>}
             />
           )}
   

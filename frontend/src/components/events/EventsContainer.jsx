@@ -54,8 +54,6 @@ import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import EventItem from "./layout/EventItem";
 import EventStatsLayout from "./layout/EventStatsLayout";
 
@@ -120,13 +118,11 @@ const Drawer = styled(MuiDrawer, {
 
 
 export default function EventsContainer() {
-  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
   const [openModalEvent,setOpenModalEvent]=useState(false)
   const [isEventsStats,setIsEventsStats]=useState(false)
   const [focusedEvent,setFocusedEvent]=useState(null)
   const [pageNumber,setPageNumber]=useState(1)
   
-
   // redux states
   const { 
     currentMode, 
@@ -444,7 +440,7 @@ export default function EventsContainer() {
   return (
       <Suspense
         fallback={
-          <Box height={"90vh"} display={"flex"} justifyContent={"center"}>
+          <Box height={"88vh"} display={"flex"} justifyContent={"center"}>
             <Box display={"flex"} justifyContent={"center"}>
               <CircularProgress size={20} />
             </Box>
@@ -453,7 +449,7 @@ export default function EventsContainer() {
       >
         <Box 
         display={"flex"} 
-        height={(CustomLandScape()|| CustomLandscapeWidest()) ?"86vh":"90vh"}
+        maxHeight={'85vh'}
          sx={{
           width:isMyStats ? window.screen.availWidth-32:undefined,
           overflow: "auto",
@@ -473,7 +469,7 @@ export default function EventsContainer() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                pt: 2,
+                pt: 1.5,
               }}
             >
               <Box>
@@ -767,7 +763,7 @@ export default function EventsContainer() {
          
             <Box
               display={"flex"}
-              mt={!CustomDeviceIsSmall() ? 2:undefined}
+              mt={!CustomDeviceIsSmall() ? 1:undefined}
               gap={2}
               maxHeight={CustomDeviceIsSmall() || CustomDeviceTablet() ?"88vh":"80vh"}
               flexWrap={"wrap"}
@@ -907,7 +903,6 @@ export default function EventsContainer() {
             message={errorMessage}
             isError={true}
             openAlertGeneral={errorMessage}
-            setOpenAlertGeneral={setOpenAlertGeneral}
             setErrorMessage={setErrorMessage}
             defaultIcon={<InfoRounded/>}
             />

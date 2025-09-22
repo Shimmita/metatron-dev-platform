@@ -22,7 +22,9 @@ import {
   SmartphoneRounded,
   SportsEsportsRounded,
   StorageRounded,
+  SupportAgentRounded,
   TimelineRounded,
+  TuneRounded,
   WebRounded,
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
@@ -39,7 +41,7 @@ function CourseIcon({ option = "" }) {
     return <AppsRounded sx={{ width: 20, height: 20 }} />;
   }
   if (option.toLowerCase().includes("android")) {
-    return <AndroidRounded sx={{ width: 22, height: 22 }} />;
+    return <AndroidRounded color="success" sx={{ width: 22, height: 22 }} />;
   }
 
   if (option.toLowerCase().includes("arduino")) {
@@ -58,12 +60,22 @@ function CourseIcon({ option = "" }) {
     return <StorageRounded sx={{ width: 24, height: 24 }} />;
   }
 
+    if (option.toLowerCase().includes("principle")) {
+    return <TuneRounded color="primary" sx={{ width: 22, height: 22 }} />;
+  }
+
   if (option.toLowerCase().includes("design")) {
-    return <DrawRounded sx={{ width: 22, height: 22 }} />;
+    return <DrawRounded color="secondary" sx={{ width: 22, height: 22 }} />;
   }
+
   if (option.toLowerCase().includes("cloud")) {
-    return <CloudRounded sx={{ width: 22, height: 22 }} />;
+    return <CloudRounded color="primary" sx={{ width: 22, height: 22, }} />;
   }
+
+   if (option.toLowerCase().includes("technical")) {
+    return <SupportAgentRounded color="primary" sx={{ width: 22, height: 22, }} />;
+  }
+
   if (option.toLowerCase().includes("block chain")) {
     return <Avatar src={bitcoin} alt={""} sx={{ width: 22, height: 22 }} />;
   }
@@ -93,7 +105,7 @@ function CourseIcon({ option = "" }) {
   }
 
   if (option.toLowerCase().includes("fullstack")) {
-    return <LayersRounded sx={{ width: 22, height: 22 }} />;
+    return <LayersRounded color="info" sx={{ width: 22, height: 22 }} />;
   }
   if (option.toLowerCase().includes("internet")) {
     return <DevicesOtherRounded sx={{ width: 22, height: 22 }} />;

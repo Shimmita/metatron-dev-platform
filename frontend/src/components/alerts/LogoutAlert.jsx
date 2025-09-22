@@ -26,7 +26,8 @@ export default function LogoutAlert() {
   const[isLoading,setIsLoading]=useState(false)
 
   //   redux states
-  const { isTabSideBar,isLogoutAlert } = useSelector((state) => state.appUI);
+  const { isTabSideBar,isLogoutAlert,currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
 
   const dispatch = useDispatch();
 
@@ -72,17 +73,6 @@ export default function LogoutAlert() {
   };
 
 
-      const handleAlertGenWidth=()=>{
-        if (CustomDeviceTablet() && isTabSideBar) {
-          return "36%"
-        } else if(CustomLandScape()){
-          return "-1%"
-        } else if(CustomLandscapeWidest()){
-          return "0%"
-        }
-      }
-
-
   return (
       <Dialog
         open={isLogoutAlert}
@@ -91,7 +81,6 @@ export default function LogoutAlert() {
         aria-describedby="alert-dialog-slide-description"
         sx={{
           backdropFilter:'blur(5px)',
-          marginLeft: handleAlertGenWidth()
         }}
       >
         <DialogTitle
@@ -99,6 +88,10 @@ export default function LogoutAlert() {
           display={"flex"}
           alignItems={"center"}
           gap={2}
+          sx={{
+            background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          }}
         >
           <Avatar src={logoApp} alt="" />
           Account Logout

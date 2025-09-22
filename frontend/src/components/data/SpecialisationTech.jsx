@@ -23,6 +23,8 @@ const SpecialisationTech = [
   "Multiplatform Mobile Development",
   "Desktop App Development",
   "System Administration",
+  "System Design and Principles",
+  "ICT Technical Support",
 ].sort();
 
 export default SpecialisationTech;

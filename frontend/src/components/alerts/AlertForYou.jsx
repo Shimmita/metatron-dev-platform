@@ -18,9 +18,6 @@ import DevAccountConfig from "../config/DevAccountConfig";
 import RecommendStepper from "../custom/RecommendStepper";
 import PremiumData from "../data/PremiumData";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -43,25 +40,15 @@ export default function AlertForYou({
   const [paymentOption,setPaymentOption]=useState("")
 
   // show checkout page
-  const [isChekout,setIsCheckOut]=useState(false)
+  const [isCheckout,setIsCheckOut]=useState(false)
 
   const handleClose = () => {
     handleCloseAll()
   };
 
   //  redux states
-  const { isTabSideBar,currentMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
  const isDarkMode=currentMode==='dark'
-  // handle width of alert dialog 
-  const handleAlertGenWidth=()=>{
-    if (CustomDeviceTablet() && isTabSideBar) {
-      return "36%"
-    } else if(CustomLandScape()){
-      return "-1%"
-    } else if(CustomLandscapeWidest()){
-      return "0%"
-    }
-  }
 
 
   // handle complete payment
@@ -78,7 +65,6 @@ export default function AlertForYou({
         aria-describedby="alert-dialog-slide-description"
           sx={{
             backdropFilter:'blur(5px)',
-           marginLeft:handleAlertGenWidth()
           }}
       >
           <DialogTitle
@@ -87,6 +73,10 @@ export default function AlertForYou({
           variant="body2"
           fontWeight={"bold"}
           gap={2}
+          sx={{
+          background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+        }}
         >
           {defaultIcon}
           {title}
@@ -101,7 +91,11 @@ export default function AlertForYou({
           fontWeight: isDarkMode ? 'bold':undefined
          }} >upgrade to premium for unlimited access</FormHelperText>
         </Box> */}
-        <DialogContent dividers>
+        <DialogContent 
+        sx={{
+          maxWidth:500
+        }}
+        dividers >
         <Box 
         maxHeight={CustomDeviceIsSmall()?"50vh":"62.5vh"}
         sx={{
@@ -116,7 +110,7 @@ export default function AlertForYou({
             }}
         >
           <DialogContentText 
-          gutterBottom maxWidth={400} 
+          gutterBottom 
           mb={message?.length>1 ? 1:0} variant="body2" 
           id="alert-dialog-slide-description">
             {message}
@@ -176,11 +170,11 @@ export default function AlertForYou({
           {isPremium && (
             <React.Fragment>
 
-           {isChekout ? (
+           {isCheckout ? (
            <React.Fragment>
             <Box display={'flex'} gap={2} flexDirection={'column'} justifyContent={'center'} width={'100%'}>
             {/* helper text */}
-            <Box display={'flex'} justifyContent={'center'} maxWidth={400}>
+            <Box display={'flex'} justifyContent={'center'} >
             <FormHelperText>You are about to upgrade to a premium plan costing ${premiumOption}. Choose your supported payment method to complete the transaction.</FormHelperText>
             </Box>
             <Box  gap={1} display={'flex'} alignItems={'center'} justifyContent={'space-around'}>
@@ -249,7 +243,6 @@ export default function AlertForYou({
               <Typography 
               variant="body2"
               key={data}
-              maxWidth={400}
               gutterBottom
               component={'li'}>
                 {data}
@@ -335,7 +328,7 @@ export default function AlertForYou({
         <DialogActions>
 
          {/* continue btn for checkout in premium */}
-        {isPremium && !isChekout && (
+        {isPremium && !isCheckout && (
            <Button 
           color={isPremium ? "secondary":"primary"}
           size="small"
@@ -348,7 +341,7 @@ export default function AlertForYou({
         )}
     
         {/* back btn restores plan selection */}
-        {isChekout && (
+        {isCheckout && (
           <Button 
           color={isPremium ? "secondary":"primary"}
           size="small"

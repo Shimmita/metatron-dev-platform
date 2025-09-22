@@ -71,8 +71,7 @@ function JobLayoutHiring({ job, textOption = "",setIsApplicantsTable,setFocusedJ
       alignItems={"center"}
       classes={"job-card"}
       bgcolor={'background.default'}
-      className="rounded"
-      maxWidth={300}
+      className="rounded-3 shadow"
       mb={2}
       height={
         !(CustomDeviceIsSmall() || CustomDeviceTablet()) ? "80%" : undefined
@@ -175,7 +174,7 @@ function JobLayoutHiring({ job, textOption = "",setIsApplicantsTable,setFocusedJ
           <Box display={"flex"} gap={1} alignItems={"center"}>
             <PeopleRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
-              Current Applications {!(job?.website==="") ? "(N/A)":`${job?.applicants?.total}/200`}
+              Current Applications {!(job?.website==="") ? "(N/A)":`${job?.applicants?.total}/${job?.applicants_max}`}
             </Typography>
           </Box>
           <Box display={"flex"} gap={1} alignItems={"center"}>

@@ -4,7 +4,8 @@ import {
   Close,
   CloudUploadRounded,
   Done,
-  DownloadForOfflineRounded
+  DownloadForOfflineRounded,
+  LockRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -28,12 +29,15 @@ import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
 import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
+import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
+import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
-
+import './Progress.css';
+import CustomCountryName from "../utilities/CustomCountryName";
 // styled modal
 const StyledModalJob = styled(Modal)({
   display: "flex",
@@ -68,6 +72,8 @@ const ApplyJobModal = ({
   skills,
   location,
   isPreview=false,
+  isMyJob=false,
+  whitelist=""
   
 }) => {
   const { user } = useSelector((state) => state.currentUser);
@@ -82,6 +88,20 @@ const ApplyJobModal = ({
   const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
   const isDarkMode=currentMode==='dark'
   const dispatch = useDispatch();
+
+ const handleCountryJob = (job) => {
+    const parent = job.split(" ");
+    const finalName =
+      parent.length > 2 ? `${parent[0]} ${parent[1]}` : parent[0];
+
+    return finalName;
+  };
+
+  // based on the whitelist job filter, show/hide action btns
+  const isEligible=
+  whitelist==="All" ||
+  whitelist===""  ||
+  handleCountryJob(whitelist)===CustomCountryName(user?.country)
 
   // handle cv file change, upload it to the backend
   const handleCVFile = (event) => {
@@ -214,6 +234,9 @@ const ApplyJobModal = ({
         // snackbar success message from the backend update redux state
         dispatch(updateCurrentSnackBar(res.data));
 
+        // update success redux to trigger alert success
+        dispatch(updateCurrentSuccessRedux({title:'Job Application',message:`${res.data} job recruiter will review your application and provide feedback`}))
+
         // close the currently displayed modal
         handleClosingModal();
       })
@@ -257,10 +280,27 @@ const ApplyJobModal = ({
     setOpenApplyJobModal(false)
   }
 
+ // handle calculation of skills percentage 
+    const handleSkillsPercentage=()=>{
+      const userSkills=user?.selectedSkills || []
+      let results=0
+
+      // loop through user skill
+      for (const userSkill of userSkills) {
+        if (skills.includes(userSkill)) {
+          results=results+1
+        }
+      }
+
+    return Math.ceil(results/skills.length*100)
+      
+    }
+
 
   // handle return width modal
   const handleReturnWidthModal=()=>{
-    if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
+    if (CustomLandScape() ||CustomLandscapeWidest() || 
+    (CustomDeviceTablet() && !isTabSideBar)) {
       return "40%"
     } else if (CustomDeviceTablet()){
       return "90%"
@@ -268,16 +308,7 @@ const ApplyJobModal = ({
     return "95%"
   }
 
-   // handle width of the global search
-     const handleModalWidth=()=>{
-      if (CustomDeviceTablet() && isTabSideBar) {
-        return "36%"
-      } else if(CustomLandScape()){
-        return "-1%"
-      } else if(CustomLandscapeWidest()){
-        return "0%"
-      }
-    }
+
 
   return (
     <StyledModalJob
@@ -292,29 +323,33 @@ const ApplyJobModal = ({
       <Box
         width={handleReturnWidthModal()}
         borderRadius={3}
-        bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
           border:  "1px solid gray",
           borderColor:'divider',
-          marginLeft: handleModalWidth(),
         }}
       >
         <Box
           bgcolor={"background.default"}
           borderRadius={3}
-          className="shadow-lg pt-2"
+          className="shadow-lg"
           sx={{ 
           border:  "1px solid gray",
           borderColor:'divider',
-           }}
+          }}
         >
           {/* toolbar like box */}
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
-            mr={0.8}
+            borderRadius={3}
+            pt={1}
+            pr={0.8}
+            sx={{
+            background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+            }}
           >
             {/* logo */}
             <Box>
@@ -360,6 +395,8 @@ const ApplyJobModal = ({
             </Box>
 
             {/*close icon */}
+             <Tooltip 
+              title={"close"}>
             <IconButton
               onClick={handleClosingModal}
               disabled={isUploading || errorMessage}
@@ -368,44 +405,42 @@ const ApplyJobModal = ({
                 borderColor:'divider',
               }}
             >
-              <Tooltip 
-              title={"close"}>
                 <Close  
                 sx={{ 
                   width:12,
                   height:12,
-                 }}
+                }}
                 />
-              </Tooltip>
             </IconButton>
+              </Tooltip>
           </Box>
 
 
           {/* display error of missing filed if any */}
 
           {(errorMessage || isUploading) && (
-             <Box
-             mt={1}
-             display={"flex"}
-             justifyContent={"center"}
-             mb={isUploading || errorMessage ? 1 : undefined}
-           >
+            <Box
+            mt={1}
+            display={"flex"}
+            justifyContent={"center"}
+            mb={isUploading || errorMessage ? 1 : undefined}
+          >
             {errorMessage && (
-               <Collapse in={errorMessage || false}>
-               <Alert
-                 severity="info"
-                 onClick={() => setErrorMessage("")}
-                 className="rounded"
-                 action={
-                   <IconButton aria-label="close" color="inherit" size="small">
-                     <Close fontSize="inherit" />
-                   </IconButton>
-                 }
-               >
-                  <FormHelperText>{errorMessage}</FormHelperText>
-               </Alert>
-             </Collapse>
-            )}
+              <Collapse in={errorMessage || false}>
+              <Alert
+                severity="info"
+                onClick={() => setErrorMessage("")}
+                className="rounded"
+                action={
+                  <IconButton aria-label="close" color="inherit" size="small">
+                    <Close fontSize="inherit" />
+                  </IconButton>
+                }
+              >
+                <FormHelperText>{errorMessage}</FormHelperText>
+              </Alert>
+            </Collapse>
+          )}
 
             {isUploading && (
               <Box>
@@ -413,13 +448,12 @@ const ApplyJobModal = ({
             </Box>
             )}
             
-           </Box>
+          </Box>
           )}
 
           {/* divider */}
           <Divider className="p-1" component={'div'}/>
-         
-
+        
           <Box
             mt={2}
             maxHeight={"70vh"}
@@ -453,7 +487,9 @@ const ApplyJobModal = ({
               </Stack>
 
               {/* divider */}
-              <Divider component={'div'} className="p-1"/>
+              <Divider 
+              component={'div'}
+              className="p-1"/>
 
               {/* skills */}
               <Stack gap={1}>
@@ -464,7 +500,13 @@ const ApplyJobModal = ({
                   {" "}
                   Skills
                 </Typography>
+                <Stack gap={2} 
+                direction={'row'} 
+                alignItems={'center'}
+                justifyContent={'space-between'}
+                >
                 {/* skills text */}
+                <Box>
                 {skills?.map((skill, index) => (
                   <Typography
                     component={"li"}
@@ -488,6 +530,30 @@ const ApplyJobModal = ({
                     <FormHelperText>{skill}</FormHelperText>
                   </Typography>
                 ))}
+                </Box>
+
+                {/* progress */}
+                <Box 
+                display={'flex'} 
+                width={'100%'} 
+                justifyContent={'center'}>
+                {/* circle */}
+                <Box mr={!CustomDeviceIsSmall()? 10:undefined} className="circular-progress">
+                  <Box className="inner-circle"></Box>
+                  <Box className="progress-bar left"></Box>
+                  <Box className="progress-bar right"></Box>
+                  <Box className="progress-text">
+                  <Typography
+                  textAlign={'center'} 
+                  fontWeight={'bold'}>
+                    {handleSkillsPercentage()} %
+                  </Typography>
+                  <Typography>Matched</Typography>
+                  </Box>
+                </Box>
+                </Box>
+
+                </Stack>
               </Stack>
 
                {/* divider */}
@@ -505,8 +571,8 @@ const ApplyJobModal = ({
                 </Typography>
                 {/* Qualification data */}
                 {requirements?.qualification.map((data) => (
-                 
-                   <FormHelperText
+                
+                  <FormHelperText
                     key={data}
                     className="mb-1"
                     component={'li'}>{
@@ -546,18 +612,27 @@ const ApplyJobModal = ({
                   {/* divider */}
               <Divider component={'div'} className="p-1"/>
 
-              {/* application section */}
-              <Stack gap={1} mb={2}>
+              {/* application section, show btn if user is eligible */}
+              {!isEligible  ? (
+                <Typography 
+                fontWeight={'bold'}
+                p={2} 
+                color={'primary'} 
+                variant="caption">
+                Unfortunately, recruiter of this role allows only applicants from 
+                their country.
+                </Typography>
+              ):(
+                <Stack gap={1} mb={2}>
                 {websiteLink === "" ? (
                   <React.Fragment>
                     {/* curriculum vitae application */}
                     <Box mb={1} >
-                   
                     <FormHelperText
                     className="mb-1 px-1"
                     >
-                     Upload your latest version of Curriculum Vitae (CV) in
-                     the format of PDF only.
+                    Upload your latest version of Curriculum Vitae (CV) in
+                    the format of PDF only.
                     </FormHelperText>
                         
                       {cvUpload ? (
@@ -584,7 +659,7 @@ const ApplyJobModal = ({
                         </Typography>
                         </Box>
                       ):user?.cvLink!=="" ?(
-                         <Box 
+                        <Box 
                         display={'flex'}
                         justifyContent={'center'}>
                         <Typography
@@ -598,7 +673,7 @@ const ApplyJobModal = ({
                           fontWeight={"bold"}
                           color={"text.secondary"}
                         >
-                         {user?.cvLink?.split("-")[1]}
+                        {user?.cvLink?.split("-")[1]}
                           <Done
                             color="success"
                             sx={{ width: 17, height: 17 }}
@@ -675,7 +750,7 @@ const ApplyJobModal = ({
                             textTransform: "none",
                             fontWeight: "bold",
                             fontSize:'x-small',
-                             borderRadius:5
+                            borderRadius:5
                           }}
                           startIcon={<DownloadForOfflineRounded />}
                         >
@@ -685,17 +760,17 @@ const ApplyJobModal = ({
                     </Box>
 
                       {/* divider */}
-              <Divider component={'div'} className="pb-1"/>
+                  <Divider component={'div'} className="pb-1"/>
 
                     {/* application btn */}
                     <Box mt={1} display={"flex"} justifyContent={"center"}>
                       <Button
                         variant="contained"
                         disableElevation
-                        disabled={ user?.cvLink==="" || isUploading || errorMessage}
+                        disabled={ user?.cvLink==="" || isUploading || errorMessage || isMyJob}
                         size="small"
                         onClick={handleJobApplication}
-                        endIcon={<BoltRounded />}
+                        endIcon={isMyJob ? <LockRounded/>:<BoltRounded />}
                         sx={{ borderRadius: "20px" }}
                       >
                         Complete Application
@@ -730,12 +805,11 @@ const ApplyJobModal = ({
                   </React.Fragment>
                 )}
               </Stack>
+              )}
+              
                 </React.Fragment>
               )}
-             
             </Stack>
-          
-            
           </Box>
         </Box>
       </Box>

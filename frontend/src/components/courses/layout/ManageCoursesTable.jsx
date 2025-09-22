@@ -48,7 +48,6 @@ export default function ManageCoursesTable({coursesData,setCourseManager,setText
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [focusedCert,setFocusedCert]=useState(null)
-
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { user } = useSelector((state) => state.currentUser);
@@ -70,7 +69,6 @@ export default function ManageCoursesTable({coursesData,setCourseManager,setText
   }
 
 
-  // handle deletion of the course
   // handle deleting of the course
   const handleDeleteCourse=(course)=>{
 
@@ -110,7 +108,7 @@ export default function ManageCoursesTable({coursesData,setCourseManager,setText
 
   return (
     <Paper elevation={0} 
-    className={'rounded'}
+    className={'rounded shadow'}
     sx={{ 
     maxWidth: window.screen.availWidth, 
     maxHeight:!CustomDeviceIsSmall() ? '75vh':undefined,
@@ -121,6 +119,7 @@ export default function ManageCoursesTable({coursesData,setCourseManager,setText
 
     <Box 
     width={'100%'} 
+    mt={1}
     display={'flex'} 
     justifyContent={'space-between'}
      alignItems={'center'} gap={2}>

@@ -5,6 +5,8 @@ const SubsectionJob = {
     "Remote Job",
     "Onsite Job",
     "Hybrid Job",
+    "Internship Job",
+    "Volunteer Job"
   ].sort((a, b) => a.localeCompare(b)),
   Post_Duration: [
     "7 days",

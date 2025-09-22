@@ -1,4 +1,4 @@
-import { DarkModeRounded, PeopleRounded } from "@mui/icons-material";
+import { DarkModeRounded } from "@mui/icons-material";
 import {
   Avatar,
   AvatarGroup,
@@ -164,144 +164,123 @@ const DrawerSmartphone = ({
           </IconButton>
         </Box>
 
-        {/* divider */}
-        <Divider component={'div'} className="p-1"/>
 
-        {/* avatar and its subsequent content */}
-        <BoxAvatarContent>
-                <Box width={"100%"}>
-                    <Box
-                      display={"flex"}
-                      justifyContent={"center"}
-                      flexDirection={'column'}
-                      alignItems={"center"}
-                      mt={1.2}
-                    >
-                    <Box 
-                    display={'flex'}
-                    alignItems={'center'}
-                    mb={1}
-                    gap={2}
-                    >
-                    {/* avatar container */}
-                      <StyledBadge
-                        overlap="circular"
-                        anchorOrigin={{
-                          vertical: "bottom",
-                          horizontal: "right",
-                        }}
-                        variant="dot"
+          {/* avatar and its subsequent content */}
+                <BoxAvatarContent>
+                      <Box 
+                      display={'flex'}
+                      alignItems={'center'}
+                      mb={1}
+                      p={2}
+                      borderRadius={2}
+                      gap={2}
+                      width={'100%'}
+                    sx={{
+                      background: !isDarkMode && 
+                    "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+                    }}
                       >
-                        <Avatar
-                          alt={''}
-                          src={user?.avatar}
-                          sx={{
-                            width: 70,
-                            height: 70,
-                            color: "white",
-                            backgroundColor: isDarkMode ? "#42A5F5":"#1976D2",
-                            }}
-                        />
-                      </StyledBadge>
-                      {/* naming container */}
-                      <Box >
-                        {/* name */}
-                          <Typography
-                            variant="body2"
-                            fontWeight={"bold"}
-                            textTransform={"uppercase"}
-                            color={isDarkMode ? "whitesmoke" : "inherit"}
-                          >
-                              {user?.name}
-                          </Typography>
+                      {/* avatar container */}
+                        <StyledBadge
+                          overlap="circular"
+                          anchorOrigin={{
+                            vertical: "bottom",
+                            horizontal: "right",
+                          }}
+                          variant="dot"
+                        >
+                          <Avatar
+                            alt={''}
+                            src={user?.avatar}
+                            sx={{
+                              width: 80,
+                              height: 80,
+                              color: "white",
+                              backgroundColor: isDarkMode ? "#42A5F5":"#1976D2",
+                              }}
+                          />
+                        </StyledBadge>
+                        {/* naming container */}
+                        <Box >
+                          {/* name */}
+                            <Typography
+                              variant="body2"
+                              fontWeight={"bold"}
+                              textTransform={"uppercase"}
+                              color={isDarkMode ? "whitesmoke" : "inherit"}
+                            >
+                                {user?.name}
+                            </Typography>
 
-                          {/* specialization */}
-                          <Typography
-                           variant="caption"
-                          textTransform={"capitalize"}
-                          >
-                          {user?.specialisationTitle}
-                          </Typography>
+                            {/* specialization */}
+                            <Typography
+                            variant="caption"
+                            textTransform={"capitalize"}
+                            >
+                            {user?.specialisationTitle}
+                            </Typography>
 
-                          {/* country */}
-                          <Box>
-                          <FormHelperText
-                          variant="caption" 
-                          sx={{ display:'flex',alignItems:'center', gap:1 }}
-                          >
-                           {user?.county} 
-                           {/* divider */}
-                           <Divider 
-                           component={'div'} 
-                           className="py-1"
-                           orientation="vertical"/>
+                            {/* country */}
+                            <Box>
+                            <FormHelperText
+                            variant="caption" 
+                            sx={{ display:'flex',alignItems:'center', gap:1 }}
+                            >
+                            {user?.county} 
+                            {/* divider */}
+                            <Divider 
+                            component={'div'} 
+                            className="py-1"
+                            orientation="vertical"/>
 
-                            {CustomCountryName(user?.country)}
-                          </FormHelperText>
+                              {CustomCountryName(user?.country)}
+                            </FormHelperText>
+                            </Box>
+
+                            {/* friends */}
+                            <Box>
+                            <FormHelperText
+                            variant="caption" 
+                            sx={{ display:'flex',alignItems:'center', gap:1 }}
+                            >
+                            Followers
+                              {/* divider */}
+                            <Divider 
+                            component={'div'} 
+                            className="py-1"
+                            orientation="vertical"/>
+
+                            {user?.network_count}
+                            </FormHelperText>
+                            </Box>
+
+                            {/* skills */}
+                          <Box 
+                          mt={0.5}
+                          display={"flex"} 
+                          alignItems={'center'}
+                          gap={1}
+                          justifyContent={"flex-start"}>
+                            {/* skills */}
+                            <AvatarGroup max={user?.selectedSkills?.length}>
+                              {/* loop through the skills and their images matched using custom fn */}
+                              {user?.selectedSkills?.map((skill, index) => (
+                                <Tooltip title={skill} arrow  key={index}>
+                                  <Avatar
+                                    alt={skill}
+                                    className="border"
+                                    sx={{ width: 21, height: 21 }}
+                                    src={getImageMatch(skill)}
+                                  />
+                                </Tooltip>
+                              ))}
+                            </AvatarGroup>
                           </Box>
-
-                          {/* skills */}
-                           <Box 
-                           mt={0.5}
-                           display={"flex"} 
-                           alignItems={'center'}
-                           gap={1}
-                           justifyContent={"flex-start"}>
-                           {/* skills */}
-                          <AvatarGroup max={user?.selectedSkills?.length}>
-                            {/* loop through the skills and their images matched using custom fn */}
-                            {user?.selectedSkills?.map((skill, index) => (
-                              <Tooltip title={skill} arrow  key={index}>
-                                <Avatar
-                                  alt={skill}
-                                  className="border"
-                                  sx={{ width: 21, height: 21 }}
-                                  src={getImageMatch(skill)}
-                                />
-                              </Tooltip>
-                            ))}
-                          </AvatarGroup>
-                           {/* divider */}
-                           <Divider 
-                           component={'div'} 
-                           className="py-1"
-                           orientation="vertical"/>
-
-                           <Box
-                           justifyContent={'center'}
-                           alignItems={'center'}
-                           gap={0.8}
-                           color={'text.secondary'}
-                           display={'flex'}>
-                           {/* connections count */}
-                           <Typography 
-                           pt={0.5}
-                           variant="caption"
-                           color={'text.secondary'}>
-                           {user?.network_count}
-                           </Typography>
-                          
-                           {/* people icon */}
-                           <PeopleRounded
-                            sx={{ width:20,height:20}}/>
-                           </Box>
                         </Box>
-                      </Box>
-                      </Box>
+                        </Box>
 
-                     {/* divider */}
-                      <Root className="my-2 px-3">
-                      <Divider>
-                      <Box display={'flex'} justifyContent={'center'}>
-                      <Typography
-                      color={'text.primary'}
-                      variant="caption"
-                       >Top Insights</Typography>
-                      </Box>
-                      </Divider>
-                      </Root>
-                    <Box 
-                    mb={1}
+                      <Box 
+                      mt={3}
                     display={"flex"} 
                     justifyContent={"center"} >
                       {!isFetching && 
@@ -310,16 +289,12 @@ const DrawerSmartphone = ({
                       errorMessage={errorMessage}
                       isFetching={isFetching}
                       dataInsights={dataInsights}/>}
-
-                      {/* <SkillAvatars user={user} isDarkMode={isDarkMode} /> */}
                     </Box>
-                  </Box>
-                </Box>
               </BoxAvatarContent>
 
                {/* section more insights */}
                       <Box
-                      mt={1.2}
+                      mt={3}
                       py={0.1}
                       bgcolor={"background.default"}
                       className=" rounded-4"
@@ -347,8 +322,9 @@ const DrawerSmartphone = ({
                       mt={0.5}
                       justifyContent={'center'}
                       display={'flex'}>
-                     {dataTools.map(tool=>(
+                    {dataTools.map(tool=>(
                       <Box 
+                      key={tool.title}
                       justifyContent={'center'}
                       flexDirection={'column'}
                       display={'flex'}>
@@ -356,17 +332,16 @@ const DrawerSmartphone = ({
                       <Avatar 
                       sx={{ width:28,height:28}}
                       src={getImageMatch(tool.title)}
-              
                       />
               
                       {/* title */}
-                       <Box display={'flex'} justifyContent={'center'}>
+                      <Box display={'flex'} justifyContent={'center'}>
                         <FormHelperText 
                         className={isDarkMode && 'text-info'}
                         sx={{ fontSize:'x-small' }}>{tool.title?.substring(0,10)}</FormHelperText>
                         </Box>
                       </Box>
-                     ))}
+                    ))}
                       </Box>
                       </Box>
                       </Box>

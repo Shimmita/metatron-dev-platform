@@ -32,7 +32,7 @@ const CountiesInKenya = [
   "Narok",
   "Nyeri",
   "Nyandarua",
-  "Nyira",
+  "Nyamira",
   "Siaya",
   "Taita Taveta",
   "Tana River",

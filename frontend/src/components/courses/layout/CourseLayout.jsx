@@ -1,4 +1,5 @@
 import {
+  AutoAwesomeRounded,
   CastForEducationRounded,
   PersonAdd,
   SchoolRounded,
@@ -16,11 +17,11 @@ import {
   Typography
 } from "@mui/material";
 import { lazy, useState } from "react";
+import { useSelector } from "react-redux";
 import pythonLogo from "../../../images/python.jpeg";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
-import CoursePlayer from "./CoursePlayer";
-import { useSelector } from "react-redux";
+import AlertSimilarCourses from "../../alerts/AlertSimilarCourses";
 const AccordionDescription = lazy(() => import("./AccordionDescription"));
 
 const labels = {
@@ -60,10 +61,17 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
   // redux state manager
   const { user } = useSelector((state) => state.currentUser);
   const isMyCourse=user?._id===courseItem?.course_instructor?.instructorId
+  const [isOpenAccordion,setIsOpenAccordion]=useState(false)
+  const [showSimilar,setShowSimilar]=useState(false)
   
   const handleOpenPlayer = () => {
    setFocusedCourse(courseItem)
   };
+
+  // handle showing similar courses suggestion
+  const handleShowSimilarCourses=()=>{
+    setShowSimilar(true)
+  }
   
   return (
     <Item
@@ -75,6 +83,7 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
           : CustomDeviceTablet()
           ? 300
           : 340,
+          height:455,
         justifyContent: "center",
         border: "1px solid",
         borderColor: isDarkMode ? "#2F2F2F" : "#E0E0E0",
@@ -84,7 +93,6 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
       <Box
         display={"flex"}
         justifyContent={"center"}
-        bgcolor={'background.default'}
         alignItems={"center"}
         flexDirection={"column"}
         gap={1}
@@ -109,7 +117,6 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
         />
         {/* title */}
         <Typography
-          variant="body2"
           fontWeight={"bold"}
         >
           {courseItem?.course_title}
@@ -239,27 +246,43 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
 
       {/* description */}
       <Box>
-        <AccordionDescription description={courseItem?.course_description} />
+        <AccordionDescription 
+        description={courseItem?.course_description}
+        setOpenAccordion={setIsOpenAccordion}
+        />
       </Box>
 
       <Divider component={"div"} />
 
+
+      {/* similar courses btn */}
+      <Box mt={2}
+      display={isOpenAccordion ? "none":'flex'}
+      justifyContent={'center'}>
+      <Button 
+      onClick={handleShowSimilarCourses}
+      size="small"
+      startIcon={<AutoAwesomeRounded/>}>
+      similar courses
+      </Button>
+      </Box>
+
         {/* enroll course button control */}
         <Box
-          display={"flex"}
+          display={isOpenAccordion ? "none":'flex'}
           justifyContent={"center"}
           flexDirection={'column'}
           width={"100%"}
-          mt={1.5}
+          mb={0.5}
           p={1}
         >
           {/* helper text, if they enrolled to continue learn */}
           {courseItem?.currentUserEnrolled? (
-            <Box display={'flex'} justifyContent={'center'}>
-            <FormHelperText className="text-success fw-bold">continue learning</FormHelperText>
+            <Box mb={1} display={'flex'} justifyContent={'center'}>
+            <FormHelperText className={`${isDarkMode ? 'text-info':'text-success'} fw-bold`}>continue learning</FormHelperText>
             </Box>
           ):(
-            <Box display={'flex'} justifyContent={'center'}>
+            <Box mb={1} display={'flex'} justifyContent={'center'}>
             <FormHelperText>
             {isMyCourse ? 'you uploaded this course':'preview and enroll free'}
             </FormHelperText>
@@ -301,7 +324,19 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
             )}
           </Box>
         </Box>
-    
+
+        {/* show similar courses alert */}
+        {showSimilar && (
+          <AlertSimilarCourses
+          openSimilarCourses={showSimilar}
+          setOpenSimilarCourses={setShowSimilar}
+          courseId={courseItem?._id}
+          isDarkMode={isDarkMode}
+          courseName={courseItem?.course_title}
+          setFocusedCourse={setFocusedCourse}
+          
+          />
+        )}
     </Item>
   );
 }

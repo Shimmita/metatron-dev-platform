@@ -237,6 +237,8 @@ const Institutions = [
   "Ziwa Technical Training Institute",
   "Bukura Agricultural College",
   "Cambridge University Kenya",
+  "Shanzu Technical Collage",
+  "Shanzu Teachers Training Collage",
 
   // Institutes of Technology
   "Coast Institute of Technology (CIT)",

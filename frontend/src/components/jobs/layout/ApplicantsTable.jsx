@@ -234,7 +234,7 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
 
   return (
     <Paper elevation={0} 
-    className={'rounded'}
+    className={'rounded shadow'}
     sx={{ 
     maxWidth: window.screen.availWidth, 
     maxHeight:!CustomDeviceIsSmall() ? '75vh':undefined,
@@ -245,6 +245,7 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
 
     <Box 
     width={'100%'} 
+    mt={1}
     display={'flex'} 
     justifyContent={'space-between'}
      alignItems={'center'} gap={2}>
@@ -329,7 +330,7 @@ export default function ApplicantsTable({setIsApplicantsTable,focusedJob}) {
                             alt={""}
                             />
                             </Tooltip>
-                             </IconButton>
+                            </IconButton>
                             </Box>
                           )}
 

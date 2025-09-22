@@ -1,6 +1,5 @@
 import {
   Add,
-  CheckCircle,
   Close,
   UpdateTwoTone
 } from "@mui/icons-material";
@@ -24,21 +23,19 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import React, { lazy, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../../images/logo_sm.png";
-import AllCountries from "../../data/AllCountries";
 import AllSkills from "../../data/AllSkillsData";
-import CountiesInKenya from "../../data/Counties";
 import SpecialisationJobs from "../../data/SpecialisationJobs";
+import SpecialisationTech from "../../data/SpecialisationTech";
 import SubsectionJob from "../../data/SubsectionJobs";
+import CourseIcon from "../../utilities/CourseIcon";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import CustomLandScape from "../../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../../utilities/getImageMatch";
-import SpecialisationTech from "../../data/SpecialisationTech";
-import CourseIcon from "../../utilities/CourseIcon";
-const LocationControl = lazy(() => import("../LocationControl"));
+import { updateCurrentSuccessRedux } from "../../../redux/CurrentSuccess";
 const LogoutAlert = lazy(() => import("../../alerts/LogoutAlert"));
 
 // styled modal
@@ -49,36 +46,27 @@ const StyledModalJob = styled(Modal)({
 });
 
 
-
 // job type and accessibility
 const jobTypeAccess = {
   type: ["Contract", "Full-Time","Internship"],
   access: ["Remote", "Hybrid", "Onsite"],
 };
-// array for image names and values
 
+// array for image names and values
 const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCurrentJobs}) => {
   const [jobTitle, setJobTitle] = useState(job_updated?.title);
   const [category, setCategory] = useState(job_updated?.category);
   const [organisationName, setOrganisationName] = useState(job_updated?.organisation?.name);
-  const [county, setCounty] = useState(job_updated?.location?.state);
   const [jobType, setJobType] = useState({ type: job_updated?.jobtypeaccess?.type, access: job_updated?.jobtypeaccess?.access });
-  const [country, setCountry] = useState(job_updated?.location?.country);
-  const [location, setLocation] = useState("KE");
   const [jobMainDoc, setJobMainDoc] = useState(job_updated?.requirements?.document);
   const [jobMainSkill, setJobMainSkill] = useState([...job_updated?.skills]);
-  const [jobSalary, setJobSalary] = useState(job_updated?.salary);
   const [jobEntryType, setJobEntryType] = useState(job_updated?.entry?.level);
   const [jobExperience, setJobExperience] = useState(job_updated?.entry?.years);
   const [webLink, setWebLink] = useState(job_updated?.website);
   const [posterAbout, setPosterAbout] = useState(job_updated?.organisation?.about);
   const [showCustomTitle, setShowCustomTitle] = useState(false);
-  const [fileUpload, setFileUpload] = useState(null);
-  const [filePreview, setFilePreview] = useState(getImageMatch(job_updated?.logo));
-  const [fileLink, setFileLink] = useState("");
-  const [isFileLink, setIsFileLink] = useState(false);
-  const [isFreeLogo, setIsFreeLogo] = useState(true);
-  const [freeLogo, setFreeLogo] = useState(job_updated?.logo);
+  const filePreview=getImageMatch(job_updated?.logo);
+  const freeLogo=job_updated?.logo;
    // To hold user input text for req
   const [reqText, setReqText] = useState("");
    // To hold checked requirements as chips
@@ -95,40 +83,12 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // control showing of logout user session expired
-  const [openAlertLogout, setOpenAlertLogout] = useState(false);
-
   // get redux states
   const { user } = useSelector((state) => state.currentUser);
+  const dispatch=useDispatch()
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
-
-  //   control the country selection
-  const [inputValue, setInputValue] = useState("");
-  const [options, setOptions] = useState(
-    AllCountries.map((val) => {
-      let country = `${val.label} (${val.code})`;
-      return country?.toLowerCase() !== "kenya (ke)" ? country : "";
-    }).sort((a,b)=>a.localeCompare(b))
-  );
-
-  const handleAddNewCountry = () => {
-    if (inputValue && !options.includes(inputValue)) {
-      setOptions([...options, inputValue]);
-      setCountry(inputValue);
-      setInputValue("");
-    }
-  };
-  // clear an country
-  const handleDeleteCountry = () => {
-    setCountry(null);
-  };
-
-  const handleFlagCountry = (option) => {
-    let split_res = option.split(" ");
-    return split_res[split_res.length - 1].substring(1, 3).toLowerCase();
-  };
+  // control showing of logout user session expired
+  const [openAlertLogout, setOpenAlertLogout] = useState(false);
 
   // redux states
   const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
@@ -201,10 +161,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
 
   // handle core missing fields
   const handleEmptyFields = () => {
-    if (!freeLogo && !fileLink && !fileUpload) {
-      setErrorMessage("provide a logo");
-      return false;
-    }
+
     if (jobTitle?.trim() === "") {
       setErrorMessage("job title is missing");
       return false;
@@ -242,19 +199,6 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
     }
     if (jobExperience?.trim() === "") {
       setErrorMessage("provide job years of experience");
-      return false;
-    }
-    if (jobSalary?.trim() === "") {
-      setErrorMessage("provide monthly salary budget");
-      return false;
-    }
-
-    if (county?.trim === "") {
-      setErrorMessage("organization location is incomplete");
-      return false;
-    }
-    if (country?.trim === "") {
-      setErrorMessage("organization location is incomplete");
       return false;
     }
 
@@ -300,12 +244,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
       access: jobType.access,
     },
 
-    logo:
-      !fileLink && !fileUpload
-        ? freeLogo
-        : !fileUpload && !freeLogo
-        ? fileLink
-        : "",
+    logo:freeLogo,
     skills: jobMainSkill,
     requirements: {
       document: jobMainDoc,
@@ -317,13 +256,15 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
       years: jobExperience,
     },
     website: webLink,
-    salary: jobSalary,
+    salary: job_updated?.salary,
     location: {
-      country: location === "KE" ? "Kenya (KE)" : country,
-      state: county,
+      country: job_updated?.location?.country,
+      state: job_updated?.location?.state,
     },
     my_email: user?.email,
     my_phone: user?.phone,
+    whitelist:job_updated?.whitelist
+
   };
   
 
@@ -344,6 +285,9 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
         .then((res) => {          
           // set current job to the one returned from backend
           setMyCurrentJobs(res?.data)
+
+          // show success update
+          dispatch(updateCurrentSuccessRedux({title:'Job Update',message:'Your job has been updated successfully, all the changes are now visible to the potential job applicants.'}))
 
           // close the modal
           setOpenModalJob(false)
@@ -371,7 +315,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
     // handle return width modal
     const handleReturnWidthModal=()=>{
       if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "60%"
+        return "50%"
       } else if (CustomDeviceTablet()){
         return "90%"
       } else if(CustomLandscapeWidest()){
@@ -387,6 +331,8 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
       open={openModalJob}
       sx={{
         marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
+        backdropFilter:'blur(5px)',
+
       }}
       // onClose={(e) => setOpenPostModal(false)}
       aria-labelledby="modal-modal-title"
@@ -394,9 +340,6 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
     >
       <Box
         width={handleReturnWidthModal()}
-        p={1}
-        borderRadius={5}
-        bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
         color={"text.primary"}
         sx={{
           border: isDarkMode && "1px solid gray",
@@ -405,7 +348,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
       >
         <Box
           bgcolor={"background.default"}
-          borderRadius={5}
+          borderRadius={3}
           className="shadow-lg"
         >
           {/* toolbar like box */}
@@ -413,6 +356,13 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
+           borderRadius={3}
+            pt={1}
+            pr={0.8}
+            sx={{
+            background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+            }}
           >
             {/* logo */}
             <Box>
@@ -430,14 +380,15 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
             </Typography>
 
             {/*close icon */}
+              <Tooltip title={"close"}>
             <IconButton
               onClick={handleClosingJobPostModal}
               disabled={isUploading || errorMessage}
+              sx={{border:'1px solid', borderColor:'divider'}}
             >
-              <Tooltip title={"close"}>
-                <Close />
-              </Tooltip>
+                <Close sx={{width:15,height:15}}/>
             </IconButton>
+            </Tooltip>
           </Box>
 
           {/* org name */}
@@ -505,7 +456,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
                     variant="body2"
                     color={"text.secondary"}
                   >
-                    Select relevant job title from the options provided.If none
+                    Select relevant job title from the options provided. If none
                     matches select option (<span className="fw-bold">Zero Matched</span> ) to provide your
                     preferred title for the role.
                   </Typography>
@@ -514,7 +465,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
                   <Box className="w-100 mb-3">
                     <TextField
                       required
-                      disabled={true}
+                      disabled
                       select
                       value={jobTitle}
                       label="Preferred job title"
@@ -550,7 +501,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
                   >
                     <TextField
                       fullWidth
-                      disabled={true}
+                      disabled
                       required
                       value={jobTitle}
                       onChange={(e) => setJobTitle(e.target.value)}
@@ -594,7 +545,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
                 <TextField
                   required
                   select
-                  disabled={isUploading}
+                  disabled
                   value={category}
                   label="Specialisation"
                   fullWidth
@@ -684,8 +635,8 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
                 local storage or link from cloud source.
               </Typography>
 
-              {/* preview the file uploaded from storage */}
-              {(fileUpload || freeLogo) && (
+              {/* preview job logo file */}
+              {filePreview && (
                 <Box display={"flex"} justifyContent={"center"}>
                   <img
                     src={filePreview}
@@ -845,160 +796,6 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
                     )}
                 </TextField>
               </Box>
-
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Select your monthly budget salary for this role, default salary
-                provided is in Kenyan Shillings (KES) and can be switched to
-                Dollars as the currency of payment.
-              </Typography>
-
-              {/* Salary */}
-              <Box className="w-100 mb-3">
-                  <TextField
-                    required
-                    select
-                    disabled={isUploading}
-                    value={jobSalary}
-                    label="Monthly budget salary (USD)"
-                    fullWidth
-                    onChange={(e) => setJobSalary(e.target.value)}
-                  >
-                    {SubsectionJob?.SalaryDollar.map((salary) => (
-                        <MenuItem key={salary} value={salary}>
-                          <small style={{ fontSize: "small" }}>{salary}</small>
-                        </MenuItem>
-                      ))}
-                  </TextField>
-                
-              </Box>
-
-              {/* Location  */}
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Where is your organisation workplace based, default location is
-                Kenya and can be switched to another location supposed you are
-                based in a different country.
-              </Typography>
-
-              <Box className="mb-3">
-                <Box
-                  display={"flex"}
-                  justifyContent={"flex-end"}
-                  mb={1}
-                  alignItems={"center"}
-                >
-                  <LocationControl
-                    setLocation={setLocation}
-                    setCountry={setCountry}
-                    setCounty={setCounty}
-                    isDisabled={isUploading || errorMessage}
-                  />
-                </Box>
-
-                {location === "KE" ? (
-                  <TextField
-                    select
-                    required
-                    disabled={isUploading}
-                    value={county}
-                    label="Location"
-                    fullWidth
-                    onChange={(e) => setCounty(e.target.value)}
-                  >
-                    {CountiesInKenya?.map((county) => (
-                        <MenuItem key={county} value={county}>
-                          <small style={{ fontSize: "small" }}> {county}</small>
-                        </MenuItem>
-                      ))}
-                  </TextField>
-                ) : (
-                  <Stack gap={3}>
-                    <Autocomplete
-                      value={country}
-                      disabled={isUploading}
-                      onChange={(event, newValue) => {
-                        setCountry(newValue);
-                      }}
-                      inputValue={inputValue}
-                      onInputChange={(event, newInputValue) => {
-                        setInputValue(newInputValue);
-                      }}
-                      options={options}
-                      freeSolo
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Select Country"
-                          variant="outlined"
-                          required
-                          fullWidth
-                        />
-                      )}
-                      renderOption={(props, option) => (
-                        <Typography display={"flex"} gap={1} {...props}>
-                          {/* image */}
-                          <img
-                            loading="lazy"
-                            width="20"
-                            srcSet={`https://flagcdn.com/w40/${handleFlagCountry(
-                              option
-                            )}.png 2x`}
-                            src={`https://flagcdn.com/w20/${handleFlagCountry(
-                              option
-                            )}.png`}
-                            alt=""
-                          />
-                          {/* country name */}
-                          {option}
-                        </Typography>
-                      )}
-                      renderTags={() =>
-                        country ? (
-                          <Chip
-                            label={country}
-                            onDelete={handleDeleteCountry}
-                            deleteIcon={<CheckCircle />}
-                          />
-                        ) : null
-                      }
-                      noOptionsText={
-                        <Chip
-                          label={`Add "${inputValue}"`}
-                          onClick={handleAddNewCountry}
-                          icon={<CheckCircle />}
-                          color="primary"
-                          clickable
-                        />
-                      }
-                    />
-                    {/* state or county */}
-
-                    {inputValue && (
-                      <React.Fragment>
-                        <Typography
-                          variant="body2"
-                          gutterBottom
-                          color={"text.secondary"}
-                        >
-                          Which city or state is your organisation based in{" "}
-                          {inputValue}. This helps in providing the most
-                          approximate location to the interested applicants.
-                        </Typography>
-
-                        <TextField
-                          required
-                          id="state-country"
-                          value={county}
-                          label={"City or State"}
-                          disabled={isUploading}
-                          fullWidth
-                          onChange={(e) => setCounty(e.target.value)}
-                        />
-                      </React.Fragment>
-                    )}
-                  </Stack>
-                )}
-              </Box>
-
 
               {/* About your Org */}
               <Typography variant="body2" color={"text.secondary"}>
@@ -1293,12 +1090,11 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
               <Box mb={2} display={"flex"} justifyContent={"center"}>
                 <Button
                   startIcon={<UpdateTwoTone />}
-                  className="w-75 rounded-5 shadow-sm"
+                  className="rounded-5 shadow-sm"
                   variant="contained"
                   color="success"
                   onClick={handleJobPostUpdate}
                   disabled={isUploading || errorMessage}
-                  size="small"
                 >
                   Update This Job Now
                 </Button>

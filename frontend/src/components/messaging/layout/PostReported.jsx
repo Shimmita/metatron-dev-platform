@@ -85,7 +85,9 @@ export default function PostReported({ report }) {
              border: "1px solid",
              borderColor: "divider",
            }}>
-            <ListItemAvatar onClick={handleShowMiniProfile}>
+            <ListItemAvatar 
+            onClick={handleShowMiniProfile}>
+            <Tooltip title='profile' arrow>
             <Avatar
             src={report?.reporter_avatar}
             variant="rounded"
@@ -97,7 +99,8 @@ export default function PostReported({ report }) {
             }}
             alt={report?.name?.split(" ")[0]}
             aria-label="avatar"
-                />
+            />
+            </Tooltip>
             </ListItemAvatar>
             <ListItemText
               primary={

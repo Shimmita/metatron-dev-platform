@@ -21,21 +21,11 @@ export default function AlertJobPreview({
     setOpenAlert(false);
   };
 
-  console.log(job)
 
   //   redux states
   const { isTabSideBar,currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode=currentMode==='dark'
 
-  // handle width of the alert
-  const handleWidthAlert=()=>{
-    if (CustomDeviceTablet() && isTabSideBar) {
-      return "60%"
-    } else if(CustomLandScape()){
-      return "92%"
-    } else if(CustomLandscapeWidest()){
-      return "97.5%"
-    }
-  }
 
   const handleAlertGenWidth=()=>{
       if (CustomDeviceTablet() && isTabSideBar) {
@@ -46,6 +36,7 @@ export default function AlertJobPreview({
         return "0%"
       }
     }
+    
   return (
       <Dialog
         open={openAlert}
@@ -55,11 +46,15 @@ export default function AlertJobPreview({
         aria-describedby="alert-dialog-slide-description"
           sx={{
               marginLeft:handleAlertGenWidth(),
-              width:handleWidthAlert()
           }}
       >
       
-        <DialogContent dividers >
+        <DialogContent dividers 
+        sx={{
+           background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+        }}
+         >
         {/* show layout job hiring */}
      
         {job && (

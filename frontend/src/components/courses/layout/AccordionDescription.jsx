@@ -6,18 +6,17 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import Typography from "@mui/material/Typography";
 import React from "react";
 
-export default function AccordionDescription({ description,isDarkMode }) {
+export default function AccordionDescription({ description,isDarkMode, setOpenAccordion }) {
   const [expanded, setExpanded] = React.useState(false);
 
   const handleExpansion = () => {
     setExpanded((prevExpanded) => !prevExpanded);
+    setOpenAccordion((prev)=>!prev)
   };
   return (
-    <Box sx={{
-      background:isDarkMode && 'black'
-    }}>
       <Accordion
         elevation={0}
+        className="rounded"
         expanded={expanded}
         onChange={handleExpansion}
         slots={{ transition: Fade }}
@@ -31,7 +30,6 @@ export default function AccordionDescription({ description,isDarkMode }) {
                 "& .MuiAccordionDetails-root": {
                   display: "block",
                 },
-                background: isDarkMode && 'black'
               }
             : {
                 "& .MuiAccordion-region": {
@@ -40,7 +38,6 @@ export default function AccordionDescription({ description,isDarkMode }) {
                 "& .MuiAccordionDetails-root": {
                   display: "none",
                 },
-                background: isDarkMode && 'black'
               },
         ]}
       >
@@ -54,10 +51,10 @@ export default function AccordionDescription({ description,isDarkMode }) {
             <Typography variant="body2">Course Description</Typography>
           </Box>
         </AccordionSummary>
-        <AccordionDetails>
+        <AccordionDetails >
           <Typography variant="caption">{description}</Typography>
         </AccordionDetails>
       </Accordion>
-    </Box>
+    
   );
 }

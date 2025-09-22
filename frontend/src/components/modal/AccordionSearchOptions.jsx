@@ -56,6 +56,8 @@ export default function AccordionSearchOptions({
   setCountry,
   entry,
   setJobEntry,
+  setAccess,
+  access,
   datePosted,
   setDatePosted,
   isFetching,
@@ -111,6 +113,23 @@ export default function AccordionSearchOptions({
               onChange={(e) => setJobEntry(e.target.value.trim())}
             >
               {SubsectionJob?.Expert_Level.map((expert_level) => (
+                  <MenuItem key={expert_level} value={expert_level?.split(" ")[0]}>
+                    <small style={{ fontSize: "small" }}>{expert_level}</small>
+                  </MenuItem>
+                ))}
+            </TextField>
+
+
+            {/* accessibility and type */}
+             <TextField
+              select
+              value={access}
+              label="access | type"
+              disabled={isFetching || errorMessage || successMessage}
+              fullWidth
+              onChange={(e) => setAccess(e.target.value.trim())}
+            >
+              {SubsectionJob?.Commitment.map((expert_level) => (
                   <MenuItem key={expert_level} value={expert_level?.split(" ")[0]}>
                     <small style={{ fontSize: "small" }}>{expert_level}</small>
                   </MenuItem>

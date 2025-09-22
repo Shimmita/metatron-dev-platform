@@ -116,6 +116,7 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
         border: "1px solid",
         borderColor: "divider" }}>
           <ListItemAvatar >
+          <Tooltip title='profile' arrow>
             <Avatar
             src={jobFeedBack?.avatar}
             variant="rounded"
@@ -128,6 +129,8 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
             alt={jobFeedBack?.name?.split(" ")[0]}
             aria-label="avatar"
           />
+          </Tooltip>
+
           </ListItemAvatar>
           <ListItemText
             primary={

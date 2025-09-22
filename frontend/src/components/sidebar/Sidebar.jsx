@@ -1,5 +1,4 @@
 import {
-  PeopleRounded,
   Smartphone
 } from "@mui/icons-material";
 import {
@@ -65,17 +64,6 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
     alignItems: "center",
     gap: "1rem",
   });
-
-
-  const Root = styled('div')(({ theme }) => ({
-  width: '100%',
-  ...theme.typography.body2,
-  color: (theme.vars || theme).palette.text.secondary,
-  '& > :not(style) ~ :not(style)': {
-    marginTop: theme.spacing(2),
-  },
-}));
-
 
 
 const Sidebar = () => {
@@ -175,6 +163,7 @@ const Sidebar = () => {
         position={"fixed"}
         width={correctWidthInPercentage()}
         maxHeight={"80vh"}
+        className='shadow'
         sx={{
         
           overflow: "auto",
@@ -190,7 +179,7 @@ const Sidebar = () => {
       {/* section profile and insights */}
         <Box
         bgcolor={"background.default"} 
-        className=" rounded-2"
+        borderRadius={3}
         sx={{ 
           border:isDarkMode && "1px solid",
           borderColor:"divider",
@@ -205,20 +194,21 @@ const Sidebar = () => {
                 <Skeleton variant="rectangular" height={"20vh"} />
               </Box>
             ) : (
+
               <BoxAvatarContent >
-                <Box width={"100%"}>
-                    <Box
-                      display={"flex"}
-                      justifyContent={"center"}
-                      flexDirection={'column'}
-                      alignItems={"center"}
-                      mt={1.2}
-                    >
                     <Box 
                     display={'flex'}
                     alignItems={'center'}
-                    mb={1}
+                    justifyContent={'center'}
+                    py={1.5}
                     gap={2}
+                    width={'100%'}
+                    borderRadius={1}
+                    sx={{
+                      background: !isDarkMode && 
+                    "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+                    }}
+                    
                     >
                     {/* avatar container */}
                       <StyledBadge
@@ -233,8 +223,8 @@ const Sidebar = () => {
                           alt={''}
                           src={user?.avatar}
                           sx={{
-                            width: 70,
-                            height: 70,
+                            width: 80,
+                            height: 80,
                             color: "white",
                             backgroundColor: isDarkMode ? "#42A5F5":"#1976D2",
                             }}
@@ -244,7 +234,7 @@ const Sidebar = () => {
                       <Box >
                         {/* name */}
                           <Typography
-                            variant="body2"
+                            variant={CustomDeviceTablet() ? 'body2':"body1"}
                             fontWeight={"bold"}
                             textTransform={"uppercase"}
                             color={isDarkMode ? "whitesmoke" : "inherit"}
@@ -254,7 +244,7 @@ const Sidebar = () => {
 
                           {/* specialization */}
                           <Typography
-                           variant="caption"
+                          variant="caption"
                           textTransform={"capitalize"}
                           >
                           {user?.specialisationTitle}
@@ -266,84 +256,70 @@ const Sidebar = () => {
                           variant="caption" 
                           sx={{ display:'flex',alignItems:'center', gap:1 }}
                           >
-                           {user?.county} 
+                          {user?.county} 
                            {/* divider */}
-                           <Divider 
-                           component={'div'} 
-                           className="py-1"
-                           orientation="vertical"/>
+                          <Divider 
+                          component={'div'} 
+                          className="py-1"
+                          orientation="vertical"/>
 
                             {CustomCountryName(user?.country)}
                           </FormHelperText>
                           </Box>
 
+                          {/* friends */}
+                          <Box>
+                          <FormHelperText
+                          variant="caption" 
+                          sx={{ display:'flex',alignItems:'center', gap:1 }}
+                          >
+                          Followers
+                            {/* divider */}
+                          <Divider 
+                          component={'div'} 
+                          className="py-1"
+                          orientation="vertical"/>
+
+                          {user?.network_count}
+                          </FormHelperText>
+                          </Box>
+
                           {/* skills */}
-                           <Box 
-                           mt={0.5}
-                           display={"flex"} 
-                           alignItems={'center'}
-                           gap={1}
-                           justifyContent={"flex-start"}>
+                            <Box 
+                            mt={0.8}
+                            display={"flex"} 
+                            alignItems={'center'}
+                            gap={1}
+                            justifyContent={"flex-start"}>
                            {/* skills */}
                           <AvatarGroup max={user?.selectedSkills?.length}>
                             {/* loop through the skills and their images matched using custom fn */}
                             {user?.selectedSkills?.map((skill, index) => (
                               <Tooltip title={skill} arrow  key={index}>
-                                <Avatar
+                                {CustomDeviceTablet () ? (
+                                  <Avatar
                                   alt={skill}
                                   className="border"
-                                  sx={{ width: 22, height: 22 }}
+                                  sx={{ width: 25, height: 25 }}
                                   src={getImageMatch(skill)}
                                 />
+                                ):(
+                                  <Avatar
+                                  alt={skill}
+                                  className="border"
+                                  sx={{ width: 28, height: 28 }}
+                                  src={getImageMatch(skill)}
+                                />
+                                )}
                               </Tooltip>
                             ))}
                           </AvatarGroup>
-                           {/* divider */}
-                           <Divider 
-                           component={'div'} 
-                           className="py-1"
-                           orientation="vertical"/>
-
-                           <Box
-                           justifyContent={'center'}
-                           alignItems={'center'}
-                           gap={0.8}
-                           color={'text.secondary'}
-                           display={'flex'}>
-                           {/* connections count */}
-                           <Typography 
-                           pt={0.5}
-                           variant="caption"
-                           >
-                           {user?.network_count}
-                           </Typography>
-                          
-                           {/* people icon */}
-                           <PeopleRounded
-                            sx={{ width:20,height:20}}/>
-                           </Box>
                         </Box>
                       </Box>
                       </Box>
 
-                     {/* divider */}
-                      <Root className="my-2 px-3">
-                      <Divider variant="middle" className="px-3">
-                      <Box 
-                      display={'flex'} 
-                      justifyContent={'center'}>
-                      <Typography 
-                      fontWeight={'bold'}
-                      color={'primary'}
-                      variant="caption"
-                      >
-                      Top Insights
-                      </Typography>
-                      </Box>
-                      </Divider>
-                      </Root>
-                    <Box 
-                    mb={1}
+                  
+                    <Box
                     display={"flex"} 
                     justifyContent={"center"} >
                       {!isFetching && 
@@ -356,28 +332,25 @@ const Sidebar = () => {
 
                   {/* section more insights */}
                   <Box
-                  mt={0.5}
-                  p={0.2}
+                  mt={1}        
                   >
-                  <Root className="mt-1">
-                    <Divider>
-                    <Box display={'flex'} justifyContent={'center'}>
-                    <Typography 
-                    fontWeight={'bold'}
-                    color={'primary'}
-                    variant="caption"
-                    >
-                    Top Tools
-                    </Typography>
-                    </Box>
-                    </Divider>
-                  </Root>
-                  
+                  <Box
+                  display={'flex'}
+                  justifyContent={'center'} 
+                  >
+                  <Typography 
+                  variant="caption"
+
+                  >
+                  Top Tools
+                  </Typography>
+                  </Box>
+
                   {/* Tools */}
                   <Box
                   alignItems={'center'}
                   gap={2}
-                  mt={0.5}
+                  mt={1}
                   justifyContent={'center'}
                   display={'flex'}>
                 {dataTools.map(tool=>(
@@ -387,14 +360,15 @@ const Sidebar = () => {
                   flexDirection={'column'}
                   display={'flex'}>
                   {/* avatar */}
+                  <Tooltip title={tool.title} arrow>
                   <Avatar 
                   sx={{ width:28,height:28}}
                   src={getImageMatch(tool.title)}
                   />
-
+                  </Tooltip>
                   {/* title */}
                   <Box 
-                  pb={0.2}
+                  pb={1}
                   display={'flex'}
                   justifyContent={'center'}>
                     <FormHelperText 
@@ -405,10 +379,8 @@ const Sidebar = () => {
                 ))}
                   </Box>
                   </Box>
+              </BoxAvatarContent>
 
-                </Box>
-              </Box>
-        </BoxAvatarContent>
             )}
           </Box>
         </Box>

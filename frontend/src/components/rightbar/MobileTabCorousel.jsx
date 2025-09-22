@@ -37,14 +37,14 @@ const MobileTabCorousel = () => {
   return (
     <Box
      color={"text.primary"}
-     className={'rounded'}
+     className={'rounded shadow-sm'}
      sx={{ 
       border:isDarkMode && "1px solid",
       borderColor:"divider",
       }}
      >
       <Box
-       className={'rounded'}
+       className={'rounded shadow-sm'}
        bgcolor={"background.default"} 
       >
         <Box>

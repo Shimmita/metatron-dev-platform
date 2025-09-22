@@ -1,4 +1,4 @@
-import { LockRounded, OpenInBrowser, Verified } from "@mui/icons-material";
+import { LockRounded, TravelExploreRounded, Verified } from "@mui/icons-material";
 import {
   Avatar,
   AvatarGroup,
@@ -136,7 +136,6 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                     <Typography ml={1} variant="caption" color={"text.secondary"}>
                       {handleCountryName(jobTop && jobTop)}
                     </Typography>
-                   
                   </Box>
 
                   {/* job skills */}
@@ -148,30 +147,13 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                           <Avatar
                             alt={skill}
                             className="border"
-                            sx={{ width: 27, height: 27 }}
+                            sx={{ width: 28, height: 28 }}
                             src={getImageMatch(skill)}
                           />
                         </Tooltip>
                       ))}
                     </AvatarGroup>
                   </Box>
-
-                  {/* description if is job belongs to the current user */}
-                {isMyJob && (
-                  <Box 
-                  display={'flex'}
-                  justifyContent={'center'}
-                  mt={1}
-                  >
-                  <Typography 
-                  textAlign={'center'}
-                  variant="caption"
-                  sx={{ color:'text.secondary', 
-                  textTransform:'lowercase' }}> - you posted this job -
-                  </Typography>
-                  </Box>
-                )}
-
                 </Box>
               }
             />
@@ -191,8 +173,8 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                   size="small"
                   onClick={handleOpeningApplyJob}
                   variant="contained"
-                  startIcon={isDeactivated || isMaxApplicants ? <LockRounded/>: !(jobTop?.website==="") ? <OpenInBrowser /> :<Verified />}
-                  disabled={jobTop?.currentUserApplied||isDeactivated || isMyJob||isMaxApplicants}
+                  startIcon={isDeactivated || isMaxApplicants ? <LockRounded/>: !(jobTop?.website==="") ? <TravelExploreRounded /> :<Verified />}
+                  disabled={jobTop?.currentUserApplied||isDeactivated ||isMaxApplicants}
                   sx={{
                     textTransform: "capitalize",
                     borderRadius: "20px",
@@ -224,6 +206,8 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
         salary={jobTop?.salary}
         skills={jobTop?.skills}
         location={jobTop?.location}
+        isMyJob={isMyJob}
+        whitelist={jobTop?.whitelist}
       />}
     </React.Fragment>
   );

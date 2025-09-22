@@ -1,4 +1,4 @@
-import AiLogo from "../../images/Ai.png";
+import AiLogo from "../../images/ai.png";
 import AjaxLogo from "../../images/ajax.png";
 import AngularLogo from "../../images/angular.png";
 import ApacheSparkLogo from "../../images/apache_spark.png";
@@ -138,6 +138,7 @@ import Bitcoin from "../../images/bitcoin.png";
 import Blender from "../../images/blender.png";
 import Blueprint from "../../images/blueprint.jpeg";
 import Buddy from "../../images/budy.png";
+import Capacitor from "../../images/capacitor.png";
 import Cassandra from "../../images/cassandra.png";
 import Cayley from "../../images/cayley.png";
 import CloudGenral from "../../images/cloud.png";
@@ -171,6 +172,7 @@ import FoundationDB from "../../images/foundationDB.png";
 import Framer from "../../images/framer.png";
 import Framework7 from "../../images/framework7.png";
 import GenralDB from "../../images/genralDB.jpeg";
+import GitHub from "../../images/github.png";
 import GoogleBigTable from "../../images/google_bigtable.png";
 import GoogleCloudBuild from "../../images/google_cloud_build.png";
 import GoogleCloudSQL from "../../images/google_cloud_sql.png";
@@ -295,6 +297,7 @@ import WxPy from "../../images/wxPython.jpeg";
 import YugaByteDB from "../../images/yugaByte.png";
 import Zustand from "../../images/zustand.png";
 
+
 const imageMap = {
   Zustand: Zustand,
   "YugaByte DB": YugaByteDB,
@@ -368,11 +371,11 @@ const imageMap = {
   "Digital Ocean": DigitalOCean,
   ObjectDB: ObjectDB,
   "Cuda-Nvidia": Nvidia,
-  Nuxtjs: NuxtJs,
+  Nuxt: NuxtJs,
   NuoDB: NuoDB,
   NLTK: NLTK,
   NLP: NLP,
-  Nextjs: Nextjs,
+  Next: Nextjs,
   Netlify: Netlify,
   Nestjs: Nestjs,
   "Neo4j DB": Neo4JDB,
@@ -417,6 +420,7 @@ const imageMap = {
   "Google Cloud Build": GoogleCloudBuild,
   "Google Spanner": GoogleCloudSpanner,
   "Google Bigtable": GoogleBigTable,
+  "Google Cloud Platform":GCPLogo,
   Database: GenralDB,
   Framework7: Framework7,
   Framer: Framer,
@@ -465,7 +469,7 @@ const imageMap = {
   Aframe: Aframe,
   "Alchemy Web3": Alchemy,
   Algolia: Algolia,
-  Alpinejs: Alpinejs,
+  Alpine: Alpinejs,
   Ansible: Ansible,
   "Apache Drill": ApacheDrill,
   "Apache Ignite": ApacheIgnite,
@@ -486,6 +490,7 @@ const imageMap = {
   "Azure DevOps": AzureDevOps,
   "Amazon DynamoDB": DynamoDBLogo,
   Balsamiq: Balsmiq,
+  Capacitor:Capacitor,
   // old
   Ruby: RubyLogo,
   Android: MobileAndroid,
@@ -594,10 +599,28 @@ const imageMap = {
   WinForms: WinformsLogo,
   WordPress: WordPressLogo,
   Xamarin: XamarinLogo,
+  "GitHub":GitHub,
+  "Containers":KuberLogo,
+  "Data Analyst":PowerBi,
+  "Data Science":DataScience,
+  "Desktop":ElectronJsLogo,
+  "Game":UnrealEngineLogo,
+  "HTML and CSS":HTMLCSSLogo,
+  "Mobile":MobileAndroid,
+  "Computer Networks":NetworkingLogo,
+  "Golang":GoLanguage,
+  "React Native":ReactNative,
+  "Python Programming Community":PythonLogo,
+  "PHP Programming Community":PHPLogo,
+  "React and Next Community":ReactLogo,
+  "Angular Community":AngularLogo,
+  "Svelte Community":Svelte,
+  "Vue Community":VueLogo,
+  "Assembly Community":AssemlyLang,
 };
 
 // Utility to get the corresponding image
-export const getImageMatch = (title = "", isAll = false) => {
+export const getImageMatch = (title = "", isAll = false, isAny=false) => {
   if (isAll) {
     const matchingKey = Object.keys(imageMap)
       .sort()
@@ -606,10 +629,23 @@ export const getImageMatch = (title = "", isAll = false) => {
       .sort()
       .map((key) => imageMap[key]);
     return [matchingKey, values];
-  } else {
+  } else if (isAny) {
+     const matchingKey = Object.keys(imageMap).filter((key)=>{
+      let tempKey=''
+      if (title.includes(key)) {
+        tempKey=key
+      }
+
+      return tempKey
+    })
+    // Default logo if no match
+    return matchingKey ? imageMap[matchingKey] : CodingGeneral;
+  }
+  else {
     const matchingKey = Object.keys(imageMap).find(
       (key) => title?.trim()?.toLowerCase() === key?.trim()?.toLowerCase()
     );
-    return matchingKey ? imageMap[matchingKey] : CodingGeneral; // Default logo if no match
+    // Default logo if no match
+    return matchingKey ? imageMap[matchingKey] : CodingGeneral;
   }
 };

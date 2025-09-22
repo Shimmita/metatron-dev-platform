@@ -1,3 +1,4 @@
+import { useTheme } from "@emotion/react";
 import {
   Close,
   DocumentScannerRounded,
@@ -11,11 +12,13 @@ import {
   Box,
   CircularProgress,
   Collapse,
+  FormHelperText,
   IconButton,
   MenuItem,
   Stack,
   TextField,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -27,9 +30,6 @@ import Slide from "@mui/material/Slide";
 import axios from "axios";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -41,6 +41,9 @@ const reporting_about_array = [
   "Phishing and fraudulent",
 ].sort();
 
+  const descriptionMax = 200;
+
+
 export default function AlertReportPost({
   openAlertReport,
   setOpenAlertReport,
@@ -49,11 +52,13 @@ export default function AlertReportPost({
 }) {
   const [reportAbout, setReportAbout] = useState("");
   const [description, setDescription] = useState("");
-
-  const [isFetching, setIsFetching] = useState(false);
   const [message, setMessage] = useState("");
+  const [supportLink,setSupportLink]=useState("")
+  const [isFetching, setIsFetching] = useState(false);
 
-  const descriptionMax = 100;
+    // smartphones and below
+  const theme=useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleClose = () => {
     if (isFetching || message) {
@@ -72,10 +77,9 @@ export default function AlertReportPost({
     handleClose();
   };
   // redux states
-  const { isTabSideBar } = useSelector((state) => state.appUI);
-
-  // axios default credentials
-  axios.defaults.withCredentials = true;
+  const { isTabSideBar,currentMode } = useSelector((state) => state.appUI);
+  
+  const isDarkMode=currentMode==='dark'
 
   const reportObject = {
     postId: post?._id,
@@ -87,6 +91,7 @@ export default function AlertReportPost({
     reporter_avatar: currentUser?.avatar,
     report_title: reportAbout,
     report_message: description,
+    reporter_link:supportLink
   };
 
   //   handle submission of report
@@ -135,15 +140,6 @@ export default function AlertReportPost({
     setMessage("");
   };
 
-  const handleReportPostWidth=()=>{
-    if (CustomDeviceTablet() && isTabSideBar) {
-      return "36%"
-    } else if(CustomLandScape()){
-      return "-1%"
-    } else if(CustomLandscapeWidest()){
-      return "0%"
-    }
-  }
 
   return (
       <Dialog
@@ -153,36 +149,60 @@ export default function AlertReportPost({
         aria-describedby="alert-dialog-slide-description"
         sx={{
           backdropFilter:'blur(5px)',
-          marginLeft:handleReportPostWidth()
         }}
       >
         <Stack mb={1}>
           <DialogTitle
             variant="body2"
             fontWeight={"bold"}
-            gutterBottom
             display={"flex"}
             gap={1}
             alignItems={"center"}
+            sx={{
+              background: !isDarkMode && 
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+            }}
           >
             <WarningRounded />
             Post Reporting Center
           </DialogTitle>
 
           {/* post title */}
-          <Box display={"flex"} justifyContent={"center"}>
+          <Box display={"flex"} mb={1} justifyContent={"center"} >
             <Typography variant="body2" fontWeight={'bold'}>{post?.post_title}</Typography>
           </Box>
+
+           {/* helper text about report count */}
+          <Box display={message? 'none':'flex'} justifyContent={'center'} >
+          <FormHelperText > post has {post?.report_count} {post?.report_count===1 ? "report":"reports"} so far</FormHelperText>
+          </Box>
+
         </Stack>
+
         <form onSubmit={handleSubmitReport}>
-          <DialogContent dividers>
+          <DialogContent 
+          dividers 
+          sx={{ 
+          maxWidth:500,
+          maxHeight:isMobile ? '65vh':"60vh",
+          overflow: "auto",
+          // Hide scrollbar for Chrome, Safari and Opera
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+          // Hide scrollbar for IE, Edge and Firefox
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
+          }}
+          >
+         
             {/* show message if present */}
             {message && (
                 <Collapse in={message || false}>
                   <Alert
                     severity="info"
                     onClose={handleClose}
-                    className="rounded"
+                    className="rounded mt-1"
                     action={
                       <IconButton
                         aria-label="close"
@@ -200,12 +220,12 @@ export default function AlertReportPost({
             )}
 
             <Box mb={1} mt={message && 1}>
-              <DialogContentText>
-                Metatron has provided default issues facing digital content
-                select the most appropriate.
+              <DialogContentText variant="body2">
+                Metatron Developer Platform has provided default issues facing digital content
+                select the most appropriate option.
               </DialogContentText>
             </Box>
-            <Stack gap={3}>
+            <Stack gap={2}>
               {/* report option */}
               <TextField
                 required
@@ -243,8 +263,16 @@ export default function AlertReportPost({
                   ))}
               </TextField>
 
-              {/*description why the reporting */}
+              {/* support link */}
+               <TextField
+                placeholder="https://www.supportive_link.com"
+                label={`supportive link`}
+                value={supportLink}
+                disabled={isFetching || message}
+                onChange={(e) => setSupportLink(e.target.value)}
+              />
 
+              {/*description why the reporting */}
               <TextField
                 placeholder="write description here ..."
                 label={`description ${descriptionMax - description.length}`}
@@ -252,7 +280,7 @@ export default function AlertReportPost({
                 multiline
                 required
                 disabled={isFetching || message}
-                rows={2}
+                rows={isMobile ? 6 :5}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </Stack>

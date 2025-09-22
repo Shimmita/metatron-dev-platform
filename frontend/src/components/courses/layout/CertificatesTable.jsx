@@ -49,7 +49,7 @@ export default function CertificatesTable({certsData}) {
 
   return (
     <Paper elevation={0} 
-    className={'rounded'}
+    className={'rounded shadow'}
     sx={{ 
     maxWidth: window.screen.availWidth, 
     maxHeight:!CustomDeviceIsSmall() ? '75vh':undefined,
@@ -60,6 +60,7 @@ export default function CertificatesTable({certsData}) {
 
     <Box 
     width={'100%'} 
+    mt={1}
     display={'flex'} 
     justifyContent={'space-between'}
      alignItems={'center'} gap={2}>
@@ -81,7 +82,7 @@ export default function CertificatesTable({certsData}) {
          textAlign={'center'} variant='caption'
          mt={1} 
          sx={{ color:'text.secondary' }}> 
-          {certsData.length} {certsData?.length>1 ? "Certificates":"Certificate"}
+          You Earned {certsData.length} {certsData?.length>1 ? "Certificates":"Certificate"}
         </Typography>
 
       </Box>

@@ -103,6 +103,7 @@ export default function PostReaction({ reaction }) {
              borderColor: "divider",
            }}>
             <ListItemAvatar onClick={handleShowMiniProfile}>
+            <Tooltip title='profile' arrow> 
             <Avatar
                  variant="rounded"
                   src={reaction?.avatar}
@@ -115,6 +116,7 @@ export default function PostReaction({ reaction }) {
                   alt={reaction?.name?.split(" ")[0]}
                   aria-label="avatar"
                 />
+                </Tooltip>
             </ListItemAvatar>
             <ListItemText
               primary={
@@ -178,10 +180,10 @@ export default function PostReaction({ reaction }) {
                       {reaction?.title}
                       <br/>
                       <Typography variant="caption" color={"text.secondary"}>
-                        {CustomCountryName(reaction?.country)} | {reaction?.county}
+                        {reaction?.county} | {CustomCountryName(reaction?.country)}
                       </Typography>
                       <br/>
-                       {reaction?.message?.toLowerCase().includes("liked") && (
+                      {reaction?.message?.toLowerCase().includes("liked") && (
                         <FavoriteRounded
                           sx={{ width: 14, height: 14, }}
                           color="primary"

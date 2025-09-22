@@ -3,7 +3,6 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import { styled } from "@mui/material/styles";
-import React from "react";
 
 const BpIcon = styled("span")(({ theme }) => ({
   borderRadius: "50%",
@@ -55,7 +54,7 @@ const BpCheckedIcon = styled(BpIcon)({
   },
 });
 
-// Inspired by blueprintjs
+// Inspired by blue-print
 function BpRadio(props) {
   return (
     <Radio
@@ -73,16 +72,33 @@ export default function LocationControl({
   setCounty,
   setCountry,
   isDisabled = false,
+  isWhiteList=false
 }) {
   const handleCountry = (e) => {
     setLocation(e.target.value);
     // clear current country and county
     setCountry("");
+    
+    if (!isWhiteList) {
     setCounty("");
+    }
+  
   };
   return (
     <FormControl disabled={isDisabled}>
-      <RadioGroup
+      {isWhiteList ? (
+        <RadioGroup
+        row
+        defaultValue="All"
+        aria-labelledby="customized-radios-country-whitelist"
+        name="customized-radios"
+        onChange={handleCountry}
+      >
+        <FormControlLabel value="All" control={<BpRadio />} label="All" />
+        <FormControlLabel value="Specific" control={<BpRadio />} label="Specific" />
+      </RadioGroup>
+      ):(
+        <RadioGroup
         row
         defaultValue="KE"
         aria-labelledby="customized-radios-currency"
@@ -92,6 +108,7 @@ export default function LocationControl({
         <FormControlLabel value="KE" control={<BpRadio />} label="KE" />
         <FormControlLabel value="Other" control={<BpRadio />} label="Other" />
       </RadioGroup>
+      )}
     </FormControl>
   );
 }
