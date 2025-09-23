@@ -5,7 +5,7 @@ import CourseIcon from '../utilities/CourseIcon';
 import CustomDeviceIsSmall from '../utilities/CustomDeviceIsSmall';
 import CustomLandscapeWidest from '../utilities/CustomLandscapeWidest';
 import { getImageMatch } from '../utilities/getImageMatch';
-import { AndroidRounded, Apple } from '@mui/icons-material';
+import { AndroidRounded, Apple, SmartphoneRounded } from '@mui/icons-material';
 
 
 export default function StepperStats({dataInsights}) {
@@ -35,15 +35,12 @@ export default function StepperStats({dataInsights}) {
           gap={1}
           alignItems={'center'}
           >
-          
-          {insight.title.split(" ")[0].includes("Multi") ?
+
+          {insight.title.split(" ")[0].includes("Multi") || 
+          insight.title.split(" ")[0].includes("Native") ?
           <CourseIcon option={insight.title.split(" ")[0]}/> :
           insight.title.split(" ")[0].includes("Backend")  ?
-          <CourseIcon option={insight.title.split(" ")[0]}/>:
-          insight.title.split(" ")[0].includes("Android") ?
-          <AndroidRounded sx={{width:24,height:24}}/> :
-          insight.title.split(" ")[0].includes("IOS") ?
-          <Apple sx={{width:24,height:24}}/> : 
+          <CourseIcon option={insight.title.split(" ")[0]}/>: 
           <Avatar 
           sx={{width:24,height:24}} 
           src={getImageMatch(insight.title.split(" ")[0])} alt=''/>  }

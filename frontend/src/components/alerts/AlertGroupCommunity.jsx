@@ -203,7 +203,8 @@ export default function AlertGroupCommunity({
   return (
       <Dialog
         open={openGroup && !isActive}
-        fullScreen={CustomDeviceIsSmall()||focusedGroup}
+        fullScreen
+        fullWidth
         TransitionComponent={Transition}
         keepMounted
         aria-describedby="alert-dialog-slide-description"
@@ -283,7 +284,6 @@ export default function AlertGroupCommunity({
         <DialogContent 
         dividers
         sx={{
-          maxWidth:600,
           overflow: "auto",
           maxHeight:'80vh',
           // Hide scrollbar for Chrome, Safari and Opera

@@ -172,7 +172,7 @@ export default function ParentNotifMessageDrawer() {
                     justifyContent={"center"}
                     alignItems={"center"}
                   >
-                    <CircularProgress/>
+                    <CircularProgress className="mt-2" size={25}/>
                   </Box>
                 </Box>
               }
