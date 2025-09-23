@@ -126,14 +126,27 @@ export default function AlertProfileCompletion({
 
   // handle click complete profile registration
   const handleCompleteRegistration = () => {
-    const formData = new FormData();
-    formData.append("image", avatarFile);
-    formData.append("user", JSON.stringify(user));
+
+    // if no about set error
+    if (!about) {
+      setErrorPosting('Please provide a brief about yourself!')
+      return
+    }
+
+    // update the about and avatar attribute
+    user.about=about
+
+    console.log(user.about)
+
+    // will be update in the backend
+    user.avatar=""
 
     // show progress user is registering
     setIsPosting(true);
-    // add the avatar property on the user
-    user.avatar = avatarPath;
+
+    const formData = new FormData();
+    formData.append("image", avatarFile);
+    formData.append("user", JSON.stringify(user));
 
     // post to the backend using axios for tokenized user using google provider
     axios

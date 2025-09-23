@@ -111,15 +111,15 @@ const RegistrationAuth = () => {
   // zero match
   useEffect(() => {
     if (specialisationTitle === "Zero Matched") setOpenAlert(true);
-  }, [specialisationTitle]);
+  }, [specialisationTitle,name]);
 
   const handleMissingField = () => {
+
     if (
-      name.trim()?.split(" ").length < 1 ||
-      name.trim()?.split(" ").length > 3
+    name.trim().split(" ").length!==2
     ) {
       setTitleAlert("Name Field");
-      setMissingFieldMessage("Please provide two names");
+      setMissingFieldMessage("Please provide two names in order to complete your profile");
       setOpenAlertGenral(true);
       return true;
     }
@@ -377,6 +377,7 @@ const RegistrationAuth = () => {
                       id="outlined-adornment-password"
                       onChange={(e) => setPassword(e.target.value)}
                       type={showPassword ? "text" : "password"}
+                      inputMode="text"
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
