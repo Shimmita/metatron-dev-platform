@@ -16,7 +16,6 @@ import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import GroupCommunityDetails from "../group/GroupCommunityDetails";
 import GroupCommunityMobile from "../group/GroupCommunityMobile";
 import GroupCommunityTab from "../group/GroupCommunityTab";
-import CustomDeviceIsSmall from '../utilities/CustomDeviceIsSmall';
 import { getImageMatch } from "../utilities/getImageMatch";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;

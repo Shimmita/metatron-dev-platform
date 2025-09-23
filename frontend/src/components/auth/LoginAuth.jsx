@@ -25,7 +25,7 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import React, { lazy, useState } from "react";
+import React, { lazy, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
@@ -45,25 +45,27 @@ const LoginAuth = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isVerifyButton,setIsVerifyButton]=useState(false)
-  // global  state from redux
-  const {currentMode } = useSelector((state) => state.appUI);
+  const [isVerifyButton, setIsVerifyButton] = useState(false);
+
+  // redux state
+  const { currentMode } = useSelector((state) => state.appUI);
   const { authMessage } = useSelector((state) => state.currentAuthMessage);
-  // update is dark const
-  const isDarkMode=currentMode==='dark'
+
+  const isDarkMode = currentMode === "dark";
 
   const [messageGeneral, setMessageGeneral] = useState("");
   const [isLogin, setIsLogin] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // control showing of terms of service and privacy policy
+
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMore = Boolean(anchorEl);
   const handleClickMore = (event) => {
@@ -73,68 +75,75 @@ const LoginAuth = () => {
     setAnchorEl(null);
   };
 
-  // UI theme dark light tweaking effect
   const handleShowDarkMode = () => {
-    // update the redux theme boolean state
     dispatch(resetDarkMode());
   };
 
-  
-
   const handleLogin = async () => {
-    const user = {
-      email,
-      password,
-    };
-    // login user without provider
+    const user = { email, password };
     setIsLogin(true);
     axios
-      .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signin/personal`, user,{withCredentials:true})
+      .post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signin/personal`,
+        user,
+        { withCredentials: true }
+      )
       .then((res) => {
-        const user_data=res.data
-        // server returns user object if their email verified else only email is sent
+        const user_data = res.data;
         if (user_data?.email_verified) {
-        // populating the redux for the logged in user
-        dispatch(updateUserCurrentUserRedux(res.data));
-        }else{
-          navigate(`/auth/verification?${user_data}`)
-        }       
+          dispatch(updateUserCurrentUserRedux(res.data));
+        } else {
+          navigate(`/auth/verification?${user_data}`);
+        }
       })
       .catch((err) => {
         if (err?.code === "ERR_NETWORK") {
           setMessageGeneral("server unreachable");
           return;
         }
-        if (err?.response?.data==="verification code sent to your email") {
-          setIsVerifyButton(true)
+        if (err?.response?.data === "verification code sent to your email") {
+          setIsVerifyButton(true);
         }
-
         setMessageGeneral(err?.response?.data);
       })
       .finally(() => {
-        setIsLogin(false);      
+        setIsLogin(false);
       });
   };
 
-  // handle clearing of auth message from redux
-  const handleClearAuthMessage = async () => {
-    setMessageGeneral("");
-    // dispatch clear auth message
+  const handleClearAuthMessage = React.useCallback(async () => {
     dispatch(resetClearCurrentAuthMessage());
-    // purge for complete clearance
     try {
       await persistor.purge();
     } catch (error) {
-      // something went wrong during the purge process
       console.log(error.message);
     }
+  }, [dispatch]);
+
+  const handleEmailVerification = () => {
+    navigate(`/auth/verification?${email}`);
   };
 
-// handle navigate to complete verification of email
-const handleEmailVerification=()=>{
-  navigate(`/auth/verification?${email}`)
-}
- 
+  // auto clear general messages after 3 seconds
+  useEffect(() => {
+    if (messageGeneral) {
+      const timer = setTimeout(() => {
+        setMessageGeneral("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [messageGeneral]);
+
+  // auto clear redux auth messages after 3 seconds
+  useEffect(() => {
+    if (authMessage) {
+      const timer = setTimeout(() => {
+        handleClearAuthMessage();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [authMessage, handleClearAuthMessage]);
+
   return (
     <Box
       display={"flex"}
@@ -152,11 +161,7 @@ const handleEmailVerification=()=>{
           border: isDarkMode && "1px solid",
           borderColor: isDarkMode && "divider",
           overflow: "auto",
-          // Hide scrollbar for Chrome, Safari and Opera
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          // Hide scrollbar for IE, Edge and Firefox
+          "&::-webkit-scrollbar": { display: "none" },
           msOverflowStyle: "none",
           scrollbarWidth: "none",
           opacity: openMore ? "0.7" : undefined,
@@ -168,13 +173,7 @@ const handleEmailVerification=()=>{
             <Box>
               <Tooltip arrow title={isDarkMode ? "Light" : "Dark"}>
                 <IconButton onClick={handleShowDarkMode}>
-                  {isDarkMode ? (
-                    <DarkModeRounded
-                      sx={{ width: 26, height: 26 ,}}
-                    />
-                  ) : (
-                    <DarkModeRounded sx={{ width: 26, height: 26 }} />
-                  )}
+                  <DarkModeRounded sx={{ width: 26, height: 26 }} />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -195,23 +194,14 @@ const handleEmailVerification=()=>{
               </Tooltip>
             </Box>
 
-            {/* menu more*/}
             <Menu
               id="basic-menu"
               anchorEl={anchorEl}
               open={openMore}
               onClose={handleClose}
-              MenuListProps={{
-                "aria-labelledby": "more-button",
-              }}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
+              MenuListProps={{ "aria-labelledby": "more-button" }}
+              anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
               <OptionsMoreLogin
                 handleClose={handleClose}
@@ -221,16 +211,16 @@ const handleEmailVerification=()=>{
               />
             </Menu>
           </Box>
-          <Box >
+
+          <Box>
             <Box display={"flex"} justifyContent={"center"}>
-              {/* logo */}
               <Avatar alt={"logo"} sx={{ width: 60, height: 60 }} src={logo} />
             </Box>
             <Box mb={3}>
               <Typography
                 textAlign={"center"}
                 fontWeight={"bold"}
-                bgcolor={!isDarkMode && "background.default"} 
+                bgcolor={!isDarkMode && "background.default"}
                 textTransform={"uppercase"}
                 variant={CustomDeviceSmallest() ? "body1" : "h6"}
                 gutterBottom
@@ -252,29 +242,30 @@ const handleEmailVerification=()=>{
                   variant={CustomDeviceSmallest() ? "caption" : "body2"}
                   color={"text.secondary"}
                 >
-                 Ultimate Tech Platform
+                  Ultimate Tech Platform
                 </Typography>
                 <WbIncandescentRounded
                   sx={{ width: 18, height: 18, color: "orange" }}
                 />
               </Box>
-
             </Box>
           </Box>
+
           <Box>
-            {/* displays error when login is unsuccessful */}
+            {/* general messages */}
             {messageGeneral && (
               <Box display={"flex"} justifyContent={"center"} mb={1}>
-                <Collapse in={messageGeneral || false}>
+                <Collapse in={!!messageGeneral}>
                   <Alert
                     className="rounded-5"
                     severity="info"
-                    onClick={() => setMessageGeneral("")}
+                    onClose={() => setMessageGeneral("")} // ✅ close button clears immediately
                     action={
                       <IconButton
                         aria-label="close"
                         color="inherit"
                         size="small"
+                        onClick={() => setMessageGeneral("")}
                       >
                         <Close fontSize="inherit" />
                       </IconButton>
@@ -286,21 +277,23 @@ const handleEmailVerification=()=>{
                 </Collapse>
               </Box>
             )}
-            {/* display when is server auth messages session and server maintenance */}
+
+            {/* redux auth messages */}
             {authMessage && (
               <Box display={"flex"} justifyContent={"center"}>
-                <Collapse in={authMessage || false}>
+                <Collapse in={!!authMessage}>
                   <Alert
                     className="rounded-5"
                     severity={
                       authMessage?.includes("server") ? "warning" : "success"
                     }
-                    onClick={handleClearAuthMessage}
+                    onClose={handleClearAuthMessage} // ✅ close button clears immediately
                     action={
                       <IconButton
                         aria-label="close"
                         color="inherit"
                         size="small"
+                        onClick={handleClearAuthMessage}
                       >
                         <Close fontSize="inherit" />
                       </IconButton>
@@ -355,11 +348,12 @@ const handleEmailVerification=()=>{
             </Box>
 
             {/* verify certificate */}
-            <Box 
-            display={isLogin ? "none":"flex"} 
-            justifyContent={"center"} 
-            alignItems={'center'}
-            mb={2}>
+            <Box
+              display={isLogin ? "none" : "flex"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              mb={2}
+            >
               <Typography
                 variant="body2"
                 color={"text.secondary"}
@@ -367,11 +361,7 @@ const handleEmailVerification=()=>{
                 gap={1}
                 alignItems={"center"}
               >
-                 <Typography
-                    variant="body2"
-                  >
-                  Verify Course Cert
-                  </Typography>
+                <Typography variant="body2">Verify Course Cert</Typography>
                 <Link to={"/cert/verify"} className="text-decoration-none">
                   <Typography
                     variant="body2"
@@ -379,18 +369,17 @@ const handleEmailVerification=()=>{
                   >
                     click here
                   </Typography>
-                </Link> 
+                </Link>
               </Typography>
             </Box>
 
-
             {/* forgot password */}
-
-            <Box 
-            display={isLogin ? "none":"flex"} 
-            justifyContent={"center"} 
-            alignItems={'center'}
-            mb={2}>
+            <Box
+              display={isLogin ? "none" : "flex"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              mb={2}
+            >
               <Typography
                 variant="body2"
                 color={"text.secondary"}
@@ -398,11 +387,7 @@ const handleEmailVerification=()=>{
                 gap={1}
                 alignItems={"center"}
               >
-                <Typography
-                    variant="body2"
-                  >
-                  Forgot Password
-                  </Typography>
+                <Typography variant="body2">Forgot Password</Typography>
                 <Link to={"/auth/recover"} className="text-decoration-none">
                   <Typography
                     variant="body2"
@@ -410,58 +395,39 @@ const handleEmailVerification=()=>{
                   >
                     reset password
                   </Typography>
-                </Link> 
+                </Link>
               </Typography>
             </Box>
 
-            {/* <Box display={"flex"} gap={1} justifyContent={"center"} mb={2}>
-              <Tooltip arrow title="signin with google">
-                <Button
-                  className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
-                  variant="outlined"
-                  disabled={isLogin || messageGeneral}
-                  startIcon={<Google />}
-                  onClick={handleLoginWithGoogle}
-                  sx={{ textTransform: "none", borderRadius: "20px",display:'none' }}
-                >
-                  {CustomDeviceSmallest ? "Google" : "Google Signin"}
-                </Button>
-              </Tooltip>
-            </Box> */}
-
             <Box mb={2} display={"flex"} justifyContent={"center"}>
-                <Button
-                startIcon={isLogin && <CircularProgress size={13}/>}
-                  variant="contained"
-                  className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
-                  disabled={
-                    isLogin ||
-                    messageGeneral ||
-                    authMessage ||
-                    !(email && password)
-                  }
-                  sx={{ textTransform: "none", borderRadius: "20px" }}
-                  disableElevation
-                  onClick={isVerifyButton ? handleEmailVerification:handleLogin}
-                >
-                 {isVerifyButton ? 'Verification':'Login'}
-                </Button>
+              <Button
+                startIcon={isLogin && <CircularProgress size={13} />}
+                variant="contained"
+                className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
+                disabled={
+                  isLogin || Boolean(messageGeneral) || Boolean(authMessage) || !(email && password)
+                }
+                sx={{ textTransform: "none", borderRadius: "20px" }}
+                disableElevation
+                onClick={isVerifyButton ? handleEmailVerification : handleLogin}
+              >
+                {isVerifyButton ? "Verification" : "Login"}
+              </Button>
             </Box>
           </Box>
         </Box>
       </Box>
 
-      {/* show backdrop when is login */}
+      {/* backdrop */}
       {isLogin && <Backdrop />}
 
-      {/* show the account help info modal when toggled */}
+      {/* modals */}
       <Box>
         <ModalAccountInfo
           openModalInfo={openModalInfo}
           setOpenModalInfo={setOpenModalInfo}
         />
       </Box>
-      {/* show modal terms of service */}
       <Box>
         <ModalPolicyTerms
           openModalTerms={openModalTerms}

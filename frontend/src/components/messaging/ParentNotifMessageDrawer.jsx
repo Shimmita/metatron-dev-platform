@@ -196,15 +196,15 @@ export default function ParentNotifMessageDrawer() {
                  {value===0 ? (
                   <React.Fragment>
                   {/* display account notification */}
-                   <NotifAccordionLayout
-                   post_reactions={post_reactions}
-                   reportedPost={reportedPost}
-                   connectNotifications={connectNotifications}
-                   profile_views={profile_views}
-                   jobFeedBacks={job_feedback}
-                 />
-                 </React.Fragment>
-                 ):(
+                  <NotifAccordionLayout
+                  post_reactions={post_reactions}
+                  reportedPost={reportedPost}
+                  connectNotifications={connectNotifications}
+                  profile_views={profile_views}
+                  jobFeedBacks={job_feedback}
+                  />
+                  </React.Fragment>
+                  ):(
                   <React.Fragment>
                   {/* display messages content and passing props */}
                   <ConversationContainer

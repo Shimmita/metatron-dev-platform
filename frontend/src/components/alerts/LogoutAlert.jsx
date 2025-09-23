@@ -14,9 +14,6 @@ import logoApp from "../../images/logo_sm.png";
 import { persistor } from "../../redux/AppStore";
 import { handleShowLogout } from "../../redux/AppUI";
 import { resetClearCurrentUserRedux } from "../../redux/CurrentUser";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -26,7 +23,7 @@ export default function LogoutAlert() {
   const[isLoading,setIsLoading]=useState(false)
 
   //   redux states
-  const { isTabSideBar,isLogoutAlert,currentMode } = useSelector((state) => state.appUI);
+  const { isLogoutAlert,currentMode } = useSelector((state) => state.appUI);
   const isDarkMode=currentMode==='dark'
 
   const dispatch = useDispatch();
