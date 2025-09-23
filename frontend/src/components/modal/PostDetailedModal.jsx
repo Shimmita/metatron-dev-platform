@@ -198,24 +198,24 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
             marginLeft:handleModalWidth()
           }}
         >
-          <Box
-           maxHeight={"78vh"}
-           sx={{
-             overflow: "auto",
-             // Hide scrollbar for Chrome, Safari and Opera
-             "&::-webkit-scrollbar": {
-               display: "none",
-             },
-             // Hide scrollbar for IE, Edge and Firefox
-             msOverflowStyle: "none",
-             scrollbarWidth: "none",
-           }}
-          >
+            <Box
+            maxHeight={"78vh"}
+            sx={{
+              overflow: "auto",
+              // Hide scrollbar for Chrome, Safari and Opera
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+              // Hide scrollbar for IE, Edge and Firefox
+              msOverflowStyle: "none",
+              scrollbarWidth: "none",
+            }}
+            >
   
           {/* display progress status */}
           {isFetching && (
             <Box display={'flex'} justifyContent={'center'} width={'100%'}>
-              <CircularProgress size={30}/>
+              <CircularProgress size={25}/>
             </Box>
           )}
   

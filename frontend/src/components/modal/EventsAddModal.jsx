@@ -387,7 +387,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
             ) : (
               isUploading && (
                 <Box>
-                  <CircularProgress size={"25px"} />
+                  <CircularProgress size={25} />
                 </Box>
               )
             )}
@@ -722,7 +722,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                   isUploading || errorMessage ||
                   reqText.length>MAX_TOPIC_LENGTH || 
                   about.length>MAX_ABOUT}
-                  startIcon={isUploading ? <CircularProgress/>:<TvRounded/>}
+                  startIcon={<TvRounded/>}
                   size='medium'
                 >
                   Upload Event

@@ -427,7 +427,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
             ) : (
               isUploading && (
                 <Box>
-                  <CircularProgress size={"25px"} />
+                  <CircularProgress size={25} />
                 </Box>
               )
             )}

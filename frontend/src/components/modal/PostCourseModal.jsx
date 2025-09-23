@@ -560,7 +560,7 @@ const handleClosingModal=()=>{
                   mb={1}                 
                   >
                   {/* progress circle */}
-                  <CircularProgress size={"25px"} />
+                  <CircularProgress size={25} />
                 </Box>
               )
             )}

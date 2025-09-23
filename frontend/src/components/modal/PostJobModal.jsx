@@ -607,7 +607,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
             ) : (
               isUploading && (
                 <Box>
-                  <CircularProgress size={"25px"} />
+                  <CircularProgress size={25} />
                 </Box>
               )
             )}
@@ -1665,7 +1665,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                   variant="contained"
                   onClick={handleJobPost}
                   disabled={isUploading || errorMessage}
-                  startIcon={isUploading ? <CircularProgress/>:<WorkRounded/>}
+                  startIcon={<WorkRounded/>}
                   size="medium"
                 >
                   Upload Job Now

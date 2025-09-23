@@ -43,6 +43,7 @@ import {
   resetClearCurrentGlobalSearch,
   updateCurrentGlobalSearchResults,
 } from "../../redux/CurrentGlobalSearch";
+import { updateCurrentGroupsCommunities } from "../../redux/CurrentGroups";
 import { updateCurrentJobFeedBack } from "../../redux/CurrentJobFeedBack";
 import { updateCurrentPostReactions } from "../../redux/CurrentPostReactions";
 import { updateCurrentReport } from "../../redux/CurrentPostReported";
@@ -52,7 +53,6 @@ import AlertGeneral from "../alerts/AlertGeneral";
 import AlertGlobalSearch from "../alerts/AlertGlobalSearch";
 import AlertSuccess from "../alerts/AlertSuccess";
 import LogoutAlert from "../alerts/LogoutAlert";
-import SpecialisationTech from "../data/SpecialisationTech";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 import PeopleModal from "../modal/PeopleModal";
 import PostDetailedModal from "../modal/PostDetailedModal";
@@ -63,7 +63,6 @@ import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import DrawerSmartphone from './DrawerSmartphone';
-import { updateCurrentGroupsCommunities } from "../../redux/CurrentGroups";
 const MetatronToolBar = styled(Toolbar)({
   display: "flex",
   justifyContent: "space-between",
@@ -136,8 +135,6 @@ const Navbar = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [openAlertGeneral,setOpenAlertGeneral]=useState(false)
   const [openAlertFilter,setOpenAlertFilter]=useState(false)
-  const [selectedOptions,setSelectedOptions]=useState([])
-  const feedOptions=SpecialisationTech || []
 
   // control opening of the events modal
   const [showMobileSearch, setShowMobileSearch] = useState(false);
@@ -963,10 +960,7 @@ const Navbar = () => {
         {openAlertFilter && (
           <AlertFilterFeed 
           openAlert={openAlertFilter}
-          feedData={feedOptions}
-          selectedOptions={selectedOptions}
           setOpenAlert={setOpenAlertFilter}
-          setSelectedOptions={setSelectedOptions}
           />
         )}
 

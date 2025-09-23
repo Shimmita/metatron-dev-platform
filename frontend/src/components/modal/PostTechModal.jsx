@@ -464,7 +464,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             ) : (
               isUploading && (
                 <Box>
-                  <CircularProgress size={"25px"} />
+                  <CircularProgress size={25} />
                 </Box>
               )
             )}
@@ -1395,7 +1395,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   variant="contained"
                   size='medium'
                   className='rounded-5'
-                  startIcon={isUploading ? <CircularProgress/>:<PostAddRounded/>}
+                  startIcon={<PostAddRounded/>}
                   disabled={isUploading || errorMessage}
                 >
                   Upload Your Post

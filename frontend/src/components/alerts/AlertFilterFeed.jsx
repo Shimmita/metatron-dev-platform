@@ -1,5 +1,5 @@
 import { SortRounded } from "@mui/icons-material";
-import { Box, Checkbox, CircularProgress, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Checkbox, CircularProgress, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -10,26 +10,25 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentPosts } from "../../redux/CurrentPosts";
+import SpecialisationTech from "../data/SpecialisationTech";
 import CourseIcon from "../utilities/CourseIcon";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const feedData=[...SpecialisationTech]
+
 export default function AlertFilterFeed({
   openAlert,
   setOpenAlert,
   title = "Feed Content Customization",
-  feedData=[],
-  selectedOptions=[],
-  setSelectedOptions,
   
 }) {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const theme=useTheme()
-
-  const isMobile=useMediaQuery(theme.breakpoints.down('sm'))
+  const [selectedOptions,setSelectedOptions]=useState([])
+  
   
   const dispatch=useDispatch()
   const { currentMode } = useSelector((state) => state.appUI);
@@ -100,14 +99,12 @@ export default function AlertFilterFeed({
             // set is fetching to false
             setIsFetching(false);
         });
-
-  }
+}
 
 
   return (
       <Dialog
         open={openAlert}
-        fullWidth={isMobile}
         TransitionComponent={Transition}
         aria-describedby="alert-dialog-filter"
         sx={{
@@ -131,7 +128,7 @@ export default function AlertFilterFeed({
           <DialogContent 
           dividers 
           sx={{ 
-          width:!isMobile && 400,
+            maxWidth:500,
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -175,7 +172,7 @@ export default function AlertFilterFeed({
               />} 
             label={
               <Typography 
-              color={selectedOptions.includes(data) && 'primary'}
+              color={selectedOptions.includes(data) ? 'primary':'inherit'}
               variant={'body2'}
               >
                 {data}

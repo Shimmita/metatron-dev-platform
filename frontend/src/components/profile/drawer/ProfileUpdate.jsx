@@ -42,7 +42,7 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-let MAX_ABOUT = 142;
+let MAX_ABOUT = 200;
 
 function ProfileUpdate({ user }) {
   const [imagePreview, setImagePreview] = useState(user?.avatar);

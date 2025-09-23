@@ -1,6 +1,5 @@
 import {
   AddAPhotoRounded,
-  ArrowBackIos,
   CheckCircleRounded,
   Close,
   CloudUploadRounded,
@@ -8,13 +7,12 @@ import {
   ErrorRounded,
   HomeRounded,
   KeyRounded,
-  RefreshRounded,
+  RefreshRounded
 } from "@mui/icons-material";
 import {
   Avatar,
   Box,
   CircularProgress,
-  FormHelperText,
   IconButton,
   styled,
   TextField,
@@ -52,7 +50,7 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-let MAX_ABOUT = 142;
+let MAX_ABOUT = 200;
 
 export default function AlertProfileCompletion({
   openAlertProfile,
@@ -153,13 +151,14 @@ export default function AlertProfileCompletion({
       })
       .catch((error) => {
         if (error?.code === "ERR_NETWORK") {
-          setErrorPosting("Server is unreachable, kindly try again later ");
+          setErrorPosting("Server is unreachable ");
           return;
         }
 
         // error post msg
         setErrorPosting(
-          `Dear ${user.name}, we encountered an error while trying to register your profile, kindly try again later.\n Error reference ${error?.message}`
+          `Dear ${user.name}, we encountered an error while trying to register your profile, 
+          kindly try again later.\n Error reference ${error?.message}`
         );
         console.log(error);
       })
@@ -169,53 +168,6 @@ export default function AlertProfileCompletion({
       );
   };
 
-  //   handle later register without avatar
-  const handleSignupLater = () => {
-    // clear error posting if any
-    setErrorPosting("");
-    // show progress user is registering
-    setIsPosting(true);
-
-    // add the avatar property on the user but empty if one from redux is null that came from auth provider
-    user.avatar = avatar || "";
-    // update user about
-    user.about = about;
-
-    // no image passed
-    const formData = new FormData();
-    formData.append("user", JSON.stringify(user));
-
-    // post to the backend using axios for tokenized user using google provider
-    axios
-      .post(
-        token
-          ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/google/${token}`
-          : `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/mongo`,
-        formData
-      )
-      .then((res) => {
-        // set success message
-        setSuccessMsg(res?.data?.message);
-        // clear error msg
-        setErrorPosting("");
-      })
-      .catch((error) => {
-        if (error?.code === "ERR_NETWORK") {
-          setErrorPosting("server is unreachable, kindly try again later ");
-          return;
-        }
-
-        // error post msg
-        setErrorPosting(
-          `Dear ${user.name}, We encountered an error during the registration process. ${error?.response?.data}`
-        );
-        console.log(error);
-      })
-      .finally(() => {
-        // posting off
-        setIsPosting(false);
-      });
-  };
 
   // handle login of the user
   const handleLogin = async () => {
@@ -268,8 +220,8 @@ export default function AlertProfileCompletion({
                       color="warning"
                       sx={{ width: 30, height: 30 }}
                     />
-                     <Typography>
-                     Error
+                    <Typography>
+                    Error
                     </Typography>
                   </React.Fragment>
                 ) : successMsg ? (
@@ -283,7 +235,7 @@ export default function AlertProfileCompletion({
                   <React.Fragment>
                     <Avatar alt="" src={avatarPath} />
                     <Typography >
-                      {showInputs ? "My Avatar" :"About Me"} 
+                      {showInputs ? "My Avatar" :""} 
                     </Typography>
                   </React.Fragment>
                 )}
@@ -294,25 +246,13 @@ export default function AlertProfileCompletion({
                 sx={{ 
                   border:'1px solid',
                   borderColor:'divider'
-                 }} 
+                }} 
                 onClick={handleClose}>
                   <Close sx={{ width: 15, height: 15 }} />
                 </IconButton>
               )}
             </DialogTitle>
             {/* helper text */}
-           
-           {!error && !errorPosting && (
-             <Box 
-            alignItems={'center'}
-            justifyContent={'center'}
-            display={'flex'}>
-           <FormHelperText className="text-info">
-            verification code will be sent to your email
-            </FormHelperText>
-            </Box>
-           )}
-
             <DialogContent dividers>
               {showInputs ? (
                 <React.Fragment>
@@ -325,11 +265,12 @@ export default function AlertProfileCompletion({
                   ) : (
                     <React.Fragment>
                       <DialogContentText
-                       maxWidth={400}
+                      maxWidth={400}
                         gutterBottom
                         id="alert-dialog-slide-description-icon_select"
                       >
-                        Choose your favorite avatar icon from your local storage, file should not exceed 5MB in size
+                      Upload a profile avatar that will be associated with your account. You can change it 
+                      later once registered.
                       </DialogContentText>{" "}
                       {/* Display error message if file exceeds 2MB */}
                       {error && (
@@ -434,7 +375,7 @@ export default function AlertProfileCompletion({
                         <TextField
                           id="outlined-basic-about-text"
                           error={about.length > MAX_ABOUT}
-                          maxRows={2}
+                          maxRows={3}
                           value={about}
                           focused
                           label={`About ${MAX_ABOUT - about.length}`}
@@ -445,13 +386,6 @@ export default function AlertProfileCompletion({
                           variant="standard"
                         />
                       </Box>
-                      <DialogContentText
-                        gutterBottom
-                        id="alert-dialog-slide-description-avatar"
-                      >
-                        Upload your preferred avatar for your profile by clicking on the avatar button. 
-                        (optional but recommended).
-                      </DialogContentText>
                     </React.Fragment>
                   )}
                 </React.Fragment>
@@ -528,22 +462,6 @@ export default function AlertProfileCompletion({
                       >
                         Avatar
                       </Button>
-
-                      {/* later button */}
-                       <Button
-                        disabled={!about || about.length>MAX_ABOUT}
-                        disableElevation
-                        size="small"
-                        variant="contained"
-                        startIcon={<CheckCircleRounded/>}
-                        sx={{
-                          textTransform: "capitalize",
-                          borderRadius: "20px",
-                        }}
-                        onClick={handleSignupLater}
-                      >
-                        Later
-                      </Button>
                     </Box>
                   )}
                 </>
@@ -604,8 +522,7 @@ export default function AlertProfileCompletion({
                     gap={5} 
                     alignItems={'center'}>
                       <Button
-                      size="small"
-                      startIcon={<ArrowBackIos/>}
+                      size="medium"
                         sx={{
                           textTransform: "capitalize",
                           borderRadius: "20px",

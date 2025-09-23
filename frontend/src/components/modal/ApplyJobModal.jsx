@@ -481,9 +481,9 @@ const ApplyJobModal = ({
                   About Us
                 </Typography>
                 {/* about text */}
-                <FormHelperText >
+                <Typography variant="caption" >
                   {organisation.about}
-                </FormHelperText>
+                </Typography>
               </Stack>
 
               {/* divider */}
@@ -508,15 +508,13 @@ const ApplyJobModal = ({
                 {/* skills text */}
                 <Box>
                 {skills?.map((skill, index) => (
-                  <Typography
+                  <Box
                     component={"li"}
                     display={"flex"}
                     gap={2}
                     alignItems={"center"}
-                    variant="body2"
                     key={index}
-                    gutterBottom
-                    color={"text.secondary"}
+                    mb={1}
                   >
                   {/* avatar */}
                     <Avatar
@@ -527,8 +525,8 @@ const ApplyJobModal = ({
                       src={getImageMatch(skill)}
                     />
                     {/* text */}
-                    <FormHelperText>{skill}</FormHelperText>
-                  </Typography>
+                    <Typography variant="caption">{skill}</Typography>
+                  </Box>
                 ))}
                 </Box>
 
@@ -572,12 +570,14 @@ const ApplyJobModal = ({
                 {/* Qualification data */}
                 {requirements?.qualification.map((data) => (
                 
-                  <FormHelperText
+                  <Typography
                     key={data}
-                    className="mb-1"
-                    component={'li'}>{
-                      data}
-                    </FormHelperText>
+                    gutterBottom
+                    component={'li'}
+                    variant="caption"
+                    >
+                    {data}
+                    </Typography>
                 ))}
               </Stack>
 
@@ -596,12 +596,14 @@ const ApplyJobModal = ({
                 </Typography>
                 {/* Qualification data */}
                 {requirements?.description.map((data) => (
-                 <FormHelperText
+                <Typography
                     key={data}
-                    className="mb-1"
-                    component={'li'}>{
-                      data}
-                  </FormHelperText>
+                    gutterBottom
+                    component={'li'}
+                    variant="caption"
+                    >
+                    {data}
+                    </Typography>
                 ))}
               </Stack>
 
@@ -628,19 +630,20 @@ const ApplyJobModal = ({
                   <React.Fragment>
                     {/* curriculum vitae application */}
                     <Box mb={1} >
-                    <FormHelperText
-                    className="mb-1 px-1"
+                    <Typography
+                    p={2}
+                    variant="caption"
                     >
                     Upload your latest version of Curriculum Vitae (CV) in
                     the format of PDF only.
-                    </FormHelperText>
+                    </Typography>
                         
                       {cvUpload ? (
                         <Box 
                         display={'flex'}
                         justifyContent={'center'}>
                         <Typography
-                          gutterBottom
+                          mt={2}
                           variant="caption"
                           width={"100%"}
                           display={"flex"}
@@ -648,7 +651,7 @@ const ApplyJobModal = ({
                           alignItems={"center"}
                           justifyContent={"center"}
                           fontWeight={"bold"}
-                          color={"text.secondary"}
+                          className="text-success"
                         >
                           {`${cvUpload.name}`.substring(0, 30)}...
                           {`${cvUpload.name}.`.split(".")[1]}
@@ -663,15 +666,15 @@ const ApplyJobModal = ({
                         display={'flex'}
                         justifyContent={'center'}>
                         <Typography
-                          gutterBottom
                           variant="caption"
                           width={"100%"}
                           display={"flex"}
+                          mt={2}
                           gap={2}
                           alignItems={"center"}
                           justifyContent={"center"}
                           fontWeight={"bold"}
-                          color={"text.secondary"}
+                          className="text-success"
                         >
                         {user?.cvLink?.split("-")[1]}
                           <Done
@@ -684,11 +687,11 @@ const ApplyJobModal = ({
 
                       <Divider className="pt-2"/>
 
-                      <Box pt={2} 
+                      <Box mt={1} 
                       display={'flex'}
                       justifyContent={'space-around'}
                       gap={2}
-                       alignItems={'center'}>
+                      alignItems={'center'}>
                        {/* upload cv */}
                         <Button
                           component="label"
