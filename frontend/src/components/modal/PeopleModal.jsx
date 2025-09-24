@@ -241,16 +241,14 @@ const PeopleModal = ({
             ):(
               <>
               {/* map over the peoples */}
-              {PeopleConnect?.slice(0,3).map((person) => (
+              {PeopleConnect?.map((person) => (
                   <FriendRequest key={person?._id} connect_request={person} />
                 ))}
               
               {/* show see more button if people is less than 2 */}
-              {isFeed && 
-              PeopleConnect.length<2 
-              && (
+              {isFeed && (
                 <Button 
-                startIcon={isFetching?<CircularProgress size={16}/> :undefined}
+                startIcon={isFetching?<CircularProgress size={13}/> :undefined}
                 disabled={isFetching || !hasMorePosts} 
                 onClick={handleLoadMore}>
                 {!hasMorePosts ? "no more":"see more"}
