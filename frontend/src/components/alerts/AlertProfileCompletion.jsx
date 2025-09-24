@@ -13,6 +13,7 @@ import {
   Avatar,
   Box,
   CircularProgress,
+  FormHelperText,
   IconButton,
   styled,
   TextField,
@@ -171,7 +172,7 @@ export default function AlertProfileCompletion({
         // error post msg
         setErrorPosting(
           `Dear ${user.name}, we encountered an error while trying to register your profile, 
-          kindly try again later.\n Error reference ${error?.message}`
+          kindly try again later.`
         );
         console.log(error);
       })
@@ -266,6 +267,14 @@ export default function AlertProfileCompletion({
               )}
             </DialogTitle>
             {/* helper text */}
+            <Box 
+            display={'flex'}
+            justifyContent={'center'}
+            >
+            <FormHelperText className="text-info">
+              Email shall be verified on login
+            </FormHelperText>
+            </Box>
             <DialogContent dividers>
               {showInputs ? (
                 <React.Fragment>
@@ -278,7 +287,7 @@ export default function AlertProfileCompletion({
                   ) : (
                     <React.Fragment>
                       <DialogContentText
-                      maxWidth={400}
+                      maxWidth={500}
                         gutterBottom
                         id="alert-dialog-slide-description-icon_select"
                       >
