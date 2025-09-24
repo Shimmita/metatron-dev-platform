@@ -1,12 +1,12 @@
 import { InfoRounded, WorkRounded } from "@mui/icons-material";
-import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import List from "@mui/material/List";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentJobsTop } from "../../redux/CurrentJobsTop";
-import FeaturedJobs from "./layouts/FeaturedJobs";
 import AlertGeneral from "../alerts/AlertGeneral";
+import FeaturedJobs from "./layouts/FeaturedJobs";
 
 export default function JobsContainer() {
   // screen width of the device
@@ -17,8 +17,6 @@ export default function JobsContainer() {
   const [isFetching, setIsFetching] = useState(false);
   const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
   const [errorMessage, setErrorMessage] = useState("");
-  const theme=useTheme()
-    const isMobileTab=useMediaQuery(theme.breakpoints.down('md'))
   
   // dispatch
   const dispatch = useDispatch();
@@ -98,7 +96,7 @@ export default function JobsContainer() {
         }}
       >
         <Box>
-          {jobsTop?.slice(0,isMobileTab ? 3:undefined).map((jobTop,index) => (
+          {jobsTop?.slice(0,3).map((jobTop,index) => (
             <Box key={jobTop?._id}>
               <FeaturedJobs 
               isLastIndex={index===jobsTop?.length-1}

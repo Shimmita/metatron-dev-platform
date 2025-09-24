@@ -49,14 +49,10 @@ const PeopleModal = ({
     setValue(newValue);
   };
 
-  
-
   // redux states
   const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
   const isDarkMode=currentMode==='dark'
   const { user } = useSelector((state) => state.currentUser);
-  
-
   const dispatch = useDispatch();
 
   // close the modal from redux by altering states to false and null data
@@ -245,12 +241,14 @@ const PeopleModal = ({
             ):(
               <>
               {/* map over the peoples */}
-              {PeopleConnect?.map((person) => (
+              {PeopleConnect?.slice(0,3).map((person) => (
                   <FriendRequest key={person?._id} connect_request={person} />
                 ))}
               
-              {/* if last item show see more button */}
-              {isFeed && (
+              {/* show see more button if people is less than 2 */}
+              {isFeed && 
+              PeopleConnect.length<2 
+              && (
                 <Button 
                 startIcon={isFetching?<CircularProgress size={16}/> :undefined}
                 disabled={isFetching || !hasMorePosts} 

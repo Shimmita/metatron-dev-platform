@@ -1,5 +1,5 @@
 import { InfoRounded, PeopleRounded } from "@mui/icons-material";
-import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import List from "@mui/material/List";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -13,9 +13,6 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
-  const theme=useTheme()
-   // defines if device is mobile or tab
-  const isMobileTab=useMediaQuery(theme.breakpoints.down('md'))
 
   const { user } = useSelector((state) => state.currentUser);
 
@@ -48,7 +45,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
       )
       .then((res) => {
         // update the redux of connect request suggestion
-        if (res?.data && res.data) {
+        if (res?.data) {
           dispatch(updateCurrentConnectTop(res.data));
         }
       })
@@ -114,7 +111,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
         }}
       >
         <Box>
-          {connectTop?.slice(0,isMobileTab? 3:undefined).map((connection, index) => (
+          {connectTop?.slice(0,3).map((connection, index) => (
               <Box key={index}>
                 <FriendRequest
                   isLoadingRequest={isFetching}

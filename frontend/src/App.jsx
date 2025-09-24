@@ -59,7 +59,7 @@ const App = () => {
                 <Typography
                   color={"primary"}
                   gutterBottom
-                  variant="h5"
+                  variant="h4"
                   fontWeight={"bold"}
                 >
                   METATRON
@@ -71,6 +71,7 @@ const App = () => {
                 >
                 <Typography 
                 variant="caption" 
+                fontWeight={'bold'}
                 color={'primary'} >
                 Ultimate Tech Platform
                 </Typography>

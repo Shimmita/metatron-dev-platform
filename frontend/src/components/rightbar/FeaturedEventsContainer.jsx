@@ -1,5 +1,5 @@
 import { InfoRounded, TvRounded } from "@mui/icons-material";
-import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import List from "@mui/material/List";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
@@ -28,10 +28,7 @@ export default function FeaturedEventsContainer() {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
-
   const dispatch = useDispatch();
-  const theme=useTheme()
-  const isMobileTab=useMediaQuery(theme.breakpoints.down('md'))
 
   // redux states
   const { eventsTop } = useSelector((state) => state.currentEventsTop);
@@ -106,7 +103,7 @@ export default function FeaturedEventsContainer() {
         }}
       >
         <Box>
-          {eventsTop?.slice(0,isMobileTab ? 3:undefined).map((currentEvent, index) => (
+          {eventsTop?.slice(0,3).map((currentEvent, index) => (
               <Box key={currentEvent?._id}>
                 <FeaturedEvent
                 isLoading={isFetching}

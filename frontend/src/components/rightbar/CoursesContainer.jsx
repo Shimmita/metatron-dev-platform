@@ -1,7 +1,6 @@
 import { SchoolRounded } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
 import List from "@mui/material/List";
-import React from "react";
 import PopularCouses from "./layouts/PopularCourses";
 
 export default function CoursesContainer() {
@@ -49,7 +48,7 @@ export default function CoursesContainer() {
         }}
       >
         <Box>
-          {items.map((item, index) => (
+          {items?.slice(0,3).map((index) => (
             <Box key={index}>
               <PopularCouses />
             </Box>
