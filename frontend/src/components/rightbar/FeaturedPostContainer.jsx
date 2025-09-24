@@ -1,12 +1,12 @@
 import { BarChart, InfoRounded } from "@mui/icons-material";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
 import List from "@mui/material/List";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentPostsTop } from "../../redux/CurrentPostsTop";
-import FeaturedPost from "./layouts/FeaturedPost";
 import AlertGeneral from "../alerts/AlertGeneral";
+import FeaturedPost from "./layouts/FeaturedPost";
 
 const screenWidth = window.screen.availWidth;
 // get the rightbar expanded appropriately
@@ -28,6 +28,8 @@ export default function FeaturedPostContainer() {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
+  const theme=useTheme()
+  const isMobileTab=useMediaQuery(theme.breakpoints.down('md'))
 
   const dispatch = useDispatch();
 
@@ -101,7 +103,7 @@ export default function FeaturedPostContainer() {
         }}
       >
         <Box>
-          {postsTop?.map((post, index) => (
+          {postsTop?.slice(0,isMobileTab?3:undefined).map((post, index) => (
               <Box key={post?._id}>
                 <FeaturedPost 
                 isLastIndex={index===postsTop?.length-1}

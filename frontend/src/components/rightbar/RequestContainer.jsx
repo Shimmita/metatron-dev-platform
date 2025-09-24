@@ -1,19 +1,22 @@
 import { InfoRounded, PeopleRounded } from "@mui/icons-material";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography, useMediaQuery, useTheme } from "@mui/material";
 import List from "@mui/material/List";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentConnectTop } from "../../redux/CurrentConnect";
-import FriendRequest from "./layouts/FriendRequest";
 import AlertGeneral from "../alerts/AlertGeneral";
+import FriendRequest from "./layouts/FriendRequest";
 
 export default function RequestContainer({ isLoadingPostLaunch }) {
   const { connectTop } = useSelector((state) => state.currentConnectRequest);
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
-  
+  const theme=useTheme()
+   // defines if device is mobile or tab
+  const isMobileTab=useMediaQuery(theme.breakpoints.down('md'))
+
   const { user } = useSelector((state) => state.currentUser);
 
   // tackle corner cases screen width
@@ -23,6 +26,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
 
   // extracting current userId for locating users ain't friend with
   const { _id } = user || {};
+
 
   // fetch from the backend the top 3 users
   useEffect(() => {
@@ -110,8 +114,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
         }}
       >
         <Box>
-          {connectTop &&
-            connectTop?.map((connection, index) => (
+          {connectTop?.slice(0,isMobileTab? 3:undefined).map((connection, index) => (
               <Box key={index}>
                 <FriendRequest
                   isLoadingRequest={isFetching}
