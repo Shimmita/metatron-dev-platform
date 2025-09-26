@@ -25,14 +25,36 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import React, { lazy, useState, useEffect } from "react";
+import React, { lazy, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
-import { persistor } from "../../redux/AppStore";
-import { resetDarkMode } from "../../redux/AppUI";
+import { resetDarkMode, resetDefaultBottomNav } from "../../redux/AppUI";
+import { resetAllSigningStateDetails } from "../../redux/CompleteSigning";
 import { resetClearCurrentAuthMessage } from "../../redux/CurrentAuthMessages";
-import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
+import { resetClearChatBot } from "../../redux/CurrentChatBot";
+import { resetClearCurrentConnectTop } from "../../redux/CurrentConnect";
+import { resetClearCurrentConnectNotif } from "../../redux/CurrentConnectNotif";
+import { resetClearConversations } from "../../redux/CurrentConversations";
+import { resetClearCurrentCourses } from "../../redux/CurrentCourses";
+import { resetClearCurrentEvents } from "../../redux/CurrentEvents";
+import { resetClearCurrentEventsTop } from "../../redux/CurrentEventsTop";
+import { resetClearCurrentGlobalSearch } from "../../redux/CurrentGlobalSearch";
+import { resetClearCurrentGroupCommunities } from "../../redux/CurrentGroups";
+import { resetClearCurrentJobFeedBack } from "../../redux/CurrentJobFeedBack";
+import { resetClearCurrentJobs } from "../../redux/CurrentJobs";
+import { resetJobSearch } from "../../redux/CurrentJobSearch";
+import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
+import { resetClearPeopleData } from "../../redux/CurrentModal";
+import { resetClearCurrentNetwork } from "../../redux/CurrentNetwork";
+import { resetClearCurrentPostReactions } from "../../redux/CurrentPostReactions";
+import { resetClearCurrentReport } from "../../redux/CurrentPostReported";
+import { resetClearCurrentPosts } from "../../redux/CurrentPosts";
+import { resetClearCurrentPostsTop } from "../../redux/CurrentPostsTop";
+import { resetClearCurrentProfileView } from "../../redux/CurrentProfileView";
+import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
+import { resetClearCurrentSuccessRedux } from "../../redux/CurrentSuccess";
+import { resetClearCurrentUserRedux, resetClearTempUserIDRedux, updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import OptionsMoreLogin from "./OptionsMoreLogin";
@@ -54,7 +76,7 @@ const LoginAuth = () => {
   const isDarkMode = currentMode === "dark";
 
   const [messageGeneral, setMessageGeneral] = useState("");
-  const [isLogin, setIsLogin] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -81,7 +103,7 @@ const LoginAuth = () => {
 
   const handleLogin = async () => {
     const user = { email, password };
-    setIsLogin(true);
+    setIsFetching(true);
     axios
       .post(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signin/personal`,
@@ -107,42 +129,122 @@ const LoginAuth = () => {
         setMessageGeneral(err?.response?.data);
       })
       .finally(() => {
-        setIsLogin(false);
+        setIsFetching(false);
       });
   };
 
-  const handleClearAuthMessage = React.useCallback(async () => {
-    dispatch(resetClearCurrentAuthMessage());
+  const handleClearReduxDataAny = React.useCallback(async () => {
     try {
-      await persistor.purge();
+      // clear any persisted user data
+      dispatch(resetClearCurrentUserRedux())
+
+      // temp user Id 
+      dispatch(resetClearTempUserIDRedux())
+
+      // reset all pending signin details
+      dispatch(resetAllSigningStateDetails())
+
+      // clear bottom nav details
+      dispatch(resetDefaultBottomNav())
+
+      // reset chat bot
+      dispatch(resetClearChatBot())
+
+      //reset connect requests
+      dispatch(resetClearCurrentConnectTop()) 
+
+      // clear connect Notifications
+      dispatch(resetClearCurrentConnectNotif())
+
+      // reset clear conversations
+      dispatch(resetClearConversations())
+
+      // reset courses
+      dispatch(resetClearCurrentCourses())
+
+      // reset clear events any
+      dispatch(resetClearCurrentEvents())
+
+      // reset clear top events
+      dispatch(resetClearCurrentEventsTop())
+
+      // reset clear global search
+      dispatch(resetClearCurrentGlobalSearch())
+
+      // reset clear communities
+      dispatch(resetClearCurrentGroupCommunities())
+
+      // reset clear
+      dispatch(resetClearCurrentJobFeedBack())
+
+      // reset clear jobs
+      dispatch(resetClearCurrentJobs())
+
+      // reset clear job search
+      dispatch(resetJobSearch())
+
+      // clear jobs top
+      dispatch(resetClearCurrentJobsTop())
+
+      // clear modal people details
+      dispatch(resetClearPeopleData())
+
+      // clear network of people
+      dispatch(resetClearCurrentNetwork())
+
+      // clear post reaction
+      dispatch(resetClearCurrentPostReactions())
+
+      // clear post reports
+      dispatch(resetClearCurrentReport())
+
+      // clear posts
+      dispatch(resetClearCurrentPosts())
+
+      // clear posts top insights
+      dispatch(resetClearCurrentPostsTop())
+
+      // clear profile view
+      dispatch(resetClearCurrentProfileView())
+
+      // clear snack bars
+      dispatch(resetClearCurrentSnack())
+      
+      // clear success msg any
+      dispatch(resetClearCurrentSuccessRedux())
+      
     } catch (error) {
       console.log(error.message);
     }
   }, [dispatch]);
+  
 
+
+  // handle clearing of auth message only
+  const handleClearAuthMessage=()=>{
+      dispatch(resetClearCurrentAuthMessage());
+  }
+
+  // handle email verification
   const handleEmailVerification = () => {
     navigate(`/auth/verification?${email}`);
   };
 
-  // auto clear general messages after 3 seconds
+  // auto clear general messages after 2 seconds
   useEffect(() => {
     if (messageGeneral) {
       const timer = setTimeout(() => {
         setMessageGeneral("");
-      }, 3000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [messageGeneral]);
 
-  // auto clear redux auth messages after 3 seconds
+  }, [messageGeneral,dispatch]);
+
+  // auto clear redux data
   useEffect(() => {
-    if (authMessage) {
-      const timer = setTimeout(() => {
-        handleClearAuthMessage();
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [authMessage, handleClearAuthMessage]);
+  handleClearReduxDataAny()
+  }, [ handleClearReduxDataAny]);
 
   return (
     <Box
@@ -184,7 +286,7 @@ const LoginAuth = () => {
                   onClick={handleClickMore}
                   aria-label="more"
                   id="more-button"
-                  disabled={isLogin}
+                  disabled={isFetching}
                   aria-controls={openMore ? "basic-menu" : undefined}
                   aria-haspopup="true"
                   aria-expanded={openMore ? "true" : undefined}
@@ -214,7 +316,7 @@ const LoginAuth = () => {
 
           <Box>
             <Box display={"flex"} justifyContent={"center"}>
-              <Avatar alt={"logo"} sx={{ width: 60, height: 60 }} src={logo} />
+              <Avatar alt={"logo"} sx={{ width: 70, height: 70 }} src={logo} />
             </Box>
             <Box mb={3}>
               <Typography
@@ -259,7 +361,8 @@ const LoginAuth = () => {
                   <Alert
                     className="rounded-5"
                     severity="info"
-                    onClose={() => setMessageGeneral("")} // ✅ close button clears immediately
+                    // close button clears immediately
+                    onClose={() => setMessageGeneral("")} 
                     action={
                       <IconButton
                         aria-label="close"
@@ -287,7 +390,8 @@ const LoginAuth = () => {
                     severity={
                       authMessage?.includes("server") ? "warning" : "success"
                     }
-                    onClose={handleClearAuthMessage} // ✅ close button clears immediately
+                    // close button clears immediately
+                    onClose={handleClearAuthMessage} 
                     action={
                       <IconButton
                         aria-label="close"
@@ -312,6 +416,7 @@ const LoginAuth = () => {
                 id="outlined-required"
                 label="Email"
                 className="w-75"
+                focused
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="username@gmail.com"
@@ -326,6 +431,7 @@ const LoginAuth = () => {
                 </InputLabel>
                 <OutlinedInput
                   required
+                  autoFocus
                   value={password}
                   id="outlined-adornment-password"
                   onChange={(e) => setPassword(e.target.value)}
@@ -349,7 +455,7 @@ const LoginAuth = () => {
 
             {/* verify certificate */}
             <Box
-              display={isLogin ? "none" : "flex"}
+              display={isFetching ? "none" : "flex"}
               justifyContent={"center"}
               alignItems={"center"}
               mb={2}
@@ -361,13 +467,13 @@ const LoginAuth = () => {
                 gap={1}
                 alignItems={"center"}
               >
-                <Typography variant="body2">Verify Course Cert</Typography>
+                <Typography variant="body2">verify course certificate</Typography>
                 <Link to={"/cert/verify"} className="text-decoration-none">
                   <Typography
                     variant="body2"
                     sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
                   >
-                    click here
+                    here
                   </Typography>
                 </Link>
               </Typography>
@@ -375,7 +481,7 @@ const LoginAuth = () => {
 
             {/* forgot password */}
             <Box
-              display={isLogin ? "none" : "flex"}
+              display={isFetching ? "none" : "flex"}
               justifyContent={"center"}
               alignItems={"center"}
               mb={2}
@@ -387,13 +493,13 @@ const LoginAuth = () => {
                 gap={1}
                 alignItems={"center"}
               >
-                <Typography variant="body2">Forgot Password</Typography>
+                <Typography variant="body2">forgot my password ?</Typography>
                 <Link to={"/auth/recover"} className="text-decoration-none">
                   <Typography
                     variant="body2"
                     sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
                   >
-                    reset password
+                    reset
                   </Typography>
                 </Link>
               </Typography>
@@ -401,12 +507,10 @@ const LoginAuth = () => {
 
             <Box mb={2} display={"flex"} justifyContent={"center"}>
               <Button
-                startIcon={isLogin && <CircularProgress size={13} />}
+                startIcon={isFetching && <CircularProgress size={13} />}
                 variant="contained"
                 className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
-                disabled={
-                  isLogin || Boolean(messageGeneral) || Boolean(authMessage) || !(email && password)
-                }
+                disabled={isFetching}
                 sx={{ textTransform: "none", borderRadius: "20px" }}
                 disableElevation
                 onClick={isVerifyButton ? handleEmailVerification : handleLogin}
@@ -419,7 +523,7 @@ const LoginAuth = () => {
       </Box>
 
       {/* backdrop */}
-      {isLogin && <Backdrop />}
+      {isFetching && <Backdrop />}
 
       {/* modals */}
       <Box>

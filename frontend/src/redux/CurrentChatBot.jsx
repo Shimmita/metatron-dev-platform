@@ -18,11 +18,16 @@ const CurrentChatBot = createSlice({
     handleCloseChatBot: (state) => {
       state.isOnline = false;
     },
+
+    // reset chat bot
+    resetClearChatBot:(state)=>{
+      state.isOnline=false
+    }
   },
 });
 
 // exporting actions
-export const { handleShowChatBot, handleCloseChatBot } = CurrentChatBot.actions;
+export const { handleShowChatBot, handleCloseChatBot,resetClearChatBot } = CurrentChatBot.actions;
 
 // exporting the main fun reducer
 export default CurrentChatBot.reducer;

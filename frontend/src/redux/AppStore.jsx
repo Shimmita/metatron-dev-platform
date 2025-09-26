@@ -23,13 +23,13 @@ import currentCoursesReducer from "./CurrentCourses";
 import currentEventsReducer from './CurrentEvents';
 import currentEventsTopReducer from './CurrentEventsTop';
 import currentGlobalSearchReducer from "./CurrentGlobalSearch";
+import currentGroupsReducer from './CurrentGroups';
 import currentJobFeedBackReducer from './CurrentJobFeedBack';
 import currentJobsReducer from "./CurrentJobs";
 import currentJobSearchReducer from "./CurrentJobSearch";
 import currentJobsTopReducer from "./CurrentJobsTop";
 import currentModalReducer from "./CurrentModal";
 import currentNetworkReducer from "./CurrentNetwork";
-import currentPaginationReducer from "./CurrentPagination";
 import currentPostReactionsReducer from "./CurrentPostReactions";
 import currentReportedPostReducer from "./CurrentPostReported";
 import currentPostsReducer from "./CurrentPosts";
@@ -38,13 +38,12 @@ import currentProfileViewReducer from './CurrentProfileView';
 import currentSnackReducer from "./CurrentSnackBar";
 import currentSuccessReducer from './CurrentSuccess';
 import currentUserReducer from "./CurrentUser";
-import currentGroupsReducer from './CurrentGroups'
 
 // Configure persist settings
 const persistConfig = {
   // Key to identify persisted data
   key: "root", 
-  storage,
+  storage, 
 };
 
 // Combine all reducers
@@ -53,7 +52,6 @@ const rootReducer = combineReducers({
   currentSnackBar: currentSnackReducer,
   currentBottomNav: currentBottomNavReducer,
   currentAuthMessage: currentAuthMessageReducer,
-  currentPagination: currentPaginationReducer,
   signUser: completeSigningReducer,
   currentUser: currentUserReducer,
   currentPosts: currentPostsReducer,
@@ -77,7 +75,6 @@ const rootReducer = combineReducers({
   currentCourses:currentCoursesReducer,
   currentSuccess:currentSuccessReducer,
   currentGroups:currentGroupsReducer,
-
 
 });
 

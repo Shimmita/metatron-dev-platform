@@ -1,7 +1,8 @@
 import { AutoAwesomeRounded, DiamondRounded, Diversity3Rounded, HelpOutlineOutlined, PeopleRounded, SmartphoneRounded } from "@mui/icons-material";
-import { Box, CircularProgress, IconButton, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { RotatingLines } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import {
   handleLoadingPostLaunch,
@@ -224,7 +225,7 @@ const FeedDefaultContent = () => {
             >
               <Box>
                 <Box display={"flex"} justifyContent={"center"}>
-                  <CircularProgress size={"30px"} />
+                  <RotatingLines width={40} />
                 </Box>
                 <Typography
                   mt={2}
@@ -232,7 +233,7 @@ const FeedDefaultContent = () => {
                   color={"text.secondary"}
                   variant="body2"
                 >
-                  loading ...
+                  retrieving data
                 </Typography>
               </Box>
             </Box>

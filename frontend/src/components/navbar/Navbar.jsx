@@ -826,7 +826,13 @@ const Navbar = () => {
                 title={"notifications"} 
                 className={CustomDeviceIsSmall() ? 'me-1':'me-2'}
                 >
-                <Badge badgeContent={post_reactions?.length + reportedPost?.length + connectNotifications?.length + profile_views?.length +job_feedback?.length } color="warning">
+                <Badge badgeContent={
+                  post_reactions?.length + 
+                  reportedPost?.length + 
+                  connectNotifications?.length + 
+                  profile_views?.length +
+                  job_feedback?.length || 0} 
+                  color="warning">
                     <IconButton
                       sx={{ padding: 0 }}
                       onClick={()=>handleShowMessageDrawer(0)}

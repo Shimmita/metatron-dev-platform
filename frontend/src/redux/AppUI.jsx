@@ -2,8 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 // initial state
 const initialState = {
-  defaultState: true, // default
-  isAccountSettings: false,
+  defaultState: true, 
   isDefaultBottomNav: true,
   isDefaultSpeedDial: true,
   isMobileRighBar: false,
@@ -34,17 +33,6 @@ const appUISliceReducerSlice = createSlice({
     handleLoadingPostLaunch: (state, action) => {
       state.isLoadingPostLaunch = action.payload;
     },
-
-  
-
-    showAccountSettings: (state) => {
-      return {
-        ...state,
-        defaultState: false,
-        isAccountSettings: true,
-      };
-    },
-  
 
     resetDarkMode: (state) => {
       return {
@@ -157,7 +145,6 @@ const appUISliceReducerSlice = createSlice({
       return {
         ...state,
         defaultState: true,
-        isAccountSettings: false,
         isDefaultBottomNav: true,
         isMobileRighBar: false,
         isSearchBar: true,
@@ -177,7 +164,6 @@ const appUISliceReducerSlice = createSlice({
         postEditUniqueId:'',
         isLogoutAlert:false,
         notificationPosition:0,
-
 
       };
     },

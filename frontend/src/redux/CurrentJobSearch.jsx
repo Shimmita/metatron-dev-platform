@@ -9,12 +9,12 @@ const currentJobSearch = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadte  user and online status to true
+    // update  user and online status to true
     updateJobSearch: (state, action) => {
       state.jobSearch = action.payload;
     },
 
-    // nullify user and fale online
+    // nullify user and false online
     resetJobSearch: (state) => {
       state.jobSearch = null;
     },

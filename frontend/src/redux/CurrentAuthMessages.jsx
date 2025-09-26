@@ -9,12 +9,12 @@ const CurrentAuthMessages = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadte  user and online status to true
+    // update  user and online status to true
     updateCurrentAuthMessage: (state, action) => {
       state.authMessage = action.payload;
     },
 
-    // nullify user and fale online
+    // nullify user and false online
     resetClearCurrentAuthMessage: (state) => {
       state.authMessage = null;
     },

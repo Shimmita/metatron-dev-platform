@@ -9,7 +9,7 @@ const CurrentPostsTop = createSlice({
   initialState: initialstate,
 
   reducers: {
-    // upadate the posts by the feed from the payload
+    // update the posts by the feed from the payload
     updateCurrentPostsTop: (state, action) => {
       state.postsTop = action.payload;
     },

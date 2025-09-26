@@ -137,8 +137,6 @@ export default function AlertProfileCompletion({
     // update the about and avatar attribute
     user.about=about
 
-    console.log(user.about)
-
     // will be update in the backend
     user.avatar=""
 
@@ -164,17 +162,17 @@ export default function AlertProfileCompletion({
         setErrorPosting("");
       })
       .catch((error) => {
+         console.log(error);
         if (error?.code === "ERR_NETWORK") {
           setErrorPosting("Server is unreachable ");
           return;
-        }
-
-        // error post msg
+        }else{
+           // error post msg
         setErrorPosting(
           `Dear ${user.name}, we encountered an error while trying to register your profile, 
           kindly try again later.`
         );
-        console.log(error);
+        }
       })
       .finally(() =>
         // set posting off

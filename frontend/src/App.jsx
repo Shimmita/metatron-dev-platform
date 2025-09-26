@@ -6,17 +6,15 @@ import {
   Typography
 } from "@mui/material";
 import { lazy, Suspense } from "react";
-import { Vortex } from "react-loader-spinner";
+import { BallTriangle } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
+import HomePageLazy from "./components/account/HomePage";
 import AppLogo from "./images/logo_sm.png";
 const CertificateVerification=lazy(()=>import("./components/auth/CertificateVerification")) ;
 const RegPersonalCompletion = lazy(() =>
   import("./components/auth/RegPersonalCompletion")
 );
-
-
-const HomePageLazy = lazy(() => import("./components/account/HomePage"));
 const RecoverAuthLazy = lazy(() => import("./components/auth/RecoverAuth"));
 const RegistrationAuthLazy = lazy(() =>
   import("./components/auth/RegistrationAuth")
@@ -46,6 +44,7 @@ const App = () => {
                 display={"flex"}
                 alignItems={"center"}
                 justifyContent={"center"}
+                gap={1}
                 flexDirection={"column"}
                 height={"100vh"}
               >
@@ -77,13 +76,12 @@ const App = () => {
                 </Typography>
                 </Box>
 
-                 <Box 
-                 display={"flex"} 
-                 justifyContent={"center"}>
-                  <Vortex width={50}/>
+                  <Box 
+                  display={"flex"} 
+                  justifyContent={"center"}>
+                  <BallTriangle width={50}/>
                 </Box>
 
-               
               </Box>
             </Box>
           }
