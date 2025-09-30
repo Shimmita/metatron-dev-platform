@@ -1,10 +1,8 @@
 import {
-  AddAPhotoRounded,
   CheckCircleRounded,
   Close,
   CloudUploadRounded,
   Done,
-  HomeRounded,
   InfoRounded,
   KeyRounded,
   RefreshRounded
@@ -16,7 +14,6 @@ import {
   FormHelperText,
   IconButton,
   styled,
-  TextField,
   Typography
 } from "@mui/material";
 import Button from "@mui/material/Button";
@@ -51,24 +48,19 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-let MAX_ABOUT = 200;
-
-export default function AlertProfileCompletion({
+export default function AlertOrgCompletion({
   openAlertProfile,
   setOpenAlertProfile,
-  isPersonal = false,
   user,
 }) {
   // redux to check when user signs with a provider
   const { avatar, token } = useSelector((state) => state.signUser);
-  const [showInputs, setShowInput] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPath, setAvatarPath] = useState(avatar || "");
   const [error, setError] = useState("");
   const [isPosting, setIsPosting] = useState(false);
   const [errorPosting, setErrorPosting] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-  const [about, setAbout] = useState("");
 
   // redux state
   const { currentMode } = useSelector((state) => state.appUI);
@@ -88,20 +80,9 @@ export default function AlertProfileCompletion({
   const handleClickAgree = () => {
     setError("")
     setErrorPosting("");
-    setShowInput(true);
   };
 
-  //   handle click back sets show input false
-  const handleClickedBack = () => {
-    setShowInput(false);
-    // clear avatar loaded from the file storage
-    setAvatarFile(null);
 
-    // check if redux avatar is available since it comes from provider
-    // if exits set it else let the path be null for later update after signin
-    setAvatarPath(avatar || "");
-    setError("");
-  };
   //   handle file change
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -127,17 +108,10 @@ export default function AlertProfileCompletion({
   };
 
   // handle click complete profile registration
-  const handleCompleteRegistration = () => {
-
-    // if no about set error
-    if (!about) {
-      setErrorPosting('Please provide a brief about yourself!')
-      return
-    }
-
-    // update the about and avatar attribute
-    user.about=about
-
+  const handleCompleteRegistrationOrg = () => {
+    // defaults for org
+    user.educationLevel="Other Qualification"
+    user.gender="Other"
     // will be update in the backend
     user.avatar=""
 
@@ -147,6 +121,7 @@ export default function AlertProfileCompletion({
     const formData = new FormData();
     formData.append("image", avatarFile);
     formData.append("user", JSON.stringify(user));
+
 
     // post to the backend using axios for tokenized user using google provider
     axios
@@ -163,7 +138,7 @@ export default function AlertProfileCompletion({
         setErrorPosting("");
       })
       .catch((error) => {
-         console.log(error);
+        console.log(error);
         if (error?.code === "ERR_NETWORK") {
           setErrorPosting("Server is unreachable ");
           return;
@@ -246,7 +221,7 @@ export default function AlertProfileCompletion({
                   <React.Fragment>
                     <Avatar alt="" src={avatarPath} />
                     <Typography >
-                      {showInputs ? "My Avatar" :""} 
+                    My Avatar
                     </Typography>
                   </React.Fragment>
                 )}
@@ -273,7 +248,6 @@ export default function AlertProfileCompletion({
             </FormHelperText>
             </Box>
             <DialogContent dividers>
-              {showInputs ? (
                 <React.Fragment>
                   {errorPosting ? (
                     <React.Fragment>
@@ -363,148 +337,9 @@ export default function AlertProfileCompletion({
                     </React.Fragment>
                   )}
                 </React.Fragment>
-              ) : (
-                <React.Fragment>
-                  {/* error present from posting user */}
-                  {errorPosting ? (
-                    <React.Fragment>
-                      <DialogContentText>{errorPosting}</DialogContentText>
-                    </React.Fragment>
-                  ) : successMsg ? (
-                    <DialogContentText>{successMsg}</DialogContentText>
-                  ) : (
-                    <React.Fragment>
-                      {/* about user */}
-
-                      <DialogContentText
-                        gutterBottom
-                        id="alert-dialog-slide-description-about"
-                      >
-                        Provide a brief introduction about yourself which will 
-                        be associated with your profile and can be viewed by 
-                        like-minded individuals on the platform.
-                      </DialogContentText>
-                      <Box
-                        display={"flex"}
-                        justifyContent={"center"}
-                        width={"100%"}
-                        mb={3}
-                        mt={1}
-                      >
-                        <TextField
-                          id="outlined-basic-about-text"
-                          error={about.length > MAX_ABOUT}
-                          maxRows={3}
-                          value={about}
-                          focused
-                          label={`About ${MAX_ABOUT - about.length}`}
-                          placeholder="write here....."
-                          onChange={(e) => setAbout(e.target.value)}
-                          fullWidth
-                          multiline
-                          variant="standard"
-                        />
-                      </Box>
-                    </React.Fragment>
-                  )}
-                </React.Fragment>
-              )}
             </DialogContent>
             <DialogActions sx={{ px: 4 }}>
-              {!showInputs ? (
-                <>
-                  {errorPosting ? (
-                    <Box 
-                    display={'flex'}
-                    alignItems={'center'}
-                    gap={5}
-                    >
-                      <Button
-                      startIcon={<HomeRounded/>}
-                      size="small"
-                      variant="outlined"
-                        sx={{
-                          textTransform: "capitalize",
-                          borderRadius: "20px",
-                        }}
-                        onClick={() => navigate("/")}
-                      >
-                        Home
-                      </Button>
-
-                      <Button
-                      size="small"
-                      variant="outlined"
-                      startIcon={<RefreshRounded/>}
-                        sx={{
-                          textTransform: "capitalize",
-                          borderRadius: "20px",
-                        }}
-                        onClick={handleClickAgree}
-                      >
-                        Retry
-                      </Button>
-                    </Box>
-                  ) : successMsg ? (
-                    <Button
-                    size="small"
-                    color="success"
-                    variant="outlined"
-                    startIcon={<KeyRounded/>}
-                      sx={{
-                        textTransform: "capitalize",
-                        borderRadius: "20px",
-                      }}
-                      onClick={handleLogin}
-                    >
-                      Login
-                    </Button>
-                  ) : (
-                    <Box 
-                    width={'100%'}
-                    py={1}
-                    justifyContent={'space-around'}
-                    alignItems={'center'}
-                    display={'flex'}>
-                     {/* avatar btn */}
-                      <Button
-                        variant="outlined"
-                        disableElevation
-                        disabled={!about || about.length>MAX_ABOUT}
-                        startIcon={<AddAPhotoRounded/>}
-                        size="small"
-                        sx={{
-                          textTransform: "capitalize",
-                          borderRadius: "20px",
-                        }}
-                        onClick={handleClickAgree}
-                      >
-                        Avatar
-                      </Button>
-                    </Box>
-                  )}
-                </>
-              ) : (
-                <>
-                  {errorPosting ? (
-                    <Box
-                    gap={5}
-                    alignItems={'center'}
-                    display={'flex'}>
-                      <Button
-                      disableElevation
-                       size="small"
-                       variant="outlined"
-                       startIcon={<HomeRounded/>}
-                        sx={{
-                          textTransform: "capitalize",
-                          borderRadius: "20px",
-                        }}
-                        onClick={() => navigate("/")}
-                      >
-                        Home
-                      </Button>
-
+                    {errorPosting ? (
                       <Button
                       disableElevation
                       variant="outlined"
@@ -518,7 +353,6 @@ export default function AlertProfileCompletion({
                       >
                         Retry
                       </Button>
-                    </Box>
                   ) : successMsg ? (
                     <Button
                     size="small"
@@ -535,22 +369,6 @@ export default function AlertProfileCompletion({
                       Login
                     </Button>
                   ) : (
-                    <Box 
-                    display='flex'
-                    disableElevation
-                    gap={5} 
-                    alignItems={'center'}>
-                      <Button
-                      size="medium"
-                        sx={{
-                          textTransform: "capitalize",
-                          borderRadius: "20px",
-                        }}
-                        onClick={handleClickedBack}
-                      >
-                        Back
-                      </Button>
-
                       <Button
                       disableElevation
                       size="small"
@@ -560,15 +378,12 @@ export default function AlertProfileCompletion({
                           textTransform: "capitalize",
                           borderRadius: "20px",
                         }}
-                        onClick={handleCompleteRegistration}
-                        disabled={avatarFile === null || error.trim() !== "" || about.length>MAX_ABOUT}
+                        onClick={handleCompleteRegistrationOrg}
+                        disabled={avatarFile === null || error.trim() !== ""}
                       >
                         Complete
                       </Button>
-                      </Box>
                   )}
-                </>
-              )}
             </DialogActions>
           </React.Fragment>
         )}

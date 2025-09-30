@@ -77,7 +77,7 @@ const DrawerSmartphone = ({
   const { currentMode } = useSelector((state) => state.appUI);
    const isDarkMode=currentMode==='dark'
 
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
   const dispatch=useDispatch()
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -209,7 +209,7 @@ const DrawerSmartphone = ({
                               textTransform={"uppercase"}
                               color={isDarkMode ? "whitesmoke" : "inherit"}
                             >
-                                {user?.name}
+                                {user?.name ||"Guest Mode"}
                             </Typography>
 
                             {/* specialization */}
@@ -217,7 +217,7 @@ const DrawerSmartphone = ({
                             variant="caption"
                             textTransform={"capitalize"}
                             >
-                            {user?.specialisationTitle}
+                            {user?.specialisationTitle||"Login or Register"}
                             </Typography>
 
                             {/* country */}
@@ -238,7 +238,7 @@ const DrawerSmartphone = ({
                             </Box>
 
                             {/* friends */}
-                            <Box>
+                            <Box display={isGuest ?'none':'block'}>
                             <FormHelperText
                             variant="caption" 
                             sx={{ display:'flex',alignItems:'center', gap:1 }}
@@ -249,11 +249,9 @@ const DrawerSmartphone = ({
                             component={'div'} 
                             className="py-1"
                             orientation="vertical"/>
-
                             {user?.network_count}
                             </FormHelperText>
                             </Box>
-
                             {/* skills */}
                           <Box 
                           mt={0.5}

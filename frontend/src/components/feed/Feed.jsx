@@ -15,17 +15,10 @@ const CoursesMainContainer =lazy(()=>import("../courses/CoursesMainContainer"));
 const CoursesInstrContainer =lazy(()=>import("../courses/CoursesInstrContainer")) ;
 const FeedDefaultSearch = lazy(() => import("./FeedDefaultSearch"));
 const PostDetailsRouted = lazy(() => import("../post/PostDetailsRouted"));
-
 const AllJobsHiringManager=lazy(()=>import("../jobs/AllJobsHiringManager")) ;
 const AllJobsContainer = lazy(() => import("../jobs/AllJobsContainer"));
-
-
 const PageNotFound = lazy(() => import("../notfound/PageNotFound"));
-
-const UserProfile = lazy(() => import("../profile/UserProfile"));
 const PostDetailsContainer = lazy(() => import("../post/PostDetailsContiner"));
-
-
 const FeedDefaultContent = lazy(() => import("./FeedDefaultContent"));
 
 
@@ -102,7 +95,6 @@ const Feed = () => {
                 path="/posts/details/:id"
                 element={<PostDetailsRouted />}
               />
-              <Route path="/users/profile/:id" element={<UserProfile />} />
               <Route
                 path="/users/profile/posts/details"
                 element={<PostDetailsContainer />}

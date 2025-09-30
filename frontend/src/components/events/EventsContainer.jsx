@@ -8,6 +8,7 @@ import {
   InfoRounded,
   Menu,
   MyLocationRounded,
+  Person,
   Refresh,
   Settings,
   WorkRounded
@@ -38,6 +39,7 @@ import Typography from "@mui/material/Typography";
 import axios from "axios";
 import React, { Suspense, useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   handleIsJobsGlobalResults,
   handleShowingSpeedDial,
@@ -137,14 +139,11 @@ export default function EventsContainer() {
 
   // dark mode theme
   const isDarkMode=currentMode==='dark'
-
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
   const { events:eventsData } = useSelector((state) => state.currentEvents);
-
-
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
   const theme = useTheme();
-
+  const navigate=useNavigate()
     // trigger redux update
     const dispatch = useDispatch();
   // smartphones and below
@@ -157,9 +156,8 @@ export default function EventsContainer() {
   );
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
   const [open, setOpen] = useState(
-    !(CustomDeviceIsSmall() || CustomDeviceTablet()) && true
+    !(CustomDeviceIsSmall() || CustomDeviceTablet()|| isGuest)
   );
- 
 
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -168,7 +166,7 @@ export default function EventsContainer() {
   const [openAlert, setOpenAlert] = useState(false);
 
    //   handle opening of drawer profile
-   const handleShowingProfileDrawer = () => {
+    const handleShowingProfileDrawer = () => {
       dispatch(showUserProfileDrawer());
     };
 
@@ -221,7 +219,7 @@ export default function EventsContainer() {
     }
 
     // nearby jobs are those within the country of the currently logged in user
-    const country = user.country.split(" ")[1];
+    const country = user?.country?.split(" ")[1]||"";
 
     // set is fetching to true
     setIsFetching(true);
@@ -436,6 +434,11 @@ export default function EventsContainer() {
       setTextOption('Explore Events')
     }
   
+     // handle navigate to login
+    const handleNavigateLogin=()=>{
+      navigate("/auth/login")
+    }
+
 
   return (
       <Suspense
@@ -450,7 +453,7 @@ export default function EventsContainer() {
         <Box 
         display={"flex"} 
         maxHeight={'85vh'}
-         sx={{
+        sx={{
           width:isMyStats ? window.screen.availWidth-32:undefined,
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
@@ -543,21 +546,28 @@ export default function EventsContainer() {
                 alignItems={'center'} 
                 justifyContent={'flex-end'}>
               
-
+                {isGuest ? (
+                  <Button 
+                    size="medium"
+                    onClick={handleNavigateLogin}
+                    color="inherit"
+                    startIcon={<Person/>}
+                    >
+                      Signin
+                    </Button>
+                ):(
+                  <React.Fragment>
                 {/* dark mode */}
                 <IconButton  
                 onClick={handleShowDarkMode}> 
                   <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
                   <DarkModeRounded
-                
                     sx={{ color: "white", height:24, width:24,}}
                   />
                 </Tooltip> 
                 </IconButton>
 
-
-              {/* profile */}
-              <Tooltip arrow title={"profile"}>
+                  <Tooltip arrow title={"profile"}>
                 <IconButton onClick={handleShowingProfileDrawer}>
                 <Avatar
                     sx={{ width: 30, height: 30 }}
@@ -566,6 +576,9 @@ export default function EventsContainer() {
                 />
                 </IconButton>
               </Tooltip>
+              </React.Fragment>
+                )}
+
               </Box>
             </Toolbar>
           </AppBar>
@@ -591,39 +604,39 @@ export default function EventsContainer() {
                 </Box>
               )}
 
-              {open && (
-               <Box display={'flex'} gap={1} alignItems={'center'}>
-               {/* icon right or left arrow */}
-             <IconButton onClick={handleDrawerClose}>
-               {theme.direction === "rtl" ? (
-                 <ChevronRightIcon  sx={{ color:'white' }}/>
-               ) : (
-                 <ChevronLeftIcon sx={{ color:'white' }} />
-               )}
-             </IconButton>
-             <Box 
-             display={'flex'} 
-             flexDirection={'column'} 
-             justifyContent={'center'} 
-             alignItems={'center'}>
-             {/* title hiring */}
-             <Typography variant="body2" 
-             sx={{color:'white'}} 
-             fontWeight={'bold'}
-             mb={1}
-             textTransform={'uppercase'}>
-               Welcome
-             </Typography>
-             <Typography 
-             fontWeight={'bold'}
-             variant="caption" 
-              sx={{color:'white'}} 
-              >
-              - {user?.name} -
-              </Typography>
-              </Box>
+                  {open && (
+                    <Box display={'flex'} gap={1} alignItems={'center'}>
+                    {/* icon right or left arrow */}
+                  <IconButton onClick={handleDrawerClose}>
+                    {theme.direction === "rtl" ? (
+                      <ChevronRightIcon  sx={{ color:'white' }}/>
+                    ) : (
+                      <ChevronLeftIcon sx={{ color:'white' }} />
+                    )}
+                  </IconButton>
+                  <Box 
+                  display={'flex'} 
+                  flexDirection={'column'} 
+                  justifyContent={'center'} 
+                  alignItems={'center'}>
+                  {/* title hiring */}
+                  <Typography variant="body2" 
+                  sx={{color:'white'}} 
+                  fontWeight={'bold'}
+                  mb={1}
+                  textTransform={'uppercase'}>
+                    Welcome
+                  </Typography>
+                  <Typography 
+                  fontWeight={'bold'}
+                  variant="caption" 
+                  sx={{color:'white'}} 
+                  >
+                  - {user?.name?.substring(0,13) || "Guest Mode"} -
+                  </Typography>
+                  </Box>
 
-           </Box>
+                </Box>
               )}
             </DrawerHeader>
             <Divider className=" w-100" component={"div"} />
@@ -653,7 +666,7 @@ export default function EventsContainer() {
                 <ListItem
                   key={text}
                   disablePadding
-                  sx={{ display: "block" }}
+                  sx={{ display:isGuest ? 'none': 'block' }}
                   onClick={() => {
                     // update the selected option
                     setTextOption(text);

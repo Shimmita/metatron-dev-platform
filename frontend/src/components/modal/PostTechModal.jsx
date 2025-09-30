@@ -80,7 +80,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [frontendUI,setFrontendUI]=useState("")
   const [group,setGroup]=useState("")
-  
+  const [other,setOther]=useState("")
   // for category 1, 2 and 3
   const [category1, setCategory1] = useState("");
   const [category2, setCategory2] = useState("");
@@ -103,7 +103,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-
+ 
   // extracting current logged in user details from the redux store
   const ownerId = user._id;
   const ownername = user.name;
@@ -128,7 +128,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     post_body: description,
     group,
     post_category: {
-      main: postCategory,
+      main: other.trim().length>1 ? other: postCategory,
       sub1: category1,
       sub2: category2,
       sub3: category3,
@@ -432,7 +432,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 sx={{ 
                   width:12,
                   height:12,
-                 }}/>
+                }}/>
               </Tooltip>{" "}
             </IconButton>
           </Box>
@@ -514,7 +514,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               </Typography>
 
               <Box className="w-100 
-               mb-2 ">
+                mb-2 ">
                 <TextField
                   required
                   select
@@ -545,10 +545,29 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 </TextField>
               </Box>
 
+              {/* other category */}
+              {postCategory.includes('Zero') && (
+                <Box className="mb-2">
+                  <Typography variant="body2" mb={2} color={"text.secondary"} >
+                    You have selected option other, provide the other specialization or category 
+                    that your post aims to address.
+                  </Typography>
+                <TextField
+                  fullWidth
+                  disabled={isUploading}
+                  value={other}
+                  onChange={(e) => setOther(e.target.value)}
+                  id="other category"
+                  label={"Provide Other"}
+                  placeholder={'provide other'}
+                />
+              </Box>
+              )}
+
               {/* Containerization  */}
               {postCategory === "Containerization and Orchestration" && (
                 <Box>
-                  <Typography    variant="body2" color={"text.secondary"} p={1}>
+                  <Typography  variant="body2" color={"text.secondary"} p={1}>
                     Containerization and Orchestration option that your post
                     aims to enlighten to other potential users on the platform.
                   </Typography>

@@ -52,12 +52,12 @@ function JobLayout_2({
   
 
   // redux states
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
   const dispatch=useDispatch()
 
 
   // extract user email, for checks if job posted by the user or not
-  const {email}=user
+  const email=user?.email || ""
 
   // if not true the false is default
   const isMyJob=email===job?.my_email || false
@@ -174,7 +174,7 @@ function JobLayout_2({
         src={getImageMatch(job?.logo)}
       />
       </Box>
-
+      
       <Stack 
       gap={1} 
       mt={1} 
@@ -225,7 +225,7 @@ function JobLayout_2({
           <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
             <LocationOnRounded sx={{ width: 22, height: 22 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
-             {job.location.state} | {handleCountryName()}{" "}
+              {job.location.state} | {handleCountryName()}{" "}
             </Typography>
           </Box>
           <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
@@ -267,7 +267,6 @@ function JobLayout_2({
               Date Uploaded {handleDateDisplay()}
             </Typography>
           </Box>
-       
       </Stack>
 
       {/* displayed is not previewHR, probably hr definitely their jobs*/}
@@ -288,22 +287,21 @@ function JobLayout_2({
           color="primary"
           size="small"
           disableElevation
-          startIcon={isDeactivated || isMaxApplicants ? <LockRounded/> :<VerifiedRounded />}
-          disabled={job?.currentUserApplied || isMaxApplicants}
+          startIcon={isDeactivated || isMaxApplicants||isGuest ? <LockRounded/> :<VerifiedRounded />}
+          disabled={job?.currentUserApplied || isMaxApplicants||isGuest}
           onClick={handleShowingApply}
           sx={{ borderRadius: "20px", fontSize:'small', textTransform:'capitalize' }}
         >
           {job?.currentUserApplied ? "Applied":isDeactivated ? "Paused":isMaxApplicants ? "Closed":"Apply Job"}
         </Button>
       ) : (
-       
         <Button
           variant={isDarkMode ? "outlined" : "contained"}
           color="primary"
           size="small"
-          disabled={isDeactivated}
+          disabled={isDeactivated||isGuest}
           disableElevation
-          startIcon={isDeactivated ? <LockRounded/> :<TravelExploreRounded />}
+          startIcon={isDeactivated || isGuest? <LockRounded/> :<TravelExploreRounded />}
           onClick={handleShowingApply}
           sx={{ 
             borderRadius: "20px",
@@ -321,7 +319,7 @@ function JobLayout_2({
     </Card>
 
     {/* next button zone, only if item is last index */}
-   {isLastIndex && !isJobSearchGlobal && (
+   {isLastIndex && !isJobSearchGlobal && !isGuest && (
     <Box 
     alignItems={'center'}
     justifyContent={'center'}
@@ -334,15 +332,15 @@ function JobLayout_2({
       border:'1px solid',
       borderColor:'divider'
       }}
-     >
-     {isFetching ? 
-     <CircularProgress size={20}/>: 
-     <ArrowCircleRightRounded
+      >
+      {isFetching ? 
+      <CircularProgress size={20}/>: 
+      <ArrowCircleRightRounded
       color="primary"
-       sx={{ width:28,height:28}}/>}
+      sx={{ width:28,height:28}}/>}
     </IconButton>
     </Box>
-   )}
+    )}
 
      {/* show modal apply jobs */}
       {openModal && (

@@ -77,7 +77,7 @@ export default function AlertReportPost({
     handleClose();
   };
   // redux states
-  const { isTabSideBar,currentMode } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
   
   const isDarkMode=currentMode==='dark'
 

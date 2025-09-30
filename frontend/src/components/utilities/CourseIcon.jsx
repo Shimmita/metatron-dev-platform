@@ -9,6 +9,7 @@ import {
   DevicesOtherRounded,
   DomainVerificationRounded,
   DrawRounded,
+  EditNoteRounded,
   FingerprintRounded,
   HubRounded,
   LanguageRounded,
@@ -25,10 +26,9 @@ import {
   SupportAgentRounded,
   TimelineRounded,
   TuneRounded,
-  WebRounded,
+  WebRounded
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
-import React from "react";
 import bitcoin from "../../images/bitcoin.png";
 import cyber from "../../images/cybersecurity.jpeg";
 import devops from "../../images/devOps.jpeg";
@@ -47,6 +47,11 @@ function CourseIcon({ option = "" }) {
   if (option.toLowerCase().includes("arduino")) {
     return <MemoryRounded sx={{ width: 26, height: 26 }} />;
   }
+
+  if (option.toLowerCase().includes("zero")) {
+    return <EditNoteRounded sx={{ width: 26, height: 26 }} />;
+  }
+
   if (option.toLowerCase().includes("frontend")) {
     return <LaptopRounded sx={{ width: 22, height: 22 }} />;
   }
@@ -103,7 +108,6 @@ function CourseIcon({ option = "" }) {
   ) {
     return <PsychologyRounded sx={{ width: 22, height: 22 }} />;
   }
-
   if (option.toLowerCase().includes("fullstack")) {
     return <LayersRounded color="info" sx={{ width: 22, height: 22 }} />;
   }

@@ -7,9 +7,9 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import axios from "axios";
-import { getAuth, signOut } from "firebase/auth";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import logoApp from "../../images/logo_sm.png";
 import { handleShowLogout, resetDefaultBottomNav } from "../../redux/AppUI";
 import { resetAllSigningStateDetails } from "../../redux/CompleteSigning";
@@ -42,10 +42,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function LogoutAlert() {
   const[isLoading,setIsLoading]=useState(false)
-
   //   redux states
   const { isLogoutAlert,currentMode } = useSelector((state) => state.appUI);
   const isDarkMode=currentMode==='dark'
+  const navigate=useNavigate()
 
   const dispatch = useDispatch();
 
@@ -59,23 +59,10 @@ export default function LogoutAlert() {
     dispatch(handleShowLogout(false))
   };
 
-  // navigate to login page and close alert
-  const handleNavigateLoginPage = async () => {
-    // is loading true
-    setIsLoading(true)
 
-    try {
-      // send a post request to the backend to clear all cookie sessions if any
-      await axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signout`);
-
-      // clear any firebase authentication details
-      const auth = getAuth();
-      const firebaseUser = auth?.currentUser;
-      if (firebaseUser) {
-        await signOut(auth);
-      }
-
-      // clear any persisted user data
+  // handle clear redux data
+  const handleClearReduxData=()=>{
+// clear any persisted user data
             dispatch(resetClearCurrentUserRedux())
       
             // temp user Id 
@@ -152,14 +139,24 @@ export default function LogoutAlert() {
             
             // clear success msg any
             dispatch(resetClearCurrentSuccessRedux())
+  }
 
-      
+  // navigate to login page and close alert
+  const handleNavigateLoginPage = async () => {
+    // is loading true
+    setIsLoading(true)
+
+    try {
+      // send a post request to the backend to clear all cookie sessions if any
+      const result=await axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signout`);
+      if (result.status===200) {
+        handleClearReduxData()
+        handleClose()
+        navigate("/")
+      }
     } catch (error) {
-      console.error("Error occurred during logout:", error);
-    } finally{
-      // execute closing of the alert
-      handleClose()
-    }
+      console.log(error)
+    } 
   };
 
 

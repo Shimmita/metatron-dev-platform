@@ -16,7 +16,7 @@ import {
 
 
 import axios from "axios";
-import { useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import AlertGeneral from "../alerts/AlertGeneral";
 import CustomCountryName from "../utilities/CustomCountryName";
@@ -84,7 +84,7 @@ const Sidebar = () => {
   } = useSelector((state) => state.appUI);
 
    const isDarkMode=currentMode==='dark'
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
 
 
    //fetch all insights from the backend
@@ -239,7 +239,7 @@ const Sidebar = () => {
                             textTransform={"uppercase"}
                             color={isDarkMode ? "whitesmoke" : "inherit"}
                           >
-                              {user?.name}
+                              {user?.name||"Guest Mode"}
                           </Typography>
 
                           {/* specialization */}
@@ -247,10 +247,12 @@ const Sidebar = () => {
                           variant="caption"
                           textTransform={"capitalize"}
                           >
-                          {user?.specialisationTitle}
+                          {user?.specialisationTitle|| "Login or Register"}
                           </Typography>
 
                           {/* country */}
+                          {!isGuest && (
+                          <React.Fragment>
                           <Box>
                           <FormHelperText
                           variant="caption" 
@@ -284,10 +286,10 @@ const Sidebar = () => {
                           </FormHelperText>
                           </Box>
 
-                          {/* skills */}
+                          {/* skills, displayed on user a/c only */}
                             <Box 
                             mt={0.8}
-                            display={"flex"} 
+                            display={user?.account!=="Organisation" ?'flex':'none'} 
                             alignItems={'center'}
                             gap={1}
                             justifyContent={"flex-start"}>
@@ -315,10 +317,12 @@ const Sidebar = () => {
                             ))}
                           </AvatarGroup>
                         </Box>
+                          </React.Fragment>
+                         )}
+
                       </Box>
                       </Box>
 
-                  
                     <Box
                     display={"flex"} 
                     justifyContent={"center"} >
@@ -329,6 +333,7 @@ const Sidebar = () => {
                       isFetching={isFetching}
                       dataInsights={dataInsights}/>}
                     </Box>
+
 
                   {/* section more insights */}
                   <Box

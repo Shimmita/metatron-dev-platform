@@ -9,6 +9,7 @@ import {
   InfoRounded,
   Menu,
   MyLocationRounded,
+  Person,
   Refresh,
   TravelExploreRounded,
   VerifiedRounded,
@@ -137,7 +138,7 @@ export default function MiniDrawer() {
 
 
   const { jobs } = useSelector((state) => state.currentJobs);
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
 
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
   const theme = useTheme();
@@ -157,7 +158,7 @@ export default function MiniDrawer() {
   );
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
   const [open, setOpen] = useState(
-    !(CustomDeviceIsSmall() || CustomDeviceTablet()) 
+    !(CustomDeviceIsSmall() || CustomDeviceTablet()||isGuest) 
   );
  
   const [isFetching, setIsFetching] = useState(false);
@@ -221,7 +222,7 @@ export default function MiniDrawer() {
     }
 
     // nearby jobs are those within the country of the currently logged in user
-    const country = user.country.split(" ")[1];
+    const country = user?.country?.split(" ")[1]||"";
 
     // set is fetching to true
     setIsFetching(true);
@@ -535,7 +536,7 @@ export default function MiniDrawer() {
 
 
      // UI theme dark light tweaking effect
-     const handleShowDarkMode = () => {
+      const handleShowDarkMode = () => {
       // update the redux theme boolean state
       dispatch(resetDarkMode());
     };
@@ -545,6 +546,11 @@ export default function MiniDrawer() {
     const handleRefreshData=()=>{
       // set text to default explore events
       setTextOption('Explore Jobs')
+    }
+
+       // handle navigate to login
+    const handleNavigateLogin=()=>{
+      navigate("/auth/login")
     }
 
   return (
@@ -617,8 +623,8 @@ export default function MiniDrawer() {
                   <Typography 
                   variant="caption"
                   fontWeight={'bold'}
-                   textTransform={'capitalize'}
-                   >
+                  textTransform={'capitalize'}
+                  >
                     {textOption} 
                   </Typography>
                 </Box>
@@ -642,8 +648,8 @@ export default function MiniDrawer() {
                   <Typography 
                   variant="caption"
                   fontWeight={'bold'}
-                   textTransform={'capitalize'}
-                   ml={open ? 30: 24}>
+                  textTransform={'capitalize'}
+                  ml={open ? 30: 24}>
                     - {textOption} -
                   </Typography>
                 </Box>
@@ -651,34 +657,42 @@ export default function MiniDrawer() {
               )}
 
               <Box 
-               display={'flex'}
+              display={'flex'}
                 gap={2} 
                 alignItems={'center'} 
                 justifyContent={'flex-end'}>
-
-
-                {/* dark mode */}
-                <IconButton  
-                onClick={handleShowDarkMode}> 
-                  <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
-                  <DarkModeRounded
-                
-                    sx={{ color: "white", height:24, width:24,}}
+                {isGuest ? (
+                    <Button 
+                      size="medium"
+                      onClick={handleNavigateLogin}
+                      color="inherit"
+                      startIcon={<Person/>}
+                      >
+                        Signin
+                      </Button>
+                  ):(
+                    <React.Fragment>
+                  {/* dark mode */}
+                  <IconButton  
+                  onClick={handleShowDarkMode}> 
+                    <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
+                    <DarkModeRounded
+                      sx={{ color: "white", height:24, width:24,}}
+                    />
+                  </Tooltip> 
+                  </IconButton>
+  
+                    <Tooltip arrow title={"profile"}>
+                  <IconButton onClick={handleShowingProfileDrawer}>
+                  <Avatar
+                      sx={{ width: 30, height: 30 }}
+                      src={user?.avatar}
+                      alt={""}
                   />
-                </Tooltip> 
-                </IconButton>
-
-
-              {/* profile */}
-              <Tooltip arrow title={"profile"}>
-                <IconButton onClick={handleShowingProfileDrawer}>
-                <Avatar
-                    sx={{ width: 30, height: 30 }}
-                    src={user?.avatar}
-                    alt={""}
-                />
-                </IconButton>
-              </Tooltip>
+                  </IconButton>
+                </Tooltip>
+                </React.Fragment>
+                  )}
               </Box>
             </Toolbar>
           </AppBar>
@@ -705,38 +719,38 @@ export default function MiniDrawer() {
               )}
 
               {open && (
-               <Box display={'flex'} gap={1} alignItems={'center'}>
-               {/* icon right or left arrow */}
-             <IconButton onClick={handleDrawerClose}>
-               {theme.direction === "rtl" ? (
-                 <ChevronRightIcon  sx={{ color:'white' }}/>
-               ) : (
-                 <ChevronLeftIcon sx={{ color:'white' }} />
-               )}
-             </IconButton>
-             <Box 
-             display={'flex'} 
-             flexDirection={'column'} 
-             justifyContent={'center'} 
-             alignItems={'center'}>
-             {/* title hiring */}
-             <Typography variant="body2" 
-             sx={{color:'white'}} 
-             fontWeight={'bold'}
-             mb={1}
-             textTransform={'uppercase'}>
-               Job Applicant
-             </Typography>
-             <Typography
-             fontWeight={'bold'}
-              variant="caption" 
-              sx={{color:'white'}} 
-              >
-              - {user?.name} -
-              </Typography>
-              </Box>
+                  <Box display={'flex'} gap={1} alignItems={'center'}>
+                  {/* icon right or left arrow */}
+                <IconButton onClick={handleDrawerClose}>
+                  {theme.direction === "rtl" ? (
+                    <ChevronRightIcon  sx={{ color:'white' }}/>
+                  ) : (
+                    <ChevronLeftIcon sx={{ color:'white' }} />
+                  )}
+                </IconButton>
+                <Box 
+                display={'flex'} 
+                flexDirection={'column'} 
+                justifyContent={'center'} 
+                alignItems={'center'}>
+                {/* title hiring */}
+                <Typography variant="body2" 
+                sx={{color:'white'}} 
+                fontWeight={'bold'}
+                mb={1}
+                textTransform={'uppercase'}>
+                  Job Applicant
+                </Typography>
+                <Typography
+                fontWeight={'bold'}
+                variant="caption" 
+                sx={{color:'white'}} 
+                >
+                - {user?.name?.substring(0,13) || "Guest Mode"} -
+                </Typography>
+                </Box>
 
-           </Box>
+              </Box>
               )}
             </DrawerHeader>
             <Divider className=" w-100" component={"div"} />
@@ -767,7 +781,7 @@ export default function MiniDrawer() {
                 <ListItem
                   key={text}
                   disablePadding
-                  sx={{ display: "block" }}
+                  sx={{ display: isGuest ? 'none':'block' }}
                   onClick={() => {
                     // update the selected option
                     setTextOption(text);
@@ -828,7 +842,7 @@ export default function MiniDrawer() {
                           color={text === textOption ? "primary" : "inherit"}
                         />
                       ) 
-                       : index === 1 ? (
+                      : index === 1 ? (
                         <AutoAwesome
                         color={text === textOption ? "primary" : "inherit"}
                       />
@@ -870,9 +884,12 @@ export default function MiniDrawer() {
                 </ListItem>
               ))}
             </List>
-
-            {open ? (
-              <Box display={'flex'} justifyContent={'center'}>
+            {!isGuest && (
+              <React.Fragment>
+              {open ? (
+              <Box 
+              display={'flex'} 
+              justifyContent={'center'}>
               {/* hiring section */}
             <Button 
             size="small" 
@@ -893,9 +910,12 @@ export default function MiniDrawer() {
               </Tooltip>
             </ListItemButton>
             )}
-        
+                        
              {/* divider */}
             <Divider component={'div'} className={'p-1'}/>
+              </React.Fragment>
+            )}
+
 
           </Drawer>
           {/* body of the jobs */}

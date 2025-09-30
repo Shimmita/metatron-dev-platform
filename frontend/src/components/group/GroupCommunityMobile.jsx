@@ -16,7 +16,7 @@ export default function GroupCommunityMobile({
     handleJoinCommunity,
 }) 
     {
-    const[openProfile,setOpenProfile]=useState(false)
+    const [openProfile,setOpenProfile]=useState(false)
     const [tempUserId,setTempUserId]=useState(null)
     const [openPostTech,setOpenPostTech]=useState(false)
     const [postDetailedData,setPostDetailedData]=useState(null)

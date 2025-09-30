@@ -31,13 +31,13 @@ import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
 import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
 import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
+import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
 import './Progress.css';
-import CustomCountryName from "../utilities/CustomCountryName";
 // styled modal
 const StyledModalJob = styled(Modal)({
   display: "flex",
@@ -83,7 +83,7 @@ const ApplyJobModal = ({
   const [currentButton,setCurrentButton]=useState(user?.cvLink==="" ? 0:1)
 
   // extract cvLink and name it cvName
-  const {cvLink:cvName}=user
+  const cvName=user?.cvLink || ""
   // redux states
   const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
   const isDarkMode=currentMode==='dark'
@@ -573,6 +573,7 @@ const ApplyJobModal = ({
                   <Typography
                     key={data}
                     gutterBottom
+                    ml={2}
                     component={'li'}
                     variant="caption"
                     >
@@ -600,6 +601,7 @@ const ApplyJobModal = ({
                     key={data}
                     gutterBottom
                     component={'li'}
+                    ml={2}
                     variant="caption"
                     >
                     {data}
@@ -631,7 +633,7 @@ const ApplyJobModal = ({
                     {/* curriculum vitae application */}
                     <Box mb={1} >
                     <Typography
-                    p={2}
+                    py={2}
                     variant="caption"
                     >
                     Upload your latest version of Curriculum Vitae (CV) in

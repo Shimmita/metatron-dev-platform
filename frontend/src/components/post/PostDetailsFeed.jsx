@@ -5,6 +5,7 @@ import {
   ForumRounded,
   GitHub,
   GradeOutlined,
+  LockRounded,
   MoreVertRounded,
   UpdateRounded,
   VerifiedRounded
@@ -114,7 +115,7 @@ const PostDetailsFeed = ({
   );
    const isDarkMode=currentMode==='dark'
 
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
   // extract basic current user details
   const { _id, avatar, name, specialisationTitle: title } = user || {};
 
@@ -194,7 +195,7 @@ const PostDetailsFeed = ({
   useLayoutEffect(() => {
     const handlePostBelongsCurrentUser = () => {
       const postID = `${postDetailedData?.post_owner?.ownerId}`;
-      const currentUserID = `${user._id}`;
+      const currentUserID = `${user?._id}`;
 
       if (postID === currentUserID) {
         setPostBelongsCurrentUser(true);
@@ -204,7 +205,7 @@ const PostDetailsFeed = ({
     };
 
     handlePostBelongsCurrentUser();
-  }, [user._id, postDetailedData?.post_owner?.ownerId, postDetailedData]);
+  }, [user?._id, postDetailedData?.post_owner?.ownerId, postDetailedData]);
 
   // handle user clicking like button
   const handlePostLikes = () => {
@@ -337,6 +338,12 @@ const PostDetailsFeed = ({
       } 
     }
 
+
+  // handle open profile
+    const handleOpenMiniProfile=()=>{
+      setOpenMiniProfileAlert(true)
+      }
+
   return (
     <React.Fragment>
       {/* display error message */}
@@ -365,8 +372,6 @@ const PostDetailsFeed = ({
         </Collapse>
       )}
 
-  
-      
       <Card
       className="rounded shadow-sm"
         style={{
@@ -378,8 +383,8 @@ const PostDetailsFeed = ({
         <CardHeader
           sx={{ padding: 0, margin: 0 }}
           avatar={
-              <IconButton onClick={() => setOpenMiniProfileAlert(true)}>
-              <Tooltip arrow title='profile'>
+              <IconButton onClick={isGuest ? null:handleOpenMiniProfile}>
+              <Tooltip arrow title={isGuest? 'login':'profile'}>
                 <Avatar
                   src={postDetailedData?.post_owner?.owneravatar}
                   variant="rounded"
@@ -407,7 +412,20 @@ const PostDetailsFeed = ({
                 {getElapsedTime(postDetailedData?.createdAt)}
               </Typography>
 
-              {!postBelongsCurrentUser && (
+              {isGuest ? (
+                <Box px={2}>
+                  <Tooltip 
+                  title="login" 
+                  arrow>
+                  <LockRounded
+                    color="primary"
+                    sx={{ width: 15, height: 15 }}
+                  />
+                  </Tooltip>
+                  </Box>
+              ):(
+                <React.Fragment>
+                {!postBelongsCurrentUser && (
                 <Tooltip title="more" arrow>
                   <IconButton
                     size="small"
@@ -420,6 +438,8 @@ const PostDetailsFeed = ({
                     />
                   </IconButton>
                 </Tooltip>
+              )}
+                </React.Fragment>
               )}
               <Menu
                 anchorEl={anchorEl}
@@ -457,12 +477,6 @@ const PostDetailsFeed = ({
                 {CustomDeviceSmallest()
                   ? handleOccupation()
                   : `${postDetailedData.post_owner.ownertitle}`}
-              </Typography>
-              {/* skills */}
-              <Typography variant="body2">
-                {postDetailedData.post_owner.ownerskills[0]} |{" "}
-                {postDetailedData.post_owner.ownerskills[1]} |{" "}
-                {postDetailedData.post_owner.ownerskills[2]}
               </Typography>
               {/* location */}
               <Typography variant="body2">
@@ -665,7 +679,7 @@ const PostDetailsFeed = ({
                     onChange={onClick}
                     icon={icon}
                     checkedIcon={icon}
-                    disabled={isUploading}
+                    disabled={isUploading||isGuest}
                   />
                 </Tooltip>
                 <Typography

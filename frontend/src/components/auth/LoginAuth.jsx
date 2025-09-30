@@ -25,36 +25,12 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import React, { lazy, useEffect, useState } from "react";
+import React, { lazy, useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
-import { resetDarkMode, resetDefaultBottomNav } from "../../redux/AppUI";
-import { resetAllSigningStateDetails } from "../../redux/CompleteSigning";
-import { resetClearCurrentAuthMessage } from "../../redux/CurrentAuthMessages";
-import { resetClearChatBot } from "../../redux/CurrentChatBot";
-import { resetClearCurrentConnectTop } from "../../redux/CurrentConnect";
-import { resetClearCurrentConnectNotif } from "../../redux/CurrentConnectNotif";
-import { resetClearConversations } from "../../redux/CurrentConversations";
-import { resetClearCurrentCourses } from "../../redux/CurrentCourses";
-import { resetClearCurrentEvents } from "../../redux/CurrentEvents";
-import { resetClearCurrentEventsTop } from "../../redux/CurrentEventsTop";
-import { resetClearCurrentGlobalSearch } from "../../redux/CurrentGlobalSearch";
-import { resetClearCurrentGroupCommunities } from "../../redux/CurrentGroups";
-import { resetClearCurrentJobFeedBack } from "../../redux/CurrentJobFeedBack";
-import { resetClearCurrentJobs } from "../../redux/CurrentJobs";
-import { resetJobSearch } from "../../redux/CurrentJobSearch";
-import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
-import { resetClearPeopleData } from "../../redux/CurrentModal";
-import { resetClearCurrentNetwork } from "../../redux/CurrentNetwork";
-import { resetClearCurrentPostReactions } from "../../redux/CurrentPostReactions";
-import { resetClearCurrentReport } from "../../redux/CurrentPostReported";
-import { resetClearCurrentPosts } from "../../redux/CurrentPosts";
-import { resetClearCurrentPostsTop } from "../../redux/CurrentPostsTop";
-import { resetClearCurrentProfileView } from "../../redux/CurrentProfileView";
-import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
-import { resetClearCurrentSuccessRedux } from "../../redux/CurrentSuccess";
-import { resetClearCurrentUserRedux, resetClearTempUserIDRedux, updateUserCurrentUserRedux } from "../../redux/CurrentUser";
+import { resetDarkMode } from "../../redux/AppUI";
+import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import OptionsMoreLogin from "./OptionsMoreLogin";
@@ -71,7 +47,8 @@ const LoginAuth = () => {
 
   // redux state
   const { currentMode } = useSelector((state) => state.appUI);
-  const { authMessage } = useSelector((state) => state.currentAuthMessage);
+  const { isGuest } = useSelector((state) => state.currentUser);
+  
 
   const isDarkMode = currentMode === "dark";
 
@@ -101,6 +78,20 @@ const LoginAuth = () => {
     dispatch(resetDarkMode());
   };
 
+  // use layout effect if user is logged nav home
+  useLayoutEffect(()=>{
+    if (!isGuest) {
+    navigate("/")
+    }
+  },[isGuest,navigate])
+
+
+// handle navigate home
+const handleNavigateHome=()=>{
+  navigate("/")
+}
+
+
   const handleLogin = async () => {
     const user = { email, password };
     setIsFetching(true);
@@ -113,7 +104,10 @@ const LoginAuth = () => {
       .then((res) => {
         const user_data = res.data;
         if (user_data?.email_verified) {
+          // update user
           dispatch(updateUserCurrentUserRedux(res.data));
+          // navigate to homepage
+          navigate("/")
         } else {
           navigate(`/auth/verification?${user_data}`);
         }
@@ -133,97 +127,6 @@ const LoginAuth = () => {
       });
   };
 
-  const handleClearReduxDataAny = React.useCallback(async () => {
-    try {
-      // clear any persisted user data
-      dispatch(resetClearCurrentUserRedux())
-
-      // temp user Id 
-      dispatch(resetClearTempUserIDRedux())
-
-      // reset all pending signin details
-      dispatch(resetAllSigningStateDetails())
-
-      // clear bottom nav details
-      dispatch(resetDefaultBottomNav())
-
-      // reset chat bot
-      dispatch(resetClearChatBot())
-
-      //reset connect requests
-      dispatch(resetClearCurrentConnectTop()) 
-
-      // clear connect Notifications
-      dispatch(resetClearCurrentConnectNotif())
-
-      // reset clear conversations
-      dispatch(resetClearConversations())
-
-      // reset courses
-      dispatch(resetClearCurrentCourses())
-
-      // reset clear events any
-      dispatch(resetClearCurrentEvents())
-
-      // reset clear top events
-      dispatch(resetClearCurrentEventsTop())
-
-      // reset clear global search
-      dispatch(resetClearCurrentGlobalSearch())
-
-      // reset clear communities
-      dispatch(resetClearCurrentGroupCommunities())
-
-      // reset clear
-      dispatch(resetClearCurrentJobFeedBack())
-
-      // reset clear jobs
-      dispatch(resetClearCurrentJobs())
-
-      // reset clear job search
-      dispatch(resetJobSearch())
-
-      // clear jobs top
-      dispatch(resetClearCurrentJobsTop())
-
-      // clear modal people details
-      dispatch(resetClearPeopleData())
-
-      // clear network of people
-      dispatch(resetClearCurrentNetwork())
-
-      // clear post reaction
-      dispatch(resetClearCurrentPostReactions())
-
-      // clear post reports
-      dispatch(resetClearCurrentReport())
-
-      // clear posts
-      dispatch(resetClearCurrentPosts())
-
-      // clear posts top insights
-      dispatch(resetClearCurrentPostsTop())
-
-      // clear profile view
-      dispatch(resetClearCurrentProfileView())
-
-      // clear snack bars
-      dispatch(resetClearCurrentSnack())
-      
-      // clear success msg any
-      dispatch(resetClearCurrentSuccessRedux())
-      
-    } catch (error) {
-      console.log(error.message);
-    }
-  }, [dispatch]);
-  
-
-
-  // handle clearing of auth message only
-  const handleClearAuthMessage=()=>{
-      dispatch(resetClearCurrentAuthMessage());
-  }
 
   // handle email verification
   const handleEmailVerification = () => {
@@ -232,19 +135,14 @@ const LoginAuth = () => {
 
   // auto clear general messages after 2 seconds
   useEffect(() => {
-    if (messageGeneral) {
+    if (messageGeneral ) {
       const timer = setTimeout(() => {
         setMessageGeneral("");
       }, 2000);
       return () => clearTimeout(timer);
     }
-
   }, [messageGeneral,dispatch]);
 
-  // auto clear redux data
-  useEffect(() => {
-  handleClearReduxDataAny()
-  }, [ handleClearReduxDataAny]);
 
   return (
     <Box
@@ -314,11 +212,11 @@ const LoginAuth = () => {
             </Menu>
           </Box>
 
-          <Box>
+          <Box >
             <Box display={"flex"} justifyContent={"center"}>
               <Avatar alt={"logo"} sx={{ width: 70, height: 70 }} src={logo} />
             </Box>
-            <Box mb={3}>
+            <Box>
               <Typography
                 textAlign={"center"}
                 fontWeight={"bold"}
@@ -381,35 +279,6 @@ const LoginAuth = () => {
               </Box>
             )}
 
-            {/* redux auth messages */}
-            {authMessage && (
-              <Box display={"flex"} justifyContent={"center"}>
-                <Collapse in={!!authMessage}>
-                  <Alert
-                    className="rounded-5"
-                    severity={
-                      authMessage?.includes("server") ? "warning" : "success"
-                    }
-                    // close button clears immediately
-                    onClose={handleClearAuthMessage} 
-                    action={
-                      <IconButton
-                        aria-label="close"
-                        color="inherit"
-                        size="small"
-                        onClick={handleClearAuthMessage}
-                      >
-                        <Close fontSize="inherit" />
-                      </IconButton>
-                    }
-                    sx={{ mb: 2 }}
-                  >
-                    {authMessage.toString()}
-                  </Alert>
-                </Collapse>
-              </Box>
-            )}
-
             <Box mb={4} display={"flex"} justifyContent={"center"}>
               <TextField
                 required
@@ -424,7 +293,7 @@ const LoginAuth = () => {
               />
             </Box>
 
-            <Box mb={4} display={"flex"} justifyContent={"center"}>
+            <Box mb={2} display={"flex"} justifyContent={"center"}>
               <FormControl fullWidth variant="outlined" className="w-75">
                 <InputLabel htmlFor="outlined-adornment-password">
                   Password &nbsp;*
@@ -505,6 +374,21 @@ const LoginAuth = () => {
               </Typography>
             </Box>
 
+            <Box mb={2} display={"flex"} justifyContent={"center"}>
+              <Button
+                startIcon={isFetching && <CircularProgress size={13} />}
+                variant="outlined"
+                className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
+                disabled={isFetching}
+                sx={{ textTransform: "none", borderRadius: "20px" }}
+                disableElevation
+                onClick={handleNavigateHome}
+              >
+                Home
+              </Button>
+            </Box>
+
+            {/* login btn */}
             <Box mb={2} display={"flex"} justifyContent={"center"}>
               <Button
                 startIcon={isFetching && <CircularProgress size={13} />}

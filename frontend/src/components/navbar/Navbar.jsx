@@ -6,6 +6,7 @@ import {
   FilterListRounded,
   MenuRounded,
   NotificationsRounded,
+  Person,
   SearchRounded
 } from "@mui/icons-material";
 import {
@@ -147,7 +148,7 @@ const Navbar = () => {
     (state) => state.currentModal
   );
 
-    const { user } = useSelector((state) => state.currentUser);
+    const { user, isGuest } = useSelector((state) => state.currentUser);
     const { post_reactions } = useSelector((state) => state.currentPostReactions);
     const { reportedPost } = useSelector((state) => state.currentReportedPost);
     const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
@@ -155,13 +156,12 @@ const Navbar = () => {
     const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
     const { conversations } = useSelector((state) => state.currentConversation);
     const { groups:groupData } = useSelector((state) => state.currentGroups);
-    
+
+    // extracting current user ID
+    const currentUserId=isGuest ?false:user?._id
 
     // get count of conversation messages where target read is false
     const conversationsCount=conversations?.filter(conversation=>conversation?.isTargetRead===false && conversation?.senderName!==user?.name)?.length 
-  
-  // extracting current user ID
-  const { _id: currentUserId } = user;
 
   // redux state UI
   const {
@@ -226,11 +226,11 @@ const Navbar = () => {
     
     // alert user to type text in search box
     if (searchTerm.length<1) {
-     setOpenAlertGeneral(true)
-     setErrorMessage("please type in the search box and search for resources!")
-     return
+        setOpenAlertGeneral(true)
+        setErrorMessage("please type in the search box and search for resources!")
+        return
     }
- 
+
     // clear any redux states of global search if present
     dispatch(resetClearCurrentGlobalSearch());
 
@@ -287,8 +287,12 @@ const Navbar = () => {
   }
   
 
+  // only when authenticated run the hooks
   // get all possible post reaction notifications based on current userID
   useLayoutEffect(() => {
+    if (!currentUserId) {
+      return
+    }
     // set is fetching to true
     setIsFetching(true);
 
@@ -323,6 +327,9 @@ const Navbar = () => {
 
   // get all connect requests sent by users to the current user as being target
   useLayoutEffect(() => {
+     if (!currentUserId) {
+      return
+    }
     // set is fetching to true
     setIsFetching(true);
 
@@ -358,6 +365,9 @@ const Navbar = () => {
 
   // get all posts reports that targets this currently logged in user
   useLayoutEffect(() => {
+     if (!currentUserId) {
+      return
+    }
     // set is fetching to true
     setIsFetching(true);
 
@@ -390,6 +400,9 @@ const Navbar = () => {
 
   // fetch or get all conversations done by the current user
     useLayoutEffect(() => {
+      if (!currentUserId) {
+      return
+    }
       // set is fetching to true
       setIsFetching(true);
   
@@ -403,7 +416,7 @@ const Navbar = () => {
         )
         .then((res) => {
           // update the states of conversations
-         dispatch(updateConversations(res?.data)) ;
+        dispatch(updateConversations(res?.data)) ;
         })
         .catch((err) => {
           console.log(err);
@@ -424,6 +437,9 @@ const Navbar = () => {
 
     // get all profile views data from the backend
     useLayoutEffect(() => {
+      if (!currentUserId) {
+      return
+    }
       // set is fetching to true
       setIsFetching(true);
   
@@ -437,7 +453,7 @@ const Navbar = () => {
         )
         .then((res) => {
           // update the states of conversations
-         dispatch(updateCurrentProfileViews(res?.data)) ;
+        dispatch(updateCurrentProfileViews(res?.data)) ;
         })
         .catch((err) => {
           console.log(err);
@@ -458,6 +474,9 @@ const Navbar = () => {
 
     // fetching of all job feedback 
     useLayoutEffect(() => {
+        if (!currentUserId) {
+        return
+      }
       // set is fetching to true
       setIsFetching(true);
   
@@ -491,44 +510,48 @@ const Navbar = () => {
 
 
      // useLayout effect, fetch data of groups
-        useLayoutEffect(()=>{
-          // redux data present
-          if (groupData) {
-            return
-          }
-    
-          // fetch to populate the redux groups
-          axios.get(
-                `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/groups/all/${user?._id}`,
-                {
-                    withCredentials: true,
-                }
-                )
-                .then((res) => {
-                // update groups and communities data
-                if (res?.data) {
-                    dispatch(updateCurrentGroupsCommunities(res.data))
-                } 
-                })
-                .catch(async (err) => {
-                console.log(err);
-                //  user login session expired show logout alert
-                if (err?.response?.data.login) {
-                    window.location.reload();
-                }
-                if (err?.code === "ERR_NETWORK") {
-                    setErrorMessage(
-                    "server unreachable!"
-                    );
-                    return;
-                }
-                setErrorMessage(err?.response.data);
-                })
-                .finally(() => {
-                setIsFetching(false);
-                });
-        },[user?._id,dispatch,groupData])
+      useLayoutEffect(()=>{
+        // redux data present
+        if (groupData) {
+          return
+        }
+  
+        // fetch to populate the redux groups
+        axios.get(
+              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/groups/all/${user?._id}`,
+              {
+                  withCredentials: true,
+              }
+              )
+              .then((res) => {
+              // update groups and communities data
+              if (res?.data) {
+                  dispatch(updateCurrentGroupsCommunities(res.data))
+              } 
+              })
+              .catch(async (err) => {
+              console.log(err);
+              //  user login session expired show logout alert
+              if (err?.response?.data.login) {
+                  window.location.reload();
+              }
+              if (err?.code === "ERR_NETWORK") {
+                  setErrorMessage(
+                  "server unreachable!"
+                  );
+                  return;
+              }
+              setErrorMessage(err?.response.data);
+              })
+              .finally(() => {
+              setIsFetching(false);
+              });
+      },[user?._id,dispatch,groupData])
 
+    // handle navigate to login
+    const handleNavigateLogin=()=>{
+      navigate("/auth/login")
+    }
 
   return (
     <React.Fragment>
@@ -597,7 +620,7 @@ const Navbar = () => {
                       src={AppLogo} 
                       sx={{ 
                         width:30,height:30
-                       }}
+                      }}
                       />
                     </IconButton>
                   )}
@@ -635,7 +658,7 @@ const Navbar = () => {
           {!(CustomDeviceIsSmall()||CustomDeviceTablet()) && (
             <SearchBar sx={{ 
               ml:10
-             }}>
+            }}>
               <Box
                 sx={{
                   display: "flex",
@@ -684,8 +707,8 @@ const Navbar = () => {
                       </Tooltip>
 
                       <Tooltip
-                       title={'filter'} 
-                       arrow
+                      title={'filter'} 
+                      arrow
                         >
                       <IconButton
                       onClick={handleShowContentFilter}
@@ -705,7 +728,6 @@ const Navbar = () => {
             </SearchBar>
           )}
 
-         
          {/* shown in small devices and tabs */}
             <Box 
             justifyContent={'center'}
@@ -779,7 +801,6 @@ const Navbar = () => {
           <IconsContainer>
             {(CustomDeviceIsSmall()||CustomDeviceTablet()) && (
               <Box 
-             
               >
                 {/* display when search not clicked */}
                 {!showMobileSearch && (
@@ -805,9 +826,8 @@ const Navbar = () => {
                 }
               >
 
-                {!CustomDeviceIsSmall() && (
+                {!CustomDeviceIsSmall() && currentUserId && (
                 <React.Fragment>
-              
                  {/* change theme trigger */}
                 <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
                 <IconButton  onClick={handleShowDarkMode}> 
@@ -820,7 +840,10 @@ const Navbar = () => {
                 </React.Fragment>
                 )}
 
-                {/* notifications icon */}
+                {/* show login btn if no user,noId */}
+                {currentUserId ? (
+                  <React.Fragment>
+                  {/* notifications icon */}
                 <Tooltip 
                 arrow 
                 title={"notifications"} 
@@ -876,6 +899,19 @@ const Navbar = () => {
                     />
                   </IconButton>
                 </Tooltip>
+                  </React.Fragment>
+                ):(
+                  <Button 
+                  size="medium"
+                  onClick={handleNavigateLogin}
+                  color="inherit"
+                  startIcon={<Person/>}
+                  >
+                    Signin
+                  </Button>
+                )}
+
+                
               </Box>
             )}
           </IconsContainer>

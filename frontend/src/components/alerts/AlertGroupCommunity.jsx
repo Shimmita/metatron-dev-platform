@@ -47,10 +47,10 @@ export default function AlertGroupCommunity({
       const dispatch=useDispatch()
 
     // redux state
-    const { user } = useSelector((state) => state.currentUser);
+    const { user,isGuest } = useSelector((state) => state.currentUser);
 
     // prevent showing group modal when is success alert
-      const { isActive } = useSelector((state) => state.currentSuccess);
+      const { isActive:isActiveSuccess } = useSelector((state) => state.currentSuccess);
     
     let { groups:groupData } = useSelector((state) => state.currentGroups);
 
@@ -201,12 +201,12 @@ export default function AlertGroupCommunity({
 
   return (
       <Dialog
-        open={openGroup && !isActive}
-        fullScreen
+        open={openGroup && !isActiveSuccess}
         fullWidth
+        fullScreen={focusedGroup}
         TransitionComponent={Transition}
         keepMounted
-        aria-describedby="alert-dialog-slide-description"
+        aria-describedby="alert-dialog-slide-alert-groups"
           sx={{
             backdropFilter:'blur(5px)',
           }}
@@ -355,7 +355,7 @@ export default function AlertGroupCommunity({
             </ListItem>
 
             {/* btn join or view */}
-            <Box>
+            <Box display={isGuest ? 'none':'block'}>
               {!group.isMember ? (
                 <Button 
               sx={{

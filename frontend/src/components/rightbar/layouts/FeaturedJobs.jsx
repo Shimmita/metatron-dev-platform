@@ -31,10 +31,10 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
     (state) => state.appUI
   );
   // redux states
-    const { user } = useSelector((state) => state.currentUser);
+    const { user,isGuest } = useSelector((state) => state.currentUser);
 
   // extract user email, for checks if job posted by the user or not
-  const {email}=user
+    const email=isGuest? "":user?.email
 
   // if not true the false is default
   const isMyJob=email===jobTop?.my_email || false
@@ -55,7 +55,9 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
   // job has been paused or deactivated by the poster
   const isDeactivated=jobTop?.status==="inactive"
     // check if job reached maxima number of applicants
-    const isMaxApplicants=jobTop?.applicants?.total===MAX_APPLICANTS || jobTop?.applicants?.total===jobTop?.applicants_max
+    const isMaxApplicants=
+    jobTop?.applicants?.total===MAX_APPLICANTS || 
+    jobTop?.applicants?.total===jobTop?.applicants_max
 
   return (
     <React.Fragment>
@@ -162,7 +164,7 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
               {/* applicants counter */}
               <Box>
                 <Typography variant="caption" color={"text.secondary"} fontWeight={'bold'}>
-                   {!(jobTop?.website==="") ? "website" :`${jobTop?.applicants?.total}/${jobTop?.applicants_max || MAX_APPLICANTS} `}
+                  {!(jobTop?.website==="") ? "website" :`${jobTop?.applicants?.total}/${jobTop?.applicants_max || MAX_APPLICANTS} `}
                 </Typography>
               </Box>
 
@@ -173,8 +175,8 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                   size="small"
                   onClick={handleOpeningApplyJob}
                   variant="contained"
-                  startIcon={isDeactivated || isMaxApplicants ? <LockRounded/>: !(jobTop?.website==="") ? <TravelExploreRounded /> :<Verified />}
-                  disabled={jobTop?.currentUserApplied||isDeactivated ||isMaxApplicants}
+                  startIcon={isDeactivated || isGuest || isMaxApplicants ? <LockRounded/>: !(jobTop?.website==="") ? <TravelExploreRounded /> :<Verified />}
+                  disabled={jobTop?.currentUserApplied||isDeactivated ||isMaxApplicants ||isGuest}
                   sx={{
                     textTransform: "capitalize",
                     borderRadius: "20px",

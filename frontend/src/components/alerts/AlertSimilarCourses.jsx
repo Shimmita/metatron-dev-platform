@@ -39,14 +39,12 @@ export default function AlertSimilarCourses({
     const [similarCourses,setSimilarCourses]=useState([])
     const [isFetching, setIsFetching] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const { user } = useSelector((state) => state.currentUser);
+    const { user,isGuest } = useSelector((state) => state.currentUser);
 
-    
     const handleClose = () => {
         setOpenSimilarCourses(false);
 
     };
-
 
     // handle focused course
     const handleFocusedCourse=(course)=>{
@@ -133,7 +131,7 @@ export default function AlertSimilarCourses({
         {/* dialog content */}
         <DialogContent 
         dividers
-         sx={{
+        sx={{
           overflow: "auto",
           maxHeight:'70vh',
           // Hide scrollbar for Chrome, Safari and Opera
@@ -196,6 +194,7 @@ export default function AlertSimilarCourses({
             {/* btn viewing the course */}
             <Box mt={1}>
                 <Button
+                disabled={isGuest}
                 size="small"
                 onClick={()=>handleFocusedCourse(course)}
                 variant="outlined"

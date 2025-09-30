@@ -1,14 +1,19 @@
 import {
+  BusinessRounded,
   CheckCircle,
   Close,
+  Person,
   PublicRounded
 } from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
+  Checkbox,
   Chip,
   Divider,
+  FormControlLabel,
   IconButton,
+  MenuItem,
   TextField,
   Tooltip,
   Typography
@@ -21,19 +26,23 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ModalPolicyTerms from "../auth/ModalPolicyTerms";
+import AccountVersion from "../data/AccountVersion";
 import AllCountries from "../data/AllCountries";
-import { useSelector } from "react-redux";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+
 export default function AlertCountry({
   openAlertCountry,
   setOpenAlertCountry,
   setCountry,
+  setAccount,
+  account,
   country = "",
   terms = "",
  
@@ -42,6 +51,8 @@ export default function AlertCountry({
   //   control the country selection
   const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState("");
+  const [value, setValue] = useState(false)
+
   const [options, setOptions] = useState(
     AllCountries.map((val) => {
       let country = `+${val.phone} ${val.label} (${val.code})`;
@@ -82,14 +93,14 @@ export default function AlertCountry({
   const handleSubmission = () => {
    
       // this is personal account we needs only country field
-      if (country) {
+      if (country && account) {
         // clear error message if any
         setError("");
         // close dialog
         handleClose();
       } else {
         // country empty
-        setError("please select your country");
+        setError("select your country and account");
       }
     
   };
@@ -105,6 +116,12 @@ export default function AlertCountry({
     handleClose();
     // nav home if user not logged in then login page be shown
     navigate("/");
+  };
+
+
+  // handle update agreement
+    const handleChange = () => {
+    setValue(prev=>!prev);
   };
 
   return (
@@ -134,13 +151,13 @@ export default function AlertCountry({
                     sx={{ width: 32, height: 32 }}
                     color="primary"
                   />
-                  <Typography variant="body1">Country Selection</Typography>
+                  <Typography variant="body1">Country and Account</Typography>
               
             </Box>
             {/* close button */}
             <Tooltip title='close' arrow>
             <IconButton 
-             sx={{ 
+            sx={{ 
                   border:'1px solid',
                   borderColor:'divider'
                 }}
@@ -161,7 +178,6 @@ export default function AlertCountry({
 
           {/* divider */}
           <Divider component={"div"} />
-
           <Box
             sx={{
               overflow: "auto",
@@ -188,8 +204,8 @@ export default function AlertCountry({
                   gutterBottom
                   id="alert-dialog-slide-description"
                 >
-                  Please select your country of residence from the
-                  drop-down options below.
+                  Please select your current country of residence from the list of 
+                  countries provided below in the drop-down menu.
                 </DialogContentText>
 
                 <Autocomplete
@@ -207,7 +223,7 @@ export default function AlertCountry({
                     <TextField
                       {...params}
                       label="Country"
-                      variant="standard"
+                      variant="outlined"
                       fullWidth
                     />
                   )}
@@ -248,12 +264,77 @@ export default function AlertCountry({
                     />
                   }
                 />
-                
+
+
+                {/* account type */}
+
+                <DialogContentText
+                mt={1}
+                variant="body2"
+                gutterBottom
+                id="alert-dialog-slide-type-account"
+                >
+                  Please select your preferred account. Personal account is intended for an individual 
+                  user while organisation for businesses, institutions, corporations and companies.
+                </DialogContentText>
+
+                <Box 
+                display={"flex"} 
+                justifyContent={"center"}>
+                  <TextField
+                    required
+                    select
+                    fullWidth
+                    id="Account"
+                    value={account}
+                    label="Account"
+                    onChange={(e) => setAccount(e.target.value)}
+                  >
+                    {
+                      AccountVersion?.map((account) => (
+                        <MenuItem
+                        key={account}
+                        value={account}
+                        sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                      >
+                        {account==="Personal" ? (
+                          <Person
+                            color="primary"
+                            sx={{ width: 26, height: 26 }}
+                          />
+                        ) :
+                          <BusinessRounded 
+                          color="info"
+                          sx={{ width: 26, height: 26 }}/>
+                        }{" "}
+                        {account}
+                      </MenuItem>
+                      ))}
+                  </TextField>
+                </Box>
+
+                {/* strategy */}
+                <Box mt={2}>
+                <FormControlLabel 
+                control={<Checkbox 
+                onChange={handleChange}
+                size="medium"/>}
+                label={
+                <Typography 
+                color={value===false ? 'text.secondary':undefined}
+                variant="body2">
+                I agree to post tech related content on the platform to the
+                community and using the platform in promoting technology.
+                </Typography>}/>
+                </Box>
               </>
             </DialogContent>
           </Box>
           <DialogActions>
-            <Button onClick={handleSubmission} sx={{ borderRadius: "10px" }}>
+            <Button 
+            disabled={value===false}
+            onClick={handleSubmission} 
+            sx={{ borderRadius: "10px" }}>
               Submit
             </Button>
           </DialogActions>

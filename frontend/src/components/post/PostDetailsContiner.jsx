@@ -253,7 +253,7 @@ function PostDetailsContainer({
               </Collapse>
             </Box>
           )}
-           
+          
           {/* card container */}
           <Box >
             {/* render post details feed here */}
@@ -318,6 +318,7 @@ function PostDetailsContainer({
               )}
             </Box>
           </Box>
+
         </React.Fragment>
       )}
     </Stack>

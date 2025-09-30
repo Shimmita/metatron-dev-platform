@@ -33,7 +33,12 @@ import GenderData from "../data/GenderData";
 import Institutions from "../data/Institution";
 import SpecialisationJobs from "../data/SpecialisationJobs";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
+import AccountVersion from "../data/AccountVersion";
+import OrgSpecializations from "../data/OrgSpecializations";
+import AlertOrgCompletion from "../alerts/AlertOrgCompletion";
 const RegisterAlertTitle = lazy(() => import("./RegisterAlertTitle"));
+
+const MAX_ABOUT=400
 
 const RegistrationAuth = () => {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -49,15 +54,21 @@ const RegistrationAuth = () => {
   const [missingFieldMessage, setMissingFieldMessage] = useState("");
   const [openAlertGenral, setOpenAlertGenral] = useState(false);
   const [titleAlert, setTitleAlert] = useState();
+  const [account,setAccount]=useState(AccountVersion[0])
   const [selectedSkills, setSelectedSkills] = useState([]);
   // control edu institutions
   const [eduInstitution, setEduInstitution] = useState("");
-  const [inputValue, setInputValue] = useState("");
+  const [eduInputValue, setEduInputValue] = useState("");
+  const [inputCounties, setInputCounties] = useState("");
   const [options, setOptions] = useState(Institutions);
+  // about field for business account
+  const [about, setAbout] = useState("");
+
+  // track business a/c
+  let isPersonal=account==="Personal"
 
   // user object
   const [user, setUser] = useState({});
-
   // alert profile pic
   const [openAlertProfile, setOpenAlertProfile] = useState(false);
   // alert country before proceed
@@ -96,11 +107,12 @@ const RegistrationAuth = () => {
     setShowNext((prev) => !prev);
   };
 
+  //handle selection institution
   const handleAddNew = () => {
-    if (inputValue && !options.includes(inputValue)) {
-      setOptions([...options, inputValue]);
-      setEduInstitution(inputValue);
-      setInputValue("");
+    if (eduInputValue && !options.includes(eduInputValue)) {
+      setOptions([...options, eduInputValue]);
+      setEduInstitution(eduInputValue);
+      setEduInputValue("");
     }
   };
   // clear an institution
@@ -108,10 +120,23 @@ const RegistrationAuth = () => {
     setEduInstitution(null);
   };
 
+  // clear county
+  const handleDeleteCounty = () => {
+    setCounty(null);
+  };
+
+  // add new county
+  const handleAddNewCounty = () => {
+    if (inputCounties && !CountiesInKenya.includes(inputCounties)) {
+      setCounty(setInputCounties);
+      setInputCounties("");
+    }
+  };
+
   // zero match
   useEffect(() => {
     if (specialisationTitle === "Zero Matched") setOpenAlert(true);
-  }, [specialisationTitle,name]);
+  }, [specialisationTitle,name,phone]);
 
   const handleMissingField = () => {
 
@@ -146,19 +171,51 @@ const RegistrationAuth = () => {
       );
       return true;
     }
-    if (educationLevel?.trim() === "") {
-      setTitleAlert("Missing Field");
-      setMissingFieldMessage(
-        "Please fill all the missing fields, field level of education is missing !"
-      );
-      return true;
-    }
-    if (eduInstitution?.trim() === "") {
-      setTitleAlert("Missing Field");
-      setMissingFieldMessage(
-        "Please fill all the missing fields, your education institution is missing !"
-      );
-      return true;
+    if (isPersonal) {
+      if (gender?.trim() === "") {
+        setTitleAlert("Missing Field");
+        setMissingFieldMessage(
+          "Please fill all the missing fields, your gender is missing !"
+        );
+        return true;
+      }
+      if (specialisationTitle.trim() === "") {
+        setTitleAlert("Missing Field");
+        setMissingFieldMessage(
+          "Please fill all the missing fields, your preferred title is missing !"
+        );
+        return true;
+      }
+      if (!selectedSkills.length > 0) {
+        setTitleAlert("Missing Field");
+        setMissingFieldMessage(
+          "Please fill all the missing fields, your skills missing atleast provide one skill or at most five !"
+        );
+        return true;
+      }
+      if (educationLevel?.trim() === "") {
+        setTitleAlert("Missing Field");
+        setMissingFieldMessage(
+          "Please fill all the missing fields, field level of education is missing !"
+        );
+        return true;
+      }
+      if (eduInstitution?.trim() === "") {
+        setTitleAlert("Missing Field");
+        setMissingFieldMessage(
+          "Please fill all the missing fields, your education institution is missing !"
+        );
+        return true;
+      }
+    } else {
+      // Business account: check about field
+      if (about.trim() === "") {
+        setTitleAlert("Missing Field");
+        setMissingFieldMessage(
+          "Please provide a brief about your organization."
+        );
+        return true;
+      }
     }
     if (phone?.trim() === "") {
       setTitleAlert("Missing Field");
@@ -167,6 +224,14 @@ const RegistrationAuth = () => {
       );
       return true;
     }
+
+    // phone must be a number
+    if (!Number.isInteger(parseInt(phone?.trim()/1)) ) {
+      setTitleAlert("Incorrect Phone")
+      setMissingFieldMessage('provided phone number is not acceptable!')
+      return true
+    }
+
     if (county?.trim() === "") {
       setTitleAlert("Missing Field");
       setMissingFieldMessage(
@@ -174,28 +239,7 @@ const RegistrationAuth = () => {
       );
       return true;
     }
-    if (gender?.trim() === "") {
-      setTitleAlert("Missing Field");
-      setMissingFieldMessage(
-        "Please fill all the missing fields, your gender is missing !"
-      );
-      return true;
-    }
 
-    if (specialisationTitle.trim() === "") {
-      setTitleAlert("Missing Field");
-      setMissingFieldMessage(
-        "Please fill all the missing fields, your preferred title is missing !"
-      );
-      return true;
-    }
-    if (!selectedSkills.length > 0) {
-      setTitleAlert("Missing Field");
-      setMissingFieldMessage(
-        "Please fill all the missing fields, your skills missing atleast provide one skill or at most five !"
-      );
-      return true;
-    }
     return false;
   };
 
@@ -209,14 +253,16 @@ const RegistrationAuth = () => {
         name,
         email,
         password,
-        educationLevel,
-        eduInstitution,
+        educationLevel: isPersonal ? educationLevel : "",
+        eduInstitution: isPersonal ? eduInstitution : "",
         phone,
         country,
         county,
-        gender,
+        gender: isPersonal ? gender : "",
         specialisationTitle,
-        selectedSkills,
+        selectedSkills: isPersonal ? selectedSkills : "",
+        account,
+        about: !isPersonal ? about : ""
       };
       // set the user object
       setUser(user);
@@ -347,24 +393,28 @@ const RegistrationAuth = () => {
                   />
                 </Box>
 
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    select
-                    id="gender"
-                    value={gender}
-                    label="Gender"
-                    className="w-75"
-                    onChange={(e) => setGender(e.target.value)}
-                  >
-                    {
-                      GenderData?.map((gender) => (
-                        <MenuItem key={gender} value={gender}>
-                          {gender}
-                        </MenuItem>
-                      ))}
-                  </TextField>
-                </Box>
+                    {isPersonal && (
+                        <Box display={"flex"} justifyContent={"center"}>
+                        <TextField
+                          required
+                          select
+                          id="gender"
+                          value={gender}
+                          label="Gender"
+                          className="w-75"
+                          onChange={(e) => setGender(e.target.value)}
+                        >
+                          {
+                            GenderData?.map((gender) => (
+                              <MenuItem 
+                              key={gender} 
+                              value={gender}>
+                                {gender}
+                              </MenuItem>
+                            ))}
+                        </TextField>
+                      </Box>
+                    )}
 
                 <Box display={"flex"} justifyContent={"center"}>
                   <FormControl fullWidth variant="outlined" className="w-75">
@@ -410,159 +460,231 @@ const RegistrationAuth = () => {
                     onChange={(e) => setSpecialisationTitle(e.target.value)}
                   >
                     {
+                      isPersonal ?
                       SpecialisationJobs?.map((specialisation_title) => (
                         <MenuItem
                           key={specialisation_title}
                           value={specialisation_title}
-                         
                         >
                       
                         {/* skill name */}
                           {specialisation_title}
                         </MenuItem>
-                      ))}
-                  </TextField>
-                </Box>
-
-                {/* education */}
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    select
-                    id="educationLevel"
-                    value={educationLevel}
-                    label="Education"
-                    className="w-75"
-                    onChange={(e) => setEducationLevel(e.target.value)}
-                  >
-                    {
-                      EducationLevel?.map((education_level) => (
-                        <MenuItem key={education_level} value={education_level}>
-                          {education_level}
+                      )) :
+                      OrgSpecializations?.map((specialisation_title) => (
+                        <MenuItem
+                          key={specialisation_title}
+                          value={specialisation_title}
+                        >
+                      
+                        {/* skill name */}
+                          {specialisation_title}
                         </MenuItem>
-                      ))}
+                      ))
+                      
+                      }
                   </TextField>
                 </Box>
 
-                {/* show this if country includes kenya */}
-                {country?.trim().toLowerCase().includes("kenya") ? (
-                  <Box display={"flex"} justifyContent={"center"}>
-                    <Autocomplete
-                      value={eduInstitution}
-                      className="w-75"
-                      onChange={(event, newValue) => {
-                        setEduInstitution(newValue);
-                      }}
-                      inputValue={inputValue}
-                      onInputChange={(event, newInputValue) => {
-                        setInputValue(newInputValue);
-                      }}
-                      options={options}
-                      freeSolo
-                      renderInput={(params) => (
+                {/* education, institution, skills only for personal account */}
+                {isPersonal && (
+                  <>
+                    {/* education */}
+                    <Box display={"flex"} justifyContent={"center"}>
+                      <TextField
+                        required
+                        select
+                        id="educationLevel"
+                        value={educationLevel}
+                        label="Education"
+                        className="w-75"
+                        onChange={(e) => setEducationLevel(e.target.value)}
+                      >
+                        {
+                          EducationLevel?.map((education_level) => (
+                            <MenuItem 
+                            key={education_level} 
+                            value={education_level}>
+                              {education_level}
+                            </MenuItem>
+                          ))}
+                      </TextField>
+                    </Box>
+
+                    {/* show this if country includes kenya's institutions */}
+                    {country?.trim().toLowerCase().includes("kenya") ? (
+                      <Box display={"flex"} justifyContent={"center"}>
+                        <Autocomplete
+                          value={eduInstitution}
+                          className="w-75"
+                          onChange={(event, newValue) => {
+                            setEduInstitution(newValue);
+                          }}
+                          inputValue={eduInputValue}
+                          onInputChange={(event, newInputValue) => {
+                            setEduInputValue(newInputValue);
+                          }}
+                          options={options}
+                          freeSolo
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="Institution"
+                              variant="outlined"
+                              fullWidth
+                            />
+                          )}
+                          renderOption={(props, option) => (
+                            <li key={option} {...props}>{option}</li>
+                          )}
+                          renderTags={() =>
+                            eduInstitution ? (
+                              <Chip
+                                label={eduInstitution}
+                                onDelete={handleDeleteInstitution}
+                                deleteIcon={<CheckCircle />}
+                              />
+                            ) : null
+                          }
+                          noOptionsText={
+                            <Chip
+                              label={`Add "${eduInputValue}"`}
+                              onClick={handleAddNew}
+                              icon={<CheckCircle />}
+                              color="primary"
+                              clickable
+                            />
+                          }
+                        />
+                      </Box>
+                    ) : (
+                      <Box display={"flex"} 
+                      justifyContent={"center"}>
                         <TextField
-                          {...params}
+                          required
+                          id="institution-other"
                           label="Institution"
-                          variant="outlined"
-                          fullWidth
+                          className="w-75"
+                          value={eduInstitution}
+                          onChange={(e) => setEduInstitution(e.target.value)}
+                          placeholder="Education Institution"
                         />
-                      )}
-                      renderOption={(props, option) => (
-                        <li {...props}>{option}</li>
-                      )}
-                      renderTags={() =>
-                        eduInstitution ? (
-                          <Chip
-                            label={eduInstitution}
-                            onDelete={handleDeleteInstitution}
-                            deleteIcon={<CheckCircle />}
+                      </Box>
+                    )}
+
+                    {/* skills */}
+                    <Box 
+                    display={"flex"} 
+                    justifyContent={"center"}>
+                      <Autocomplete
+                        multiple
+                        options={AllSkills}
+                        value={selectedSkills}
+                        onChange={handleChange}
+                        disableCloseOnSelect
+                        className="w-75"
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            variant="outlined"
+                            label="Skills *"
+                            placeholder="Skill"
                           />
-                        ) : null
-                      }
-                      noOptionsText={
-                        <Chip
-                          label={`Add "${inputValue}"`}
-                          onClick={handleAddNew}
-                          icon={<CheckCircle />}
-                          color="primary"
-                          clickable
-                        />
-                      }
-                    />
-                  </Box>
-                ) : (
-                  <Box display={"flex"} justifyContent={"center"}>
-                    <TextField
-                      required
-                      id="institution-other"
-                      label="Institution"
-                      className="w-75"
-                      value={eduInstitution}
-                      onChange={(e) => setEduInstitution(e.target.value)}
-                      placeholder="Education Institution"
-                    />
-                  </Box>
+                        )}
+                        renderTags={(value, getTagProps) =>
+                          value.map((skill, index) => (
+                            <Chip
+                              label={skill}
+                              {...getTagProps({ index })}
+                              onDelete={() => handleDelete(skill)}
+                              key={index}
+                            />
+                          ))
+                        }
+                      />
+                    </Box>
+                  </>
                 )}
 
-                {/* skills */}
-                <Box display={"flex"} justifyContent={"center"}>
-                  <Autocomplete
-                    multiple
-                    options={AllSkills}
-                    value={selectedSkills}
-                    onChange={handleChange}
-                    disableCloseOnSelect
-                    className="w-75"
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        variant="outlined"
-                        label="Skills *"
-                        placeholder="Skill"
-                      />
-                    )}
-                    renderTags={(value, getTagProps) =>
-                      value.map((skill, index) => (
-                        <Chip
-                          label={skill}
-                          {...getTagProps({ index })}
-                          onDelete={() => handleDelete(skill)}
+                {/* show this if country includes kenya for ke counties */}
+                    {country?.trim().toLowerCase().includes("kenya") ? (
+                      <Box 
+                      display={"flex"} 
+                      justifyContent={"center"}>
+                        <Autocomplete
+                          value={county}
+                          className="w-75"
+                          onChange={(event, newValue) => {
+                            setCounty(newValue);
+                          }}
+                          inputValue={inputCounties}
+                          onInputChange={(event, newInputValue) => {
+                            setInputCounties(newInputValue);
+                          }}
+                          options={CountiesInKenya}
+                          freeSolo
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="County, City or State"
+                              variant="outlined"
+                              fullWidth
+                            />
+                          )}
+                          renderOption={(props, option) => (
+                            <li {...props}>{option}</li>
+                          )}
+                          renderTags={() =>
+                            county ? (
+                              <Chip
+                                label={county}
+                                onDelete={handleDeleteCounty}
+                                deleteIcon={<CheckCircle />}
+                              />
+                            ) : null
+                          }
+                          noOptionsText={
+                            <Chip
+                              label={`Add "${eduInputValue}"`}
+                              onClick={handleAddNewCounty}
+                              icon={<CheckCircle />}
+                              color="primary"
+                              clickable
+                            />
+                          }
                         />
-                      ))
-                    }
-                  />
-                </Box>
+                      </Box>
+                    ) : (
+                      <Box 
+                      display={"flex"} 
+                      justifyContent={"center"}>
+                        <TextField
+                          required
+                          id="county-other"
+                          label="County, City or State"
+                          className="w-75"
+                          value={county}
+                          onChange={(e) => setCounty(e.target.value)}
+                          placeholder="County"
+                        />
+                      </Box>
+                    )}
 
-                {/* show this if country is contains kenya */}
-                {country?.trim().toLowerCase().includes("kenya") ? (
+                {/* About field for business account */}
+                {!isPersonal && (
                   <Box display={"flex"} justifyContent={"center"}>
                     <TextField
                       required
-                      select
-                      id="county"
-                      value={county}
-                      label="County"
+                      id="about-org"
+                      label={`About Organisation ${MAX_ABOUT-about.length}`}
                       className="w-75"
-                      onChange={(e) => setCounty(e.target.value)}
-                    >
-                      {
-                        CountiesInKenya?.map((county) => (
-                          <MenuItem key={county} value={county}>
-                            {county}
-                          </MenuItem>
-                        ))}
-                    </TextField>
-                  </Box>
-                ) : (
-                  <Box display={"flex"} justifyContent={"center"}>
-                    <TextField
-                      required
-                      id="county_other"
-                      label="City or State"
-                      className="w-75"
-                      value={county}
-                      onChange={(e) => setCounty(e.target.value)}
-                      placeholder="my city or state"
+                      maxRows={5}
+                      value={about}
+                      error={about.length>MAX_ABOUT}
+                      onChange={(e) => setAbout(e.target.value)}
+                      placeholder="About your organization"
+                      multiline
+                      minRows={3}
                     />
                   </Box>
                 )}
@@ -624,7 +746,7 @@ const RegistrationAuth = () => {
                     className="w-25"
                     sx={{ borderRadius: "20px" }}
                     disableElevation
-                    disabled={openAlertProfile}
+                    disabled={openAlertProfile || about.length>MAX_ABOUT}
                     onClick={handleUserRegistration}
                     type="submit"
                   >
@@ -636,13 +758,13 @@ const RegistrationAuth = () => {
       </Box>
 
       {/* show alert for custom title when zero selection is matched */}
-     {openAlert && (
-       <RegisterAlertTitle
+      {openAlert && (
+        <RegisterAlertTitle
         openAlert={openAlert}
         setOpenAlert={setOpenAlert}
         setSpecialisationTitle={setSpecialisationTitle}
       />
-     )}
+    )}
 
       {/* alert general */}
       {openAlertGenral && (
@@ -656,12 +778,19 @@ const RegistrationAuth = () => {
       )}
 
       {/* alert profile picture completion */}
-      {openAlertProfile && (
+      {openAlertProfile && isPersonal ? (
         <AlertProfileCompletion
         openAlertProfile={openAlertProfile}
         setOpenAlertProfile={setOpenAlertProfile}
         user={user}
+        isPersonal={isPersonal}
       />
+      ):(
+        <AlertOrgCompletion
+          user={user}
+          openAlertProfile={openAlertProfile}
+          setOpenAlertProfile={setOpenAlertProfile}
+        />
       )}
 
       {/* alert country of the user */}
@@ -671,6 +800,8 @@ const RegistrationAuth = () => {
         setOpenAlertCountry={setOpenAlertCountry}
         country={country}
         setCountry={setCountry}
+        account={account}
+        setAccount={setAccount}
       />
       )}
     </Box>

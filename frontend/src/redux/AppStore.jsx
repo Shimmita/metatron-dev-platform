@@ -13,7 +13,6 @@ import {
 
 import appUISliceReducer from "./AppUI";
 import completeSigningReducer from "./CompleteSigning";
-import currentAuthMessageReducer from "./CurrentAuthMessages";
 import currentBottomNavReducer from "./CurrentBottomNav";
 import currentChatBot from "./CurrentChatBot";
 import currentConnectRequestReducer from "./CurrentConnect";
@@ -51,7 +50,6 @@ const rootReducer = combineReducers({
   appUI: appUISliceReducer,
   currentSnackBar: currentSnackReducer,
   currentBottomNav: currentBottomNavReducer,
-  currentAuthMessage: currentAuthMessageReducer,
   signUser: completeSigningReducer,
   currentUser: currentUserReducer,
   currentPosts: currentPostsReducer,

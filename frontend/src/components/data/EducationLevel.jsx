@@ -1,4 +1,5 @@
 const EducationLevel = [
+  "Other Qualification",
   "High School Diploma",
   "Diploma Certificate",
   "Associate Degree",

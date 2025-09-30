@@ -13,7 +13,7 @@ import {
 import { Close, RefreshRounded, SendOutlined } from "@mui/icons-material";
 
 import axios from "axios";
-import { lazy, useState } from "react";
+import React, { lazy, useState } from "react";
 import { useSelector } from "react-redux";
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
@@ -30,7 +30,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
   axios.defaults.withCredentials = true;
   
   // redux states
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
   // extract basic current user details
   const { _id, avatar, name,county, specialisationTitle: title } = user || {};
 
@@ -138,6 +138,9 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
           setPostDetailedData={setPostDetailedData}
         />
 
+        {!isGuest && (
+          <React.Fragment>
+
         {/* all user comments container pass the comments of the post */}
         <Box className='shadow-sm' mt={1}>
           <CommentContainer
@@ -191,6 +194,8 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
           )}
         </Box>
       </Box>
+          </React.Fragment>
+        )}
 
       </Box>
 

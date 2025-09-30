@@ -3,7 +3,7 @@ import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import React from "react";
-import { PostAddRounded, SchoolRounded, TvRounded, Work } from "@mui/icons-material";
+import { LockRounded, PersonAdd, PostAddRounded, SchoolRounded, TvRounded, Work } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 import EventsAddModal from "../modal/EventsAddModal";
@@ -12,6 +12,7 @@ import PostJobModal from "../modal/PostJobModal";
 import PostTechModal from "../modal/PostTechModal";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import { useNavigate } from "react-router-dom";
 
 const actions = [
   {
@@ -33,6 +34,18 @@ const actions = [
  
 ];
 
+// actions for login and register
+const actionsAuth=[
+  {
+    icon: <LockRounded color="primary" sx={{ width: 33, height: 33}} />,
+    name: "Login",
+  },
+  {
+    icon: <PersonAdd color="primary" sx={{ width: 26, height: 26 }} />,
+    name: "Register",
+  },
+]
+
 export default function BasicSpeedDial() {
   const [open, setOpen] = React.useState(false);
 
@@ -42,6 +55,8 @@ export default function BasicSpeedDial() {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const navigate=useNavigate()
 
   // control showing opening of the Upload modal
   const [openModalTech, setOpenModalTech] = React.useState(false);
@@ -53,6 +68,7 @@ export default function BasicSpeedDial() {
   const { isLoadingPostLaunch } = useSelector(
     (state) => state.appUI
   );
+const {isGuest } = useSelector((state) => state.currentUser);
 
   return (
     <Box
@@ -63,6 +79,44 @@ export default function BasicSpeedDial() {
       
       }}
     >
+    {isGuest ? (
+      <SpeedDial
+        ariaLabel="SpeedDial"
+        sx={{
+          position: "absolute",
+          bottom: 0,
+          right: CustomDeviceSmallest() ? 5 : CustomDeviceTablet() ? 7 : 12,
+        }}
+        icon={<SpeedDialIcon />}
+        onClose={handleClose}
+        onOpen={handleOpen}
+        open={open}
+      >
+        {actionsAuth.map((action) => (
+          <SpeedDialAction
+            key={action.name}
+            icon={action.icon}
+            onClick={(e) => {
+              if (action.name === "Login") {
+                navigate("/auth/login")
+              }
+              if (action.name === "Register") {
+                navigate("/auth/register/personal")
+              }
+            }}
+            tooltipTitle={
+              <Typography
+                p={1}
+                fontWeight={"bold"}
+                variant="body2"
+              >
+                {action.name}
+              </Typography>
+            }
+          />
+        ))}
+      </SpeedDial>
+    ):(
       <SpeedDial
         ariaLabel="SpeedDial"
         sx={{
@@ -107,6 +161,7 @@ export default function BasicSpeedDial() {
           />
         ))}
       </SpeedDial>
+    )}
 
       {/* Tech Field Modal */}
       {openModalTech && 

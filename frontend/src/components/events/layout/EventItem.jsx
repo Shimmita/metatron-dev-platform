@@ -48,7 +48,7 @@ function EventItem({
   const [openMiniProfile,setOpenMiniProfile]=useState(false)
   
   // redux states
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
   const { events:eventsData } = useSelector((state) => state.currentEvents);
   const isUserMadeRSVP=event?.users?.value.some((currentId)=>currentId===user?._id)
   const isMyOwnEvent=event?.ownerId===user?._id
@@ -395,7 +395,6 @@ function EventItem({
                     variant="caption"
                     fontWeight={"bold"}
                   >
-                   
                   <Typography
                     variant="caption"
                     fontWeight={"bold"}
@@ -403,8 +402,9 @@ function EventItem({
                     display={"flex"}
                   >
                     <Box>
-                    <Tooltip arrow title='profile'>
-                    <ListItemAvatar onClick={handleShowMiniProfile}>
+                    <Tooltip arrow title={isGuest ? 'login':'profile'}>
+                    <ListItemAvatar 
+                    onClick={isGuest ? null:handleShowMiniProfile}>
                       <Avatar 
                       src={event?.ownerAvatar}
                       sx={{
@@ -450,7 +450,7 @@ function EventItem({
                       </Typography>
 
                   {/* country */}
-                   <Typography
+                  <Typography
                         textTransform={"capitalize"}
                         variant="caption"
                       >
@@ -472,7 +472,7 @@ function EventItem({
                 variant="caption"
                 className={isUserMadeRSVP && 'text-success fw-bold'}
                 sx={{ fontSize:'x-small' }}>
-                 {isUserMadeRSVP ? `You and ${event?.users?.count} others made rsvp`:` ${event?.users?.count} Users Done RSVP`}
+                {isUserMadeRSVP ? `You and ${event?.users?.count} others made rsvp`:` ${event?.users?.count} Users Done RSVP`}
                 </Typography>
                 </Box> 
 
@@ -580,13 +580,13 @@ function EventItem({
                   <Button
                     disableElevation
                     variant={isDarkMode ?'outlined':'contained'}
-                    disabled={isFetching || isUserMadeRSVP || isMyOwnEvent}
+                    disabled={isFetching || isUserMadeRSVP || isMyOwnEvent||isGuest}
                     size="small"
                     sx={{ 
                     borderRadius: 5,
                     }}
                     onClick={handleCreateRSVP}
-                    startIcon={isFetching ? <CircularProgress size={13}/>:isMyOwnEvent ? <LockRounded/>: <CheckCircleRounded />}
+                    startIcon={isFetching ? <CircularProgress size={13}/>:isMyOwnEvent||isGuest ? <LockRounded/>: <CheckCircleRounded />}
                   >
                     {isMyOwnEvent ? "Your Event":"RSVP EVENT"}
                   </Button>
@@ -597,7 +597,7 @@ function EventItem({
 
 
          {/* next button zone, only if item is last index */}
-           {isLastIndex && (
+           {isLastIndex && !isGuest && (
              <Box 
             alignItems={'center'}
             justifyContent={'center'}

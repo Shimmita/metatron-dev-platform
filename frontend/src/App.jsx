@@ -5,11 +5,12 @@ import {
   ThemeProvider,
   Typography
 } from "@mui/material";
-import { lazy, Suspense } from "react";
+import React, { lazy, Suspense } from "react";
 import { BallTriangle } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import HomePageLazy from "./components/account/HomePage";
+import LoginAuth from "./components/auth/LoginAuth";
 import AppLogo from "./images/logo_sm.png";
 const CertificateVerification=lazy(()=>import("./components/auth/CertificateVerification")) ;
 const RegPersonalCompletion = lazy(() =>
@@ -19,13 +20,12 @@ const RecoverAuthLazy = lazy(() => import("./components/auth/RecoverAuth"));
 const RegistrationAuthLazy = lazy(() =>
   import("./components/auth/RegistrationAuth")
 );
-const AuthCheckLazy = lazy(() => import("./components/account/AuthCheck"));
 const EmailVerificationAuth=lazy(()=>import("./components/auth/EmailVerification"))
 
 const App = () => {
   // global dark mode state from redux
   const { currentMode } = useSelector((state) => state.appUI);
-
+  
   const darkTheme = createTheme({
     palette: {
       mode: currentMode,
@@ -92,12 +92,21 @@ const App = () => {
                 exact
                 path="/*"
                 element={
-                  <AuthCheckLazy>
+                  <React.Fragment>
+                  {/* <AuthCheckLazy>
                     <HomePageLazy />
-                  </AuthCheckLazy>
+                  </AuthCheckLazy> */}
+                  <HomePageLazy/>
+                  </React.Fragment>
                 }
               />
               
+              {/* login route */}
+              <Route
+                exact
+                path="/auth/login"
+                element={<LoginAuth/>}
+              />
               <Route
                 exact
                 path={"/auth/register/personal"}

@@ -46,7 +46,7 @@ const FeedDefaultContent = () => {
     (state) => state.appUI
   );
 
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
 
   // will be used when the post is focused for full details
   const [postDetailedData, setPostDetailedData] = useState();
@@ -300,7 +300,7 @@ const FeedDefaultContent = () => {
             <Stack
             justifyContent={'center'}
             alignItems={'center'}
-            display={'flex'}>
+            display={ isGuest ?'none':'flex'}>
           <IconButton color="primary" onClick={handleShowPeopleSuggest}>
             <PeopleRounded sx={{ 
             width:25,

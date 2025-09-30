@@ -325,10 +325,15 @@ export default function UserProfileDrawer({ profileData }) {
         </React.Fragment>
         
       ) : (
-        <Box px={2} mt={1}>
+        <Box 
+        px={2}
+         mt={1}>
           {/* shown when there is profile info */}
             <Box>
-              <Box display={"flex"} justifyContent={"center"}>
+              <Box 
+              display={"flex"}
+              mb={1} 
+              justifyContent={"center"}>
                 <Avatar 
                 src={user?.avatar}
                 alt="" 
@@ -337,10 +342,9 @@ export default function UserProfileDrawer({ profileData }) {
 
               {/* skills */}
               <Box
-                display={"flex"}
+                display={profileData?.account==="Organisation" ? "none":'flex'}
                 justifyContent={"center"}
                 mb={1}
-                mt={1}
                 gap={1}
                 alignItems={"center"}
               >

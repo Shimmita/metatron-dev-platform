@@ -13,6 +13,7 @@ const CountiesInKenya = [
   "Kiambu",
   "Kirinyaga",
   "Kisii",
+  "Kilifi",
   "Kisumu",
   "Kitui",
   "Kwale",

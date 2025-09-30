@@ -78,6 +78,7 @@ export default function AlertMiniProfileView({
   // redux states
   const { user } = useSelector((state) => state.currentUser);
 
+
   const {
     _id: currentUserId,
   } = user || {};
@@ -98,7 +99,7 @@ export default function AlertMiniProfileView({
       .then((main_res) => {
           // setting user data
           setMiniProfileData(main_res?.data?.user);
-
+          
           // setting isOnline status
           setIsOnline(main_res?.data?.isOnline)  
       })
@@ -324,7 +325,9 @@ export default function AlertMiniProfileView({
                   </Box>
                 </Box>
 
-                {/* divider */}
+              {miniProfileData?.account!=="Organisation" && (
+                <React.Fragment>
+                   {/* divider */}
                 <Divider component={"div"} className="pb-1" />
                 {/* skills avatars */}
                 <Box display={"flex"} justifyContent={"center"} mt={1}>
@@ -341,6 +344,8 @@ export default function AlertMiniProfileView({
                     ))}
                   </AvatarGroup>
                 </Box>
+                </React.Fragment>
+              )}
 
                 {/* divider */}
                 <Divider className="p-1" component={"div"} />

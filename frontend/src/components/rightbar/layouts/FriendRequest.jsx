@@ -33,7 +33,6 @@ function FriendRequest({
   isLoadingRequest = false,
   connect_request,
   isAcceptFriends = false,
-  isLastItem = false,
 }) {
   const [showMiniProfile, setShowMiniProfile] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
@@ -316,12 +315,13 @@ function FriendRequest({
                       </Typography>
 
                       <Typography variant="caption" color={"text.secondary"}>
-                        {connect_request?.county} |{" "}
+                        {connect_request?.county} | {" "}
                         {CustomCountryName(connect_request?.country)} 
                       </Typography>
 
                       {/* skills of the user */}
-                      <Box display={"flex"} mt={"2px"}>
+                      {connect_request?.selectedSkills?.length>1 && (
+                        <Box display={'flex' } mt={"2px"}>
                         <AvatarGroup
                           max={connect_request?.selectedSkills?.length}
                         >
@@ -340,6 +340,7 @@ function FriendRequest({
                           )}
                         </AvatarGroup>
                       </Box>
+                      )}
                     </React.Fragment>
                   )}
                 </Box>

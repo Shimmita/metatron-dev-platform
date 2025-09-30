@@ -6,6 +6,7 @@ import {
   LocalLibraryOutlined,
   ManageSearchOutlined,
   Menu,
+  Person,
   PictureAsPdfOutlined,
   PrintRounded,
   Refresh,
@@ -142,7 +143,7 @@ import CoursePlayer from "./layout/CoursePlayer";
     const isDarkMode=currentMode==='dark'
 
     // array for simulation of courses
-    const { user } = useSelector((state) => state.currentUser);
+    const { user,isGuest } = useSelector((state) => state.currentUser);
     const {courses}=useSelector((state)=>state.currentCourses);
 
     const { messageSnack } = useSelector((state) => state.currentSnackBar);
@@ -159,14 +160,12 @@ import CoursePlayer from "./layout/CoursePlayer";
     );
     const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
     const [open, setOpen] = useState(
-      !(CustomDeviceIsSmall() || CustomDeviceTablet()) && true
+      !(CustomDeviceIsSmall() || CustomDeviceTablet()||isGuest)
     );
-   
   
     const [isFetching, setIsFetching] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
-    
     const [openAlert, setOpenAlert] = useState(false);
   
      //   handle opening of drawer profile
@@ -486,6 +485,11 @@ import CoursePlayer from "./layout/CoursePlayer";
                   });
         }
 
+      // handle navigate to login
+    const handleNavigateLogin=()=>{
+      navigate("/auth/login")
+    }
+
   
     return (
         <Suspense
@@ -551,34 +555,46 @@ import CoursePlayer from "./layout/CoursePlayer";
                     variant="caption" 
                     fontWeight={'bold'}
                     textTransform={'capitalize'}
-                     ml={open && 22}>
+                    ml={open && 22}>
                       - {textOption} -
                     </Typography>
                   </Box>
                 </Box>
   
                 <Box display={'flex'} gap={2} alignItems={'center'} justifyContent={'flex-end'}>
-                {/* dark mode */}
-                <IconButton  
-                onClick={handleShowDarkMode}> 
-                  <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
-                  <DarkModeRounded
-                
-                    sx={{ color: "white", height:24, width:24,}}
-                  />
-                </Tooltip> 
-                </IconButton>
-  
-                {/* profile */}
-                <Tooltip arrow title={"profile"}>
-                  <IconButton onClick={handleShowingProfileDrawer}>
-                  <Avatar
-                      sx={{ width: 30, height: 30 }}
-                      src={user?.avatar}
-                      alt={""}
-                  />
-                  </IconButton>
-                </Tooltip>
+                {isGuest ? (
+                        <Button 
+                          size="medium"
+                          onClick={handleNavigateLogin}
+                          color="inherit"
+                          startIcon={<Person/>}
+                          >
+                            Signin
+                          </Button>
+                      ):(
+                        <React.Fragment>
+                      {/* dark mode */}
+                      <IconButton  
+                      onClick={handleShowDarkMode}> 
+                        <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
+                        <DarkModeRounded
+                          sx={{ color: "white", height:24, width:24,}}
+                        />
+                      </Tooltip> 
+                      </IconButton>
+      
+                        <Tooltip arrow title={"profile"}>
+                      <IconButton onClick={handleShowingProfileDrawer}>
+                      <Avatar
+                          sx={{ width: 30, height: 30 }}
+                          src={user?.avatar}
+                          alt={""}
+                      />
+                      </IconButton>
+                    </Tooltip>
+                    </React.Fragment>
+                      )}
+
                 </Box>
               </Toolbar>
             </AppBar>
@@ -631,19 +647,19 @@ import CoursePlayer from "./layout/CoursePlayer";
               >
                 <LocalLibraryOutlined/>
                 Tech Student
-               </Typography>
+              </Typography>
 
-               {/* user name */}
-               <Typography
-               fontWeight={'bold'}
-                variant="caption"
-                sx={{color:'white'}} 
-                >
-                - {user?.name} -
-                </Typography>
-                </Box>
-  
-             </Box>
+              {/* user name */}
+              <Typography
+              fontWeight={'bold'}
+              variant="caption"
+              sx={{color:'white'}} 
+              >
+              - {user?.name?.substring(0,13)||"Guest Mode"} -
+              </Typography>
+              </Box>
+
+            </Box>
                 )}
               </DrawerHeader>
               <Divider className=" w-100" component={"div"} />
@@ -673,7 +689,7 @@ import CoursePlayer from "./layout/CoursePlayer";
                   <ListItem
                     key={text}
                     disablePadding
-                    sx={{ display: "block" }}
+                    sx={{ display: isGuest ?'none':'block' }}
                     onClick={() => {
                       // update the selected option
                       setTextOption(text);
@@ -772,28 +788,30 @@ import CoursePlayer from "./layout/CoursePlayer";
                 ))}
               </List>
   
-            {/* navigates to instructor page */}
-           {open ? (
-             <Box 
-             width={'100%'}
-             display={'flex'} 
-             justifyContent={'center'}>
-                <Button 
-                size="small" 
-                startIcon={<SupportAgentRounded/>}
-                color="secondary"
-                disableElevation
-                sx={{my:1, px:1,
-                 borderRadius:5,
-                  width:'90%',
-                  fontWeight:'bold', 
-                  border:'1px solid', 
-                  borderColor:'divider'}}
-                onClick={handleNavigateInstructor}>
-                 I'M Instructor
-                </Button>
-                </Box>
-           ):(
+              {!isGuest && (
+                <React.Fragment>
+                  {/* navigates to instructor page */}
+                {open ? (
+                  <Box 
+                  width={'100%'}
+                  display={'flex'} 
+                  justifyContent={'center'}>
+                    <Button 
+                    size="small" 
+                    startIcon={<SupportAgentRounded/>}
+                    color="secondary"
+                    disableElevation
+                    sx={{my:1, px:1,
+                      borderRadius:5,
+                      width:'90%',
+                      fontWeight:'bold', 
+                      border:'1px solid', 
+                      borderColor:'divider'}}
+                    onClick={handleNavigateInstructor}>
+                      I'M Instructor
+                    </Button>
+                    </Box>
+                ):(
               <ListItemButton size="small" >
                 <Tooltip title={"Instructor Page"} arrow>
                 <ListItemIcon 
@@ -805,6 +823,8 @@ import CoursePlayer from "./layout/CoursePlayer";
                 </Tooltip>
               </ListItemButton>
           )}
+                </React.Fragment>
+              )}
 
   
         </Drawer>

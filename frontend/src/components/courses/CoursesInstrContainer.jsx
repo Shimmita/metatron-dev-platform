@@ -411,7 +411,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                 variant="caption"
                 sx={{color:'white'}} 
                 >
-                - {user?.name} -
+                - {user?.name?.substring(0,13)} -
                 </Typography>
                 </Box>
              </Box>

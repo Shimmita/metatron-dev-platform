@@ -4,13 +4,13 @@ import {
   GitHub,
   GradeOutlined,
   InfoRounded,
+  LockRounded,
   MoreVertRounded,
   RefreshRounded,
   VerifiedRounded
 } from "@mui/icons-material";
 import {
   Avatar,
-  AvatarGroup,
   Box,
   Button,
   Card,
@@ -75,14 +75,13 @@ const CardFeed = ({
   // track progress of fetching more data
   const [isFetching,setIsFetching]=useState(false)
   const [hasMorePosts,setHasMorePosts]=useState(true)
-
-
   // redux states
   const { currentMode } = useSelector((state) => state.appUI);
   // update is dark const
   const isDarkMode=currentMode==='dark'
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
+  
   // extract basic current user details
   const { _id, avatar, name, specialisationTitle: title, country, county } = user || {};
 
@@ -164,7 +163,7 @@ const CardFeed = ({
   useEffect(() => {
     const handlePostBelongsCurrentUser = () => {
       const postID = `${post.post_owner?.ownerId}`;
-      const currentUserID = `${user._id}`;
+      const currentUserID = `${user?._id}`;
 
       if (postID === currentUserID) {
         setPostBelongsCurrentUser(true);
@@ -174,7 +173,7 @@ const CardFeed = ({
     };
 
     handlePostBelongsCurrentUser();
-  }, [user._id, post.post_owner?.ownerId]);
+  }, [user?._id, post?.post_owner?.ownerId]);
 
   // handle user clicking like button
   const handlePostLikes = () => {
@@ -380,8 +379,9 @@ const CardFeed = ({
           <CardHeader
             sx={{ ml: 1, p: 0 }}
             avatar={
-            <ListItemAvatar onClick={handleMiniProfileView}>
-            <Tooltip arrow title='profile'>
+            <ListItemAvatar 
+            onClick={isGuest? null: handleMiniProfileView}>
+            <Tooltip arrow title={isGuest ?'login':'profile'}>
               <Avatar
                 src={post?.post_owner?.owneravatar}
                 variant="rounded"
@@ -405,12 +405,27 @@ const CardFeed = ({
                   alignItems={"center"}
                 >
                   {/* created time */}
-                  <Typography pt={0.5} variant="caption" mr={postBelongsCurrentUser ? 2:1}>
+                  <Typography pt={0.5} 
+                  variant="caption" 
+                  mr={postBelongsCurrentUser ? 2:1}>
                     {getElapsedTime(post?.createdAt)}
                   </Typography>
 
-
-                  {/* more icon  */}
+                  {/* guest */}
+                  {isGuest ? (
+                    <Box pr={2}>
+                    <Tooltip 
+                    title="login" 
+                    arrow>
+                        <LockRounded
+                          color="primary"
+                          sx={{ width: 15, height: 15 }}
+                        />
+                    </Tooltip>
+                    </Box>
+                  ):(
+                    <React.Fragment>
+                     {/* more icon  */}
                   {!postBelongsCurrentUser && (
                     <Tooltip title="more" arrow>
                       <IconButton
@@ -425,6 +440,9 @@ const CardFeed = ({
                       </IconButton>
                     </Tooltip>
                   )}
+                    </React.Fragment>
+                  )}
+                
                   <Menu
                     anchorEl={anchorEl}
                     open={openMenu}
@@ -492,25 +510,6 @@ const CardFeed = ({
                 >
                 {post?.post_location.state} | {CustomCountryName(post?.post_location.country)}{" "}
                 </Typography>
-                {/* skills */}
-                <Box display={"flex"} mt={0.5}>
-                  <AvatarGroup max={post?.post_owner.ownerskills.length}>
-                    {/* loop through the skills and their images matched using custom fn */}
-                    {post?.post_owner.ownerskills?.map((skill) => (
-                      <Tooltip title={skill} key={skill} arrow>
-                        <Avatar
-                          alt={skill}
-                          className={!isDarkMode && 'border'}
-                          sx={{ 
-                            width: 24,
-                             height: 24,
-                            }}
-                          src={getImageMatch(skill)}
-                        />
-                      </Tooltip>
-                    ))}
-                  </AvatarGroup>
-                </Box>
               </Box>
             }
           />
@@ -714,7 +713,7 @@ const CardFeed = ({
                     onChange={onClick}
                     icon={icon}
                     checkedIcon={icon}
-                    disabled={isProcessingPost || (title==='Github' && !post_github_link)}
+                    disabled={isProcessingPost||isGuest|| (title==='Github' && !post_github_link)}
                   />
                 </Tooltip>
                 <Typography

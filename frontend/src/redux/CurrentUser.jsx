@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialstate = {
   user: null,
   isOnline: false,
+  isGuest:true,
   tempUserProfileID: null,
 };
 
@@ -15,12 +16,14 @@ const currentUser = createSlice({
     updateUserCurrentUserRedux: (state, action) => {
       state.user = action.payload;
       state.isOnline = true;
+      state.isGuest=false
     },
 
     // nullify user and false online
     resetClearCurrentUserRedux: (state) => {
       state.user = null;
       state.isOnline = false;
+      state.isGuest=true
     },
 
     // update tempUser ID for temp profile review

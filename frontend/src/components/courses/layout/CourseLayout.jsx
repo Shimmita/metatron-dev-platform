@@ -1,6 +1,7 @@
 import {
   AutoAwesomeRounded,
   CastForEducationRounded,
+  LockRounded,
   PersonAdd,
   SchoolRounded,
   VideoLibraryRounded
@@ -59,7 +60,7 @@ const Item = styled(Paper)(({ theme }) => ({
 function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
   
   // redux state manager
-  const { user } = useSelector((state) => state.currentUser);
+  const { user,isGuest } = useSelector((state) => state.currentUser);
   const isMyCourse=user?._id===courseItem?.course_instructor?.instructorId
   const [isOpenAccordion,setIsOpenAccordion]=useState(false)
   const [showSimilar,setShowSimilar]=useState(false)
@@ -284,7 +285,9 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
           ):(
             <Box mb={1} display={'flex'} justifyContent={'center'}>
             <FormHelperText>
-            {isMyCourse ? 'you uploaded this course':'preview and enroll free'}
+            {isGuest ? "login and enroll free"
+            :isMyCourse ? 'you uploaded this course'
+            :'preview and enroll free'}
             </FormHelperText>
             </Box>
           )}
@@ -294,10 +297,15 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
             {isMyCourse ? (
               <Button
               onClick={handleOpenPlayer}
-              size="medium"
+              size="small"
               className="rounded-5"
+              disabled={isGuest}
               variant={isDarkMode ? "outlined" : "contained"}
-              startIcon={ courseItem?.currentUserEnrolled ? <VideoLibraryRounded/> : <CastForEducationRounded />}
+              startIcon={ 
+                courseItem?.currentUserEnrolled ?
+                <VideoLibraryRounded/> :
+                isGuest ? <LockRounded/>:
+                <CastForEducationRounded />}
               sx={{
                 textTransform: "capitalize",
                 background: !isDarkMode && "linear-gradient(180deg, #42a5f5,rgb(41, 99, 146))",
@@ -309,10 +317,15 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
             ):(
               <Button
               onClick={handleOpenPlayer}
-              size="medium"
+              size="small"
+              disabled={isGuest}
               className="rounded-5"
               variant={isDarkMode ? "outlined" : "contained"}
-              startIcon={ courseItem?.currentUserEnrolled ? <VideoLibraryRounded/> : <CastForEducationRounded />}
+              startIcon={ 
+              courseItem?.currentUserEnrolled ? 
+              <VideoLibraryRounded/> :
+              isGuest ? <LockRounded/>:
+              <CastForEducationRounded />}
               sx={{
                 textTransform: "capitalize",
                 background: !isDarkMode && "linear-gradient(180deg, #42a5f5,rgb(41, 99, 146))",

@@ -26,6 +26,9 @@ const RightbarAll = () => {
   );
     const isDarkMode=currentMode==='dark'
 
+  const { isGuest } = useSelector((state) => state.currentUser);
+  
+
 
   const handleNavigateJobs=()=>{
     navigate("/jobs"); 
@@ -81,38 +84,48 @@ const RightbarAll = () => {
               {/* shown on smartphones and tablets only */}
               {(CustomDeviceIsSmall()|| CustomDeviceTablet()) && (
                 <Box display={'flex'} justifyContent={'center'} width={'auto'}>
-                <Button startIcon={<InsightsRounded/>} onClick={handleNavigateJobs} size="small" sx={{ textTransform:'capitalize', borderRadius:4}} >more jobs</Button>
+                <Button startIcon={<InsightsRounded/>} 
+                onClick={handleNavigateJobs} size="small" 
+                sx={{ textTransform:'capitalize', borderRadius:4}} >more jobs</Button>
                 </Box>
               )}
             </Stack>
 
+            {/* not shown if user is guest */}
+            {!isGuest && (
+              <React.Fragment>
             {/* connect request */}
             <Box display={corouselCounter === 1 ? "block" : "none"}>
               <RequestContainer />
             </Box>
-
-            {/* featured events */}
-             <Box display={corouselCounter === 2 ? "block" : "none"}>
+              {/* featured events */}
+            <Box display={corouselCounter === 2 ? "block" : "none"}>
               <FeaturedEventsContainer />
             </Box>
-
-            {/* featured posts */}
+              {/* featured posts */}
             <Box display={corouselCounter === 3 ? "block" : "none"}>
               <FeaturedPostContainer />
             </Box>
-
+              </React.Fragment>
+            )}
+          
             {/* popular courses */}
             {/* <Box display={corouselCounter === 3 ? "block" : "none"}>
               <CoursesContainer />
             </Box> */}
           </Box>
-          {/* stepper controller */}
-          <Box display={"flex"} justifyContent={"center"}>
+          {/* stepper controller, not shown when user is guest */}
+          {!isGuest && (
+              <Box 
+          display={"flex"} 
+          justifyContent={"center"}>
             <RightBarStepper
               corouselCounter={corouselCounter}
               setCorouselCounter={setCorouselCounter}
             />
           </Box>
+          )}
+        
         </Box>
       </Box>     
     </Box>

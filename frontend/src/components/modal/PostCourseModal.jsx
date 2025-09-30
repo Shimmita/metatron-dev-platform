@@ -90,7 +90,8 @@ const PostCourseModal =({ openModalCourse, setOpenModalCourse }) => {
   const [freeLogo, setFreeLogo] = useState("");
   const [imageUpload, setImageUpload] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
-  
+  const [other,setOther]=useState("")
+
   // redux states
   const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
   const isDarkMode=currentMode==='dark'
@@ -356,7 +357,7 @@ const handleClosingModal=()=>{
     course_title: title,
     course_description: description,
     course_category: {
-      main: postCategory,
+      main:other.trim().length>2 ? other: postCategory,
       sub1: category1,
       sub2: category2,
       sub3: category3,
@@ -594,16 +595,9 @@ const handleClosingModal=()=>{
                     "lecture_2_variables" etc. This will ease the algorithm in sorting your overall course and maintaining the flow of 
                     concepts as intended.
                     <br/>
-                  - We do not buy or sell courses on the platform but rather providing learning 
-                  resources freely to the technocrats. Interested users will get enrolled and learn for free. Only certificate of completion 
+                  - Currently we do not buy or sell courses on the platform but rather providing learning 
+                  resources freely to technocrats. Interested users will get enrolled and learn for free. Only certificate of completion 
                   is paid for and your name shall be printed on the certificate as the chief instructor. <br/>
-                  - Certificate of completion is optional and cannot limit the user from learning the 
-                  uploaded course. Only when the user is satisfied to download the certificate for reference they shall have 
-                    to pay for it.
-                  <br/>
-                  - Certificate of completion minimum price is $1 and max is $10. Course uploaded shall be reviewed continuously 
-                  to determine its genuineness to the end users. Rogue courses are prohibited and shall lead to permanent deletion of your account
-                  with or without your consent.
                 </Typography>
               
                 <Divider component={'div'} className={'p-2'}/>
@@ -660,6 +654,25 @@ const handleClosingModal=()=>{
                     )}
                 </TextField>
               </Box>
+
+               {/* other category */}
+              {postCategory.includes('Zero') && (
+                <Box className="mb-2">
+                  <Typography variant="body2" mb={2} color={"text.secondary"} >
+                    You have selected option other, provide the other specialization or category 
+                    that your course aims to address.
+                  </Typography>
+                <TextField
+                  fullWidth
+                  disabled={isUploading}
+                  value={other}
+                  onChange={(e) => setOther(e.target.value)}
+                  id="other category"
+                  label={"Provide Other"}
+                  placeholder={'provide other'}
+                />
+              </Box>
+              )}
 
               {/* programming Language */}
               {postCategory === "Programming Languages" && (

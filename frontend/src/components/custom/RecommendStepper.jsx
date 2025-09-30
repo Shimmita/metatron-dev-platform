@@ -48,7 +48,7 @@ export default function RecommendStepper() {
         setIsFetching(true);
     
         // performing get request
-        axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/insights/all/recommendation`,userSkills, {
+        axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/insights/all/recommendation`, {
             withCredentials: true,
           })
           .then((res) => {
@@ -71,7 +71,7 @@ export default function RecommendStepper() {
             // set is fetching to false
             setIsFetching(false);
           });
-    }, [dataRecommend.length,userSkills]);
+    }, [dataRecommend.length]);
 
   return (
     <Box sx={{ maxWidth: 430 }}>

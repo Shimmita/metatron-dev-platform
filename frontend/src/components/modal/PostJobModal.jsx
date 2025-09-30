@@ -32,6 +32,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
 import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
+import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import AllCountries from "../data/AllCountries";
 import AllSkills from "../data/AllSkillsData";
 import CountiesInKenya from "../data/Counties";
@@ -45,7 +46,6 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
-import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 const LocationControl = lazy(() => import("./LocationControl"));
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
@@ -100,6 +100,8 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
   const [isFileLink, setIsFileLink] = useState(false);
   const [isFreeLogo, setIsFreeLogo] = useState(false);
   const [freeLogo, setFreeLogo] = useState("");
+  const [other,setOther]=useState("")
+  
    // To hold user input text for req
     const [reqText, setReqText] = useState("");
      // To hold checked requirements as chips
@@ -351,7 +353,7 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
   // create job object
   const job = {
     title: jobTitle,
-    category,
+    category:other.trim().length>2 ? other:category,
     organisation: {
       name: organisationName,
       about: posterAbout,
@@ -756,6 +758,25 @@ const PostJobModal = ({ openModalJob, setOpenModalJob, setTextOption, isHiring=f
                     )}
                 </TextField>
               </Box>
+              
+                {/* other category */}
+                {category.includes('Zero') && (
+                  <Box className="mb-2">
+                    <Typography mb={2} variant="body2" color={"text.secondary"}>
+                      You have selected option other, provide the other specialization or category 
+                      that your job is to be placed.
+                    </Typography>
+                  <TextField
+                    fullWidth
+                    disabled={isUploading}
+                    value={other}
+                    onChange={(e) => setOther(e.target.value)}
+                    id="other category"
+                    label={"Provide Other"}
+                    placeholder={'provide other'}
+                  />
+                </Box>
+                )}
 
               {/* job type */}
               <Typography   gutterBottom variant="body2" color={"text.secondary"}>

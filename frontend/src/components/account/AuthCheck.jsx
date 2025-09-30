@@ -135,7 +135,6 @@ const AuthCheck = ({ children }) => {
 
         // update authMessage error in redux for display on auth pages
         dispatch(updateCurrentAuthMessage(err?.response?.data));
-      
     });
 
   // check login status before proceeding

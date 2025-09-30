@@ -9,7 +9,7 @@ import {
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import axios from "axios";
-import React, { lazy, Suspense, useLayoutEffect, useState } from "react";
+import React, { Suspense, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleShowLogout, showUserProfileDrawer } from "../../../redux/AppUI";
 import {
@@ -18,8 +18,8 @@ import {
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
-const ProfileUpdate = lazy(() => import("./ProfileUpdate"));
-const UserProfileDrawer = lazy(() => import("./UserProfileDrawer"));
+import ProfileUpdate from "./ProfileUpdate";
+import UserProfileDrawer from "./UserProfileDrawer";
 
 
   // handle the width of the drawer

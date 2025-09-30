@@ -53,7 +53,11 @@ const MAX_ABOUT=160
 // max topic length
 const MAX_TOPIC_LENGTH=35
 
-const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption, isHiring=false}) => {
+const EventsAddModal = ({
+  openModalEventAdd, 
+  setOpenModalEventAdd, 
+  setTextOption, 
+  isHiring=false}) => {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [eventLink, setEventLink] = useState("");
@@ -62,6 +66,8 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
   const [country, setCountry] = useState("");
   const [about, setAbout] = useState("");
   const [skills,setSkills]=useState([])
+  const [other,setOther]=useState("")
+  
 
    // To hold user input text for req
     const [reqText, setReqText] = useState("");
@@ -183,22 +189,17 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
       setErrorMessage("missing about field");
       return false;
     }
- 
-
     if (topicsRequirement?.length <=3) {
       setErrorMessage("provide 4 main topics");
       return false;
     }
-
-    
-
     return true;
   };
 
   // event object
   const eventObject={
     title,
-    category,
+    category:other.trim().length>2 ? other:category,
     hostLink:eventLink,
     dateHosted:eventDate,
     ownerId,
@@ -356,7 +357,7 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                 sx={{ 
                   width:12,
                   height:12,
-                 }}/>
+                }}/>
               </Tooltip>
             </IconButton>
           </Box>
@@ -460,6 +461,25 @@ const EventsAddModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextOption
                     )}
                 </TextField>
               </Box>
+
+               {/* other category */}
+                {category.includes('Zero') && (
+                  <Box className="mb-2">
+                    <Typography mb={2} variant="body2" color={"text.secondary"}>
+                      You have selected option other, provide the other specialization or category 
+                      that your event is to be placed.
+                    </Typography>
+                  <TextField
+                    fullWidth
+                    disabled={isUploading}
+                    value={other}
+                    onChange={(e) => setOther(e.target.value)}
+                    id="other category"
+                    label={"Provide Other"}
+                    placeholder={'provide other'}
+                  />
+                </Box>
+                )}
 
                {/*event hosting link */}
                 <Box className="w-100 mb-3">
