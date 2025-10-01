@@ -272,8 +272,7 @@ const Navbar = () => {
           setResponseMessage("failed to search network error");
           return;
         }
-        // update the snackbar notification of error from the server
-        setResponseMessage(err?.response.data);
+     
       })
       .finally(() => {
         // set is fetching to false
@@ -308,16 +307,14 @@ const Navbar = () => {
         }
       })
       .catch((err) => {
+        console.log(err);
         if (err?.code === "ERR_NETWORK") {
           setErrorMessage(
             "Server is unreachable "
           );
           return;
         }
-        setErrorMessage(err?.response.data);
 
-        // open alert general
-        setOpenAlertGeneral(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -348,14 +345,12 @@ const Navbar = () => {
         }
       })
       .catch((err) => {
+        console.log(err);
         if (err?.code === "ERR_NETWORK") {
           setErrorMessage("server is unreachable please try again later");
           return;
         }
-        setErrorMessage(err?.response.data);
 
-        // open alert general
-        setOpenAlertGeneral(true)
       })
       .finally(() => {
         // set is fetching to false
@@ -383,13 +378,12 @@ const Navbar = () => {
         }
       })
       .catch((err) => {
+        console.log(err);
         if (err?.code === "ERR_NETWORK") {
           setErrorMessage("server is unreachable");
           return;
         }
-        setErrorMessage(err?.response.data);
-        // open alert general
-        setOpenAlertGeneral(true)
+ 
       })
       .finally(() => {
         // set is fetching to false
@@ -424,9 +418,7 @@ const Navbar = () => {
             setErrorMessage("server is unreachable!");
             return;
           }
-          setErrorMessage(err?.response.data);
-          // open alert general
-        setOpenAlertGeneral(true)
+        
         })
         .finally(() => {
           // set is fetching to false
@@ -461,9 +453,7 @@ const Navbar = () => {
             setErrorMessage("server is unreachable!");
             return;
           }
-          setErrorMessage(err?.response.data);
-          // open alert general
-        setOpenAlertGeneral(true)
+        
         })
         .finally(() => {
           // set is fetching to false
@@ -500,7 +490,6 @@ const Navbar = () => {
             setErrorMessage("server is unreachable!");
             return;
           }
-          setErrorMessage(err?.response.data);
         })
         .finally(() => {
           // set is fetching to false
@@ -541,7 +530,7 @@ const Navbar = () => {
                   );
                   return;
               }
-              setErrorMessage(err?.response.data);
+
               })
               .finally(() => {
               setIsFetching(false);

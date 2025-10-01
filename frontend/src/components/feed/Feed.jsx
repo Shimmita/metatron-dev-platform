@@ -9,6 +9,7 @@ import BottomNav from "../bottom/BottomNav";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
+import GuestCheck from "../account/GuestCheck";
 const EventsContainer =lazy(()=>import("../events/EventsContainer")) ;
 const SnackBarPostSuccess =lazy(()=>import("../snackbar/SnackBarPostSuccess")) ;
 const CoursesMainContainer =lazy(()=>import("../courses/CoursesMainContainer"));
@@ -68,24 +69,44 @@ const Feed = () => {
             }
           >
           
-            <Routes>
-              <Route path="/" element={<FeedDefaultContent />} />
+            <Routes >
+              <Route path="/" element={
+                <GuestCheck>
+                <FeedDefaultContent />
+              </GuestCheck>} />
 
               {/* events */}
-              <Route path="/events" element={<EventsContainer />} />
+              <Route path="/events" element={
+                <GuestCheck>
+                <EventsContainer />
+              </GuestCheck>} />
 
             
               {/* final selection route for courses */}
-              <Route path="/courses/available" element={<CoursesMainContainer />} />
+              <Route path="/courses/available" element={
+                <GuestCheck>
+                <CoursesMainContainer />
+              </GuestCheck>} />
                {/* instructor */}
-              <Route path="/courses/instructor" element={<CoursesInstrContainer />} />
+              <Route path="/courses/instructor" element={
+                <GuestCheck>
+                  <CoursesInstrContainer />
+                </GuestCheck>
+              } />
 
 
               {/* jobseeker pane */}
-              <Route path="/jobs" element={<AllJobsContainer />} />
+              <Route path="/jobs" element={
+                <GuestCheck>
+                <AllJobsContainer />
+              </GuestCheck>} />
 
               {/* hiring manager pane */}
-              <Route path="/jobs/hiring" element={<AllJobsHiringManager/>}/>
+              <Route path="/jobs/hiring" element={
+                <GuestCheck>
+                  <AllJobsHiringManager/>
+                </GuestCheck>
+              }/>
 
               <Route
                 path="/posts/search/results"
@@ -93,11 +114,17 @@ const Feed = () => {
               />
               <Route
                 path="/posts/details/:id"
-                element={<PostDetailsRouted />}
+                element={
+                <GuestCheck>
+                  <PostDetailsRouted />
+                </GuestCheck>}
               />
               <Route
                 path="/users/profile/posts/details"
-                element={<PostDetailsContainer />}
+                element={
+                <GuestCheck>
+                  <PostDetailsContainer/>
+                </GuestCheck>}
               />
               {/* page not found; no urls matched */}
               <Route path="*" element={<PageNotFound />} />

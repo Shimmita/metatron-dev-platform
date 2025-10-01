@@ -34,7 +34,6 @@ const RecoverAuth = () => {
 
   const navigate = useNavigate();
 
-
     // axios defaults with credentials to true
     axios.defaults.withCredentials = true;
 

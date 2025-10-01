@@ -9,10 +9,10 @@ import { lazy, Suspense } from "react";
 import { BallTriangle } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
-import GuestCheck from "./components/account/GuestCheck";
 import HomePageLazy from "./components/account/HomePage";
 import LoginAuth from "./components/auth/LoginAuth";
 import AppLogo from "./images/logo_sm.png";
+import GuestCheck from "./components/account/GuestCheck";
 const CertificateVerification=lazy(()=>import("./components/auth/CertificateVerification")) ;
 const RegPersonalCompletion = lazy(() =>
   import("./components/auth/RegPersonalCompletion")
@@ -95,7 +95,7 @@ const App = () => {
                 element={
                   <GuestCheck>
                     <HomePageLazy/>
-                  </GuestCheck>
+                    </GuestCheck>
                 }
               />
               

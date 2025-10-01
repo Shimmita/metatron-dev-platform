@@ -1,5 +1,6 @@
-import { useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { useCallback, useLayoutEffect } from "react";
+import { useDispatch } from "react-redux";
 import { resetDefaultBottomNav } from "../../redux/AppUI";
 import { resetAllSigningStateDetails } from "../../redux/CompleteSigning";
 import { resetClearChatBot } from "../../redux/CurrentChatBot";
@@ -25,11 +26,10 @@ import { resetClearCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import { resetClearCurrentUserRedux, resetClearTempUserIDRedux } from "../../redux/CurrentUser";
 
 const GuestCheck = ({ children }) => {
-  // access current user online status from redux which is populated
-  // from the server
-  const { isGuest } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
-
+  // axios defaults with credentials to true
+  axios.defaults.withCredentials = true;
+  // handle redux clearance
   const handleClearReduxData=useCallback(()=>{
           // clear any persisted user data
           dispatch(resetClearCurrentUserRedux())
@@ -110,15 +110,15 @@ const GuestCheck = ({ children }) => {
           dispatch(resetClearCurrentSuccessRedux())
   },[dispatch])
 
-  // clear the redux data if user is guest,
-  // avoids stale data 
-  useEffect(()=>{
-    if (isGuest) {
+ 
+  // use layout effect to check the validity of the request
+  useLayoutEffect(()=>{
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/valid`).catch(()=>{
+      // clear redux since user session expired. request be guest user
       handleClearReduxData()
-    }
-  },[isGuest,handleClearReduxData])
-
-
+    })
+  },[handleClearReduxData])
+  
   // check login status before proceeding
   return children
 };
