@@ -1,9 +1,7 @@
-import axios from "axios";
-import { useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetDefaultBottomNav } from "../../redux/AppUI";
 import { resetAllSigningStateDetails } from "../../redux/CompleteSigning";
-import { resetClearCurrentAuthMessage, updateCurrentAuthMessage } from "../../redux/CurrentAuthMessages";
 import { resetClearChatBot } from "../../redux/CurrentChatBot";
 import { resetClearCurrentConnectTop } from "../../redux/CurrentConnect";
 import { resetClearCurrentConnectNotif } from "../../redux/CurrentConnectNotif";
@@ -25,23 +23,14 @@ import { resetClearCurrentProfileView } from "../../redux/CurrentProfileView";
 import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
 import { resetClearCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import { resetClearCurrentUserRedux, resetClearTempUserIDRedux } from "../../redux/CurrentUser";
-import LoginAuth from "../auth/LoginAuth";
 
-const AuthCheck = ({ children }) => {
+const GuestCheck = ({ children }) => {
   // access current user online status from redux which is populated
   // from the server
-  const { isOnline } = useSelector((state) => state.currentUser);
-  const [isAuthorised, setIsAuthorised] = useState(isOnline);
-  
+  const { isGuest } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
 
-  // for secured API calls to and fro the backend
-  axios.defaults.withCredentials = true;
-
-  const handleClearReduxData=()=>{
-     // last auth message
-          dispatch(resetClearCurrentAuthMessage());
-    
+  const handleClearReduxData=useCallback(()=>{
           // clear any persisted user data
           dispatch(resetClearCurrentUserRedux())
     
@@ -119,26 +108,19 @@ const AuthCheck = ({ children }) => {
           
           // clear success msg any
           dispatch(resetClearCurrentSuccessRedux())
-  }
+  },[dispatch])
 
-  axios
-    .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/valid`)
-    .then((res) => {
-      setIsAuthorised(res.data.authorised);
-    })
-    .catch(async (err) => {
-      // update user authorised to false
-      setIsAuthorised(false);
-
-      // clear all redux data
+  // clear the redux data if user is guest,
+  // avoids stale data 
+  useEffect(()=>{
+    if (isGuest) {
       handleClearReduxData()
+    }
+  },[isGuest,handleClearReduxData])
 
-        // update authMessage error in redux for display on auth pages
-        dispatch(updateCurrentAuthMessage(err?.response?.data));
-    });
 
   // check login status before proceeding
-  return isOnline && isAuthorised ? children : <LoginAuth />;
+  return children
 };
 
-export default AuthCheck;
+export default GuestCheck;

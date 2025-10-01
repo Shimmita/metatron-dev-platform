@@ -84,8 +84,6 @@ const DrawerSmartphone = ({
   const [dataInsights,setDataInsights]=useState([])
   const [dataTools,setDataTools]=useState([])
   
-  
-
   // UI theme dark light tweaking effect
     const handleShowDarkMode = () => {
     // update the redux theme boolean state
