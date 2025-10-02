@@ -25,17 +25,17 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import AlertCountry from "../alerts/AlertCountry";
 import AlertGeneral from "../alerts/AlertGeneral";
+import AlertOrgCompletion from "../alerts/AlertOrgCompletion";
 import AlertProfileCompletion from "../alerts/AlertProfileCompletion";
+import AccountVersion from "../data/AccountVersion";
 import AllSkills from "../data/AllSkillsData";
 import CountiesInKenya from "../data/Counties";
 import EducationLevel from "../data/EducationLevel";
 import GenderData from "../data/GenderData";
 import Institutions from "../data/Institution";
+import OrgSpecializations from "../data/OrgSpecializations";
 import SpecialisationJobs from "../data/SpecialisationJobs";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-import AccountVersion from "../data/AccountVersion";
-import OrgSpecializations from "../data/OrgSpecializations";
-import AlertOrgCompletion from "../alerts/AlertOrgCompletion";
 const RegisterAlertTitle = lazy(() => import("./RegisterAlertTitle"));
 
 const MAX_ABOUT=400
@@ -339,7 +339,7 @@ const RegistrationAuth = () => {
                 variant={CustomDeviceSmallest() ? "caption" : "body2"}
                 color={"text.secondary"}
               >
-                User Account Signup
+                {account} Account Signup
               </Typography>
               <WorkRounded color="primary" sx={{ width: 17, height: 17 }} />
             </Box>

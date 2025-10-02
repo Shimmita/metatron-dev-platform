@@ -84,7 +84,7 @@ const Sidebar = () => {
   } = useSelector((state) => state.appUI);
 
    const isDarkMode=currentMode==='dark'
-  const { user,isGuest } = useSelector((state) => state.currentUser);
+  const { user,isGuest,usersCount } = useSelector((state) => state.currentUser);
 
 
    //fetch all insights from the backend
@@ -247,7 +247,8 @@ const Sidebar = () => {
                           variant="caption"
                           textTransform={"capitalize"}
                           >
-                          {user?.specialisationTitle|| "Login or Register"}
+                          {user?.specialisationTitle || "Login or Register"} <br/>
+                          {isGuest && usersCount + "+ Subscribers"}
                           </Typography>
 
                           {/* country */}
@@ -318,7 +319,7 @@ const Sidebar = () => {
                           </AvatarGroup>
                         </Box>
                           </React.Fragment>
-                         )}
+                        )}
 
                       </Box>
                       </Box>

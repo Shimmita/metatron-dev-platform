@@ -23,7 +23,7 @@ import { resetClearCurrentPostsTop } from "../../redux/CurrentPostsTop";
 import { resetClearCurrentProfileView } from "../../redux/CurrentProfileView";
 import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
 import { resetClearCurrentSuccessRedux } from "../../redux/CurrentSuccess";
-import { resetClearCurrentUserRedux, resetClearTempUserIDRedux } from "../../redux/CurrentUser";
+import { resetClearCurrentUserRedux, resetClearTempUserIDRedux, updateUserCountRedux } from "../../redux/CurrentUser";
 
 const GuestCheck = ({ children }) => {
   const dispatch = useDispatch();
@@ -113,11 +113,15 @@ const GuestCheck = ({ children }) => {
  
   // use layout effect to check the validity of the request
   useLayoutEffect(()=>{
-    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/valid`).catch(()=>{
-      // clear redux since user session expired. request be guest user
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/valid`)
+    .then(res=>dispatch(updateUserCountRedux(res.data.usersCount)))
+    .catch((err)=>{
+        // clear redux since user session expired. request be guest user
       handleClearReduxData()
+      // update user count
+      dispatch(updateUserCountRedux(err?.response?.data?.usersCount))
     })
-  },[handleClearReduxData])
+  },[handleClearReduxData,dispatch])
   
   // check login status before proceeding
   return children

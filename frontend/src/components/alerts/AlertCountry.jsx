@@ -198,14 +198,14 @@ export default function AlertCountry({
                 gap: 2,
               }}
             >
-              <>
+              <React.Fragment>
                 <DialogContentText
                   variant="body2"
                   gutterBottom
                   id="alert-dialog-slide-description"
                 >
                   Please select your current country of residence from the list of 
-                  countries provided below in the drop-down menu.
+                  countries provided.
                 </DialogContentText>
 
                 <Autocomplete
@@ -274,10 +274,9 @@ export default function AlertCountry({
                 gutterBottom
                 id="alert-dialog-slide-type-account"
                 >
-                  Please select your preferred account. Personal account is intended for an individual 
-                  user while organisation for businesses, institutions, corporations and companies.
+                  Personal account is intended for individual users
+                  while organisation for Businesses.
                 </DialogContentText>
-
                 <Box 
                 display={"flex"} 
                 justifyContent={"center"}>
@@ -314,7 +313,7 @@ export default function AlertCountry({
                 </Box>
 
                 {/* strategy */}
-                <Box mt={2}>
+                <Box mt={1}>
                 <FormControlLabel 
                 control={<Checkbox 
                 onChange={handleChange}
@@ -323,11 +322,10 @@ export default function AlertCountry({
                 <Typography 
                 color={value===false ? 'text.secondary':undefined}
                 variant="body2">
-                I agree to post tech related content on the platform to the
-                community and using the platform in promoting technology.
+                I agree to post tech related content to the platform.
                 </Typography>}/>
                 </Box>
-              </>
+              </React.Fragment>
             </DialogContent>
           </Box>
           <DialogActions>

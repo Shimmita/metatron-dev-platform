@@ -5,6 +5,7 @@ const initialstate = {
   isOnline: false,
   isGuest:true,
   tempUserProfileID: null,
+  usersCount:0,
 };
 
 const currentUser = createSlice({
@@ -23,7 +24,12 @@ const currentUser = createSlice({
     resetClearCurrentUserRedux: (state) => {
       state.user = null;
       state.isOnline = false;
-      state.isGuest=true
+      state.isGuest=true;
+    },
+
+    // update user count
+    updateUserCountRedux:(state,action)=>{
+      state.usersCount=action.payload
     },
 
     // update tempUser ID for temp profile review
@@ -44,6 +50,7 @@ export const {
   resetClearCurrentUserRedux,
   updateTempUserIDRedux,
   resetClearTempUserIDRedux,
+  updateUserCountRedux
 } = currentUser.actions;
 
 // exporting the main fun reducer
