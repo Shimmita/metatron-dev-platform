@@ -77,7 +77,7 @@ const DrawerSmartphone = ({
   const { currentMode } = useSelector((state) => state.appUI);
    const isDarkMode=currentMode==='dark'
 
-  const { user,isGuest } = useSelector((state) => state.currentUser);
+  const { user,isGuest,usersCount } = useSelector((state) => state.currentUser);
   const dispatch=useDispatch()
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -165,18 +165,18 @@ const DrawerSmartphone = ({
 
           {/* avatar and its subsequent content */}
                 <BoxAvatarContent>
-                      <Box 
-                      display={'flex'}
-                      alignItems={'center'}
-                      mb={1}
-                      p={2}
-                      borderRadius={2}
-                      gap={2}
-                      width={'100%'}
-                    sx={{
-                      background: !isDarkMode && 
-                    "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-                    }}
+                    <Box 
+                    display={'flex'}
+                    alignItems={'center'}
+                    mb={1}
+                    p={2}
+                    borderRadius={2}
+                    gap={2}
+                    width={'100%'}
+                  sx={{
+                    background: !isDarkMode && 
+                  "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+                  }}
                       >
                       {/* avatar container */}
                         <StyledBadge
@@ -215,7 +215,8 @@ const DrawerSmartphone = ({
                             variant="caption"
                             textTransform={"capitalize"}
                             >
-                            {user?.specialisationTitle||"Login or Register"}
+                            {user?.specialisationTitle||"Login or Register"} <br/>
+                          {isGuest && usersCount + "+ Subscribers 🎉"}
                             </Typography>
 
                             {/* country */}

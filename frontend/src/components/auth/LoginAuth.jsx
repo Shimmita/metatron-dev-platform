@@ -1,6 +1,8 @@
 import {
   Close,
   DarkModeRounded,
+  HomeRounded,
+  KeyRounded,
   PersonAddRounded,
   Visibility,
   VisibilityOff,
@@ -376,22 +378,24 @@ const handleNavigateHome=()=>{
 
             <Box mb={2} display={"flex"} justifyContent={"center"}>
               <Button
-                startIcon={isFetching && <CircularProgress size={13} />}
                 variant="outlined"
                 className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
                 disabled={isFetching}
+                startIcon={<HomeRounded/>}
                 sx={{ textTransform: "none", borderRadius: "20px" }}
                 disableElevation
                 onClick={handleNavigateHome}
               >
-                Home
+                Proceed Home
               </Button>
             </Box>
 
             {/* login btn */}
             <Box mb={2} display={"flex"} justifyContent={"center"}>
               <Button
-                startIcon={isFetching && <CircularProgress size={13} />}
+                startIcon={isFetching ? 
+                <CircularProgress size={13} />:
+                <KeyRounded/>}
                 variant="contained"
                 className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
                 disabled={isFetching}
@@ -399,7 +403,7 @@ const handleNavigateHome=()=>{
                 disableElevation
                 onClick={isVerifyButton ? handleEmailVerification : handleLogin}
               >
-                {isVerifyButton ? "Verification" : "Login"}
+                {isVerifyButton ? "Verification" : "Proceed Login"}
               </Button>
             </Box>
           </Box>

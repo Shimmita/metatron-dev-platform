@@ -248,7 +248,7 @@ const Sidebar = () => {
                           textTransform={"capitalize"}
                           >
                           {user?.specialisationTitle || "Login or Register"} <br/>
-                          {isGuest && usersCount + "+ Subscribers"}
+                          {isGuest && usersCount + "+ Subscribers 🎉"}
                           </Typography>
 
                           {/* country */}
