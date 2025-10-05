@@ -3,6 +3,7 @@ import {
   ArrowCircleRightRounded,
   BalanceRounded,
   CalendarMonthRounded,
+  Done,
   LocationOnRounded,
   LockRounded,
   PaidRounded,
@@ -49,7 +50,7 @@ function JobLayout_2({
  }) {
   const [openModal, setOpenApplyJobModal] = useState(false);
   const [isFetching,setIsFetching]=useState(false)
-  
+  const [isCopiedStatus, setIsCopiedStatus] = useState(false);
 
   // redux states
   const { user,isGuest } = useSelector((state) => state.currentUser);
@@ -141,6 +142,20 @@ function JobLayout_2({
         // set is fetching to false
         setIsFetching(false);
       });
+  }
+
+  // handle getting of job link
+  const handleGetJobLink=async()=>{
+    const urlJob=`${window.location.href}?id=${job?._id}`
+      try {
+      await navigator.clipboard.writeText(urlJob);
+      setIsCopiedStatus(true);
+      setTimeout(() => {
+      setIsCopiedStatus(false)
+      }, 2000); 
+    } catch (err) {
+      console.error('Failed to Copy: ', err);
+    }
   }
 
   return (
@@ -274,13 +289,32 @@ function JobLayout_2({
         <React.Fragment>
       
       <Box
-      mt={2}
+      mt={1}
       pb={2}
       justifyContent={'center'}
       width={'100%'}
+      gap={1}
+      flexDirection={'column'}
       display={'flex'}>
-      {/* application  btns */}
-      <Box >
+      {/* share the job */}
+      <Box 
+      display={'flex'} 
+      justifyContent={'center'}>
+      <Button
+      onClick={handleGetJobLink}
+      color={isCopiedStatus ? 'success':'primary'}
+      startIcon={isCopiedStatus ? <Done/>:undefined} 
+      sx={{
+        borderRadius:'20px',
+      fontSize:'small', 
+      textTransform:'capitalize' }}
+      size="small">
+        {isCopiedStatus ? "Copied":"Share"}
+      </Button>
+      </Box>
+      <Box 
+      display={'flex'} 
+      justifyContent={'center'}>
       {websiteLink === "" ? (
         <Button
           variant={isDarkMode ? "outlined" : "contained"}

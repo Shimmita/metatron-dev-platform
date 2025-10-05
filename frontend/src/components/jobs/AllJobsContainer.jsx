@@ -49,6 +49,7 @@ import {
   resetDarkMode,
   showUserProfileDrawer
 } from "../../redux/AppUI";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import { updateCurrentJobs } from "../../redux/CurrentJobs";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertJobSearch from "../alerts/AlertJobSearch";
@@ -139,10 +140,9 @@ export default function MiniDrawer() {
 
   const { jobs } = useSelector((state) => state.currentJobs);
   const { user,isGuest } = useSelector((state) => state.currentUser);
-
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
   const theme = useTheme();
-
+  
     // trigger redux update
     const dispatch = useDispatch();
 
@@ -203,6 +203,9 @@ export default function MiniDrawer() {
   // use effect for fetching jobs
   // fetch job posts from the backend (all,verified,nearby,recommended etc)
   useEffect(() => {
+      // update bottom nav position
+        dispatch(updateCurrentBottomNav(1))
+
     // don't fetch any if isJob-search global to avoid overriding  data
     if (isJobSearchGlobal) {
       // increase page number for bypassing similar jobs in the array of next fetch
@@ -229,6 +232,40 @@ export default function MiniDrawer() {
 
     // fetch all jobs if the request is so
     if (textOption === "Explore Jobs") {
+
+        // get the full pathname
+        const pathName=window.location.href
+        // init job id
+
+        let jobId=""
+
+        // check existence of query
+        if (pathName?.includes("?")) {
+          jobId=pathName?.split("?")[1]?.split("=")[1]
+
+          // axios query
+          axios
+            .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/specific/${user?._id}/${jobId}`, {
+              withCredentials: true,
+            }).then(res=>
+              dispatch(updateCurrentJobs(res.data))
+            ).catch(err=>{
+              if (err?.response?.data.login) {
+                window.location.reload();
+              }
+              if (err?.code === "ERR_NETWORK") {
+                setErrorMessage(
+                  "server unreachable"
+                );
+                return;
+              }
+              setErrorMessage(err?.response.data);
+            }).finally(() => {
+          setIsFetching(false);
+          // false my stats
+          setIsMyStats(false)
+        });
+        }else {
 
       axios
         .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/${user?._id}`, {
@@ -262,6 +299,8 @@ export default function MiniDrawer() {
           // false my stats
           setIsMyStats(false)
         });
+
+      }
     }
 
     // fetch all jobs that have been verified

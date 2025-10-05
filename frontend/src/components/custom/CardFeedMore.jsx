@@ -1,4 +1,5 @@
 import {
+  DoneRounded,
   EmailOutlined,
   FlagRounded,
   LinkRounded,
@@ -266,11 +267,19 @@ function CardFeedMore({
              <Divider component={"li"} />
             <MenuItem onClick={handleSharePost} disabled={isFetching}>
               <ListItemText>              
-                 <LinkRounded 
+        
+                {isCopiedStatus ? (
+                  <DoneRounded 
                 sx={{ width:24,height:24 }}
-                color={isCopiedStatus ? "success":"secondary"} 
+                color='success'
                 className="mx-2" />
-               
+                ):(
+                  <LinkRounded 
+                sx={{ width:24,height:24 }}
+                color='secondary'
+                className="mx-2" />
+                )}
+              
               </ListItemText>
               <ListItemText
                 sx={{ textTransform: "capitalize" }}
