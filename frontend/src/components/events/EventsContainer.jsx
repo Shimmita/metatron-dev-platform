@@ -58,6 +58,7 @@ import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import EventItem from "./layout/EventItem";
 import EventStatsLayout from "./layout/EventStatsLayout";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 
 const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
 
@@ -202,6 +203,9 @@ export default function EventsContainer() {
   // use effect for fetching jobs
   // fetch job posts from the backend (all,verified,nearby,recommended etc)
   useEffect(() => {
+     // update bottom nav position
+      dispatch(updateCurrentBottomNav(2))
+
     // don't fetch any if isJob-search-events global to avoid overriding  data
     if (isJobSearchGlobal) {
       // false my stats
@@ -226,37 +230,70 @@ export default function EventsContainer() {
 
     // fetch all jobs if the request is so
     if (textOption === "Explore Events") {
+       // get the full pathname
+        const pathName=window.location.href
+        // init job id
 
-      axios
-        .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all`, {
-          withCredentials: true,
-        })
-        .then((res) => {
-          // update the redux of current events
-          if (res?.data) {
-            dispatch(updateCurrentEvents(res.data))
-          } 
-        })
-        .catch(async (err) => {
-          //  user login session expired show logout alert
-          if (err?.response?.data.login) {
-            window.location.reload();
-          }
-          if (err?.code === "ERR_NETWORK") {
-            setErrorMessage(
-              "server unreachable"
-            );
-            return;
-          }
-          setErrorMessage(err?.response.data);
-        })
-        .finally(() => {
-          setIsFetching(false);
-          // false my stats
-          setIsMyStats(false)
-        });
-    }
+        let eventId=""
 
+        // check existence of query
+            if (pathName?.includes("?")) {
+              eventId=pathName?.split("?")[1]?.split("=")[1]
+    
+              // axios query
+              axios
+                .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/specific/${eventId}`, {
+                  withCredentials: true,
+                }).then(res=>
+                  dispatch(updateCurrentEvents(res.data))
+                ).catch(err=>{
+                  if (err?.response?.data.login) {
+                    window.location.reload();
+                  }
+                  if (err?.code === "ERR_NETWORK") {
+                    setErrorMessage(
+                      "server unreachable"
+                    );
+                    return;
+                  }
+                  setErrorMessage(err?.response.data);
+                }).finally(() => {
+              setIsFetching(false);
+              // false my stats
+              setIsMyStats(false)
+            });
+            }else {
+
+            axios
+              .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all`, {
+                withCredentials: true,
+              })
+              .then((res) => {
+                // update the redux of current events
+                if (res?.data) {
+                  dispatch(updateCurrentEvents(res.data))
+                } 
+              })
+              .catch(async (err) => {
+                //  user login session expired show logout alert
+                if (err?.response?.data.login) {
+                  window.location.reload();
+                }
+                if (err?.code === "ERR_NETWORK") {
+                  setErrorMessage(
+                    "server unreachable"
+                  );
+                  return;
+                }
+                setErrorMessage(err?.response.data);
+              })
+              .finally(() => {
+                setIsFetching(false);
+                // false my stats
+                setIsMyStats(false)
+              });
+          }
+  }
     // trigger showing of modal event
     if (textOption === "Create Events") {
       // activate modal

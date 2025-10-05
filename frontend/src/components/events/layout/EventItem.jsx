@@ -3,6 +3,7 @@ import {
   BarChart,
   CheckCircleRounded,
   Delete,
+  Done,
   LockRounded,
   SmartDisplayRounded
 } from "@mui/icons-material";
@@ -46,6 +47,8 @@ function EventItem({
 
   const [isFetching, setIsFetching] = useState(false);
   const [openMiniProfile,setOpenMiniProfile]=useState(false)
+  const [isCopiedStatus, setIsCopiedStatus] = useState(false);
+  
   
   // redux states
   const { user,isGuest } = useSelector((state) => state.currentUser);
@@ -263,6 +266,19 @@ function EventItem({
     window.open(event?.hostLink,'_blank_')
   }
 
+  // handle getting of job link
+  const handleGetEventLink=async()=>{
+    const urlEvent=`${window.location.href}?id=${event?._id}`
+      try {
+      await navigator.clipboard.writeText(urlEvent);
+      setIsCopiedStatus(true);
+      setTimeout(() => {
+      setIsCopiedStatus(false)
+      }, 2000); 
+    } catch (err) {
+      console.error('Failed to Copy: ', err);
+    }
+  }
 
 
   return (
@@ -576,7 +592,27 @@ function EventItem({
                   <Box
                 display={"flex"}
                 mt={0.5}
+                flexDirection={'column'}
                 justifyContent={"center"}>
+                  <Box 
+                  display={'flex'} 
+                  justifyContent={'center'}>
+                  <Button
+                  onClick={handleGetEventLink}
+                  color={isCopiedStatus ? 'success':'primary'}
+                  startIcon={isCopiedStatus ? <Done/>:undefined} 
+                  sx={{
+                  borderRadius:'20px',
+                  fontSize:'small', 
+                  textTransform:'capitalize' }}
+                  size="small">
+                    {isCopiedStatus ? "Copied":"Share Event"}
+                      </Button>
+                    </Box>
+
+                    <Box 
+                    display={'flex'} 
+                    justifyContent={'center'}>
                   <Button
                     disableElevation
                     variant={isDarkMode ?'outlined':'contained'}
@@ -590,6 +626,7 @@ function EventItem({
                   >
                     {isMyOwnEvent ? "Your Event":"RSVP EVENT"}
                   </Button>
+                  </Box>
                 </Box>  
                 )}
           </CardContent>
@@ -597,28 +634,28 @@ function EventItem({
 
 
          {/* next button zone, only if item is last index */}
-           {isLastIndex && !isGuest && (
-             <Box 
-            alignItems={'center'}
-            justifyContent={'center'}
-            display={'flex'}>
-            <IconButton 
-            disabled={isFetching}
-             onClick={handleFetchMoreData}
-             size="small"
-             sx={{ 
-              border:'1px solid',
-              borderColor:'divider'
-              }}
-             >
-             {isFetching ? 
-             <CircularProgress size={20}/>: 
-             <ArrowCircleRightRounded
-              color="primary"
-               sx={{ width:28,height:28}}/>}
-            </IconButton>
-            </Box>
-           )}
+            {isLastIndex && !isGuest && (
+              <Box 
+              alignItems={'center'}
+              justifyContent={'center'}
+              display={'flex'}>
+              <IconButton 
+              disabled={isFetching}
+              onClick={handleFetchMoreData}
+              size="small"
+              sx={{ 
+                border:'1px solid',
+                borderColor:'divider'
+                }}
+              >
+              {isFetching ? 
+              <CircularProgress size={20}/>: 
+              <ArrowCircleRightRounded
+                color="primary"
+                sx={{ width:28,height:28}}/>}
+              </IconButton>
+              </Box>
+            )}
 
 
           {/* mini profile alert  */}

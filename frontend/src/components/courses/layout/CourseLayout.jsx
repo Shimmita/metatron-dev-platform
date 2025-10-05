@@ -1,7 +1,9 @@
 import {
   AutoAwesomeRounded,
   CastForEducationRounded,
+  DoneRounded,
   LockRounded,
+  MobileScreenShareRounded,
   PersonAdd,
   SchoolRounded,
   VideoLibraryRounded
@@ -20,9 +22,9 @@ import {
 import { lazy, useState } from "react";
 import { useSelector } from "react-redux";
 import pythonLogo from "../../../images/python.jpeg";
+import AlertSimilarCourses from "../../alerts/AlertSimilarCourses";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
-import AlertSimilarCourses from "../../alerts/AlertSimilarCourses";
 const AccordionDescription = lazy(() => import("./AccordionDescription"));
 
 const labels = {
@@ -64,6 +66,8 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
   const isMyCourse=user?._id===courseItem?.course_instructor?.instructorId
   const [isOpenAccordion,setIsOpenAccordion]=useState(false)
   const [showSimilar,setShowSimilar]=useState(false)
+  const [isCopiedStatus, setIsCopiedStatus] = useState(false);
+  
   
   const handleOpenPlayer = () => {
    setFocusedCourse(courseItem)
@@ -72,6 +76,20 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
   // handle showing similar courses suggestion
   const handleShowSimilarCourses=()=>{
     setShowSimilar(true)
+  }
+
+  // handle get course link
+  const handleGetCourseLink=async()=>{
+    const urlCourse=`${window.location.href}?id=${courseItem?._id}`
+      try {
+      await navigator.clipboard.writeText(urlCourse);
+      setIsCopiedStatus(true);
+      setTimeout(() => {
+      setIsCopiedStatus(false)
+      }, 2000); 
+    } catch (err) {
+      console.error('Failed to Copy: ', err);
+    }
   }
   
   return (
@@ -257,16 +275,42 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
 
 
       {/* similar courses btn */}
-      <Box mt={2}
+      <Box 
+      p={1}
+      gap={1}
+      alignItems={'center'}
       display={isOpenAccordion ? "none":'flex'}
       justifyContent={'center'}>
+      {/* similar courses */}
       <Button 
+      sx={{
+        fontSize:'small', 
+      textTransform:'capitalize' 
+      }}
       onClick={handleShowSimilarCourses}
       size="small"
       startIcon={<AutoAwesomeRounded/>}>
-      similar courses
+      similar Courses
+      </Button>
+      <Divider 
+      component={'div'}
+      orientation="vertical"/>
+      {/* share courses */}
+      <Button 
+      sx={{
+        fontSize:'small', 
+      textTransform:'capitalize' 
+      }}
+      onClick={handleGetCourseLink}
+      size="small"
+      color={isCopiedStatus ? 'success':'primary'}
+      startIcon={isCopiedStatus ? <DoneRounded/>:<MobileScreenShareRounded/>}
+      >
+      {isCopiedStatus ? "Link Copied":"Share Course"}
       </Button>
       </Box>
+
+      <Divider component={"div"} />
 
         {/* enroll course button control */}
         <Box

@@ -49,6 +49,7 @@ import {
   resetDarkMode,
   showUserProfileDrawer
 } from "../../redux/AppUI";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import { updateCurrentCourses } from "../../redux/CurrentCourses";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertJobSearch from "../alerts/AlertJobSearch";
@@ -210,6 +211,9 @@ import CoursePlayer from "./layout/CoursePlayer";
 
     // fetch courses on launch
     useLayoutEffect(() => {
+       // update bottom nav position
+        dispatch(updateCurrentBottomNav(3))
+
       // set is certificate to false default
       setIsCert(false)
 
@@ -230,7 +234,37 @@ import CoursePlayer from "./layout/CoursePlayer";
     
         // fetch all courses, governed by pagination of 12 each fetch
         if (textOption === "Explore Courses") {
-    
+
+          // get the full pathname
+          const pathName=window.location.href
+          // init job id
+
+          let courseId=""
+          if (pathName?.includes("?")) {
+                courseId=pathName?.split("?")[1]?.split("=")[1]
+      
+                // axios query
+                axios
+                  .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/specific/${user?._id}/${courseId}`, {
+                    withCredentials: true,
+                  }).then(res=>
+                    dispatch(updateCurrentCourses(res.data))
+                  ).catch(err=>{
+                    if (err?.response?.data.login) {
+                      window.location.reload();
+                    }
+                    if (err?.code === "ERR_NETWORK") {
+                      setErrorMessage(
+                        "server unreachable"
+                      );
+                      return;
+                    }
+                    setErrorMessage(err?.response.data);
+                  }).finally(() => {
+                setIsFetching(false);
+              });
+              }
+              else{    
           axios
             .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/${user?._id}`, {
               withCredentials: true,
@@ -257,6 +291,7 @@ import CoursePlayer from "./layout/CoursePlayer";
             .finally(() => {
               setIsFetching(false);
             });
+        }
         }
     
         // performing post request for popular courses
