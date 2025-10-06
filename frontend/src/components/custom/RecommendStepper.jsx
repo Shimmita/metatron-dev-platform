@@ -1,4 +1,4 @@
-import { Avatar, Divider } from '@mui/material';
+import { Avatar, CircularProgress, Divider } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Step from '@mui/material/Step';
@@ -8,7 +8,6 @@ import Stepper from '@mui/material/Stepper';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import React, { useLayoutEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import CustomDeviceIsSmall from '../utilities/CustomDeviceIsSmall';
 import { getImageMatch } from '../utilities/getImageMatch';
 
@@ -20,10 +19,6 @@ export default function RecommendStepper() {
   const [errorMessage, setErrorMessage] = useState("");
   const [dataRecommend,setDataRecommend]=useState([])
 
-  // redux store
-  const { user } = useSelector((state) => state.currentUser);
-  // extract user skills for backend posting
-  const userSkills=user?.selectedSkills
   
 
   const handleNext = () => {
@@ -75,7 +70,34 @@ export default function RecommendStepper() {
 
   return (
     <Box sx={{ maxWidth: 430 }}>
-      <Stepper activeStep={activeStep} orientation="vertical">
+      {isFetching ? (
+        <Box 
+        width={'100%'} 
+        mt={3}
+        display={'flex'} 
+        gap={1}
+        justifyContent={'center'}>
+        <Box>
+        <CircularProgress size={18}/>
+        </Box>
+        <Box>
+        <Typography 
+        color={'text.secondary'}
+        variant='body2'>
+        getting insights...
+        </Typography>
+        </Box>
+        </Box>
+      ) : errorMessage ? (
+        <Box mt={3} 
+        display={'flex'} 
+        justifyContent={'center'}>
+        {errorMessage}
+        </Box>
+      ):
+      (
+        <React.Fragment>
+          <Stepper activeStep={activeStep} orientation="vertical">
         {dataRecommend.map((data, index) => (
           <Step  key={data.label}>
             <StepLabel
@@ -174,6 +196,8 @@ export default function RecommendStepper() {
           </Button>
         </>
       )}
+        </React.Fragment>
+      ) }
     </Box>
   );
 }
