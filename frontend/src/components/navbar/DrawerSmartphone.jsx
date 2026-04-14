@@ -12,6 +12,8 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import { appGradients } from "../../utils/colors";
 import axios from "axios";
 import { useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,8 +25,8 @@ import { getImageMatch } from "../utilities/getImageMatch";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
-    backgroundColor: "#44b700",
-    color: "#44b700",
+    backgroundColor: theme.palette.success.main,
+    color: theme.palette.success.main,
     boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
     "&::after": {
       position: "absolute",
@@ -75,7 +77,8 @@ const DrawerSmartphone = ({
 
   // redux states
   const { currentMode } = useSelector((state) => state.appUI);
-   const isDarkMode=currentMode==='dark'
+  const theme = useTheme();
+  const isDarkMode=currentMode==='dark'
 
   const { user,isGuest,usersCount } = useSelector((state) => state.currentUser);
   const dispatch=useDispatch()
@@ -174,8 +177,7 @@ const DrawerSmartphone = ({
                     gap={2}
                     width={'100%'}
                   sx={{
-                    background: !isDarkMode && 
-                  "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+                    background: !isDarkMode && appGradients.soft,
                   }}
                       >
                       {/* avatar container */}
@@ -193,8 +195,8 @@ const DrawerSmartphone = ({
                             sx={{
                               width: 80,
                               height: 80,
-                              color: "white",
-                              backgroundColor: isDarkMode ? "#42A5F5":"#1976D2",
+                              color: theme.palette.common.white,
+                              backgroundColor: theme.palette.primary.main,
                               }}
                           />
                         </StyledBadge>

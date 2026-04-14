@@ -59,6 +59,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import EventItem from "./layout/EventItem";
 import EventStatsLayout from "./layout/EventStatsLayout";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import { appGradients } from "../../utils/colors";
 
 const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
 
@@ -144,6 +145,7 @@ export default function EventsContainer() {
   const { events:eventsData } = useSelector((state) => state.currentEvents);
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
   const theme = useTheme();
+  const panelRadius = `${theme.shape.borderRadius}px`;
   const navigate=useNavigate()
     // trigger redux update
     const dispatch = useDispatch();
@@ -493,6 +495,7 @@ export default function EventsContainer() {
         sx={{
           width:isMyStats ? window.screen.availWidth-32:undefined,
           overflow: "auto",
+          borderRadius: panelRadius,
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
             display: "none",
@@ -502,7 +505,19 @@ export default function EventsContainer() {
           scrollbarWidth: "none", 
          }}
         >
-          <AppBar position="fixed" open={open}>
+          <AppBar
+            position="fixed"
+            open={open}
+            sx={{
+              background: theme.palette.mode === "dark"
+                ? "linear-gradient(135deg, rgba(8,21,38,0.96), rgba(15,76,129,0.88))"
+                : appGradients.primary,
+              boxShadow: theme.palette.mode === "dark"
+                ? "0 18px 36px rgba(0,0,0,0.24)"
+                : "0 18px 36px rgba(15,76,129,0.14)",
+              borderBottom: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.18)"}`,
+            }}
+          >
             <Toolbar
               sx={{
                 width: "100%",
@@ -623,14 +638,26 @@ export default function EventsContainer() {
           <Drawer
             variant="permanent"
             open={open}
-            sx={{ display: isDrawerPane ? "block" : "none" }}
+            sx={{
+              display: isDrawerPane ? "block" : "none",
+              "& .MuiDrawer-paper": {
+                borderRight: "1px solid",
+                borderColor: "divider",
+                backgroundColor: theme.palette.background.paper,
+                backgroundImage: theme.palette.mode === "dark"
+                  ? "linear-gradient(180deg, rgba(15,76,129,0.16), rgba(255,255,255,0.01))"
+                  : "linear-gradient(180deg, rgba(15,76,129,0.08), rgba(255,255,255,0.92))",
+              },
+            }}
           >
             <DrawerHeader
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                backgroundColor:isDarkMode ? '#272727' :"#1976D2"
+                background: theme.palette.mode === "dark"
+                  ? "linear-gradient(135deg, rgba(8,21,38,0.96), rgba(15,76,129,0.82))"
+                  : appGradients.primary,
               }}
             >
               {!open && (
@@ -809,6 +836,7 @@ export default function EventsContainer() {
         width={"100%"}
         display={"flex"}
           justifyContent={"center"}
+          sx={{ px: { xs: 1, md: 2 } }}
           >
          
             <Box
@@ -820,6 +848,11 @@ export default function EventsContainer() {
               justifyContent={"center"}
               sx={{
                 overflow: "auto",
+                width: "100%",
+                borderRadius: panelRadius,
+                backgroundColor: theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.02)"
+                  : "rgba(255,255,255,0.74)",
                 // Hide scrollbar for Chrome, Safari and Opera
                 "&::-webkit-scrollbar": {
                   display: "none",

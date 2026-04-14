@@ -1,4 +1,6 @@
 import {
+  CloseRounded,
+  DownloadRounded,
   FavoriteRounded,
   ForumRounded,
   GitHub,
@@ -7,7 +9,7 @@ import {
   LockRounded,
   MoreVertRounded,
   RefreshRounded,
-  VerifiedRounded
+  VerifiedRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -16,23 +18,28 @@ import {
   Card,
   CardActionArea,
   CardContent,
-  CardHeader,
   Checkbox,
   CircularProgress,
+  Divider,
+  Dialog,
   FormHelperText,
   IconButton,
   ListItemAvatar,
   Menu,
-  Paper,
   Stack,
   Tooltip,
-  Typography
+  Typography,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleUpdateIsPostDetailed } from "../../redux/AppUI";
-import { resetClearCurrentPosts, updateCurrentPostDetails, updateCurrentPosts } from "../../redux/CurrentPosts";
+import {
+  resetClearCurrentPosts,
+  updateCurrentPostDetails,
+  updateCurrentPosts,
+} from "../../redux/CurrentPosts";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertMiniProfileView from "../alerts/AlertMiniProfileView";
 import AlertReportPost from "../alerts/AlertReportPost";
@@ -48,18 +55,17 @@ import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
 import CardFeedMore from "./CardFeedMore";
 
-const CardFeed = ({ 
-    post, 
-    posts,
-    setPostDetailedData,
-   isLastIndex=false,
-   setPageNumber,
-   pageNumber,
-   errorMessage, 
-   setErrorMessage
-  }) => {
+const CardFeed = ({
+  post,
+  posts,
+  setPostDetailedData,
+  isLastIndex = false,
+  setPageNumber,
+  pageNumber,
+  errorMessage,
+  setErrorMessage,
+}) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const openMenu = Boolean(anchorEl);
   const [postBelongsCurrentUser, setPostBelongsCurrentUser] = useState(false);
   const [isProcessingPost, setIsProcessingPost] = useState(false);
   const [isFullDescription, setIsFullDescription] = useState(false);
@@ -67,57 +73,33 @@ const CardFeed = ({
   const [messageMore, setMessageMore] = useState("");
   const [openAlertReport, setOpenAlertReport] = useState(false);
   const [postWholeReport, setPostWholeReport] = useState("");
-  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
-  // control more option
+  const [openAlertGeneral, setOpenAlertGeneral] = useState(false);
+  const [openImagePreview, setOpenImagePreview] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const [hasMorePosts, setHasMorePosts] = useState(true);
+
+  const openMenu = Boolean(anchorEl);
   const handleClickMoreVertPost = (event) => setAnchorEl(event.currentTarget);
   const handleCloseMenu = () => setAnchorEl(null);
 
-  // track progress of fetching more data
-  const [isFetching,setIsFetching]=useState(false)
-  const [hasMorePosts,setHasMorePosts]=useState(true)
-  // redux states
   const { currentMode } = useSelector((state) => state.appUI);
-  // update is dark const
-  const isDarkMode=currentMode==='dark'
-  const { user,isGuest } = useSelector((state) => state.currentUser);
+  const { user, isGuest } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
-  
-  // extract basic current user details
+  const theme = useTheme();
+  const isDarkMode = currentMode === "dark";
+  const panelRadius = `${theme.shape.borderRadius}px`;
+  const imageRadius = `${Math.max(theme.shape.borderRadius - 2, 10)}px`;
+
   const { _id, avatar, name, specialisationTitle: title, country, county } = user || {};
-
-  // extract the likes and array of liked usersIDs of this post
   const { clicks: post_like_cicks } = post.post_liked || {};
-
-  // extract the counts of github clicks
-  const { clicks: post_github_clicks, link:post_github_link } = post.post_github || {};
-
-  //   extract the counts of comments
+  const { clicks: post_github_clicks, link: post_github_link } = post.post_github || {};
   const { count: post_comment_count } = post?.post_comments || {};
 
   const post_likes = post_like_cicks;
-
-  // for checking if current user  liked the post.
-  const currentUserLiked = post?.post_liked?.clickers?.some(
-    (clickerId) => clickerId === _id
-  );
-
-  // check for if current user clicked github
-  const currentUserClickedGithub = post?.post_github?.clickers?.some(
-    (clickerId) => clickerId === _id
-  );
-
-  // for checking if the current user commented any on the post
-  const currentUserCommented = post?.post_comments?.comments?.some(
-    (commentors) => commentors.userId === _id
-  );
-
-  // controls the length of description shown for each devices
-  const max_description = CustomDeviceIsSmall() ?  125 : 250;
-
+  const max_description = CustomDeviceIsSmall() ? 125 : 250;
   const details = post?.post_body || "";
   const detailsLong = details.length > max_description;
 
-  // current user info
   const userInfo = {
     userId: _id,
     ownerId: post.post_owner.ownerId,
@@ -126,17 +108,33 @@ const CardFeed = ({
     name,
     title,
     country,
-    county
+    county,
   };
+
+  const currentUserLiked = post?.post_liked?.clickers?.some(
+    (clickerId) => clickerId === _id
+  );
+  const currentUserClickedGithub = post?.post_github?.clickers?.some(
+    (clickerId) => clickerId === _id
+  );
+  const currentUserCommented = post?.post_comments?.comments?.some(
+    (commentors) => commentors.userId === _id
+  );
+
+  const categoryTags = [
+    post?.post_category?.sub1,
+    post?.post_category?.sub2,
+    post?.post_category?.sub3,
+    post?.post_category?.sub4,
+  ].filter((item) => item && !item.toLowerCase().includes("other"));
 
   const handleDetailsLength = () =>
     detailsLong ? details.substring(0, max_description) : details;
 
-  // handle the length of owner title for smallest devices
   const handleOccupation = () => {
-    const title = post.post_owner.ownertitle.split(" ");
-    const first = title[0];
-    let second = title[1];
+    const titleParts = post?.post_owner?.ownertitle?.split(" ") || [];
+    const first = titleParts[0] || "";
+    let second = titleParts[1] || "";
 
     if (second?.toLowerCase().includes("developer")) {
       second = "Dev";
@@ -145,640 +143,580 @@ const CardFeed = ({
       second = "Eng";
     }
 
-    return first + " " + second;
+    return [first, second].filter(Boolean).join(" ");
   };
 
-  // handle the length of owner title for smallest devices
   const handleName = () => {
-    const title = post.post_owner.ownername.split(" ");
-    const first = title[0];
-    let second = title[1].substring(0, 1);
+    const titleParts = post?.post_owner?.ownername?.split(" ") || [];
+    const first = titleParts[0] || "";
+    const second = titleParts[1] ? titleParts[1].substring(0, 1) : "";
 
-    return first + " " + second;
+    return [first, second].filter(Boolean).join(" ");
   };
 
+  const ownerNameDisplay = CustomDeviceSmallest()
+    ? handleName()
+    : `${post?.post_owner?.ownername || ""}`;
+  const ownerTitleDisplay = CustomDeviceSmallest()
+    ? handleOccupation()
+    : `${post?.post_owner?.ownertitle || ""}`;
+  const locationLabel = [
+    post?.post_location?.state,
+    CustomCountryName(post?.post_location?.country),
+  ]
+    .filter(Boolean)
+    .join(" • ");
+  const popupMeta = [post?.post_category?.main, locationLabel, getElapsedTime(post?.createdAt)]
+    .filter(Boolean);
 
-  // check if the current userID matches the ownerID of the post
-  // means belongs to current user thus no need for options menu
   useEffect(() => {
-    const handlePostBelongsCurrentUser = () => {
-      const postID = `${post.post_owner?.ownerId}`;
-      const currentUserID = `${user?._id}`;
-
-      if (postID === currentUserID) {
-        setPostBelongsCurrentUser(true);
-      } else {
-        setPostBelongsCurrentUser(false);
-      }
-    };
-
-    handlePostBelongsCurrentUser();
+    const postID = `${post.post_owner?.ownerId}`;
+    const currentUserID = `${user?._id}`;
+    setPostBelongsCurrentUser(postID === currentUserID);
   }, [user?._id, post?.post_owner?.ownerId]);
 
-  // handle user clicking like button
   const handlePostLikes = () => {
     let message = "liked your post";
-    let minimessage = post?.post_title?.substring(0, 30) + "...";
+    let minimessage = `${post?.post_title?.substring(0, 30)}...`;
 
-    // add the above properties to the userInfo that is being sent to the backend
     userInfo.message = message;
     userInfo.minimessage = minimessage;
-    // add users to the liked clickers group and increment the value of clicks
     setIsProcessingPost(true);
-    // performing post request
+
     axios
-      .put(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/likes`,
-        userInfo,
-        {
-          withCredentials: true,
-        }
-      )
+      .put(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/likes`, userInfo, {
+        withCredentials: true,
+      })
       .then((res) => {
-        // update the returned post object to reflect in the global redux
-        if (res.data.reaction === "liked") {
-          dispatch(updateCurrentPostDetails(res.data.post));
-        }
-        if (res.data.reaction === "disliked") {
-          // update the returned post object to reflect in the global redux
+        if (res.data.reaction === "liked" || res.data.reaction === "disliked") {
           dispatch(updateCurrentPostDetails(res.data.post));
         }
       })
-      .catch(async (err) => {
+      .catch((err) => {
         console.log(err);
-        setOpenAlertGeneral(true)
-        setErrorMessage(err?.response.data);
+        setOpenAlertGeneral(true);
+        setErrorMessage(err?.response?.data);
       })
       .finally(() => {
         setIsProcessingPost(false);
       });
   };
 
-  // handle github counts updates
   const handleGithubClicks = () => {
     let message = "viewed your github link";
-    let minimessage = post?.post_title?.substring(0, 30) + "...";
+    let minimessage = `${post?.post_title?.substring(0, 30)}...`;
 
-    // add the above properties to the userInfo that is being sent to the backend
     userInfo.message = message;
     userInfo.minimessage = minimessage;
-    // add users to the liked clickers group and increment the value of clicks
     setIsProcessingPost(true);
-    // performing post request
-    axios
-      .put(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/github`,
-        userInfo,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        // update the returned post object to reflect in the global redux
-        dispatch(updateCurrentPostDetails(res.data));
 
-        // navigate to github page
-        window.open(post?.post_github?.link,'__blank__')
+    axios
+      .put(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/github`, userInfo, {
+        withCredentials: true,
       })
-      .catch(async (err) => {
+      .then((res) => {
+        dispatch(updateCurrentPostDetails(res.data));
+        window.open(post?.post_github?.link, "__blank__");
+      })
+      .catch((err) => {
         console.log(err);
-        setOpenAlertGeneral(true)
-        setErrorMessage(err?.response.data);
+        setOpenAlertGeneral(true);
+        setErrorMessage(err?.response?.data);
       })
       .finally(() => {
         setIsProcessingPost(false);
       });
   };
 
-  // handle showing full post description
   const handleFullDescription = () => {
     setIsFullDescription((prev) => !prev);
   };
 
-  // handle the image incorporated in the post for some is free logo
-  // other is custom uploaded to the cloud
   const handlePostImagePresent = () => {
-    // if the url name of the image present in the logo names use getImage fn
     const arrayFreeLogoName = getImageMatch("", true)[0];
     if (arrayFreeLogoName?.includes(post?.post_url)) {
-      // they used free logo images, return the matching image using getImage
       return getImageMatch(post?.post_url);
     }
 
-    // the user possibly uploaded the image to cloud thus return the url incorporated
     return post?.post_url;
   };
 
-  // handle showing post comments layout like full post details plus comments
   const handleShowFullPostComments = () => {
-    // true is post details in redux to avoid speed dial show in details view
     dispatch(handleUpdateIsPostDetailed(true));
-
-    // populate with current post for details
     setPostDetailedData(post);
   };
 
-  // handle display of miniprofile
   const handleMiniProfileView = useCallback(() => {
     setOpenMiniProfileAlert(true);
   }, []);
 
-
-  // handle fetching of more data when load more button clicked
-  const handleFetchMoreData=()=>{
-    // if are no more posts, reset to page 1 and refresh content
-    if (!hasMorePosts) {
-      setPageNumber(1)
-      dispatch(resetClearCurrentPosts())
+  const handleOpenImagePreview = () => {
+    if (postImageSrc) {
+      setOpenImagePreview(true);
     }
-    // fetching to true
-    setIsFetching(true)
-    // axios api call to fetch more data
-    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all?page=${pageNumber}&limit=10`, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        // update the redux of current post
-        if (res?.data) {
-          // more data update redux
-          if (res.data.length>0) {
-          dispatch(updateCurrentPosts([...posts,...res.data]));  
-          }else{
-            // are no more posts from the backend
-            setHasMorePosts(false)
-          }
-        } 
+  };
 
-        // update the page number for the next fetch
-        setPageNumber((prev)=>prev+1)
-        
+  const handleCloseImagePreview = () => {
+    setOpenImagePreview(false);
+  };
+
+  const handleDownloadImage = async () => {
+    if (!postImageSrc) {
+      return;
+    }
+
+    try {
+      const response = await fetch(postImageSrc);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const fileName = `${(post?.post_title || "metatron-post-image")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "metatron-post-image"}.jpg`;
+
+      link.href = blobUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      window.open(postImageSrc, "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const handleFetchMoreData = () => {
+    if (!hasMorePosts) {
+      setPageNumber(1);
+      dispatch(resetClearCurrentPosts());
+    }
+
+    setIsFetching(true);
+
+    axios
+      .get(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all?page=${pageNumber}&limit=10`,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        if (res?.data) {
+          if (res.data.length > 0) {
+            dispatch(updateCurrentPosts([...posts, ...res.data]));
+          } else {
+            setHasMorePosts(false);
+          }
+        }
+
+        setPageNumber((prev) => prev + 1);
       })
       .catch((err) => {
-        //  user login session expired show logout alert
         if (err?.response?.data.login) {
           window.location.reload();
         }
         if (err?.code === "ERR_NETWORK") {
-          setErrorMessage(
-            "server unreachable"
-          );
+          setErrorMessage("server unreachable");
           return;
         }
-        setErrorMessage(err?.response.data);
-        setOpenAlertGeneral(true)
+        setErrorMessage(err?.response?.data);
+        setOpenAlertGeneral(true);
       })
       .finally(() => {
-        // set is fetching to false
         setIsFetching(false);
       });
-  }
+  };
 
- 
-    // handle image width
-    const handleImageWidth=()=>{
-      if(CustomDeviceIsSmall()){
-        return "100%"
-      } else if(CustomDeviceTablet()){
-        return "95%"
-      }else{
-        return "92%"
-      } 
+  const handleMaxTextWidth = () => {
+    if (CustomLandscapeWidest()) {
+      return "90%";
+    }
+    if (CustomDeviceTablet()) {
+      return "95%";
+    }
+    if (CustomLandScape()) {
+      return "93%";
     }
 
-  
-      // handle max text width
-      const handleMaxTextWidth=()=>{
-        if (CustomLandscapeWidest()) {
-          return "90%"
-        }else if(CustomDeviceTablet()){
-          return "95%"
-        } else if(CustomLandScape()){
-          return "93%"
-        }
-    
-        return "98%"
-      }
+    return "98%";
+  };
+
+  const postImageSrc = handlePostImagePresent();
+
+  const actionItems = [
+    {
+      key: "like",
+      count: post_likes,
+      title: "like",
+      onClick: handlePostLikes,
+      disabled: isProcessingPost || isGuest,
+      icon: isProcessingPost ? (
+        <CircularProgress size={20} />
+      ) : (
+        <FavoriteRounded
+          sx={{ width: 18, height: 18 }}
+          color={currentUserLiked ? "primary" : undefined}
+        />
+      ),
+    },
+    {
+      key: "github",
+      count: post_github_clicks,
+      title: "Github",
+      onClick: handleGithubClicks,
+      disabled: isProcessingPost || isGuest || !post_github_link,
+      icon: isProcessingPost ? (
+        <CircularProgress size={20} />
+      ) : (
+        <GitHub
+          sx={{ width: 18, height: 18 }}
+          color={currentUserClickedGithub ? "primary" : undefined}
+        />
+      ),
+    },
+    {
+      key: "comment",
+      count: post_comment_count,
+      title: "comment",
+      onClick: handleShowFullPostComments,
+      disabled: isProcessingPost || isGuest,
+      icon: isProcessingPost ? (
+        <CircularProgress size={20} />
+      ) : (
+        <ForumRounded
+          sx={{ width: 18, height: 18 }}
+          color={currentUserCommented ? "primary" : undefined}
+        />
+      ),
+    },
+  ];
 
   return (
-    <Paper  
-    elevation={3}
-    square={false}
-    sx={{
-      marginBottom:isLastIndex ? 10 :3
-    }}
+    <Card
+      elevation={0}
+      sx={{
+        mt: 2,
+        mb: isLastIndex ? 10 : 4,
+        maxWidth: { xs: "100%", md: "700px", lg: "780px", xl: "860px" },
+        width: "100%",
+        mx: "auto",
+        backgroundColor: theme.palette.background.paper,
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? "0 12px 30px rgba(0,0,0,0.24)"
+            : "0 18px 45px rgba(15,76,129,0.08)",
+        border:
+          theme.palette.mode === "dark"
+            ? "1px solid rgba(255,255,255,0.08)"
+            : "1px solid rgba(15,76,129,0.12)",
+        borderRadius: panelRadius,
+        opacity: openMenu && !isDarkMode ? 0.98 : 1,
+        overflow: "hidden",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease",
+        "&:hover": {
+          transform: "translateY(-2px)",
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 18px 36px rgba(0,0,0,0.3)"
+              : "0 22px 48px rgba(15,76,129,0.14)",
+        },
+      }}
     >
-      <Box
-      pt={1}
-        sx={{
-          border:isDarkMode && "1px solid",
-          borderColor: "divider",
-          opacity: openMenu && !isDarkMode ? "0.8" : undefined,
-        }}
-      >
-        <Card elevation={0}>
-          <CardHeader
-            sx={{ ml: 1, p: 0 }}
-            avatar={
-            <ListItemAvatar 
-            onClick={isGuest? null: handleMiniProfileView}>
-            <Tooltip arrow title={isGuest ?'login':'profile'}>
-              <Avatar
-                src={post?.post_owner?.owneravatar}
-                variant="rounded"
-                sx={{
-                  width: 50,
-                  height: 50,
-                  color: "white",
-                }}
-                alt={''}
-              >
-              </Avatar>
+      <Box px={2} pt={2} pb={1.25}>
+        <Box display="flex" justifyContent="space-between" gap={1.5}>
+          <Box display="flex" gap={1.5} flex={1} minWidth={0}>
+            <ListItemAvatar
+              sx={{ minWidth: "auto", mr: 0 }}
+              onClick={isGuest ? null : handleMiniProfileView}
+            >
+              <Tooltip arrow title={isGuest ? "login" : "profile"}>
+                <Avatar
+                  src={post?.post_owner?.owneravatar}
+                  variant="rounded"
+                  sx={{
+                    width: 52,
+                    height: 52,
+                    color: "white",
+                    borderRadius: imageRadius,
+                  }}
+                  alt=""
+                />
               </Tooltip>
             </ListItemAvatar>
-            }
-            action={
-              <Stack>
-                <Box
-                  flexDirection={"row"}
-                  display={"flex"}
-                  mt={1}
-                  alignItems={"center"}
-                >
-                  {/* created time */}
-                  <Typography pt={0.5} 
-                  variant="caption" 
-                  mr={postBelongsCurrentUser ? 2:1}>
-                    {getElapsedTime(post?.createdAt)}
-                  </Typography>
 
-                  {/* guest */}
-                  {isGuest ? (
-                    <Box pr={2}>
-                    <Tooltip 
-                    title="login" 
-                    arrow>
-                        <LockRounded
-                          color="primary"
-                          sx={{ width: 15, height: 15 }}
-                        />
-                    </Tooltip>
-                    </Box>
-                  ):(
-                    <React.Fragment>
-                     {/* more icon  */}
-                  {!postBelongsCurrentUser && (
-                    <Tooltip title="more" arrow>
-                      <IconButton
-                        size="small"
-                        aria-label="more"
-                        onClick={handleClickMoreVertPost}
-                      >
-                        <MoreVertRounded
-                          color="primary"
-                          sx={{ width: 18, height: 17 }}
-                        />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                    </React.Fragment>
-                  )}
-                
-                  <Menu
-                    anchorEl={anchorEl}
-                    open={openMenu}
-                    onClose={handleCloseMenu}
-                    MenuListProps={{ "aria-labelledby": "more-button" }}
-                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
-                    transformOrigin={{ vertical: "top", horizontal: "right" }}
-                  >
-                    <CardFeedMore
-                      ownerId={post?.post_owner?.ownerId}
-                      currentUserNetwork={user?.network}
-                      ownerName={post?.post_owner?.ownername}
-                      setMessageMore={setMessageMore}
-                      handleCloseMenu={handleCloseMenu}
-                      setOpenAlertReport={setOpenAlertReport}
-                      setPostWhole={setPostWholeReport}
-                      post={post}
-                    />
-                  </Menu>
-                </Box>
-
-                {/* if post edited */}
+            <Box minWidth={0} flex={1}>
+              <Box display="flex" alignItems="center" gap={0.8} flexWrap="wrap">
+                <Typography fontWeight={700} variant="body1" lineHeight={1.2}>
+                  {ownerNameDisplay}
+                </Typography>
+                <VerifiedRounded color="primary" sx={{ width: 17, height: 17 }} />
                 {post?.post_edited && (
-                  <Box display={"flex"} justifyContent={"flex-end"} mr={4}>
-                    <Typography 
-                    color={"text.secondary"} 
-                    variant="caption"
-                    
-                    >
-                      edited
-                    </Typography>
-                  </Box>
-                )}
-              </Stack>
-            }
-            title={
-              <Box display="flex" alignItems="center" mt={1} gap={1}>
-                <Typography
-                  fontWeight="bold"
-                  variant={'body2'}
-                >
-                  {CustomDeviceSmallest()
-                    ? handleName()
-                    : `${post?.post_owner.ownername}`}
-                </Typography>
-                <VerifiedRounded
-                  color="primary"
-                  sx={{ width: 18, height: 18 }}
-                />
-              </Box>
-            }
-            subheader={
-              <Box>
-                {/*occupation title */}
-                <Typography variant="body2">
-                  {CustomDeviceSmallest()
-                    ? handleOccupation()
-                    : `${post?.post_owner.ownertitle}`}
-                </Typography>
-                {/* location */}
-                <Typography
-                  variant="body2"
-                  display={"flex"}
-                  alignItems={"center"}
-                >
-                {post?.post_location.state} | {CustomCountryName(post?.post_location.country)}{" "}
-                </Typography>
-              </Box>
-            }
-          />
-
-          <Box >
-            <CardContent>
-              <Box mb={1.5} width={"100%"}>
-                <Box mb={1}>
-                  {/* post specialization */}
                   <Typography
-                    variant="body2"
-                    textAlign={"center"}
-                    fontWeight={"bold"}
+                    variant="caption"
+                    sx={{
+                      px: 0.75,
+                      py: 0.15,
+                      borderRadius: 999,
+                      bgcolor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(15,76,129,0.08)",
+                      color: "text.secondary",
+                    }}
                   >
-                    {post?.post_category.main}
+                    edited
                   </Typography>
-                </Box>
-
-                <Box
-                  display={"flex"}
-                  justifyContent={"center"}
-                  alignItems={"center"}
-                  gap={2}
-                >
-                  <GradeOutlined
-                    sx={{
-                      width: 18,
-                      height: 18,
-                      color: isDarkMode ? "yellow" : "orange",
-                    }}
-                  />
-                  {/* title of the post */}
-                  <Typography variant="body2">
-                    {post?.post_title}
-                  </Typography>
-
-                  <GradeOutlined
-                    sx={{
-                      width: 18,
-                      height: 18,
-                      color: isDarkMode ? "yellow" : "orange",
-                    }}
-                  />
-                </Box>
-
-                {/* sub2 and 3 if present */}
-               {post?.post_category?.sub1  && (
-                  <Box 
-                display={'flex'} 
-                mt={1}
-                justifyContent={'center'}
-                gap={2}
-                alignItems={'center'}>
-                <Typography variant="caption">
-                  #{post?.post_category?.sub1}
-                  {post?.post_category?.sub2 && !post?.post_category?.sub2?.includes('other') && `#${post?.post_category?.sub2}`}
-                  {post?.post_category?.sub3 && !post?.post_category?.sub3?.includes('other') && `#${post?.post_category?.sub3}`}
-                  {post?.post_category?.sub4 && !post?.post_category?.sub4?.includes('other') && `#${post?.post_category?.sub4}`}
-                </Typography>
-                </Box>
-                ) }
+                )}
               </Box>
 
-              <CardActionArea
-                onClick={handleFullDescription}
-                disabled={!detailsLong}
-              >
-                <Box display={"flex"} 
-                justifyContent={"center"}
-                width={"100%"}
-                flexDirection={'column'}
-                >
-                  {/* times added to favorite */}
-                  {post?.favorite_count>0 && 
-                  <Box 
-                  display={'flex'}
-                  justifyContent={'center'}
-                  >
-                  <FormHelperText className={isDarkMode ? 'text-info':'text-success'}>
-                  {post?.favorite_count} added this to their favorite
-                  </FormHelperText>
-                  </Box>}
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.35 }}>
+                {ownerTitleDisplay}
+              </Typography>
 
-                  {/* post details */}
-                  <Box display={"flex"} justifyContent={"center"} width={"100%"}>
-                    <Typography
-                    color={isDarkMode && 'text.secondary'}
-                    sx={{ fontSize:'small' }}
-                      variant={"body2"}
-                      maxWidth={handleMaxTextWidth()}
-                    >
-                      {!isFullDescription && handleDetailsLength()}
-                      {detailsLong && !isFullDescription && (
-                        <Typography
-                          variant="body2"
-                          component={"span"}
-                          fontWeight={"bold"}
-                          color={"primary"}
-                          sx={{ fontSize:'small' }}
-                        >
-                          &nbsp; more
-                        </Typography>
-                      )}
-                      {isFullDescription && details}
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardActionArea>
-            </CardContent>
-            <Box 
-            px={1}
-            display={"flex"} 
-            flexDirection={'column'}
-            justifyContent={"center"} 
-            width={"100%"}>
-              {/* image container */}
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                  <img 
-                  style={{ 
-                    height:CustomDeviceScreenSize(),
-                    width:handleImageWidth(),
-                    objectFit:'fill',
-                    borderRadius:5,
-                   }}
-                  src={handlePostImagePresent()}
-                   loading="lazy"
-                  alt="" />
-              </Box>
-            </Box>
-   
-          </Box>
-
-          <Box
-            display="flex"
-            p={1}
-            justifyContent="space-around"
-            alignItems="center"
-          >
-            {[
-              {
-                icon: (
-                  <React.Fragment>
-                    {isProcessingPost ? (
-                      <CircularProgress size={20} />
-                    ) : (
-                      <FavoriteRounded
-                        sx={{ width: 18, height: 18 }}
-                        color={currentUserLiked ? "primary" : undefined}
-                      />
-                    )}
-                  </React.Fragment>
-                ),
-                count: post_likes,
-                title: "like",
-                onClick: handlePostLikes,
-              },
-              {
-                icon: (
-                  <React.Fragment>
-                    {isProcessingPost ? (
-                      <CircularProgress size={20} />
-                    ) : (
-                      <GitHub
-                        sx={{ width: 18, height: 18 }}
-                        color={currentUserClickedGithub ? "primary" : undefined}
-                      />
-                    )}
-                  </React.Fragment>
-                ),
-                count: post_github_clicks,
-                title: "Github",
-                onClick: handleGithubClicks,
-              },
-              {
-                icon: (
-                  <React.Fragment>
-                    {isProcessingPost ? (
-                      <CircularProgress size={20} />
-                    ) : (
-                      <ForumRounded
-                        sx={{ width: 18, height: 18 }}
-                        color={currentUserCommented ? "primary" : undefined}
-                      />
-                    )}
-                  </React.Fragment>
-                ),
-                count: post_comment_count,
-                title: "comment",
-                onClick: handleShowFullPostComments,
-              },
-            ].map(({ icon, count, title, onClick }) => (
-              <Box display="flex" alignItems="center" key={title}>
-                <Tooltip title={title} arrow>
-                  <Checkbox
-                    onChange={onClick}
-                    icon={icon}
-                    checkedIcon={icon}
-                    disabled={isProcessingPost||isGuest|| (title==='Github' && !post_github_link)}
-                  />
-                </Tooltip>
+              {locationLabel && (
                 <Typography
-                  fontWeight="bold"
-                  variant="body2"
+                  variant="caption"
                   color="text.secondary"
+                  sx={{ display: "block", mt: 0.4 }}
                 >
-                  {count}
+                  {locationLabel}
                 </Typography>
-              </Box>
-            ))}
+              )}
+            </Box>
           </Box>
-        </Card>
 
-        {/* show button fetch more if its the last item */}
-        {isLastIndex && (
-          <Box 
-          justifyContent={'center'}
-          display={'flex'}
-          flexDirection={'column'}
-          p={1}
-          sx={{ 
-            borderTop:isDarkMode && '1px solid',
-            borderColor: "divider",
-           }}
-          >
-          <Button 
-          startIcon={isFetching ? <CircularProgress size={14}/>:<RefreshRounded/>}
-          size="small"
-          className="fw-bold"
-          onClick={handleFetchMoreData}
-          disabled={isFetching}
-          >
-            {hasMorePosts ? "Load More":"Refresh Now"}
-            </Button>
+          <Stack alignItems="flex-end" spacing={0.5}>
+            <Box display="flex" alignItems="center">
+              <Typography pt={0.5} variant="caption" mr={postBelongsCurrentUser ? 0 : 0.5}>
+                {getElapsedTime(post?.createdAt)}
+              </Typography>
 
-            {/* displayed when no more posts are available from the backend */}
-            {!hasMorePosts && (
-              <Box 
-              justifyContent={'center'}
-              display={'flex'}>
-              <FormHelperText>
-              -- no more posts from the backend --
+              {isGuest ? (
+                <Box pl={1}>
+                  <Tooltip title="login" arrow>
+                    <LockRounded color="primary" sx={{ width: 15, height: 15 }} />
+                  </Tooltip>
+                </Box>
+              ) : (
+                !postBelongsCurrentUser && (
+                  <Tooltip title="more" arrow>
+                    <IconButton
+                      size="small"
+                      aria-label="more"
+                      onClick={handleClickMoreVertPost}
+                      sx={{ ml: 0.5 }}
+                    >
+                      <MoreVertRounded color="primary" sx={{ width: 18, height: 17 }} />
+                    </IconButton>
+                  </Tooltip>
+                )
+              )}
+            </Box>
+          </Stack>
+        </Box>
+
+        <Menu
+          anchorEl={anchorEl}
+          open={openMenu}
+          onClose={handleCloseMenu}
+          MenuListProps={{ "aria-labelledby": "more-button" }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <CardFeedMore
+            ownerId={post?.post_owner?.ownerId}
+            currentUserNetwork={user?.network}
+            ownerName={post?.post_owner?.ownername}
+            setMessageMore={setMessageMore}
+            handleCloseMenu={handleCloseMenu}
+            setOpenAlertReport={setOpenAlertReport}
+            setPostWhole={setPostWholeReport}
+            post={post}
+          />
+        </Menu>
+      </Box>
+
+      <CardContent sx={{ pt: 0.5, pb: postImageSrc ? 2 : 2.5 }}>
+        <Box mb={1.75}>
+          <Box display="flex" alignItems="center" justifyContent="space-between" gap={1} flexWrap="wrap">
+            <Box
+              sx={{
+                px: 1.1,
+                py: 0.45,
+                borderRadius: 999,
+                bgcolor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(15,76,129,0.08)",
+              }}
+            >
+              <Typography variant="caption" fontWeight={700} color="primary">
+                {post?.post_category?.main}
+              </Typography>
+            </Box>
+
+            {post?.favorite_count > 0 && (
+              <FormHelperText sx={{ m: 0, color: "success.main" }}>
+                {post?.favorite_count} saved this post
               </FormHelperText>
-              </Box>
             )}
           </Box>
-        )}
 
+          <Box mt={1.25} display="flex" alignItems="flex-start" gap={1}>
+            <GradeOutlined
+              sx={{
+                width: 18,
+                height: 18,
+                mt: 0.4,
+                color: isDarkMode ? "warning.light" : "warning.main",
+              }}
+            />
+            <Box>
+              <Typography variant="h6" fontWeight={700} lineHeight={1.3}>
+                {post?.post_title}
+              </Typography>
 
+              {categoryTags.length > 0 && (
+                <Box mt={1} display="flex" gap={0.75} flexWrap="wrap">
+                  {categoryTags.map((tag) => (
+                    <Box
+                      key={tag}
+                      sx={{
+                        px: 1,
+                        py: 0.3,
+                        borderRadius: 999,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        bgcolor: "background.default",
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        #{tag}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Box>
 
-       {/* alert general of the error message */}
-        {errorMessage && (
-          <AlertGeneral
-          title={'something went wrong!'}
+        <CardActionArea onClick={handleFullDescription} disabled={!detailsLong} sx={{ borderRadius: imageRadius }}>
+          <Box display="flex" justifyContent="center" width="100%" flexDirection="column">
+            <Box display="flex" justifyContent="center" width="100%">
+              <Typography
+                color={isDarkMode ? "text.secondary" : "text.primary"}
+                sx={{ fontSize: "0.95rem", lineHeight: 1.8 }}
+                variant="body2"
+                maxWidth={handleMaxTextWidth()}
+              >
+                {isFullDescription ? details : handleDetailsLength()}
+                {detailsLong && !isFullDescription && (
+                  <Box component="span" fontWeight={700} color="primary.main">
+                    {" "}
+                    more
+                  </Box>
+                )}
+              </Typography>
+            </Box>
+          </Box>
+        </CardActionArea>
+      </CardContent>
+
+      {postImageSrc && (
+        <Box px={2} pb={2} display="flex" flexDirection="column" justifyContent="center" width="100%">
+          <CardActionArea
+            onClick={handleOpenImagePreview}
+            sx={{
+              width: "100%",
+              borderRadius: imageRadius,
+              overflow: "hidden",
+              border: "1px solid",
+              borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(15,76,129,0.12)",
+              bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "rgba(15,76,129,0.03)",
+            }}
+          >
+            <Box
+              component="img"
+              src={postImageSrc}
+              loading="lazy"
+              alt={post?.post_title || "Post preview"}
+              sx={{
+                width: "100%",
+                minHeight: CustomDeviceScreenSize(),
+                maxHeight: { xs: 260, sm: 320, md: 420 },
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+          </CardActionArea>
+        </Box>
+      )}
+
+      <Divider />
+
+      <Box
+        display="flex"
+        p={1.25}
+        justifyContent="space-around"
+        alignItems="center"
+        sx={{
+          bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "rgba(15,76,129,0.02)",
+        }}
+      >
+        {actionItems.map(({ key, icon, count, title, onClick, disabled }) => (
+          <Box key={key} display="flex" alignItems="center" sx={{ px: 0.5, py: 0.2, borderRadius: 999 }}>
+            <Tooltip title={title} arrow>
+              <Checkbox
+                onChange={onClick}
+                icon={icon}
+                checkedIcon={icon}
+                disabled={disabled}
+              />
+            </Tooltip>
+            <Typography fontWeight="bold" variant="body2" color="text.secondary">
+              {count}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
+
+      {isLastIndex && (
+        <Box
+          justifyContent={"center"}
+          display={"flex"}
+          flexDirection={"column"}
+          p={1}
+          sx={{
+            borderTop: "1px solid",
+            borderColor: "divider",
+          }}
+        >
+          <Button
+            startIcon={isFetching ? <CircularProgress size={14} /> : <RefreshRounded />}
+            size="small"
+            className="fw-bold"
+            onClick={handleFetchMoreData}
+            disabled={isFetching}
+          >
+            {hasMorePosts ? "Load More" : "Refresh Now"}
+          </Button>
+
+          {!hasMorePosts && (
+            <Box justifyContent={"center"} display={"flex"}>
+              <FormHelperText>no more posts from the backend</FormHelperText>
+            </Box>
+          )}
+        </Box>
+      )}
+
+      {errorMessage && (
+        <AlertGeneral
+          title={"something went wrong!"}
           message={errorMessage}
           isError={true}
           openAlertGeneral={openAlertGeneral}
           setOpenAlertGeneral={setOpenAlertGeneral}
           setErrorMessage={setErrorMessage}
-          defaultIcon={<InfoRounded/>}
-          />
-        )}
+          defaultIcon={<InfoRounded />}
+        />
+      )}
 
-      {/* show alert report a post  */}
       {openAlertReport && (
         <AlertReportPost
           openAlertReport={openAlertReport}
@@ -788,20 +726,270 @@ const CardFeed = ({
         />
       )}
 
-      {/* snackbar showing results, specially card-feed more response */}
       {messageMore && <SnackbarConnect message={messageMore} />}
 
-      {/* alert for showing user mini-profile details by passing the post ownerID */}
       {openMiniProfileAlert && (
         <AlertMiniProfileView
-        openAlert={openMiniProfileAlert}
-        setOpenAlert={setOpenMiniProfileAlert}
-        userId={post.post_owner.ownerId}
-      />
+          openAlert={openMiniProfileAlert}
+          setOpenAlert={setOpenMiniProfileAlert}
+          userId={post.post_owner.ownerId}
+        />
       )}
 
-      </Box>
-</Paper>
+      <Dialog
+        open={openImagePreview}
+        onClose={handleCloseImagePreview}
+        fullScreen
+        PaperProps={{
+          sx: {
+            background: "rgba(7, 16, 30, 0.42)",
+            backdropFilter: "blur(18px)",
+            WebkitBackdropFilter: "blur(18px)",
+            backgroundImage: "none",
+            boxShadow: "none",
+          },
+        }}
+        sx={{
+          "& .MuiBackdrop-root": {
+            background: "rgba(5, 12, 24, 0.58)",
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+          },
+        }}
+      >
+        <Box
+          sx={{
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            p: { xs: 2, md: 3 },
+          }}
+        >
+          <Box
+            sx={{
+              position: "absolute",
+              top: { xs: 14, md: 22 },
+              left: { xs: 14, md: 22 },
+              zIndex: 2,
+            }}
+          >
+            <IconButton
+              onClick={handleCloseImagePreview}
+              aria-label="Close image preview"
+              sx={{
+                bgcolor: "rgba(255,255,255,0.14)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,0.22)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                "&:hover": {
+                  bgcolor: "rgba(255,255,255,0.22)",
+                },
+              }}
+            >
+              <CloseRounded />
+            </IconButton>
+          </Box>
+
+          <Box
+            sx={{
+              position: "absolute",
+              top: { xs: 14, md: 22 },
+              right: { xs: 14, md: 22 },
+              zIndex: 2,
+            }}
+          >
+            <IconButton
+              onClick={handleDownloadImage}
+              aria-label="Download image"
+              sx={{
+                bgcolor: "rgba(255,255,255,0.14)",
+                color: "#fff",
+                border: "1px solid rgba(255,255,255,0.22)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                "&:hover": {
+                  bgcolor: "rgba(255,255,255,0.22)",
+                },
+              }}
+            >
+              <DownloadRounded />
+            </IconButton>
+          </Box>
+
+          <Box
+            sx={{
+              maxWidth: "min(96vw, 1460px)",
+              maxHeight: "90vh",
+              width: "100%",
+              height: "100%",
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1.35fr) minmax(320px, 420px)" },
+              borderRadius: "24px",
+              overflow: "hidden",
+              border: "1px solid rgba(255,255,255,0.18)",
+              bgcolor: "rgba(255,255,255,0.08)",
+              boxShadow: "0 24px 80px rgba(0,0,0,0.35)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+            }}
+          >
+            <Box
+              sx={{
+                minHeight: { xs: "54vh", lg: "100%" },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: "rgba(0,0,0,0.16)",
+                p: { xs: 1.5, md: 2.5 },
+                borderRight: { lg: "1px solid rgba(255,255,255,0.12)" },
+              }}
+            >
+              {postImageSrc && (
+                <Box
+                  component="img"
+                  src={postImageSrc}
+                  alt={post?.post_title || "Post preview"}
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    maxHeight: "82vh",
+                    objectFit: "contain",
+                    display: "block",
+                    borderRadius: "18px",
+                  }}
+                />
+              )}
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                p: { xs: 2, md: 2.5 },
+                color: "#F8FAFC",
+                background:
+                  "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04))",
+              }}
+            >
+              <Box>
+                <Box
+                  sx={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    px: 1.2,
+                    py: 0.45,
+                    borderRadius: 999,
+                    bgcolor: "rgba(255,255,255,0.10)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    mb: 1.5,
+                  }}
+                >
+                  <Typography variant="caption" fontWeight={700} sx={{ color: "#BFDBFE" }}>
+                    Image preview
+                  </Typography>
+                </Box>
+
+                <Typography variant="h5" fontWeight={700} lineHeight={1.2}>
+                  {post?.post_title}
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mt: 1.25,
+                    color: "rgba(241,245,249,0.82)",
+                    lineHeight: 1.8,
+                  }}
+                >
+                  {detailsLong ? `${details.substring(0, 180)}...` : details}
+                </Typography>
+
+                {popupMeta.length > 0 && (
+                  <Box mt={2} display="flex" gap={0.8} flexWrap="wrap">
+                    {popupMeta.map((item) => (
+                      <Box
+                        key={item}
+                        sx={{
+                          px: 1,
+                          py: 0.45,
+                          borderRadius: 999,
+                          bgcolor: "rgba(255,255,255,0.08)",
+                          border: "1px solid rgba(255,255,255,0.12)",
+                        }}
+                      >
+                        <Typography variant="caption" sx={{ color: "rgba(241,245,249,0.86)" }}>
+                          {item}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              </Box>
+
+              <Box mt={3}>
+                <Box display="flex" alignItems="center" gap={1.2}>
+                  <Avatar
+                    src={post?.post_owner?.owneravatar}
+                    alt={post?.post_owner?.ownername || "Author"}
+                    variant="rounded"
+                    sx={{
+                      width: 46,
+                      height: 46,
+                      borderRadius: "14px",
+                    }}
+                  />
+                  <Box>
+                    <Box display="flex" alignItems="center" gap={0.7}>
+                      <Typography variant="body2" fontWeight={700}>
+                        {post?.post_owner?.ownername}
+                      </Typography>
+                      <VerifiedRounded sx={{ width: 16, height: 16, color: "#93C5FD" }} />
+                    </Box>
+                    <Typography variant="caption" sx={{ color: "rgba(241,245,249,0.75)" }}>
+                      {post?.post_owner?.ownertitle}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {categoryTags.length > 0 && (
+                  <Box mt={2}>
+                    <Typography
+                      variant="caption"
+                      sx={{ color: "rgba(241,245,249,0.62)", display: "block", mb: 0.8 }}
+                    >
+                      Related topics
+                    </Typography>
+                    <Box display="flex" gap={0.75} flexWrap="wrap">
+                      {categoryTags.map((tag) => (
+                        <Box
+                          key={tag}
+                          sx={{
+                            px: 1,
+                            py: 0.35,
+                            borderRadius: 999,
+                            bgcolor: "rgba(255,255,255,0.08)",
+                            border: "1px solid rgba(255,255,255,0.12)",
+                          }}
+                        >
+                          <Typography variant="caption" sx={{ color: "#E2E8F0" }}>
+                            #{tag}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Dialog>
+    </Card>
   );
 };
 

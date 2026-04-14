@@ -1,8 +1,7 @@
 import {
   Close,
   DarkModeRounded,
-  HomeRounded,
-  KeyRounded,
+  Lock,
   PersonAddRounded,
   Visibility,
   VisibilityOff,
@@ -50,7 +49,7 @@ const LoginAuth = () => {
   // redux state
   const { currentMode } = useSelector((state) => state.appUI);
   const { isGuest } = useSelector((state) => state.currentUser);
-  
+
 
   const isDarkMode = currentMode === "dark";
 
@@ -81,17 +80,12 @@ const LoginAuth = () => {
   };
 
   // use layout effect if user is logged nav home
-  useLayoutEffect(()=>{
+  useLayoutEffect(() => {
     if (!isGuest) {
-    navigate("/")
+      navigate("/")
     }
-  },[isGuest,navigate])
+  }, [isGuest, navigate])
 
-
-// handle navigate home
-const handleNavigateHome=()=>{
-  navigate("/")
-}
 
 
   const handleLogin = async () => {
@@ -137,13 +131,13 @@ const handleNavigateHome=()=>{
 
   // auto clear general messages after 2 seconds
   useEffect(() => {
-    if (messageGeneral ) {
+    if (messageGeneral) {
       const timer = setTimeout(() => {
         setMessageGeneral("");
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [messageGeneral,dispatch]);
+  }, [messageGeneral, dispatch]);
 
 
   return (
@@ -262,7 +256,7 @@ const handleNavigateHome=()=>{
                     className="rounded-5"
                     severity="info"
                     // close button clears immediately
-                    onClose={() => setMessageGeneral("")} 
+                    onClose={() => setMessageGeneral("")}
                     action={
                       <IconButton
                         aria-label="close"
@@ -376,26 +370,13 @@ const handleNavigateHome=()=>{
               </Typography>
             </Box>
 
-            <Box mb={2} display={"flex"} justifyContent={"center"}>
-              <Button
-                variant="outlined"
-                className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
-                disabled={isFetching}
-                startIcon={<HomeRounded/>}
-                sx={{ textTransform: "none", borderRadius: "20px" }}
-                disableElevation
-                onClick={handleNavigateHome}
-              >
-                Proceed Home
-              </Button>
-            </Box>
 
             {/* login btn */}
             <Box mb={2} display={"flex"} justifyContent={"center"}>
               <Button
-                startIcon={isFetching ? 
-                <CircularProgress size={13} />:
-                <KeyRounded/>}
+                startIcon={isFetching ?
+                  <CircularProgress size={13} /> :
+                  <Lock />}
                 variant="contained"
                 className={CustomDeviceIsSmall() ? "w-50" : "w-25"}
                 disabled={isFetching}
@@ -403,7 +384,7 @@ const handleNavigateHome=()=>{
                 disableElevation
                 onClick={isVerifyButton ? handleEmailVerification : handleLogin}
               >
-                {isVerifyButton ? "Verification" : "Proceed Login"}
+                {isVerifyButton ? "Verification" : "Login"}
               </Button>
             </Box>
           </Box>

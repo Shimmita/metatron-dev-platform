@@ -88,9 +88,9 @@ const handleCompletely=()=>{
           fontWeight={"bold"}
           gap={2}
           sx={{
-          background: !isDarkMode && 
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-        }}
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+          }}
         >
           <TipsAndUpdatesRounded sx={{width:20,height:20, color:'orange'}}/>
           About Metatron Developer

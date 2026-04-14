@@ -1,7 +1,8 @@
 import {
   Avatar,
   Box,
-  createTheme,
+  CssBaseline,
+  GlobalStyles,
   ThemeProvider,
   Typography
 } from "@mui/material";
@@ -13,6 +14,8 @@ import HomePageLazy from "./components/account/HomePage";
 import LoginAuth from "./components/auth/LoginAuth";
 import AppLogo from "./images/logo_sm.png";
 import GuestCheck from "./components/account/GuestCheck";
+import getAppTheme from "./utils/theme";
+import { appGradients } from "./utils/colors";
 const CertificateVerification=lazy(()=>import("./components/auth/CertificateVerification")) ;
 const RegPersonalCompletion = lazy(() =>
   import("./components/auth/RegPersonalCompletion")
@@ -26,29 +29,61 @@ const EmailVerificationAuth=lazy(()=>import("./components/auth/EmailVerification
 const App = () => {
   // global dark mode state from redux
   const { currentMode } = useSelector((state) => state.appUI);
-  
-  const darkTheme = createTheme({
-    palette: {
-      mode: currentMode,
-    },
-  });
+  const theme = getAppTheme(currentMode);
+
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <GlobalStyles
+        styles={{
+          "html, body, #root": {
+            minHeight: "100%",
+            overflowX: "hidden",
+          },
+          body: {
+            backgroundColor: theme.palette.background.default,
+            color: theme.palette.text.primary,
+            minHeight: "100vh",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          },
+          "*": {
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          },
+          "*::-webkit-scrollbar": {
+            width: 0,
+            height: 0,
+            display: "none",
+          },
+          "::selection": {
+            backgroundColor: theme.palette.primary.light,
+            color: "#ffffff",
+          },
+        }}
+      />
+
       <Box
-      bgcolor={currentMode==='dark' ? "background.default" :"#f2f2f2"} 
-      color={"text.primary"}>
+        sx={{
+          bgcolor: theme.palette.background.default,
+          color: theme.palette.text.primary,
+        }}>
         {/* error boundary to catch errors from lazily loaded components */}
         <Suspense
           fallback={
-            <Box color={"text.primary"} alignItems="center">
-              <Box
-                display={"flex"}
-                alignItems={"center"}
-                justifyContent={"center"}
-                gap={1}
-                flexDirection={"column"}
-                height={"100vh"}
-              >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 1,
+                flexDirection: "column",
+                minHeight: "100vh",
+                bgcolor: theme.palette.mode === "dark" ? theme.palette.background.default : appGradients.soft,
+                color: theme.palette.text.primary,
+                p: 2,
+              }}
+            >
               
                 <Avatar
                   sx={{ width: 100, height: 100 }}
@@ -84,7 +119,6 @@ const App = () => {
                 </Box>
 
               </Box>
-            </Box>
           }
         >
           

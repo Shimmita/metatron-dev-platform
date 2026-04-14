@@ -24,6 +24,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import React, { Suspense, useLayoutEffect, useState } from "react";
 
 import axios from "axios";
@@ -174,7 +175,8 @@ const Navbar = () => {
     isPostFullDetailModal,
     isLogoutAlert
   } = useSelector((state) => state.appUI);
-   const isDarkMode=currentMode==='dark'
+  const theme = useTheme();
+  const isDarkMode = currentMode === 'dark';
 
   const handleShowMobileSearch = () => {
     setShowMobileSearch((prev) => !prev);
@@ -544,10 +546,15 @@ const Navbar = () => {
 
   return (
     <React.Fragment>
-      <AppBar 
-      color={isDarkMode ? "default":"primary"}
-      position="fixed" 
-      elevation={0}>
+      <AppBar
+        color="primary"
+        position="fixed"
+        elevation={0}
+        sx={{
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          backgroundColor: theme.palette.primary.main,
+        }}>
         <MetatronToolBar variant="dense">
           {/* lg screen toolbar */}
           <LogoContent
@@ -586,7 +593,7 @@ const Navbar = () => {
               {!CustomDeviceTablet() ? (
                 <React.Fragment>
                   <IconButton onClick={(e) => setOpenDrawer(!openDrawer)}>
-                    <MenuRounded  sx={{ color:'white' }} />
+                    <MenuRounded color="inherit" />
                   </IconButton>
                   {/* app tile on smallest devices won't show 
                   only medium sized. show app logo on smallest devices
@@ -690,7 +697,7 @@ const Navbar = () => {
                         type="submit"
                       >
                         <SearchRounded
-                          sx={{ width: 20, height: 20,color:'white'}}
+                          sx={{ width: 20, height: 20, color: 'inherit' }}
                         />
                       </IconButton>
                       </Tooltip>
@@ -703,7 +710,7 @@ const Navbar = () => {
                       onClick={handleShowContentFilter}
                     >
                       <FilterListRounded
-                        sx={{ width: 22, height: 22, color:'white' }}
+                        sx={{ width: 22, height: 22, color: 'inherit' }}
                       />
                     </IconButton>
                     </Tooltip>
@@ -761,7 +768,7 @@ const Navbar = () => {
                             disabled={searchTerm?.length < 2}
                           >
                             <SearchRounded
-                              sx={{ width: 22, height: 22, color:'white' }}
+                              sx={{ width: 22, height: 22, color: 'inherit' }}
                             />
                           </IconButton>
                         )}
@@ -775,13 +782,13 @@ const Navbar = () => {
                         onClick={handleShowContentFilter}
                       >
                         <FilterListRounded
-                          sx={{ width: 20, height: 20, color:'white'}}
+                          sx={{ width: 20, height: 20, color: 'inherit' }}
                         />
                       </IconButton>
                       </Tooltip>
 
                     <IconButton onClick={handleShowMobileSearch}>
-                      <Close sx={{ width: 18, height: 18, color:'white'}} />
+                      <Close sx={{ width: 18, height: 18, color: 'inherit' }} />
                     </IconButton>
                   </Box>
                 </SearchBar>
@@ -794,7 +801,7 @@ const Navbar = () => {
                 {/* display when search not clicked */}
                 {!showMobileSearch && (
                   <IconButton onClick={handleShowMobileSearch}>
-                    <SearchRounded sx={{ color:'white'}} />
+                    <SearchRounded color="inherit" />
                   </IconButton>
                 )}
                   </Box>
@@ -821,7 +828,7 @@ const Navbar = () => {
                 <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
                 <IconButton  onClick={handleShowDarkMode}> 
                 <DarkModeRounded
-                sx={{ height:24, width:24, color:'white' }}
+                sx={{ height:24, width:24, color:'inherit' }}
                 />
                 </IconButton>
                 </Tooltip> 
@@ -850,7 +857,7 @@ const Navbar = () => {
                       onClick={()=>handleShowMessageDrawer(0)}
                     >
                       <NotificationsRounded
-                        sx={{ width: 25, height: 25,color:'white' }}
+                        sx={{ width: 25, height: 25, color: 'inherit' }}
                       />
                     </IconButton>
                 </Badge>
@@ -870,7 +877,7 @@ const Navbar = () => {
                     onClick={()=>handleShowMessageDrawer(1)}
                   >
                     <EmailRounded
-                      sx={{ width: 22, height: 22,color:'white' }}
+                      sx={{ width: 22, height: 22, color: 'inherit' }}
                     />
                   </IconButton>
                 </Badge>

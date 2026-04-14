@@ -21,6 +21,7 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -48,6 +49,7 @@ function EventItem({
   const [isFetching, setIsFetching] = useState(false);
   const [openMiniProfile,setOpenMiniProfile]=useState(false)
   const [isCopiedStatus, setIsCopiedStatus] = useState(false);
+  const theme = useTheme();
   
   
   // redux states
@@ -293,18 +295,30 @@ function EventItem({
       {/* card events details */}
         <Card
           elevation={0}
-          className="rounded-2 shadow"
           sx={{ 
           border:'1px solid',
           borderColor:'divider',
-          width:CustomDeviceIsSmall() ? 330: CustomDeviceTablet() ? 300:320, 
+          width:CustomDeviceIsSmall() ? 330: CustomDeviceTablet() ? 300:320,
+          borderRadius: `${theme.shape.borderRadius}px`,
+          boxShadow: theme.palette.mode === "dark"
+            ? "0 18px 36px rgba(0,0,0,0.18)"
+            : "0 20px 40px rgba(15,76,129,0.08)",
+          background: theme.palette.mode === "dark"
+            ? "linear-gradient(180deg, rgba(15,76,129,0.12), rgba(255,255,255,0.02))"
+            : "linear-gradient(180deg, rgba(15,76,129,0.05), rgba(255,255,255,0.96))",
           }}
         >
           <CardContent>
             <Stack
-            className='rounded-1'
-            bgcolor={isDarkMode ? '#3333':'black'}
+            bgcolor={isDarkMode ? 'rgba(15,76,129,0.3)':'primary.main'}
             gap={0.5}
+            sx={{
+              borderRadius: `calc(${theme.shape.borderRadius}px - 4px)`,
+              p: 1,
+              boxShadow: theme.palette.mode === "dark"
+                ? "inset 0 1px 0 rgba(255,255,255,0.04)"
+                : "inset 0 1px 0 rgba(255,255,255,0.18)",
+            }}
            >
 
               {/* skills panel */}
@@ -333,7 +347,7 @@ function EventItem({
               justifyContent={'center'}>
               
                 <Typography
-                variant="body2"
+                variant="body1"
                 textTransform={"capitalize"}
                 fontWeight="bold"
                 sx={{ color:'white' }}
@@ -603,7 +617,9 @@ function EventItem({
                   startIcon={isCopiedStatus ? <Done/>:undefined} 
                   sx={{
                   borderRadius:'20px',
-                  fontSize:'small', 
+                  fontSize:'small',
+                  border: "1px solid",
+                  borderColor: isCopiedStatus ? "success.main" : "divider",
                   textTransform:'capitalize' }}
                   size="small">
                     {isCopiedStatus ? "Copied":"Share Event"}

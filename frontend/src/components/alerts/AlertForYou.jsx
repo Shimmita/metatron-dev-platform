@@ -10,6 +10,7 @@ import Slide from "@mui/material/Slide";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
 import GoogleLogo from "../../images/google.png";
 import MpesaLogo from "../../images/mpesa.png";
 import PaypalLogo from "../../images/paypal2.png";
@@ -36,9 +37,6 @@ export default function AlertForYou({
   // premium option
   const [premiumOption,setPremiumOption]=useState(3)
 
-  // payment option
-  const [paymentOption,setPaymentOption]=useState("")
-
   // show checkout page
   const [isCheckout,setIsCheckOut]=useState(false)
 
@@ -46,9 +44,7 @@ export default function AlertForYou({
     handleCloseAll()
   };
 
-  //  redux states
-  const { currentMode } = useSelector((state) => state.appUI);
- const isDarkMode=currentMode==='dark'
+  const theme = useTheme();
 
 
   // handle complete payment
@@ -74,9 +70,9 @@ export default function AlertForYou({
           fontWeight={"bold"}
           gap={2}
           sx={{
-          background: !isDarkMode && 
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-        }}
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+          }}
         >
           {defaultIcon}
           {title}

@@ -1,3 +1,4 @@
+import { useTheme } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -18,68 +19,66 @@ export default function AlertGeneral({
   message,
   defaultIcon,
   setErrorMessage,
-  isError=false,
+  isError = false,
 }) {
- 
+
   const handleClose = () => {
-   
+
     // if is error means the alert has setError message to clear
     if (isError) {
 
       setErrorMessage("")
-    }else{
+    } else {
 
-    // close alert
-    setOpenAlertGeneral(false);
+      // close alert
+      setOpenAlertGeneral(false);
     }
 
   };
 
-  //  redux states
-  const { currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode=currentMode==='dark'
+  const theme = useTheme();
 
 
 
 
   return (
-      <Dialog
-        open={openAlertGeneral}
-        onClose={handleClose}
-        TransitionComponent={Transition}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
-          sx={{
-            backdropFilter:'blur(5px)',
-          }}
-      >
-          <DialogTitle
-          display={"flex"}
-          alignItems={"center"}
-          variant="body2"
-          fontWeight={"bold"}
-          gap={2}
-          sx={{
-            background: !isDarkMode && 
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-          }}
-        >
-          {defaultIcon}
-          {`${title}`}
-        </DialogTitle>
-        <DialogContent 
+    <Dialog
+      open={openAlertGeneral}
+      onClose={handleClose}
+      TransitionComponent={Transition}
+      keepMounted
+      aria-describedby="alert-dialog-slide-description"
+      sx={{
+        backdropFilter: 'blur(5px)',
+      }}
+    >
+      <DialogTitle
+        display={"flex"}
+        alignItems={"center"}
+        variant="body2"
+        fontWeight={"bold"}
+        gap={2}
         sx={{
-          maxWidth:500
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+        }}
+      >
+        {defaultIcon}
+        {`${title}`}
+      </DialogTitle>
+      <DialogContent
+        sx={{
+          maxWidth: 500
         }}
         dividers>
-          <DialogContentText variant="body2"
-           id="alert-dialog-slide-general">
-            {`${message}`}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} sx={{ borderRadius:4 }}>Ok</Button>
-        </DialogActions>
-      </Dialog>
+        <DialogContentText variant="body2"
+          id="alert-dialog-slide-general">
+          {`${message}`}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} sx={{ borderRadius: 4 }}>Ok</Button>
+      </DialogActions>
+    </Dialog>
   );
 }

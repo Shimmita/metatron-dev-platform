@@ -25,6 +25,7 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -51,6 +52,7 @@ function JobLayout_2({
   const [openModal, setOpenApplyJobModal] = useState(false);
   const [isFetching,setIsFetching]=useState(false)
   const [isCopiedStatus, setIsCopiedStatus] = useState(false);
+  const theme = useTheme();
 
   // redux states
   const { user,isGuest } = useSelector((state) => state.currentUser);
@@ -171,21 +173,37 @@ function JobLayout_2({
       {/* card, for job content */}
       <Card
         elevation={0}
-        className="rounded-3 shadow"
         sx={{ 
         border:'1px solid',
         borderColor:'divider',
-        width:CustomDeviceIsSmall() && !CustomDeviceSmallest() ? 320:300, 
+        width:CustomDeviceIsSmall() && !CustomDeviceSmallest() ? 320:300,
+        borderRadius: `${theme.shape.borderRadius}px`,
+        boxShadow: theme.palette.mode === "dark"
+          ? "0 18px 36px rgba(0,0,0,0.18)"
+          : "0 20px 40px rgba(15,76,129,0.08)",
+        background: theme.palette.mode === "dark"
+          ? "linear-gradient(180deg, rgba(15,76,129,0.12), rgba(255,255,255,0.02))"
+          : "linear-gradient(180deg, rgba(15,76,129,0.05), rgba(255,255,255,0.96))",
         }}
       >
       {/* job avatar */}
-    <Box 
+    <Box
     justifyContent={'center'}
-    display={'flex'}>
+    display={'flex'}
+    sx={{ pt: 2 }}>
       <Avatar
         alt=""
         className="border"
-        sx={{ width: 45, height: 45, mt:isPreviewHR ? 0:1 }}
+        sx={{
+          width: 52,
+          height: 52,
+          mt:isPreviewHR ? 0:1,
+          border: "2px solid",
+          borderColor: "background.paper",
+          boxShadow: theme.palette.mode === "dark"
+            ? "0 8px 18px rgba(0,0,0,0.28)"
+            : "0 10px 20px rgba(15,76,129,0.12)",
+        }}
         src={getImageMatch(job?.logo)}
       />
       </Box>
@@ -199,7 +217,7 @@ function JobLayout_2({
           color={"primary"} 
           textAlign={'center'}
           fontWeight={"bold"} 
-          sx={{ fontSize:'small' }}>
+          sx={{ fontSize:'0.95rem', px: 2 }}>
             {job?.title}
           </Typography>
 
@@ -234,49 +252,49 @@ function JobLayout_2({
         
         {/* divider centered */}
         <Box display={'flex'} justifyContent={'center'} width={'100%'}>
-        <Divider className="p-1 w-75" component={'div'}/>
+        <Divider component={'div'} sx={{ width: "78%" }}/>
         </Box>
 
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
             <LocationOnRounded sx={{ width: 22, height: 22 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
               {job.location.state} | {handleCountryName()}{" "}
             </Typography>
           </Box>
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
             <AccessTimeFilledRounded sx={{ width: 19, height: 19}} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
               Access {job?.jobtypeaccess?.access} | {job?.jobtypeaccess?.type}
             </Typography>
           </Box>
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
             <PaidRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" textTransform={"uppercase"} sx={{ fontSize:'small' }}>
               {job?.salary}
             </Typography>
           </Box>
 
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
             <WorkHistoryRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" textTransform={"capitalize"} sx={{ fontSize:'small' }}>
               {job?.entry?.years}
             </Typography>
           </Box>
 
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
             <BalanceRounded sx={{ width: 22, height: 22 }} />
             <Typography variant="body2" textTransform={"capitalize"} sx={{ fontSize:'small' }}>
               {handleEntryPosition()} Position Level
             </Typography>
           </Box>
 
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
             <PeopleRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }}>
               Current Applications {!(job?.website==="") ? "(N/A)":`${job?.applicants?.total}/${job?.applicants_max || MAX_APPLICANTS}`}
             </Typography>
           </Box>
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"}>
+          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
             <CalendarMonthRounded sx={{ width: 20, height: 20 }} />
             <Typography variant="body2" sx={{ fontSize:'small' }} >
               Date Uploaded {handleDateDisplay()}
@@ -306,7 +324,9 @@ function JobLayout_2({
       startIcon={isCopiedStatus ? <Done/>:undefined} 
       sx={{
         borderRadius:'20px',
-      fontSize:'small', 
+      fontSize:'small',
+      border: "1px solid",
+      borderColor: isCopiedStatus ? "success.main" : "divider",
       textTransform:'capitalize' }}
       size="small">
         {isCopiedStatus ? "Copied":"Share"}

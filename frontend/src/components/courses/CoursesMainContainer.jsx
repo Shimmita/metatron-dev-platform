@@ -61,6 +61,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CertificatesTable from "./layout/CertificatesTable";
 import CourseLayout from "./layout/CourseLayout";
 import CoursePlayer from "./layout/CoursePlayer";
+import { appGradients } from "../../utils/colors";
   
   const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
   
@@ -149,6 +150,7 @@ import CoursePlayer from "./layout/CoursePlayer";
 
     const { messageSnack } = useSelector((state) => state.currentSnackBar);
     const theme = useTheme();
+    const panelRadius = `${theme.shape.borderRadius}px`;
    
     // smartphones and below
     const isMobile = useMediaQuery(theme.breakpoints.down("sm")); 
@@ -543,8 +545,21 @@ import CoursePlayer from "./layout/CoursePlayer";
           maxHeight={'85vh'} 
           display={"flex"} 
           width={window.screen.availWidth-18}
+          sx={{ borderRadius: panelRadius, overflow: "auto" }}
           >
-            <AppBar position="fixed" open={open}>
+            <AppBar
+              position="fixed"
+              open={open}
+              sx={{
+                background: theme.palette.mode === "dark"
+                  ? "linear-gradient(135deg, rgba(8,21,38,0.96), rgba(15,76,129,0.88))"
+                  : appGradients.primary,
+                boxShadow: theme.palette.mode === "dark"
+                  ? "0 18px 36px rgba(0,0,0,0.24)"
+                  : "0 18px 36px rgba(15,76,129,0.14)",
+                borderBottom: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.18)"}`,
+              }}
+            >
               <Toolbar
                 sx={{
                   width: "100%",
@@ -637,14 +652,26 @@ import CoursePlayer from "./layout/CoursePlayer";
             <Drawer
               variant="permanent"
               open={open}
-              sx={{ display: isDrawerPane ? "block" : "none" }}
+              sx={{
+                display: isDrawerPane ? "block" : "none",
+                "& .MuiDrawer-paper": {
+                  borderRight: "1px solid",
+                  borderColor: "divider",
+                  backgroundColor: theme.palette.background.paper,
+                  backgroundImage: theme.palette.mode === "dark"
+                    ? "linear-gradient(180deg, rgba(15,76,129,0.16), rgba(255,255,255,0.01))"
+                    : "linear-gradient(180deg, rgba(15,76,129,0.08), rgba(255,255,255,0.92))",
+                },
+              }}
             >
               <DrawerHeader
                 sx={{
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  backgroundColor:isDarkMode ? '#272727' :"#1976D2"
+                  background: theme.palette.mode === "dark"
+                    ? "linear-gradient(135deg, rgba(8,21,38,0.96), rgba(15,76,129,0.82))"
+                    : appGradients.primary,
                 }}
               >
                 {!open && (
@@ -868,6 +895,7 @@ import CoursePlayer from "./layout/CoursePlayer";
         width={"100%"}
         display={"flex"}
           justifyContent={"center"}
+          sx={{ px: { xs: 1, md: 2 } }}
           >
         
             <Box
@@ -879,6 +907,11 @@ import CoursePlayer from "./layout/CoursePlayer";
               justifyContent={"center"}
               sx={{
                 overflow: "auto",
+                width: "100%",
+                borderRadius: panelRadius,
+                backgroundColor: theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.02)"
+                  : "rgba(255,255,255,0.74)",
                 // Hide scrollbar for Chrome, Safari and Opera
                 "&::-webkit-scrollbar": {
                   display: "none",
