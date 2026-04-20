@@ -9,6 +9,7 @@ import Slide from "@mui/material/Slide";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import SubsectionTech from "../data/SubsectionTech";
+import { useTheme } from "@emotion/react";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -51,6 +52,7 @@ export default function AlertInput({
   };
 
 
+  const theme=useTheme()
 
   return (
       <Dialog
@@ -59,8 +61,9 @@ export default function AlertInput({
         keepMounted
         maxWidth={400}
         aria-describedby="alert-dialog-slide-input"
-        sx={{
-          backdropFilter:'blur(5px)'
+       sx={{
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
         }}
       >
         <DialogTitle

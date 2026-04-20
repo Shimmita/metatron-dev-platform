@@ -1,3 +1,4 @@
+import { useTheme } from "@emotion/react";
 import {
   Close,
   PageviewRounded,
@@ -44,8 +45,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function AlertJobSearch({
   openAlert,
   setOpenAlert,
-  isEventSearch=false,
-  isCourseSearch=false
+  isEventSearch = false,
+  isCourseSearch = false
 }) {
   const [isFetching, setIsFetching] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -71,8 +72,8 @@ export default function AlertJobSearch({
   // redux states
   const { user } = useSelector((state) => state.currentUser);
   const { currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode=currentMode==='dark'
-  
+  const isDarkMode = currentMode === 'dark'
+
 
   const handleChangeTitles = (_, newValue) => {
     if (newValue.length > 3) {
@@ -89,7 +90,7 @@ export default function AlertJobSearch({
 
   // fetch the matching jobs from the backend
   const handleFetchingJobsSearch = () => {
-    
+
     // create job search object that will be sent to the backend
     const jobSearch = {
       job_titles,
@@ -97,18 +98,18 @@ export default function AlertJobSearch({
       entry,
       datePosted,
       category,
-      access:access.split(" ")[0]
+      access: access.split(" ")[0]
     };
 
     // event search object that will be sent to the backend
-    const eventObject={
+    const eventObject = {
       job_titles,
       country,
       category
     }
 
     // course search object
-    const courseSearchObject={
+    const courseSearchObject = {
       job_titles,
       category
     }
@@ -119,10 +120,10 @@ export default function AlertJobSearch({
     // else if events too
     axios
       .post(
-        isEventSearch ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/search`:
-         isCourseSearch ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/search/${user?._id}`  : `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search/${user?._id}`
+        isEventSearch ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/search` :
+          isCourseSearch ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/search/${user?._id}` : `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search/${user?._id}`
         ,
-        isEventSearch ? eventObject:isCourseSearch ? courseSearchObject: jobSearch,
+        isEventSearch ? eventObject : isCourseSearch ? courseSearchObject : jobSearch,
         {
           withCredentials: true,
         }
@@ -133,11 +134,11 @@ export default function AlertJobSearch({
           // update success message
           setSuccessMessage(res.data?.message);
           // update events redux
-          isEventSearch ? dispatch(updateCurrentEvents(res.data.data)):
-          // update redux courses
-          isCourseSearch ? dispatch(updateCurrentCourses(res.data.data)) :
-          // update the redux states for job search
-          dispatch(updateCurrentJobs(res.data?.data));
+          isEventSearch ? dispatch(updateCurrentEvents(res.data.data)) :
+            // update redux courses
+            isCourseSearch ? dispatch(updateCurrentCourses(res.data.data)) :
+              // update the redux states for job search
+              dispatch(updateCurrentJobs(res.data?.data));
           // close expansion of accordion after any results
           setExpanded(false)
         } else {
@@ -172,6 +173,8 @@ export default function AlertJobSearch({
     setSuccessMessage("");
   };
 
+  const theme = useTheme()
+
   return (
     <Dialog
       open={openAlert}
@@ -182,14 +185,16 @@ export default function AlertJobSearch({
       onClose={handleCloseAlert}
       aria-describedby="alert-dialog-job-search"
       sx={{
-          backdropFilter:'blur(5px)',
-          }}
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        backdropFilter: 'blur(3px)'
+      }}
     >
-      <Box 
-      bgcolor={"background.default"} 
-      border={'1px solid'}
-      borderColor={'divider'}
-      maxHeight={"80vh"}
+      <Box
+        bgcolor={"background.default"}
+        border={'1px solid'}
+        borderColor={'divider'}
+        maxHeight={"80vh"}
         sx={{
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
@@ -207,40 +212,40 @@ export default function AlertJobSearch({
           justifyContent={"space-between"}
           width={"100%"}
           sx={{
-              background: !isDarkMode && 
+            background: !isDarkMode &&
               "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
           }}
         >
           <Box display={"flex"} gap={2} alignItems={"center"}>
-          {isEventSearch ? (
-            <React.Fragment>
-               {/*  icon */}
-            <TvRounded />
-            {/* title */}
-            <Typography variant={'body1'}>
-            Tech Event Search
-            </Typography>
-            </React.Fragment>
-          ): isCourseSearch ? (
-            <React.Fragment>
-               {/*  icon */}
-            <SchoolRounded />
-            {/* title */}
-            <Typography variant={'body1'}>
-              Tech Course Search
-            </Typography>
-            </React.Fragment>
-          ):(
-            <React.Fragment>
-              {/*  icon */}
-            <WorkRounded />
-            {/* title */}
-            <Typography variant={'body1'}>
-            Tech Job Search
-          </Typography>
-            </React.Fragment>
-          )}
-           
+            {isEventSearch ? (
+              <React.Fragment>
+                {/*  icon */}
+                <TvRounded />
+                {/* title */}
+                <Typography variant={'body1'}>
+                  Tech Event Search
+                </Typography>
+              </React.Fragment>
+            ) : isCourseSearch ? (
+              <React.Fragment>
+                {/*  icon */}
+                <SchoolRounded />
+                {/* title */}
+                <Typography variant={'body1'}>
+                  Tech Course Search
+                </Typography>
+              </React.Fragment>
+            ) : (
+              <React.Fragment>
+                {/*  icon */}
+                <WorkRounded />
+                {/* title */}
+                <Typography variant={'body1'}>
+                  Tech Job Search
+                </Typography>
+              </React.Fragment>
+            )}
+
           </Box>
           <Box>{isFetching && <CircularProgress size={"20px"} />}</Box>
         </DialogTitle>
@@ -301,7 +306,7 @@ export default function AlertJobSearch({
         )}
         <DialogContent dividers>
           <DialogContentText gutterBottom mb={2} >
-            provide the name of the {isEventSearch ? "event": isCourseSearch ? "course":"job"} and click on the search icon.
+            provide the name of the {isEventSearch ? "event" : isCourseSearch ? "course" : "job"} and click on the search icon.
           </DialogContentText>
           <Autocomplete
             multiple
@@ -332,57 +337,57 @@ export default function AlertJobSearch({
           {/* category */}
 
           <Box mt={2}>
-             <TextField
+            <TextField
               select
               disabled={isFetching}
               value={category}
               label={"specialization"}
               fullWidth
               onChange={(e) => setCategory(e.target.value)}
-                >
-                  {SpecialisationTech?.filter((about) => about !== "None").map(
-                  (about) => (
-                    <MenuItem
-                      key={about}
-                      value={about}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 2,
-                      }}
-                    >
-                      {/* icon */}
-                      <CourseIcon option={about} />
-                      {/* name */}
-                      <small style={{ fontSize: "small" }}>{about}</small>
-                    </MenuItem>
-                  )
-                    )}
-                </TextField>
+            >
+              {SpecialisationTech?.filter((about) => about !== "None").map(
+                (about) => (
+                  <MenuItem
+                    key={about}
+                    value={about}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
+                  >
+                    {/* icon */}
+                    <CourseIcon option={about} />
+                    {/* name */}
+                    <small style={{ fontSize: "small" }}>{about}</small>
+                  </MenuItem>
+                )
+              )}
+            </TextField>
           </Box>
 
           {/* more search options accordion, not for courses */}
           {!isCourseSearch && (
             <Box mt={2}>
-            <AccordionSearchOptions
-              country={country}
-              setCountry={setCountry}
-              entry={entry}
-              setJobEntry={setJobEntry}
-              datePosted={datePosted}
-              setDatePosted={setDatePosted}
-              successMessage={successMessage}
-              setAccess={setAccess}
-              access={access}
-              errorMessage={errorMessage}
-              isFetching={isFetching}
-              isEventSearch={isEventSearch}
-              expanded={expanded}
-              setExpanded={setExpanded}
-            />
-          </Box>
+              <AccordionSearchOptions
+                country={country}
+                setCountry={setCountry}
+                entry={entry}
+                setJobEntry={setJobEntry}
+                datePosted={datePosted}
+                setDatePosted={setDatePosted}
+                successMessage={successMessage}
+                setAccess={setAccess}
+                access={access}
+                errorMessage={errorMessage}
+                isFetching={isFetching}
+                isEventSearch={isEventSearch}
+                expanded={expanded}
+                setExpanded={setExpanded}
+              />
+            </Box>
           )}
-          
+
         </DialogContent>
 
         <DialogActions>
@@ -403,17 +408,17 @@ export default function AlertJobSearch({
             </Box>
           ) : (
             <React.Fragment>
-            {/* search button */}
-            <Box mr={2}>
-            <Tooltip arrow title="search">
-            <IconButton 
-            disabled={isFetching || errorMessage || successMessage}
-            onClick={handleFetchingJobsSearch}
-            >
-             <PageviewRounded sx={{ width: 23, height: 23 }} />
-            </IconButton>
-            </Tooltip>
-            </Box>
+              {/* search button */}
+              <Box mr={2}>
+                <Tooltip arrow title="search">
+                  <IconButton
+                    disabled={isFetching || errorMessage || successMessage}
+                    onClick={handleFetchingJobsSearch}
+                  >
+                    <PageviewRounded sx={{ width: 23, height: 23 }} />
+                  </IconButton>
+                </Tooltip>
+              </Box>
 
             </React.Fragment>
           )}

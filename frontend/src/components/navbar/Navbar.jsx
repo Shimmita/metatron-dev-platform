@@ -593,7 +593,7 @@ const Navbar = () => {
               {!CustomDeviceTablet() ? (
                 <React.Fragment>
                   <IconButton onClick={(e) => setOpenDrawer(!openDrawer)}>
-                    <MenuRounded color="inherit" />
+                    <MenuRounded sx={{color:"white"}} />
                   </IconButton>
                   {/* app tile on smallest devices won't show 
                   only medium sized. show app logo on smallest devices
@@ -697,7 +697,7 @@ const Navbar = () => {
                         type="submit"
                       >
                         <SearchRounded
-                          sx={{ width: 20, height: 20, color: 'inherit' }}
+                          sx={{ width: 20, height: 20, color:"white" }}
                         />
                       </IconButton>
                       </Tooltip>
@@ -710,7 +710,7 @@ const Navbar = () => {
                       onClick={handleShowContentFilter}
                     >
                       <FilterListRounded
-                        sx={{ width: 22, height: 22, color: 'inherit' }}
+                        sx={{ width: 22, height: 22, color:"white" }}
                       />
                     </IconButton>
                     </Tooltip>
@@ -768,7 +768,7 @@ const Navbar = () => {
                             disabled={searchTerm?.length < 2}
                           >
                             <SearchRounded
-                              sx={{ width: 22, height: 22, color: 'inherit' }}
+                              sx={{ width: 22, height: 22,color:"white" }}
                             />
                           </IconButton>
                         )}
@@ -782,13 +782,13 @@ const Navbar = () => {
                         onClick={handleShowContentFilter}
                       >
                         <FilterListRounded
-                          sx={{ width: 20, height: 20, color: 'inherit' }}
+                          sx={{ width: 20, height: 20, color:"white" }}
                         />
                       </IconButton>
                       </Tooltip>
 
                     <IconButton onClick={handleShowMobileSearch}>
-                      <Close sx={{ width: 18, height: 18, color: 'inherit' }} />
+                      <Close sx={{ width: 18, height: 18, color:"white" }} />
                     </IconButton>
                   </Box>
                 </SearchBar>
@@ -801,7 +801,7 @@ const Navbar = () => {
                 {/* display when search not clicked */}
                 {!showMobileSearch && (
                   <IconButton onClick={handleShowMobileSearch}>
-                    <SearchRounded color="inherit" />
+                    <SearchRounded sx={{color:"white"}} />
                   </IconButton>
                 )}
                   </Box>
@@ -822,13 +822,13 @@ const Navbar = () => {
                 }
               >
 
-                {!CustomDeviceIsSmall() && currentUserId && (
+                {!CustomDeviceIsSmall() && (
                 <React.Fragment>
                  {/* change theme trigger */}
                 <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
                 <IconButton  onClick={handleShowDarkMode}> 
                 <DarkModeRounded
-                sx={{ height:24, width:24, color:'inherit' }}
+                sx={{ height:24, width:24,color:"white" }}
                 />
                 </IconButton>
                 </Tooltip> 
@@ -857,7 +857,7 @@ const Navbar = () => {
                       onClick={()=>handleShowMessageDrawer(0)}
                     >
                       <NotificationsRounded
-                        sx={{ width: 25, height: 25, color: 'inherit' }}
+                        sx={{ width: 25, height: 25,color:"white" }}
                       />
                     </IconButton>
                 </Badge>
@@ -877,7 +877,7 @@ const Navbar = () => {
                     onClick={()=>handleShowMessageDrawer(1)}
                   >
                     <EmailRounded
-                      sx={{ width: 22, height: 22, color: 'inherit' }}
+                      sx={{ width: 22, height: 22, color:"white" }}
                     />
                   </IconButton>
                 </Badge>
@@ -901,7 +901,7 @@ const Navbar = () => {
                   size="medium"
                   onClick={handleNavigateLogin}
                   color="inherit"
-                  startIcon={<Person/>}
+                  startIcon={<Person sx={{color:"white"}}/>}
                   >
                     Signin
                   </Button>

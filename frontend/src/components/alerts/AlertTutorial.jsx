@@ -16,35 +16,35 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AlertTutorial({isDarkMode=false}) {
-    const [isFetching, setIsFetching] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+export default function AlertTutorial({ isDarkMode = false }) {
+  const [isFetching, setIsFetching] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-     // smartphones and below
-    const theme=useTheme()
-    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-    
+  // smartphones and below
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
- // redux states
+
+  // redux states
   const { user } = useSelector((state) => state.currentUser);
-  const dispatch=useDispatch()
+  const dispatch = useDispatch()
 
   // track showing of lunched tutorial
-  const [openTutorial,setOpenTutorial]=useState(user?.isTutorial || false)
- 
+  const [openTutorial, setOpenTutorial] = useState(user?.isTutorial || false)
+
   const handleClose = () => {
     setOpenTutorial(false)
   };
 
 
-// completely done tutorial
-const handleCompletely=()=>{
+  // completely done tutorial
+  const handleCompletely = () => {
     // fetching state
     setIsFetching(true)
     // axios post, update the tutorial state in the user db backend
-    axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/tutorial`,{userId:user?._id}, {
-        withCredentials: true,
-      })
+    axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/tutorial`, { userId: user?._id }, {
+      withCredentials: true,
+    })
       .then((res) => {
         // update the current user redux state from the backend
         dispatch(updateUserCurrentUserRedux(res.data))
@@ -66,39 +66,39 @@ const handleCompletely=()=>{
         // set is fetching to false
         setIsFetching(false);
       });
-}
-
-
+  }
 
   return (
-      <Dialog
-        open={openTutorial}
-        fullWidth
-        TransitionComponent={Transition}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
-          sx={{
-            backdropFilter:'blur(5px)',
-          }}
+    <Dialog
+      open={openTutorial}
+      fullWidth
+      TransitionComponent={Transition}
+      keepMounted
+      aria-describedby="alert-dialog-slide-description"
+       sx={{
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        backdropFilter: 'blur(3px)'
+      }}
+    >
+      <DialogTitle
+        display={"flex"}
+        alignItems={"center"}
+        variant="body1"
+        fontWeight={"bold"}
+        gap={2}
+        sx={{
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+        }}
       >
-          <DialogTitle
-          display={"flex"}
-          alignItems={"center"}
-          variant="body1"
-          fontWeight={"bold"}
-          gap={2}
-          sx={{
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-          }}
-        >
-          <TipsAndUpdatesRounded sx={{width:20,height:20, color:'orange'}}/>
-          About Metatron Developer
-        </DialogTitle>
-        <DialogContent 
+        <TipsAndUpdatesRounded sx={{ width: 20, height: 20, color: 'orange' }} />
+        About Metatron Developer
+      </DialogTitle>
+      <DialogContent
         dividers
-          sx={{ 
-          maxHeight:isMobile ? '70vh':undefined,
+        sx={{
+          maxHeight: isMobile ? '70vh' : undefined,
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -107,58 +107,58 @@ const handleCompletely=()=>{
           // Hide scrollbar for IE, Edge and Firefox
           msOverflowStyle: "none",
           scrollbarWidth: "none",
-          }}
-        > 
+        }}
+      >
 
         {/* error displayed if any */}
         {errorMessage && (
-            <Box 
-            display={'flex'} 
-            justifyContent={'center'} 
+          <Box
+            display={'flex'}
+            justifyContent={'center'}
             mb={1}>
             <Typography className="text-info">{errorMessage}</Typography>
-            </Box>
+          </Box>
         )}
-        
 
-        {TutorialData.map(tutorial=>(
-            <Box key={tutorial.description}>
+
+        {TutorialData.map(tutorial => (
+          <Box key={tutorial.description}>
             {/* description */}
             <DialogContentText gutterBottom variant="body2" id="alert-dialog-tutorial-description">
-            {tutorial.description}
+              {tutorial.description}
             </DialogContentText>
             {/* listing details and functions */}
-            {tutorial.listing.map(list=>(
-            <DialogContentText gutterBottom component={'li'} variant="body2" id="alert-dialog-tutorial-listing">
-            {list}
-            </DialogContentText>
+            {tutorial.listing.map(list => (
+              <DialogContentText gutterBottom component={'li'} variant="body2" id="alert-dialog-tutorial-listing">
+                {list}
+              </DialogContentText>
             ))}
-           
-            </Box>
-       
+
+          </Box>
+
         ))}
-          
-        </DialogContent>
-        <DialogActions>
+
+      </DialogContent>
+      <DialogActions>
 
         {user?.isTutorial && (
-          <Button 
-          size="small"
-          disabled={isFetching}
-          startIcon={isFetching ? <CircularProgress size={12}/> :undefined}
-          onClick={handleCompletely} 
-          sx={{ borderRadius:4}}>
-          Ok don't show
+          <Button
+            size="small"
+            disabled={isFetching}
+            startIcon={isFetching ? <CircularProgress size={12} /> : undefined}
+            onClick={handleCompletely}
+            sx={{ borderRadius: 4 }}>
+            Ok don't show
           </Button>
         )}
-          
-          
-          <Button 
-          onClick={handleClose} 
+
+
+        <Button
+          onClick={handleClose}
           size="small"
           disabled={isFetching}
-          sx={{ borderRadius:4}}>continue</Button>
-        </DialogActions>
-      </Dialog>
+          sx={{ borderRadius: 4 }}>continue</Button>
+      </DialogActions>
+    </Dialog>
   );
 }

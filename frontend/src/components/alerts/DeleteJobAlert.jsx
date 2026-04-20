@@ -1,5 +1,6 @@
 import { WarningRounded } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -23,7 +24,7 @@ export default function DeleteJobAlert({
   setOpenAlert,
   message,
   title,
-  applicants=0,
+  applicants = 0,
   my_email,
   job_id,
 }) {
@@ -32,140 +33,143 @@ export default function DeleteJobAlert({
     setOpenAlert(false);
   };
 
-   // track axios progress
-    const [isFetching, setIsFetching] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+  // track axios progress
+  const [isFetching, setIsFetching] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   // redux states
-  const {currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode=currentMode==='dark'
+  const { currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode = currentMode === 'dark'
 
-  const dispatch=useDispatch()
+  const dispatch = useDispatch()
 
   // handle complete deletion of the job
-  const handleCompleteDeletion=()=>{
+  const handleCompleteDeletion = () => {
 
     // set is fetching to true
-        setIsFetching(true)
-    
-        axios.delete(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/job/delete/${my_email}/${job_id}`,{
-                withCredentials: true,
-            })
-            .then((res) => {
-                // update the jobs from the backend
-                if (res?.data) {
+    setIsFetching(true)
 
-                  // log for debug message from backend 
-                  console.log(res.data)
+    axios.delete(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/job/delete/${my_email}/${job_id}`, {
+      withCredentials: true,
+    })
+      .then((res) => {
+        // update the jobs from the backend
+        if (res?.data) {
 
-                  // update current jobs, triggers refetch
-                  dispatch(resetClearCurrentJobs())
+          // log for debug message from backend 
+          console.log(res.data)
 
-                  // refresh jobs to too for refetch
-                  dispatch(resetClearCurrentJobsTop())
+          // update current jobs, triggers refetch
+          dispatch(resetClearCurrentJobs())
 
-                  // success alert
-                  dispatch(updateCurrentSuccessRedux({title:'Job Update',message:'Your job has been successfully deleted from the platform and its associated information.' }))
-                
-                // clear current jobs for fresh
-                  dispatch(resetClearCurrentJobsTop())
-                  // close the alert
-                  handleClose()
-                } 
+          // refresh jobs to too for refetch
+          dispatch(resetClearCurrentJobsTop())
 
-            })
-            .catch((err) => {
+          // success alert
+          dispatch(updateCurrentSuccessRedux({ title: 'Job Update', message: 'Your job has been successfully deleted from the platform and its associated information.' }))
 
-              // log message
-              console.log(err?.response?.data)
+          // clear current jobs for fresh
+          dispatch(resetClearCurrentJobsTop())
+          // close the alert
+          handleClose()
+        }
 
-            //  user login session expired show logout alert
-            if (err?.response?.data?.login) {
-            window.location.reload();
-            }
-            if (err?.code === "ERR_NETWORK") {
-            setErrorMessage(
-                "server unreachable!"
-            );
-            }
-            // update error message
-            setErrorMessage(err.response.data)
-        })
-        .finally(() => {
-            // false fetching
-            setIsFetching(false);        
-        });
-    
+      })
+      .catch((err) => {
+
+        // log message
+        console.log(err?.response?.data)
+
+        //  user login session expired show logout alert
+        if (err?.response?.data?.login) {
+          window.location.reload();
+        }
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage(
+            "server unreachable!"
+          );
+        }
+        // update error message
+        setErrorMessage(err.response.data)
+      })
+      .finally(() => {
+        // false fetching
+        setIsFetching(false);
+      });
+
   }
 
+  const theme = useTheme()
 
   return (
-      <Dialog
-        open={openAlert}
-        TransitionComponent={Transition}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
+    <Dialog
+      open={openAlert}
+      TransitionComponent={Transition}
+      keepMounted
+      aria-describedby="alert-dialog-slide-description"
+      sx={{
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        backdropFilter: 'blur(3px)'
+      }}
+    >
+      <DialogTitle
+        display={"flex"}
+        alignItems={"center"}
+        variant="body1"
+        gap={2}
         sx={{
-          backdropFilter:'blur(5px)'
+          background: !isDarkMode &&
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
         }}
       >
-        <DialogTitle
-          display={"flex"}
-          alignItems={"center"}
-          variant="body1"
-          gap={2}
-          sx={{
-            background: !isDarkMode && 
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-          }}
-        >
-          {/* delete icon */}
-          <WarningRounded />
-          <Box>
+        {/* delete icon */}
+        <WarningRounded />
+        <Box>
           {/* title */}
-          <Typography 
+          <Typography
           >
-          {title}  
+            {title}
           </Typography>
-          <Typography textAlign={'center'} variant={'caption'} sx={{ color:'text.secondary' }}>
-            {applicants} {applicants===1 ? "applicant":"applicants"}
+          <Typography textAlign={'center'} variant={'caption'} sx={{ color: 'text.secondary' }}>
+            {applicants} {applicants === 1 ? "applicant" : "applicants"}
           </Typography>
-          </Box>
-         
-        </DialogTitle>
-        {errorMessage && (
-        <Box textAlign={'center'}>
-        <Typography className="text-info" textAlign={'center'} variant="caption">
-          {errorMessage}
-        </Typography>
         </Box>
-        )}
-        <DialogContent
+
+      </DialogTitle>
+      {errorMessage && (
+        <Box textAlign={'center'}>
+          <Typography className="text-info" textAlign={'center'} variant="caption">
+            {errorMessage}
+          </Typography>
+        </Box>
+      )}
+      <DialogContent
         sx={{
-          maxWidth:500
+          maxWidth: 500
         }}
-         dividers>
-          <DialogContentText 
+        dividers>
+        <DialogContentText
           variant="body2" id="alert-dialog-slide-description">
-            {message}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button 
-          size="small"
-          disabled={isFetching} 
-          sx={{ borderRadius: "20px" }} onClick={handleClose}>
-            No
-          </Button>
-          <Button 
+          {message}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button
           size="small"
           disabled={isFetching}
-           sx={{ borderRadius: "20px" }} 
-           onClick={handleCompleteDeletion} 
-           color="warning">
-            {isFetching ? "Wait...":"Yes"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+          sx={{ borderRadius: "20px" }} onClick={handleClose}>
+          No
+        </Button>
+        <Button
+          size="small"
+          disabled={isFetching}
+          sx={{ borderRadius: "20px" }}
+          onClick={handleCompleteDeletion}
+          color="warning">
+          {isFetching ? "Wait..." : "Yes"}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }

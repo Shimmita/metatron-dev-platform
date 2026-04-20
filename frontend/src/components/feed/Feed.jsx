@@ -6,9 +6,6 @@ import BasicSpeedDial from "../custom/SpeedDial";
 
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import BottomNav from "../bottom/BottomNav";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomFeedEquidstance from "../utilities/CustomFeedEquidstance";
 import GuestCheck from "../account/GuestCheck";
 const EventsContainer =lazy(()=>import("../events/EventsContainer")) ;
 const SnackBarPostSuccess =lazy(()=>import("../snackbar/SnackBarPostSuccess")) ;
@@ -45,11 +42,15 @@ const Feed = () => {
 
   return (      
         <Box
-          mr={CustomFeedEquidstance()}
-          flex={3}
-          p={1}
-          mt={1}
+          component="main"
           color={"text.primary"}
+          sx={{
+            width: "100%",
+            minWidth: 0,
+            flex: 1,
+            mt: { xs: 1, md: 2 },
+            px: { xs: 0, md: 1 },
+          }}
         >
           <Suspense
             fallback={
@@ -60,7 +61,7 @@ const Feed = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  height: "98vh",
+                  minHeight: "70vh",
                 }}
               >
                 {/* loader be shown before actual loading of content */}
@@ -151,9 +152,9 @@ const Feed = () => {
                     <Box
                       position={"fixed"}
                       sx={{
-                        left: 0,
-                        right: CustomDeviceIsSmall()? "39.5%" : CustomDeviceTablet() ? "31%" : "47%",
-                        bottom: CustomDeviceIsSmall() ? 30:5,
+                        right: { xs: 16, sm: 20, md: 28 },
+                        bottom: { xs: 88, sm: 78, md: 28 },
+                        zIndex: 1100,
                       }}
                     >
                       {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}

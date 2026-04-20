@@ -1,3 +1,4 @@
+import { useTheme } from "@emotion/react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import Slide from "@mui/material/Slide";
@@ -12,9 +13,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function AlertJobPreview({
-   openAlert,
-   setOpenAlert,
-    job,
+  openAlert,
+  setOpenAlert,
+  job,
 }) {
   const handleClose = () => {
     // close alert
@@ -23,44 +24,49 @@ export default function AlertJobPreview({
 
 
   //   redux states
-  const { isTabSideBar,currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode=currentMode==='dark'
+  const { isTabSideBar, currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode = currentMode === 'dark'
 
 
-  const handleAlertGenWidth=()=>{
-      if (CustomDeviceTablet() && isTabSideBar) {
-        return "36%"
-      } else if(CustomLandScape()){
-        return "-1%"
-      } else if(CustomLandscapeWidest()){
-        return "0%"
-      }
+  const handleAlertGenWidth = () => {
+    if (CustomDeviceTablet() && isTabSideBar) {
+      return "36%"
+    } else if (CustomLandScape()) {
+      return "-1%"
+    } else if (CustomLandscapeWidest()) {
+      return "0%"
     }
-    
+  }
+
+  const theme = useTheme()
+
   return (
-      <Dialog
-        open={openAlert}
-        TransitionComponent={Transition}
-        onClose={handleClose}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
-          sx={{
-              marginLeft:handleAlertGenWidth(),
-          }}
-      >
-      
-        <DialogContent dividers 
+    <Dialog
+      open={openAlert}
+      TransitionComponent={Transition}
+      onClose={handleClose}
+      keepMounted
+      aria-describedby="alert-dialog-slide-description"
+
+      sx={{
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        marginLeft: handleAlertGenWidth(),
+      }}
+    >
+
+      <DialogContent dividers
         sx={{
-           background: !isDarkMode && 
+          background: !isDarkMode &&
             "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
         }}
-         >
+      >
         {/* show layout job hiring */}
-     
+
         {job && (
-        <JobLayout job={job} isPreviewHR={true} isDarkMode={currentMode==='dark'}/>
-       )}
-        </DialogContent>
-      </Dialog>
+          <JobLayout job={job} isPreviewHR={true} isDarkMode={currentMode === 'dark'} />
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }

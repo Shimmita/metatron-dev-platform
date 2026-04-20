@@ -1,36 +1,28 @@
-import { Add, Close, PeopleRounded } from "@mui/icons-material";
+import { Add, GroupRounded, PeopleRounded } from "@mui/icons-material";
 import {
-  Avatar,
   Box,
   Button,
   CircularProgress,
-  IconButton,
-  Modal,
-  Stack,
-  styled,
   Tab,
   Tabs,
-  Tooltip,
-  Typography
+  Typography,
+  useTheme,
 } from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import AppLogo from "../../images/logo_sm.png";
 import { updateCurrentConnectTop } from "../../redux/CurrentConnect";
 import { resetClearPeopleData } from "../../redux/CurrentModal";
 import UserNetwork from "../profile/UserNetwork";
 import FriendRequest from "../rightbar/layouts/FriendRequest";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-
-// styled modal
-const StyledModalPeople = styled(Modal)({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-});
+import {
+  ModalBody,
+  ModalHeader,
+  ModalShell,
+  SectionCard,
+  SectionTitle,
+  StatusBanner,
+} from "./ModalShared";
 
 const PeopleModal = ({
   openPeopleModal, 
@@ -50,10 +42,11 @@ const PeopleModal = ({
   };
 
   // redux states
-  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
   const isDarkMode=currentMode==='dark'
   const { user } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   // close the modal from redux by altering states to false and null data
   const handleCloseModalPeople = () => {
@@ -65,18 +58,6 @@ const PeopleModal = ({
   };
 
 
-   // handle return width modal
-    const handleReturnWidthModal=()=>{
-      if (CustomLandScape() || CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "35%"
-      } else if (CustomDeviceTablet()){
-        return "90%"
-      } 
-      return "100%"
-    }
-
- 
-    
      // handle loading of more data
   const handleLoadMore=()=>{
 
@@ -127,141 +108,163 @@ const PeopleModal = ({
 
   }
 
+  const tabLabel = value === 1 ? "Friends and network" : "Suggested people";
+  const suggestionsCount = PeopleConnect?.length || 0;
+
   return (
-    <StyledModalPeople
-      keepMounted
-      open={openPeopleModal}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-      sx={{
-        backdropFilter:'blur(5px)',
-      }}
-    >
-      <Box
-        width={handleReturnWidthModal()}
-        color={"text.primary"}
-        display={"flex"}
-        justifyContent={"center"}
-        borderRadius={2}
-        border={isDarkMode &&'1px solid'}
-        borderColor={'divider'}
-        alignItems={"center"}
-      >
-        <Box
-          borderRadius={3}
-          width={"100%"}
-          bgcolor={"background.default"}
-        >
-          {/* toolbar  */}
-          <Box
-            display={"flex"}
-            justifyContent={"center"}
-            width={"100%"}
-            alignItems={"center"}
-            gap={2}
-            borderRadius={2}
-            pt={1}
-            sx={{
-             background: !isDarkMode && 
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-        }}
-          >
-            <Stack
-              direction={"row"}
-              alignItems={"center"}
-              gap={1}
-              width={"100%"}
-            >
-              {/* logo */}
-              <Box>
-                <Avatar src={AppLogo} alt="logo" />
-              </Box>
+    <ModalShell open={openPeopleModal}>
+      <ModalHeader
+        title={isFeed ? "People suggestions" : "Search results"}
+        subtitle={
+          value === 1
+            ? "Review your current network and manage the people you already know."
+            : "Discover professionals you may want to connect with based on your activity and interests."
+        }
+        onClose={handleCloseModalPeople}
+      />
 
-              <Typography
-                variant="body2"
-                fontWeight={"bold"}
-                textTransform={"uppercase"}
-              >
-                {isFeed ? "People Suggestions":"Search Suggestion"}
-              </Typography>
-            </Stack>
+      <StatusBanner
+        errorMessage={errorMessage}
+        onDismiss={() => setErrorMessage("")}
+        isUploading={false}
+      />
 
-            <Box mr={3}>
-              {/*close icon */}
-                <Tooltip 
-                title={"close"}>
-              <IconButton 
-              sx={{ 
-                  border:'1px solid',
-                  borderColor:'divider'
-                 }}
-              onClick={handleCloseModalPeople}>
-              
-                  <Close sx={{ width: 10, height: 10 }} />
-              </IconButton>
-                </Tooltip>
-            </Box>
-          </Box>
-
-          {/* Tabs centered */}
+      <ModalBody>
+        <Box display={"flex"} flexDirection={"column"} gap={2}>
           {isFeed && (
-            <Box display={'flex'} justifyContent={'center'}>
-            <Box >
-            <Tabs  value={value} onChange={handleChangeTab} aria-label="people_tab">
-              <Tab label="Connect" className="me-4" icon={<Add />} iconPosition="start"/>
-              <Tab label="Friends" onClick={handleShowFriends} icon={<PeopleRounded/>} iconPosition="start" />
-            </Tabs>
-          </Box>
-          </Box>
+            <Box
+              sx={{
+                px: { xs: 0.5, sm: 1 },
+                pt: 0.5,
+              }}
+            >
+              <Tabs
+                value={value}
+                onChange={handleChangeTab}
+                aria-label="people_tab"
+                variant="fullWidth"
+                sx={{
+                  minHeight: 52,
+                  "& .MuiTabs-flexContainer": {
+                    gap: { xs: 0.5, sm: 1 },
+                  },
+                  "& .MuiTab-root": {
+                    minHeight: 52,
+                    borderRadius: 999,
+                    textTransform: "none",
+                    fontWeight: 700,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    color: "text.secondary",
+                    bgcolor: isDarkMode
+                      ? "rgba(255,255,255,0.03)"
+                      : "rgba(15,76,129,0.03)",
+                  },
+                  "& .Mui-selected": {
+                    bgcolor: isDarkMode
+                      ? "rgba(255,255,255,0.08)"
+                      : "rgba(15,76,129,0.08)",
+                    color: "primary.main",
+                  },
+                  "& .MuiTabs-indicator": {
+                    display: "none",
+                  },
+                }}
+              >
+                <Tab label="Connect" icon={<Add />} iconPosition="start" />
+                <Tab
+                  label="Friends"
+                  onClick={handleShowFriends}
+                  icon={<PeopleRounded />}
+                  iconPosition="start"
+                />
+              </Tabs>
+            </Box>
           )}
 
-          <Box
-            maxHeight={'70vh'}
-            className="px-3 mt-1"
-            sx={{
-              overflow: "auto",
-              // Hide scrollbar for Chrome, Safari and Opera
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
-              // Hide scrollbar for IE, Edge and Firefox
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
-            }}
-          >
-            <Box 
-            display={"flex"} 
-            flexDirection={"column"} 
-            justifyContent={'center'}
+          <SectionCard>
+            <Box
+              display="flex"
+              alignItems={{ xs: "flex-start", sm: "center" }}
+              justifyContent="space-between"
+              gap={1.5}
+              flexDirection={{ xs: "column", sm: "row" }}
+              mb={2}
             >
+              <Box>
+                <SectionTitle>{tabLabel}</SectionTitle>
+                <Typography variant="body2" color="text.secondary">
+                  {value === 1
+                    ? "Stay on top of your existing relationships and revisit people you already follow or know."
+                    : "Browse curated suggestions, review profiles, and connect with relevant people from the platform."}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  px: 1.4,
+                  py: 0.7,
+                  borderRadius: 999,
+                  border: "1px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.default",
+                  minWidth: { xs: "100%", sm: "auto" },
+                }}
+              >
+                <Typography variant="caption" color="text.secondary">
+                  {value === 1
+                    ? "Network overview"
+                    : `${suggestionsCount} suggestion${suggestionsCount === 1 ? "" : "s"}`}
+                </Typography>
+              </Box>
+            </Box>
 
-            {/* display friends */}
             {value===1 ? (
               <UserNetwork/>
             ):(
-              <>
-              {/* map over the peoples */}
-              {PeopleConnect?.map((person) => (
-                  <FriendRequest key={person?._id} connect_request={person} />
-                ))}
-              
-              {/* show see more button if people is less than 2 */}
-              {isFeed && (
-                <Button 
-                startIcon={isFetching?<CircularProgress size={13}/> :undefined}
-                disabled={isFetching || !hasMorePosts} 
-                onClick={handleLoadMore}>
-                {!hasMorePosts ? "no more":"see more"}
-                </Button>
-              )}
-              </>
+              <Box display={"flex"} flexDirection={"column"} gap={1.5}>
+                {suggestionsCount > 0 ? (
+                  PeopleConnect?.map((person) => (
+                    <FriendRequest key={person?._id} connect_request={person} />
+                  ))
+                ) : (
+                  <Box
+                    sx={{
+                      border: "1px dashed",
+                      borderColor: "divider",
+                      borderRadius: `${theme.shape.borderRadius + 2}px`,
+                      p: 2.5,
+                      textAlign: "center",
+                      bgcolor: "background.default",
+                    }}
+                  >
+                    <GroupRounded color="primary" sx={{ mb: 1 }} />
+                    <Typography fontWeight={700} mb={0.5}>
+                      No people to show right now
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      New suggestions will appear here once more matching profiles are available.
+                    </Typography>
+                  </Box>
+                )}
+
+                {isFeed && suggestionsCount > 0 && (
+                  <Box display="flex" justifyContent="center" pt={1}>
+                    <Button
+                      variant="outlined"
+                      startIcon={isFetching ? <CircularProgress size={14}/> : undefined}
+                      disabled={isFetching || !hasMorePosts}
+                      onClick={handleLoadMore}
+                    >
+                      {!hasMorePosts ? "No more suggestions" : "Load more people"}
+                    </Button>
+                  </Box>
+                )}
+              </Box>
             )}
-              
-            </Box>
-          </Box>
+          </SectionCard>
         </Box>
-      </Box>
-    </StyledModalPeople>
+      </ModalBody>
+    </ModalShell>
   );
 };
 

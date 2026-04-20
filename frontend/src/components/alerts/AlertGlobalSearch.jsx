@@ -29,6 +29,7 @@ import {
 } from "../../redux/CurrentModal";
 import { updateCurrentPostsFromSearch } from "../../redux/CurrentPosts";
 import AlertGroupCommunity from "./AlertGroupCommunity";
+import { useTheme } from "@emotion/react";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -175,6 +176,8 @@ export default function AlertGlobalSearch({
     setShowGroups(true)
   }
 
+  const theme=useTheme()
+
   return (
       <Dialog
         className="shadow"
@@ -183,8 +186,8 @@ export default function AlertGlobalSearch({
         keepMounted
         aria-describedby="alert-dialog-slide-alering"
         sx={{
-          backdropFilter:'blur(5px)',
-          display:showGroups ? 'none':'block'
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
         }}
       >
         <Box
@@ -192,10 +195,6 @@ export default function AlertGlobalSearch({
           pr={1}
           alignItems={"center"}
           justifyContent={'space-between'}
-          sx={{
-          background: !isDarkMode && 
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-        }}
         >
         <DialogTitle 
         variant="body1"

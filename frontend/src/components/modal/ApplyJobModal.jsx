@@ -22,6 +22,7 @@ import {
   styled,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
 import axios from "axios";
 import React, { useState } from "react";
@@ -58,6 +59,39 @@ const StyledInput = styled("input")({
   width: 1,
 });
 
+const HeaderBar = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: theme.spacing(2),
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  padding: theme.spacing(1.5),
+  flexWrap: "wrap",
+}));
+
+const SectionCard = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: 0,
+  padding: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+  boxShadow: theme.palette.mode === 'dark'
+    ? '0 2px 8px rgba(0,0,0,0.15)'
+    : '0 2px 8px rgba(0,0,0,0.08)',
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(1),
+  fontWeight: 700,
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  padding: theme.spacing(0.5, 1),
+  borderRadius: theme.shape.borderRadius,
+  display: 'inline-block',
+  fontSize: '0.9rem',
+}));
+
 
 const ApplyJobModal = ({
   openApplyJobModal,
@@ -87,6 +121,7 @@ const ApplyJobModal = ({
   // redux states
   const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
   const isDarkMode=currentMode==='dark'
+  const theme = useTheme();
   const dispatch = useDispatch();
 
  const handleCountryJob = (job) => {
@@ -327,30 +362,20 @@ const ApplyJobModal = ({
         sx={{
           border:  "1px solid gray",
           borderColor:'divider',
+          borderTopLeftRadius: theme.shape.borderRadius,
+          borderTopRightRadius: theme.shape.borderRadius,
+          overflow: 'hidden',
         }}
       >
         <Box
           bgcolor={"background.default"}
-          borderRadius={3}
           className="shadow-lg"
           sx={{ 
           border:  "1px solid gray",
           borderColor:'divider',
           }}
         >
-          {/* toolbar like box */}
-          <Box
-            display={"flex"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-            borderRadius={3}
-            pt={1}
-            pr={0.8}
-            sx={{
-            background: !isDarkMode && 
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-            }}
-          >
+          <HeaderBar>
             {/* logo */}
             <Box>
               <Avatar sx={{ width: 50, height: 50 }} src={AppLogo} alt="logo" />
@@ -413,7 +438,7 @@ const ApplyJobModal = ({
                 />
             </IconButton>
               </Tooltip>
-          </Box>
+          </HeaderBar>
 
 
           {/* display error of missing filed if any */}
@@ -471,150 +496,120 @@ const ApplyJobModal = ({
           >
 
             <Stack gap={2}>
-              {/* about org */}
-              <Stack >
-                <Typography
-                variant="caption"
-                  fontWeight={"bold"}
-                >
-                  {" "}
-                  About Us
-                </Typography>
-                {/* about text */}
-                <Typography variant="caption" >
-                  {organisation.about}
-                </Typography>
-              </Stack>
-
-              {/* divider */}
-              <Divider 
-              component={'div'}
-              className="p-1"/>
-
-              {/* skills */}
-              <Stack gap={1}>
-                <Typography
-                  variant="caption"
-                  fontWeight={"bold"}
-                >
-                  {" "}
-                  Skills
-                </Typography>
-                <Stack gap={2} 
-                direction={'row'} 
-                alignItems={'center'}
-                justifyContent={'space-between'}
-                >
-                {/* skills text */}
-                <Box>
-                {skills?.map((skill, index) => (
-                  <Box
-                    component={"li"}
-                    display={"flex"}
-                    gap={2}
-                    alignItems={"center"}
-                    key={index}
-                    mb={1}
-                  >
-                  {/* avatar */}
-                    <Avatar
-                      key={index}
-                      alt={skill}
-                      className="border"
-                      sx={{ width: 30, height: 30 }}
-                      src={getImageMatch(skill)}
-                    />
-                    {/* text */}
-                    <Typography variant="caption">{skill}</Typography>
-                  </Box>
-                ))}
-                </Box>
-
-                {/* progress */}
-                <Box 
-                display={'flex'} 
-                width={'100%'} 
-                justifyContent={'center'}>
-                {/* circle */}
-                <Box mr={!CustomDeviceIsSmall()? 10:undefined} className="circular-progress">
-                  <Box className="inner-circle"></Box>
-                  <Box className="progress-bar left"></Box>
-                  <Box className="progress-bar right"></Box>
-                  <Box className="progress-text">
-                  <Typography
-                  textAlign={'center'} 
-                  fontWeight={'bold'}>
-                    {handleSkillsPercentage()} %
+              <SectionCard>
+                <SectionTitle variant="h6">About Us</SectionTitle>
+                {/* about org */}
+                <Stack >
+                  {/* about text */}
+                  <Typography variant="caption" >
+                    {organisation.about}
                   </Typography>
-                  <Typography>Matched</Typography>
-                  </Box>
-                </Box>
-                </Box>
-
                 </Stack>
-              </Stack>
+              </SectionCard>
 
-               {/* divider */}
-              <Divider component={'div'} className="p-1"/>
+              <SectionCard>
+                <SectionTitle variant="h6">Skills</SectionTitle>
+                {/* skills */}
+                <Stack gap={1}>
+                  <Stack gap={2} 
+                  direction={'row'} 
+                  alignItems={'center'}
+                  justifyContent={'space-between'}
+                  >
+                  {/* skills text */}
+                  <Box>
+                  {skills?.map((skill, index) => (
+                    <Box
+                      component={"li"}
+                      display={"flex"}
+                      gap={2}
+                      alignItems={"center"}
+                      key={index}
+                      mb={1}
+                    >
+                    {/* avatar */}
+                      <Avatar
+                        key={index}
+                        alt={skill}
+                        className="border"
+                        sx={{ width: 30, height: 30 }}
+                        src={getImageMatch(skill)}
+                      />
+                      {/* text */}
+                      <Typography variant="caption">{skill}</Typography>
+                    </Box>
+                  ))}
+                  </Box>
 
-              {/* qualifications */}
-              <Stack gap={1}>
-                <Typography
-                  variant="caption"
-                  gutterBottom
-                  fontWeight={"bold"}
-                >
-                  {" "}
-                  Qualification
-                </Typography>
-                {/* Qualification data */}
-                {requirements?.qualification.map((data) => (
-                
+                  {/* progress */}
+                  <Box 
+                  display={'flex'} 
+                  width={'100%'} 
+                  justifyContent={'center'}>
+                  {/* circle */}
+                  <Box mr={!CustomDeviceIsSmall()? 10:undefined} className="circular-progress">
+                    <Box className="inner-circle"></Box>
+                    <Box className="progress-bar left"></Box>
+                    <Box className="progress-bar right"></Box>
+                    <Box className="progress-text">
+                    <Typography
+                    textAlign={'center'} 
+                    fontWeight={'bold'}>
+                      {handleSkillsPercentage()} %
+                    </Typography>
+                    <Typography>Matched</Typography>
+                    </Box>
+                  </Box>
+                  </Box>
+
+                  </Stack>
+                </Stack>
+              </SectionCard>
+
+              <SectionCard>
+                <SectionTitle variant="h6">Qualification</SectionTitle>
+                {/* qualifications */}
+                <Stack gap={1}>
+                  {/* Qualification data */}
+                  {requirements?.qualification.map((data) => (
+                  
+                    <Typography
+                      key={data}
+                      gutterBottom
+                      ml={2}
+                      component={'li'}
+                      variant="caption"
+                      >
+                      {data}
+                      </Typography>
+                  ))}
+                </Stack>
+              </SectionCard>
+
+              <SectionCard>
+                <SectionTitle variant="h6">Job Description</SectionTitle>
+                {/* Job Description */}
+                <Stack gap={1}>
+                  {/* Qualification data */}
+                  {requirements?.description.map((data) => (
                   <Typography
-                    key={data}
-                    gutterBottom
-                    ml={2}
-                    component={'li'}
-                    variant="caption"
-                    >
-                    {data}
-                    </Typography>
-                ))}
-              </Stack>
-
-               {/* divider */}
-              <Divider component={'div'} className="p-1"/>
-
-              {/* Job Description */}
-              <Stack gap={1}>
-                <Typography
-                  variant="caption"
-                  gutterBottom
-                  fontWeight={"bold"}
-                >
-                  {" "}
-                  Job Description
-                </Typography>
-                {/* Qualification data */}
-                {requirements?.description.map((data) => (
-                <Typography
-                    key={data}
-                    gutterBottom
-                    component={'li'}
-                    ml={2}
-                    variant="caption"
-                    >
-                    {data}
-                    </Typography>
-                ))}
-              </Stack>
+                      key={data}
+                      gutterBottom
+                      component={'li'}
+                      ml={2}
+                      variant="caption"
+                      >
+                      {data}
+                      </Typography>
+                  ))}
+                </Stack>
+              </SectionCard>
 
               {/* don't show action btns in preview mode */}
 
               {!isPreview && (
-                <React.Fragment>
-                  {/* divider */}
-              <Divider component={'div'} className="p-1"/>
+                <SectionCard>
+                  <SectionTitle variant="h6">Application</SectionTitle>
 
               {/* application section, show btn if user is eligible */}
               {!isEligible  ? (
@@ -812,7 +807,7 @@ const ApplyJobModal = ({
               </Stack>
               )}
               
-                </React.Fragment>
+                </SectionCard>
               )}
             </Stack>
           </Box>

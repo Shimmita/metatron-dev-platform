@@ -207,9 +207,10 @@ export default function AlertGroupCommunity({
         TransitionComponent={Transition}
         keepMounted
         aria-describedby="alert-dialog-slide-alert-groups"
-          sx={{
-            backdropFilter:'blur(5px)',
-          }}
+         sx={{
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+        }}
       >
         <DialogTitle
         display={"flex"}

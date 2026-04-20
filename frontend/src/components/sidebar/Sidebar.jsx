@@ -28,7 +28,6 @@ import { appColors, appGradients } from "../../utils/colors";
 import AlertGeneral from "../alerts/AlertGeneral";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
 import StepperStats from "./StepperStats";
 
@@ -61,8 +60,6 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const screenWidth = window.screen.availWidth;
-
 const BoxAvatarContent = styled(Box)({
   display: "flex",
   flexDirection: "column",
@@ -85,11 +82,11 @@ const Sidebar = () => {
     isLoadingPostLaunch: isLoadingRequest,
   } = useSelector((state) => state.appUI);
   const { user, isGuest, usersCount } = useSelector((state) => state.currentUser);
+  const { position } = useSelector((state) => state.currentBottomNav);
 
   const theme = useTheme();
   const navigate = useNavigate();
   const isDarkMode = currentMode === "dark";
-  const panelRadius = `${theme.shape.borderRadius}px`;
   const cardRadius = `${Math.max(theme.shape.borderRadius - 2, 8)}px`;
 
   useLayoutEffect(() => {
@@ -121,20 +118,6 @@ const Sidebar = () => {
       });
   }, [dataInsights.length]);
 
-  const correctWidthInPercentage = () => {
-    if (screenWidth > 1200 && screenWidth <= 1400) {
-      return "25%";
-    }
-    return undefined;
-  };
-
-  const equidistantSidebar = () => {
-    if (screenWidth > 1400) {
-      return "8%";
-    }
-    return undefined;
-  };
-
   const primaryNavItems = [
     {
       label: "Jobs",
@@ -158,48 +141,41 @@ const Sidebar = () => {
 
   return (
     <Box
-      height={"90vh"}
-      flex={CustomDeviceTablet() ? 1 : 2}
-      p={CustomDeviceTablet() ? 1 : 2}
-      marginLeft={equidistantSidebar()}
       sx={{
+        width: { md: 280, lg: 310, xl: 330 },
+        flexShrink: 0,
+        mt: { md: 2 },
         display: {
           xs: "none",
           sm: CustomDeviceTablet()
-            ? isSidebarRighbar && isTabSideBar
+            ? isSidebarRighbar && isTabSideBar && position === 0
               ? "block"
               : "none"
             : "none",
-          md: isSidebarRighbar ? "block" : "none",
-          marginRight: CustomDeviceTablet() ? "6rem" : undefined,
+          md: position === 0 ? "block" : "none",
         },
       }}
     >
       <Box
-        position={"fixed"}
-        width={correctWidthInPercentage()}
-        maxHeight={"80vh"}
         className="shadow"
         sx={{
-          overflow: "auto",
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
+          position: "sticky",
+          top: { md: 88 },
+          alignSelf: "flex-start",
+          width: "100%",
         }}
       >
         <Box
           bgcolor={"background.paper"}
-          borderRadius={panelRadius}
-          width={CustomLandscapeWidest() ? 300 : undefined}
           sx={{
             border: "1px solid",
             borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : appColors.border,
             boxShadow: isDarkMode
               ? "0 18px 45px rgba(0,0,0,0.18)"
               : "0 20px 40px rgba(15,76,129,0.08)",
-            overflow: "hidden",
+            overflow: "visible",
+            borderRadius: `${theme.shape.borderRadius + 6}px`,
+            width: "100%",
           }}
         >
           <BoxAvatarContent>
@@ -245,9 +221,8 @@ const Sidebar = () => {
 
                     <Box flex={1}>
                       <Typography
-                        variant={CustomDeviceTablet() ? "body2" : "body1"}
+                        variant={"body1"}
                         fontWeight={700}
-                        textTransform={"uppercase"}
                         color={"text.primary"}
                         sx={{ lineHeight: 1.2 }}
                       >
@@ -256,7 +231,7 @@ const Sidebar = () => {
 
                       <Typography
                         variant="caption"
-                        textTransform={"capitalize"}
+                        textTransform={"none"}
                         sx={{ display: "block", mt: 0.5 }}
                       >
                         {user?.specialisationTitle || "Login or Register"}
@@ -396,7 +371,7 @@ const Sidebar = () => {
                     Top tools in demand
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Technologies surfacing across jobs, learning, and events.
+                    Technologies showing up most often across hiring, learning, and community activity.
                   </Typography>
 
                   <Divider sx={{ my: 1.25 }} />

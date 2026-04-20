@@ -18,7 +18,6 @@ import {
   Card,
   CardActionArea,
   CardContent,
-  Checkbox,
   CircularProgress,
   Divider,
   Dialog,
@@ -168,6 +167,7 @@ const CardFeed = ({
     .join(" • ");
   const popupMeta = [post?.post_category?.main, locationLabel, getElapsedTime(post?.createdAt)]
     .filter(Boolean);
+  const engagementSummary = actionItems => actionItems.reduce((sum, item) => sum + (item.count || 0), 0);
 
   useEffect(() => {
     const postID = `${post.post_owner?.ownerId}`;
@@ -470,20 +470,24 @@ const CardFeed = ({
               <Typography variant="body2" color="text.secondary" sx={{ mt: 0.35 }}>
                 {ownerTitleDisplay}
               </Typography>
-
-              {locationLabel && (
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mt: 0.4 }}
-                >
-                  {locationLabel}
-                </Typography>
-              )}
             </Box>
           </Box>
 
           <Stack alignItems="flex-end" spacing={0.5}>
+            <Box
+              sx={{
+                px: 1.1,
+                py: 0.4,
+                borderRadius: 999,
+                border: "1px solid",
+                borderColor: "divider",
+                bgcolor: isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(15,76,129,0.05)",
+              }}
+            >
+              <Typography variant="caption" fontWeight={700} color="primary">
+                {post?.post_category?.main}
+              </Typography>
+            </Box>
             <Box display="flex" alignItems="center">
               <Typography pt={0.5} variant="caption" mr={postBelongsCurrentUser ? 0 : 0.5}>
                 {getElapsedTime(post?.createdAt)}
@@ -537,24 +541,42 @@ const CardFeed = ({
       <CardContent sx={{ pt: 0.5, pb: postImageSrc ? 2 : 2.5 }}>
         <Box mb={1.75}>
           <Box display="flex" alignItems="center" justifyContent="space-between" gap={1} flexWrap="wrap">
-            <Box
-              sx={{
-                px: 1.1,
-                py: 0.45,
-                borderRadius: 999,
-                bgcolor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(15,76,129,0.08)",
-              }}
-            >
-              <Typography variant="caption" fontWeight={700} color="primary">
-                {post?.post_category?.main}
-              </Typography>
+            <Box display="flex" gap={0.75} flexWrap="wrap">
+              {locationLabel && (
+                <Box
+                  sx={{
+                    px: 1,
+                    py: 0.35,
+                    borderRadius: 999,
+                    bgcolor: "background.default",
+                    border: "1px solid",
+                    borderColor: "divider",
+                  }}
+                >
+                  <Typography variant="caption" color="text.secondary">
+                    {locationLabel}
+                  </Typography>
+                </Box>
+              )}
+              {post?.favorite_count > 0 && (
+                <Box
+                  sx={{
+                    px: 1,
+                    py: 0.35,
+                    borderRadius: 999,
+                    bgcolor: isDarkMode ? "rgba(68,183,0,0.1)" : "rgba(68,183,0,0.08)",
+                    border: "1px solid rgba(68,183,0,0.18)",
+                  }}
+                >
+                  <Typography variant="caption" color="success.main" fontWeight={700}>
+                    {post?.favorite_count} saved
+                  </Typography>
+                </Box>
+              )}
             </Box>
-
-            {post?.favorite_count > 0 && (
-              <FormHelperText sx={{ m: 0, color: "success.main" }}>
-                {post?.favorite_count} saved this post
-              </FormHelperText>
-            )}
+            <Typography variant="caption" color="text.secondary">
+              {engagementSummary(actionItems)} total interactions
+            </Typography>
           </Box>
 
           <Box mt={1.25} display="flex" alignItems="flex-start" gap={1}>
@@ -597,23 +619,35 @@ const CardFeed = ({
         </Box>
 
         <CardActionArea onClick={handleFullDescription} disabled={!detailsLong} sx={{ borderRadius: imageRadius }}>
-          <Box display="flex" justifyContent="center" width="100%" flexDirection="column">
-            <Box display="flex" justifyContent="center" width="100%">
-              <Typography
-                color={isDarkMode ? "text.secondary" : "text.primary"}
-                sx={{ fontSize: "0.95rem", lineHeight: 1.8 }}
-                variant="body2"
-                maxWidth={handleMaxTextWidth()}
-              >
-                {isFullDescription ? details : handleDetailsLength()}
-                {detailsLong && !isFullDescription && (
-                  <Box component="span" fontWeight={700} color="primary.main">
-                    {" "}
-                    more
-                  </Box>
-                )}
+          <Box
+            sx={{
+              borderRadius: imageRadius,
+              bgcolor: isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(15,76,129,0.03)",
+              border: "1px solid",
+              borderColor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(15,76,129,0.08)",
+              px: { xs: 1.25, sm: 1.5 },
+              py: 1.35,
+            }}
+          >
+            <Typography
+              color={isDarkMode ? "text.secondary" : "text.primary"}
+              sx={{ fontSize: "0.95rem", lineHeight: 1.8 }}
+              variant="body2"
+              maxWidth={handleMaxTextWidth()}
+            >
+              {isFullDescription ? details : handleDetailsLength()}
+              {detailsLong && !isFullDescription && (
+                <Box component="span" fontWeight={700} color="primary.main">
+                  {" "}
+                  Read more
+                </Box>
+              )}
+            </Typography>
+            {detailsLong && (
+              <Typography variant="caption" color="primary" fontWeight={700} sx={{ display: "block", mt: 1 }}>
+                {isFullDescription ? "Show less" : "Tap to expand"}
               </Typography>
-            </Box>
+            )}
           </Box>
         </CardActionArea>
       </CardContent>
@@ -653,27 +687,39 @@ const CardFeed = ({
       <Box
         display="flex"
         p={1.25}
-        justifyContent="space-around"
+        justifyContent="center"
         alignItems="center"
         sx={{
           bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "rgba(15,76,129,0.02)",
         }}
       >
-        {actionItems.map(({ key, icon, count, title, onClick, disabled }) => (
-          <Box key={key} display="flex" alignItems="center" sx={{ px: 0.5, py: 0.2, borderRadius: 999 }}>
-            <Tooltip title={title} arrow>
-              <Checkbox
-                onChange={onClick}
-                icon={icon}
-                checkedIcon={icon}
-                disabled={disabled}
-              />
+        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" justifyContent="center" width="100%">
+          {actionItems.map(({ key, icon, count, title, onClick, disabled }) => (
+            <Tooltip key={key} title={title} arrow>
+              <span>
+                <Button
+                  onClick={onClick}
+                  disabled={disabled}
+                  variant="text"
+                  startIcon={icon}
+                  sx={{
+                    minWidth: { xs: "calc(50% - 8px)", sm: 132 },
+                    px: 1.5,
+                    py: 0.85,
+                    justifyContent: "flex-start",
+                    borderRadius: 999,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    bgcolor: "background.paper",
+                    color: "text.secondary",
+                  }}
+                >
+                  {title} {count}
+                </Button>
+              </span>
             </Tooltip>
-            <Typography fontWeight="bold" variant="body2" color="text.secondary">
-              {count}
-            </Typography>
-          </Box>
-        ))}
+          ))}
+        </Stack>
       </Box>
 
       {isLastIndex && (
@@ -890,7 +936,7 @@ const CardFeed = ({
                   }}
                 >
                   <Typography variant="caption" fontWeight={700} sx={{ color: "#BFDBFE" }}>
-                    Image preview
+                    Post preview
                   </Typography>
                 </Box>
 

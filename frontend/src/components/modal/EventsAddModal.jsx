@@ -22,6 +22,7 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
 import axios from "axios";
 import React, { lazy, useState } from "react";
@@ -52,6 +53,39 @@ const MAX_ABOUT=160
 
 // max topic length
 const MAX_TOPIC_LENGTH=35
+
+const HeaderBar = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: theme.spacing(2),
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  padding: theme.spacing(1.5),
+  flexWrap: "wrap",
+}));
+
+const SectionCard = styled(Box)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: 0,
+  padding: theme.spacing(2),
+  marginBottom: theme.spacing(2),
+  boxShadow: theme.palette.mode === 'dark'
+    ? '0 2px 8px rgba(0,0,0,0.15)'
+    : '0 2px 8px rgba(0,0,0,0.08)',
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(1),
+  fontWeight: 700,
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  padding: theme.spacing(0.5, 1),
+  borderRadius: theme.shape.borderRadius,
+  display: 'inline-block',
+  fontSize: '0.9rem',
+}));
 
 const EventsAddModal = ({
   openModalEventAdd, 
@@ -140,6 +174,7 @@ const EventsAddModal = ({
   // redux states
   const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
       const isDarkMode=currentMode==='dark'
+  const theme = useTheme();
 
   // Handle input change for req
   const handleTextChangeReq = (e, value) => {
@@ -305,30 +340,20 @@ const EventsAddModal = ({
         sx={{
           border:  "1px solid gray",
           borderColor:'divider',
+          borderTopLeftRadius: theme.shape.borderRadius,
+          borderTopRightRadius: theme.shape.borderRadius,
+          overflow: 'hidden',
         }}
       >
         <Box
           bgcolor={"background.default"}
-          borderRadius={3}
           className="shadow-lg"
           sx={{ 
           border:  "1px solid gray",
           borderColor:'divider',
           }}
         >
-          {/* toolbar like box */}
-          <Box
-            display={"flex"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-            borderRadius={3}
-            pt={1}
-            pr={0.8}
-            sx={{
-              background: !isDarkMode && 
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-            }}
-          >
+          <HeaderBar>
             {/* logo */}
             <Box>
               <Avatar sx={{ width: 50, height: 50 }} src={AppLogo} alt="" />
@@ -360,7 +385,7 @@ const EventsAddModal = ({
                 }}/>
               </Tooltip>
             </IconButton>
-          </Box>
+          </HeaderBar>
 
 
           {/* display error of missing filed if any */}
@@ -409,328 +434,348 @@ const EventsAddModal = ({
             }}
           >
             <Box display={"flex"} flexDirection={"column"} gap={2} mt={3}>
-                {/*event title */}
-                <Box className="w-100 mb-2">
-                <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                  Provide the name or title of the event. Should be concise and self explanatory 
-                  without complexities.
-                </Typography>
+                <SectionCard>
+                  <SectionTitle variant="h6">Event Title</SectionTitle>
+                  {/*event title */}
+                  <Box className="w-100 mb-2">
+                  <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                    Provide the name or title of the event. Should be concise and self explanatory 
+                    without complexities.
+                  </Typography>
+
+                    <TextField
+                      required
+                      disabled={isUploading}
+                      value={title}
+                      label="event title"
+                      placeholder="Machine Learning"
+                      fullWidth
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
+                  </Box>
+                </SectionCard>
+                <SectionCard>
+                  <SectionTitle variant="h6">Event Specialization</SectionTitle>
+                  {/* event category */}
+                 <Box className="w-100 mb-2 ">
+                 <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                    Provide the category or area of specialization of the event. Makes it easier for searching algorithm to locate your event instantly.
+                  </Typography>
 
                   <TextField
                     required
+                    select
                     disabled={isUploading}
-                    value={title}
-                    label="event title"
-                    placeholder="Machine Learning"
+                    value={category}
+                    label="event specialization"
                     fullWidth
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
+                    onChange={(e) => setCategory(e.target.value)}
+                  >
+                    {SpecialisationTech?.filter((about) => about !== "None").map(
+                        (about) => (
+                          <MenuItem
+                            key={about}
+                            value={about}
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 2,
+                            }}
+                          >
+                            {/* icon */}
+                            <CourseIcon option={about} />
+                            {/* name */}
+                          <Typography variant="body2">{about}</Typography>
+                          </MenuItem>
+                        )
+                      )}
+                  </TextField>
                 </Box>
-                {/* event category */}
-               <Box className="w-100 mb-2 ">
-               <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                  Provide the category or area of specialization of the event. Makes it easier for searching algorithm to locate your event instantly.
-                </Typography>
 
-                <TextField
-                  required
-                  select
-                  disabled={isUploading}
-                  value={category}
-                  label="event specialization"
-                  fullWidth
-                  onChange={(e) => setCategory(e.target.value)}
-                >
-                  {SpecialisationTech?.filter((about) => about !== "None").map(
-                      (about) => (
-                        <MenuItem
-                          key={about}
-                          value={about}
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 2,
-                          }}
-                        >
-                          {/* icon */}
-                          <CourseIcon option={about} />
-                          {/* name */}
-                        <Typography variant="body2">{about}</Typography>
-                        </MenuItem>
-                      )
-                    )}
-                </TextField>
-              </Box>
+                 {/* other category */}
+                  {category.includes('Zero') && (
+                    <Box className="mb-2">
+                      <Typography mb={2} variant="body2" color={"text.secondary"}>
+                        You have selected option other, provide the other specialization or category 
+                        that your event is to be placed.
+                      </Typography>
+                    <TextField
+                      fullWidth
+                      disabled={isUploading}
+                      value={other}
+                      onChange={(e) => setOther(e.target.value)}
+                      id="other category"
+                      label={"Provide Other"}
+                      placeholder={'provide other'}
+                    />
+                  </Box>
+                  )}
+                </SectionCard>
 
-               {/* other category */}
-                {category.includes('Zero') && (
-                  <Box className="mb-2">
-                    <Typography mb={2} variant="body2" color={"text.secondary"}>
-                      You have selected option other, provide the other specialization or category 
-                      that your event is to be placed.
-                    </Typography>
-                  <TextField
-                    fullWidth
-                    disabled={isUploading}
-                    value={other}
-                    onChange={(e) => setOther(e.target.value)}
-                    id="other category"
-                    label={"Provide Other"}
-                    placeholder={'provide other'}
-                  />
-                </Box>
-                )}
+                <SectionCard>
+                  <SectionTitle variant="h6">Event Details</SectionTitle>
+                 {/*event hosting link */}
+                  <Box className="w-100 mb-3">
+                  <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                    Please share the event link from zoom, google meet, calendly etc. 
+                    currently we do not support video conferencing.
+                  </Typography>
+                    <TextField
+                      required
+                      disabled={isUploading}
+                      value={eventLink}
+                      label="event meeting link"
+                      placeholder="zoom, google meet, calendly..."
+                      fullWidth
+                      onChange={(e) => setEventLink(e.target.value)}
+                    />
+                  </Box>
 
-               {/*event hosting link */}
+
+                  {/* date */}
                 <Box className="w-100 mb-3">
                 <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                  Please share the event link from zoom, google meet, calendly etc. 
-                  currently we do not support video conferencing.
-                </Typography>
-                  <TextField
-                    required
-                    disabled={isUploading}
-                    value={eventLink}
-                    label="event meeting link"
-                    placeholder="zoom, google meet, calendly..."
-                    fullWidth
-                    onChange={(e) => setEventLink(e.target.value)}
-                  />
-                </Box>
-
-
-                {/* date */}
-              <Box className="w-100 mb-3">
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                Please select the date when your planned event is going to take place. Your timezone shall be shown to the 
-                potential users.
-                </Typography>
-                  <TextField
-                    required
-                    disabled={isUploading}
-                    value={eventDate}
-                    fullWidth
-                    type="datetime-local"
-                    onChange={(e) => setEventDate(e.target.value)}
-                  />
-                </Box>
-
-              <Box className="mb-3">
-                  <Stack gap={3}>
-                  <Box>
-                    <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                    Please select your country of residence from the drop-down list below. Your country makes it easier in
-                    tracking timezones.
-                    </Typography>
-                    <Autocomplete
-                      value={country}
-                      disabled={isUploading}
-                      onChange={(event, newValue) => {
-                        setCountry(newValue);
-                      }}
-                      inputValue={inputValue}
-                      onInputChange={(event, newInputValue) => {
-                        setInputValue(newInputValue);
-                      }}
-                      options={options}
-                      freeSolo
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="your country option"
-                          variant="outlined"
-                          required
-                          fullWidth
-                        />
-                      )}
-                      renderOption={(props, option) => (
-                        <Typography display={"flex"} gap={1} {...props}>
-                          {/* image */}
-                          <img
-                            loading="lazy"
-                            width="20"
-                            srcSet={`https://flagcdn.com/w40/${handleFlagCountry(
-                              option
-                            )}.png 2x`}
-                            src={`https://flagcdn.com/w20/${handleFlagCountry(
-                              option
-                            )}.png`}
-                            alt=""
-                          />
-                          {/* country name */}
-                          {option}
-                        </Typography>
-                      )}
-                      renderTags={() =>
-                        country ? (
-                          <Chip
-                            label={country}
-                            onDelete={handleDeleteCountry}
-                            deleteIcon={<CheckCircle />}
-                          />
-                        ) : null
-                      }
-                      noOptionsText={
-                        <Chip
-                          label={`Add "${inputValue}"`}
-                          onClick={handleAddNewCountry}
-                          icon={<CheckCircle />}
-                          color="primary"
-                          clickable
-                        />
-                      }
-                    />
-                    </Box>
-                    {/* state or county */}
-                    <Box>
-                    <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                    Provide your city or state to facilitate easier recommendation of close or nearby tech friends to 
-                    attend your event.
-                    </Typography>
-                     <TextField
-                      required
-                      id="state-country"
-                      value={county}
-                      label={"your city or state"}
-                      disabled={isUploading}
-                      fullWidth
-                      onChange={(e) => setCounty(e.target.value)}
-                    />
-                    </Box>
-                  </Stack>
-                
-              </Box>
-
-              {/* skills covered */}
-
-                <Box mb={2}>
-                    <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                    What skills or technical areas is your event purposed to explore. select the most 
-                    appropriate ones from the options below.
-                    </Typography>
-                    <Autocomplete
-                      multiple
-                      disabled={isUploading}
-                      options={AllSkills}
-                      value={skills}
-                      onChange={handleChangeMainSkills}
-                      disableCloseOnSelect
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          variant="outlined"
-                          label="skills explored max 5*"
-                          placeholder="skill"
-                        />
-                      )}
-                      renderTags={(value, getTagProps) =>
-                        value.map((skill, index) => (
-                          <Chip
-                            label={skill}
-                            {...getTagProps({ index })}
-                            onDelete={() => handleDeleteMainSkills(skill)}
-                          />
-                        ))
-                      }
-                    />
-                  </Box>
-
-
-              <Box className="mb-3">
-                  <React.Fragment>
-                  <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                    Provide atleast four topics which you intend to cover.This may help 
-                    the potential individuals in estimating worthiness of attending event. 
-                    </Typography>
-                    <Autocomplete
-                      freeSolo
-                      options={options_req} 
-                      value={reqText}
-                      onInputChange={handleTextChangeReq}
-                      disableClearable
-                      inputValue={reqText}
-                      disabled={isUploading}
-                      onChange={handleTextChangeReq}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          error={reqText.length>MAX_TOPIC_LENGTH}
-                          label={`topic explored ${MAX_TOPIC_LENGTH-reqText.length} *`}
-                          placeholder="introduction to machine learning"
-                          fullWidth
-                        />
-                      )}
-                    />
-
-                    <Box sx={{ marginTop: 1 }}>
-                      <Button
-                        disableElevation
-                        disabled={reqText.length>MAX_TOPIC_LENGTH}
-                        startIcon={<Add />}
-                        onClick={handleAddTopicRequirement}
-                        size="small"
-                        color="success"
-                        sx={{ textTransform: "none" }}
-                      >
-                        Add Topic
-                      </Button>
-                    </Box>
-                  </React.Fragment>
-              
-                {/* Display the added requirements */}
-                {topicsRequirement.length > 0 && (
-                  <Box mt={2} mb={2}>
-                    <Box component={"ol"} bgcolor={"#f1f1f1"}>
-                      {topicsRequirement.map((requirement, index) => (
-                        <Box
-                          display={"flex"}
-                          gap={1}
-                          key={index}
-                          alignItems={"center"}
-                        >
-                          <Typography
-                            component={"li"}
-                            variant="body2"
-                            color="text.secondary"
-                          >
-                            {requirement}
-                          </Typography>
-                          {/* clear or delete icon */}
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDeleteReq(requirement)}
-                          >
-                            <Close sx={{ width: 15, height: 15 }} />
-                          </IconButton>
-                        </Box>
-                      ))}
-                    </Box>
-                  </Box>
-                )}
-              </Box>
-
-
-              {/* about your event */}
-              <Box mb={3}>
-              <Typography gutterBottom variant="body2" color={"text.secondary"}>
-                  Write a brief description about your event highlighting the importance and the impact 
-                  your event is aimed to address.
+                  Please select the date when your planned event is going to take place. Your timezone shall be shown to the 
+                  potential users.
                   </Typography>
-                <TextField
-                  minRows={window.screen.availWidth <= 320 ? 3 : 5}
-                  multiline
-                  required
-                  disabled={isUploading}
-                  contentEditable={false}
-                  error={about.length > MAX_ABOUT}
-                  id="about-meeting-required"
-                  label={`tell us about your event ${MAX_ABOUT - about.length}`}
-                  fullWidth
-                  value={about}
-                  onChange={(e) => setAbout(e.target.value)}
-                  placeholder="we will explore the realm of machine learning..."
-                />
-              </Box>
+                    <TextField
+                      required
+                      disabled={isUploading}
+                      value={eventDate}
+                      fullWidth
+                      type="datetime-local"
+                      onChange={(e) => setEventDate(e.target.value)}
+                    />
+                  </Box>
+                </SectionCard>
+
+                <SectionCard>
+                  <SectionTitle variant="h6">Location</SectionTitle>
+                  <Box className="mb-3">
+                    <Stack gap={3}>
+                    <Box>
+                      <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                      Please select your country of residence from the drop-down list below. Your country makes it easier in
+                      tracking timezones.
+                      </Typography>
+                      <Autocomplete
+                        value={country}
+                        disabled={isUploading}
+                        onChange={(event, newValue) => {
+                          setCountry(newValue);
+                        }}
+                        inputValue={inputValue}
+                        onInputChange={(event, newInputValue) => {
+                          setInputValue(newInputValue);
+                        }}
+                        options={options}
+                        freeSolo
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="your country option"
+                            variant="outlined"
+                            required
+                            fullWidth
+                          />
+                        )}
+                        renderOption={(props, option) => (
+                          <Typography display={"flex"} gap={1} {...props}>
+                            {/* image */}
+                            <img
+                              loading="lazy"
+                              width="20"
+                              srcSet={`https://flagcdn.com/w40/${handleFlagCountry(
+                                option
+                              )}.png 2x`}
+                              src={`https://flagcdn.com/w20/${handleFlagCountry(
+                                option
+                              )}.png`}
+                              alt=""
+                            />
+                            {/* country name */}
+                            {option}
+                          </Typography>
+                        )}
+                        renderTags={() =>
+                          country ? (
+                            <Chip
+                              label={country}
+                              onDelete={handleDeleteCountry}
+                              deleteIcon={<CheckCircle />}
+                            />
+                          ) : null
+                        }
+                        noOptionsText={
+                          <Chip
+                            label={`Add "${inputValue}"`}
+                            onClick={handleAddNewCountry}
+                            icon={<CheckCircle />}
+                            color="primary"
+                            clickable
+                          />
+                        }
+                      />
+                      </Box>
+                      {/* state or county */}
+                      <Box>
+                      <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                      Provide your city or state to facilitate easier recommendation of close or nearby tech friends to 
+                      attend your event.
+                      </Typography>
+                       <TextField
+                        required
+                        id="state-country"
+                        value={county}
+                        label={"your city or state"}
+                        disabled={isUploading}
+                        fullWidth
+                        onChange={(e) => setCounty(e.target.value)}
+                      />
+                      </Box>
+                    </Stack>
+                  </Box>
+                </SectionCard>
+
+                <SectionCard>
+                  <SectionTitle variant="h6">Skills Covered</SectionTitle>
+                  {/* skills covered */}
+
+                  <Box mb={2}>
+                      <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                      What skills or technical areas is your event purposed to explore. select the most 
+                      appropriate ones from the options below.
+                      </Typography>
+                      <Autocomplete
+                        multiple
+                        disabled={isUploading}
+                        options={AllSkills}
+                        value={skills}
+                        onChange={handleChangeMainSkills}
+                        disableCloseOnSelect
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            variant="outlined"
+                            label="skills explored max 5*"
+                            placeholder="skill"
+                          />
+                        )}
+                        renderTags={(value, getTagProps) =>
+                          value.map((skill, index) => (
+                            <Chip
+                              label={skill}
+                              {...getTagProps({ index })}
+                              onDelete={() => handleDeleteMainSkills(skill)}
+                            />
+                          ))
+                        }
+                      />
+                    </Box>
+                </SectionCard>
+
+
+                <SectionCard>
+                  <SectionTitle variant="h6">Topics to Cover</SectionTitle>
+                  <Box className="mb-3">
+                    <React.Fragment>
+                    <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                      Provide atleast four topics which you intend to cover.This may help 
+                      the potential individuals in estimating worthiness of attending event. 
+                      </Typography>
+                      <Autocomplete
+                        freeSolo
+                        options={options_req} 
+                        value={reqText}
+                        onInputChange={handleTextChangeReq}
+                        disableClearable
+                        inputValue={reqText}
+                        disabled={isUploading}
+                        onChange={handleTextChangeReq}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            error={reqText.length>MAX_TOPIC_LENGTH}
+                            label={`topic explored ${MAX_TOPIC_LENGTH-reqText.length} *`}
+                            placeholder="introduction to machine learning"
+                            fullWidth
+                          />
+                        )}
+                      />
+
+                      <Box sx={{ marginTop: 1 }}>
+                        <Button
+                          disableElevation
+                          disabled={reqText.length>MAX_TOPIC_LENGTH}
+                          startIcon={<Add />}
+                          onClick={handleAddTopicRequirement}
+                          size="small"
+                          color="success"
+                          sx={{ textTransform: "none" }}
+                        >
+                          Add Topic
+                        </Button>
+                      </Box>
+                    </React.Fragment>
+                
+                  {/* Display the added requirements */}
+                  {topicsRequirement.length > 0 && (
+                    <Box mt={2} mb={2}>
+                      <Box component={"ol"} bgcolor={"#f1f1f1"}>
+                        {topicsRequirement.map((requirement, index) => (
+                          <Box
+                            display={"flex"}
+                            gap={1}
+                            key={index}
+                            alignItems={"center"}
+                          >
+                            <Typography
+                              component={"li"}
+                              variant="body2"
+                              color="text.secondary"
+                            >
+                              {requirement}
+                            </Typography>
+                            {/* clear or delete icon */}
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeleteReq(requirement)}
+                            >
+                              <Close sx={{ width: 15, height: 15 }} />
+                            </IconButton>
+                          </Box>
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
+                </SectionCard>
+
+
+                <SectionCard>
+                  <SectionTitle variant="h6">Event Description</SectionTitle>
+                  {/* about your event */}
+                  <Box mb={3}>
+                  <Typography gutterBottom variant="body2" color={"text.secondary"}>
+                      Write a brief description about your event highlighting the importance and the impact 
+                      your event is aimed to address.
+                      </Typography>
+                    <TextField
+                      minRows={window.screen.availWidth <= 320 ? 3 : 5}
+                      multiline
+                      required
+                      disabled={isUploading}
+                      contentEditable={false}
+                      error={about.length > MAX_ABOUT}
+                      id="about-meeting-required"
+                      label={`tell us about your event ${MAX_ABOUT - about.length}`}
+                      fullWidth
+                      value={about}
+                      onChange={(e) => setAbout(e.target.value)}
+                      placeholder="we will explore the realm of machine learning..."
+                    />
+                  </Box>
+                </SectionCard>
 
               {/*  button for posting */}
               <Box mb={2} display={"flex"} justifyContent={"center"}>

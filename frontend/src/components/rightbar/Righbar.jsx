@@ -14,8 +14,6 @@ import { handleSidebarRightbar } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import { appColors, appGradients } from "../../utils/colors";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CoursesContainer from "./CoursesContainer";
 import FeaturedEventsContainer from "./FeaturedEventsContainer";
 import JobsContainer from "./JobsContainer";
@@ -29,9 +27,9 @@ const RightbarAll = () => {
 
   const { currentMode, isSidebarRighbar } = useSelector((state) => state.appUI);
   const { isGuest } = useSelector((state) => state.currentUser);
+  const { position } = useSelector((state) => state.currentBottomNav);
 
   const isDarkMode = currentMode === "dark";
-  const panelRadius = `${theme.shape.borderRadius}px`;
   const cardRadius = `${Math.max(theme.shape.borderRadius - 2, 8)}px`;
 
   const handleNavigate = (route, bottomIndex) => {
@@ -90,29 +88,24 @@ const RightbarAll = () => {
 
   return (
     <Box
-      height={"95vh"}
-      flex={2}
-      marginRight={CustomLandscapeWidest() ? "5%" : "0"}
-      p={2}
       sx={{
+        width: { md: 300, lg: 330, xl: 350 },
+        flexShrink: 0,
+        mt: { md: 2 },
         display: {
           xs: "none",
           sm: "none",
-          md: isSidebarRighbar ? "block" : "none",
+          md: position === 0 ? "block" : "none",
         },
       }}
     >
       <Box
-        position={"fixed"}
-        maxHeight={"80vh"}
         className="shadow"
         sx={{
-          overflow: "auto",
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
+          position: "sticky",
+          top: { md: 88 },
+          alignSelf: "flex-start",
+          width: "100%",
         }}
       >
         <Box
@@ -120,11 +113,12 @@ const RightbarAll = () => {
           sx={{
             border: "1px solid",
             borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : appColors.border,
-            borderRadius: panelRadius,
             boxShadow: isDarkMode
               ? "0 18px 45px rgba(0,0,0,0.18)"
               : "0 20px 40px rgba(15,76,129,0.08)",
-            overflow: "hidden",
+            overflow: "visible",
+            borderRadius: `${theme.shape.borderRadius + 6}px`,
+            width: "100%",
           }}
         >
           <Box
@@ -146,7 +140,7 @@ const RightbarAll = () => {
               Discover the next move in your tech journey
             </Typography>
             <Typography variant="body2" color="text.secondary" mt={0.75}>
-              Curated opportunities across hiring, learning, and events, organized for quick decision-making.
+              Curated opportunities across hiring, learning, events, and networking, organized for faster, clearer decisions.
             </Typography>
           </Box>
 
@@ -214,7 +208,7 @@ const RightbarAll = () => {
               {currentSection.content}
             </Box>
 
-            {(CustomDeviceIsSmall() || CustomDeviceTablet()) && currentSection.key === "jobs" && (
+            {CustomDeviceIsSmall() && currentSection.key === "jobs" && (
               <Box display={"flex"} justifyContent={"center"} width={"auto"} mt={1}>
                 <Button
                   startIcon={<InsightsRounded />}

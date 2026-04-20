@@ -34,6 +34,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../images/logo_sm.png";
 import { resetAllSigningStateDetails } from "../../redux/CompleteSigning";
 import BrowserCompress from "../utilities/BrowserCompress";
+import { useTheme } from "@emotion/react";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -195,13 +196,19 @@ export default function AlertProfileCompletion({
     }
   };
 
+  const theme=useTheme()
+
   return (
       <Dialog
         open={openAlertProfile}
         TransitionComponent={Transition}
         keepMounted
         aria-describedby="alert-dialog-slide-description"
-        sx={{backdropFilter:'blur(5px)'}}
+        sx={{
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        backdropFilter: 'blur(3px)'
+      }}
       >
         {isPosting ? (
           <React.Fragment>

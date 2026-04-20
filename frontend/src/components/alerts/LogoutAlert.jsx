@@ -1,4 +1,5 @@
 import { Avatar } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -41,16 +42,16 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function LogoutAlert() {
-  const[isLoading,setIsLoading]=useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   //   redux states
-  const { isLogoutAlert,currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode=currentMode==='dark'
-  const navigate=useNavigate()
+  const { isLogoutAlert, currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode = currentMode === 'dark'
+  const navigate = useNavigate()
 
   const dispatch = useDispatch();
 
   // handles alert close
-  const handleClose = async() => {
+  const handleClose = async () => {
 
     // set is loading false
     setIsLoading(false)
@@ -61,84 +62,84 @@ export default function LogoutAlert() {
 
 
   // handle clear redux data
-  const handleClearReduxData=()=>{
-// clear any persisted user data
-            dispatch(resetClearCurrentUserRedux())
-      
-            // temp user Id 
-            dispatch(resetClearTempUserIDRedux())
-      
-            // reset all pending signin details
-            dispatch(resetAllSigningStateDetails())
-      
-            // clear bottom nav details
-            dispatch(resetDefaultBottomNav())
-      
-            // reset chat bot
-            dispatch(resetClearChatBot())
-      
-            //reset connect requests
-            dispatch(resetClearCurrentConnectTop()) 
-      
-            // clear connect Notifications
-            dispatch(resetClearCurrentConnectNotif())
-      
-            // reset clear conversations
-            dispatch(resetClearConversations())
-      
-            // reset courses
-            dispatch(resetClearCurrentCourses())
-      
-            // reset clear events any
-            dispatch(resetClearCurrentEvents())
-      
-            // reset clear top events
-            dispatch(resetClearCurrentEventsTop())
-      
-            // reset clear global search
-            dispatch(resetClearCurrentGlobalSearch())
-      
-            // reset clear communities
-            dispatch(resetClearCurrentGroupCommunities())
-      
-            // reset clear
-            dispatch(resetClearCurrentJobFeedBack())
-      
-            // reset clear jobs
-            dispatch(resetClearCurrentJobFeedBack())
-      
-            // reset clear job search
-            dispatch(resetJobSearch())
-      
-            // clear jobs top
-            dispatch(resetClearCurrentJobsTop())
-      
-            // clear modal people details
-            dispatch(resetClearPeopleData())
-      
-            // clear network of people
-            dispatch(resetClearCurrentNetwork())
-      
-            // clear post reaction
-            dispatch(resetClearCurrentPostReactions())
-      
-            // clear post reports
-            dispatch(resetClearCurrentReport())
-      
-            // clear posts
-            dispatch(resetClearCurrentPosts())
-      
-            // clear posts top insights
-            dispatch(resetClearCurrentPostsTop())
-      
-            // clear profile view
-            dispatch(resetClearCurrentProfileView())
-      
-            // clear snack bars
-            dispatch(resetClearCurrentSnack())
-            
-            // clear success msg any
-            dispatch(resetClearCurrentSuccessRedux())
+  const handleClearReduxData = () => {
+    // clear any persisted user data
+    dispatch(resetClearCurrentUserRedux())
+
+    // temp user Id 
+    dispatch(resetClearTempUserIDRedux())
+
+    // reset all pending signin details
+    dispatch(resetAllSigningStateDetails())
+
+    // clear bottom nav details
+    dispatch(resetDefaultBottomNav())
+
+    // reset chat bot
+    dispatch(resetClearChatBot())
+
+    //reset connect requests
+    dispatch(resetClearCurrentConnectTop())
+
+    // clear connect Notifications
+    dispatch(resetClearCurrentConnectNotif())
+
+    // reset clear conversations
+    dispatch(resetClearConversations())
+
+    // reset courses
+    dispatch(resetClearCurrentCourses())
+
+    // reset clear events any
+    dispatch(resetClearCurrentEvents())
+
+    // reset clear top events
+    dispatch(resetClearCurrentEventsTop())
+
+    // reset clear global search
+    dispatch(resetClearCurrentGlobalSearch())
+
+    // reset clear communities
+    dispatch(resetClearCurrentGroupCommunities())
+
+    // reset clear
+    dispatch(resetClearCurrentJobFeedBack())
+
+    // reset clear jobs
+    dispatch(resetClearCurrentJobFeedBack())
+
+    // reset clear job search
+    dispatch(resetJobSearch())
+
+    // clear jobs top
+    dispatch(resetClearCurrentJobsTop())
+
+    // clear modal people details
+    dispatch(resetClearPeopleData())
+
+    // clear network of people
+    dispatch(resetClearCurrentNetwork())
+
+    // clear post reaction
+    dispatch(resetClearCurrentPostReactions())
+
+    // clear post reports
+    dispatch(resetClearCurrentReport())
+
+    // clear posts
+    dispatch(resetClearCurrentPosts())
+
+    // clear posts top insights
+    dispatch(resetClearCurrentPostsTop())
+
+    // clear profile view
+    dispatch(resetClearCurrentProfileView())
+
+    // clear snack bars
+    dispatch(resetClearCurrentSnack())
+
+    // clear success msg any
+    dispatch(resetClearCurrentSuccessRedux())
   }
 
   // navigate to login page and close alert
@@ -148,50 +149,53 @@ export default function LogoutAlert() {
 
     try {
       // send a post request to the backend to clear all cookie sessions if any
-      const result=await axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signout`);
-      if (result.status===200) {
+      const result = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signout`);
+      if (result.status === 200) {
         handleClearReduxData()
         handleClose()
         navigate("/")
       }
     } catch (error) {
       console.log(error)
-    } 
+    }
   };
 
+  const theme = useTheme()
 
   return (
-      <Dialog
-        open={isLogoutAlert}
-        TransitionComponent={Transition}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
+    <Dialog
+      open={isLogoutAlert}
+      TransitionComponent={Transition}
+      keepMounted
+      aria-describedby="alert-dialog-slide-description"
+      sx={{
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        backdropFilter: 'blur(3px)'
+      }}
+    >
+      <DialogTitle
+        variant="body1"
+        display={"flex"}
+        alignItems={"center"}
+        gap={2}
         sx={{
-          backdropFilter:'blur(5px)',
+          background: !isDarkMode &&
+            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
         }}
       >
-        <DialogTitle
-          variant="body1"
-          display={"flex"}
-          alignItems={"center"}
-          gap={2}
-          sx={{
-            background: !isDarkMode && 
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-          }}
-        >
-          <Avatar src={logoApp} alt="" />
-          Account Logout
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-            You will be logged out and required to login next time.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} disabled={isLoading}>Disagree</Button>
-          <Button onClick={handleNavigateLoginPage} disabled={isLoading}>Agree</Button>
-        </DialogActions>
-      </Dialog>
+        <Avatar src={logoApp} alt="" />
+        Account Logout
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText id="alert-dialog-slide-description">
+          You will be logged out and required to login next time.
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} disabled={isLoading}>Disagree</Button>
+        <Button onClick={handleNavigateLoginPage} disabled={isLoading}>Agree</Button>
+      </DialogActions>
+    </Dialog>
   );
 }
