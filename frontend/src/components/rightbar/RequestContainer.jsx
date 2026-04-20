@@ -107,7 +107,8 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
         className="rounded"
         sx={{
           bgcolor: "background.paper",
-          width: rightBarExpanded(),
+          width: "100%",
+          p: 0,
         }}
       >
         <Box>

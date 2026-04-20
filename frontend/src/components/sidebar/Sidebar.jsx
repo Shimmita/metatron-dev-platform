@@ -174,7 +174,7 @@ const Sidebar = () => {
               ? "0 18px 45px rgba(0,0,0,0.18)"
               : "0 20px 40px rgba(15,76,129,0.08)",
             overflow: "visible",
-            borderRadius: `${theme.shape.borderRadius + 6}px`,
+            borderRadius: `${theme.shape.borderRadius + 6}px ${theme.shape.borderRadius + 6}px 0 0`,
             width: "100%",
           }}
         >

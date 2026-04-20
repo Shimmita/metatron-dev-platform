@@ -99,7 +99,8 @@ export default function FeaturedEventsContainer() {
         className="rounded mt-2"
         sx={{
           bgcolor: "background.paper",
-          width: rightBarExpanded(),
+          width: "100%",
+          p: 0,
         }}
       >
         <Box>

@@ -44,7 +44,8 @@ export default function CoursesContainer() {
         className="rounded"
         sx={{
           bgcolor: "background.paper",
-          width: rightBarExpaned(),
+          width: "100%",
+          p: 0,
         }}
       >
         <Box>

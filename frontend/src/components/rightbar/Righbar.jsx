@@ -106,6 +106,7 @@ const RightbarAll = () => {
           top: { md: 88 },
           alignSelf: "flex-start",
           width: "100%",
+          
         }}
       >
         <Box
@@ -117,7 +118,7 @@ const RightbarAll = () => {
               ? "0 18px 45px rgba(0,0,0,0.18)"
               : "0 20px 40px rgba(15,76,129,0.08)",
             overflow: "visible",
-            borderRadius: `${theme.shape.borderRadius + 6}px`,
+            borderRadius: `${theme.shape.borderRadius + 6}px ${theme.shape.borderRadius + 6}px 0 0`,
             width: "100%",
           }}
         >
@@ -163,6 +164,7 @@ const RightbarAll = () => {
                           ? "rgba(15,76,129,0.14)"
                           : "rgba(15,76,129,0.05)",
                     color: activeSection === index ? "primary.contrastText" : "text.primary",
+                    flexShrink: 0,
                   }}
                 >
                   {section.label}
@@ -202,7 +204,8 @@ const RightbarAll = () => {
               mt={1.5}
               sx={{
                 borderRadius: cardRadius,
-                overflow: "hidden",
+                height: "100%",
+                p: 0.5,
               }}
             >
               {currentSection.content}

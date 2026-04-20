@@ -92,7 +92,8 @@ export default function JobsContainer() {
         className="rounded"
         sx={{
           bgcolor: "background.paper",
-          width: rightBarExpanded(),
+          width: "100%",
+          p: 0,
         }}
       >
         <Box>
