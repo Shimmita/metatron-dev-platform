@@ -1,15 +1,13 @@
-import { useTheme } from "@mui/material";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  Typography,
+  Fade,
+  Backdrop,
+} from "@mui/material";
 import React from "react";
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export default function AlertGeneral({
   openAlertGeneral,
@@ -20,64 +18,123 @@ export default function AlertGeneral({
   setErrorMessage,
   isError = false,
 }) {
-
   const handleClose = () => {
-
-    // if is error means the alert has setError message to clear
     if (isError) {
-
-      setErrorMessage("")
+      setErrorMessage("");
+      setOpenAlertGeneral(false);
     } else {
-
-      // close alert
       setOpenAlertGeneral(false);
     }
-
   };
-
-  const theme = useTheme();
-
-
-
 
   return (
     <Dialog
       open={openAlertGeneral}
       onClose={handleClose}
-      TransitionComponent={Transition}
-      keepMounted
-      aria-describedby="alert-dialog-slide-description"
-      sx={{
-        backdropFilter: 'blur(5px)',
+      closeAfterTransition
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          timeout: 300,
+          sx: {
+            backdropFilter: "blur(8px)",
+            background: "rgba(6,13,24,0.7)",
+          },
+        },
       }}
+      TransitionComponent={Fade}
     >
-      <DialogTitle
-        display={"flex"}
-        alignItems={"center"}
-        variant="body2"
-        fontWeight={"bold"}
-        gap={2}
+      <Box
         sx={{
-          backgroundColor: theme.palette.primary.main,
-          color: theme.palette.primary.contrastText,
+          width: { xs: "90vw", sm: 420 },
+          borderRadius: "16px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+          overflow: "hidden",
         }}
       >
-        {defaultIcon}
-        {`${title}`}
-      </DialogTitle>
-      <DialogContent
-        sx={{
-          maxWidth: 500
-        }}
-        dividers>
-        <DialogContentText variant="body2"
-          id="alert-dialog-slide-general">
-          {`${message}`}
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} sx={{ borderRadius: 4 }}>Ok</Button>
-      </DialogActions>
+        {/* HEADER */}
+        <Box
+          display="flex"
+          alignItems="center"
+          gap={1.5}
+          px={2}
+          py={1.5}
+          sx={{
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 34,
+              height: 34,
+              borderRadius: "10px",
+              background: isError
+                ? "rgba(255,100,100,0.15)"
+                : "rgba(20,210,190,0.15)",
+              color: isError ? "#EF4444" : "#14D2BE",
+            }}
+          >
+            {defaultIcon}
+          </Box>
+
+          <Typography
+            fontSize={14}
+            fontWeight={600}
+            sx={{ color: "#F0F4FA" }}
+          >
+            {title}
+          </Typography>
+        </Box>
+
+        {/* CONTENT */}
+        <DialogContent
+          sx={{
+            px: 2,
+            py: 2,
+          }}
+        >
+          <Typography
+            fontSize={13}
+            sx={{
+              color: "rgba(240,244,250,0.7)",
+              lineHeight: 1.6,
+            }}
+          >
+            {message}
+          </Typography>
+        </DialogContent>
+
+        {/* ACTION */}
+        <Box
+          display="flex"
+          justifyContent="flex-end"
+          px={2}
+          pb={2}
+        >
+          <Button
+            onClick={handleClose}
+            sx={{
+              borderRadius: "10px",
+              px: 2,
+              background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              color: "#fff",
+              fontSize: 12,
+
+              "&:hover": {
+                background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+              },
+            }}
+          >
+            Got it
+          </Button>
+        </Box>
+      </Box>
     </Dialog>
   );
 }

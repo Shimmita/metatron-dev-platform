@@ -1,263 +1,257 @@
-import { useTheme } from "@emotion/react";
-import { MenuBookRounded, SchoolRounded } from "@mui/icons-material";
-import { Avatar, Box, CircularProgress, List, ListItem, ListItemAvatar, Rating, Typography } from "@mui/material";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
+import {
+  Box,
+  Button,
+  Dialog,
+  Typography,
+  Fade,
+  Backdrop,
+  Avatar,
+  Rating,
+  CircularProgress,
+} from "@mui/material";
+import { SchoolRounded, MenuBookRounded } from "@mui/icons-material";
 import axios from "axios";
 import React, { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
-const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-});
-
-const labels = {
-    0.5: "Useless",
-    1: "Useless+",
-    1.5: "Poor",
-    2: "Poor+",
-    2.5: "Ok",
-    3: "Ok+",
-    3.5: "Good",
-    4: "Good+",
-    4.5: "Excellent",
-    5: "Excellent+",
-};
-
 
 export default function AlertSimilarCourses({
-    openSimilarCourses,
-    setOpenSimilarCourses,
-    isDarkMode = false,
-    courseId,
-    courseName,
-    setFocusedCourse
+  openSimilarCourses,
+  setOpenSimilarCourses,
+  courseId,
+  courseName,
+  setFocusedCourse,
 }) {
+  const [similarCourses, setSimilarCourses] = useState([]);
+  const [isFetching, setIsFetching] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
-    const [similarCourses, setSimilarCourses] = useState([])
-    const [isFetching, setIsFetching] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const { user, isGuest } = useSelector((state) => state.currentUser);
+  const { user, isGuest } = useSelector((state) => state.currentUser);
 
-    const handleClose = () => {
-        setOpenSimilarCourses(false);
+  const handleClose = () => setOpenSimilarCourses(false);
 
-    };
+  const handleFocusedCourse = (course) => {
+    setFocusedCourse(course);
+    handleClose();
+  };
 
-    // handle focused course
-    const handleFocusedCourse = (course) => {
-        setFocusedCourse(course)
-        handleClose()
-    }
+  useLayoutEffect(() => {
+    setIsFetching(true);
 
-    //  useEffect to fetch all similar courses under same category
-    useLayoutEffect(() => {
-        axios.get(
-            `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/similar/${user?._id}/${courseId}`,
-            {
-                withCredentials: true,
-            }
-        )
-            .then((res) => {
-                // update similar courses state
-                if (res?.data) {
-                    setSimilarCourses(res.data)
-                }
-            })
-            .catch(async (err) => {
-                console.log(err);
-                //  user login session expired show logout alert
-                if (err?.response?.data.login) {
-                    window.location.reload();
-                }
-                if (err?.code === "ERR_NETWORK") {
-                    setErrorMessage(
-                        "server unreachable!"
-                    );
-                    return;
-                }
-                setErrorMessage(err?.response.data);
-            })
-            .finally(() => {
-                setIsFetching(false);
-            });
+    axios
+      .get(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/similar/${user?._id}/${courseId}`,
+        { withCredentials: true }
+      )
+      .then((res) => {
+        if (res?.data) setSimilarCourses(res.data);
+      })
+      .catch((err) => {
+        if (err?.response?.data?.login) window.location.reload();
 
-    }, [user, courseId])
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("Server unreachable");
+        } else {
+          setErrorMessage(err?.response?.data);
+        }
+      })
+      .finally(() => setIsFetching(false));
+  }, [user, courseId]);
 
-
-    const theme = useTheme()
-
-    return (
-        <Dialog
-            open={openSimilarCourses}
-            TransitionComponent={Transition}
-            keepMounted
-            fullWidth
-            aria-describedby="alert-dialog-slide-description"
-            sx={{
-                backgroundColor: theme.palette.primary.main,
-                color: theme.palette.primary.contrastText,
-                backdropFilter: 'blur(3px)'
-            }}
+  return (
+    <Dialog
+      open={openSimilarCourses}
+      onClose={handleClose}
+      TransitionComponent={Fade}
+      fullWidth
+      maxWidth="sm"
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backdropFilter: "blur(8px)",
+            background: "rgba(6,13,24,0.7)",
+          },
+        },
+      }}
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+        },
+      }}
+    >
+      {/* HEADER */}
+      <Box
+        display="flex"
+        alignItems="center"
+        gap={1.5}
+        px={2}
+        py={1.5}
+        sx={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+      >
+        <Box
+          sx={{
+            width: 36,
+            height: 36,
+            borderRadius: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(20,210,190,0.15)",
+            color: "#14D2BE",
+          }}
         >
-            <DialogTitle
-                display={"flex"}
-                alignItems={"center"}
-                fontWeight={"bold"}
-                variant="body1"
-                gap={2}
-                sx={{
-                    background: !isDarkMode &&
-                        "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          <SchoolRounded />
+        </Box>
 
-                }}
+        <Typography fontSize={14} fontWeight={600} color="#F0F4FA">
+          Similar Courses
+        </Typography>
+      </Box>
+
+      {/* SUBTEXT */}
+      <Box px={2} py={1}>
+        <Typography
+          fontSize={12}
+          sx={{
+            color: errorMessage
+              ? "#F59E0B"
+              : "rgba(240,244,250,0.6)",
+          }}
+        >
+          {errorMessage || courseName}
+        </Typography>
+      </Box>
+
+      {/* CONTENT */}
+      <Box px={2} pb={2} maxHeight="65vh" overflow="auto">
+        {isFetching ? (
+          <Box display="flex" justifyContent="center" mt={3}>
+            <CircularProgress size={30} />
+          </Box>
+        ) : similarCourses.length ? (
+          similarCourses.map((course) => (
+            <Box
+              key={course._id}
+              mb={1.2}
+              sx={{
+                p: 1.5,
+                borderRadius: "12px",
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                transition: "all 0.25s ease",
+
+                "&:hover": {
+                  background: "rgba(20,210,190,0.06)",
+                  borderColor: "rgba(20,210,190,0.3)",
+                },
+              }}
             >
-                <SchoolRounded />
-                Similar Courses
-            </DialogTitle>
-            {/* display error info here */}
-            <Box p={0.5} display={'flex'}
-                justifyContent={'center'}>
-                <Typography
-                    className={errorMessage ? 'text-info' : ''}
-                    variant="caption"
-                    color={!errorMessage ? 'text.secondary' : undefined}
-                    fontWeight={'bold'}
-                >
-                    {errorMessage ? errorMessage : courseName}
-                </Typography>
+              <Box display="flex" gap={1.5}>
+                {/* AVATAR */}
+                <Avatar
+                  src={course?.course_instructor?.instructorAvatar}
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    border: "1px solid rgba(255,255,255,0.1)",
+                  }}
+                />
+
+                {/* DETAILS */}
+                <Box flex={1}>
+                  <Typography
+                    fontSize={13}
+                    fontWeight={600}
+                    color="#F0F4FA"
+                  >
+                    {course?.course_title}
+                  </Typography>
+
+                  <Typography
+                    fontSize={12}
+                    sx={{ color: "rgba(240,244,250,0.6)" }}
+                  >
+                    {course?.course_instructor?.instructorName}
+                  </Typography>
+
+                  {/* RATING */}
+                  <Box display="flex" alignItems="center" gap={1} mt={0.5}>
+                    <Rating
+                      size="small"
+                      value={course?.course_rate_count}
+                      readOnly
+                      precision={0.5}
+                    />
+                    <Typography
+                      fontSize={11}
+                      sx={{ color: "rgba(240,244,250,0.5)" }}
+                    >
+                      {course?.course_rate_count}
+                    </Typography>
+                  </Box>
+
+                  {/* BUTTON */}
+                  <Box mt={1}>
+                    <Button
+                      disabled={isGuest}
+                      onClick={() => handleFocusedCourse(course)}
+                      sx={{
+                        borderRadius: "8px",
+                        fontSize: 11,
+                        px: 1.5,
+                        background:
+                          "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                        color: "#fff",
+
+                        "&:hover": {
+                          background:
+                            "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+                        },
+                      }}
+                    >
+                      View Details
+                    </Button>
+                  </Box>
+                </Box>
+              </Box>
             </Box>
-
-            {/* dialog content */}
-            <DialogContent
-                dividers
-                sx={{
-                    overflow: "auto",
-                    maxHeight: '70vh',
-                    // Hide scrollbar for Chrome, Safari and Opera
-                    "&::-webkit-scrollbar": {
-                        display: "none",
-                    },
-                    // Hide scrollbar for IE, Edge and Firefox
-                    msOverflowStyle: "none",
-                    scrollbarWidth: "none",
-                }}
+          ))
+        ) : (
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mt={4}
+            gap={1}
+          >
+            <MenuBookRounded sx={{ color: "#14D2BE" }} />
+            <Typography
+              fontSize={13}
+              sx={{ color: "rgba(240,244,250,0.6)" }}
             >
+              No Similar Courses Found
+            </Typography>
+          </Box>
+        )}
+      </Box>
 
-                <List sx={{ width: '100%', }}>
-
-                    {/* loop through similar courses */}
-                    {similarCourses?.map((course) => (
-                        <Box mb={1} key={course._id}>
-                            <ListItem alignItems="flex-start">
-                                {/* avatar */}
-                                <ListItemAvatar>
-                                    <Avatar
-                                        src={course?.course_instructor?.instructorAvatar}
-                                        sx={{ width: 50, height: 50 }} />
-                                </ListItemAvatar>
-
-                                {/* course details more */}
-                                <Box ml={2}>
-                                    {/* course title */}
-                                    <Typography
-                                        variant="body1"
-                                        gutterBottom
-                                        textTransform={"capitalize"}
-                                    >
-
-                                        {course?.course_title}
-
-                                    </Typography>
-                                    {/* poster or course owner or Instructor */}
-                                    <Typography
-                                        gutterBottom variant="body2"
-                                        color="text.secondary">
-                                        {course?.course_instructor?.instructorName}
-                                    </Typography>
-
-                                    {/* rating section */}
-                                    <Box display={"flex"} gap={1} alignItems={"center"}>
-                                        {/* stars  */}
-                                        <Rating
-                                            name="feedback"
-                                            size="small"
-                                            value={course?.course_rate_count}
-                                            readOnly
-                                            precision={0.5}
-                                        />
-                                        {/* rating label */}
-                                        <Typography variant="body2" color="text.secondary">
-                                            {labels[Math.floor(course?.course_rate_count)]}
-                                        </Typography>
-                                    </Box>
-                                    {/* btn viewing the course */}
-                                    <Box mt={1}>
-                                        <Button
-                                            disabled={isGuest}
-                                            size="small"
-                                            onClick={() => handleFocusedCourse(course)}
-                                            variant="outlined"
-                                            sx={{ textTransform: "lowercase", }}
-                                        >
-                                            View Course Details
-                                        </Button>
-                                    </Box>
-                                </Box>
-                            </ListItem>
-
-
-                        </Box>
-                    ))}
-
-                </List>
-
-
-                {/* displayed when loading,fetching */}
-                {isFetching && (
-                    <Box
-                        display={'flex'}
-                        justifyContent={'center'}>
-                        <CircularProgress size={40} />
-                    </Box>
-                )}
-
-                {/* displayed when are no course and no fetching */}
-                {!isFetching && !similarCourses.length && (
-                    <React.Fragment>
-                        <Box
-                            display={'flex'}
-                            flexDirection={'column'}
-                            alignItems={'center'}
-                            gap={2}
-                            justifyContent={'center'}>
-
-                            {/* icon */}
-                            <MenuBookRounded
-                                sx={{ width: 30, height: 30 }}
-                            />
-
-                            {/* text */}
-                            <Typography variant="body2"
-                                color={'text.secondary'}>
-                                No Similar Courses
-                            </Typography>
-                        </Box>
-                    </React.Fragment>
-                )}
-
-            </DialogContent>
-            <DialogActions>
-                <Button
-                    disabled={isFetching}
-                    onClick={handleClose}
-                    sx={{ borderRadius: 4 }}>
-                    close
-                </Button>
-            </DialogActions>
-        </Dialog>
-    );
+      {/* ACTION */}
+      <Box px={2} pb={2} display="flex" justifyContent="flex-end">
+        <Button
+          onClick={handleClose}
+          sx={{
+            borderRadius: "10px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "rgba(255,255,255,0.7)",
+          }}
+        >
+          Close
+        </Button>
+      </Box>
+    </Dialog>
+  );
 }

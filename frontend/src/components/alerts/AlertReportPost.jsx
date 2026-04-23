@@ -1,48 +1,30 @@
-import { useTheme } from "@emotion/react";
 import {
-  Close,
-  DocumentScannerRounded,
-  PhishingRounded,
-  PlagiarismRounded,
-  PsychologyAltRounded,
-  WarningRounded
-} from "@mui/icons-material";
-import {
-  Alert,
   Box,
-  CircularProgress,
-  Collapse,
-  FormHelperText,
-  IconButton,
-  MenuItem,
-  Stack,
-  TextField,
+  Button,
+  Dialog,
   Typography,
-  useMediaQuery,
+  Fade,
+  Backdrop,
+  TextField,
+  MenuItem,
+  CircularProgress,
 } from "@mui/material";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
+import {
+  WarningRounded,
+  DocumentScannerRounded,
+  PlagiarismRounded,
+  PhishingRounded,
+} from "@mui/icons-material";
 import axios from "axios";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 const reporting_about_array = [
   "Irrelevant tech content",
   "Plagiarized tech content",
   "Phishing and fraudulent",
-].sort();
+];
 
 const descriptionMax = 200;
-
 
 export default function AlertReportPost({
   openAlertReport,
@@ -52,260 +34,207 @@ export default function AlertReportPost({
 }) {
   const [reportAbout, setReportAbout] = useState("");
   const [description, setDescription] = useState("");
+  const [supportLink, setSupportLink] = useState("");
   const [message, setMessage] = useState("");
-  const [supportLink, setSupportLink] = useState("")
   const [isFetching, setIsFetching] = useState(false);
 
-  // smartphones and below
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   const handleClose = () => {
-    if (isFetching || message) {
-      return;
-    }
-    // close alert
-    setOpenAlertReport(false);
+    if (!isFetching) setOpenAlertReport(false);
   };
 
-  //   handle when user dismissed the dialog
-  const handleDismiss = () => {
-    if (isFetching || message) {
-      return;
-    }
-
-    handleClose();
-  };
-  // redux states
-  const { currentMode } = useSelector((state) => state.appUI);
-
-  const isDarkMode = currentMode === 'dark'
-
-  const reportObject = {
-    postId: post?._id,
-    postOwnerId: post?.post_owner?.ownerId,
-    post_title: post?.post_title,
-    reporterId: currentUser?._id,
-    reporter_name: currentUser?.name,
-    reporter_speciality: currentUser?.specialisationTitle,
-    reporter_avatar: currentUser?.avatar,
-    report_title: reportAbout,
-    report_message: description,
-    reporter_link: supportLink
-  };
-
-  //   handle submission of report
-  const handleSubmitReport = (event) => {
-    // prevent default form submission
-    event.preventDefault();
-
-    // set is fetching to true
+  const handleSubmitReport = async (e) => {
+    e.preventDefault();
     setIsFetching(true);
 
-    // performing delete request and passing id of the currently user and that of miniprofile user being
-    // viewed
-    axios
-      .post(
+    try {
+      const res = await axios.post(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/report/create`,
-        reportObject
-      )
-      .then((res) => {
-        // update the message state
-        if (res?.data && res.data) {
-          // update the message
-          setMessage(res.data);
+        {
+          postId: post?._id,
+          report_title: reportAbout,
+          report_message: description,
+          reporter_link: supportLink,
+        }
+      );
 
-          // clear the report about
-          setReportAbout("");
-          // clear the description
-          setDescription("");
-        }
-      })
-      .catch(async (err) => {
-        if (err?.code === "ERR_NETWORK") {
-          setMessage("server is unreachable check your internet");
-          return;
-        }
-        // error message
+      setMessage(res.data);
+      setReportAbout("");
+      setDescription("");
+    } catch (err) {
+      if (err?.code === "ERR_NETWORK") {
+        setMessage("Server unreachable");
+      } else {
         setMessage(err?.response?.data);
-      })
-      .finally(() => {
-        // set is fetching to false
-        setIsFetching(false);
-      });
+      }
+    } finally {
+      setIsFetching(false);
+    }
   };
-
-  // handle clearing of the message
-  const handleClearMessage = () => {
-    setMessage("");
-  };
-
 
   return (
     <Dialog
       open={openAlertReport}
-      TransitionComponent={Transition}
-      keepMounted
-      aria-describedby="alert-dialog-slide-description"
-      sx={{
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.contrastText,
-        backdropFilter: 'blur(3px)'
+      onClose={handleClose}
+      TransitionComponent={Fade}
+      fullWidth
+      maxWidth="sm"
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backdropFilter: "blur(8px)",
+            background: "rgba(6,13,24,0.7)",
+          },
+        },
+      }}
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+        },
       }}
     >
-      <Stack mb={1}>
-        <DialogTitle
-          variant="body2"
-          fontWeight={"bold"}
-          display={"flex"}
-          gap={1}
-          alignItems={"center"}
+      {/* HEADER */}
+      <Box
+        display="flex"
+        alignItems="center"
+        gap={1.5}
+        px={2}
+        py={1.5}
+        sx={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+      >
+        <Box
           sx={{
-            background: !isDarkMode &&
-              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+            width: 36,
+            height: 36,
+            borderRadius: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(239,68,68,0.15)",
+            color: "#EF4444",
           }}
         >
           <WarningRounded />
-          Post Reporting Center
-        </DialogTitle>
-
-        {/* post title */}
-        <Box display={"flex"} mb={1} justifyContent={"center"} >
-          <Typography variant="body2" fontWeight={'bold'}>{post?.post_title}</Typography>
         </Box>
 
-        {/* helper text about report count */}
-        <Box display={message ? 'none' : 'flex'} justifyContent={'center'} >
-          <FormHelperText > post has {post?.report_count} {post?.report_count === 1 ? "report" : "reports"} so far</FormHelperText>
+        <Box>
+          <Typography fontSize={14} fontWeight={600} color="#F0F4FA">
+            Report Content
+          </Typography>
+          <Typography fontSize={11} sx={{ color: "rgba(240,244,250,0.5)" }}>
+            Help keep Metatron safe
+          </Typography>
         </Box>
+      </Box>
 
-      </Stack>
+      {/* POST TITLE */}
+      <Box px={2} py={1}>
+        <Typography
+          fontSize={13}
+          fontWeight={600}
+          sx={{ color: "#F0F4FA" }}
+        >
+          {post?.post_title}
+        </Typography>
+      </Box>
 
-      <form onSubmit={handleSubmitReport}>
-        <DialogContent
-          dividers
+      {/* MESSAGE */}
+      {message && (
+        <Box px={2}>
+          <Typography
+            fontSize={12}
+            sx={{ color: "#14D2BE", textAlign: "center" }}
+          >
+            {message}
+          </Typography>
+        </Box>
+      )}
+
+      {/* FORM */}
+      <Box px={2} py={2} component="form" onSubmit={handleSubmitReport}>
+        {/* SELECT */}
+        <TextField
+          select
+          fullWidth
+          label="Reason for reporting"
+          value={reportAbout}
+          onChange={(e) => setReportAbout(e.target.value)}
+          required
+          disabled={isFetching}
+          sx={{ mb: 2 }}
+        >
+          {reporting_about_array.map((item) => (
+            <MenuItem key={item} value={item}>
+              {item.includes("Phishing") ? (
+                <PhishingRounded sx={{ mr: 1 }} />
+              ) : item.includes("Plagiarized") ? (
+                <PlagiarismRounded sx={{ mr: 1 }} />
+              ) : (
+                <DocumentScannerRounded sx={{ mr: 1 }} />
+              )}
+              {item}
+            </MenuItem>
+          ))}
+        </TextField>
+
+        {/* LINK */}
+        <TextField
+          fullWidth
+          label="Supporting link (optional)"
+          value={supportLink}
+          onChange={(e) => setSupportLink(e.target.value)}
+          sx={{ mb: 2 }}
+          disabled={isFetching}
+        />
+
+        {/* DESCRIPTION */}
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          label={`Description (${descriptionMax - description.length})`}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+          disabled={isFetching}
+          sx={{ mb: 2 }}
+        />
+      </Box>
+
+      {/* ACTIONS */}
+      <Box display="flex" justifyContent="flex-end" gap={1.2} px={2} pb={2}>
+        <Button
+          onClick={handleClose}
+          disabled={isFetching}
           sx={{
-            maxWidth: 500,
-            maxHeight: isMobile ? '65vh' : "60vh",
-            overflow: "auto",
-            // Hide scrollbar for Chrome, Safari and Opera
-            "&::-webkit-scrollbar": {
-              display: "none",
-            },
-            // Hide scrollbar for IE, Edge and Firefox
-            msOverflowStyle: "none",
-            scrollbarWidth: "none",
+            borderRadius: "10px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "rgba(255,255,255,0.7)",
           }}
         >
+          Cancel
+        </Button>
 
-          {/* show message if present */}
-          {message && (
-            <Collapse in={message || false}>
-              <Alert
-                severity="info"
-                onClose={handleClose}
-                className="rounded mt-1"
-                action={
-                  <IconButton
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    onClick={handleClearMessage}
-                  >
-                    <Close fontSize="inherit" />
-                  </IconButton>
-                }
-              >
-                {message}
-              </Alert>
-            </Collapse>
+        <Button
+          type="submit"
+          disabled={isFetching || description.length > descriptionMax}
+          sx={{
+            borderRadius: "10px",
+            background: "linear-gradient(135deg,#EF4444,#FF6D3A)",
+            color: "#fff",
+          }}
+        >
+          {isFetching ? (
+            <CircularProgress size={16} />
+          ) : (
+            "Submit Report"
           )}
-
-          <Box mb={1} mt={message && 1}>
-            <DialogContentText variant="body2">
-              Metatron Developer Platform has provided default issues facing digital content
-              select the most appropriate option.
-            </DialogContentText>
-          </Box>
-          <Stack gap={2}>
-            {/* report option */}
-            <TextField
-              required
-              select
-              value={reportAbout}
-              margin="dense"
-              onChange={(e) => setReportAbout(e.target.value)}
-              id="custom_area-of-report"
-              label={"reporting on"}
-              fullWidth
-              disabled={isFetching || message}
-              variant="outlined"
-            >
-              {
-                reporting_about_array?.map((about) => (
-                  <MenuItem
-                    key={about}
-                    value={about}
-                    sx={{ display: "flex", alignItems: "center", gap: 2 }}
-                  >
-                    {about.includes("other") ? (
-                      <PsychologyAltRounded
-                        color="primary"
-                        sx={{ width: 26, height: 26 }}
-                      />
-                    ) : about.includes("Phishing") ? (
-                      <PhishingRounded color="info" />
-                    ) : about.includes("Plagiarized") ? (
-                      <PlagiarismRounded color="secondary" />
-                    ) : (
-                      <DocumentScannerRounded color="warning" />
-                    )}{" "}
-                    {about}
-                  </MenuItem>
-                ))}
-            </TextField>
-
-            {/* support link */}
-            <TextField
-              placeholder="https://www.supportive_link.com"
-              label={`supportive link`}
-              value={supportLink}
-              disabled={isFetching || message}
-              onChange={(e) => setSupportLink(e.target.value)}
-            />
-
-            {/*description why the reporting */}
-            <TextField
-              placeholder="write description here ..."
-              label={`description ${descriptionMax - description.length}`}
-              value={description}
-              multiline
-              required
-              disabled={isFetching || message}
-              rows={isMobile ? 6 : 5}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          {/* show circular progress when is loading */}
-          {isFetching && <CircularProgress size={20} className="me-2" />}
-
-          <Button onClick={handleDismiss} disabled={isFetching || message}>
-            Close
-          </Button>
-
-          <Button
-            type="submit"
-            disabled={
-              description?.length > descriptionMax || isFetching || message
-            }
-          >
-            Submit
-          </Button>
-
-        </DialogActions>
-      </form>
+        </Button>
+      </Box>
     </Dialog>
   );
 }

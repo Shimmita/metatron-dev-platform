@@ -1,12 +1,24 @@
-import { HomeOutlined, HomeRounded, SchoolOutlined, SchoolRounded, TvRounded, TvTwoTone, WorkOutlineOutlined, WorkRounded } from "@mui/icons-material";
+import {
+  HomeOutlined,
+  HomeRounded,
+  SchoolOutlined,
+  SchoolRounded,
+  TvRounded,
+  TvTwoTone,
+  WorkOutlineOutlined,
+  WorkRounded,
+} from "@mui/icons-material";
+
 import {
   BottomNavigation,
   BottomNavigationAction,
-  Paper,
-  Tooltip
+  Box,
+  Tooltip,
 } from "@mui/material";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
 import {
   handleShowingSpeedDial,
   handleSidebarRightbar,
@@ -15,164 +27,157 @@ import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 const BottomNav = () => {
-  // redux states
-  const { isSidebarRighbar,currentMode } = useSelector((state) => state.appUI);
-  // update is dark const
-  const isDarkMode=currentMode==='dark'
+  const { isSidebarRighbar, currentMode, isTabSideBar } = useSelector(
+    (state) => state.appUI
+  );
 
   const { position } = useSelector((state) => state.currentBottomNav);
 
+  const isDarkMode = currentMode === "dark";
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-    // accessing the redux state values
-    const { isTabSideBar } = useSelector((state) => state.appUI);
-
-  // return home or default card page
+  /* ─── Navigation Handlers ─── */
   const handleReturnHome = () => {
-    // update the sidebar to be shown always
-    // always default sidebar and right-bar showing for larger screens
-    if (!isSidebarRighbar) {
-      dispatch(handleSidebarRightbar());
-    }
-
-    // show speed dial if ain't visible
+    if (!isSidebarRighbar) dispatch(handleSidebarRightbar());
     dispatch(handleShowingSpeedDial(true));
-
-    // return home
     navigate("/");
   };
 
-  // return job page
   const handleJobContent = () => {
     navigate("/jobs");
-
-    // disable sidebar
-    if (isSidebarRighbar) {
-      dispatch(handleSidebarRightbar());
-    }
+    if (isSidebarRighbar) dispatch(handleSidebarRightbar());
   };
 
-  // handle events page
-  const handleNavigateEvents=()=>{
-    navigate("/events")
-    // disable sidebar
-    if (isSidebarRighbar) {
-      dispatch(handleSidebarRightbar());
-    }
-  }
+  const handleNavigateEvents = () => {
+    navigate("/events");
+    if (isSidebarRighbar) dispatch(handleSidebarRightbar());
+  };
 
-  // handle corses page
   const handleOpenCourses = () => {
-  
-     // disable sidebar
-     if (isSidebarRighbar) {
-      
-      dispatch(handleSidebarRightbar());
-    }
     navigate("/courses/available");
+    if (isSidebarRighbar) dispatch(handleSidebarRightbar());
   };
 
-
+  /* ─── Icon Styling ─── */
+  const iconStyle = (active) => ({
+    width: 26,
+    height: 26,
+    color: active ? "#14D2BE" : "rgba(255,255,255,0.55)",
+    transition: "all 0.25s ease",
+  });
 
   return (
-    <Paper sx={{ position: "fixed",
-     bottom: 0,
-      left: 0,
-       right: 0,
-         }}>
+    <Box
+      sx={{
+        position: "fixed",
+        bottom: 10,
+        left: 0,
+        right: 0,
+        display: "flex",
+        justifyContent: "center",
+        zIndex: 1200,
+      }}
+    >
       <BottomNavigation
-        showLabels={true}
-        sx={{
-          overflowX: "auto",
-          // Hide scrollbar for Chrome, Safari and Opera
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          // Hide scrollbar for IE, Edge and Firefox
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
-        }}
         value={position}
-        onChange={(event, newValue) => {
-          // update the redux state value
-          dispatch(updateCurrentBottomNav(newValue));
+        onChange={(e, newValue) =>
+          dispatch(updateCurrentBottomNav(newValue))
+        }
+        showLabels
+        sx={{
+          width: "95%",
+          maxWidth: 420,
+          borderRadius: "18px",
+          px: 1,
+          py: 0.5,
+
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255,255,255,0.08)",
+
+          boxShadow: "0 10px 40px rgba(0,0,0,0.6)",
+
+          "& .MuiBottomNavigationAction-root": {
+            color: "rgba(255,255,255,0.6)",
+            fontSize: 11,
+            transition: "all 0.25s ease",
+
+            "&.Mui-selected": {
+              color: "#14D2BE",
+              transform: "translateY(-2px)",
+            },
+          },
         }}
       >
-        <Tooltip title="Home" arrow  
-        style={{
-              marginLeft:CustomDeviceTablet() && isTabSideBar && "30%"
-            }}>
+        {/* HOME */}
+        <Tooltip
+          title="Home"
+          arrow
+          style={{
+            marginLeft:
+              CustomDeviceTablet() && isTabSideBar ? "30%" : undefined,
+          }}
+        >
           <BottomNavigationAction
             label="Home"
-            icon={
-           
-                isDarkMode ? (
-                  <HomeOutlined sx={{ width: 29, height: 29}} />
-                ):(
-                  <HomeRounded sx={{ width: 29, height: 29}} />
-                )
-                
-            }
             onClick={handleReturnHome}
+            icon={
+              position === 0 ? (
+                <HomeRounded sx={iconStyle(true)} />
+              ) : (
+                <HomeOutlined sx={iconStyle(false)} />
+              )
+            }
           />
         </Tooltip>
 
+        {/* JOBS */}
         <Tooltip title="Tech Jobs" arrow>
           <BottomNavigationAction
-            onClick={handleJobContent}
             label="Jobs"
-            icon={<>
-            {isDarkMode ? (
-               <WorkOutlineOutlined sx={{ width: 28, height: 28 }} />
-            ):(
-              <WorkRounded sx={{ width: 28, height: 28 }} />
-            )}
-           
-            </>}
+            onClick={handleJobContent}
+            icon={
+              position === 1 ? (
+                <WorkRounded sx={iconStyle(true)} />
+              ) : (
+                <WorkOutlineOutlined sx={iconStyle(false)} />
+              )
+            }
           />
         </Tooltip>
 
-
-           {/* tech events */}
-         <Tooltip 
-         title="Tech Events"
-          arrow
-          >
+        {/* EVENTS */}
+        <Tooltip title="Tech Events" arrow>
           <BottomNavigationAction
-            onClick={handleNavigateEvents}
             label="Events"
-            icon={<>
-            {isDarkMode ?(
-               <TvRounded sx={{ width: 26, height: 26 }} />
-            ):(
-              <TvTwoTone sx={{ width: 26, height: 26 }} />
-            )}
-           
-            </>}
+            onClick={handleNavigateEvents}
+            icon={
+              position === 2 ? (
+                <TvRounded sx={iconStyle(true)} />
+              ) : (
+                <TvTwoTone sx={iconStyle(false)} />
+              )
+            }
           />
         </Tooltip>
 
-        
-        {/* online courses */}
+        {/* COURSES */}
         <Tooltip title="Tech Courses" arrow>
           <BottomNavigationAction
-            onClick={handleOpenCourses}
             label="Courses"
-            icon={<>
-            {isDarkMode ? (
-              <SchoolOutlined sx={{ width: 30, height: 30 }} />
-            ):(
-              <SchoolRounded sx={{ width: 30, height: 30 }} />
-            )}
-            
-            </>}
+            onClick={handleOpenCourses}
+            icon={
+              position === 3 ? (
+                <SchoolRounded sx={iconStyle(true)} />
+              ) : (
+                <SchoolOutlined sx={iconStyle(false)} />
+              )
+            }
           />
         </Tooltip>
-
       </BottomNavigation>
-
-    </Paper>
+    </Box>
   );
 };
 

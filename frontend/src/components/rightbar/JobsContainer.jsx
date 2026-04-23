@@ -15,9 +15,9 @@ export default function JobsContainer() {
   const { user } = useSelector((state) => state.currentUser);
   const { jobsTop } = useSelector((state) => state.currentJobsTop);
   const [isFetching, setIsFetching] = useState(false);
-  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
+  const [openAlertGeneral, setOpenAlertGeneral] = useState(false)
   const [errorMessage, setErrorMessage] = useState("");
-  
+
   // dispatch
   const dispatch = useDispatch();
 
@@ -70,39 +70,40 @@ export default function JobsContainer() {
 
   return (
     <React.Fragment>
-      <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
-        <Box
-          display={"flex"}
-          alignItems={"center"}
-          justifyContent={"center"}
-          gap={2}
-          pt={2}
-        >
-          <Typography fontWeight={"bold"} color={"primary"}>
-            FEATURED JOBS
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={1}
+        py={1.5}
+      >
+        <Box display="flex" alignItems="center" gap={1}>
+          <WorkRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+          <Typography fontSize={13} fontWeight={600} color="#F0F4FA">
+            Featured Opportunities
           </Typography>
-          {isFetching ? (
-            <CircularProgress size={16}/>
-          ):(
-            <WorkRounded color="primary" sx={{ width: 20, height: 20 }} />
-          )}
         </Box>
+
+        {isFetching && <CircularProgress size={14} />}
       </Box>
       <List
         className="rounded"
         sx={{
-          bgcolor: "background.paper",
           width: "100%",
           p: 0,
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: "12px",
+          backdropFilter: "blur(10px)",
         }}
       >
         <Box>
-          {jobsTop?.slice(0,3).map((jobTop,index) => (
+          {jobsTop?.slice(0, 3).map((jobTop, index) => (
             <Box key={jobTop?._id}>
-              <FeaturedJobs 
-              isLastIndex={index===jobsTop?.length-1}
-              isLoading={isFetching} 
-              jobTop={jobTop} />
+              <FeaturedJobs
+                isLastIndex={index === jobsTop?.length - 1}
+                isLoading={isFetching}
+                jobTop={jobTop} />
             </Box>
           ))}
         </Box>
@@ -111,13 +112,13 @@ export default function JobsContainer() {
       {/* alert general of the error message */}
       {errorMessage && (
         <AlertGeneral
-        title={'something went wrong!'}
-        message={errorMessage}
-        isError={true}
-        openAlertGeneral={openAlertGeneral}
-        setOpenAlertGeneral={setOpenAlertGeneral}
-        setErrorMessage={setErrorMessage}
-        defaultIcon={<InfoRounded/>}
+          title={'something went wrong!'}
+          message={errorMessage}
+          isError={true}
+          openAlertGeneral={openAlertGeneral}
+          setOpenAlertGeneral={setOpenAlertGeneral}
+          setErrorMessage={setErrorMessage}
+          defaultIcon={<InfoRounded />}
         />
       )}
 

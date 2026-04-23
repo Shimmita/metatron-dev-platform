@@ -4,453 +4,435 @@ import {
   GitHub,
   Language,
   LinkedIn,
-  PeopleRounded
+  LocationOnRounded,
+  PeopleRounded,
 } from "@mui/icons-material";
 import {
-  Alert,
   Avatar,
   AvatarGroup,
   Badge,
   Box,
-  CircularProgress,
-  Collapse,
-  Divider,
   IconButton,
-  Stack,
+  Skeleton,
   styled,
   Tooltip,
-  Typography
+  Typography,
 } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
-import DialogContent from "@mui/material/DialogContent";
 import Slide from "@mui/material/Slide";
 import axios from "axios";
 import React, { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getImageMatch } from "../utilities/getImageMatch";
 import AlertInputMessage from "./AlertInputMessage";
-import { useTheme } from "@emotion/react";
+import { appColors } from "../../utils/colors";
 
+/* ─── Transition ────────────────────────────────────────────────────── */
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const StyledBadge = styled(Badge)(({ theme }) => ({
+/* ─── Online pulse badge ────────────────────────────────────────────── */
+const OnlineBadge = styled(Badge)(() => ({
   "& .MuiBadge-badge": {
-    backgroundColor: "#44b700",
-    color: "#44b700",
-    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+    backgroundColor: appColors.success,
+    color: appColors.success,
+    boxShadow: `0 0 0 2px #081220`,
     "&::after": {
       position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
+      top: 0, left: 0,
+      width: "100%", height: "100%",
       borderRadius: "50%",
-      animation: "ripple 1.2s infinite ease-in-out",
+      animation: "mpRipple 1.4s infinite ease-in-out",
       border: "1px solid currentColor",
       content: '""',
     },
   },
-  "@keyframes ripple": {
-    "0%": {
-      transform: "scale(.8)",
-      opacity: 1,
-    },
-    "100%": {
-      transform: "scale(2.4)",
-      opacity: 0,
-    },
+  "@keyframes mpRipple": {
+    "0%":   { transform: "scale(.8)", opacity: 1 },
+    "100%": { transform: "scale(2.6)", opacity: 0 },
   },
 }));
 
-export default function AlertMiniProfileView({
-  openAlert,
-  setOpenAlert,
-  userId,
-}) {
-  // redux states
-  const [miniProfileData, setMiniProfileData] = useState();
-  const [isFetching, setIsFetching] = useState(true);
-  const [message, setMessage] = useState("");
-  const [isOnline, setIsOnline] = useState(false);
-  const [openAlertMessage,setOpenAlertMessage]=useState(false)
+/* ─── Action button ─────────────────────────────────────────────────── */
+const ActionBtn = ({ icon, label, onClick, disabled }) => (
+  <Tooltip title={label} arrow>
+    <span>
+      <IconButton
+        onClick={onClick}
+        disabled={disabled}
+        sx={{
+          width: 36, height: 36,
+          borderRadius: "9px",
+          border: `1px solid ${disabled ? "rgba(255,255,255,0.05)" : appColors.border}`,
+          background: disabled ? "transparent" : "rgba(255,255,255,0.04)",
+          color: disabled ? "rgba(255,255,255,0.12)" : "rgba(240,244,250,0.55)",
+          transition: "all 0.2s",
+          "&:hover": disabled ? {} : {
+            color: appColors.primary,
+            borderColor: appColors.glow,
+            background: "rgba(20,210,190,0.1)",
+            transform: "translateY(-2px)",
+            boxShadow: `0 4px 12px ${appColors.glow}`,
+          },
+        }}
+      >
+        {icon}
+      </IconButton>
+    </span>
+  </Tooltip>
+);
 
-  // redux states
-  const { user } = useSelector((state) => state.currentUser);
+/* ─── Inline stat ───────────────────────────────────────────────────── */
+const InlineStat = ({ icon, value }) => (
+  <Box display="flex" alignItems="center" gap={0.6}>
+    <Box sx={{ color: appColors.primary, display: "flex", alignItems: "center" }}>{icon}</Box>
+    <Typography sx={{ fontSize: 12, color: appColors.textSecondary }}>{value}</Typography>
+  </Box>
+);
 
+/* ─── Skeleton ──────────────────────────────────────────────────────── */
+const ProfileSkeleton = () => (
+  <Box p={2.5}>
+    {/* header row */}
+    <Box display="flex" gap={2} alignItems="center" mb={2}>
+      <Skeleton variant="circular" width={62} height={62} sx={{ bgcolor: "rgba(255,255,255,0.07)", flexShrink: 0 }} />
+      <Box flex={1}>
+        <Skeleton variant="text" width="65%" height={20} sx={{ bgcolor: "rgba(255,255,255,0.07)" }} />
+        <Skeleton variant="text" width="45%" height={15} sx={{ bgcolor: "rgba(255,255,255,0.07)", mt: 0.5 }} />
+        <Skeleton variant="text" width="55%" height={14} sx={{ bgcolor: "rgba(255,255,255,0.07)", mt: 0.5 }} />
+      </Box>
+    </Box>
+    <Skeleton variant="rounded" width="100%" height={52} sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "10px", mb: 1.5 }} />
+    <Box display="flex" justifyContent="center" gap={1.5}>
+      {[1,2,3,4].map(i => (
+        <Skeleton key={i} variant="rounded" width={36} height={36} sx={{ bgcolor: "rgba(255,255,255,0.06)", borderRadius: "9px" }} />
+      ))}
+    </Box>
+  </Box>
+);
 
-  const {
-    _id: currentUserId,
-  } = user || {};
+/* ═══════════════════════════════════════════════════════════════════════
+   Main component
+═══════════════════════════════════════════════════════════════════════ */
+export default function AlertMiniProfileView({ openAlert, setOpenAlert, userId }) {
+  const [miniProfileData, setMiniProfileData] = useState(null);
+  const [isFetching, setIsFetching]           = useState(true);
+  const [error, setError]                     = useState("");
+  const [isOnline, setIsOnline]               = useState(false);
+  const [openAlertMessage, setOpenAlertMessage] = useState(false);
 
-  // checks for if current user is friends
-  const isFriends =miniProfileData?.network?.includes(currentUserId);
- 
+  const { user }      = useSelector((s) => s.currentUser);
+  const { _id: currentUserId } = user || {};
+
+  const isFriends = miniProfileData?.network?.includes(currentUserId);
+  const isSelf    = userId === currentUserId;
+  const isOrg     = miniProfileData?.account === "Organisation";
+  const hasGit    = miniProfileData?.gitHub?.length > 2;
+  const hasLi     = miniProfileData?.linkedin?.length > 2;
+  const hasWeb    = miniProfileData?.portfolio?.length > 2;
+
   useLayoutEffect(() => {
-
-    // track fetching backend true
-    setIsFetching(true)
-
-    // fetch details of the liked or reacted user based on their id and also the id of the current user
+    if (!userId || !currentUserId) return;
+    setIsFetching(true);
+    setError("");
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/specific/${userId}/${currentUserId}`, {
-        withCredentials: true,
-      })
-      .then((main_res) => {
-          // setting user data
-          setMiniProfileData(main_res?.data?.user);
-          
-          // setting isOnline status
-          setIsOnline(main_res?.data?.isOnline)  
+      .get(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/specific/${userId}/${currentUserId}`,
+        { withCredentials: true }
+      )
+      .then((res) => {
+        setMiniProfileData(res?.data?.user);
+        setIsOnline(res?.data?.isOnline);
       })
       .catch((err) => {
-        // there is an error
-        if (err?.code === "ERR_NETWORK") {
-          // update the snackbar notification of the error of connection
-          setMessage("Network Error");
-        }
-      
+        setError(err?.code === "ERR_NETWORK" ? "Server unreachable" : "Failed to load profile");
       })
-      .finally(() => {
-        // set is fetching to false
-        setIsFetching(false);
+      .finally(() => setIsFetching(false));
+  }, [userId, currentUserId]);
 
-      });
+  const handleClose = () => { setOpenAlert(false); setError(""); };
 
-  }, [userId,currentUserId]);
-
-  // handle country length to only two names
-  const handleCountryName = (country) => {
-    const parent = country?.split(" ");
-    const parentName =
-      parent?.length < 4 ? parent[1] : `${parent[1]} ${parent[2]}`;
-
-    return parentName;
+  const getCountryName = (country) => {
+    const p = country?.split(" ");
+    return p?.length < 4 ? p?.[1] : `${p?.[1]} ${p?.[2]}`;
   };
 
- 
-  const handleClose = () => {
-    // close alert
-    setOpenAlert(false);
+  /* relation */
+  const relationLabel  = isSelf ? "You" : isFriends ? "Connected" : null;
+  const relationColor  = isSelf ? appColors.accent : appColors.primary;
+  const relationBg     = isSelf ? "rgba(200,169,110,0.12)" : "rgba(20,210,190,0.1)";
+  const relationBorder = isSelf ? "rgba(200,169,110,0.28)" : "rgba(20,210,190,0.28)";
 
-    // clear any messages info
-    setMessage("");
-  };
-
-  // handle clearing of the message
-  const handleClearMessage = () => {
-    setMessage("");
-  };
-
-  
-  // handle showing of input alert message
-  const handleShowMessageInput=()=>{
-    // open alert to true
-    setOpenAlertMessage(true)
-  }
-
-
-  // handle navigation to Git
-  const handleNavigateGit=()=>{
-    window.open(miniProfileData?.gitHub,"__blank__")
-  }
-
-  // handle navigate to website
-  const handleNavigateWebsite=()=>{
-    window.open(miniProfileData?.portfolio,'__blank__')
-  }
-
-  // handle navigate to Linkedin
-  const handleNavigateLinkedin=()=>{
-    window.open(miniProfileData?.linkedin,'__blank__')
-  }
-
-  const theme=useTheme()
-  
   return (
+    <>
       <Dialog
-        className="shadow"
         open={openAlert}
         TransitionComponent={Transition}
-        onClose={handleClose}
         keepMounted
-        aria-describedby="alert-dialog-slide-alering"
-        sx={{
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.contrastText,
-        backdropFilter: 'blur(5px)'
-      }}
+        PaperProps={{
+          sx: {
+            background: "rgba(8,18,32,0.92)",
+            backdropFilter: "blur(40px)",
+            border: `1px solid ${appColors.border}`,
+            borderRadius: "18px",
+            boxShadow: `0 28px 70px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.07)`,
+            width: "100%",
+            maxWidth: 400,
+            minWidth: { xs: "88vw", sm: 360 },
+            overflow: "hidden",
+            position: "relative",
+          },
+        }}
+        sx={{ "& .MuiBackdrop-root": { backdropFilter: "blur(6px)", background: "rgba(6,13,24,0.65)" } }}
       >
-        <DialogContent dividers 
-        >
-          {/* message from backend present display this */}
-          {message && (
-              <Collapse in={message || false}>
-                <Alert
-                  severity="info"
-                  onClose={handleClose}
-                  className="rounded"
-                  action={
-                    <IconButton
-                      aria-label="close"
-                      color="inherit"
-                      size="small"
-                      onClick={handleClearMessage}
-                    >
-                      <Close fontSize="inherit" />
-                    </IconButton>
-                  }
-                >
-                  {message}
-                </Alert>
-              </Collapse>
-          )}
+        {/* Top teal glow */}
+        <Box sx={{
+          position: "absolute", top: -50, left: "50%", transform: "translateX(-50%)",
+          width: 220, height: 130, borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(20,210,190,0.13), transparent 70%)",
+          pointerEvents: "none", zIndex: 0,
+        }} />
 
-          {/* show circular progress */}
-          {isFetching && (
-            <Box display={"flex"} justifyContent={"center"} p={1}>
-              <CircularProgress size={20} />
+        {/* Close */}
+        <IconButton
+          onClick={handleClose}
+          size="small"
+          sx={{
+            position: "absolute", top: 10, right: 10, zIndex: 20,
+            width: 26, height: 26, borderRadius: "7px",
+            border: `1px solid ${appColors.divider}`,
+            color: appColors.textMuted,
+            "&:hover": { color: appColors.textPrimary, borderColor: appColors.border },
+          }}
+        >
+          <Close sx={{ width: 12, height: 12 }} />
+        </IconButton>
+
+        {/* ── Content ── */}
+        <Box sx={{ position: "relative", zIndex: 1 }}>
+
+          {isFetching && <ProfileSkeleton />}
+
+          {/* Error */}
+          {!isFetching && error && (
+            <Box p={3} textAlign="center">
+              <Typography sx={{ fontSize: 13, color: appColors.warning }}>{error}</Typography>
+              <Typography sx={{ fontSize: 11, color: appColors.textMuted, mt: 0.5 }}>
+                Check your connection and try again.
+              </Typography>
             </Box>
           )}
-          {/* render miniprofile layout */}
-          <Box 
-          >
-            <Box display={"flex"} justifyContent={"center"}>
-              <Stack gap={1}>
-                {/* avatar */}
-                <Box display={"flex"} justifyContent={"center"}>
-                  {/* show this avatar only when user is online */}
-                  {isOnline ? (
-                    <StyledBadge
-                      overlap="circular"
-                      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                      variant="dot"
-                    >
-                      <Avatar src={miniProfileData?.avatar} 
-                      alt="" sx={{ width: 70, height: 70 }}/>
-                    </StyledBadge>
-                  ) : (
-                    <Avatar 
-                    src={miniProfileData?.avatar} alt="" 
-                    sx={{ width: 70, height: 70 }}/>
-                  )}
-                </Box>
-                {/* name of the user */}
-                <Box
-                  display={"flex"}
-                  justifyContent={"center"}
-                  flexDirection={"column"}
-                >
-                  <Typography
-                    variant="body2"
-                    textTransform={"uppercase"}
-                    textAlign={"center"}
-                    fontWeight={"bold"}
+
+          {/* No data */}
+          {!isFetching && !error && !miniProfileData && (
+            <Box p={3} textAlign="center">
+              <Typography sx={{ fontSize: 13, color: appColors.textSecondary }}>No profile found.</Typography>
+            </Box>
+          )}
+
+          {/* ── Profile ── */}
+          {!isFetching && miniProfileData && (
+            <Box>
+
+              {/* ━━ HEADER ROW ━━ */}
+              <Box
+                display="flex"
+                alignItems="center"
+                gap={2}
+                sx={{
+                  p: "18px 20px 16px",
+                  borderBottom: `1px solid ${appColors.divider}`,
+                }}
+              >
+                {/* Avatar */}
+                {isOnline ? (
+                  <OnlineBadge
+                    overlap="circular"
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    variant="dot"
                   >
-                    {miniProfileData?.name}
-                  </Typography>
-
-                  {/* friends status */}
-                  {isFriends && (
-                    <Box my={0.5} display={"flex"} justifyContent={"center"}>
-                      <Typography variant="caption" color={"text.secondary"}>
-                        ( You are friends )
-                      </Typography>
-                    </Box>
-                  )}
-
-                  {/* displayed if the current user is the one being checked */}
-                  {userId === currentUserId && (
-                    <Box display={"flex"} justifyContent={"center"} my={0.5}>
-                      <Typography
-                        variant="caption"
-                        textTransform={"capitalize"}
-                        fontWeight={"bold"}
-                        color={"text.secondary"}
-                      >
-                        ( You )
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-                {/* specialisation */}
-                <Box display={"flex"} justifyContent={"center"} mb={1}>
-                  <Typography variant="body2" color={"text.secondary"}>
-                    {miniProfileData?.specialisationTitle}
-                  </Typography>
-                </Box>
-                {/* country and location */}
-                <Box
-                  display={"flex"}
-                  justifyContent={"space-between"}
-                  gap={2}
-                  alignItems={"center"}
-                  
-                >
-                  {/* state or county */}
-                  <Typography variant="body1" color={"text.secondary"}>
-                    {miniProfileData?.county}
-                  </Typography>
-                
-                  {/* divider vert */}
-                  <Divider
-                    component={"div"}
-                    variant="middle"
-                    orientation="vertical"
-                    className="p-1"
+                    <Avatar
+                      src={miniProfileData?.avatar}
+                      alt={miniProfileData?.name}
+                      sx={{
+                        width: 62, height: 62, flexShrink: 0,
+                        border: `1.5px solid rgba(20,210,190,0.5)`,
+                        boxShadow: `0 0 0 3px rgba(20,210,190,0.12)`,
+                      }}
+                    />
+                  </OnlineBadge>
+                ) : (
+                  <Avatar
+                    src={miniProfileData?.avatar}
+                    alt={miniProfileData?.name}
+                    sx={{
+                      width: 62, height: 62, flexShrink: 0,
+                      border: `1.5px solid ${appColors.border}`,
+                    }}
                   />
-                 {/* country */}
-                  <Typography variant="body1" color={"text.secondary"}>
-                    {/* call this if only miniprofile data present */}
-                    {miniProfileData &&
-                      handleCountryName(miniProfileData?.country)}
-                  </Typography>
+                )}
 
-                  {/* divider vert */}
-                  <Divider
-                    component={"div"}
-                    variant="middle"
-                    orientation="vertical"
-                    className="p-1"
-                  />
-
-                  <Box display={"flex"} gap={1} alignItems={"center"}>
-                    {/* network connection count */}
+                {/* Identity */}
+                <Box flex={1} minWidth={0}>
+                  <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
                     <Typography
-                      variant="body1"
-                      color="text.secondary"
-                      sx={{ pt: "1px" }}
+                      noWrap
+                      sx={{
+                        fontFamily: "'Playfair Display', Georgia, serif",
+                        fontSize: 16, fontWeight: 700,
+                        color: appColors.textPrimary,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.04em",
+                      }}
                     >
-                      {miniProfileData?.network_count}
+                      {miniProfileData?.name}
                     </Typography>
 
-                    {/* diversity network icon */}
-                    <PeopleRounded sx={{ width: 23, height: 23 }} />
+                    {relationLabel && (
+                      <Box sx={{
+                        px: 1, py: "1px",
+                        borderRadius: "20px",
+                        background: relationBg,
+                        border: `1px solid ${relationBorder}`,
+                        flexShrink: 0,
+                      }}>
+                        <Typography sx={{ fontSize: 9, color: relationColor, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                          {relationLabel}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+
+                  <Typography sx={{ fontSize: 11.5, color: appColors.textSecondary, mt: 0.3 }}>
+                    {miniProfileData?.specialisationTitle || "—"}
+                  </Typography>
+
+                  {/* Inline stats row */}
+                  <Box display="flex" flexWrap="wrap" gap={1.5} mt={0.8}>
+                    <InlineStat
+                      icon={<LocationOnRounded sx={{ width: 11, height: 11 }} />}
+                      value={`${miniProfileData?.county || "—"}, ${getCountryName(miniProfileData?.country) || "—"}`}
+                    />
+                    <InlineStat
+                      icon={<PeopleRounded sx={{ width: 11, height: 11 }} />}
+                      value={`${miniProfileData?.network_count ?? 0} connections`}
+                    />
                   </Box>
                 </Box>
+              </Box>
 
-              {miniProfileData?.account!=="Organisation" && (
-                <React.Fragment>
-                   {/* divider */}
-                <Divider component={"div"} className="pb-1" />
-                {/* skills avatars */}
-                <Box display={"flex"} justifyContent={"center"} mt={1}>
-                  <AvatarGroup max={miniProfileData?.selectedSkills?.length}>
-                    {/* loop through the skills and their images matched using custom fn */}
+              {/* ━━ SKILLS (personal only) ━━ */}
+              {!isOrg && miniProfileData?.selectedSkills?.length > 0 && (
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={1.5}
+                  sx={{
+                    px: "20px", py: "11px",
+                    borderBottom: `1px solid ${appColors.divider}`,
+                  }}
+                >
+                  <Typography sx={{ fontSize: 10, color: appColors.textMuted, letterSpacing: "0.14em", textTransform: "uppercase", flexShrink: 0 }}>
+                    Skills
+                  </Typography>
+                  <AvatarGroup
+                    max={5}
+                    sx={{
+                      "& .MuiAvatar-root": {
+                        width: 28, height: 28,
+                        fontSize: 10,
+                        border: `1px solid ${appColors.border}`,
+                        background: "#0D1B2A",
+                      },
+                    }}
+                  >
                     {miniProfileData?.selectedSkills?.map((skill) => (
                       <Tooltip title={skill} key={skill} arrow>
-                        <Avatar
-                          alt={skill}
-                          className="border"
-                          src={getImageMatch(skill)}
-                        />
+                        <Avatar alt={skill} src={getImageMatch(skill)} />
                       </Tooltip>
                     ))}
                   </AvatarGroup>
                 </Box>
-                </React.Fragment>
               )}
 
-                {/* divider */}
-                <Divider className="p-1" component={"div"} />
-                {/* user about */}
-                <Box display={"flex"} justifyContent={"center"}>
-                  <Typography
-                    variant="body2"
-                    maxWidth={400}
-                    color="text.secondary"
-                    sx={{ textTransform:'lowercase' }}
-                  >
-                    {miniProfileData?.about || "** No About**"}
-                  </Typography>
-                </Box>
-
-                <Divider className="p-1" component={"div"} />
-                {/* caption joined date */}
-                <Box display={"flex"} justifyContent={"center"}>
-                  <Typography variant="caption" color={"text.secondary"}>
-                    Joined:{miniProfileData?.createdAt?.split("T")[0]}
-                  </Typography>
-                </Box>
-
-
-                {/* other profile related links */}
-              <Box 
-              display={'flex'} 
-              alignItems={'center'} 
-              justifyContent={'center'}
-              gap={2}
-              >
-              {/* message  */}
-              <Tooltip 
-                arrow
-                title='Message'>
-                <IconButton 
-                onClick={handleShowMessageInput}
-                disabled={userId === currentUserId}
+              {/* ━━ ABOUT ━━ */}
+              {miniProfileData?.about ? (
+                <Box
+                  sx={{
+                    px: "20px", py: "12px",
+                    borderBottom: `1px solid ${appColors.divider}`,
+                  }}
                 >
-                  <EmailRounded
-                  color={userId === currentUserId ? 'disabled':'primary'}
-                  sx={{ width:24,height:24 }}/>
-                </IconButton>
-                </Tooltip>
-
-                {/* github */}
-                <Tooltip 
-                arrow
-                title='GitHub'>
-                <IconButton
-                onClick={handleNavigateGit}
-                disabled={miniProfileData?.gitHub?.length<2}>
-                  <GitHub  
-                  color={miniProfileData?.gitHub?.length<2? 'disabled':'primary'}
-                  sx={{ width:23,height:23 }}/>
-                </IconButton>
-                </Tooltip>
-
-                {/* linkedin */}
-                  <Tooltip 
-                  arrow
-                  title='Linkedin'>
-                  <IconButton
-                  onClick={handleNavigateLinkedin}
-                  disabled={miniProfileData?.linkedin?.length<2}>
-                    <LinkedIn
-                    color={miniProfileData?.linkedin?.length<2? 'disabled':'primary'}
-                    sx={{ width:24,height:24 }}/>
-                  </IconButton>
-                  </Tooltip>
-
-                {/* website */}
-                  <Tooltip 
-                  arrow
-                  title='portfolio'>
-                  <IconButton 
-                  onClick={handleNavigateWebsite}
-                  disabled={miniProfileData?.portfolio?.length<2}>
-                    <Language color={miniProfileData?.portfolio?.length<2? 'disabled':'primary'} 
-                    sx={{ width:24,height:24 }}/>
-                  </IconButton>
-                  </Tooltip>
+                  <Typography
+                    sx={{
+                      fontSize: 12, color: appColors.textSecondary,
+                      lineHeight: 1.7,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {miniProfileData.about}
+                  </Typography>
                 </Box>
-              </Stack>
-            </Box>
-          </Box>
-        </DialogContent>
+              ) : null}
 
-        {/* show alert input message */}
-        {openAlertMessage && (
-          <AlertInputMessage 
+              {/* ━━ FOOTER: joined + actions ━━ */}
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                sx={{ px: "20px", py: "12px" }}
+              >
+                <Typography sx={{ fontSize: 10, color: appColors.textMuted, letterSpacing: "0.08em" }}>
+                  Joined {miniProfileData?.createdAt?.split("T")[0] ?? "—"}
+                </Typography>
+
+                <Box display="flex" gap={1}>
+                  <ActionBtn
+                    icon={<EmailRounded sx={{ width: 15, height: 15 }} />}
+                    label="Message"
+                    onClick={() => setOpenAlertMessage(true)}
+                    disabled={isSelf}
+                  />
+                  <ActionBtn
+                    icon={<GitHub sx={{ width: 15, height: 15 }} />}
+                    label="GitHub"
+                    onClick={() => window.open(miniProfileData?.gitHub, "__blank__")}
+                    disabled={!hasGit}
+                  />
+                  <ActionBtn
+                    icon={<LinkedIn sx={{ width: 15, height: 15 }} />}
+                    label="LinkedIn"
+                    onClick={() => window.open(miniProfileData?.linkedin, "__blank__")}
+                    disabled={!hasLi}
+                  />
+                  <ActionBtn
+                    icon={<Language sx={{ width: 15, height: 15 }} />}
+                    label="Portfolio"
+                    onClick={() => window.open(miniProfileData?.portfolio, "__blank__")}
+                    disabled={!hasWeb}
+                  />
+                </Box>
+              </Box>
+
+            </Box>
+          )}
+        </Box>
+      </Dialog>
+
+      {openAlertMessage && (
+        <AlertInputMessage
           openAlert={openAlertMessage}
           setOpenAlert={setOpenAlertMessage}
           targetId={miniProfileData?._id}
           targetName={miniProfileData?.name}
           targetSpecialisation={miniProfileData?.specialisationTitle}
           targetAvatar={miniProfileData?.avatar}
-          
-          />
-        )}
-      </Dialog>
+        />
+      )}
+    </>
   );
 }

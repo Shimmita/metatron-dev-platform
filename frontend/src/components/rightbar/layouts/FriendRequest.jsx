@@ -209,8 +209,21 @@ function FriendRequest({
   return (
     <React.Fragment>
       {isLoadingRequest ? (
-        <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-          <ListItem>
+        <List sx={{ width: "100%", background: "transparent" }}>
+          <ListItem sx={{
+            borderRadius: "12px",
+            mb: 0.8,
+            px: 1.2,
+            py: 1,
+            background: "rgba(255,255,255,0.02)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            transition: "all 0.25s ease",
+
+            "&:hover": {
+              background: "rgba(20,210,190,0.06)",
+              borderColor: "rgba(20,210,190,0.3)",
+            },
+          }}>
             <ListItemAvatar>
               <Skeleton animation="wave" variant="circular" />
             </ListItemAvatar>
@@ -234,26 +247,38 @@ function FriendRequest({
         </List>
       ) : (
         <List
-         sx={{ 
-          display:'flex',
-          justifyContent:'center',
-          alignItems:'center',
-          width: "100%",
-          bgcolor: "background.paper",
-          p:1,
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: "100%",
+            background: "transparent",
+            p: 1,
           }}>
-          <ListItem 
-          className="rounded" 
-          sx={{ 
-          border: "1px solid",
-          borderColor: "divider" }}>
+          <ListItem
+            className="rounded"
+            sx={{
+              borderRadius: "12px",
+              mb: 0.8,
+              px: 1.2,
+              py: 1,
+              background: "rgba(255,255,255,0.02)",
+              border: "1px solid rgba(255,255,255,0.06)",
+              transition: "all 0.25s ease",
+
+              "&:hover": {
+                background: "rgba(20,210,190,0.06)",
+                borderColor: "rgba(20,210,190,0.3)",
+              },
+            }}>
             <ListItemAvatar onClick={handleShowMiniProfile}>
               {isAcceptFriends ? (
                 <Avatar
-                 variant="rounded"
+                  variant="rounded"
                   src={connect_request?.avatar}
                   sx={{
-                    backgroundColor: "#1976D2",
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.1)",
                     color: "white",
                     width: 40,
                     height: 40,
@@ -264,26 +289,31 @@ function FriendRequest({
               ) : (
                 <Tooltip title={'profile'} arrow>
                   <Avatar
-                  src={connect_request?.avatar}
-                  variant="rounded"
-                  sx={{
-                    backgroundColor: "#1976D2",
-                    color: "white",
-                    width: 40,
-                    height: 40,
-                  }}
-                  alt={connect_request?.name?.split(" ")[0]}
-                  aria-label="avatar"
-                />
+                    src={connect_request?.avatar}
+                    variant="rounded"
+                    sx={{
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      color: "white",
+                      width: 40,
+                      height: 40,
+                    }}
+                    alt={connect_request?.name?.split(" ")[0]}
+                    aria-label="avatar"
+                  />
                 </Tooltip>
               )}
             </ListItemAvatar>
             <ListItemText
               primary={
                 <Typography
-                  sx={{ color: "text.primary" }}
                   fontWeight={"bold"}
                   variant="body2"
+                  sx={{
+                    color: "#F0F4FA",
+                    fontWeight: 600,
+                    fontSize: 13,
+                  }}
                 >
                   {connect_request?.name}
                 </Typography>
@@ -293,53 +323,57 @@ function FriendRequest({
                   {/* location of the user */}
                   {isAcceptFriends ? (
                     <React.Fragment>
-                        <Typography variant="body2" color={"text.secondary"}>
+                      <Typography variant="body2" sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}>
                         {connect_request?.title}
                       </Typography>
-                      <Typography variant="caption" color={"text.secondary"}>
+                      <Typography variant="caption" sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}>
                         {connect_request?.country} | {connect_request?.state}
                       </Typography>
-                      <br/>
+                      <br />
                       <Typography
                         variant="caption"
-                        sx={{ color:'text.primary' }}
+                        sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}
                       >
                         - is {connect_request?.message} -
                       </Typography>
                     </React.Fragment>
                   ) : (
                     <React.Fragment>
-                        {/* specialisation of the user */}
-                        <Typography variant="body2" color={"text.secondary"}>
+                      {/* specialisation of the user */}
+                      <Typography variant="body2" sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}>
                         {connect_request?.specialisationTitle}
                       </Typography>
 
-                      <Typography variant="caption" color={"text.secondary"}>
+                      <Typography variant="caption" sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}>
                         {connect_request?.county} | {" "}
-                        {CustomCountryName(connect_request?.country)} 
+                        {CustomCountryName(connect_request?.country)}
                       </Typography>
 
                       {/* skills of the user */}
-                      {connect_request?.selectedSkills?.length>1 && (
-                        <Box display={'flex' } mt={"2px"}>
-                        <AvatarGroup
-                          max={connect_request?.selectedSkills?.length}
-                        >
-                          {/* loop through the skills and their images matched using custom fn */}
-                          {connect_request?.selectedSkills?.map(
-                            (skill, index) => (
-                              <Tooltip title={skill} arrow key={index}>
-                                <Avatar
-                                  alt={skill}
-                                  className="border"
-                                  sx={{ width: 28, height: 28 }}
-                                  src={getImageMatch(skill)}
-                                />
-                              </Tooltip>
-                            )
-                          )}
-                        </AvatarGroup>
-                      </Box>
+                      {connect_request?.selectedSkills?.length > 1 && (
+                        <Box display={'flex'} mt={"2px"}>
+                          <AvatarGroup
+                            max={connect_request?.selectedSkills?.length}
+                          >
+                            {/* loop through the skills and their images matched using custom fn */}
+                            {connect_request?.selectedSkills?.map(
+                              (skill, index) => (
+                                <Tooltip title={skill} arrow key={index}>
+                                  <Avatar
+                                    alt={skill}
+                                    className="border"
+                                    sx={{
+                                      width: 26,
+                                      height: 26,
+                                      border: "1px solid rgba(255,255,255,0.1)",
+                                      background: "rgba(255,255,255,0.05)",
+                                    }} src={getImageMatch(skill)}
+                                  />
+                                </Tooltip>
+                              )
+                            )}
+                          </AvatarGroup>
+                        </Box>
                       )}
                     </React.Fragment>
                   )}
@@ -360,7 +394,10 @@ function FriendRequest({
                     >
                       {/* time  */}
                       <Box>
-                        <Typography variant="caption">
+                        <Typography variant="caption" sx={{
+                          color: "rgba(240,244,250,0.5)",
+                          fontSize: 11,
+                        }}>
                           {getElapsedTime(connect_request?.createdAt)}
                         </Typography>
                       </Box>
@@ -374,11 +411,14 @@ function FriendRequest({
                         <Tooltip arrow title={"connect"}>
                           <IconButton
                             size="small"
-                            color="primary"
+                            sx={{
+                              color: "#14D2BE",
+                              "&:hover": { background: "rgba(20,210,190,0.1)" }
+                            }}
                             onClick={handleAcceptConnectRequestFriends}
                           >
-                            <PersonAddRounded 
-                             sx={{ width: 18, height: 18 }} />
+                            <PersonAddRounded
+                              sx={{ width: 18, height: 18 }} />
                           </IconButton>
                         </Tooltip>
 
@@ -387,6 +427,10 @@ function FriendRequest({
                           <IconButton
                             size="small"
                             onClick={handleRejectConnectRequest}
+                            sx={{
+                              color: "rgba(255,255,255,0.6)",
+                              "&:hover": { color: "#FF6D3A" }
+                            }}
                           >
                             <Close sx={{ width: 17, height: 17 }} />
                           </IconButton>
@@ -409,8 +453,18 @@ function FriendRequest({
                         <Tooltip arrow title={"connect"}>
                           <IconButton
                             size="small"
-                            color="primary"
-                            className="border"
+                            sx={{
+                              borderRadius: "8px",
+                              border: "1px solid rgba(255,255,255,0.08)",
+                              background: "rgba(255,255,255,0.03)",
+                              color: "rgba(255,255,255,0.7)",
+
+                              "&:hover": {
+                                background: "rgba(20,210,190,0.08)",
+                                borderColor: "rgba(20,210,190,0.4)",
+                                color: "#14D2BE",
+                              }
+                            }}
                             onClick={handleSendConnectRequest}
                           >
                             <PersonAddRounded sx={{ width: 18, height: 18 }} />

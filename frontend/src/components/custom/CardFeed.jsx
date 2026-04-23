@@ -19,8 +19,8 @@ import {
   CardActionArea,
   CardContent,
   CircularProgress,
-  Divider,
   Dialog,
+  Divider,
   FormHelperText,
   IconButton,
   ListItemAvatar,
@@ -31,7 +31,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import axios from "axios";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleUpdateIsPostDetailed } from "../../redux/AppUI";
 import {
@@ -45,7 +45,6 @@ import AlertReportPost from "../alerts/AlertReportPost";
 import SnackbarConnect from "../snackbar/SnackbarConnect";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
@@ -355,8 +354,11 @@ const CardFeed = ({
         <CircularProgress size={20} />
       ) : (
         <FavoriteRounded
-          sx={{ width: 18, height: 18 }}
-          color={currentUserLiked ? "primary" : undefined}
+          sx={{
+            width: 18,
+            height: 18,
+            color: currentUserLiked ? "#14D2BE" : "rgba(255,255,255,0.6)"
+          }}
         />
       ),
     },
@@ -398,14 +400,13 @@ const CardFeed = ({
       sx={{
         mt: 2,
         mb: isLastIndex ? 10 : 4,
-        maxWidth: { xs: "100%", md: "700px", lg: "780px", xl: "860px" },
-        width: "100%",
+        maxWidth: { xs: "100%", sm: "540px", md: "560px", lg: "580px" },
         mx: "auto",
-        backgroundColor: theme.palette.background.paper,
-        boxShadow:
-          theme.palette.mode === "dark"
-            ? "0 12px 30px rgba(0,0,0,0.24)"
-            : "0 18px 45px rgba(15,76,129,0.08)",
+        background: "rgba(255,255,255,0.04)",
+        backdropFilter: "blur(25px)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+
         border:
           theme.palette.mode === "dark"
             ? "1px solid rgba(255,255,255,0.08)"
@@ -415,17 +416,14 @@ const CardFeed = ({
         overflow: "hidden",
         transition: "transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease",
         "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow:
-            theme.palette.mode === "dark"
-              ? "0 18px 36px rgba(0,0,0,0.3)"
-              : "0 22px 48px rgba(15,76,129,0.14)",
-        },
+          transform: "translateY(-3px)",
+          boxShadow: "0 30px 80px rgba(0,0,0,0.75)",
+        }
       }}
     >
-      <Box px={2} pt={2} pb={1.25}>
-        <Box display="flex" justifyContent="space-between" gap={1.5}>
-          <Box display="flex" gap={1.5} flex={1} minWidth={0}>
+      <Box px={1.5} pt={1.5} pb={1}>
+        <Box display="flex" justifyContent="space-between" gap={1.2}>
+          <Box display="flex" gap={1.2} flex={1} minWidth={0}>
             <ListItemAvatar
               sx={{ minWidth: "auto", mr: 0 }}
               onClick={isGuest ? null : handleMiniProfileView}
@@ -435,10 +433,11 @@ const CardFeed = ({
                   src={post?.post_owner?.owneravatar}
                   variant="rounded"
                   sx={{
-                    width: 52,
-                    height: 52,
-                    color: "white",
-                    borderRadius: imageRadius,
+                    width: 48,
+                    height: 48,
+                    borderRadius: "14px",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                    boxShadow: "0 0 10px rgba(20,210,190,0.2)",
                   }}
                   alt=""
                 />
@@ -480,8 +479,9 @@ const CardFeed = ({
                 py: 0.4,
                 borderRadius: 999,
                 border: "1px solid",
-                borderColor: "divider",
-                bgcolor: isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(15,76,129,0.05)",
+                borderColor: "rgba(255,255,255,0.12)",
+                background: "rgba(20,210,190,0.08)",
+                border: "1px solid rgba(20,210,190,0.25)",
               }}
             >
               <Typography variant="caption" fontWeight={700} color="primary">
@@ -539,7 +539,7 @@ const CardFeed = ({
       </Box>
 
       <CardContent sx={{ pt: 0.5, pb: postImageSrc ? 2 : 2.5 }}>
-        <Box mb={1.75}>
+        <Box mb={1.2}>
           <Box display="flex" alignItems="center" justifyContent="space-between" gap={1} flexWrap="wrap">
             <Box display="flex" gap={0.75} flexWrap="wrap">
               {locationLabel && (
@@ -547,10 +547,9 @@ const CardFeed = ({
                   sx={{
                     px: 1,
                     py: 0.35,
-                    borderRadius: 999,
-                    bgcolor: "background.default",
-                    border: "1px solid",
-                    borderColor: "divider",
+                    borderRadius: 10,
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.04)",
                   }}
                 >
                   <Typography variant="caption" color="text.secondary">
@@ -589,7 +588,8 @@ const CardFeed = ({
               }}
             />
             <Box>
-              <Typography variant="h6" fontWeight={700} lineHeight={1.3}>
+              <Typography fontSize={{ xs: 16, sm: 18 }}
+                fontWeight={700}>
                 {post?.post_title}
               </Typography>
 
@@ -603,8 +603,10 @@ const CardFeed = ({
                         py: 0.3,
                         borderRadius: 999,
                         border: "1px solid",
-                        borderColor: "divider",
-                        bgcolor: "background.default",
+                        borderColor: "rgba(255,255,255,0.12)",
+                        background: "rgba(20,210,190,0.08)",
+                        background: "rgba(255,255,255,0.04)",
+                        border: "1px solid rgba(255,255,255,0.08)",
                       }}
                     >
                       <Typography variant="caption" color="text.secondary">
@@ -622,8 +624,9 @@ const CardFeed = ({
           <Box
             sx={{
               borderRadius: imageRadius,
-              bgcolor: isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(15,76,129,0.03)",
-              border: "1px solid",
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              backdropFilter: "blur(10px)", border: "1px solid",
               borderColor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(15,76,129,0.08)",
               px: { xs: 1.25, sm: 1.5 },
               py: 1.35,
@@ -631,9 +634,13 @@ const CardFeed = ({
           >
             <Typography
               color={isDarkMode ? "text.secondary" : "text.primary"}
-              sx={{ fontSize: "0.95rem", lineHeight: 1.8 }}
+              sx={{
+                fontSize: { xs: "0.9rem", sm: "0.95rem" },
+                lineHeight: 1.7,
+                letterSpacing: "0.01em",
+              }}
               variant="body2"
-              maxWidth={handleMaxTextWidth()}
+              maxWidth="100%"
             >
               {isFullDescription ? details : handleDetailsLength()}
               {detailsLong && !isFullDescription && (
@@ -643,11 +650,7 @@ const CardFeed = ({
                 </Box>
               )}
             </Typography>
-            {detailsLong && (
-              <Typography variant="caption" color="primary" fontWeight={700} sx={{ display: "block", mt: 1 }}>
-                {isFullDescription ? "Show less" : "Tap to expand"}
-              </Typography>
-            )}
+
           </Box>
         </CardActionArea>
       </CardContent>
@@ -662,28 +665,45 @@ const CardFeed = ({
               overflow: "hidden",
               border: "1px solid",
               borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(15,76,129,0.12)",
-              bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "rgba(15,76,129,0.03)",
+              background: "rgba(255,255,255,0.02)",
+              backdropFilter: "blur(10px)",
+              borderTop: "1px solid rgba(255,255,255,0.06)",
             }}
           >
             <Box
-              component="img"
-              src={postImageSrc}
-              loading="lazy"
-              alt={post?.post_title || "Post preview"}
               sx={{
+                position: "relative",
                 width: "100%",
-                minHeight: CustomDeviceScreenSize(),
-                maxHeight: { xs: 260, sm: 320, md: 420 },
-                objectFit: "cover",
-                display: "block",
+                borderRadius: imageRadius,
+                overflow: "hidden",
+                border: "1px solid rgba(255,255,255,0.08)",
+                background: "rgba(255,255,255,0.02)",
+                aspectRatio: post?.post_type === "image" ? "1 / 1" : "16 / 9", 
               }}
-            />
+            >
+              <Box
+                component="img"
+                src={postImageSrc}
+                alt={post?.post_title}
+                loading="lazy"
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                  transition: "transform 0.4s ease",
+
+                  "&:hover": {
+                    transform: "scale(1.03)",
+                  },
+                }}
+              />
+            </Box>
           </CardActionArea>
         </Box>
       )}
 
-      <Divider />
-
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
       <Box
         display="flex"
         p={1.25}
@@ -703,15 +723,24 @@ const CardFeed = ({
                   variant="text"
                   startIcon={icon}
                   sx={{
-                    minWidth: { xs: "calc(50% - 8px)", sm: 132 },
-                    px: 1.5,
-                    py: 0.85,
+                    minWidth: { xs: "48%", sm: 120 },
+                     px: 1.5,
+                    py: 0.6,
+                    fontSize: 12, 
                     justifyContent: "flex-start",
-                    borderRadius: 999,
-                    border: "1px solid",
-                    borderColor: "divider",
-                    bgcolor: "background.paper",
+                    borderRadius: 10,
                     color: "text.secondary",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: "rgba(255,255,255,0.7)",
+                    transition: "all 0.25s ease",
+
+                    "&:hover": {
+                      background: "rgba(20,210,190,0.08)",
+                      borderColor: "rgba(20,210,190,0.4)",
+                      color: "#14D2BE",
+                      transform: "translateY(-1px)",
+                    }
                   }}
                 >
                   {title} {count}
@@ -730,7 +759,8 @@ const CardFeed = ({
           p={1}
           sx={{
             borderTop: "1px solid",
-            borderColor: "divider",
+            borderColor: "rgba(255,255,255,0.12)",
+            background: "rgba(20,210,190,0.08)",
           }}
         >
           <Button
@@ -873,8 +903,11 @@ const CardFeed = ({
               width: "100%",
               height: "100%",
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", lg: "minmax(0, 1.35fr) minmax(320px, 420px)" },
-              borderRadius: "24px",
+              gridTemplateColumns: {
+                xs: "1fr",
+                md: "1fr",
+                lg: "1.4fr 1fr"
+              }, borderRadius: "24px",
               overflow: "hidden",
               border: "1px solid rgba(255,255,255,0.18)",
               bgcolor: "rgba(255,255,255,0.08)",
@@ -896,18 +929,34 @@ const CardFeed = ({
             >
               {postImageSrc && (
                 <Box
-                  component="img"
-                  src={postImageSrc}
-                  alt={post?.post_title || "Post preview"}
                   sx={{
+                    position: "relative",
                     width: "100%",
-                    height: "100%",
-                    maxHeight: "82vh",
-                    objectFit: "contain",
-                    display: "block",
-                    borderRadius: "18px",
+                    borderRadius: imageRadius,
+                    overflow: "hidden",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(255,255,255,0.02)",
+                    aspectRatio: post?.post_type === "image" ? "1 / 1" : "16 / 9"
                   }}
-                />
+                >
+                  <Box
+                    component="img"
+                    src={postImageSrc}
+                    alt={post?.post_title}
+                    loading="lazy"
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                      transition: "transform 0.4s ease",
+
+                      "&:hover": {
+                        transform: "scale(1.03)",
+                      },
+                    }}
+                  />
+                </Box>
               )}
             </Box>
 

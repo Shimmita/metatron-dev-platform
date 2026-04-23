@@ -27,7 +27,7 @@ const rightBarExpanded = () => {
 export default function FeaturedEventsContainer() {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
+  const [openAlertGeneral, setOpenAlertGeneral] = useState(false)
   const dispatch = useDispatch();
 
   // redux states
@@ -75,60 +75,59 @@ export default function FeaturedEventsContainer() {
     <React.Fragment>
       <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
         <Box
-          display={"flex"}
-          alignItems={"center"}
-          justifyContent={"center"}
-          gap={2}
-          pt={2}
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          px={1}
+          py={1.5}
         >
-          <Typography 
-          fontWeight={"bold"} 
-          color={"primary"}>
-            FEATURED EVENTS
-          </Typography>
+          <Box display="flex" alignItems="center" gap={1}>
+            <TvRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+            <Typography fontSize={13} fontWeight={600} color="#F0F4FA">
+              Featured Events
+            </Typography>
+          </Box>
 
-          {/* loading content when not ready */}
-          {isFetching ? (
-            <CircularProgress size={18}/>
-          ):(
-            <TvRounded color="primary" sx={{width:22, height:22}} />
-          )}
+          {isFetching && <CircularProgress size={14} />}
         </Box>
       </Box>
       <List
         className="rounded mt-2"
         sx={{
-          bgcolor: "background.paper",
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: "12px",
+          backdropFilter: "blur(10px)",
           width: "100%",
           p: 0,
         }}
       >
         <Box>
-          {eventsTop?.slice(0,3).map((currentEvent, index) => (
-              <Box key={currentEvent?._id}>
-                <FeaturedEvent
+          {eventsTop?.slice(0, 3).map((currentEvent, index) => (
+            <Box key={currentEvent?._id}>
+              <FeaturedEvent
                 isLoading={isFetching}
                 eventTop={currentEvent}
                 setErrorMessage={setErrorMessage}
-                isLastIndex={index===eventsTop?.length-1}
-                />
-              </Box>
-            ))}
+                isLastIndex={index === eventsTop?.length - 1}
+              />
+            </Box>
+          ))}
         </Box>
       </List>
 
-       {/* alert general of the error message */}
-        {errorMessage && (
-          <AlertGeneral
+      {/* alert general of the error message */}
+      {errorMessage && (
+        <AlertGeneral
           title={'something went wrong!'}
           message={errorMessage}
           isError={true}
           openAlertGeneral={openAlertGeneral}
           setOpenAlertGeneral={setOpenAlertGeneral}
           setErrorMessage={setErrorMessage}
-          defaultIcon={<InfoRounded/>}
-          />
-        )}
+          defaultIcon={<InfoRounded />}
+        />
+      )}
 
     </React.Fragment>
   );

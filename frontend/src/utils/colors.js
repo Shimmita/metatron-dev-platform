@@ -1,26 +1,44 @@
 export const appColors = {
-  brandBlue: "#0F4C81",
-  brandBlueSoft: "#1D7ED7",
-  brandSky: "#29B4DC",
-  brandTeal: "#0FB8C9",
-  brandAccent: "#FF6D3A",
-  brandAccentSoft: "#FF8A5C",
-  success: "#44B700",
-  warning: "#FFB300",
-  info: "#64B5F6",
-  backgroundLight: "#F4F8FF",
+  /* ─── Core Brand (Metatron Identity) ─── */
+  primary: "#14D2BE",          // MAIN brand (teal)
+  primarySoft: "#1EE8D2",
+  primaryDark: "#0FA88F",
+
+  secondary: "#0F4C81",        // deep tech blue (support only)
+  secondarySoft: "#1D7ED7",
+
+  accent: "#C8A96E",           // premium gold accent
+  accentSoft: "#E7C58A",
+
+  /* ─── Semantic ─── */
+  success: "#22C55E",
+  warning: "#F59E0B",
+  error: "#EF4444",
+  info: "#38BDF8",
+
+  /* ─── Background System (Glass UI) ─── */
+  bgDark: "#060D18",                 // main app background
+  bgCard: "rgba(255,255,255,0.045)", // glass cards
+  bgInput: "rgba(255,255,255,0.08)",
+
   surface: "#FFFFFF",
-  surfaceAlt: "#F6F9FF",
-  surfaceDark: "#081526",
-  textPrimary: "#0F172A",
-  textSecondary: "#475569",
-  textMuted: "#64748B",
-  border: "#DBE6F0",
-  divider: "#CFD8E8",
+  surfaceAlt: "#F8FAFC",
+
+  /* ─── Text ─── */
+  textPrimary: "#F0F4FA",
+  textSecondary: "rgba(240,244,250,0.7)",
+  textMuted: "rgba(240,244,250,0.45)",
+
+  /* ─── Borders ─── */
+  border: "rgba(255,255,255,0.12)",
+  divider: "rgba(255,255,255,0.08)",
+
+  /* ─── Effects ─── */
+  glow: "rgba(20,210,190,0.25)",
 };
 
 export const appGradients = {
-  primary: `linear-gradient(135deg, ${appColors.brandBlue} 0%, ${appColors.brandSky} 100%)`,
-  soft: `linear-gradient(180deg, rgba(15, 76, 129, 0.95), rgba(35, 181, 221, 0.15), transparent)`,
-  accent: `linear-gradient(135deg, ${appColors.brandAccent}, ${appColors.brandAccentSoft})`,
+  primary: `linear-gradient(135deg, #0FA88F 0%, #14D2BE 100%)`,
+  glow: `linear-gradient(135deg, rgba(20,210,190,0.25), transparent)`,
+  accent: `linear-gradient(135deg, #C8A96E, #E7C58A)`,
 };

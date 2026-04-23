@@ -2,16 +2,19 @@ import {
   Close,
   PeopleRounded
 } from "@mui/icons-material";
+
 import {
   Avatar,
   Box,
   Divider,
   IconButton,
   Modal,
-  styled,
   Tooltip,
   Typography,
+  Fade,
+  Backdrop,
 } from "@mui/material";
+
 import { useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import DataAccounts from "../data/DataAccounts";
@@ -20,143 +23,158 @@ import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import CustomModalHeight from "../utilities/CustomModalHeight";
 
-const StyledModalEvent = styled(Modal)({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  margin: "5px",
-});
-
+/* ─── Modal Container ─── */
 const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
-  // redux states
   const { currentMode } = useSelector((state) => state.appUI);
- // update is dark const
-  const isDarkMode=currentMode==='dark'
+  const isDarkMode = currentMode === "dark";
 
-  // modal width
-  const handleModalWidth=()=>{
-    if (CustomDeviceTablet()||CustomLandScape()) {
-      return "80%"
-    }
-    if (CustomLandscapeWidest()) {
-      return "50%"
-    }
-
-    return "100%"
-  }
+  /* ─── Responsive Width ─── */
+  const handleModalWidth = () => {
+    if (CustomLandscapeWidest()) return "50%";
+    if (CustomDeviceTablet() || CustomLandScape()) return "80%";
+    return "95%";
+  };
 
   return (
-    <StyledModalEvent
-      keepMounted
+    <Modal
       open={openModalInfo}
-      // onClose={(e) => setOpenPostModal(false)}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
+      onClose={() => setOpenModalInfo(false)}
+      closeAfterTransition
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          timeout: 400,
+          sx: {
+            backdropFilter: "blur(8px)",
+            background: "rgba(6,13,24,0.7)",
+          },
+        },
+      }}
     >
-      <Box
-        width={
-          handleModalWidth()
-        }
-        p={1}
-        borderRadius={5}
-        bgcolor={isDarkMode ? "background.default" : "#D9D8E7"}
-        color={"text.primary"}
-        sx={{
-          border: isDarkMode && "1px solid gray",
-        }}
-      >
+      <Fade in={openModalInfo} timeout={400}>
         <Box
-          bgcolor={"background.default"}
-          borderRadius={5}
-          className="shadow-lg "
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+          px={1}
         >
-          {/* toolbar like box */}
           <Box
-            display={"flex"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-          >
-            {/* logo */}
-            <Box>
-              <Avatar sx={{ width: 60, height: 60 }} src={AppLogo} alt="logo" />
-            </Box>
-
-            <Typography variant="body1" color={"primary"} fontWeight={"bold"}>
-              Help Information
-            </Typography>
-
-            {/*close icon */}
-            <Tooltip title={"close"}>
-              <IconButton onClick={(e) => setOpenModalInfo(false)}>
-                <Close />
-              </IconButton>
-            </Tooltip>
-          </Box>
-
-          {/* divider */}
-          <Divider component={"div"} className="p-2 border-success" />
-
-          <Box
-            maxHeight={CustomModalHeight()}
+            width={handleModalWidth()}
             sx={{
-              overflow: "auto",
-              // Hide scrollbar for Chrome, Safari and Opera
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
-              // Hide scrollbar for IE, Edge and Firefox
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
+              borderRadius: "20px",
+              background: "rgba(255,255,255,0.05)",
+              backdropFilter: "blur(30px)",
+              border: "1px solid rgba(255,255,255,0.12)",
+              boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+              overflow: "hidden",
             }}
           >
+            {/* ─── Header ─── */}
             <Box
-              className="p-1"
-              display={"flex"}
-              flexDirection={"column"}
-              gap={2}
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              px={3}
+              py={2}
+              sx={{
+                borderBottom: "1px solid rgba(255,255,255,0.08)",
+              }}
             >
-              {/* personal account */}
-              <Box mb={1}>
-                <Box display={"flex"} justifyContent={"center"}>
-                  <PeopleRounded color="primary" sx={{ width: 36, height: 36 }} />
-                </Box>
-                <Box>
-                  <Typography
-                    gutterBottom
-                    fontWeight={"bold"}
-                    variant="body2"
-                    mb={1}
-                    textAlign={"center"}
-                  >
-                    Registered Account
-                  </Typography>
-
-                  <ol>
-                    {
-                      DataAccounts?.Personal.map((data, index) => (
-                        <Typography
-                          key={index}
-                          variant="body2"
-                          gutterBottom
-                          mb={1}
-                          component={"li"}
-                          color={"text.secondary"}
-                        >
-                          {data}
-                        </Typography>
-                      ))}
-                  </ol>
-                </Box>
+              {/* Left */}
+              <Box display="flex" alignItems="center" gap={1.5}>
+                <Avatar src={AppLogo} sx={{ width: 36, height: 36 }} />
+                <Typography
+                  fontWeight={600}
+                  sx={{ color: "#F0F4FA", letterSpacing: "0.03em" }}
+                >
+                  Account Intelligence
+                </Typography>
               </Box>
 
-              
+              {/* Close */}
+              <Tooltip title="Close">
+                <IconButton
+                  onClick={() => setOpenModalInfo(false)}
+                  sx={{
+                    color: "rgba(255,255,255,0.6)",
+                    "&:hover": { color: "#14D2BE" },
+                  }}
+                >
+                  <Close />
+                </IconButton>
+              </Tooltip>
+            </Box>
+
+            {/* ─── Content ─── */}
+            <Box
+              maxHeight={CustomModalHeight()}
+              px={3}
+              py={3}
+              sx={{
+                overflowY: "auto",
+                "&::-webkit-scrollbar": { display: "none" },
+              }}
+            >
+              <Box display="flex" flexDirection="column" gap={3}>
+                
+                {/* Section */}
+                <Box>
+                  {/* Icon */}
+                  <Box display="flex" justifyContent="center" mb={1}>
+                    <PeopleRounded
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        color: "#14D2BE",
+                      }}
+                    />
+                  </Box>
+
+                  {/* Title */}
+                  <Typography
+                    textAlign="center"
+                    fontWeight={600}
+                    fontSize={15}
+                    color="#F0F4FA"
+                    mb={2}
+                  >
+                    Registered Account Types
+                  </Typography>
+
+                  {/* List */}
+                  <Box
+                    component="ol"
+                    sx={{
+                      pl: 3,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 1.2,
+                    }}
+                  >
+                    {DataAccounts?.Personal.map((data, index) => (
+                      <Typography
+                        key={index}
+                        component="li"
+                        fontSize={13}
+                        sx={{
+                          color: "rgba(240,244,250,0.7)",
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {data}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Box>
+
+              </Box>
             </Box>
           </Box>
         </Box>
-      </Box>
-    </StyledModalEvent>
+      </Fade>
+    </Modal>
   );
 };
-
 
 export default ModalAccountInfo;

@@ -1,400 +1,212 @@
 import {
-  CheckCircleRounded,
-  Close,
-  CloudUploadRounded,
-  Done,
-  InfoRounded,
-  KeyRounded,
-  RefreshRounded
-} from "@mui/icons-material";
-import {
-  Avatar,
   Box,
+  Button,
+  Dialog,
+  Typography,
+  Fade,
+  Backdrop,
+  Avatar,
   CircularProgress,
-  FormHelperText,
-  IconButton,
-  styled,
-  Typography
 } from "@mui/material";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
+import {
+  CloudUploadRounded,
+  CheckCircleRounded,
+} from "@mui/icons-material";
 import axios from "axios";
-import { getAuth, signOut } from "firebase/auth";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { getAuth, signOut } from "firebase/auth";
 import logo from "../../images/logo_sm.png";
 import { resetAllSigningStateDetails } from "../../redux/CompleteSigning";
 import BrowserCompress from "../utilities/BrowserCompress";
-import { useTheme } from "@emotion/react";
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
 
 export default function AlertOrgCompletion({
   openAlertProfile,
   setOpenAlertProfile,
   user,
 }) {
-  // redux to check when user signs with a provider
   const { avatar, token } = useSelector((state) => state.signUser);
+
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPath, setAvatarPath] = useState(avatar || "");
-  const [error, setError] = useState("");
   const [isPosting, setIsPosting] = useState(false);
+  const [error, setError] = useState("");
   const [errorPosting, setErrorPosting] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  // redux state
-  const { currentMode } = useSelector((state) => state.appUI);
-    const isDarkMode=currentMode==='dark'
-
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  //   close the dialog
-  const handleClose = () => {
-    // close alert
-    setOpenAlertProfile(false);
-    setIsPosting(false);
-  };
+  /* ───────── FILE HANDLING ───────── */
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  //   handle click agree
-  const handleClickAgree = () => {
-    setError("")
-    setErrorPosting("");
-  };
-
-
-  //   handle file change
-  const handleFileChange = async (event) => {
-    const file = event.target.files[0];
-
-    // clear any error
-    setError("");
-    // check file size
-    if (handleFileSize(file)) {
-      setError("File size should not exceed 5MB");
-    } else {
-      // compress the file using the custom utility created
-      const compressedFile = await BrowserCompress(file);
-      setAvatarFile(compressedFile);
-
-      // create an object from URI of the image
-      setAvatarPath(URL.createObjectURL(compressedFile));
+    if (file.size > 5 * 1024 * 1024) {
+      setError("File must be less than 5MB");
+      return;
     }
+
+    const compressed = await BrowserCompress(file);
+    setAvatarFile(compressed);
+    setAvatarPath(URL.createObjectURL(compressed));
+    setError("");
   };
 
-  //   handle file size
-  const handleFileSize = (file) => {
-    return file.size > 5 * 1024 * 1024;
-  };
-
-  // handle click complete profile registration
-  const handleCompleteRegistrationOrg = () => {
-    // defaults for org
-    user.educationLevel="Other Qualification"
-    user.gender="Other"
-    // will be update in the backend
-    user.avatar=""
-
-    // show progress user is registering
+  /* ───────── COMPLETE REGISTRATION ───────── */
+  const handleCompleteRegistration = async () => {
     setIsPosting(true);
 
-    const formData = new FormData();
-    formData.append("image", avatarFile);
-    formData.append("user", JSON.stringify(user));
+    try {
+      user.educationLevel = "Other Qualification";
+      user.gender = "Other";
+      user.avatar = "";
 
+      const formData = new FormData();
+      formData.append("image", avatarFile);
+      formData.append("user", JSON.stringify(user));
 
-    // post to the backend using axios for tokenized user using google provider
-    axios
-      .post(
+      const res = await axios.post(
         token
           ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/google/${token}`
           : `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signup/personal/mongo`,
         formData
-      )
-      .then((res) => {
-        // set success message
-        setSuccessMsg(res?.data?.message);
-        // clear error msg
-        setErrorPosting("");
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error?.code === "ERR_NETWORK") {
-          setErrorPosting("Server is unreachable ");
-          return;
-        }else{
-           // error post msg
-        setErrorPosting(
-          `${user.name} something went wrong. ${error.response.data}`
-        );
-        }
-      })
-      .finally(() =>
-        // set posting off
-        setIsPosting(false)
       );
-  };
 
-
-  // handle login of the user
-  const handleLogin = async () => {
-    // sign out the user if used token
-    if (token) {
-      // reset the state of redux for temp user
-      dispatch(resetAllSigningStateDetails());
-      const auth = getAuth();
-      signOut(auth).then(() => navigate("/"));
-    } else {
-      // user did not use auth provider during signin
-      navigate("/");
+      setSuccessMsg(res?.data?.message);
+      setErrorPosting("");
+    } catch (err) {
+      if (err?.code === "ERR_NETWORK") {
+        setErrorPosting("Server unreachable");
+      } else {
+        setErrorPosting(err?.response?.data);
+      }
+    } finally {
+      setIsPosting(false);
     }
   };
 
+  /* ───────── LOGIN ───────── */
+  const handleLogin = async () => {
+    if (token) {
+      dispatch(resetAllSigningStateDetails());
+      const auth = getAuth();
+      await signOut(auth);
+    }
+    navigate("/");
+  };
 
-  const theme=useTheme()
+  const handleClose = () => setOpenAlertProfile(false);
 
   return (
-      <Dialog
-        open={openAlertProfile}
-        TransitionComponent={Transition}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
-        sx={{
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.contrastText,
-        backdropFilter: 'blur(5px)'
+    <Dialog
+      open={openAlertProfile}
+      onClose={handleClose}
+      TransitionComponent={Fade}
+      fullWidth
+      maxWidth="xs"
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backdropFilter: "blur(8px)",
+            background: "rgba(6,13,24,0.7)",
+          },
+        },
       }}
-      >
-        {isPosting ? (
-          <React.Fragment>
-            {/* content spinning wheels or indicators */}
-            <DialogContent>
-              <Box display={"flex"} justifyContent={"center"}>
-                <CircularProgress />
-              </Box>
-            </DialogContent>
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
-            <DialogTitle
-              display={"flex"}
-              alignItems={"center"}
-              justifyContent={"space-between"}
-              sx={{
-              background: !isDarkMode && 
-              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-          }}
-            >
-              {/* icon and title */}
-              <Box display={"flex"} alignItems={"center"} gap={2}>
-                {errorPosting ? (
-                  <React.Fragment>
-                    {/* error when posting user */}
-                    <InfoRounded
-                      sx={{ width: 30, height: 30 }}
-                    />
-                    <Typography>
-                    Error
-                    </Typography>
-                  </React.Fragment>
-                ) : successMsg ? (
-                  <React.Fragment>
-                    <Avatar alt="" src={avatarPath ? avatarPath:logo} />
-                    <Typography>
-                    Signup Successful
-                    </Typography>
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    <Avatar alt="" src={avatarPath} />
-                    <Typography >
-                    My Avatar
-                    </Typography>
-                  </React.Fragment>
-                )}
-              </Box>
-              {/* close btn */}
-              {!successMsg && (
-                <IconButton
-                sx={{ 
-                  border:'1px solid',
-                  borderColor:'divider'
-                }} 
-                onClick={handleClose}>
-                  <Close sx={{ width: 15, height: 15 }} />
-                </IconButton>
-              )}
-            </DialogTitle>
-            {/* helper text */}
-            <Box 
-            display={'flex'}
-            justifyContent={'center'}
-            >
-            <FormHelperText className="text-info">
-              Email shall be verified on login
-            </FormHelperText>
-            </Box>
-            <DialogContent dividers>
-                <React.Fragment>
-                  {errorPosting ? (
-                    <React.Fragment>
-                      <DialogContentText>{errorPosting}</DialogContentText>
-                    </React.Fragment>
-                  ) : successMsg ? (
-                    <DialogContentText>{successMsg}</DialogContentText>
-                  ) : (
-                    <React.Fragment>
-                      <DialogContentText
-                      maxWidth={500}
-                        gutterBottom
-                        id="alert-dialog-slide-description-icon_select"
-                      >
-                      Upload a profile avatar that will be associated with your account. You can change it 
-                      later once registered.
-                      </DialogContentText>{" "}
-                      {/* Display error message if file exceeds 2MB */}
-                      {error && (
-                        <Typography
-                          gutterBottom
-                          variant="caption"
-                          style={{ color: "red" }}
-                        >
-                          {error}
-                        </Typography>
-                      )}
-                      <Box display={"flex"} gap={1} alignItems={"center"}>
-                        <Button
-                          component="label"
-                          role={undefined}
-                          disableElevation
-                          variant="text"
-                          size="medium"
-                          sx={{
-                            textTransform: "capitalize",
-                            borderRadius: "20px",
-                            mt: 1,
-                          }}
-                          tabIndex={-1}
-                          startIcon={<CloudUploadRounded />}
-                        >
-                          choose
-                          <VisuallyHiddenInput
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                          />
-                        </Button>
-                        {/* file name */}
-                        <Typography
-                          mt={1}
-                          variant="body2"
-                          color={"text.secondary"}
-                        >
-                          {avatarFile && `${avatarFile.name}`.substring(0, 8)}
-                        </Typography>
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+          textAlign: "center",
+          p: 2,
+        },
+      }}
+    >
+      {isPosting ? (
+        <CircularProgress sx={{ my: 4 }} />
+      ) : successMsg ? (
+        <>
+          <Typography color="#22C55E" mb={2}>
+            {successMsg}
+          </Typography>
 
-                        {/* file size */}
-                        <Typography
-                          mt={1}
-                          variant="body2"
-                          color={"text.secondary"}
-                        >
-                          {avatarFile &&
-                            `${parseFloat(
-                              avatarFile.size / (1024 * 1024)
-                            ).toPrecision(1)}MB`}
-                        </Typography>
-                        {/* done tick */}
-                        {avatarFile && (
-                          <React.Fragment>
-                            {error ? (
-                              <Close
-                                color="error"
-                                sx={{ width: 15, height: 15 }}
-                              />
-                            ) : (
-                              <Done
-                                color="success"
-                                sx={{ width: 17, height: 17 }}
-                              />
-                            )}
-                          </React.Fragment>
-                        )}
-                      </Box>
-                    </React.Fragment>
-                  )}
-                </React.Fragment>
-            </DialogContent>
-            <DialogActions sx={{ px: 4 }}>
-                    {errorPosting ? (
-                      <Button
-                      disableElevation
-                      variant="outlined"
-                      size="small"
-                      startIcon={<RefreshRounded/>}
-                        sx={{
-                          textTransform: "capitalize",
-                          borderRadius: "20px",
-                        }}
-                        onClick={handleClickAgree}
-                      >
-                        Retry
-                      </Button>
-                  ) : successMsg ? (
-                    <Button
-                    size="small"
-                    variant="outlined"
-                    disableElevation
-                    color="success"
-                    startIcon={<KeyRounded/>}
-                      sx={{
-                        textTransform: "capitalize",
-                        borderRadius: "20px",
-                      }}
-                      onClick={handleLogin}
-                    >
-                      Login
-                    </Button>
-                  ) : (
-                      <Button
-                      disableElevation
-                      size="small"
-                      variant="contained"
-                      startIcon={<CheckCircleRounded/>}
-                        sx={{
-                          textTransform: "capitalize",
-                          borderRadius: "20px",
-                        }}
-                        onClick={handleCompleteRegistrationOrg}
-                        disabled={avatarFile === null || error.trim() !== ""}
-                      >
-                        Complete
-                      </Button>
-                  )}
-            </DialogActions>
-          </React.Fragment>
-        )}
-      </Dialog>
+          <Button
+            onClick={handleLogin}
+            sx={{
+              background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              color: "#fff",
+            }}
+          >
+            Login
+          </Button>
+        </>
+      ) : (
+        <>
+          {/* HEADER */}
+          <Avatar
+            src={avatarPath || logo}
+            sx={{ width: 70, height: 70, mx: "auto", mb: 1 }}
+          />
+
+          <Typography fontSize={15} fontWeight={600} color="#F0F4FA">
+            Organization Profile
+          </Typography>
+
+          <Typography
+            fontSize={12}
+            sx={{ color: "rgba(240,244,250,0.6)", mb: 2 }}
+          >
+            Upload your organization logo
+          </Typography>
+
+          {/* UPLOAD */}
+          <Button
+            component="label"
+            startIcon={<CloudUploadRounded />}
+            sx={{
+              borderRadius: "10px",
+              border: "1px solid rgba(255,255,255,0.1)",
+              color: "#fff",
+              mb: 2,
+            }}
+          >
+            Upload Logo
+            <input hidden type="file" onChange={handleFileChange} />
+          </Button>
+
+          {error && (
+            <Typography color="error" fontSize={12}>
+              {error}
+            </Typography>
+          )}
+
+          {errorPosting && (
+            <Typography color="#F59E0B" fontSize={12}>
+              {errorPosting}
+            </Typography>
+          )}
+
+          {/* COMPLETE */}
+          <Button
+            fullWidth
+            startIcon={<CheckCircleRounded />}
+            disabled={!avatarFile}
+            onClick={handleCompleteRegistration}
+            sx={{
+              mt: 2,
+              background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              color: "#fff",
+            }}
+          >
+            Complete 
+          </Button>
+        </>
+      )}
+    </Dialog>
   );
 }

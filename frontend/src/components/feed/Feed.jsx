@@ -7,6 +7,7 @@ import BasicSpeedDial from "../custom/SpeedDial";
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import BottomNav from "../bottom/BottomNav";
 import GuestCheck from "../account/GuestCheck";
+import AlertTutorial from "../alerts/AlertTutorial";
 const EventsContainer =lazy(()=>import("../events/EventsContainer")) ;
 const SnackBarPostSuccess =lazy(()=>import("../snackbar/SnackBarPostSuccess")) ;
 const CoursesMainContainer =lazy(()=>import("../courses/CoursesMainContainer"));
@@ -31,6 +32,9 @@ const Feed = () => {
   const { messageSnackPostTech } = useSelector(
     (state) => state.currentSnackBar
   );
+
+    const { user } = useSelector((state) => state.currentUser);
+
 
   const dispatch = useDispatch();
 
@@ -162,6 +166,13 @@ const Feed = () => {
                     </Box>
                   )}
               </Box>
+
+
+              {/* show alert tutorial if user new */}
+              {user?.isTutorial && (
+                <AlertTutorial />
+              )}
+
           </Suspense>
         </Box>
       

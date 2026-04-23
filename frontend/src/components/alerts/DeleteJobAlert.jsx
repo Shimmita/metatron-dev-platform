@@ -1,23 +1,18 @@
+import {
+  Box,
+  Button,
+  Dialog,
+  Typography,
+  Fade,
+  Backdrop,
+} from "@mui/material";
 import { WarningRounded } from "@mui/icons-material";
-import { Box, Typography } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
-import axios from "axios";
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { useDispatch } from "react-redux";
 import { resetClearCurrentJobs } from "../../redux/CurrentJobs";
 import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
 import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export default function DeleteJobAlert({
   openAlert,
@@ -28,148 +23,188 @@ export default function DeleteJobAlert({
   my_email,
   job_id,
 }) {
-  const handleClose = () => {
-    // close alert
-    setOpenAlert(false);
-  };
-
-  // track axios progress
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // redux states
-  const { currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode = currentMode === 'dark'
+  const dispatch = useDispatch();
 
-  const dispatch = useDispatch()
+  const handleClose = () => setOpenAlert(false);
 
-  // handle complete deletion of the job
-  const handleCompleteDeletion = () => {
+  const handleCompleteDeletion = async () => {
+    setIsFetching(true);
 
-    // set is fetching to true
-    setIsFetching(true)
+    try {
+      const res = await axios.delete(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/job/delete/${my_email}/${job_id}`,
+        { withCredentials: true }
+      );
 
-    axios.delete(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/hiring/job/delete/${my_email}/${job_id}`, {
-      withCredentials: true,
-    })
-      .then((res) => {
-        // update the jobs from the backend
-        if (res?.data) {
+      if (res?.data) {
+        dispatch(resetClearCurrentJobs());
+        dispatch(resetClearCurrentJobsTop());
 
-          // log for debug message from backend 
-          console.log(res.data)
+        dispatch(
+          updateCurrentSuccessRedux({
+            title: "Job Deleted",
+            message:
+              "The job and all associated data have been permanently removed.",
+          })
+        );
 
-          // update current jobs, triggers refetch
-          dispatch(resetClearCurrentJobs())
+        handleClose();
+      }
+    } catch (err) {
+      if (err?.response?.data?.login) {
+        window.location.reload();
+      }
 
-          // refresh jobs to too for refetch
-          dispatch(resetClearCurrentJobsTop())
-
-          // success alert
-          dispatch(updateCurrentSuccessRedux({ title: 'Job Update', message: 'Your job has been successfully deleted from the platform and its associated information.' }))
-
-          // clear current jobs for fresh
-          dispatch(resetClearCurrentJobsTop())
-          // close the alert
-          handleClose()
-        }
-
-      })
-      .catch((err) => {
-
-        // log message
-        console.log(err?.response?.data)
-
-        //  user login session expired show logout alert
-        if (err?.response?.data?.login) {
-          window.location.reload();
-        }
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage(
-            "server unreachable!"
-          );
-        }
-        // update error message
-        setErrorMessage(err.response.data)
-      })
-      .finally(() => {
-        // false fetching
-        setIsFetching(false);
-      });
-
-  }
-
-  const theme = useTheme()
+      if (err?.code === "ERR_NETWORK") {
+        setErrorMessage("Server unreachable");
+      } else {
+        setErrorMessage(err?.response?.data);
+      }
+    } finally {
+      setIsFetching(false);
+    }
+  };
 
   return (
     <Dialog
       open={openAlert}
-      TransitionComponent={Transition}
-      keepMounted
-      aria-describedby="alert-dialog-slide-description"
-      sx={{
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.contrastText,
-        backdropFilter: 'blur(3px)'
+      onClose={handleClose}
+      closeAfterTransition
+      TransitionComponent={Fade}
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          timeout: 300,
+          sx: {
+            backdropFilter: "blur(8px)",
+            background: "rgba(6,13,24,0.7)",
+          },
+        },
+      }}
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+          width: { xs: "90vw", sm: 400 },
+          overflow: "hidden",
+        },
       }}
     >
-      <DialogTitle
-        display={"flex"}
-        alignItems={"center"}
-        variant="body1"
-        gap={2}
+      {/* HEADER */}
+      <Box
+        display="flex"
+        alignItems="center"
+        gap={1.5}
+        px={2}
+        py={1.5}
         sx={{
-          background: !isDarkMode &&
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        {/* delete icon */}
-        <WarningRounded />
-        <Box>
-          {/* title */}
-          <Typography
-          >
-            {title}
-          </Typography>
-          <Typography textAlign={'center'} variant={'caption'} sx={{ color: 'text.secondary' }}>
-            {applicants} {applicants === 1 ? "applicant" : "applicants"}
-          </Typography>
+        <Box
+          sx={{
+            width: 36,
+            height: 36,
+            borderRadius: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(239,68,68,0.15)",
+            color: "#EF4444",
+          }}
+        >
+          <WarningRounded />
         </Box>
 
-      </DialogTitle>
+        <Box>
+          <Typography fontSize={14} fontWeight={600} color="#F0F4FA">
+            {title}
+          </Typography>
+
+          <Typography
+            fontSize={11}
+            sx={{ color: "rgba(240,244,250,0.5)" }}
+          >
+            {applicants}{" "}
+            {applicants === 1 ? "applicant affected" : "applicants affected"}
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* ERROR */}
       {errorMessage && (
-        <Box textAlign={'center'}>
-          <Typography className="text-info" textAlign={'center'} variant="caption">
+        <Box px={2} pt={1}>
+          <Typography
+            fontSize={12}
+            sx={{ color: "#F59E0B", textAlign: "center" }}
+          >
             {errorMessage}
           </Typography>
         </Box>
       )}
-      <DialogContent
-        sx={{
-          maxWidth: 500
-        }}
-        dividers>
-        <DialogContentText
-          variant="body2" id="alert-dialog-slide-description">
+
+      {/* CONTENT */}
+      <Box px={2} py={2}>
+        <Typography
+          fontSize={13}
+          sx={{
+            color: "rgba(240,244,250,0.7)",
+            lineHeight: 1.6,
+          }}
+        >
           {message}
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
+        </Typography>
+      </Box>
+
+      {/* ACTIONS */}
+      <Box
+        display="flex"
+        justifyContent="flex-end"
+        gap={1.2}
+        px={2}
+        pb={2}
+      >
+        {/* CANCEL */}
         <Button
-          size="small"
           disabled={isFetching}
-          sx={{ borderRadius: "20px" }} onClick={handleClose}>
-          No
+          onClick={handleClose}
+          sx={{
+            borderRadius: "10px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "rgba(255,255,255,0.7)",
+
+            "&:hover": {
+              background: "rgba(255,255,255,0.05)",
+            },
+          }}
+        >
+          Cancel
         </Button>
+
+        {/* DELETE */}
         <Button
-          size="small"
           disabled={isFetching}
-          sx={{ borderRadius: "20px" }}
           onClick={handleCompleteDeletion}
-          color="warning">
-          {isFetching ? "Wait..." : "Yes"}
+          sx={{
+            borderRadius: "10px",
+            background: "linear-gradient(135deg,#EF4444,#FF6D3A)",
+            color: "#fff",
+            px: 2,
+
+            "&:hover": {
+              background: "linear-gradient(135deg,#DC2626,#FF6D3A)",
+            },
+          }}
+        >
+          {isFetching ? "Deleting..." : "Delete"}
         </Button>
-      </DialogActions>
+      </Box>
     </Dialog>
   );
 }

@@ -1,165 +1,214 @@
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 import { appColors } from "./colors";
 
-const createAppTheme = (mode = "light") => {
+const createAppTheme = (mode = "dark") => {
+  const isDark = mode === "dark";
+
   const palette = {
     mode,
+
     primary: {
-      main: appColors.brandBlue,
+      main: appColors.primary,
       contrastText: "#FFFFFF",
     },
+
     secondary: {
-      main: appColors.brandAccent,
-      contrastText: "#FFFFFF",
+      main: appColors.secondary,
     },
-    success: {
-      main: appColors.success,
-    },
-    warning: {
-      main: appColors.warning,
-    },
-    info: {
-      main: appColors.info,
-    },
+
+    success: { main: appColors.success },
+    warning: { main: appColors.warning },
+    error: { main: appColors.error },
+    info: { main: appColors.info },
+
     background: {
-      default: mode === "dark" ? appColors.surfaceDark : appColors.backgroundLight,
-      paper: mode === "dark" ? "#0F172A" : appColors.surface,
+      default: isDark ? appColors.bgDark : appColors.surfaceAlt,
+      paper: isDark ? "rgba(255,255,255,0.04)" : "#FFFFFF",
     },
+
     text: {
-      primary: mode === "dark" ? "#F8FAFC" : appColors.textPrimary,
-      secondary: mode === "dark" ? "#CBD5E1" : appColors.textSecondary,
+      primary: isDark ? appColors.textPrimary : "#0F172A",
+      secondary: isDark ? appColors.textSecondary : "#475569",
     },
+
     divider: appColors.divider,
   };
 
   let theme = createTheme({
     palette,
+
     shape: {
       borderRadius: 14,
     },
+
     typography: {
-      fontFamily: ["Poppins", "Segoe UI", "sans-serif"].join(","),
+      fontFamily: ["Inter", "Poppins", "Segoe UI", "sans-serif"].join(","),
+
+      h1: { fontWeight: 700, letterSpacing: "-0.04em" },
+      h2: { fontWeight: 700 },
+      h3: { fontWeight: 600 },
+
       button: {
         textTransform: "none",
-        fontWeight: 700,
-      },
-      h1: {
-        fontWeight: 700,
-        letterSpacing: "-0.05em",
-      },
-      h2: {
-        fontWeight: 700,
-      },
-      h3: {
-        fontWeight: 700,
-      },
-      body1: {
-        color: palette.text.primary,
-      },
-      body2: {
-        color: palette.text.secondary,
+        fontWeight: 600,
       },
     },
+
     components: {
+      /* ─── Global Body ─── */
       MuiCssBaseline: {
         styleOverrides: {
           body: {
             backgroundColor: palette.background.default,
             color: palette.text.primary,
-            minHeight: "100vh",
-            fontFamily: ["Poppins", "Segoe UI", "sans-serif"].join(","),
           },
         },
       },
+
+      /* ─── AppBar (Glass Nav) ─── */
       MuiAppBar: {
         styleOverrides: {
           root: {
-            backdropFilter: "blur(14px)",
-            WebkitBackdropFilter: "blur(14px)",
-            borderBottom: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(15,76,129,0.18)"}`,
+            background: "rgba(6,13,24,0.8)",
+            backdropFilter: "blur(20px)",
+            borderBottom: `1px solid ${appColors.border}`,
           },
         },
       },
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            backgroundImage: "none",
-          },
-        },
-      },
+
+      /* ─── Cards (Glassmorphism) ─── */
       MuiCard: {
         styleOverrides: {
           root: {
-            border: `1px solid ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(15,76,129,0.12)"}`,
-            boxShadow: mode === "dark" ? "0 18px 45px rgba(0,0,0,0.16)" : "0 20px 40px rgba(15,76,129,0.08)",
+            background: appColors.bgCard,
+            backdropFilter: "blur(25px)",
+            border: `1px solid ${appColors.border}`,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
           },
         },
       },
+
+      /* ─── Dialogs (Modal consistency) ─── */
       MuiDialog: {
         styleOverrides: {
           paper: {
-            backgroundColor: palette.background.paper,
-            color: palette.text.primary,
+            background: appColors.bgCard,
+            backdropFilter: "blur(30px)",
+            border: `1px solid ${appColors.border}`,
             borderRadius: 20,
-            boxShadow: mode === "dark" ? "0 22px 48px rgba(0,0,0,0.4)" : "0 25px 60px rgba(15,76,129,0.12)",
           },
         },
       },
+
       MuiDialogTitle: {
         styleOverrides: {
           root: {
-            padding: "20px 24px",
-            backgroundColor: palette.primary.main,
-            color: palette.primary.contrastText,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
+            background: "transparent",
+            color: appColors.textPrimary,
+            fontWeight: 600,
           },
         },
       },
-      MuiDialogContent: {
-        styleOverrides: {
-          root: {
-            padding: "24px",
-          },
-        },
-      },
-      MuiDialogActions: {
-        styleOverrides: {
-          root: {
-            padding: "16px 24px 24px",
-          },
-        },
-      },
+
+      /* ─── Buttons (Metatron Style) ─── */
       MuiButton: {
         styleOverrides: {
           root: {
-            borderRadius: 999,
+            borderRadius: 10,
             padding: "10px 20px",
+          },
+
+          contained: {
+            background: `linear-gradient(135deg, #0FA88F, #14D2BE)`,
+            boxShadow: `0 8px 25px ${appColors.glow}`,
+
+            "&:hover": {
+              boxShadow: `0 12px 35px ${appColors.glow}`,
+            },
           },
         },
       },
-      MuiTooltip: {
+
+      /* ─── Inputs (GLOBAL FIX 🔥) ─── */
+      MuiOutlinedInput: {
         styleOverrides: {
-          tooltip: {
-            borderRadius: 10,
-            backgroundColor: appColors.brandBlue,
+          root: {
+            background: appColors.bgInput,
+            borderRadius: 12,
+
+            "& fieldset": {
+              borderColor: appColors.border,
+            },
+
+            "&:hover fieldset": {
+              borderColor: "rgba(255,255,255,0.3)",
+            },
+
+            "&.Mui-focused fieldset": {
+              borderColor: appColors.primary,
+            },
+
+            "&.Mui-focused": {
+              boxShadow: `0 0 0 3px ${appColors.glow}`,
+            },
+          },
+
+          input: {
             color: "#FFFFFF",
           },
         },
       },
-      MuiLinearProgress: {
+
+      MuiInputLabel: {
         styleOverrides: {
           root: {
-            borderRadius: 8,
-            overflow: "hidden",
+            color: appColors.textMuted,
           },
         },
       },
-    },
-  });
 
-  theme = responsiveFontSizes(theme);
-  return theme;
+      /* ─── Alerts ─── */
+      MuiAlert: {
+        styleOverrides: {
+          root: {
+            borderRadius: 10,
+            background: "rgba(20,210,190,0.1)",
+            border: `1px solid ${appColors.primary}`,
+            color: appColors.textPrimary,
+          },
+        },
+      },
+
+      MuiMenuItem: {
+        styleOverrides
+          : {
+          px: 1.5,
+          py: 1,
+          borderRadius: "10px",
+          mx: 0.5,
+          my: 0.3,
+          transition: "all 0.2s ease",
+
+          "&:hover": {
+            background: "rgba(20,210,190,0.08)",
+          },
+        },
+      },
+      
+
+        /* ─── Tooltip ─── */
+        MuiTooltip: {
+          styleOverrides: {
+            tooltip: {
+              background: "#0D1B2A",
+              border: `1px solid ${appColors.border}`,
+            },
+          },
+        },
+      },
+    });
+
+  return responsiveFontSizes(theme);
 };
 
 export default createAppTheme;

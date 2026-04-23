@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { handleSidebarRightbar } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
-import { appColors, appGradients } from "../../utils/colors";
+import { appColors } from "../../utils/colors";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CoursesContainer from "./CoursesContainer";
 import FeaturedEventsContainer from "./FeaturedEventsContainer";
@@ -71,16 +71,16 @@ const RightbarAll = () => {
     },
     ...(!isGuest
       ? [
-          {
-            key: "network",
-            label: "Network",
-            description: "People and collaboration opportunities around you.",
-            icon: <Diversity3Rounded fontSize="small" />,
-            cta: "Grow your network",
-            onClick: () => setActiveSection(3),
-            content: <RequestContainer />,
-          },
-        ]
+        {
+          key: "network",
+          label: "Network",
+          description: "People and collaboration opportunities around you.",
+          icon: <Diversity3Rounded fontSize="small" />,
+          cta: "Grow your network",
+          onClick: () => setActiveSection(3),
+          content: <RequestContainer />,
+        },
+      ]
       : []),
   ];
 
@@ -106,11 +106,9 @@ const RightbarAll = () => {
           top: { md: 88 },
           alignSelf: "flex-start",
           width: "100%",
-          
         }}
       >
         <Box
-          bgcolor={"background.paper"}
           sx={{
             border: "1px solid",
             borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : appColors.border,
@@ -120,20 +118,23 @@ const RightbarAll = () => {
             overflow: "visible",
             borderRadius: `${theme.shape.borderRadius + 6}px ${theme.shape.borderRadius + 6}px 0 0`,
             width: "100%",
+            background: "rgba(255,255,255,0.04)",
+            backdropFilter: "blur(25px)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
           }}
         >
           <Box
             px={2}
             py={2}
             sx={{
-              background: isDarkMode
-                ? "linear-gradient(180deg, rgba(15,76,129,0.32), rgba(8,21,38,0.14))"
-                : appGradients.soft,
+              background: "linear-gradient(180deg, rgba(20,210,190,0.15), transparent)",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
             }}
           >
             <Box display={"flex"} alignItems={"center"} gap={1} mb={0.75}>
-              <InsightsRounded color="primary" fontSize="small" />
-              <Typography variant="body2" fontWeight={700}>
+              <InsightsRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+              <Typography variant="body2" fontWeight={700} color="#F0F4FA">
                 Career dashboard
               </Typography>
             </Box>
@@ -157,13 +158,20 @@ const RightbarAll = () => {
                     borderRadius: cardRadius,
                     px: 1.5,
                     py: 0.9,
-                    bgcolor:
+                    background:
                       activeSection === index
-                        ? "primary.main"
-                        : isDarkMode
-                          ? "rgba(15,76,129,0.14)"
-                          : "rgba(15,76,129,0.05)",
-                    color: activeSection === index ? "primary.contrastText" : "text.primary",
+                        ? "linear-gradient(135deg,#0FA88F,#14D2BE)"
+                        : "rgba(255,255,255,0.03)",
+
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    color: activeSection === index ? "#fff" : "rgba(255,255,255,0.7)",
+
+                    transition: "all 0.25s ease",
+
+                    "&:hover": {
+                      background: "rgba(20,210,190,0.08)",
+                      borderColor: "rgba(20,210,190,0.4)",
+                    },
                     flexShrink: 0,
                   }}
                 >
@@ -176,24 +184,39 @@ const RightbarAll = () => {
               mt={1.5}
               sx={{
                 borderRadius: cardRadius,
-                border: "1px solid",
                 borderColor: "divider",
-                bgcolor: "background.default",
-                p: 1.5,
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                backdropFilter: "blur(10px)", p: 1.5,
               }}
             >
-              <Typography variant="body2" fontWeight={700}>
+              <Typography variant="body2"
+                sx={{
+                  color: "#F0F4FA",
+                  fontWeight: 600,
+                }}>
                 {currentSection.label}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{
+                color: "rgba(240,244,250,0.65)",
+              }}>
                 {currentSection.description}
               </Typography>
               <Box mt={1.2}>
                 <Button
                   onClick={currentSection.onClick}
                   size="small"
-                  startIcon={<InsightsRounded fontSize="small" />}
-                  sx={{ borderRadius: cardRadius }}
+                  startIcon={<InsightsRounded sx={{ color: "#14D2BE", fontSize: 18 }} />}
+                  sx={{
+                    borderRadius: 10,
+                    background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                    color: "#fff",
+                    px: 2,
+
+                    "&:hover": {
+                      background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+                    }
+                  }}
                 >
                   {currentSection.cta}
                 </Button>
@@ -205,7 +228,9 @@ const RightbarAll = () => {
               sx={{
                 borderRadius: cardRadius,
                 height: "100%",
-                p: 0.5,
+                background: "rgba(255,255,255,0.02)",
+                border: "1px solid rgba(255,255,255,0.06)",
+                borderRadius: cardRadius,
               }}
             >
               {currentSection.content}
@@ -214,7 +239,7 @@ const RightbarAll = () => {
             {CustomDeviceIsSmall() && currentSection.key === "jobs" && (
               <Box display={"flex"} justifyContent={"center"} width={"auto"} mt={1}>
                 <Button
-                  startIcon={<InsightsRounded />}
+                  startIcon={<InsightsRounded sx={{ color: "#14D2BE", fontSize: 18 }} />}
                   onClick={() => handleNavigate("/jobs", 1)}
                   size="small"
                   sx={{ textTransform: "capitalize", borderRadius: cardRadius }}

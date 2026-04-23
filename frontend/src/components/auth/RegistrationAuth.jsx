@@ -1,10 +1,11 @@
 import {
   ArrowBackIosNewRounded,
+  ArrowForwardIosRounded,
+  BusinessRounded,
   CheckCircle,
+  PersonRounded,
   Visibility,
   VisibilityOff,
-  WbIncandescentRounded,
-  WorkRounded
 } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -18,11 +19,13 @@ import {
   MenuItem,
   OutlinedInput,
   TextField,
-  Typography
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import React, { lazy, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+
 import AlertCountry from "../alerts/AlertCountry";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertOrgCompletion from "../alerts/AlertOrgCompletion";
@@ -36,78 +39,205 @@ import Institutions from "../data/Institution";
 import OrgSpecializations from "../data/OrgSpecializations";
 import SpecialisationJobs from "../data/SpecialisationJobs";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
+
 const RegisterAlertTitle = lazy(() => import("./RegisterAlertTitle"));
 
-const MAX_ABOUT=400
+const MAX_ABOUT = 400;
 
+/* ─── Design tokens (shared with LoginAuth) ────────────────────────── */
+const C = {
+  bg:          "#060D18",
+  bgCard:      "rgba(255,255,255,0.045)",
+  bgInput:     "rgba(255,255,255,0.06)",
+  border:      "rgba(255,255,255,0.09)",
+  borderFocus: "rgba(20,210,190,0.55)",
+  teal:        "#14D2BE",
+  tealDim:     "rgba(20,210,190,0.18)",
+  tealGlow:    "rgba(20,210,190,0.28)",
+  gold:        "#C8A96E",
+  textPri:     "#F0F4FA",
+  textSec:     "rgba(240,244,250,0.55)",
+  textHint:    "rgba(240,244,250,0.32)",
+  danger:      "#FF6B6B",
+};
+
+/* ─── Ambient orb ─────────────────────────────────────────────────── */
+const Orb = ({ top, left, right, bottom, size, color, delay = "0s" }) => (
+  <Box
+    sx={{
+      position: "absolute",
+      top, left, right, bottom,
+      width: size, height: size,
+      borderRadius: "50%",
+      background: color,
+      filter: "blur(90px)",
+      opacity: 0.4,
+      animation: `orbPulse 9s ease-in-out ${delay} infinite`,
+      pointerEvents: "none",
+      "@keyframes orbPulse": {
+        "0%,100%": { transform: "scale(1)", opacity: 0.4 },
+        "50%":     { transform: "scale(1.15)", opacity: 0.6 },
+      },
+    }}
+  />
+);
+
+/* ─── Dot-grid backdrop ─────────────────────────────────────────────── */
+const DotGrid = () => (
+  <Box
+    sx={{
+      position: "absolute", inset: 0,
+      backgroundImage: "radial-gradient(circle, rgba(20,210,190,0.1) 1px, transparent 1px)",
+      backgroundSize: "28px 28px",
+      pointerEvents: "none",
+    }}
+  />
+);
+
+/* ─── Step indicator ────────────────────────────────────────────────── */
+const StepDots = ({ current, total }) => (
+  <Box display="flex" justifyContent="center" gap={1} mb={3}>
+    {Array.from({ length: total }).map((_, i) => (
+      <Box
+        key={i}
+        sx={{
+          width: i === current ? 20 : 6,
+          height: 6,
+          borderRadius: 3,
+          background: i === current ? C.teal : C.border,
+          transition: "all 0.35s cubic-bezier(0.34,1.56,0.64,1)",
+        }}
+      />
+    ))}
+  </Box>
+);
+
+/* ─── Shared input sx ───────────────────────────────────────────────── */
+const inputSx = {
+  "& .MuiOutlinedInput-root": {
+    color: C.textPri,
+    background: C.bgInput,
+    borderRadius: "10px",
+    transition: "box-shadow 0.25s",
+    "& fieldset": { borderColor: C.border, borderWidth: "1px" },
+    "&:hover fieldset": { borderColor: "rgba(255,255,255,0.2)" },
+    "&.Mui-focused fieldset": { borderColor: C.borderFocus, borderWidth: "1px" },
+    "&.Mui-focused": { boxShadow: `0 0 0 3px ${C.tealGlow}` },
+  },
+  "& .MuiInputLabel-root": { color: C.textHint, fontSize: 14 },
+  "& .MuiInputLabel-root.Mui-focused": { color: C.teal },
+  "& .MuiSelect-icon": { color: C.textHint },
+  "& .MuiAutocomplete-popupIndicator": { color: C.textHint },
+  "& .MuiAutocomplete-clearIndicator": { color: C.textHint },
+  "& input:-webkit-autofill": {
+    WebkitBoxShadow: `0 0 0 100px #0A1625 inset`,
+    WebkitTextFillColor: C.textPri,
+  },
+};
+
+/* ─── Chip sx (skills, county, institution) ─────────────────────────── */
+const chipSx = {
+  background: C.tealDim,
+  border: `1px solid rgba(20,210,190,0.3)`,
+  color: C.teal,
+  fontSize: 11,
+  height: 24,
+  "& .MuiChip-deleteIcon": { color: "rgba(20,210,190,0.6)", "&:hover": { color: C.teal } },
+};
+
+/* ─── Section label ─────────────────────────────────────────────────── */
+const SectionLabel = ({ children }) => (
+  <Box display="flex" alignItems="center" gap={1.5} mb={2}>
+    <Box sx={{ width: 16, height: 1.5, bgcolor: C.teal, borderRadius: 1 }} />
+    <Typography sx={{ fontSize: 10, letterSpacing: "0.18em", color: C.teal, textTransform: "uppercase" }}>
+      {children}
+    </Typography>
+    <Box sx={{ flex: 1, height: 1, bgcolor: C.border }} />
+  </Box>
+);
+
+/* ─── Account toggle pill ───────────────────────────────────────────── */
+const AccountToggle = ({ account, setAccount, AccountVersion }) => (
+  <Box
+    display="flex"
+    sx={{
+      background: "rgba(255,255,255,0.04)",
+      border: `1px solid ${C.border}`,
+      borderRadius: "12px",
+      p: "4px",
+      mb: 3,
+    }}
+  >
+    {AccountVersion.map((v) => (
+      <Box
+        key={v}
+        onClick={() => setAccount(v)}
+        sx={{
+          flex: 1,
+          py: 1,
+          borderRadius: "9px",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 0.75,
+          transition: "all 0.25s",
+          background: account === v ? "rgba(20,210,190,0.15)" : "transparent",
+          border: account === v ? `1px solid rgba(20,210,190,0.35)` : "1px solid transparent",
+        }}
+      >
+        {v === "Personal"
+          ? <PersonRounded sx={{ width: 15, height: 15, color: account === v ? C.teal : C.textHint }} />
+          : <BusinessRounded sx={{ width: 15, height: 15, color: account === v ? C.teal : C.textHint }} />
+        }
+        <Typography sx={{ fontSize: 12, fontWeight: 500, color: account === v ? C.teal : C.textHint }}>
+          {v}
+        </Typography>
+      </Box>
+    ))}
+  </Box>
+);
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Main component
+═══════════════════════════════════════════════════════════════════════ */
 const RegistrationAuth = () => {
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [name, setName] = useState("");
-  const [educationLevel, setEducationLevel] = useState("");
-  const [gender, setGender] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [name, setName]                         = useState("");
+  const [educationLevel, setEducationLevel]     = useState("");
+  const [gender, setGender]                     = useState("");
   const [specialisationTitle, setSpecialisationTitle] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState();
-  const [password, setPassword] = useState("");
-  const [country, setCountry] = useState("");
-  const [county, setCounty] = useState("");
+  const [email, setEmail]                       = useState("");
+  const [phone, setPhone]                       = useState("");
+  const [password, setPassword]                 = useState("");
+  const [country, setCountry]                   = useState("");
+  const [county, setCounty]                     = useState("");
   const [missingFieldMessage, setMissingFieldMessage] = useState("");
-  const [openAlertGenral, setOpenAlertGenral] = useState(false);
-  const [titleAlert, setTitleAlert] = useState();
-  const [account,setAccount]=useState(AccountVersion[0])
-  const [selectedSkills, setSelectedSkills] = useState([]);
-  // control edu institutions
-  const [eduInstitution, setEduInstitution] = useState("");
-  const [eduInputValue, setEduInputValue] = useState("");
-  const [inputCounties, setInputCounties] = useState("");
-  const [options, setOptions] = useState(Institutions);
-  // about field for business account
-  const [about, setAbout] = useState("");
-
-  // track business a/c
-  let isPersonal=account==="Personal"
-
-  // user object
-  const [user, setUser] = useState({});
-  // alert profile pic
+  const [openAlertGenral, setOpenAlertGenral]   = useState(false);
+  const [titleAlert, setTitleAlert]             = useState();
+  const [account, setAccount]                   = useState(AccountVersion[0]);
+  const [selectedSkills, setSelectedSkills]     = useState([]);
+  const [eduInstitution, setEduInstitution]     = useState("");
+  const [eduInputValue, setEduInputValue]       = useState("");
+  const [inputCounties, setInputCounties]       = useState("");
+  const [options, setOptions]                   = useState(Institutions);
+  const [about, setAbout]                       = useState("");
+  const [user, setUser]                         = useState({});
   const [openAlertProfile, setOpenAlertProfile] = useState(false);
-  // alert country before proceed
   const [openAlertCountry, setOpenAlertCountry] = useState(true);
-  // will define showing of custom title alert or not
-  const [openAlert, setOpenAlert] = useState(false);
+  const [openAlert, setOpenAlert]               = useState(false);
+  const [showNext, setShowNext]                 = useState(false);
 
-  // control showing of the next and previous input detail
-  const [showNext, setShowNext] = useState(false);
+  const isPersonal = account === "Personal";
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
+  const { currentMode } = useSelector((s) => s.appUI);
 
-  const handleChange = (event, newValue) => {
-    if (newValue.length > 5) {
-      return; // Limit to 5 selections
-    }
+  const handleChange = (_, newValue) => {
+    if (newValue.length > 5) return;
     setSelectedSkills(newValue);
   };
+  const handleDelete = (s) => setSelectedSkills((p) => p.filter((x) => x !== s));
 
-  const handleDelete = (skillToDelete) => {
-    setSelectedSkills((prevSkills) =>
-      prevSkills.filter((skill) => skill !== skillToDelete)
-    );
-  };
-
-  // global dark mode state from redux
-  const { currentMode } = useSelector((state) => state.appUI);
-  // update is dark const
-  const isDarkMode=currentMode==='dark'
-
-  // handle showing next and prev inputs
-  const handleShowNext = () => {
-    setShowNext((prev) => !prev);
-  };
-
-  //handle selection institution
   const handleAddNew = () => {
     if (eduInputValue && !options.includes(eduInputValue)) {
       setOptions([...options, eduInputValue]);
@@ -115,694 +245,507 @@ const RegistrationAuth = () => {
       setEduInputValue("");
     }
   };
-  // clear an institution
-  const handleDeleteInstitution = () => {
-    setEduInstitution(null);
-  };
-
-  // clear county
-  const handleDeleteCounty = () => {
-    setCounty(null);
-  };
-
-  // add new county
+  const handleDeleteInstitution = () => setEduInstitution(null);
+  const handleDeleteCounty      = () => setCounty(null);
   const handleAddNewCounty = () => {
     if (inputCounties && !CountiesInKenya.includes(inputCounties)) {
-      setCounty(setInputCounties);
+      setCounty(inputCounties);
       setInputCounties("");
     }
   };
 
-  // zero match
   useEffect(() => {
     if (specialisationTitle === "Zero Matched") setOpenAlert(true);
-  }, [specialisationTitle,name,phone]);
+  }, [specialisationTitle, name, phone]);
 
   const handleMissingField = () => {
-
-    if (
-    name.trim().split(" ").length!==2
-    ) {
-      setTitleAlert("Name Field");
-      setMissingFieldMessage("Please provide two names in order to complete your profile");
-      setOpenAlertGenral(true);
-      return true;
-    }
-
-    if (name?.trim() === "") {
-      setTitleAlert("Missing Field");
-      setMissingFieldMessage(
-        "Please fill all the missing fields, your name is missing !"
-      );
-      setOpenAlertGenral(true);
-      return true;
-    }
-    if (email?.trim() === "") {
-      setTitleAlert("Missing Field");
-      setMissingFieldMessage(
-        "Please fill all the missing fields, your email is missing !"
-      );
-      return true;
-    }
-    if (password?.trim() === "") {
-      setTitleAlert("Missing Field");
-      setMissingFieldMessage(
-        "Please fill all the missing fields, your password is missing !"
-      );
-      return true;
-    }
+    const fail = (title, msg) => { setTitleAlert(title); setMissingFieldMessage(msg); setOpenAlertGenral(true); return true; };
+    if (name.trim().split(" ").length !== 2)    return fail("Name Field", "Please provide two names to complete your profile.");
+    if (name.trim() === "")                      return fail("Missing Field", "Your name is missing.");
+    if (email.trim() === "")                     return fail("Missing Field", "Your email is missing.");
+    if (password.trim() === "")                  return fail("Missing Field", "Your password is missing.");
     if (isPersonal) {
-      if (gender?.trim() === "") {
-        setTitleAlert("Missing Field");
-        setMissingFieldMessage(
-          "Please fill all the missing fields, your gender is missing !"
-        );
-        return true;
-      }
-      if (specialisationTitle.trim() === "") {
-        setTitleAlert("Missing Field");
-        setMissingFieldMessage(
-          "Please fill all the missing fields, your preferred title is missing !"
-        );
-        return true;
-      }
-      if (!selectedSkills.length > 0) {
-        setTitleAlert("Missing Field");
-        setMissingFieldMessage(
-          "Please fill all the missing fields, your skills missing atleast provide one skill or at most five !"
-        );
-        return true;
-      }
-      if (educationLevel?.trim() === "") {
-        setTitleAlert("Missing Field");
-        setMissingFieldMessage(
-          "Please fill all the missing fields, field level of education is missing !"
-        );
-        return true;
-      }
-      if (eduInstitution?.trim() === "") {
-        setTitleAlert("Missing Field");
-        setMissingFieldMessage(
-          "Please fill all the missing fields, your education institution is missing !"
-        );
-        return true;
-      }
+      if (gender.trim() === "")                  return fail("Missing Field", "Your gender is missing.");
+      if (specialisationTitle.trim() === "")     return fail("Missing Field", "Your preferred specialisation is missing.");
+      if (!selectedSkills.length)                return fail("Missing Field", "Provide at least one skill (max 5).");
+      if (educationLevel.trim() === "")          return fail("Missing Field", "Education level is missing.");
+      if (!eduInstitution || eduInstitution.trim() === "") return fail("Missing Field", "Your institution is missing.");
     } else {
-      // Business account: check about field
-      if (about.trim() === "") {
-        setTitleAlert("Missing Field");
-        setMissingFieldMessage(
-          "Please provide a brief about your organization."
-        );
-        return true;
-      }
+      if (about.trim() === "")                   return fail("Missing Field", "Please provide a brief about your organisation.");
     }
-    if (phone?.trim() === "") {
-      setTitleAlert("Missing Field");
-      setMissingFieldMessage(
-        "Please fill all the missing fields, your phone is missing !"
-      );
-      return true;
-    }
-
-    // phone must be a number
-    if (!Number.isInteger(parseInt(phone?.trim()/1)) ) {
-      setTitleAlert("Incorrect Phone")
-      setMissingFieldMessage('provided phone number is not acceptable!')
-      return true
-    }
-
-    if (county?.trim() === "") {
-      setTitleAlert("Missing Field");
-      setMissingFieldMessage(
-        "Please fill all the missing fields, your county or location is missing !"
-      );
-      return true;
-    }
-
+    if (!phone || phone.trim() === "")           return fail("Missing Field", "Your phone number is missing.");
+    if (!Number.isInteger(parseInt(phone.trim() / 1))) return fail("Incorrect Phone", "The provided phone number is not valid.");
+    if (!county || county.trim() === "")         return fail("Missing Field", "Your county/city/state is missing.");
     return false;
   };
 
-  // handle registration of user
   const handleUserRegistration = () => {
-    // check any missing data and alert
-    if (handleMissingField()) {
-      setOpenAlertGenral(true);
-    } else {
-      const user = {
-        name,
-        email,
-        password,
-        educationLevel: isPersonal ? educationLevel : "",
-        eduInstitution: isPersonal ? eduInstitution : "",
-        phone,
-        country,
-        county,
-        gender: isPersonal ? gender : "",
-        specialisationTitle,
-        selectedSkills: isPersonal ? selectedSkills : "",
-        account,
-        about: !isPersonal ? about : ""
-      };
-      // set the user object
-      setUser(user);
-
-      // set open alertProfile where user will now post data if necessary
-      setOpenAlertProfile(true);
-    }
+    if (handleMissingField()) return;
+    setUser({
+      name, email, password,
+      educationLevel: isPersonal ? educationLevel : "",
+      eduInstitution: isPersonal ? eduInstitution : "",
+      phone, country, county,
+      gender: isPersonal ? gender : "",
+      specialisationTitle,
+      selectedSkills: isPersonal ? selectedSkills : "",
+      account,
+      about: !isPersonal ? about : "",
+    });
+    setOpenAlertProfile(true);
   };
 
+  /* ── Render ── */
   return (
     <Box
-      height={"100vh"}
-      className={"container"}
-      display={"flex"}
-      justifyContent={"center"}
-      alignItems={"center"}
-      sx={{ opacity: openAlertProfile ? ".5" : undefined }}
+      minHeight="100vh"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      sx={{
+        background: C.bg,
+        position: "relative",
+        overflow: "hidden",
+        opacity: openAlertProfile ? 0.5 : 1,
+        transition: "opacity 0.3s",
+        px: 2,
+        py: 4,
+      }}
     >
+      {/* Ambient orbs */}
+      <Orb top="-8%"   left="-6%"  size={480} color="radial-gradient(circle,rgba(20,210,190,0.3),transparent)" delay="0s" />
+      <Orb bottom="-6%" right="-4%" size={360} color="radial-gradient(circle,rgba(15,76,129,0.45),transparent)" delay="4s" />
+      <Orb top="40%"   left="45%"  size={250} color="radial-gradient(circle,rgba(200,169,110,0.1),transparent)" delay="2s" />
+      <DotGrid />
+
+      {/* ── Card ── */}
       <Box
-        className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
-        border={isDarkMode ? "1px solid gray" : "none"}
-        bgcolor={!isDarkMode && "background.default"}
-        width={"100%"}
-        maxHeight={'98vh'}
         sx={{
-          overflow: "auto",
-          // Hide scrollbar for Chrome, Safari and Opera
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          // Hide scrollbar for IE, Edge and Firefox
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
+          maxWidth: 480,
+          background: C.bgCard,
+          backdropFilter: "blur(30px)",
+          border: `1px solid ${C.border}`,
+          borderRadius: "20px",
+          p: { xs: 3, sm: 4 },
+          boxShadow: "0 24px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07)",
+          overflow: "hidden",
+          maxHeight: "96vh",
+          overflowY: "auto",
+          /* Hide scrollbar */
+          "&::-webkit-scrollbar": { display: "none" },
           msOverflowStyle: "none",
           scrollbarWidth: "none",
         }}
       >
-          <Box>
-            <Typography
-              textAlign={"center"}
-              fontWeight={"bold"}
-              mt={1}
-              textTransform={"uppercase"}
-              variant={CustomDeviceSmallest() ? "body1" : "h6"}
-              gutterBottom
-              color={"primary"}
-            >
-              Metatron Developer
-            </Typography>
+        {/* card inner glow */}
+        <Box
+          sx={{
+            position: "absolute", top: -60, left: -60,
+            width: 200, height: 200, borderRadius: "50%",
+            background: `radial-gradient(circle, ${C.tealDim}, transparent 70%)`,
+            pointerEvents: "none",
+          }}
+        />
 
-            <Typography
-              fontWeight={"bold"}
-              color={"text.secondary"}
-              variant="body2"
-              mb={1}
-              textTransform={"capitalize"}
-              display={"flex"}
-              gap={1}
-              alignItems={"center"}
-              justifyContent={"center"}
-            >
-              <WbIncandescentRounded sx={{ width: 20, height: 20,color: "orange" }} />
-              Ultimate Tech Platform{" "}
-              <WbIncandescentRounded sx={{ width: 20, height: 20,color: "orange" }} />
+        {/* ── Card header ── */}
+        <Box textAlign="center" mb={3} sx={{ position: "relative" }}>
+          <Box display="flex" alignItems="center" justifyContent="center" gap={1} mb={1.5}>
+            <Box sx={{ width: 20, height: 1.5, bgcolor: C.teal, borderRadius: 1 }} />
+            <Typography sx={{ fontSize: 9, letterSpacing: "0.22em", color: C.teal, textTransform: "uppercase" }}>
+              Create Account
             </Typography>
-
-            <Box
-              mb={1}
-              display={"flex"}
-              justifyContent={"center"}
-              gap={1}
-              alignItems={"center"}
-            >
-              <WorkRounded color="primary" sx={{ width: 17, height: 17 }} />
-              <Typography
-                variant={CustomDeviceSmallest() ? "caption" : "body2"}
-                color={"text.secondary"}
-              >
-                {account} Account Signup
-              </Typography>
-              <WorkRounded color="primary" sx={{ width: 17, height: 17 }} />
-            </Box>
+            <Box sx={{ width: 20, height: 1.5, bgcolor: C.teal, borderRadius: 1 }} />
           </Box>
 
-          <Box
-            display={"flex"}
-            flexDirection={"column"}
-            justifyContent={"center"}
-            gap={2}
+          <Typography
+            sx={{
+              fontFamily: "'Playfair Display', 'Georgia', serif",
+              fontWeight: 700, fontSize: CustomDeviceSmallest() ? 20 : 24,
+              color: C.textPri, letterSpacing: "0.02em",
+            }}
           >
-            {/* first section */}
+            Join Metatron
+          </Typography>
+          <Typography sx={{ fontSize: 12, color: C.textSec, mt: 0.5 }}>
+            Build your developer profile today
+          </Typography>
+        </Box>
 
-            {!showNext ? (
+        {/* ── Account type toggle ── */}
+        <AccountToggle account={account} setAccount={setAccount} AccountVersion={AccountVersion} />
+
+        {/* ── Step indicator ── */}
+        <StepDots current={showNext ? 1 : 0} total={2} />
+
+        {/* ════════════════════════════════
+            STEP 1 — Core credentials
+        ════════════════════════════════ */}
+        {!showNext ? (
+          <Box display="flex" flexDirection="column" gap={2}>
+            <SectionLabel>Basic Info</SectionLabel>
+
+            <TextField
+              required
+              label="Full Name"
+              fullWidth
+              value={name}
+              onChange={(e) => setName(e.target.value.toUpperCase())}
+              placeholder="FirstName LastName"
+              sx={inputSx}
+            />
+
+            <TextField
+              required
+              label="Email Address"
+              fullWidth
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              sx={inputSx}
+            />
+
+            <TextField
+              required
+              label="Phone Number"
+              fullWidth
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder={`${country?.split(" ")[0] || "+254"}xxxxxxx`}
+              sx={inputSx}
+            />
+
+            {isPersonal && (
+              <TextField
+                required
+                select
+                label="Gender"
+                fullWidth
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                sx={inputSx}
+                SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0D1B2A", border: `1px solid ${C.border}` } } } }}
+              >
+                {GenderData?.map((g) => (
+                  <MenuItem key={g} value={g} sx={{ color: C.textSec, "&:hover": { color: C.textPri } }}>{g}</MenuItem>
+                ))}
+              </TextField>
+            )}
+
+            <FormControl fullWidth sx={inputSx}>
+              <InputLabel>Password *</InputLabel>
+              <OutlinedInput
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type={showPassword ? "text" : "password"}
+                label="Password"
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword((p) => !p)}
+                      edge="end"
+                      sx={{ color: C.textHint, "&:hover": { color: C.teal } }}
+                    >
+                      {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+          </Box>
+
+        ) : (
+          /* ════════════════════════════════
+              STEP 2 — Profile details
+          ════════════════════════════════ */
+          <Box display="flex" flexDirection="column" gap={2}>
+            <SectionLabel>Profile Details</SectionLabel>
+
+            {/* Specialisation */}
+            <TextField
+              required
+              select
+              label="Specialisation"
+              fullWidth
+              value={specialisationTitle}
+              onChange={(e) => setSpecialisationTitle(e.target.value)}
+              sx={inputSx}
+              SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0D1B2A", border: `1px solid ${C.border}`, maxHeight: 260 } } } }}
+            >
+              {(isPersonal ? SpecialisationJobs : OrgSpecializations)?.map((t) => (
+                <MenuItem key={t} value={t} sx={{ color: C.textSec, "&:hover": { color: C.textPri } }}>{t}</MenuItem>
+              ))}
+            </TextField>
+
+            {/* Personal-only fields */}
+            {isPersonal && (
               <>
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    id="name"
-                    label="Name"
-                    className="w-75"
-                    onChange={(e) => setName(e.target.value.toUpperCase())}
-                    value={name}
-                    placeholder="FirstName LastName"
-                  />
-                </Box>
+                <TextField
+                  required
+                  select
+                  label="Education Level"
+                  fullWidth
+                  value={educationLevel}
+                  onChange={(e) => setEducationLevel(e.target.value)}
+                  sx={inputSx}
+                  SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0D1B2A", border: `1px solid ${C.border}` } } } }}
+                >
+                  {EducationLevel?.map((l) => (
+                    <MenuItem key={l} value={l} sx={{ color: C.textSec, "&:hover": { color: C.textPri } }}>{l}</MenuItem>
+                  ))}
+                </TextField>
 
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    id="email"
-                    label="Email"
-                    display={"flex"}
-                    justifyContent={"center"}
-                    className="w-75"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="username@gmail.com"
-                    type="email"
-                  />
-                </Box>
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    id="phone"
-                    label="Phone"
-                    className="w-75"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder={`${country?.split(" ")[0]}xyz`}
-                  />
-                </Box>
-
-                    {isPersonal && (
-                        <Box display={"flex"} justifyContent={"center"}>
-                        <TextField
-                          required
-                          select
-                          id="gender"
-                          value={gender}
-                          label="Gender"
-                          className="w-75"
-                          onChange={(e) => setGender(e.target.value)}
-                        >
-                          {
-                            GenderData?.map((gender) => (
-                              <MenuItem 
-                              key={gender} 
-                              value={gender}>
-                                {gender}
-                              </MenuItem>
-                            ))}
-                        </TextField>
-                      </Box>
-                    )}
-
-                <Box display={"flex"} justifyContent={"center"}>
-                  <FormControl fullWidth variant="outlined" className="w-75">
-                    <InputLabel htmlFor="outlined-adornment-password">
-                      Password &nbsp;*
-                    </InputLabel>
-                    <OutlinedInput
-                      required
-                      value={password}
-                      id="outlined-adornment-password"
-                      onChange={(e) => setPassword(e.target.value)}
-                      type={showPassword ? "text" : "password"}
-                      inputMode="text"
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}
-                            edge="end"
-                          >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      }
-                      label="Password"
-                    />
-                  </FormControl>
-                </Box>
-              </>
-            ) : (
-              <>
-
-                {/* specialisation title */}
-                <Box display={"flex"} justifyContent={"center"}>
-                  <TextField
-                    required
-                    select
-                    id="preferred-title"
-                    value={specialisationTitle}
-                    label="Specialisation"
-                    className="w-75"
-                    onChange={(e) => setSpecialisationTitle(e.target.value)}
-                  >
-                    {
-                      isPersonal ?
-                      SpecialisationJobs?.map((specialisation_title) => (
-                        <MenuItem
-                          key={specialisation_title}
-                          value={specialisation_title}
-                        >
-                      
-                        {/* skill name */}
-                          {specialisation_title}
-                        </MenuItem>
-                      )) :
-                      OrgSpecializations?.map((specialisation_title) => (
-                        <MenuItem
-                          key={specialisation_title}
-                          value={specialisation_title}
-                        >
-                      
-                        {/* skill name */}
-                          {specialisation_title}
-                        </MenuItem>
-                      ))
-                      
-                      }
-                  </TextField>
-                </Box>
-
-                {/* education, institution, skills only for personal account */}
-                {isPersonal && (
-                  <>
-                    {/* education */}
-                    <Box display={"flex"} justifyContent={"center"}>
-                      <TextField
-                        required
-                        select
-                        id="educationLevel"
-                        value={educationLevel}
-                        label="Education"
-                        className="w-75"
-                        onChange={(e) => setEducationLevel(e.target.value)}
-                      >
-                        {
-                          EducationLevel?.map((education_level) => (
-                            <MenuItem 
-                            key={education_level} 
-                            value={education_level}>
-                              {education_level}
-                            </MenuItem>
-                          ))}
-                      </TextField>
-                    </Box>
-
-                    {/* show this if country includes kenya's institutions */}
-                    {country?.trim().toLowerCase().includes("kenya") ? (
-                      <Box display={"flex"} justifyContent={"center"}>
-                        <Autocomplete
-                          value={eduInstitution}
-                          className="w-75"
-                          onChange={(event, newValue) => {
-                            setEduInstitution(newValue);
-                          }}
-                          inputValue={eduInputValue}
-                          onInputChange={(event, newInputValue) => {
-                            setEduInputValue(newInputValue);
-                          }}
-                          options={options}
-                          freeSolo
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="Institution"
-                              variant="outlined"
-                              fullWidth
-                            />
-                          )}
-                          renderOption={(props, option) => (
-                            <li key={option} {...props}>{option}</li>
-                          )}
-                          renderTags={() =>
-                            eduInstitution ? (
-                              <Chip
-                                label={eduInstitution}
-                                onDelete={handleDeleteInstitution}
-                                deleteIcon={<CheckCircle />}
-                              />
-                            ) : null
-                          }
-                          noOptionsText={
-                            <Chip
-                              label={`Add "${eduInputValue}"`}
-                              onClick={handleAddNew}
-                              icon={<CheckCircle />}
-                              color="primary"
-                              clickable
-                            />
-                          }
-                        />
-                      </Box>
-                    ) : (
-                      <Box display={"flex"} 
-                      justifyContent={"center"}>
-                        <TextField
-                          required
-                          id="institution-other"
-                          label="Institution"
-                          className="w-75"
-                          value={eduInstitution}
-                          onChange={(e) => setEduInstitution(e.target.value)}
-                          placeholder="Education Institution"
-                        />
-                      </Box>
-                    )}
-
-                    {/* skills */}
-                    <Box 
-                    display={"flex"} 
-                    justifyContent={"center"}>
-                      <Autocomplete
-                        multiple
-                        options={AllSkills}
-                        value={selectedSkills}
-                        onChange={handleChange}
-                        disableCloseOnSelect
-                        className="w-75"
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="outlined"
-                            label="Skills *"
-                            placeholder="Skill"
-                          />
-                        )}
-                        renderTags={(value, getTagProps) =>
-                          value.map((skill, index) => (
-                            <Chip
-                              label={skill}
-                              {...getTagProps({ index })}
-                              onDelete={() => handleDelete(skill)}
-                              key={index}
-                            />
-                          ))
-                        }
+                {/* Institution */}
+                {country?.trim().toLowerCase().includes("kenya") ? (
+                  <Autocomplete
+                    value={eduInstitution}
+                    onChange={(_, v) => setEduInstitution(v)}
+                    inputValue={eduInputValue}
+                    onInputChange={(_, v) => setEduInputValue(v)}
+                    options={options}
+                    freeSolo
+                    sx={inputSx}
+                    renderInput={(p) => <TextField {...p} label="Institution" variant="outlined" fullWidth />}
+                    renderOption={(p, o) => <li key={o} {...p} style={{ color: C.textSec }}>{o}</li>}
+                    renderTags={() =>
+                      eduInstitution ? (
+                        <Chip label={eduInstitution} onDelete={handleDeleteInstitution} deleteIcon={<CheckCircle />} sx={chipSx} />
+                      ) : null
+                    }
+                    noOptionsText={
+                      <Chip
+                        label={`Add "${eduInputValue}"`}
+                        onClick={handleAddNew}
+                        icon={<CheckCircle />}
+                        color="primary"
+                        clickable
                       />
-                    </Box>
-                  </>
-                )}
-
-                {/* show this if country includes kenya for ke counties */}
-                    {country?.trim().toLowerCase().includes("kenya") ? (
-                      <Box 
-                      display={"flex"} 
-                      justifyContent={"center"}>
-                        <Autocomplete
-                          value={county}
-                          className="w-75"
-                          onChange={(event, newValue) => {
-                            setCounty(newValue);
-                          }}
-                          inputValue={inputCounties}
-                          onInputChange={(event, newInputValue) => {
-                            setInputCounties(newInputValue);
-                          }}
-                          options={CountiesInKenya}
-                          freeSolo
-                          renderInput={(params) => (
-                            <TextField
-                              {...params}
-                              label="County, City or State"
-                              variant="outlined"
-                              fullWidth
-                            />
-                          )}
-                          renderOption={(props, option) => (
-                            <li {...props}>{option}</li>
-                          )}
-                          renderTags={() =>
-                            county ? (
-                              <Chip
-                                label={county}
-                                onDelete={handleDeleteCounty}
-                                deleteIcon={<CheckCircle />}
-                              />
-                            ) : null
-                          }
-                          noOptionsText={
-                            <Chip
-                              label={`Add "${eduInputValue}"`}
-                              onClick={handleAddNewCounty}
-                              icon={<CheckCircle />}
-                              color="primary"
-                              clickable
-                            />
-                          }
-                        />
-                      </Box>
-                    ) : (
-                      <Box 
-                      display={"flex"} 
-                      justifyContent={"center"}>
-                        <TextField
-                          required
-                          id="county-other"
-                          label="County, City or State"
-                          className="w-75"
-                          value={county}
-                          onChange={(e) => setCounty(e.target.value)}
-                          placeholder="County"
-                        />
+                    }
+                    PaperComponent={({ children }) => (
+                      <Box sx={{ background: "#0D1B2A", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
+                        {children}
                       </Box>
                     )}
-
-                {/* About field for business account */}
-                {!isPersonal && (
-                  <Box display={"flex"} justifyContent={"center"}>
-                    <TextField
-                      required
-                      id="about-org"
-                      label={`About Organisation ${MAX_ABOUT-about.length}`}
-                      className="w-75"
-                      maxRows={5}
-                      value={about}
-                      error={about.length>MAX_ABOUT}
-                      onChange={(e) => setAbout(e.target.value)}
-                      placeholder="About your organization"
-                      multiline
-                      minRows={3}
-                    />
-                  </Box>
+                  />
+                ) : (
+                  <TextField
+                    required
+                    label="Institution"
+                    fullWidth
+                    value={eduInstitution}
+                    onChange={(e) => setEduInstitution(e.target.value)}
+                    placeholder="institution name"
+                    sx={inputSx}
+                  />
                 )}
+
+                {/* Skills */}
+                <Autocomplete
+                  multiple
+                  options={AllSkills}
+                  value={selectedSkills}
+                  onChange={handleChange}
+                  disableCloseOnSelect
+                  sx={inputSx}
+                  renderInput={(p) => (
+                    <TextField
+                      {...p}
+                      label="Skills *"
+                      placeholder={selectedSkills.length < 5 ? "Add skill…" : ""}
+                      helperText={
+                        <Typography component="span" sx={{ fontSize: 11, color: C.textHint }}>
+                          {selectedSkills.length}/5 selected
+                        </Typography>
+                      }
+                    />
+                  )}
+                  renderTags={(v, getTagProps) =>
+                    v.map((skill, i) => (
+                      <Chip
+                        label={skill}
+                        {...getTagProps({ index: i })}
+                        onDelete={() => handleDelete(skill)}
+                        key={i}
+                        sx={chipSx}
+                      />
+                    ))
+                  }
+                  PaperComponent={({ children }) => (
+                    <Box sx={{ background: "#0D1B2A", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
+                      {children}
+                    </Box>
+                  )}
+                />
               </>
             )}
 
-            <Box display={"flex"} justifyContent={"center"}>
-              <Box className={"w-75"}>
-                {/* prev content toggle */}
-                {showNext && (
-                  <Box>
-                    <IconButton size="small" onClick={handleShowNext}>
-                      <ArrowBackIosNewRounded
-                        color="primary"
-                        sx={{ width: 17, height: 17 }}
-                      />
-                    </IconButton>
+            {/* County / City */}
+            {country?.trim().toLowerCase().includes("kenya") ? (
+              <Autocomplete
+                value={county}
+                onChange={(_, v) => setCounty(v)}
+                inputValue={inputCounties}
+                onInputChange={(_, v) => setInputCounties(v)}
+                options={CountiesInKenya}
+                freeSolo
+                sx={inputSx}
+                renderInput={(p) => <TextField {...p} label="County, City or State" variant="outlined" fullWidth />}
+                renderOption={(p, o) => <li {...p} style={{ color: C.textSec }}>{o}</li>}
+                renderTags={() =>
+                  county ? (
+                    <Chip label={county} onDelete={handleDeleteCounty} deleteIcon={<CheckCircle />} sx={chipSx} />
+                  ) : null
+                }
+                noOptionsText={
+                  <Chip
+                    label={`Add "${inputCounties}"`}
+                    onClick={handleAddNewCounty}
+                    icon={<CheckCircle />}
+                    color="primary"
+                    clickable
+                  />
+                }
+                PaperComponent={({ children }) => (
+                  <Box sx={{ background: "#0D1B2A", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
+                    {children}
                   </Box>
                 )}
+              />
+            ) : (
+              <TextField
+                required
+                label="County, City or State"
+                fullWidth
+                value={county}
+                onChange={(e) => setCounty(e.target.value)}
+                placeholder="Your location"
+                sx={inputSx}
+              />
+            )}
 
-                {/* back to login links */}
-                <Box
-                  display={"flex"}
-                  gap={1}
-                  width={"100%"}
-                  justifyContent={"center"}
-                >
-                  {" "}
-                  <Typography variant="body2" color={"text.secondary"}>
-                    have an account?
-                  </Typography>
-                  <Link to={"/auth/login"} className="text-decoration-none">
-                    <Typography
-                      variant="body2"
-                      sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
-                    >
-                      login
-                    </Typography>
-                  </Link>
-                </Box>
-              </Box>
-            </Box>
-
-            <Box pb={1} display={"flex"} justifyContent={"center"}>
-              {!showNext ? (
-                  <Button
-                    variant="contained"
-                    className="w-25"
-                    sx={{ borderRadius: "20px" }}
-                    disableElevation
-                    onClick={handleShowNext}
-                    type="submit"
-                  >
-                    Next
-                  </Button>
-              ) : (
-                  <Button
-                    variant="contained"
-                    className="w-25"
-                    sx={{ borderRadius: "20px" }}
-                    disableElevation
-                    disabled={openAlertProfile || about.length>MAX_ABOUT}
-                    onClick={handleUserRegistration}
-                    type="submit"
-                  >
-                    Signup
-                  </Button>
-              )}
-            </Box>
+            {/* About — org only */}
+            {!isPersonal && (
+              <TextField
+                required
+                label={`About Organisation — ${MAX_ABOUT - about.length} chars left`}
+                fullWidth
+                multiline
+                minRows={3}
+                maxRows={5}
+                value={about}
+                error={about.length > MAX_ABOUT}
+                onChange={(e) => setAbout(e.target.value)}
+                placeholder="Brief description of your organisation…"
+                sx={{
+                  ...inputSx,
+                  "& .MuiOutlinedInput-root.Mui-error fieldset": { borderColor: C.danger },
+                }}
+              />
+            )}
           </Box>
+        )}
+
+        {/* ── Navigation row ── */}
+        <Box mt={3} display="flex" flexDirection="column" gap={2}>
+          <Box display="flex" alignItems="center" gap={1.5}>
+            {showNext && (
+              <Tooltip title="Back">
+                <IconButton
+                  size="small"
+                  onClick={() => setShowNext(false)}
+                  sx={{
+                    color: C.textHint,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: "8px",
+                    width: 38, height: 38,
+                    "&:hover": { color: C.teal, borderColor: "rgba(20,210,190,0.4)" },
+                  }}
+                >
+                  <ArrowBackIosNewRounded sx={{ width: 14, height: 14 }} />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            {/* Primary CTA */}
+            <Button
+              fullWidth
+              variant="contained"
+              disabled={openAlertProfile || about.length > MAX_ABOUT}
+              onClick={showNext ? handleUserRegistration : () => setShowNext(true)}
+              endIcon={!showNext ? <ArrowForwardIosRounded sx={{ width: 13, height: 13 }} /> : null}
+              sx={{
+                py: 1.5,
+                borderRadius: "10px",
+                fontWeight: 600,
+                fontSize: 14,
+                letterSpacing: "0.04em",
+                textTransform: "none",
+                background: `linear-gradient(135deg, #0FA88F 0%, ${C.teal} 100%)`,
+                boxShadow: `0 8px 28px ${C.tealGlow}`,
+                transition: "all 0.25s",
+                "&:hover": {
+                  background: `linear-gradient(135deg, #0BBFA5 0%, #1EE8D2 100%)`,
+                  boxShadow: `0 12px 36px rgba(20,210,190,0.42)`,
+                  transform: "translateY(-1px)",
+                },
+                "&:active": { transform: "translateY(0)" },
+                "&.Mui-disabled": { background: "rgba(255,255,255,0.06)", color: C.textHint },
+              }}
+            >
+              {showNext ? "Create Account" : "Continue"}
+            </Button>
+          </Box>
+
+          {/* Login link */}
+          <Typography textAlign="center" sx={{ fontSize: 12, color: C.textHint }}>
+            Already have an account?{" "}
+            <Box
+              component={Link}
+              to="/auth/login"
+              sx={{ color: C.teal, textDecoration: "none", "&:hover": { opacity: 0.8 } }}
+            >
+              Sign in
+            </Box>
+          </Typography>
+        </Box>
       </Box>
 
-      {/* show alert for custom title when zero selection is matched */}
+      {/* ── Modals / Alerts ── */}
       {openAlert && (
-        <RegisterAlertTitle
-        openAlert={openAlert}
-        setOpenAlert={setOpenAlert}
-        setSpecialisationTitle={setSpecialisationTitle}
-      />
-    )}
-
-      {/* alert general */}
+        <RegisterAlertTitle openAlert={openAlert} setOpenAlert={setOpenAlert} setSpecialisationTitle={setSpecialisationTitle} />
+      )}
       {openAlertGenral && (
         <AlertGeneral
-        openAlertGeneral={openAlertGenral}
-        setOpenAlertGeneral={setOpenAlertGenral}
-        title={titleAlert}
-        message={missingFieldMessage}
-        setErrorMessage={setMissingFieldMessage}
-      />
-      )}
-
-      {/* alert profile picture completion */}
-      {openAlertProfile && isPersonal ? (
-        <AlertProfileCompletion
-        openAlertProfile={openAlertProfile}
-        setOpenAlertProfile={setOpenAlertProfile}
-        user={user}
-        isPersonal={isPersonal}
-      />
-      ):(
-        <AlertOrgCompletion
-          user={user}
-          openAlertProfile={openAlertProfile}
-          setOpenAlertProfile={setOpenAlertProfile}
+          openAlertGeneral={openAlertGenral}
+          setOpenAlertGeneral={setOpenAlertGenral}
+          title={titleAlert}
+          message={missingFieldMessage}
+          setErrorMessage={setMissingFieldMessage}
         />
       )}
-
-      {/* alert country of the user */}
+      {openAlertProfile && isPersonal ? (
+        <AlertProfileCompletion
+          openAlertProfile={openAlertProfile}
+          setOpenAlertProfile={setOpenAlertProfile}
+          user={user}
+          isPersonal={isPersonal}
+        />
+      ) : (
+        <AlertOrgCompletion user={user} openAlertProfile={openAlertProfile} setOpenAlertProfile={setOpenAlertProfile} />
+      )}
       {openAlertCountry && (
         <AlertCountry
-        openAlertCountry={openAlertCountry}
-        setOpenAlertCountry={setOpenAlertCountry}
-        country={country}
-        setCountry={setCountry}
-        account={account}
-        setAccount={setAccount}
-      />
+          openAlertCountry={openAlertCountry}
+          setOpenAlertCountry={setOpenAlertCountry}
+          country={country}
+          setCountry={setCountry}
+          account={account}
+          setAccount={setAccount}
+        />
       )}
     </Box>
   );

@@ -93,40 +93,40 @@ const LogoContent = styled(Box)({
 });
 
 
- // search bar option
-  const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: '20px',
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(1),
-      width: 'auto',
-    },
-  }));
-  
+// search bar option
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: '10px',
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(1),
+    width: 'auto',
+  },
+}));
 
-  
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    width: '100%',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      [theme.breakpoints.up('sm')]: {
-        width: '15ch',
-        '&:focus': {
-          width: '20ch',
-        },
+
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  width: '100%',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    [theme.breakpoints.up('sm')]: {
+      width: '15ch',
+      '&:focus': {
+        width: '20ch',
       },
     },
-  }));
+  },
+}));
 
 const Navbar = () => {
   const [isFetching, setIsFetching] = useState(false);
@@ -135,8 +135,8 @@ const Navbar = () => {
   const [openAlertResults, setOpenAlertResults] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [openAlertGeneral,setOpenAlertGeneral]=useState(false)
-  const [openAlertFilter,setOpenAlertFilter]=useState(false)
+  const [openAlertGeneral, setOpenAlertGeneral] = useState(false)
+  const [openAlertFilter, setOpenAlertFilter] = useState(false)
 
   // control opening of the events modal
   const [showMobileSearch, setShowMobileSearch] = useState(false);
@@ -144,25 +144,25 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-//  redux states
+  //  redux states
   const { isPeopleModal, peopleData } = useSelector(
     (state) => state.currentModal
   );
 
-    const { user, isGuest } = useSelector((state) => state.currentUser);
-    const { post_reactions } = useSelector((state) => state.currentPostReactions);
-    const { reportedPost } = useSelector((state) => state.currentReportedPost);
-    const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
-    const { profile_views } = useSelector((state) => state.currentProfileView);
-    const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
-    const { conversations } = useSelector((state) => state.currentConversation);
-    const { groups:groupData } = useSelector((state) => state.currentGroups);
+  const { user, isGuest } = useSelector((state) => state.currentUser);
+  const { post_reactions } = useSelector((state) => state.currentPostReactions);
+  const { reportedPost } = useSelector((state) => state.currentReportedPost);
+  const { connectNotifications } = useSelector((state) => state.currentConnectNotif);
+  const { profile_views } = useSelector((state) => state.currentProfileView);
+  const { job_feedback } = useSelector((state) => state.currentJobFeedBack);
+  const { conversations } = useSelector((state) => state.currentConversation);
+  const { groups: groupData } = useSelector((state) => state.currentGroups);
 
-    // extracting current user ID
-    const currentUserId=isGuest ?false:user?._id
+  // extracting current user ID
+  const currentUserId = isGuest ? false : user?._id
 
-    // get count of conversation messages where target read is false
-    const conversationsCount=conversations?.filter(conversation=>conversation?.isTargetRead===false && conversation?.senderName!==user?.name)?.length 
+  // get count of conversation messages where target read is false
+  const conversationsCount = conversations?.filter(conversation => conversation?.isTargetRead === false && conversation?.senderName !== user?.name)?.length
 
   // redux state UI
   const {
@@ -184,8 +184,8 @@ const Navbar = () => {
     setSearchTerm("");
   };
 
-   // UI theme dark light tweaking effect
-   const handleShowDarkMode = () => {
+  // UI theme dark light tweaking effect
+  const handleShowDarkMode = () => {
     // update the redux theme boolean state
     dispatch(resetDarkMode());
   };
@@ -225,12 +225,12 @@ const Navbar = () => {
   const handleSubmitGlobalSearch = (event) => {
     // prevent default form submission
     event.preventDefault();
-    
+
     // alert user to type text in search box
-    if (searchTerm.length<1) {
-        setOpenAlertGeneral(true)
-        setErrorMessage("please type in the search box and search for resources!")
-        return
+    if (searchTerm.length < 1) {
+      setOpenAlertGeneral(true)
+      setErrorMessage("please type in the search box and search for resources!")
+      return
     }
 
     // clear any redux states of global search if present
@@ -241,19 +241,18 @@ const Navbar = () => {
 
     // start the =get request axios, global search
     axios.get(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/global/search/${searchTerm}`,
-        {
-          withCredentials: true,
-        }
-      )
+      `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/global/search/${searchTerm}`,
+      {
+        withCredentials: true,
+      }
+    )
       .then((res) => {
         if (res?.data) {
           // set response message to total number of results
           setResponseMessage(
-            `${
-              res.data.users.count + res.data.posts.count 
-              + res.data.jobs.count + res.data.events.count
-              +res.data.courses.count
+            `${res.data.users.count + res.data.posts.count
+            + res.data.jobs.count + res.data.events.count
+            + res.data.courses.count
             } results found`
           );
 
@@ -274,7 +273,7 @@ const Navbar = () => {
           setResponseMessage("failed to search network error");
           return;
         }
-     
+
       })
       .finally(() => {
         // set is fetching to false
@@ -283,10 +282,10 @@ const Navbar = () => {
   };
 
   // handle showing of the filter dialog to customize feed results
-  const handleShowContentFilter=()=>{
+  const handleShowContentFilter = () => {
     setOpenAlertFilter(true)
   }
-  
+
 
   // only when authenticated run the hooks
   // get all possible post reaction notifications based on current userID
@@ -326,7 +325,7 @@ const Navbar = () => {
 
   // get all connect requests sent by users to the current user as being target
   useLayoutEffect(() => {
-     if (!currentUserId) {
+    if (!currentUserId) {
       return
     }
     // set is fetching to true
@@ -362,7 +361,7 @@ const Navbar = () => {
 
   // get all posts reports that targets this currently logged in user
   useLayoutEffect(() => {
-     if (!currentUserId) {
+    if (!currentUserId) {
       return
     }
     // set is fetching to true
@@ -385,7 +384,7 @@ const Navbar = () => {
           setErrorMessage("server is unreachable");
           return;
         }
- 
+
       })
       .finally(() => {
         // set is fetching to false
@@ -395,154 +394,154 @@ const Navbar = () => {
 
 
   // fetch or get all conversations done by the current user
-    useLayoutEffect(() => {
-      if (!currentUserId) {
+  useLayoutEffect(() => {
+    if (!currentUserId) {
       return
     }
-      // set is fetching to true
-      setIsFetching(true);
-  
-      // performing post request under the id of the current user
-      axios
-        .get(
-          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/all/${currentUserId}`,
-          {
-            withCredentials: true,
-          }
-        )
-        .then((res) => {
-          // update the states of conversations
-        dispatch(updateConversations(res?.data)) ;
-        })
-        .catch((err) => {
-          console.log(err);
-          if (err?.code === "ERR_NETWORK") {
-            setErrorMessage("server is unreachable!");
-            return;
-          }
-        
-        })
-        .finally(() => {
-          // set is fetching to false
-          setIsFetching(false);
-        });
-    }, [currentUserId, dispatch]);
+    // set is fetching to true
+    setIsFetching(true);
 
-
-    // get all profile views data from the backend
-    useLayoutEffect(() => {
-      if (!currentUserId) {
-      return
-    }
-      // set is fetching to true
-      setIsFetching(true);
-  
-      // performing post request under the id of the current user
-      axios
-        .get(
-          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/profile_views/${currentUserId}`,
-          {
-            withCredentials: true,
-          }
-        )
-        .then((res) => {
-          // update the states of conversations
-        dispatch(updateCurrentProfileViews(res?.data)) ;
-        })
-        .catch((err) => {
-          console.log(err);
-          if (err?.code === "ERR_NETWORK") {
-            setErrorMessage("server is unreachable!");
-            return;
-          }
-        
-        })
-        .finally(() => {
-          // set is fetching to false
-          setIsFetching(false);
-        });
-    }, [currentUserId, dispatch]);
-
-
-    // fetching of all job feedback 
-    useLayoutEffect(() => {
-        if (!currentUserId) {
-        return
-      }
-      // set is fetching to true
-      setIsFetching(true);
-  
-      // performing post request under the id of the current user
-      axios
-        .get(
-          `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/feedback/${currentUserId}`,
-          {
-            withCredentials: true,
-          }
-        )
-        .then((res) => {
-          // update the states of conversations
-         dispatch(updateCurrentJobFeedBack(res?.data)) ;
-         // open alert general
-        setOpenAlertGeneral(true)
-        })
-        .catch((err) => {
-          console.log(err);
-          if (err?.code === "ERR_NETWORK") {
-            setErrorMessage("server is unreachable!");
-            return;
-          }
-        })
-        .finally(() => {
-          // set is fetching to false
-          setIsFetching(false);
-        });
-    }, [currentUserId, dispatch]);
-
-
-     // useLayout effect, fetch data of groups
-      useLayoutEffect(()=>{
-        // redux data present
-        if (groupData) {
-          return
+    // performing post request under the id of the current user
+    axios
+      .get(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/all/${currentUserId}`,
+        {
+          withCredentials: true,
         }
-  
-        // fetch to populate the redux groups
-        axios.get(
-              `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/groups/all/${user?._id}`,
-              {
-                  withCredentials: true,
-              }
-              )
-              .then((res) => {
-              // update groups and communities data
-              if (res?.data) {
-                  dispatch(updateCurrentGroupsCommunities(res.data))
-              } 
-              })
-              .catch(async (err) => {
-              console.log(err);
-              //  user login session expired show logout alert
-              if (err?.response?.data.login) {
-                  window.location.reload();
-              }
-              if (err?.code === "ERR_NETWORK") {
-                  setErrorMessage(
-                  "server unreachable!"
-                  );
-                  return;
-              }
+      )
+      .then((res) => {
+        // update the states of conversations
+        dispatch(updateConversations(res?.data));
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("server is unreachable!");
+          return;
+        }
 
-              })
-              .finally(() => {
-              setIsFetching(false);
-              });
-      },[user?._id,dispatch,groupData])
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  }, [currentUserId, dispatch]);
 
-    // handle navigate to login
-    const handleNavigateLogin=()=>{
-      navigate("/auth/login")
+
+  // get all profile views data from the backend
+  useLayoutEffect(() => {
+    if (!currentUserId) {
+      return
     }
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request under the id of the current user
+    axios
+      .get(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/all/profile_views/${currentUserId}`,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        // update the states of conversations
+        dispatch(updateCurrentProfileViews(res?.data));
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("server is unreachable!");
+          return;
+        }
+
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  }, [currentUserId, dispatch]);
+
+
+  // fetching of all job feedback 
+  useLayoutEffect(() => {
+    if (!currentUserId) {
+      return
+    }
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request under the id of the current user
+    axios
+      .get(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/feedback/${currentUserId}`,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        // update the states of conversations
+        dispatch(updateCurrentJobFeedBack(res?.data));
+        // open alert general
+        setOpenAlertGeneral(true)
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("server is unreachable!");
+          return;
+        }
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  }, [currentUserId, dispatch]);
+
+
+  // useLayout effect, fetch data of groups
+  useLayoutEffect(() => {
+    // redux data present
+    if (groupData) {
+      return
+    }
+
+    // fetch to populate the redux groups
+    axios.get(
+      `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/groups/all/${user?._id}`,
+      {
+        withCredentials: true,
+      }
+    )
+      .then((res) => {
+        // update groups and communities data
+        if (res?.data) {
+          dispatch(updateCurrentGroupsCommunities(res.data))
+        }
+      })
+      .catch(async (err) => {
+        console.log(err);
+        //  user login session expired show logout alert
+        if (err?.response?.data.login) {
+          window.location.reload();
+        }
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage(
+            "server unreachable!"
+          );
+          return;
+        }
+
+      })
+      .finally(() => {
+        setIsFetching(false);
+      });
+  }, [user?._id, dispatch, groupData])
+
+  // handle navigate to login
+  const handleNavigateLogin = () => {
+    navigate("/auth/login")
+  }
 
   return (
     <React.Fragment>
@@ -553,7 +552,9 @@ const Navbar = () => {
         sx={{
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
-          backgroundColor: theme.palette.primary.main,
+          background: "rgba(6,13,24,0.75)",
+          backdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
         }}>
         <MetatronToolBar variant="dense">
           {/* lg screen toolbar */}
@@ -566,19 +567,26 @@ const Navbar = () => {
               },
             }}
           >
-            <Box 
-            display={"flex"} 
-            alignItems={"center"}
-            gap={1}>
-              <Avatar alt="KE" 
-              src={AppLogo} 
-              sx={{ width: 50, height: 50 }} />
+            <Box
+              display={"flex"}
+              alignItems={"center"}
+              gap={1}>
+              <Avatar alt="KE"
+                src={AppLogo}
+                sx={{ width: 50, height: 50 }} />
 
-                <Button onClick={handleHome} >
-                  <Typography variant="h6" fontWeight={"bold"} color={'white'} >
-                    METATRON
-                  </Typography>
-                </Button>
+              <Button onClick={handleHome} >
+                <Typography
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: 18,
+                    letterSpacing: "0.05em",
+                    color: "#F0F4FA",
+                  }}
+                >
+                  METATRON
+                </Typography>
+              </Button>
             </Box>
           </LogoContent>
 
@@ -593,30 +601,30 @@ const Navbar = () => {
               {!CustomDeviceTablet() ? (
                 <React.Fragment>
                   <IconButton onClick={(e) => setOpenDrawer(!openDrawer)}>
-                    <MenuRounded sx={{color:"white"}} />
+                    <MenuRounded sx={{ color: "white" }} />
                   </IconButton>
                   {/* app tile on smallest devices won't show 
                   only medium sized. show app logo on smallest devices
                   */}
                   {!CustomDeviceSmallest() ? (
                     <Button onClick={handleHome} >
-                    <Typography
-                      fontWeight={"bold"}
-                      color={'white'}
-                      sx={{ fontsize:'medium' }}
-                    >
-                      METATRON
-                    </Typography>
-                  </Button>
-                  ):(
-                    <IconButton 
-                    size="small"
-                    onClick={handleHome} >
-                      <Avatar alt="KE" 
-                      src={AppLogo} 
-                      sx={{ 
-                        width:30,height:30
-                      }}
+                      <Typography
+                        fontWeight={"bold"}
+                        color={'white'}
+                        sx={{ fontsize: 'medium' }}
+                      >
+                        METATRON
+                      </Typography>
+                    </Button>
+                  ) : (
+                    <IconButton
+                      size="small"
+                      onClick={handleHome} >
+                      <Avatar alt="KE"
+                        src={AppLogo}
+                        sx={{
+                          width: 30, height: 30
+                        }}
                       />
                     </IconButton>
                   )}
@@ -625,97 +633,99 @@ const Navbar = () => {
               ) : (
                 <Box display={"flex"} ml={0} alignItems={"center"} gap={1}>
                   {/* tablet show app logo not on smaller Devices */}
-                    <IconButton onClick={handleHome}>
-                      <Avatar
-                        alt=""
-                        src={AppLogo}
-                        sx={{ width: 38, height: 38 }}
-                      />
-                    </IconButton>
+                  <IconButton onClick={handleHome}>
+                    <Avatar
+                      alt=""
+                      src={AppLogo}
+                      sx={{ width: 38, height: 38 }}
+                    />
+                  </IconButton>
 
                   {/* app title for tablets */}
                   <Button>
                     <Typography
-                    color={'white'}
-                      variant="h6"
-                      fontWeight={"bold"}
-                      
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: 18,
+                        letterSpacing: "0.05em",
+                        color: "#F0F4FA",
+                      }}
                     >
                       METATRON
                     </Typography>
-                    </Button>
-                
+                  </Button>
+
                 </Box>
               )}
             </LogoContent>
           )}
 
           {/* visible on lap and ++ screens always */}
-          {!(CustomDeviceIsSmall()||CustomDeviceTablet()) && (
-            <SearchBar sx={{ 
-              ml:10
+          {!(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
+            <SearchBar sx={{
+              ml: 10
             }}>
               <Box
                 sx={{
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  width:'100%'
+                  width: '100%'
                 }}
               >
                 <form className="d-flex" onSubmit={handleSubmitGlobalSearch}>
-                    <Search>
+                  <Search>
                     <StyledInputBase
                       placeholder="search…"
                       inputProps={{ 'aria-label': 'search' }}
-                      sx={{ 
-                      borderRadius:'20px',
-                      fontSize:'small'
-                        }}
+                      sx={{
+                        borderRadius: '20px',
+                        fontSize: 'small'
+                      }}
                       type="text"
                       disabled={isFetching}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </Search>
-                  <Box 
-                  display={'flex'} 
-                  alignItems={'center'}
-                  ml={1}
-                  gap={1}
+                  <Box
+                    display={'flex'}
+                    alignItems={'center'}
+                    ml={1}
+                    gap={1}
                   >
                     {isFetching ? (
                       <CircularProgress
                         size={18}
-                        sx={{  ml: 1 }}
+                        sx={{ ml: 1 }}
                       />
                     ) : (
                       <React.Fragment>
-                      {/* // search icon */}
-                      <Tooltip title={'search'} arrow>
-                      <IconButton
-                        type="submit"
-                      >
-                        <SearchRounded
-                          sx={{ width: 20, height: 20, color:"white" }}
-                        />
-                      </IconButton>
-                      </Tooltip>
+                        {/* // search icon */}
+                        <Tooltip title={'search'} arrow>
+                          <IconButton
+                            type="submit"
+                          >
+                            <SearchRounded
+                              sx={{ width: 20, height: 20, color: "white" }}
+                            />
+                          </IconButton>
+                        </Tooltip>
 
-                      <Tooltip
-                      title={'filter'} 
-                      arrow
+                        <Tooltip
+                          title={'filter'}
+                          arrow
                         >
-                      <IconButton
-                      onClick={handleShowContentFilter}
-                    >
-                      <FilterListRounded
-                        sx={{ width: 22, height: 22, color:"white" }}
-                      />
-                    </IconButton>
-                    </Tooltip>
-                    
-                    </React.Fragment>
+                          <IconButton
+                            onClick={handleShowContentFilter}
+                          >
+                            <FilterListRounded
+                              sx={{ width: 22, height: 22, color: "white" }}
+                            />
+                          </IconButton>
+                        </Tooltip>
+
+                      </React.Fragment>
 
                     )}
                   </Box>
@@ -724,90 +734,90 @@ const Navbar = () => {
             </SearchBar>
           )}
 
-         {/* shown in small devices and tabs */}
-            <Box 
+          {/* shown in small devices and tabs */}
+          <Box
             justifyContent={'center'}
             alignItems={'center'}
-            display={showMobileSearch? "block":"none"}
+            display={showMobileSearch ? "block" : "none"}
             width={'100%'}
-            ml={CustomDeviceIsSmall()?2:20}
-            >
-                <SearchBar className="ms-5">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <form
-                      className="d-flex gap-1"
-                      onSubmit={handleSubmitGlobalSearch}
-                    >
-                      <Search>
-                        <StyledInputBase
-                          placeholder="search…"
-                          inputProps={{ 'aria-label': 'search' }}
-                          sx={{ 
-                          borderRadius:'20px',
-                          fontSize:'small'
-                            }}
-                          type="text"
-                          disabled={isFetching}
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                      </Search>
+            ml={CustomDeviceIsSmall() ? 2 : 20}
+          >
+            <SearchBar className="ms-5">
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <form
+                  className="d-flex gap-1"
+                  onSubmit={handleSubmitGlobalSearch}
+                >
+                  <Search>
+                    <StyledInputBase
+                      placeholder="search…"
+                      inputProps={{ 'aria-label': 'search' }}
+                      sx={{
+                        borderRadius: '20px',
+                        fontSize: 'small'
+                      }}
+                      type="text"
+                      disabled={isFetching}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </Search>
 
-                      <Box>
-                        {isFetching ? (
-                          <CircularProgress size={18} />
-                        ) : (
-                          <IconButton
-                            type="submit"
-                            disabled={searchTerm?.length < 2}
-                          >
-                            <SearchRounded
-                              sx={{ width: 22, height: 22,color:"white" }}
-                            />
-                          </IconButton>
-                        )}
-                      </Box>
-                    </form>
-                    <Tooltip
-                          title={'filter'} 
-                          arrow
-                          >
-                        <IconButton
-                        onClick={handleShowContentFilter}
+                  <Box>
+                    {isFetching ? (
+                      <CircularProgress size={18} />
+                    ) : (
+                      <IconButton
+                        type="submit"
+                        disabled={searchTerm?.length < 2}
                       >
-                        <FilterListRounded
-                          sx={{ width: 20, height: 20, color:"white" }}
+                        <SearchRounded
+                          sx={{ width: 22, height: 22, color: "white" }}
                         />
                       </IconButton>
-                      </Tooltip>
-
-                    <IconButton onClick={handleShowMobileSearch}>
-                      <Close sx={{ width: 18, height: 18, color:"white" }} />
-                    </IconButton>
+                    )}
                   </Box>
-                </SearchBar>
-         </Box>
+                </form>
+                <Tooltip
+                  title={'filter'}
+                  arrow
+                >
+                  <IconButton
+                    onClick={handleShowContentFilter}
+                  >
+                    <FilterListRounded
+                      sx={{ width: 20, height: 20, color: "white" }}
+                    />
+                  </IconButton>
+                </Tooltip>
+
+                <IconButton onClick={handleShowMobileSearch}>
+                  <Close sx={{ width: 18, height: 18, color: "white" }} />
+                </IconButton>
+              </Box>
+            </SearchBar>
+          </Box>
 
           <IconsContainer>
-            {(CustomDeviceIsSmall()||CustomDeviceTablet()) && (
-              <Box 
+            {(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
+              <Box
               >
                 {/* display when search not clicked */}
                 {!showMobileSearch && (
                   <IconButton onClick={handleShowMobileSearch}>
-                    <SearchRounded sx={{color:"white"}} />
+                    <SearchRounded sx={{ color: "white" }} />
                   </IconButton>
                 )}
-                  </Box>
-                )}
+              </Box>
+            )}
 
-        
+
             {/* display when search not clicked */}
             {!showMobileSearch && (
               <Box
@@ -815,99 +825,99 @@ const Navbar = () => {
                 alignItems={"center"}
                 gap={
                   CustomDeviceTablet() ||
-                  CustomLandscapeWidest() ||
-                  CustomLandscapeWidest()
+                    CustomLandscapeWidest() ||
+                    CustomLandscapeWidest()
                     ? 4
                     : 2
                 }
               >
 
                 {!CustomDeviceIsSmall() && (
-                <React.Fragment>
-                 {/* change theme trigger */}
-                <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
-                <IconButton  onClick={handleShowDarkMode}> 
-                <DarkModeRounded
-                sx={{ height:24, width:24,color:"white" }}
-                />
-                </IconButton>
-                </Tooltip> 
+                  <React.Fragment>
+                    {/* change theme trigger */}
+                    <Tooltip arrow title={isDarkMode ? "Light" : "Dark"}>
+                      <IconButton onClick={handleShowDarkMode}>
+                        <DarkModeRounded
+                          sx={{ height: 24, width: 24, color: "white" }}
+                        />
+                      </IconButton>
+                    </Tooltip>
 
-                </React.Fragment>
+                  </React.Fragment>
                 )}
 
                 {/* show login btn if no user,noId */}
                 {currentUserId ? (
                   <React.Fragment>
-                  {/* notifications icon */}
-                <Tooltip 
-                arrow 
-                title={"notifications"} 
-                className={CustomDeviceIsSmall() ? 'me-1':'me-2'}
-                >
-                <Badge badgeContent={
-                  post_reactions?.length + 
-                  reportedPost?.length + 
-                  connectNotifications?.length + 
-                  profile_views?.length +
-                  job_feedback?.length || 0} 
-                  color="warning">
-                    <IconButton
-                      sx={{ padding: 0 }}
-                      onClick={()=>handleShowMessageDrawer(0)}
+                    {/* notifications icon */}
+                    <Tooltip
+                      arrow
+                      title={"notifications"}
+                      className={CustomDeviceIsSmall() ? 'me-1' : 'me-2'}
                     >
-                      <NotificationsRounded
-                        sx={{ width: 25, height: 25,color:"white" }}
-                      />
-                    </IconButton>
-                </Badge>
-                </Tooltip>
+                      <Badge badgeContent={
+                        post_reactions?.length +
+                        reportedPost?.length +
+                        connectNotifications?.length +
+                        profile_views?.length +
+                        job_feedback?.length || 0}
+                        color="warning">
+                        <IconButton
+                          sx={{ padding: 0 }}
+                          onClick={() => handleShowMessageDrawer(0)}
+                        >
+                          <NotificationsRounded
+                            sx={{ width: 25, height: 25, color: "white" }}
+                          />
+                        </IconButton>
+                      </Badge>
+                    </Tooltip>
 
-                {/* messages icon */}
-                <Tooltip 
-                arrow 
-                title={"messages"}
-                >
-                <Badge 
-                badgeContent={conversationsCount} 
-                className={!CustomDeviceIsSmall() && 'me-1'}
-                color="warning">
-                  <IconButton
-                    sx={{ padding: 0 }}
-                    onClick={()=>handleShowMessageDrawer(1)}
-                  >
-                    <EmailRounded
-                      sx={{ width: 22, height: 22, color:"white" }}
-                    />
-                  </IconButton>
-                </Badge>
-                </Tooltip>
+                    {/* messages icon */}
+                    <Tooltip
+                      arrow
+                      title={"messages"}
+                    >
+                      <Badge
+                        badgeContent={conversationsCount}
+                        className={!CustomDeviceIsSmall() && 'me-1'}
+                        color="warning">
+                        <IconButton
+                          sx={{ padding: 0 }}
+                          onClick={() => handleShowMessageDrawer(1)}
+                        >
+                          <EmailRounded
+                            sx={{ width: 22, height: 22, color: "white" }}
+                          />
+                        </IconButton>
+                      </Badge>
+                    </Tooltip>
 
-                {/* avatar for profile icon */}
-                <Tooltip 
-                arrow 
-                title={"profile"}>
-                  <IconButton onClick={handleShowingProfileDrawer}>
-                    <Avatar
-                      sx={{ width: 32, height: 32 }}
-                      src={user?.avatar}
-                      alt={''}
-                    />
-                  </IconButton>
-                </Tooltip>
+                    {/* avatar for profile icon */}
+                    <Tooltip
+                      arrow
+                      title={"profile"}>
+                      <IconButton onClick={handleShowingProfileDrawer}>
+                        <Avatar
+                          sx={{ width: 32, height: 32 }}
+                          src={user?.avatar}
+                          alt={''}
+                        />
+                      </IconButton>
+                    </Tooltip>
                   </React.Fragment>
-                ):(
-                  <Button 
-                  size="medium"
-                  onClick={handleNavigateLogin}
-                  color="inherit"
-                  startIcon={<Person sx={{color:"white"}}/>}
+                ) : (
+                  <Button
+                    size="medium"
+                    onClick={handleNavigateLogin}
+                    color="inherit"
+                    startIcon={<Person sx={{ color: "white" }} />}
                   >
                     Signin
                   </Button>
                 )}
 
-                
+
               </Box>
             )}
           </IconsContainer>
@@ -929,89 +939,89 @@ const Navbar = () => {
           {/* drawer smartphones for sidebar purpose */}
           {openDrawer && (
             <DrawerSmartphone
-            openDrawer={openDrawer}
-            setOpenDrawer={setOpenDrawer}
-          />
+              openDrawer={openDrawer}
+              setOpenDrawer={setOpenDrawer}
+            />
           )}
 
           {/* holds the notification and messaging drawer */}
           {isOpenMessageDrawer && (
-          <ParentNotifMessageDrawer />
+            <ParentNotifMessageDrawer />
           )}
 
           {/* holds the profile drawer which contains user account info */}
           {isOpenDrawerProfile && (
-          <ProfileDrawer />
+            <ProfileDrawer />
           )}
 
-         {/* show logout alert */}
-         {isLogoutAlert && (
-          <LogoutAlert/>
-         )}
+          {/* show logout alert */}
+          {isLogoutAlert && (
+            <LogoutAlert />
+          )}
 
           {/* alert general when is an error */}
-        {errorMessage &&(
-          <AlertGeneral
-           isError={true} 
-           setErrorMessage={setErrorMessage}
-           title={"Error"}
-           message={errorMessage}
-           defaultIcon={<ErrorOutline/>}
-           openAlertGeneral={openAlertGeneral}
-           setOpenAlertGeneral={setOpenAlertGeneral}
-           />
-        )}
+          {errorMessage && (
+            <AlertGeneral
+              isError={true}
+              setErrorMessage={setErrorMessage}
+              title={"Error"}
+              message={errorMessage}
+              defaultIcon={<ErrorOutline />}
+              openAlertGeneral={openAlertGeneral}
+              setOpenAlertGeneral={setOpenAlertGeneral}
+            />
+          )}
 
 
 
-        {/* show modal connect with people or people search results */}
-        {isPeopleModal && (
-          <PeopleModal
-          openPeopleModal={isPeopleModal}
-          PeopleConnect={peopleData}
-        />
-        )}
+          {/* show modal connect with people or people search results */}
+          {isPeopleModal && (
+            <PeopleModal
+              openPeopleModal={isPeopleModal}
+              PeopleConnect={peopleData}
+            />
+          )}
 
-         {/* show alert post edit modal when triggered by redux */}
-            {isPostEditModal && (
-              <PostEditModal/>
-            )}
+          {/* show alert post edit modal when triggered by redux */}
+          {isPostEditModal && (
+            <PostEditModal />
+          )}
 
-            {/* show alert post detailed modal when triggered by redux */}
-            {isPostFullDetailModal && (
-              <PostDetailedModal/>
-            )}
+          {/* show alert post detailed modal when triggered by redux */}
+          {isPostFullDetailModal && (
+            <PostDetailedModal />
+          )}
 
-        {/* show alert search results global */}
-        {openAlertResults && (
-          <AlertGlobalSearch
-          openAlert={openAlertResults}
-          setOpenAlert={setOpenAlertResults}
-          message={responseMessage}
-          setMessage={setResponseMessage}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
-        )}
+          {/* show alert search results global */}
+          {openAlertResults && (
+            <AlertGlobalSearch
+              openAlert={openAlertResults}
+              setOpenAlert={setOpenAlertResults}
+              message={responseMessage}
+              setMessage={setResponseMessage}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+            />
+          )}
 
-        {/* open alert filter */}
-        {openAlertFilter && (
-          <AlertFilterFeed 
-          openAlert={openAlertFilter}
-          setOpenAlert={setOpenAlertFilter}
-          />
-        )}
+          {/* open alert filter */}
+          {openAlertFilter && (
+            <AlertFilterFeed
+              openAlert={openAlertFilter}
+              setOpenAlert={setOpenAlertFilter}
+            />
+          )}
 
 
-        {/* display success alert */}
-        <AlertSuccess/>
+          {/* display success alert */}
+          <AlertSuccess />
 
 
         </Suspense>
       </AppBar>
 
       {/* fix the contents to be shown fully */}
-      <Box pb={CustomDeviceTablet()? 7:5.5}/>
+      <Box pb={CustomDeviceTablet() ? 7 : 5.5} />
     </React.Fragment>
   );
 };

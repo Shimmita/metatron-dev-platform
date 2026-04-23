@@ -119,15 +119,18 @@ const FeedDefaultContent = () => {
     <Box
       sx={{
         minHeight: "calc(100vh - 120px)",
+        px: { xs: 1, sm: 2 },
       }}
-    >
-      {/* render the post is focused for full viewing and that post detailed
+    > {/* render the post is focused for full viewing and that post detailed
       data is no null */}
       {postDetailedData ? (
         <Box
           sx={{
-            border: isDarkMode && "1px solid",
-            borderColor: "divider",
+            background: "rgba(255,255,255,0.04)",
+            backdropFilter: "blur(25px)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: "16px",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
             overflowX: "auto",
             "&::-webkit-scrollbar": {
               display: "none",
@@ -147,23 +150,30 @@ const FeedDefaultContent = () => {
           {/* show progress loader when is fetching true */}
           {isFetching && (
             <Box
-              width={"100%"}
-              display={"flex"}
-              justifyContent={"center"}
-              minHeight={'70vh'}
-              alignItems={"center"}
+              width="100%"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              minHeight="70vh"
             >
-              <Box>
-                <Box display={"flex"} justifyContent={"center"}>
-                  <RotatingLines width={40} />
-                </Box>
+              <Box
+                sx={{
+                  p: 3,
+                  borderRadius: "16px",
+                  background: "rgba(255,255,255,0.04)",
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  textAlign: "center",
+                }}
+              >
+                <RotatingLines width={36} strokeColor="#14D2BE" />
+
                 <Typography
                   mt={2}
-                  textAlign={"center"}
-                  color={"text.secondary"}
-                  variant="body2"
+                  fontSize={13}
+                  sx={{ color: "rgba(240,244,250,0.65)" }}
                 >
-                  retrieving data
+                  Fetching intelligence feed...
                 </Typography>
               </Box>
             </Box>
@@ -185,6 +195,7 @@ const FeedDefaultContent = () => {
               sx={{
                 display: "grid",
                 gap: 2,
+                alignContent: "start",
               }}
             >
 
@@ -197,10 +208,12 @@ const FeedDefaultContent = () => {
                   <React.Fragment>
                     {(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
                       <Box
-                        className="mb-2 rounded p-1"
                         sx={{
-                          border: isDarkMode && "1px solid",
-                          borderColor: isDarkMode && "divider",
+                          borderRadius: "12px",
+                          background: "rgba(255,255,255,0.03)",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          backdropFilter: "blur(10px)",
+                          p: 1,
                         }}
                       >
                         {" "}

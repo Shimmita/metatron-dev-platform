@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import axios from "axios";
-import React, { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { appColors, appGradients } from "../../utils/colors";
@@ -166,7 +166,6 @@ const Sidebar = () => {
         }}
       >
         <Box
-          bgcolor={"background.paper"}
           sx={{
             border: "1px solid",
             borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : appColors.border,
@@ -176,6 +175,10 @@ const Sidebar = () => {
             overflow: "visible",
             borderRadius: `${theme.shape.borderRadius + 6}px ${theme.shape.borderRadius + 6}px 0 0`,
             width: "100%",
+            background: "rgba(255,255,255,0.04)",
+            backdropFilter: "blur(25px)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
           }}
         >
           <BoxAvatarContent>
@@ -184,9 +187,8 @@ const Sidebar = () => {
               px={1.5}
               py={2}
               sx={{
-                background: isDarkMode
-                  ? "linear-gradient(180deg, rgba(15,76,129,0.3), rgba(8,21,38,0.2))"
-                  : appGradients.soft,
+                background: "linear-gradient(180deg, rgba(20,210,190,0.15), transparent)",
+                borderBottom: "1px solid rgba(255,255,255,0.06)",
               }}
             >
               {isLoadingRequest ? (
@@ -213,8 +215,8 @@ const Sidebar = () => {
                         sx={{
                           width: 80,
                           height: 80,
-                          color: theme.palette.common.white,
-                          backgroundColor: theme.palette.primary.main,
+                          background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                          boxShadow: "0 0 20px rgba(20,210,190,0.35)",
                         }}
                       />
                     </StyledBadge>
@@ -289,17 +291,17 @@ const Sidebar = () => {
                   borderRadius: cardRadius,
                   border: "1px solid",
                   borderColor: "divider",
-                  bgcolor: "background.default",
-                  p: 1.5,
+                  background: "rgba(255,255,255,0.03)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  backdropFilter: "blur(20px)", p: 1.5,
                 }}
               >
-                <Box display={"flex"} alignItems={"center"} gap={1} mb={1.5}>
-                  <TrendingUpRounded color="primary" fontSize="small" />
-                  <Typography fontWeight={700} variant="body2">
-                    Professional pathways
+                <Box display="flex" alignItems="center" gap={1} mb={1.5}>
+                  <TrendingUpRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+                  <Typography fontWeight={600} fontSize={13} color="#F0F4FA">
+                    Professional Pathways
                   </Typography>
                 </Box>
-
                 <Stack spacing={1}>
                   {primaryNavItems.map((item) => (
                     <Button
@@ -315,7 +317,15 @@ const Sidebar = () => {
                         px: 1.25,
                         py: 1,
                         color: "text.primary",
-                        bgcolor: isDarkMode ? "rgba(15,76,129,0.16)" : "rgba(15,76,129,0.05)",
+                        background: "rgba(255,255,255,0.03)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        transition: "all 0.25s ease",
+
+                        "&:hover": {
+                          background: "rgba(20,210,190,0.08)",
+                          borderColor: "rgba(20,210,190,0.4)",
+                          transform: "translateY(-1px)",
+                        }
                       }}
                     >
                       <Box textAlign={"left"}>
@@ -337,7 +347,9 @@ const Sidebar = () => {
                     borderRadius: cardRadius,
                     border: "1px solid",
                     borderColor: "divider",
-                    bgcolor: "background.default",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    backdropFilter: "blur(20px)",
                     p: 1.5,
                   }}
                 >
@@ -363,7 +375,9 @@ const Sidebar = () => {
                     borderRadius: cardRadius,
                     border: "1px solid",
                     borderColor: "divider",
-                    bgcolor: "background.default",
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    backdropFilter: "blur(20px)",
                     p: 1.5,
                   }}
                 >
@@ -459,7 +473,7 @@ const Sidebar = () => {
           "Mobile application is still under development once completed by our esteemed software engineers, it will be rolled out."
         }
         openAlertGeneral={openMobileApp}
-        setOpenAlertGenral={setOpenMobileApp}
+        setOpenAlertGeneral={setOpenMobileApp}
         defaultIcon={<Smartphone />}
       />
     </Box>

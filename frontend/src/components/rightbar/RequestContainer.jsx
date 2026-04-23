@@ -12,7 +12,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
   const { connectTop } = useSelector((state) => state.currentConnectRequest);
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
+  const [openAlertGeneral, setOpenAlertGeneral] = useState(false)
 
   const { user } = useSelector((state) => state.currentUser);
 
@@ -87,52 +87,55 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
     <React.Fragment>
       <Box alignItems={"center"} display={"flex"} justifyContent={"center"}>
         <Box
-          display={"flex"}
-          alignItems={"center"}
-          justifyContent={"center"}
-          gap={2}
-          pt={2}
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          px={1}
+          py={1.5}
         >
-          <Typography fontWeight={"bold"} color={"primary"}>
-            CONNECT SUGGESTION
-          </Typography>
-          {isFetching ? (
-            <CircularProgress size={16}/>
-          ):(
-            <PeopleRounded color="primary" />
-          )}
+          <Box display="flex" alignItems="center" gap={1}>
+            <PeopleRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+            <Typography fontSize={13} fontWeight={600} color="#F0F4FA">
+              Network Suggestions
+            </Typography>
+          </Box>
+
+          {isFetching && <CircularProgress size={14} />}
         </Box>
       </Box>
       <List
         className="rounded"
         sx={{
-          bgcolor: "background.paper",
+          background: "rgba(255,255,255,0.03)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: "12px",
+          backdropFilter: "blur(10px)",
           width: "100%",
           p: 0,
         }}
       >
         <Box>
-          {connectTop?.slice(0,3).map((connection, index) => (
-              <Box key={index}>
-                <FriendRequest
-                  isLoadingRequest={isFetching}
-                  connect_request={connection}
-                />
-              </Box>
-            ))}
+          {connectTop?.slice(0, 3).map((connection, index) => (
+            <Box key={index}>
+              <FriendRequest
+                isLoadingRequest={isFetching}
+                connect_request={connection}
+              />
+            </Box>
+          ))}
         </Box>
       </List>
 
-       {/* alert general of the error message */}
+      {/* alert general of the error message */}
       {errorMessage && (
         <AlertGeneral
-        title={'something went wrong!'}
-        message={errorMessage}
-        isError={true}
-        openAlertGeneral={openAlertGeneral}
-        setOpenAlertGeneral={setOpenAlertGeneral}
-        setErrorMessage={setErrorMessage}
-        defaultIcon={<InfoRounded/>}
+          title={'something went wrong!'}
+          message={errorMessage}
+          isError={true}
+          openAlertGeneral={openAlertGeneral}
+          setOpenAlertGeneral={setOpenAlertGeneral}
+          setErrorMessage={setErrorMessage}
+          defaultIcon={<InfoRounded />}
         />
       )}
 

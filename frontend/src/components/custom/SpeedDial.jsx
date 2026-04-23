@@ -1,29 +1,29 @@
+import { LockRounded, PersonAdd, PostAddRounded, SchoolRounded, TvRounded, Work } from "@mui/icons-material";
+import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
-import React from "react";
-import { LockRounded, PersonAdd, PostAddRounded, SchoolRounded, TvRounded, Work } from "@mui/icons-material";
-import { Typography } from "@mui/material";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import EventsAddModal from "../modal/EventsAddModal";
 import PostCourseModal from "../modal/PostCourseModal";
 import PostJobModal from "../modal/PostJobModal";
 import PostTechModal from "../modal/PostTechModal";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import { useNavigate } from "react-router-dom";
 
 const actions = [
   {
-    icon: <PostAddRounded color="primary" sx={{ width: 33, height: 33}} />,
+    icon: <PostAddRounded color="primary" sx={{ width: 33, height: 33 }} />,
     name: "Upload Milestone",
   },
   {
     icon: <Work color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Upload Job",
   },
-   {
+  {
     icon: <TvRounded color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Upload Event",
   },
@@ -31,13 +31,13 @@ const actions = [
     icon: <SchoolRounded color="primary" sx={{ width: 26, height: 26 }} />,
     name: "Course Upload",
   },
- 
+
 ];
 
 // actions for login and register
-const actionsAuth=[
+const actionsAuth = [
   {
-    icon: <LockRounded color="primary" sx={{ width: 33, height: 33}} />,
+    icon: <LockRounded color="primary" sx={{ width: 33, height: 33 }} />,
     name: "Login",
   },
   {
@@ -56,7 +56,7 @@ export default function BasicSpeedDial() {
     setOpen(false);
   };
 
-  const navigate=useNavigate()
+  const navigate = useNavigate()
 
   // control showing opening of the Upload modal
   const [openModalTech, setOpenModalTech] = React.useState(false);
@@ -68,7 +68,30 @@ export default function BasicSpeedDial() {
   const { isLoadingPostLaunch } = useSelector(
     (state) => state.appUI
   );
-const {isGuest } = useSelector((state) => state.currentUser);
+  const { isGuest } = useSelector((state) => state.currentUser);
+
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY && currentScrollY > 30) {
+        // scrolling down → hide
+        setVisible(false);
+      } else {
+        // scrolling up → show
+        setVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
 
   return (
     <Box
@@ -76,119 +99,122 @@ const {isGuest } = useSelector((state) => state.currentUser);
         transform: "translateZ(0px)",
         flexGrow: 1,
         visibility: isLoadingPostLaunch ? "hidden" : "visible",
-      
+
       }}
     >
-    {isGuest ? (
-      <SpeedDial
-        ariaLabel="SpeedDial"
-        sx={{
-          position: "absolute",
-          bottom: 0,
-          right: CustomDeviceSmallest() ? 5 : CustomDeviceTablet() ? 7 : 12,
-        }}
-        icon={<SpeedDialIcon />}
-        onClose={handleClose}
-        onOpen={handleOpen}
-        open={open}
-      >
-        {actionsAuth.map((action) => (
-          <SpeedDialAction
-            key={action.name}
-            icon={action.icon}
-            onClick={(e) => {
-              if (action.name === "Login") {
-                navigate("/auth/login")
+      {isGuest ? (
+        <SpeedDial
+          ariaLabel="SpeedDial"
+          sx={{
+            position: "fixed",
+            bottom: 10,
+            transform: visible ? "translateY(0)" : "translateY(120%)",
+            opacity: visible ? 1 : 0,
+            transition: "all 0.35s ease",
+            right: CustomDeviceSmallest() ? 5 : CustomDeviceTablet() ? 7 : 12,
+          }}
+          icon={<SpeedDialIcon />}
+          onClose={handleClose}
+          onOpen={handleOpen}
+          open={open}
+        >
+          {actionsAuth.map((action) => (
+            <SpeedDialAction
+              key={action.name}
+              icon={action.icon}
+              onClick={(e) => {
+                if (action.name === "Login") {
+                  navigate("/auth/login")
+                }
+                if (action.name === "Register") {
+                  navigate("/auth/register/personal")
+                }
+              }}
+              tooltipTitle={
+                <Typography
+                  p={1}
+                  fontWeight={"bold"}
+                  variant="body2"
+                >
+                  {action.name}
+                </Typography>
               }
-              if (action.name === "Register") {
-                navigate("/auth/register/personal")
-              }
-            }}
-            tooltipTitle={
-              <Typography
-                p={1}
-                fontWeight={"bold"}
-                variant="body2"
-              >
-                {action.name}
-              </Typography>
-            }
-          />
-        ))}
-      </SpeedDial>
-    ):(
-      <SpeedDial
-        ariaLabel="SpeedDial"
-        sx={{
-          position: "absolute",
-          bottom: 0,
-          right: CustomDeviceSmallest() ? 5 : CustomDeviceTablet() ? 7 : 12,
-        }}
-        icon={<SpeedDialIcon />}
-        onClose={handleClose}
-        onOpen={handleOpen}
-        open={open}
-      >
-        {actions.map((action) => (
-          <SpeedDialAction
-            key={action.name}
-            icon={action.icon}
-            onClick={(e) => {
-              if (action.name === "Upload Milestone") {
-                setOpenModalTech(true);
-              }
-              if (action.name === "Upload Job") {
-                setOpenModalJob(true);
-              }
+            />
+          ))}
+        </SpeedDial>
+      ) : (
+        <SpeedDial
+          ariaLabel="SpeedDial"
+          sx={{
+            position: "absolute",
+            bottom: 0,
+            right: CustomDeviceSmallest() ? 5 : CustomDeviceTablet() ? 7 : 12,
+          }}
+          icon={<SpeedDialIcon />}
+          onClose={handleClose}
+          onOpen={handleOpen}
+          open={open}
+        >
+          {actions.map((action) => (
+            <SpeedDialAction
+              key={action.name}
+              icon={action.icon}
+              onClick={(e) => {
+                if (action.name === "Upload Milestone") {
+                  setOpenModalTech(true);
+                }
+                if (action.name === "Upload Job") {
+                  setOpenModalJob(true);
+                }
 
-              if (action.name==="Upload Event") {
-                setOpenModalEvent(true)
-              }
+                if (action.name === "Upload Event") {
+                  setOpenModalEvent(true)
+                }
 
-              if (action.name === "Course Upload") {
-                setOpenModalCourse(true);
+                if (action.name === "Course Upload") {
+                  setOpenModalCourse(true);
+                }
+              }}
+              tooltipTitle={
+                <Typography
+                  p={1}
+                  fontWeight={"bold"}
+                  variant="body2"
+                >
+                  {action.name}
+                </Typography>
               }
-            }}
-            tooltipTitle={
-              <Typography
-                p={1}
-                fontWeight={"bold"}
-                variant="body2"
-              >
-                {action.name}
-              </Typography>
-            }
-          />
-        ))}
-      </SpeedDial>
-    )}
+            />
+          ))}
+        </SpeedDial>
+      )}
 
       {/* Tech Field Modal */}
-      {openModalTech && 
-      <PostTechModal
-        openModalTech={openModalTech}
-        setOpenModalTech={setOpenModalTech}
-      />}
+      {openModalTech &&
+        <PostTechModal
+          openModalTech={openModalTech}
+          setOpenModalTech={setOpenModalTech}
+        />}
 
       {/* Post Job Modal */}
-      {openModalJob && 
-      <PostJobModal
-        openModalJob={openModalJob}
-        setOpenModalJob={setOpenModalJob}
-      />}
+      {openModalJob &&
+        <PostJobModal
+          openModalJob={openModalJob}
+          setOpenModalJob={setOpenModalJob}
+        />}
 
       {/* open post modal */}
-      {openModalCourse && 
-      <PostCourseModal
-        openModalCourse={openModalCourse}
-        setOpenModalCourse={setOpenModalCourse}
-      />}
+      {openModalCourse &&
+        <PostCourseModal
+          openModalCourse={openModalCourse}
+          setOpenModalCourse={setOpenModalCourse}
+        />}
       {/* open modal event */}
-      {openModalEvent && 
-      <EventsAddModal 
-      openModalEventAdd={openModalEvent}
-      setOpenModalEventAdd={setOpenModalEvent}
-      />}
+      {openModalEvent &&
+        <EventsAddModal
+          openModalEventAdd={openModalEvent}
+          setOpenModalEventAdd={setOpenModalEvent}
+        />}
     </Box>
   );
 }

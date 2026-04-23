@@ -21,23 +21,23 @@ import ApplyJobModal from "../../modal/ApplyJobModal";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
-const MAX_APPLICANTS=500
+const MAX_APPLICANTS = 500
 
 
-function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
+function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
   const [openApplyJobModal, setOpenApplyJobModal] = useState();
   // redux states
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
     (state) => state.appUI
   );
   // redux states
-    const { user,isGuest } = useSelector((state) => state.currentUser);
+  const { user, isGuest } = useSelector((state) => state.currentUser);
 
   // extract user email, for checks if job posted by the user or not
-    const email=isGuest? "":user?.email
+  const email = isGuest ? "" : user?.email
 
   // if not true the false is default
-  const isMyJob=email===jobTop?.my_email || false
+  const isMyJob = email === jobTop?.my_email || false
 
   const handleCountryName = (job) => {
     const parent = job.location.country.split(" ");
@@ -53,17 +53,30 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
   };
 
   // job has been paused or deactivated by the poster
-  const isDeactivated=jobTop?.status==="inactive"
-    // check if job reached maxima number of applicants
-    const isMaxApplicants=
-    jobTop?.applicants?.total===MAX_APPLICANTS || 
-    jobTop?.applicants?.total===jobTop?.applicants_max
+  const isDeactivated = jobTop?.status === "inactive"
+  // check if job reached maxima number of applicants
+  const isMaxApplicants =
+    jobTop?.applicants?.total === MAX_APPLICANTS ||
+    jobTop?.applicants?.total === jobTop?.applicants_max
 
   return (
     <React.Fragment>
       {isLoadingRequest || isLoading ? (
-        <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-          <ListItem>
+        <List sx={{ width: "100%", background: "transparent" }}>
+          <ListItem sx={{
+            borderRadius: "12px",
+            mb: 0.8,
+            px: 1.2,
+            py: 1,
+            background: "rgba(255,255,255,0.02)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            transition: "all 0.25s ease",
+
+            "&:hover": {
+              background: "rgba(20,210,190,0.06)",
+              borderColor: "rgba(20,210,190,0.3)",
+            },
+          }}>
             <ListItemAvatar>
               <IconButton>
                 <Skeleton
@@ -88,17 +101,31 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
               />
             </Box>
           </ListItem>
-          <Divider variant="inset" component="li" />
+          <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
         </List>
       ) : (
-        <List sx={{ width: "100%", bgcolor: "background.paper" }}>
-          <ListItem>
+        <List sx={{ width: "100%", background: "transparent" }}>
+          <ListItem sx={{
+            borderRadius: "12px",
+            mb: 0.8,
+            px: 1.2,
+            py: 1,
+            background: "rgba(255,255,255,0.02)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            transition: "all 0.25s ease",
+
+            "&:hover": {
+              background: "rgba(20,210,190,0.06)",
+              borderColor: "rgba(20,210,190,0.3)",
+            },
+          }}>
             <ListItemAvatar>
               <Avatar
                 variant="rounded"
                 src={getImageMatch(jobTop.logo)}
                 sx={{
-                  backgroundColor: "#1976D2",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.1)",
                 }}
                 alt={jobTop?.title[0]}
                 aria-label="avatar"
@@ -106,36 +133,35 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
             </ListItemAvatar>
             <ListItemText
               primary={
-                <Typography fontWeight={"bold"} variant="body2">
+                <Typography
+                  fontSize={13}
+                  fontWeight={600}
+                  color="#F0F4FA"
+                >
                   {jobTop?.title}
                 </Typography>
               }
               secondary={
                 <Box>
                   {/* poster */}
-                  <Typography variant="body2" color={"text.secondary"}>
+                  <Typography variant="body2" sx={{ color: "rgba(240,244,250,0.65)" }}>
                     {jobTop?.organisation?.name}
                   </Typography>
 
                   {/* location, state, access */}
                   <Box display={"flex"} alignItems={"center"}>
-                   {/* state */}
+                    {/* state */}
                     <Typography
                       variant="caption"
-                      color={"text.secondary"}
+                      sx={{ color: "rgba(240,244,250,0.65)" }}
                     >
                       {jobTop?.location?.state}
                     </Typography>
 
-                     {/* divider */}
-                    <Divider
-                      component={"li"}
-                      orientation="vertical"
-                      variant="middle"
-                      className="p-1"
-                    />
+                    {/* divider */}
+                   <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
                     {/* country */}
-                    <Typography ml={1} variant="caption" color={"text.secondary"}>
+                    <Typography ml={1} variant="caption" sx={{ color: "rgba(240,244,250,0.65)" }}>
                       {handleCountryName(jobTop && jobTop)}
                     </Typography>
                   </Box>
@@ -149,7 +175,12 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
                           <Avatar
                             alt={skill}
                             className="border"
-                            sx={{ width: 28, height: 28 }}
+                            sx={{
+                              width: 26,
+                              height: 26,
+                              border: "1px solid rgba(255,255,255,0.1)",
+                              background: "rgba(255,255,255,0.05)",
+                            }}
                             src={getImageMatch(skill)}
                           />
                         </Tooltip>
@@ -163,54 +194,68 @@ function FeaturedJobs({ isLoading, jobTop,isLastIndex }) {
             <Stack gap={1} alignItems={"center"} justifyContent={"flex-end"}>
               {/* applicants counter */}
               <Box>
-                <Typography variant="caption" color={"text.secondary"} fontWeight={'bold'}>
-                  {!(jobTop?.website==="") ? "website" :`${jobTop?.applicants?.total}/${jobTop?.applicants_max || MAX_APPLICANTS} `}
+                <Typography variant="caption" sx={{
+                  color: "rgba(240,244,250,0.6)",
+                  fontSize: 11,
+                }}>
+                  {!(jobTop?.website === "") ? "website" : `${jobTop?.applicants?.total}/${jobTop?.applicants_max || MAX_APPLICANTS} `}
                 </Typography>
               </Box>
 
-                <React.Fragment>
+              <React.Fragment>
                 {/* button apply */}
                 <Button
                   disableElevation
                   size="small"
                   onClick={handleOpeningApplyJob}
-                  variant="contained"
-                  startIcon={isDeactivated || isGuest || isMaxApplicants ? <LockRounded/>: !(jobTop?.website==="") ? <TravelExploreRounded /> :<Verified />}
-                  disabled={jobTop?.currentUserApplied||isDeactivated ||isMaxApplicants ||isGuest}
+                  startIcon={isDeactivated || isGuest || isMaxApplicants ? <LockRounded /> : !(jobTop?.website === "") ? <TravelExploreRounded /> : <Verified />}
+                  disabled={jobTop?.currentUserApplied || isDeactivated || isMaxApplicants || isGuest}
                   sx={{
-                    textTransform: "capitalize",
-                    borderRadius: "20px",
-                    fontSize:!CustomDeviceIsSmall() && 'x-small'
+                    borderRadius: "10px",
+                    background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                    color: "#fff",
+                    px: 1.5,
+                    py: 0.4,
+                    fontSize: "0.7rem",
+
+                    "&:hover": {
+                      background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+                    },
+
+                    "&:disabled": {
+                      background: "rgba(255,255,255,0.08)",
+                      color: "rgba(255,255,255,0.4)",
+                    }
                   }}
                 >
-                  {jobTop?.currentUserApplied ? "Applied":isDeactivated ? "Paused":isMaxApplicants ? "Closed":"Apply"}
+                  {jobTop?.currentUserApplied ? "Applied" : isDeactivated ? "Paused" : isMaxApplicants ? "Closed" : "Apply"}
                 </Button>
-                </React.Fragment>
-              
+              </React.Fragment>
+
             </Stack>
           </ListItem>
-        
-         {/* show divider only if the job is not the last index */}
-         {!isLastIndex &&  <Divider variant="inset" component="li" />}
+
+          {/* show divider only if the job is not the last index */}
+          {!isLastIndex && <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />}
         </List>
       )}
       {/* show modal apply jobs */}
-      {openApplyJobModal && 
-      <ApplyJobModal
-        title={jobTop?.title}
-        organisation={jobTop?.organisation}
-        requirements={jobTop?.requirements}
-        websiteLink={jobTop?.website}
-        openApplyJobModal={openApplyJobModal}
-        setOpenApplyJobModal={setOpenApplyJobModal}
-        jobID={jobTop?._id}
-        jobaccesstype={jobTop?.jobtypeaccess}
-        salary={jobTop?.salary}
-        skills={jobTop?.skills}
-        location={jobTop?.location}
-        isMyJob={isMyJob}
-        whitelist={jobTop?.whitelist}
-      />}
+      {openApplyJobModal &&
+        <ApplyJobModal
+          title={jobTop?.title}
+          organisation={jobTop?.organisation}
+          requirements={jobTop?.requirements}
+          websiteLink={jobTop?.website}
+          openApplyJobModal={openApplyJobModal}
+          setOpenApplyJobModal={setOpenApplyJobModal}
+          jobID={jobTop?._id}
+          jobaccesstype={jobTop?.jobtypeaccess}
+          salary={jobTop?.salary}
+          skills={jobTop?.skills}
+          location={jobTop?.location}
+          isMyJob={isMyJob}
+          whitelist={jobTop?.whitelist}
+        />}
     </React.Fragment>
   );
 }

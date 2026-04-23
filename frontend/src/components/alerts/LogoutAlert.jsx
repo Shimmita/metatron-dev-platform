@@ -1,18 +1,23 @@
-import { Avatar } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
-import axios from "axios";
+import {
+  Box,
+  Button,
+  Dialog,
+  Typography,
+  Fade,
+  Backdrop,
+  Avatar,
+} from "@mui/material";
 import React, { useState } from "react";
+import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import logoApp from "../../images/logo_sm.png";
-import { handleShowLogout, resetDefaultBottomNav } from "../../redux/AppUI";
+
+import {
+  handleShowLogout,
+  resetDefaultBottomNav,
+} from "../../redux/AppUI";
+
 import { resetAllSigningStateDetails } from "../../redux/CompleteSigning";
 import { resetClearChatBot } from "../../redux/CurrentChatBot";
 import { resetClearCurrentConnectTop } from "../../redux/CurrentConnect";
@@ -37,31 +42,19 @@ import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
 import { resetClearCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import { resetClearCurrentUserRedux, resetClearTempUserIDRedux } from "../../redux/CurrentUser";
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
 export default function LogoutAlert() {
-  const [isLoading, setIsLoading] = useState(false)
-  //   redux states
-  const { isLogoutAlert, currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode = currentMode === 'dark'
-  const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(false);
 
+  const { isLogoutAlert } = useSelector((state) => state.appUI);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // handles alert close
-  const handleClose = async () => {
-
-    // set is loading false
-    setIsLoading(false)
-
-    // close the alert
-    dispatch(handleShowLogout(false))
+  /* ─── CLOSE ─── */
+  const handleClose = () => {
+    setIsLoading(false);
+    dispatch(handleShowLogout(false));
   };
 
-
-  // handle clear redux data
   const handleClearReduxData = () => {
     // clear any persisted user data
     dispatch(resetClearCurrentUserRedux())
@@ -140,62 +133,133 @@ export default function LogoutAlert() {
 
     // clear success msg any
     dispatch(resetClearCurrentSuccessRedux())
-  }
-
-  // navigate to login page and close alert
+  };
+  
+  /* ─── LOGOUT ─── */
   const handleNavigateLoginPage = async () => {
-    // is loading true
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      // send a post request to the backend to clear all cookie sessions if any
-      const result = await axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signout`);
+      const result = await axios.post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/signout`
+      );
+
       if (result.status === 200) {
-        handleClearReduxData()
-        handleClose()
-        navigate("/")
+        handleClearReduxData();
+        handleClose();
+        navigate("/");
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  const theme = useTheme()
 
   return (
     <Dialog
       open={isLogoutAlert}
-      TransitionComponent={Transition}
-      keepMounted
-      aria-describedby="alert-dialog-slide-description"
-      sx={{
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.contrastText,
-        backdropFilter: 'blur(3px)'
+      onClose={handleClose}
+      closeAfterTransition
+      TransitionComponent={Fade}
+      slots={{ backdrop: Backdrop }}
+      slotProps={{
+        backdrop: {
+          timeout: 300,
+          sx: {
+            backdropFilter: "blur(8px)",
+            background: "rgba(6,13,24,0.7)",
+          },
+        },
+      }}
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+          width: { xs: "90vw", sm: 380 },
+          overflow: "hidden",
+        },
       }}
     >
-      <DialogTitle
-        variant="body1"
-        display={"flex"}
-        alignItems={"center"}
-        gap={2}
+      {/* HEADER */}
+      <Box
+        display="flex"
+        alignItems="center"
+        gap={1.5}
+        px={2}
+        py={1.5}
         sx={{
-          background: !isDarkMode &&
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
         }}
       >
-        <Avatar src={logoApp} alt="" />
-        Account Logout
-      </DialogTitle>
-      <DialogContent>
-        <DialogContentText id="alert-dialog-slide-description">
-          You will be logged out and required to login next time.
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} disabled={isLoading}>Disagree</Button>
-        <Button onClick={handleNavigateLoginPage} disabled={isLoading}>Agree</Button>
-      </DialogActions>
+        <Avatar
+          src={logoApp}
+          sx={{
+            width: 34,
+            height: 34,
+            borderRadius: "10px",
+          }}
+        />
+
+        <Typography fontSize={14} fontWeight={600} color="#F0F4FA">
+          Confirm Logout
+        </Typography>
+      </Box>
+
+      {/* CONTENT */}
+      <Box px={2} py={2}>
+        <Typography
+          fontSize={13}
+          sx={{
+            color: "rgba(240,244,250,0.7)",
+            lineHeight: 1.6,
+          }}
+        >
+          You will be signed out of your account. You’ll need to log in again to
+          continue using Metatron.
+        </Typography>
+      </Box>
+
+      {/* ACTIONS */}
+      <Box display="flex" justifyContent="flex-end" gap={1.2} px={2} pb={2}>
+        {/* CANCEL */}
+        <Button
+          onClick={handleClose}
+          disabled={isLoading}
+          sx={{
+            borderRadius: "10px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "rgba(255,255,255,0.7)",
+
+            "&:hover": {
+              background: "rgba(255,255,255,0.05)",
+            },
+          }}
+        >
+          Cancel
+        </Button>
+
+        {/* LOGOUT */}
+        <Button
+          onClick={handleNavigateLoginPage}
+          disabled={isLoading}
+          sx={{
+            borderRadius: "10px",
+            background: "linear-gradient(135deg,#EF4444,#FF6D3A)",
+            color: "#fff",
+            px: 2,
+
+            "&:hover": {
+              background: "linear-gradient(135deg,#DC2626,#FF6D3A)",
+            },
+          }}
+        >
+          {isLoading ? "Logging out..." : "Logout"}
+        </Button>
+      </Box>
     </Dialog>
   );
 }

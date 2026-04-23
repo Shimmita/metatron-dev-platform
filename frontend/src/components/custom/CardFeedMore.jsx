@@ -26,16 +26,16 @@ function CardFeedMore({
 }) {
   const [isFriend, setIsFriend] = useState();
   const [isFetching, setIsFetching] = useState(false);
-  const [openAlertMessage,setOpenAlertMessage]=useState(false)
+  const [openAlertMessage, setOpenAlertMessage] = useState(false)
   const [isCopiedStatus, setIsCopiedStatus] = useState(false);
-  const textToCopy=`${window.location.href}posts/details/${post?._id}`;
+  const textToCopy = `${window.location.href}posts/details/${post?._id}`;
 
-  
+
 
 
   // redux states
   const dispatch = useDispatch();
-  
+
   const { user } = useSelector((state) => state.currentUser);
   const {
     _id: currentUserId,
@@ -46,13 +46,12 @@ function CardFeedMore({
     specialisationTitle: title,
   } = user || {};
 
-  const owner_post = `${ownerName?.split(" ")[0]} ${
-    ownerName?.split(" ")[1]
-  }`.toLowerCase();
+  const owner_post = `${ownerName?.split(" ")[0]} ${ownerName?.split(" ")[1]
+    }`.toLowerCase();
 
 
   // handle showing of alert input message
-  const handleOpeningAlertMessage=()=>{
+  const handleOpeningAlertMessage = () => {
     // open the alert
     setOpenAlertMessage(true)
   }
@@ -162,19 +161,19 @@ function CardFeedMore({
   };
 
   // handle adding to the favorites
-  const handleAddFavorite=()=>{
-    const favoriteObject={
-      postId:post?._id,
-      userFavoriteId:currentUserId
+  const handleAddFavorite = () => {
+    const favoriteObject = {
+      postId: post?._id,
+      userFavoriteId: currentUserId
     }
 
-     // set is fetching to true
+    // set is fetching to true
     setIsFetching(true);
 
     // performing update request
     axios.put(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/favorite`,favoriteObject
-      )
+      `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/favorite`, favoriteObject
+    )
       .then((res) => {
         // update the message state
         if (res?.data && res.data) {
@@ -200,118 +199,177 @@ function CardFeedMore({
   }
 
   // handle sharing of the post
-  const handleSharePost=async()=>{
-      try {
+  const handleSharePost = async () => {
+    try {
       await navigator.clipboard.writeText(textToCopy);
       setIsCopiedStatus(true);
       setTimeout(() => {
-      setIsCopiedStatus(false)
-      }, 2000); 
+        setIsCopiedStatus(false)
+      }, 2000);
     } catch (err) {
       console.error('Failed to Copy: ', err);
     }
   }
 
   return (
-      <Box borderRadius={5}>
-            {isFriend ? (
-              <MenuItem onClick={handleUnfriendFriend} disabled={isFetching}>
-              <ListItemText>
-                <PersonRemoveRounded color="warning" className="mx-2" />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={<Typography variant={'body2'}>{owner_post}</Typography>}
-              />
-            </MenuItem>
-            ):(
-          <MenuItem onClick={handleCreateConnection} disabled={isFetching}>
-              <ListItemText>
-                <PersonAddRounded color="primary" className="mx-2" />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={<Typography variant={'body2'}>{owner_post}</Typography>}
-              />
-            </MenuItem>
-            )}
-            
-            <Divider component={"li"} />
+    <Box
+      sx={{
+        borderRadius: "16px",
+        background: "rgba(255,255,255,0.05)",
+        backdropFilter: "blur(20px)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        overflow: "hidden",
+      }}
+    >
+      {isFriend ? (
+        <MenuItem onClick={handleUnfriendFriend} disabled={isFetching}>
+          <ListItemText>
+            <PersonRemoveRounded color="warning" sx={{ mr: 1.2 }} />
+          </ListItemText>
+          <ListItemText
+            sx={{ textTransform: "capitalize" }}
+            primary={<Typography
+              fontSize={13}
+              sx={{
+                color: "rgba(240,244,250,0.85)",
+                fontWeight: 500,
+              }}
+            >{owner_post}</Typography>}
+          />
+        </MenuItem>
+      ) : (
+        <MenuItem onClick={handleCreateConnection} disabled={isFetching}>
+          <ListItemText>
+            <PersonAddRounded sx={{
+              color: "rgba(255,255,255,0.7)",
+              transition: "0.2s",
+              mr: 1.2,
 
-            <MenuItem onClick={handleOpeningAlertMessage} disabled={isFetching}>
-              <ListItemText>
-                <EmailOutlined color="primary" className="mx-2" sx={{ width:22,height:22 }}/>
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={<Typography variant={'body2'}>{owner_post}</Typography>}
-              />
-            </MenuItem>
+              ".MuiMenuItem-root:hover &": {
+                color: "#14D2BE",
+              }
+            }}  />
+          </ListItemText>
+          <ListItemText
+            sx={{ textTransform: "capitalize" }}
+            primary={<Typography
+              fontSize={13}
+              sx={{
+                color: "rgba(240,244,250,0.85)",
+                fontWeight: 500,
+              }}
+            >{owner_post}</Typography>}
+          />
+        </MenuItem>
+      )}
 
-            {/* add to favorites */}
-            <Divider component={"li"} />
-            <MenuItem onClick={ handleAddFavorite } disabled={isFetching}>
-              <ListItemText>
-                <StarRounded 
-                sx={{ width:26,height:26 }}
-                color="success" 
-                className="mx-2" />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={<Typography variant={'body2'}>Add to Favorites</Typography>}
-              />
-            </MenuItem>
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
+      <MenuItem onClick={handleOpeningAlertMessage} disabled={isFetching}>
+        <ListItemText>
+          <EmailOutlined  sx={{
+            color: "rgba(255,255,255,0.7)",
+            transition: "0.2s",
+              mr: 1.2,
 
-            {/* share post */}
-             <Divider component={"li"} />
-            <MenuItem onClick={handleSharePost} disabled={isFetching}>
-              <ListItemText>              
-        
-                {isCopiedStatus ? (
-                  <DoneRounded 
-                sx={{ width:24,height:24 }}
-                color='success'
-                className="mx-2" />
-                ):(
-                  <LinkRounded 
-                sx={{ width:24,height:24 }}
-                color='secondary'
-                className="mx-2" />
-                )}
-              
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={<Typography variant={'body2'} >
-                  {isCopiedStatus ? "Link Copied":"Share this Post"}
-                </Typography>}
-              />
-            </MenuItem>
+            ".MuiMenuItem-root:hover &": {
+              color: "#14D2BE",
+            }
+          }} />
+        </ListItemText>
+        <ListItemText
+          sx={{ textTransform: "capitalize" }}
+          primary={<Typography
+            fontSize={13}
+            sx={{
+              color: "rgba(240,244,250,0.85)",
+              fontWeight: 500,
+            }}
+          >{owner_post}</Typography>}
+        />
+      </MenuItem>
 
-            {/* repost post */}
-            <Divider component={"li"} />
-            <MenuItem onClick={handleShowReportAlert} disabled={isFetching}>
-              <ListItemText>
-                <FlagRounded color="warning" className="mx-2" />
-              </ListItemText>
-              <ListItemText
-                sx={{ textTransform: "capitalize" }}
-                primary={<Typography variant={'body2'}>Report this Post</Typography>}
-              />
-            </MenuItem>
-        
-            {/* alert message render */}
-            {openAlertMessage && (
-              <AlertInputMessage openAlert={openAlertMessage}
-               setOpenAlert={setOpenAlertMessage} 
-               targetId={ownerId} 
-               targetName={ownerName}
-               targetSpecialisation={post?.post_owner?.ownertitle}
-               targetAvatar={post?.post_owner?.owneravatar}
-               />
-            )}
-      </Box>
+      {/* add to favorites */}
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
+      <MenuItem onClick={handleAddFavorite} disabled={isFetching}>
+        <ListItemText>
+          <StarRounded
+            sx={{ width: 26, height: 26 }}
+            color="success"
+            sx={{ mr: 1.2 }}   />
+        </ListItemText>
+        <ListItemText
+          sx={{ textTransform: "capitalize" }}
+          primary={<Typography
+            fontSize={13}
+            sx={{
+              color: "rgba(240,244,250,0.85)",
+              fontWeight: 500,
+            }}
+          >Add to Favorites</Typography>}
+        />
+      </MenuItem>
+
+      {/* share post */}
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
+      <MenuItem onClick={handleSharePost} disabled={isFetching}>
+        <ListItemText>
+
+          {isCopiedStatus ? (
+            <DoneRounded
+              sx={{ width: 24, height: 24 }}
+              color='success'
+             />
+          ) : (
+            <LinkRounded
+              sx={{ width: 24, height: 24 }}
+              color='secondary'
+              sx={{ mr: 1.2 }} />
+          )}
+
+        </ListItemText>
+        <ListItemText
+          sx={{ textTransform: "capitalize" }}
+          primary={<Typography
+            fontSize={13}
+            sx={{
+              color: "rgba(240,244,250,0.85)",
+              fontWeight: 500,
+            }}
+          >
+            {isCopiedStatus ? "Link Copied" : "Share this Post"}
+          </Typography>}
+        />
+      </MenuItem>
+
+      {/* repost post */}
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
+      <MenuItem onClick={handleShowReportAlert} disabled={isFetching}>
+        <ListItemText>
+          <FlagRounded color="warning" sx={{ mr: 1.2 }} />
+        </ListItemText>
+        <ListItemText
+          sx={{ textTransform: "capitalize" }}
+          primary={<Typography
+            fontSize={13}
+            sx={{
+              color: "rgba(240,244,250,0.85)",
+              fontWeight: 500,
+            }}
+          >Report this Post</Typography>}
+        />
+      </MenuItem>
+
+      {/* alert message render */}
+      {openAlertMessage && (
+        <AlertInputMessage openAlert={openAlertMessage}
+          setOpenAlert={setOpenAlertMessage}
+          targetId={ownerId}
+          targetName={ownerName}
+          targetSpecialisation={post?.post_owner?.ownertitle}
+          targetAvatar={post?.post_owner?.owneravatar}
+        />
+      )}
+    </Box>
   );
 }
 

@@ -1,11 +1,10 @@
 import { useTheme } from "@emotion/react";
 import { SortRounded } from "@mui/icons-material";
-import { Box, Checkbox, CircularProgress, Divider, FormControl, FormControlLabel, FormGroup, FormHelperText, Typography } from "@mui/material";
+import { Box, Checkbox, CircularProgress, FormControl, FormControlLabel, FormGroup, FormHelperText, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import axios from "axios";
 import React, { useState } from "react";
@@ -111,36 +110,43 @@ export default function AlertFilterFeed({
       open={openAlert}
       TransitionComponent={Transition}
       aria-describedby="alert-dialog-filter"
-      sx={{
-        backdropFilter: 'blur(5px)',
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+        },
       }}
     >
-      <DialogTitle
-        display={"flex"}
-        alignItems={"center"}
-        variant="body1"
-        fontWeight={"bold"}
-        gap={2}
-        sx={{
-          backgroundColor: theme.palette.primary.main,
-          color: theme.palette.primary.contrastText,
-        }}
-      >
-        <SortRounded />
-        {title}
-      </DialogTitle>
+      <Box display="flex" alignItems="center" gap={1.5}>
+        <Box
+          sx={{
+            width: 34,
+            height: 34,
+            borderRadius: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(20,210,190,0.15)",
+            color: "#14D2BE",
+          }}
+        >
+          <SortRounded />
+        </Box>
+
+        <Typography fontWeight={600} fontSize={14}>
+          {title}
+        </Typography>
+      </Box>
       <DialogContent
         dividers
         sx={{
-          maxWidth: 500,
-          overflow: "auto",
-          // Hide scrollbar for Chrome, Safari and Opera
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          // Hide scrollbar for IE, Edge and Firefox
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
+          maxWidth: 420,
+          px: 2,
+          py: 2,
+          background: "rgba(255,255,255,0.03)",
         }}
       >
 
@@ -148,16 +154,40 @@ export default function AlertFilterFeed({
           {/* message helper text info, error */}
           {errorMessage &&
             <Box display={'flex'} justifyContent={'center'}>
-              <FormHelperText className={"mb-1 text-warning fw-bold"}>
+              <FormHelperText
+                sx={{
+                  color: "#FFB300",
+                  fontSize: 12,
+                  textAlign: "center",
+                }}
+              >
                 {errorMessage}
               </FormHelperText>
             </Box>
           }
 
           {/* form data checkboxes */}
-          <FormGroup>
+          <FormGroup >
             {feedData?.map(data => (
-              <Box key={data}>
+              <Box key={data} sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                px: 1.2,
+                py: 1,
+                borderRadius: "10px",
+                background: selectedOptions.includes(data)
+                  ? "rgba(20,210,190,0.08)"
+                  : "rgba(255,255,255,0.02)",
+                border: selectedOptions.includes(data)
+                  ? "1px solid rgba(20,210,190,0.4)"
+                  : "1px solid rgba(255,255,255,0.06)",
+                transition: "all 0.2s ease",
+
+                "&:hover": {
+                  background: "rgba(20,210,190,0.06)",
+                },
+              }}>
                 <Box
                   display={'flex'}
                   alignItems={'center'}
@@ -171,20 +201,30 @@ export default function AlertFilterFeed({
                     value={data}
                     control={<Checkbox
                       onChange={handleChange}
-                      name={data}
                       checked={selectedOptions.includes(data)}
+                      sx={{
+                        color: "rgba(255,255,255,0.5)",
+
+                        "&.Mui-checked": {
+                          color: "#14D2BE",
+                        },
+                      }}
                     />}
                     label={
                       <Typography
-                        color={selectedOptions.includes(data) ? 'primary' : 'inherit'}
                         variant={'body2'}
+                        sx={{
+                          color: selectedOptions.includes(data)
+                            ? "#14D2BE"
+                            : "rgba(240,244,250,0.7)",
+                          fontSize: 13,
+                        }}
                       >
                         {data}
                       </Typography>
                     } />
                 </Box>
-                <Divider
-                  component={'div'} />
+
               </Box>
             ))
             }
@@ -196,6 +236,15 @@ export default function AlertFilterFeed({
         <Button
           onClick={handleDismiss}
           disabled={isFetching}
+          sx={{
+            borderRadius: "10px",
+            border: "1px solid rgba(255,255,255,0.08)",
+            color: "rgba(255,255,255,0.7)",
+
+            "&:hover": {
+              background: "rgba(255,255,255,0.05)",
+            },
+          }}
         >
           Close
         </Button>
@@ -204,6 +253,20 @@ export default function AlertFilterFeed({
           startIcon={isFetching ? <CircularProgress size={15} /> : undefined}
           onClick={handleEnter}
           disabled={selectedOptions?.length < 1 || isFetching}
+          sx={{
+            borderRadius: "10px",
+            background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+            color: "#fff",
+
+            "&:hover": {
+              background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+            },
+
+            "&:disabled": {
+              background: "rgba(255,255,255,0.08)",
+              color: "rgba(255,255,255,0.4)",
+            }
+          }}
         >
           Sort
         </Button>
