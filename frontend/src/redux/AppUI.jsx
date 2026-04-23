@@ -23,7 +23,7 @@ const initialState = {
   notificationPosition:0,
 
   // theme
-  currentMode: "light",
+  currentMode: "dark",
 };
 
 const appUISliceReducerSlice = createSlice({
