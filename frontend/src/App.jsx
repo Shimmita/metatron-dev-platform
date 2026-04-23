@@ -27,9 +27,7 @@ const RegistrationAuthLazy = lazy(() =>
 const EmailVerificationAuth = lazy(() => import("./components/auth/EmailVerification"))
 
 const App = () => {
-  // global dark mode state from redux
-  const { currentMode } = useSelector((state) => state.appUI);
-  const theme = getAppTheme(currentMode);
+  const theme = getAppTheme();
 
   return (
     <ThemeProvider theme={theme}>
