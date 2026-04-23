@@ -1,31 +1,23 @@
 import { useTheme } from "@emotion/react";
-import { Close } from "@mui/icons-material";
-import { Avatar, Box, DialogContentText, IconButton, InputBase, styled, Tooltip, Typography } from "@mui/material";
+import { Close, SendRounded } from "@mui/icons-material";
+import {
+  Avatar,
+  Box,
+  DialogContentText,
+  IconButton,
+  InputBase,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import Slide from "@mui/material/Slide";
+import Fade from "@mui/material/Fade";
 import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetClearConversations } from "../../redux/CurrentConversations";
 import { updateMessageConnectRequest } from "../../redux/CurrentSnackBar";
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-// input base
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    transition: theme.transitions.create("width"),
-    width: "100%",
-
-  },
-}));
 
 export default function AlertInputMessage({
   openAlert,
@@ -33,177 +25,147 @@ export default function AlertInputMessage({
   targetId,
   targetName,
   targetAvatar,
-  targetSpecialisation
+  targetSpecialisation,
 }) {
-
-  // for monitoring api request status
   const [isSending, setIsSending] = useState(false);
   const [textMessage, setTextMessage] = useState("");
-  const dispatch = useDispatch()
 
-  // redux states
-  const { currentMode } = useSelector((state) => state.appUI);
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.currentUser);
 
-  const isDarkMode = currentMode === 'dark'
+  const handleClose = () => setOpenAlert(false);
 
-
-  const handleClose = () => {
-    // close alert
-    setOpenAlert(false);
-  };
-
-  //   handle when user dismissed the dialog
-  const handleDismiss = () => {
-    handleClose();
-  };
-
-  // handle sending of the message
   const handleSendingMessage = async () => {
-    // conversationObject
     const conversation = {
       senderId: user._id,
       content: textMessage,
       participants: [user._id, targetId],
     };
 
-    // call api request to post data to the backed
     try {
-      // set is fetching to true
       setIsSending(true);
+
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/create`,
         conversation
       );
-      //update the conversation with the one returned from the backend
+
       if (response.data) {
-        // reset conversations by clearing the info in redux for auto refetch
-        dispatch(resetClearConversations())
-
-        // update notification
-        dispatch(updateMessageConnectRequest("message has been sent"));
-
+        dispatch(resetClearConversations());
+        dispatch(updateMessageConnectRequest("Message sent"));
       }
     } catch (err) {
       if (err?.code === "ERR_NETWORK") {
-        dispatch(
-          updateMessageConnectRequest(
-            "server is unreachable check your internet"
-          )
-        );
-        return;
+        dispatch(updateMessageConnectRequest("Server unreachable"));
+      } else {
+        dispatch(updateMessageConnectRequest(err?.response?.data));
       }
-      dispatch(updateMessageConnectRequest(err?.response?.data));
     } finally {
-      // close is fetching
       setIsSending(false);
-      // clear the message content
       setTextMessage("");
-
-      //  close the message alert
-      handleDismiss()
-
+      handleClose();
     }
   };
 
-
-  const theme = useTheme()
+  const theme = useTheme();
 
   return (
     <Dialog
       open={openAlert}
-      TransitionComponent={Transition}
-      keepMounted
-      maxWidth={400}
-      aria-describedby="alert-dialog-slide-description"
-      sx={{
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.contrastText,
-        backdropFilter: 'blur(3px)'
+      onClose={handleClose}
+      fullWidth
+      maxWidth="xs"
+      TransitionComponent={Fade}
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+        },
       }}
     >
-      <Box width={'100%'}>
-        <Box
-          display={'flex'} gap={2}
-          p={1}
-          alignItems={'center'}
-          justifyContent={'space-between'}
-          sx={{
-            background: !isDarkMode &&
-              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-          }}
-        >
-          {/* avatar */}
-          <Avatar
-            src={targetAvatar}
-            sx={{
+      {/* HEADER */}
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        px={2}
+        py={1.5}
+        borderBottom="1px solid rgba(255,255,255,0.08)"
+      >
+        <Box display="flex" gap={1.5} alignItems="center">
+          <Avatar src={targetAvatar} sx={{ width: 36, height: 36 }} />
 
-              width: 34,
-              height: 34,
-            }}
-            alt={targetName?.split(" ")[0]}
-            aria-label="avatar"
-          />
-
-          {/* title */}
-          <Box
-            display={'flex'}
-            justifyContent={'center'}
-            flexDirection={'column'}
-            alignItems={'center'}>
-            <Typography variant="body2" gutterBottom> {targetName}</Typography>
-            <Typography variant="caption"
-              sx={{ color: 'text.secondary' }}>
+          <Box>
+            <Typography fontSize={13} fontWeight={600}>
+              {targetName}
+            </Typography>
+            <Typography fontSize={11} color="text.secondary">
               {targetSpecialisation}
             </Typography>
           </Box>
-
-          {/* close icon button */}
-          <Tooltip title={'close'} arrow>
-            <IconButton
-              sx={{ border: '1px solid', borderColor: "divider" }}
-              onClick={handleDismiss} >
-              <Close sx={{ width: 12, height: 12 }} />
-            </IconButton>
-          </Tooltip>
         </Box>
 
-        <DialogContent dividers>
-          <DialogContentText variant="body2" fontSize={'small'} pl={1} pr={1}>
-            write your message and send it instantly by clicking send
-          </DialogContentText>
-          <StyledInputBase
-            sx={{
-              padding: "10px",
-              width: '100%',
-              border: '1px solid',
-              borderColor: 'divider',
-              fontSize: 'small'
-            }}
+        <Tooltip title="Close">
+          <IconButton onClick={handleClose}>
+            <Close sx={{ width: 18, height: 18 }} />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      {/* CONTENT */}
+      <DialogContent>
+        <DialogContentText
+          sx={{
+            fontSize: 12,
+            color: "text.secondary",
+            mb: 1,
+          }}
+        >
+          Send a quick message
+        </DialogContentText>
+
+        {/* INPUT */}
+        <Box
+          sx={{
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "12px",
+            px: 1,
+            py: 1,
+            background: "rgba(255,255,255,0.03)",
+          }}
+        >
+          <InputBase
             multiline
             fullWidth
+            minRows={4}
+            maxRows={6}
+            placeholder="Write your message..."
             value={textMessage}
             onChange={(e) => setTextMessage(e.target.value)}
-            placeholder="write message ..."
-            autoFocus
             disabled={isSending}
-            minRows={5}
-            maxRows={5}
-            className={'rounded'}
-            inputProps={{ "aria-label": "search" }}
           />
-        </DialogContent>
-        <DialogActions>
+        </Box>
+      </DialogContent>
 
-          <Button
-            size="small"
-            disabled={textMessage.trim() === "" || isSending}
-            onClick={handleSendingMessage}
-            sx={{ borderRadius: 3 }}
-          >
-            send
-          </Button>
-        </DialogActions>
+      {/* ACTION */}
+      <Box px={2} pb={2}>
+        <Button
+          fullWidth
+          variant="contained"
+          startIcon={<SendRounded />}
+          disabled={textMessage.trim() === "" || isSending}
+          onClick={handleSendingMessage}
+          sx={{
+            borderRadius: "12px",
+            background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+            color: "#fff",
+          }}
+        >
+          {isSending ? "Sending..." : "Send Message"}
+        </Button>
       </Box>
     </Dialog>
   );

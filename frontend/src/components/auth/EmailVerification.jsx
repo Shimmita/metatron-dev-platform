@@ -1,237 +1,197 @@
-import { Close, WbIncandescentRounded } from "@mui/icons-material";
-import { Alert, Box, Button, CircularProgress, Collapse, FormHelperText, IconButton, TextField, Typography } from "@mui/material";
+import {
+  Close,
+  VerifiedRounded,
+  WbIncandescentRounded
+} from "@mui/icons-material";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Collapse,
+  IconButton,
+  TextField,
+  Typography
+} from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 
 const EmailVerification = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const [messageGeneral, setMessageGeneral] = useState("");
-  const [isProcessing,setIsProcessing]=useState(false)
-  const [isDisabledInput,setIsDisabledInput]=useState(false)
-  const navigate=useNavigate()
-  //extract email from the url
-  const email=window.location.href.split('?')[1]
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  // dark mode state from redux
-  const { isDarkMode } = useSelector((state) => state.appUI);
-  
-  const handleSubmitDetails = (event) => {
-    // prevent default form submission
-    event.preventDefault();
-    // set is processing true
-    setIsProcessing(true)
-    // user object
-    const verificationObject = {
-      email,
-      email_code: verificationCode,
-    };
-   
+  const navigate = useNavigate();
+  const email = window.location.href.split("?")[1];
+
+  const handleSubmitDetails = (e) => {
+    e.preventDefault();
+    setIsProcessing(true);
+
     axios
-      .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/account/personal/verify/email`, verificationObject)
+      .post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/account/personal/verify/email`,
+        { email, email_code: verificationCode }
+      )
       .then((res) => {
-        // set message response from the backend
-        setMessageGeneral(res.data)
-        setIsDisabledInput(true)
+        setMessageGeneral(res.data);
+        setIsSuccess(true);
       })
       .catch((err) => {
         if (err?.code === "ERR_NETWORK") {
-          setMessageGeneral("Server Unreachable");
-          return;
+          setMessageGeneral("Server unreachable");
+        } else {
+          setMessageGeneral(err?.response?.data);
         }
-        setMessageGeneral(err?.response?.data);
-
       })
-      .finally(() => {
-        setIsProcessing(false)
-      });
+      .finally(() => setIsProcessing(false));
   };
 
-  // handle navigate back to login since verification went successful
-  const handleNavigateBackLogin=()=>{
-    // home route will forward request back to login page if user not logged in
-    navigate("/")
-  }
-
+  const handleProceed = () => navigate("/");
 
   return (
     <Box
-      display={"flex"}
-      justifyContent={"center"}
-      alignItems={"center"}
-      className=" container"
-      height={"100vh"}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+      px={2}
     >
       <Box
-        className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
-        border={isDarkMode ? "1px solid gray" : "none"}
-        width={"100%"}
-        bgcolor={!isDarkMode && "background.default"}
+        width="100%"
+        maxWidth={420}
+        p={3}
+        borderRadius="18px"
         sx={{
-          overflow: "auto",
-          // Hide scrollbar for Chrome, Safari and Opera
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          // Hide scrollbar for IE, Edge and Firefox
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.4)",
         }}
       >
-        <form
-          onSubmit={handleSubmitDetails}
-          className="w-100 p-3  justify-content-center align-items-center align-content-center"
-        >
-          <Typography
-            textAlign={"center"}
-            fontWeight={"bold"}
-            textTransform={"uppercase"}
-            variant={CustomDeviceSmallest() ? "body1" : "h6"}
-            gutterBottom
-            color={"primary"}
-          >
+        {/* HEADER */}
+        <Box textAlign="center" mb={2}>
+          <Typography fontWeight={700}>
             Metatron Developer
           </Typography>
 
-          <Box
-            mb={2}
-            display={"flex"}
-            justifyContent={"center"}
-            gap={1}
-            alignItems={"center"}
-          >
-            <WbIncandescentRounded
-              sx={{ width: 18, height: 18, color: "orange" }}
-            />
-            <Typography
-              variant={CustomDeviceSmallest() ? "caption" : "body2"}
-              color={"text.secondary"}
-            >
-              Enlightening Technology Globally
-            </Typography>
-            <WbIncandescentRounded
-              sx={{ width: 18, height: 18, color: "orange" }}
-            />
-          </Box>
-
           <Typography
-            textAlign={"center"}
-            fontWeight={"bold"}
-            variant="body1"
-            color={"text.secondary"}
+            fontSize={13}
+            color="text.secondary"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            gap={1}
           >
-            Email Verification Center
+            <WbIncandescentRounded sx={{ color: "#f59e0b", width: 16 }} />
+            Secure Email Verification
+            <WbIncandescentRounded sx={{ color: "#f59e0b", width: 16 }} />
           </Typography>
+        </Box>
 
-          {/* helper text */}
-          <Box 
-          mb={1}
-          justifyContent={'center'}
-          width={'100%'}
-          display={'flex'} 
-          >
-        <FormHelperText> we sent an email verification code</FormHelperText>
-          </Box>
+        {/* TITLE */}
+        <Box textAlign="center" mb={2}>
+          <VerifiedRounded sx={{ fontSize: 40, color: "#14D2BE" }} />
+          <Typography fontWeight={600}>
+            Verify Your Email
+          </Typography>
+        </Box>
 
-           {messageGeneral && (
-            <Box display={"flex"} justifyContent={"center"} mb={1}>
-                <Collapse in={messageGeneral || false}>
-                <Alert
-                    className="rounded-5"
-                    severity={messageGeneral?.includes('successful') ? 'info':'warning'}
-                    onClick={() => setMessageGeneral("")}
-                    action={
-                    <IconButton
-                        aria-label="close"
-                        color="inherit"
-                        size="small"
-                    >
-                        <Close fontSize="inherit" />
-                    </IconButton>
-                    }
+        {/* ALERT */}
+        {messageGeneral && (
+          <Collapse in>
+            <Alert
+              severity={isSuccess ? "success" : "info"}
+              sx={{ mb: 2 }}
+              action={
+                <IconButton
+                  size="small"
+                  onClick={() => setMessageGeneral("")}
                 >
-                    {messageGeneral.toString()}
-                </Alert>
-                </Collapse>
-            </Box>
-            )}
+                  <Close fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              {messageGeneral}
+            </Alert>
+          </Collapse>
+        )}
 
-            <Box mb={3} mt={3} display={"flex"} justifyContent={"center"}>
+        {/* SUCCESS VIEW */}
+        {isSuccess ? (
+          <Box textAlign="center">
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleProceed}
+              sx={{
+                borderRadius: "12px",
+                background:
+                  "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                color: "#fff",
+              }}
+            >
+              Proceed to Login
+            </Button>
+          </Box>
+        ) : (
+          <form onSubmit={handleSubmitDetails}>
+            {/* EMAIL */}
             <TextField
-              required
-              id="outlined-email"
+              fullWidth
               label="Email"
-              className="w-75"
               value={email}
               disabled
-              placeholder="username@gmail.com"
-              type="email"
+              sx={{ mb: 2 }}
             />
-          </Box>
 
-          <Box mb={3} mt={4} display={"flex"} justifyContent={"center"}>
+            {/* CODE */}
             <TextField
-              required
-              id="outlined-code"
-              label="code"
-              focused
-              disabled={isDisabledInput}
-              className="w-75"
+              fullWidth
+              label="Verification Code"
+              placeholder="Enter code"
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.target.value)}
-              placeholder="A3YUs2"
+              disabled={isProcessing}
+              sx={{ mb: 2 }}
             />
-          </Box>
 
-            
-          <Box 
-          display={"flex"} 
-          justifyContent={"center"}
-          alignItems={'center'}
-          mt={3}
-          gap={1}
-          color={'text.secondary'}
-           >
-          
-            {/* back to login */}
-            <Typography
-              variant="body2"
-              color={"text.secondary"}
-              display={"flex"}
-              gap={1}
-              alignItems={"center"}
-            >
-              Back to
-              <Link to={"/"} className="text-decoration-none">
-                <Typography
-                  variant="body2"
-                  sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
-                >
-                login
-                </Typography>{" "}
-              </Link>
-            </Typography>
-          </Box>
-
-          <div className="d-flex justify-content-center mt-3">
-            {isProcessing ? (
-              <CircularProgress size={20}/>
-            ):(
-              <Button
-              variant="contained"
-              sx={{ borderRadius: "20px",textTransform: "none", }}
-              disableElevation
-              onClick={isDisabledInput ? handleNavigateBackLogin :handleSubmitDetails}
-              disabled={isProcessing || !verificationCode}
+            {/* ACTION */}
+            <Button
+              fullWidth
               type="submit"
+              variant="contained"
+              disabled={!verificationCode || isProcessing}
+              startIcon={
+                isProcessing && <CircularProgress size={16} />
+              }
+              sx={{
+                borderRadius: "12px",
+                background:
+                  "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                color: "#fff",
+              }}
             >
-              {isDisabledInput ? "Proceed":"Verify Email"}
+              {isProcessing
+                ? "Verifying..."
+                : "Verify Email"}
             </Button>
+
+            {/* BACK */}
+            {!isProcessing && (
+              <Box textAlign="center" mt={2}>
+                <Typography fontSize={12} color="text.secondary">
+                  Back to{" "}
+                  <Link to="/" style={{ color: "#14D2BE" }}>
+                    login
+                  </Link>
+                </Typography>
+              </Box>
             )}
-          </div>
-        </form>
+          </form>
+        )}
       </Box>
     </Box>
   );

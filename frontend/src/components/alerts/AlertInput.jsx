@@ -1,107 +1,172 @@
-import { TextField } from "@mui/material";
+import { useTheme } from "@emotion/react";
+import { Close, SendRounded } from "@mui/icons-material";
+import {
+  Avatar,
+  Box,
+  DialogContentText,
+  IconButton,
+  InputBase,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
+import Fade from "@mui/material/Fade";
+import axios from "axios";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import SubsectionTech from "../data/SubsectionTech";
-import { useTheme } from "@emotion/react";
+import { useDispatch, useSelector } from "react-redux";
+import { resetClearConversations } from "../../redux/CurrentConversations";
+import { updateMessageConnectRequest } from "../../redux/CurrentSnackBar";
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-export default function AlertInput({
+export default function AlertInputMessage({
   openAlert,
   setOpenAlert,
-  setCustomArea,
-  body = "",
-  title = "",
+  targetId,
+  targetName,
+  targetAvatar,
+  targetSpecialisation,
 }) {
-  // redux states
-  const {currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode=currentMode==='dark'
-  
-  const [customTitle, setCustomTitle] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [textMessage, setTextMessage] = useState("");
 
-  const handleClose = () => {
-    // close alert
-    setOpenAlert(false);
-  };
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.currentUser);
 
-  // handle info entered by the user before closing the modal
-  const handleEnterInfo = () => {
-    // update the array then set the value of the user before close
-    if (SubsectionTech?.MachineLearning?.includes(customTitle)) {
-      return;
-    } else {
-      SubsectionTech.MachineLearning.push(customTitle);
-      setCustomArea(customTitle);
+  const handleClose = () => setOpenAlert(false);
+
+  const handleSendingMessage = async () => {
+    const conversation = {
+      senderId: user._id,
+      content: textMessage,
+      participants: [user._id, targetId],
+    };
+
+    try {
+      setIsSending(true);
+
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/create`,
+        conversation
+      );
+
+      if (response.data) {
+        dispatch(resetClearConversations());
+        dispatch(updateMessageConnectRequest("Message sent"));
+      }
+    } catch (err) {
+      if (err?.code === "ERR_NETWORK") {
+        dispatch(updateMessageConnectRequest("Server unreachable"));
+      } else {
+        dispatch(updateMessageConnectRequest(err?.response?.data));
+      }
+    } finally {
+      setIsSending(false);
+      setTextMessage("");
       handleClose();
     }
   };
 
-  //   handle when user dismissed the dialog
-  const handleDismiss = () => {
-    setCustomArea("");
-    handleClose();
-  };
-
-
-  const theme=useTheme()
+  const theme = useTheme();
 
   return (
-      <Dialog
-        open={openAlert}
-        TransitionComponent={Transition}
-        keepMounted
-        maxWidth={400}
-        aria-describedby="alert-dialog-slide-input"
-       sx={{
-          backgroundColor: theme.palette.primary.main,
-          color: theme.palette.primary.contrastText,
-        }}
+    <Dialog
+      open={openAlert}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="xs"
+      TransitionComponent={Fade}
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+        },
+      }}
+    >
+      {/* HEADER */}
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        px={2}
+        py={1.5}
+        borderBottom="1px solid rgba(255,255,255,0.08)"
       >
-        <DialogTitle
-         variant="body2"
-          sx={{
-              background: !isDarkMode && 
-              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-          }}
-         >
-         {title}
-         </DialogTitle>
-        <DialogContent>
-          <DialogContentText 
-          variant="body2"
-           id="alert-dialog-slide-input">
-            {body}
-          </DialogContentText>
+        <Box display="flex" gap={1.5} alignItems="center">
+          <Avatar src={targetAvatar} sx={{ width: 36, height: 36 }} />
 
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="custom_area"
-            label={"preferred area"}
+          <Box>
+            <Typography fontSize={13} fontWeight={600}>
+              {targetName}
+            </Typography>
+            <Typography fontSize={11} color="text.secondary">
+              {targetSpecialisation}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Tooltip title="Close">
+          <IconButton onClick={handleClose}>
+            <Close sx={{ width: 18, height: 18 }} />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      {/* CONTENT */}
+      <DialogContent>
+        <DialogContentText
+          sx={{
+            fontSize: 12,
+            color: "text.secondary",
+            mb: 1,
+          }}
+        >
+          Send a quick message
+        </DialogContentText>
+
+        {/* INPUT */}
+        <Box
+          sx={{
+            border: "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "12px",
+            px: 1,
+            py: 1,
+            background: "rgba(255,255,255,0.03)",
+          }}
+        >
+          <InputBase
+            multiline
             fullWidth
-            onChange={(e) => setCustomTitle(e.target.value)}
-            variant="standard"
+            minRows={4}
+            maxRows={6}
+            placeholder="Write your message..."
+            value={textMessage}
+            onChange={(e) => setTextMessage(e.target.value)}
+            disabled={isSending}
           />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDismiss}>Back</Button>
-          <Button
-            disabled={customTitle.trim() === ""}
-            onClick={handleEnterInfo}
-          >
-            Enter
-          </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </DialogContent>
+
+      {/* ACTION */}
+      <Box px={2} pb={2}>
+        <Button
+          fullWidth
+          variant="contained"
+          startIcon={<SendRounded />}
+          disabled={textMessage.trim() === "" || isSending}
+          onClick={handleSendingMessage}
+          sx={{
+            borderRadius: "12px",
+            background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+            color: "#fff",
+          }}
+        >
+          {isSending ? "Sending..." : "Send Message"}
+        </Button>
+      </Box>
+    </Dialog>
   );
 }

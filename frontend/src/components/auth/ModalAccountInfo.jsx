@@ -139,7 +139,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                     color="#F0F4FA"
                     mb={2}
                   >
-                    Registered Account Types
+                    Registered Accounts
                   </Typography>
 
                   {/* List */}

@@ -1,20 +1,21 @@
 import { Box, CircularProgress } from "@mui/material";
-import { lazy, Suspense, useLayoutEffect } from "react";
+import React, { lazy, Suspense, useLayoutEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes } from "react-router-dom";
 import BasicSpeedDial from "../custom/SpeedDial";
 
 import { handleShowingSpeedDial } from "../../redux/AppUI";
-import BottomNav from "../bottom/BottomNav";
 import GuestCheck from "../account/GuestCheck";
+import AlertGroupCommunity from "../alerts/AlertGroupCommunity";
 import AlertTutorial from "../alerts/AlertTutorial";
-const EventsContainer =lazy(()=>import("../events/EventsContainer")) ;
-const SnackBarPostSuccess =lazy(()=>import("../snackbar/SnackBarPostSuccess")) ;
-const CoursesMainContainer =lazy(()=>import("../courses/CoursesMainContainer"));
-const CoursesInstrContainer =lazy(()=>import("../courses/CoursesInstrContainer")) ;
+import BottomNav from "../bottom/BottomNav";
+const EventsContainer = lazy(() => import("../events/EventsContainer"));
+const SnackBarPostSuccess = lazy(() => import("../snackbar/SnackBarPostSuccess"));
+const CoursesMainContainer = lazy(() => import("../courses/CoursesMainContainer"));
+const CoursesInstrContainer = lazy(() => import("../courses/CoursesInstrContainer"));
 const FeedDefaultSearch = lazy(() => import("./FeedDefaultSearch"));
 const PostDetailsRouted = lazy(() => import("../post/PostDetailsRouted"));
-const AllJobsHiringManager=lazy(()=>import("../jobs/AllJobsHiringManager")) ;
+const AllJobsHiringManager = lazy(() => import("../jobs/AllJobsHiringManager"));
 const AllJobsContainer = lazy(() => import("../jobs/AllJobsContainer"));
 const PageNotFound = lazy(() => import("../notfound/PageNotFound"));
 const PostDetailsContainer = lazy(() => import("../post/PostDetailsContiner"));
@@ -33,7 +34,9 @@ const Feed = () => {
     (state) => state.currentSnackBar
   );
 
-    const { user } = useSelector((state) => state.currentUser);
+  const { user } = useSelector((state) => state.currentUser);
+
+  const [openCommunity,setOpenCommunity] = React.useState(user?.isGroupTutorial || false)
 
 
   const dispatch = useDispatch();
@@ -44,138 +47,143 @@ const Feed = () => {
     dispatch(handleShowingSpeedDial(true));
   }, [dispatch]);
 
-  return (      
-        <Box
-          component="main"
-          color={"text.primary"}
-          sx={{
-            width: "100%",
-            minWidth: 0,
-            flex: 1,
-            mt: { xs: 1, md: 2 },
-            px: { xs: 0, md: 1 },
-          }}
-        >
-          <Suspense
-            fallback={
+  return (
+    <Box
+      component="main"
+      color={"text.primary"}
+      sx={{
+        width: "100%",
+        minWidth: 0,
+        flex: 1,
+        mt: { xs: 1, md: 2 },
+        px: { xs: 0, md: 1 },
+      }}
+    >
+      <Suspense
+        fallback={
+          <Box
+            bgcolor={"background.default"}
+            color={"text.primary"}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "70vh",
+            }}
+          >
+            {/* loader be shown before actual loading of content */}
+            <CircularProgress size={"2rem"} />
+          </Box>
+        }
+      >
+
+        <Routes >
+          <Route path="/" element={
+            <GuestCheck>
+              <FeedDefaultContent />
+            </GuestCheck>} />
+
+          {/* events */}
+          <Route path="/events" element={
+            <GuestCheck>
+              <EventsContainer />
+            </GuestCheck>} />
+
+
+          {/* final selection route for courses */}
+          <Route path="/courses/available" element={
+            <GuestCheck>
+              <CoursesMainContainer />
+            </GuestCheck>} />
+          {/* instructor */}
+          <Route path="/courses/instructor" element={
+            <GuestCheck>
+              <CoursesInstrContainer />
+            </GuestCheck>
+          } />
+
+
+          {/* jobseeker pane */}
+          <Route path="/jobs" element={
+            <GuestCheck>
+              <AllJobsContainer />
+            </GuestCheck>} />
+
+          {/* hiring manager pane */}
+          <Route path="/jobs/hiring" element={
+            <GuestCheck>
+              <AllJobsHiringManager />
+            </GuestCheck>
+          } />
+
+          <Route
+            path="/posts/search/results"
+            element={<FeedDefaultSearch />}
+          />
+          <Route
+            path="/posts/details/:id"
+            element={
+              <GuestCheck>
+                <PostDetailsRouted />
+              </GuestCheck>}
+          />
+          <Route
+            path="/users/profile/posts/details"
+            element={
+              <GuestCheck>
+                <PostDetailsContainer />
+              </GuestCheck>}
+          />
+          {/* page not found; no urls matched */}
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+
+        {/* snack bar success shown when tech post uploaded  */}
+        {messageSnackPostTech && (
+          <SnackBarPostSuccess
+            messageSnackPostTech={messageSnackPostTech}
+          />
+        )}
+
+        {/* decide bottom nav is to be show or not */}
+        <Box>
+          {isDefaultBottomNav && !isLoadingPostLaunch && <BottomNav />}
+        </Box>
+
+        {/* display speed dial in feed section only for mobile and no landscape */}
+        <Box>
+          {/* decide speed dial being shown or is floating button to refresh posts or  */}
+          {isDefaultBottomNav &&
+            isDefaultSpeedDial &&
+            !isPostDetailed && (
               <Box
-                bgcolor={"background.default"}
-                color={"text.primary"}
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  minHeight: "70vh",
+                position={"fixed"}
+                sx={{
+                  right: { xs: 16, sm: 20, md: 28 },
+                  bottom: { xs: 88, sm: 78, md: 28 },
+                  zIndex: 1100,
                 }}
               >
-                {/* loader be shown before actual loading of content */}
-                <CircularProgress size={"2rem"} />
+                {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}
+                <BasicSpeedDial />
               </Box>
-            }
-          >
-          
-            <Routes >
-              <Route path="/" element={
-                <GuestCheck>
-                <FeedDefaultContent />
-              </GuestCheck>} />
-
-              {/* events */}
-              <Route path="/events" element={
-                <GuestCheck>
-                <EventsContainer />
-              </GuestCheck>} />
-
-            
-              {/* final selection route for courses */}
-              <Route path="/courses/available" element={
-                <GuestCheck>
-                <CoursesMainContainer />
-              </GuestCheck>} />
-               {/* instructor */}
-              <Route path="/courses/instructor" element={
-                <GuestCheck>
-                  <CoursesInstrContainer />
-                </GuestCheck>
-              } />
-
-
-              {/* jobseeker pane */}
-              <Route path="/jobs" element={
-                <GuestCheck>
-                <AllJobsContainer />
-              </GuestCheck>} />
-
-              {/* hiring manager pane */}
-              <Route path="/jobs/hiring" element={
-                <GuestCheck>
-                  <AllJobsHiringManager/>
-                </GuestCheck>
-              }/>
-
-              <Route
-                path="/posts/search/results"
-                element={<FeedDefaultSearch />}
-              />
-              <Route
-                path="/posts/details/:id"
-                element={
-                <GuestCheck>
-                  <PostDetailsRouted />
-                </GuestCheck>}
-              />
-              <Route
-                path="/users/profile/posts/details"
-                element={
-                <GuestCheck>
-                  <PostDetailsContainer/>
-                </GuestCheck>}
-              />
-              {/* page not found; no urls matched */}
-              <Route path="*" element={<PageNotFound />} />
-            </Routes>
-
-            {/* snack bar success shown when tech post uploaded  */}
-            {messageSnackPostTech && (
-              <SnackBarPostSuccess
-                messageSnackPostTech={messageSnackPostTech}
-              />
             )}
-
-            {/* decide bottom nav is to be show or not */}
-            <Box>
-              {isDefaultBottomNav && !isLoadingPostLaunch && <BottomNav />}
-            </Box>
-
-            {/* display speed dial in feed section only for mobile and no landscape */}
-              <Box>
-                {/* decide speed dial being shown or is floating button to refresh posts or  */}
-                {isDefaultBottomNav &&
-                  isDefaultSpeedDial &&
-                  !isPostDetailed && (
-                    <Box
-                      position={"fixed"}
-                      sx={{
-                        right: { xs: 16, sm: 20, md: 28 },
-                        bottom: { xs: 88, sm: 78, md: 28 },
-                        zIndex: 1100,
-                      }}
-                    >
-                      {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}
-                      <BasicSpeedDial />
-                    </Box>
-                  )}
-              </Box>
-
-
-              {/* show alert tutorial if user new */}
-              {user?.isTutorial && (
-                <AlertTutorial />
-              )}
-
-          </Suspense>
         </Box>
-      
+
+
+        {/* show alert tutorial if user new */}
+        {user?.isTutorial && (
+          <AlertTutorial />
+        )}
+
+        {/* show group and comminities alert */}
+        {openCommunity && (
+          <AlertGroupCommunity openGroup={openCommunity} setOpenGroup={setOpenCommunity} />
+        )}
+
+      </Suspense>
+    </Box>
+
   );
 };
 

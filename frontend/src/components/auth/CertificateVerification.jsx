@@ -1,220 +1,192 @@
-import { Close, WbIncandescentRounded } from "@mui/icons-material";
-import { Alert, Box, Button, CircularProgress, Collapse, IconButton, TextField, Typography } from "@mui/material";
+import {
+  Close,
+  WbIncandescentRounded,
+  VerifiedRounded
+} from "@mui/icons-material";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Collapse,
+  IconButton,
+  TextField,
+  Typography
+} from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CertVerified from "./CertVerified";
 
 const CertificateVerification = () => {
   const [certID, setCertID] = useState("");
   const [messageGeneral, setMessageGeneral] = useState("");
-  const [isProcessing,setIsProcessing]=useState(false)
-  const [certData,setCertData]=useState(null)
-  
-  // dark mode state from redux
-  const { isDarkMode } = useSelector((state) => state.appUI);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [certData, setCertData] = useState(null);
 
-  
   const handleSubmitDetails = (event) => {
-    // prevent default form submission
     event.preventDefault();
-    // set is processing true
-    setIsProcessing(true)
-  
-   
+    setIsProcessing(true);
+
     axios
-      .post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/certificate/verify`,{certID} )
+      .post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/certificate/verify`,
+        { certID }
+      )
       .then((res) => {
-        // certificate present, populate cert data from backend
-        setCertData(res.data)
-        
+        setCertData(res.data);
       })
       .catch((err) => {
         if (err?.code === "ERR_NETWORK") {
-          setMessageGeneral("server unreachable");
-          return;
+          setMessageGeneral("Server unreachable");
+        } else {
+          setMessageGeneral(err?.response?.data);
         }
-        setMessageGeneral(err?.response?.data);
       })
       .finally(() => {
-        setIsProcessing(false)
+        setIsProcessing(false);
       });
   };
 
-
- //  handle closing of cert window
-   const handleCloseCertWindow=()=>{
-    setCertData(null)
-    setCertID('')
-   }
-
-
+  const handleCloseCertWindow = () => {
+    setCertData(null);
+    setCertID("");
+  };
 
   return (
     <Box
-      display={"flex"}
-      justifyContent={"center"}
-      alignItems={"center"}
-      className=" container"
-      height={"100vh"}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+      px={2}
     >
       <Box
-        p={certData ? 0 :3}
-        className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
-        border={isDarkMode ? "1px solid gray" : "none"}
-        width={"100%"}
-        bgcolor={!isDarkMode && "background.default"}
-        maxHeight={'98vh'}
+        width="100%"
+        maxWidth={420}
+        p={certData ? 0 : 3}
+        borderRadius="18px"
         sx={{
-          overflow: "auto",
-          // Hide scrollbar for Chrome, Safari and Opera
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          // Hide scrollbar for IE, Edge and Firefox
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.4)",
         }}
       >
-      {/* show cert if data else input for certID search */}
-      {certData  ? (
-        <Box display={'flex'} 
-        justifyContent={'center'} 
-        mb={2}
-        gap={2} flexDirection={'column'}
-        px={1}
-        >
-        <CertVerified certificateData={certData}/>
-        <Box display={'flex'} justifyContent={'center'}>
-        <Button 
-        color="secondary" size="large" 
-        onClick={handleCloseCertWindow} variant="outlined"
-         sx={{borderRadius:3, fontWeight:'bold'}}>
-         click to close window
-         </Button>
-        </Box>
-        </Box>
-      ):(
-         <form
-          onSubmit={handleSubmitDetails}
-          className="w-100 p-3  justify-content-center align-items-center align-content-center"
-        >
-          <Typography
-            textAlign={"center"}
-            fontWeight={"bold"}
-            textTransform={"uppercase"}
-            variant={CustomDeviceSmallest() ? "body1" : "h6"}
-            gutterBottom
-            color={"primary"}
-          >
-            Metatron Developer
-          </Typography>
+        {/* VERIFIED VIEW */}
+        {certData ? (
+          <Box textAlign="center" p={2}>
+            <CertVerified certificateData={certData} />
 
-          <Box
-            mb={2}
-            display={"flex"}
-            justifyContent={"center"}
-            gap={1}
-            alignItems={"center"}
-          >
-            <WbIncandescentRounded
-              sx={{ width: 18, height: 18, color: "orange" }}
-            />
-            <Typography
-              variant={CustomDeviceSmallest() ? "caption" : "body2"}
-              color={"text.secondary"}
+            <Button
+              onClick={handleCloseCertWindow}
+              variant="outlined"
+              sx={{ mt: 2, borderRadius: 3 }}
             >
-              Ultimate Tech Platform
-            </Typography>
-            <WbIncandescentRounded
-              sx={{ width: 18, height: 18, color: "orange" }}
-            />
+              Verify Another Certificate
+            </Button>
           </Box>
+        ) : (
+          <form onSubmit={handleSubmitDetails}>
+            {/* HEADER */}
+            <Box textAlign="center" mb={2}>
+              <Typography fontWeight={700}>
+                Metatron Developer
+              </Typography>
 
-          <Typography
-            textAlign={"center"}
-            fontWeight={"bold"}
-            variant="body1"
-            color={"text.secondary"}
-            mb={2}
-        >
-        Course Certificate Verification
-        </Typography>
+              <Typography
+                fontSize={13}
+                color="text.secondary"
+                display="flex"
+                justifyContent="center"
+                gap={1}
+                alignItems="center"
+              >
+                <WbIncandescentRounded
+                  sx={{ color: "#f59e0b", width: 16 }}
+                />
+                Certificate Verification Portal
+                <WbIncandescentRounded
+                  sx={{ color: "#f59e0b", width: 16 }}
+                />
+              </Typography>
+            </Box>
 
-        {messageGeneral && (
-            <Box display={"flex"} justifyContent={"center"} mb={1}>
-                <Collapse in={messageGeneral || false}>
+            {/* TITLE */}
+            <Box textAlign="center" mb={2}>
+              <VerifiedRounded
+                sx={{ fontSize: 40, color: "#14D2BE" }}
+              />
+              <Typography fontWeight={600} mt={1}>
+                Verify Certificate
+              </Typography>
+            </Box>
+
+            {/* ALERT */}
+            {messageGeneral && (
+              <Collapse in>
                 <Alert
-                    className="rounded-5"
-                    severity={'info'}
-                    onClick={() => setMessageGeneral("")}
-                    action={
+                  severity="info"
+                  sx={{ mb: 2 }}
+                  action={
                     <IconButton
-                        aria-label="close"
-                        color="inherit"
-                        size="small"
+                      size="small"
+                      onClick={() => setMessageGeneral("")}
                     >
-                        <Close fontSize="inherit" />
+                      <Close fontSize="inherit" />
                     </IconButton>
-                    }
-                  >
-                    {messageGeneral.toString()}
-                  </Alert>
-                </Collapse>
-              </Box>
+                  }
+                >
+                  {messageGeneral}
+                </Alert>
+              </Collapse>
             )}
 
-          <Box mb={3} mt={2} display={"flex"} justifyContent={"center"}>
+            {/* INPUT */}
             <TextField
-              required
-              id="outlined-email"
-              label="Course Certificate ID"
-              disabled={isProcessing}
-              className="w-75"
+              fullWidth
+              label="Certificate ID"
               value={certID}
               onChange={(e) => setCertID(e.target.value)}
-              placeholder="ID"
+              disabled={isProcessing}
+              sx={{ mb: 2 }}
             />
-          </Box>
-        
-          <Box display={isProcessing ? 'none':'flex'} justifyContent={"center"} mt={2}>
-            <Typography
-              variant="body2"
-              color={"text.secondary"}
-              display={"flex"}
-              gap={1}
-              alignItems={"center"}
-            >
-              Back to
-              <Link to={"/"} className="text-decoration-none">
-                <Typography
-                  variant="body2"
-                  sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
-                >
-                  Login
-                </Typography>{" "}
-              </Link>
-            </Typography>
-          </Box>
 
-          <div className="d-flex justify-content-center mt-4">
-              <Button
+            {/* ACTION */}
+            <Button
+              fullWidth
               variant="contained"
-              startIcon={isProcessing &&  <CircularProgress size={13}/>}
-              sx={{ borderRadius: "20px"}}
-              disableElevation
-              disabled={isProcessing || certID.length<1}
               type="submit"
+              disabled={!certID || isProcessing}
+              startIcon={
+                isProcessing && <CircularProgress size={16} />
+              }
+              sx={{
+                borderRadius: "12px",
+                background:
+                  "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                color: "#fff",
+              }}
             >
-            Verify Certificate
+              {isProcessing
+                ? "Verifying..."
+                : "Verify Certificate"}
             </Button>
-          
-          </div>
-        </form>
-      )}
-      </Box>     
+
+            {/* BACK */}
+            {!isProcessing && (
+              <Box textAlign="center" mt={2}>
+                <Typography fontSize={12} color="text.secondary">
+                  Back to{" "}
+                  <Link to="/" style={{ color: "#14D2BE" }}>
+                    Login
+                  </Link>
+                </Typography>
+              </Box>
+            )}
+          </form>
+        )}
+      </Box>
     </Box>
   );
 };

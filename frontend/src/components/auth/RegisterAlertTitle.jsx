@@ -1,18 +1,17 @@
-import { TextField } from "@mui/material";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
+import { Close, WorkOutlineRounded } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  IconButton,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import Fade from "@mui/material/Fade";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import SpecialisationJobs from "../data/SpecialisationJobs";
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export default function RegisterAlertTitle({
   openAlert,
@@ -21,72 +20,108 @@ export default function RegisterAlertTitle({
 }) {
   const [customTitle, setCustomTitle] = useState("");
 
-   // redux states
   const { currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode=currentMode==='dark'
+  const isDarkMode = currentMode === "dark";
 
-  // close alert
-  const handleClose = () => {
-    setOpenAlert(false);
-  };
+  const handleClose = () => setOpenAlert(false);
 
-  // handle info entered by the user before closing the modal
-  const handleEnterInfo = () => {
-    // update the array then set the value of the user before close
-    SpecialisationJobs && SpecialisationJobs.push(customTitle);
-    setSpecialisationTitle(customTitle);
+  const handleSave = () => {
+    setSpecialisationTitle(customTitle.trim());
     handleClose();
   };
 
-  //   handle when user dismissed the dialog
   const handleDismiss = () => {
     setSpecialisationTitle("");
     handleClose();
   };
 
   return (
-    <React.Fragment>
-      <Dialog
-        open={openAlert}
-        TransitionComponent={Transition}
-        keepMounted
-        maxWidth={500}
-        aria-describedby="alert-dialog-slide-description"
+    <Dialog
+      open={openAlert}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="xs"
+      TransitionComponent={Fade}
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+        },
+      }}
+    >
+      {/* HEADER */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={2}
+        py={1.5}
+        borderBottom="1px solid rgba(255,255,255,0.08)"
       >
-        <DialogTitle 
-        variant="body2"
-        sx={{
-              background: !isDarkMode && 
-              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
-          }}
-        >
-        Preferred Title
-        </DialogTitle>
-        <DialogContent dividers>
-          <DialogContentText 
-          variant="body2"
-          id="alert-dialog-slide-text">
-            Provide your specialisation title that is relevant to the
-            IT Industry.
-          </DialogContentText>
+        <Box display="flex" gap={1} alignItems="center">
+          <WorkOutlineRounded />
+          <Typography fontWeight={600}>
+            Your Specialisation
+          </Typography>
+        </Box>
 
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="custom-title"
-            name="custom-title"
-            label="custom title"
+        <Tooltip title="Close">
+          <IconButton onClick={handleClose}>
+            <Close sx={{ width: 18, height: 18 }} />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      {/* CONTENT */}
+      <DialogContent>
+        <Typography
+          fontSize={13}
+          color="text.secondary"
+          mb={2}
+        >
+          Enter your primary IT specialization (e.g. Frontend Developer,
+          DevOps Engineer, Cybersecurity Analyst).
+        </Typography>
+
+        <TextField
+          autoFocus
+          fullWidth
+          label="Specialisation Title"
+          placeholder="e.g. Backend Developer"
+          value={customTitle}
+          onChange={(e) => setCustomTitle(e.target.value)}
+        />
+
+        {/* ACTIONS */}
+        <Box mt={3} display="flex" gap={1}>
+          <Button
             fullWidth
-            onChange={(e) => setCustomTitle(e.target.value)}
-            variant="standard"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDismiss}>Back</Button>
-          <Button disabled={!customTitle} onClick={handleEnterInfo}>Enter</Button>
-        </DialogActions>
-      </Dialog>
-    </React.Fragment>
+            variant="outlined"
+            onClick={handleDismiss}
+            sx={{ borderRadius: "12px" }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            fullWidth
+            variant="contained"
+            disabled={!customTitle.trim()}
+            onClick={handleSave}
+            sx={{
+              borderRadius: "12px",
+              background:
+                "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              color: "#fff",
+            }}
+          >
+            Save
+          </Button>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 }

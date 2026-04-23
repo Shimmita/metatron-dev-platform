@@ -167,11 +167,7 @@ const Sidebar = () => {
       >
         <Box
           sx={{
-            border: "1px solid",
             borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : appColors.border,
-            boxShadow: isDarkMode
-              ? "0 18px 45px rgba(0,0,0,0.18)"
-              : "0 20px 40px rgba(15,76,129,0.08)",
             overflow: "visible",
             borderRadius: `${theme.shape.borderRadius + 6}px ${theme.shape.borderRadius + 6}px 0 0`,
             width: "100%",
@@ -289,7 +285,6 @@ const Sidebar = () => {
               <Box
                 sx={{
                   borderRadius: cardRadius,
-                  border: "1px solid",
                   borderColor: "divider",
                   background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.08)",
@@ -345,7 +340,6 @@ const Sidebar = () => {
                 <Box
                   sx={{
                     borderRadius: cardRadius,
-                    border: "1px solid",
                     borderColor: "divider",
                     background: "rgba(255,255,255,0.03)",
                     border: "1px solid rgba(255,255,255,0.08)",
@@ -373,7 +367,6 @@ const Sidebar = () => {
                 <Box
                   sx={{
                     borderRadius: cardRadius,
-                    border: "1px solid",
                     borderColor: "divider",
                     background: "rgba(255,255,255,0.03)",
                     border: "1px solid rgba(255,255,255,0.08)",

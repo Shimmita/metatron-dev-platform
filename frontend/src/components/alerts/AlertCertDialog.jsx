@@ -1,344 +1,246 @@
 import {
-    Box,
-    Button,
-    Dialog,
-    DialogContent,
-    Typography,
-    useMediaQuery
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  Typography,
+  IconButton,
+  Tooltip,
+  useMediaQuery,
 } from "@mui/material";
+import { Close, DownloadRounded } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import html2pdf from "html2pdf.js";
 import { useRef } from "react";
 
-
-
-const AlertCertDialog = ({ certData,setCertData }) => {
-
-  // handle screen responsiveness
+const AlertCertDialog = ({ certData, setCertData }) => {
   const theme = useTheme();
-  const isMobileTab = useMediaQuery(theme.breakpoints.down("md")); // tabs and below
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const certificateRef = useRef();
 
   const handleClose = () => setCertData(null);
- const certificateRef = useRef();
 
-
-  // format current date (e.g., August 19, 2025)
   const certDate = new Date(certData?.createdAt?.split("T")[0]);
   const formattedDate = certDate.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
-    weekday:"long"
   });
 
-    const handleDownload = () => {
-      const element = certificateRef.current;
-      const opt = {
-        margin: 0,
-        filename: `${certData?.studentName}-certificate.pdf`,
-        image: { type: "jpeg", quality: 1 },
-        html2canvas: { scale: 2 }, // High resolution
-        jsPDF: { unit: "in", format: "letter", orientation: "landscape" },
-      };
-      html2pdf().set(opt).from(element).save();
-    };
-  
+  const handleDownload = () => {
+    const element = certificateRef.current;
 
+    const opt = {
+      margin: 0,
+      filename: `${certData?.studentName}-certificate.pdf`,
+      image: { type: "jpeg", quality: 1 },
+      html2canvas: { scale: 3 },
+      jsPDF: {
+        unit: "in",
+        format: "letter",
+        orientation: "landscape",
+      },
+    };
+
+    html2pdf().set(opt).from(element).save();
+  };
 
   return (
-   
-    <Box bgcolor={'background.default'}>
-      <Dialog
-        sx={{ backdropFilter: "blur(3px)"}}
-        open={certData}
-        fullScreen
-        keepMounted
-        fullWidth
-        maxWidth="lg"
-        
-      >
-      <Box
-      bgcolor={'background.default'}
-      sx={{
-        overflow: "auto",
-        // Hide scrollbar for Chrome, Safari and Opera
-        "&::-webkit-scrollbar": {
-          display: "none",
+    <Dialog
+      open={!!certData}
+      fullScreen
+      TransitionComponent={(props) => <div {...props} />}
+      PaperProps={{
+        sx: {
+          background: "rgba(10,18,32,0.9)",
+          backdropFilter: "blur(20px)",
         },
-        // Hide scrollbar for IE, Edge and Firefox
-        msOverflowStyle: "none",
-        scrollbarWidth: "none",
       }}
+    >
+      {/* HEADER */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={2}
+        py={1.5}
+        borderBottom="1px solid rgba(255,255,255,0.08)"
       >
-        <DialogContent dividers={isMobileTab} >
-          <Box
-            display="flex"
-            flexDirection={isMobileTab ? "column" : "row"}       
+        <Typography fontWeight={600}>
+          Certificate Preview
+        </Typography>
+
+        <Box display="flex" gap={1}>
+          <Button
+            startIcon={<DownloadRounded />}
+            variant="contained"
+            onClick={handleDownload}
+            sx={{
+              background:
+                "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              color: "#fff",
+            }}
           >
-            <Box 
-            flex={2} p={1} 
-            border={'1px solid'} 
-            borderColor={'divider'} 
-            borderRadius={2}>
+            Download
+          </Button>
+
+          <Tooltip title="Close">
+            <IconButton onClick={handleClose}>
+              <Close />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Box>
+
+      {/* CONTENT */}
+      <DialogContent
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          overflow: "auto",
+        }}
+      >
+        <Box
+          ref={certificateRef}
+          sx={{
+            width: "100%",
+            maxWidth: 900,
+            minHeight: 600,
+            p: { xs: 3, md: 6 },
+            borderRadius: 3,
+            background: "linear-gradient(135deg,#fffdf5,#f9f6ef)",
+            boxShadow: "0 15px 40px rgba(0,0,0,0.4)",
+            position: "relative",
+            fontFamily: "Georgia, serif",
+          }}
+        >
+          {/* BORDER */}
+          <Box
+            sx={{
+              border: "8px double #0d1b2a",
+              borderRadius: 2,
+              p: 4,
+              height: "100%",
+            }}
+          >
+            {/* LOGO */}
             <Box
-            gap={2}
-            alignItems={'center'}
-            display={'flex'} 
-            justifyContent={'center'}>
-            {/* text */}
-            <Typography 
-            fontWeight={'bold'}
-            alignItems={'center'}
-            variant="body2"
-            className={'text-success'}
-            textAlign={'center'}>
-            {/* text */}
-            You can now download certificate
+              sx={{
+                width: 70,
+                height: 70,
+                borderRadius: "50%",
+                background: "#0d1b2a",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mx: "auto",
+                mb: 2,
+                border: "3px solid goldenrod",
+              }}
+            >
+              <Typography sx={{ color: "#fff", fontWeight: 700 }}>
+                MD
+              </Typography>
+            </Box>
+
+            {/* TITLE */}
+            <Typography
+              textAlign="center"
+              sx={{
+                fontWeight: 700,
+                letterSpacing: 2,
+                color: "#0d1b2a",
+              }}
+            >
+              METATRON DEVELOPER
             </Typography>
 
-            {/* download btn */}
-            <Button 
-            onClick={handleDownload} size="small" 
-            variant="contained"
-            disableElevation
-            color="success"
-            sx={{textTransform:'capitalize',
-            fontWeight:'bold',
-             borderRadius:3}}>
-             download
-            </Button>
+            <Typography
+              variant="h4"
+              textAlign="center"
+              sx={{
+                mt: 2,
+                fontWeight: "bold",
+                color: "goldenrod",
+              }}
+            >
+              CERTIFICATE OF COMPLETION
+            </Typography>
 
-             {/* close btn */}
-            <Button 
-            onClick={handleClose} size="small" 
-            variant="outlined"
-            color="success"
-            sx={{textTransform:'capitalize',
-            fontWeight:'bold',
-             borderRadius:3}}>
-             close
-            </Button>
-            </Box>
-            {/* certificate */}
-             <Box 
-              ref={certificateRef}
-             sx={{ textAlign: "center", mt: 2}}>
-                <Box
-                sx={{
-                    width: "100%",
-                    maxWidth: "850px",
-                    minHeight: "620px",
-                    border: "8px double #0d1b2a",
-                    borderRadius: "12px",
-                    p: { xs: 3, md: 6 },
-                    textAlign: "center",
-                    background: "linear-gradient(135deg, #fffdf5, #f9f6ef)",
-                    mx: "auto",
-                    boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-                    fontFamily: "Georgia, serif",
-                    position: "relative",
-                    overflow: "hidden",
-                }}
-                  >
-                    {/* Decorative corners */}
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: 10,
-                        left: 10,
-                        width: 30,
-                        height: 30,
-                        borderTop: "4px solid goldenrod",
-                        borderLeft: "4px solid goldenrod",
-                      }}
-                    />
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: 10,
-                        right: 10,
-                        width: 30,
-                        height: 30,
-                        borderTop: "4px solid goldenrod",
-                        borderRight: "4px solid goldenrod",
-                      }}
-                    />
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        bottom: 10,
-                        left: 10,
-                        width: 30,
-                        height: 30,
-                        borderBottom: "4px solid goldenrod",
-                        borderLeft: "4px solid goldenrod",
-                      }}
-                    />
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        bottom: 10,
-                        right: 10,
-                        width: 30,
-                        height: 30,
-                        borderBottom: "4px solid goldenrod",
-                        borderRight: "4px solid goldenrod",
-                      }}
-                    />
-            
-                    {/* Logo */}
-                    <Box
-                      sx={{
-                        width: 80,
-                        height: 80,
-                        borderRadius: "50%",
-                        background: "#0d1b2a",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mx: "auto",
-                        mb: 2,
-                        border: "3px solid goldenrod",
-                      }}
-                    >
-                      <Typography variant="h4" sx={{ color: "white", fontWeight: "bold" }}>
-                        MD
-                      </Typography>
-                    </Box>
-            
-                    {/* Platform Name */}
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: "bold",
-                        letterSpacing: 2,
-                        color: "#0d1b2a",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      METATRON DEVELOPER
-                    </Typography>
-            
-                    {/* Title */}
-                    <Typography
-                      variant="h4"
-                      sx={{
-                        fontWeight: "bold",
-                        color: "goldenrod",
-                        mt: 2,
-                        textShadow: "1px 1px 2px #333",
-                      }}
-                    >
-                      CERTIFICATE OF COMPLETION
-                    </Typography>
-            
-                    {/* Subtitle */}
-                    <Typography sx={{ mt: 3, fontSize: "1rem", color: "#444" }}>
-                      This is to certify that
-                    </Typography>
-            
-                    {/* Recipient Name */}
-                    <Typography
-                      variant="h3"
-                      sx={{
-                        fontWeight: "bold",
-                        color: "#0d1b2a",
-                        mt: 2,
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {certData?.studentName}
-                    </Typography>
-            
-                    <Typography sx={{ mt: 2, fontSize: "1rem", color: "#444" }}>
-                      has successfully completed the course
-                    </Typography>
-            
-                    {/* Course Name */}
-                    <Typography
-                      variant="h6"
-                      textTransform={'uppercase'}
-                      sx={{
-                        fontWeight: "bold",
-                        color: "#0d1b2a",
-                        mt: 1,
-                        fontSize: "1.2rem",
-                      }}
-                    >
-                      {certData?.course_title}
-                    </Typography>
-            
-                    {/* Instructor */}
-                    <Typography sx={{ mt: 3, fontSize: "1rem", color: "#444" }}>
-                      under the instruction of
-                    </Typography>
-                    <Typography
-                      variant="h6"
-                      textTransform={'uppercase'}
-                      sx={{ fontWeight: "bold", color: "#0d1b2a", mt: 1 }}
-                    >
-                      {certData?.instructorName}
-                    </Typography>
-            
-                    {/* Date */}
-                    <Typography
-                      sx={{
-                        mt: 3,
-                        fontSize: "1rem",
-                        color: "#444",
-                        fontStyle: "italic",
-                      }}
-                    >
-                      {formattedDate}
-                    </Typography>
-            
-                    {/* Footer */}
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-end",
-                        mt: 6,
-                        px: 2,
-                      }}
-                    >
-                      <Typography
-                        variant="body2"
-                        sx={{ fontSize: "0.9rem", color: "#333" }}
-                      >
-                        Certificate ID: {certData?._id}
-                      </Typography>
-            
-                      {/* Signature */}
-                      <Box sx={{ textAlign: "right" }}>
-                        <Typography
-                          sx={{
-                            fontFamily: "'Brush Script MT', cursive",
-                            fontSize: "1.5rem",
-                            fontStyle: "italic",
-                            color: "#0d1b2a",
-                          }}
-                        >
-                          {process.env.REACT_APP_METATRON_CEO}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{ fontSize: "0.8rem", color: "#333" }}
-                        >
-                          CEO, METATRON DEVELOPER
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                </Box>
-        
-            </Box>
-        </Box>
-        </DialogContent>
-        </Box>
-      </Dialog>
+            {/* BODY */}
+            <Typography textAlign="center" mt={3}>
+              This is to certify that
+            </Typography>
 
-    </Box>
+            <Typography
+              variant="h3"
+              textAlign="center"
+              sx={{
+                mt: 2,
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                color: "#0d1b2a",
+              }}
+            >
+              {certData?.studentName}
+            </Typography>
+
+            <Typography textAlign="center" mt={2}>
+              has successfully completed
+            </Typography>
+
+            <Typography
+              textAlign="center"
+              sx={{
+                fontWeight: "bold",
+                mt: 1,
+                textTransform: "uppercase",
+              }}
+            >
+              {certData?.course_title}
+            </Typography>
+
+            <Typography textAlign="center" mt={3}>
+              Instructor
+            </Typography>
+
+            <Typography textAlign="center" fontWeight="bold">
+              {certData?.instructorName}
+            </Typography>
+
+            <Typography textAlign="center" mt={3} fontStyle="italic">
+              {formattedDate}
+            </Typography>
+
+            {/* FOOTER */}
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              mt={5}
+            >
+              <Typography variant="caption">
+                ID: {certData?._id}
+              </Typography>
+
+              <Box textAlign="right">
+                <Typography
+                  sx={{
+                    fontFamily: "cursive",
+                    fontSize: 18,
+                  }}
+                >
+                  {process.env.REACT_APP_METATRON_CEO}
+                </Typography>
+                <Typography variant="caption">
+                  CEO
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 };
 

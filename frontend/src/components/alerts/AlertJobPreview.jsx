@@ -1,71 +1,73 @@
-import { useTheme } from "@emotion/react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
-import Slide from "@mui/material/Slide";
+import Fade from "@mui/material/Fade";
 import React from "react";
 import { useSelector } from "react-redux";
+import { Box, IconButton } from "@mui/material";
+import { Close } from "@mui/icons-material";
 import JobLayout from "../jobs/layout/JobLayout";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export default function AlertJobPreview({
   openAlert,
   setOpenAlert,
   job,
 }) {
-  const handleClose = () => {
-    // close alert
-    setOpenAlert(false);
-  };
+  const handleClose = () => setOpenAlert(false);
 
-
-  //   redux states
-  const { isTabSideBar, currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode = currentMode === 'dark'
-
-
-  const handleAlertGenWidth = () => {
-    if (CustomDeviceTablet() && isTabSideBar) {
-      return "36%"
-    } else if (CustomLandScape()) {
-      return "-1%"
-    } else if (CustomLandscapeWidest()) {
-      return "0%"
-    }
-  }
-
-  const theme = useTheme()
+  const { currentMode } = useSelector((state) => state.appUI);
+  const isDarkMode = currentMode === "dark";
 
   return (
     <Dialog
       open={openAlert}
-      TransitionComponent={Transition}
       onClose={handleClose}
-      keepMounted
-      aria-describedby="alert-dialog-slide-description"
-
-      sx={{
-        backgroundColor: theme.palette.primary.main,
-        color: theme.palette.primary.contrastText,
-        marginLeft: handleAlertGenWidth(),
+      fullWidth
+      maxWidth="md" // 🔥 KEY FIX (controls width properly)
+      TransitionComponent={Fade}
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+          overflow: "hidden",
+        },
       }}
     >
+      {/* CLOSE BUTTON */}
+      <Box display="flex" justifyContent="flex-end" p={1}>
+        <IconButton onClick={handleClose}>
+          <Close />
+        </IconButton>
+      </Box>
 
-      <DialogContent dividers
+      {/* CONTENT */}
+      <DialogContent
         sx={{
-          background: !isDarkMode &&
-            "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+          maxHeight: "80vh",
+          overflowY: "auto",
+
+          // 🔥 smooth scroll UI
+          "&::-webkit-scrollbar": {
+            width: "6px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "rgba(255,255,255,0.2)",
+            borderRadius: "10px",
+          },
         }}
       >
-        {/* show layout job hiring */}
-
-        {job && (
-          <JobLayout job={job} isPreviewHR={true} isDarkMode={currentMode === 'dark'} />
-        )}
+        {/* CENTER CONTENT */}
+        <Box display="flex" justifyContent="center">
+          {job && (
+            <JobLayout
+              job={job}
+              isPreviewHR={true}
+              isDarkMode={isDarkMode}
+            />
+          )}
+        </Box>
       </DialogContent>
     </Dialog>
   );

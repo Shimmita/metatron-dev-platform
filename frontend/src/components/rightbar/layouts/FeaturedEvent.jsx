@@ -21,9 +21,8 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentEventsTop } from "../../../redux/CurrentEventsTop";
 import { updateCurrentSnackBar } from "../../../redux/CurrentSnackBar";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import { getImageMatch } from "../../utilities/getImageMatch";
 import CustomCountryName from "../../utilities/CustomCountryName";
+import { getImageMatch } from "../../utilities/getImageMatch";
 
 
 function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
@@ -155,7 +154,6 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
             <Box ml={3}>
               <Skeleton
                 variant="rectangular"
-                sx={{ borderRadius: "20px" }}
                 width={35}
                 height={15}
                 sx={{
@@ -218,7 +216,7 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
                       sx={{ color: "rgba(240,244,250,0.65)" }}
                     >
                       {eventTop?.location?.state}
-                  
+
                     </Typography>
 
                     {/* divider */}

@@ -2,11 +2,12 @@ import {
   GavelRounded,
   InfoRounded,
   PersonAddRounded,
-  SecurityRounded
+  SecurityRounded,
 } from "@mui/icons-material";
-import { Box, Divider, ListItemText, MenuItem } from "@mui/material";
+import { Box, Divider, MenuItem, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
 function OptionsMoreLogin({
   setOpenModalInfo,
   setOpenModalTerms,
@@ -14,72 +15,88 @@ function OptionsMoreLogin({
   setShowPrivacy,
 }) {
   const navigate = useNavigate();
-  // navigae to the registration personal
+
   const handleRegisterPersonal = () => {
     navigate("/auth/register/personal");
+    handleClose();
   };
 
-  
-
-  //handle toggling of the modal accounts
   const handleShowingModalInfo = () => {
     setOpenModalInfo(true);
-    // close the menu item
     handleClose();
   };
 
-  // handle toggling of the terms or service modal
   const handleShowingModalTerms = () => {
     setOpenModalTerms(true);
-    // aimes modal to terms of service than privacy 
     setShowPrivacy(false);
-    // close the menu item
     handleClose();
   };
 
-  // show modal terms but privacy policy section
   const handleShowingModalTermsPrivacy = () => {
     setOpenModalTerms(true);
-    // aims modal to display privacy than terms of services
     setShowPrivacy(true);
-    // close the menu item
     handleClose();
   };
 
+  // reusable menu item
+  const MenuOption = ({ icon, label, onClick }) => (
+    <MenuItem
+      onClick={onClick}
+      sx={{
+        borderRadius: "10px",
+        mx: 1,
+        my: 0.5,
+        px: 1.5,
+        py: 1,
+        display: "flex",
+        alignItems: "center",
+        gap: 1.5,
+        transition: "0.2s ease",
+        "&:hover": {
+          background: "rgba(255,255,255,0.08)",
+          transform: "translateX(3px)",
+        },
+      }}
+    >
+      {icon}
+
+      <Typography fontSize={13} fontWeight={500}>
+        {label}
+      </Typography>
+    </MenuItem>
+  );
+
   return (
-    <Box>
-      <MenuItem onClick={handleRegisterPersonal}>
-        <ListItemText>
-          <PersonAddRounded color="primary" className="mx-2" />
-        </ListItemText>
-        <ListItemText primary={<small>Register Account</small>} />
-      </MenuItem>      
+    <Box px={1} py={1}>
+      <MenuOption
+        icon={<PersonAddRounded color="primary" />}
+        label="Register Account"
+        onClick={handleRegisterPersonal}
+      />
 
-      <Divider component={"div"} />
+      <Divider sx={{ my: 0.5, opacity: 0.3 }} />
 
-      <MenuItem onClick={handleShowingModalInfo}>
-        <ListItemText>
-          <InfoRounded color="success" className="mx-2" />
-        </ListItemText>
-        <ListItemText primary={<small>Help Information </small>} />
-      </MenuItem>
-      <Divider component={"div"} />
+      <MenuOption
+        icon={<InfoRounded color="success" />}
+        label="Help Information"
+        onClick={handleShowingModalInfo}
+      />
 
-      <MenuItem onClick={handleShowingModalTerms}>
-        <ListItemText>
-          <GavelRounded color="secondary" className="mx-2" />
-        </ListItemText>
-        <ListItemText primary={<small>Terms of Service </small>} />
-      </MenuItem>
+      <Divider sx={{ my: 0.5, opacity: 0.3 }} />
 
-      <Divider component={"div"} />
+      <MenuOption
+        icon={<GavelRounded color="secondary" />}
+        label="Terms of Service"
+        onClick={handleShowingModalTerms}
+      />
 
-      <MenuItem onClick={handleShowingModalTermsPrivacy}>
-        <ListItemText>
-          <SecurityRounded color="primary" className="mx-2" />
-        </ListItemText>
-        <ListItemText primary={<small>Privacy and Policy </small>} />
-      </MenuItem>
+      <Divider sx={{ my: 0.5, opacity: 0.3 }} />
+
+      <MenuOption
+        icon={<SecurityRounded color="primary" />}
+        label="Privacy Policy"
+        onClick={handleShowingModalTermsPrivacy}
+      />
     </Box>
   );
 }

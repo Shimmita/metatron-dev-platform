@@ -1,363 +1,230 @@
-import { EmailOutlined, GradeRounded, NavigateNext, PhoneOutlined, StarBorderRounded, StarHalfRounded } from "@mui/icons-material";
-import { Avatar, Box, FormHelperText, Stack, Typography } from "@mui/material";
+import {
+  EmailOutlined,
+  GradeRounded,
+  NavigateNext,
+  PhoneOutlined,
+  StarBorderRounded,
+  StarHalfRounded,
+  Close
+} from "@mui/icons-material";
+import {
+  Avatar,
+  Box,
+  FormHelperText,
+  Stack,
+  Typography,
+  IconButton,
+  Tooltip
+} from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
+import Fade from "@mui/material/Fade";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { useTheme } from "@mui/material/styles";
+
 import GoogleLogo from "../../images/google.png";
 import MpesaLogo from "../../images/mpesa.png";
 import PaypalLogo from "../../images/paypal2.png";
 import StripeLogo from "../../images/stripe.jpeg";
+
 import DevAccountConfig from "../config/DevAccountConfig";
 import RecommendStepper from "../custom/RecommendStepper";
 import PremiumData from "../data/PremiumData";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 export default function AlertForYou({
   openAlertGeneral,
   title,
   message,
   defaultIcon,
-  isRecommend=false,
-  isPremium=false,
-  isApp=false,
-  isHelp=false,
-  handleCloseAll
+  isRecommend = false,
+  isPremium = false,
+  isHelp = false,
+  handleCloseAll,
 }) {
-  // premium option
-  const [premiumOption,setPremiumOption]=useState(3)
+  const [premiumOption, setPremiumOption] = useState(3);
+  const [isCheckout, setIsCheckOut] = useState(false);
 
-  // show checkout page
-  const [isCheckout,setIsCheckOut]=useState(false)
-
-  const handleClose = () => {
-    handleCloseAll()
-  };
-
-  const theme = useTheme();
-
-
-  // handle complete payment
-  const handleCheckOut=(e)=>{
-    setIsCheckOut(prev=>!prev)
-  }
-  
+  const handleClose = () => handleCloseAll();
+  const handleCheckOut = () => setIsCheckOut((prev) => !prev);
 
   return (
-      <Dialog
-        open={openAlertGeneral}
-        TransitionComponent={Transition}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
-          sx={{
-            backdropFilter:'blur(5px)',
-          }}
+    <Dialog
+      open={openAlertGeneral}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="sm"
+      TransitionComponent={Fade}
+      PaperProps={{
+        sx: {
+          borderRadius: "18px",
+          background: "rgba(255,255,255,0.05)",
+          backdropFilter: "blur(30px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
+        },
+      }}
+    >
+      {/* HEADER */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={2}
+        py={1.5}
+        borderBottom="1px solid rgba(255,255,255,0.08)"
       >
-          <DialogTitle
-          display={"flex"}
-          alignItems={"center"}
-          variant="body2"
-          fontWeight={"bold"}
-          gap={2}
-          sx={{
-            backgroundColor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-          }}
-        >
+        <Box display="flex" gap={1} alignItems="center">
           {defaultIcon}
-          {title}
-        </DialogTitle>
-        {/* upgrade to premium helper */}
-        {/* <Box 
-        width={'100%'}
-        justifyContent={'center'}
-        display={'flex'}>
-        <FormHelperText sx={{ 
-          color:isDarkMode ? '#ab47bc' :'#7b1fa2',
-          fontWeight: isDarkMode ? 'bold':undefined
-         }} >upgrade to premium for unlimited access</FormHelperText>
-        </Box> */}
-        <DialogContent 
-        sx={{
-          maxWidth:500
-        }}
-        dividers >
-        <Box 
-        maxHeight={CustomDeviceIsSmall()?"50vh":"62.5vh"}
-        sx={{
-              overflowX: "auto",
-              // Hide scrollbar for Chrome, Safari and Opera
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
-              // Hide scrollbar for IE, Edge and Firefox
-              "-ms-overflow-style": "none",
-              "scrollbar-width": "none",
-            }}
-        >
-          <DialogContentText 
-          gutterBottom 
-          mb={message?.length>1 ? 1:0} variant="body2" 
-          id="alert-dialog-slide-description">
+          <Typography fontWeight={600}>{title}</Typography>
+        </Box>
+
+        <Tooltip title="Close">
+          <IconButton onClick={handleClose}>
+            <Close sx={{ width: 18, height: 18 }} />
+          </IconButton>
+        </Tooltip>
+      </Box>
+
+      <DialogContent>
+        {/* MESSAGE */}
+        {message && (
+          <Typography fontSize={13} color="text.secondary" mb={2}>
             {message}
-          </DialogContentText>
+          </Typography>
+        )}
 
-          {/* content for help are buttons */}
-          {isHelp && (
-            <Box 
-           mt={2}
-            display={'flex'}
-            justifyContent={'center'} 
-            gap={2}
-            flexDirection={CustomDeviceIsSmall() && "column"}
-                >
-                <Link 
-                to={`tel:${DevAccountConfig.dev_phone}`}
-                >
-                <Button 
-                startIcon={<PhoneOutlined/>}
-                variant="outlined"
-                disableElevation
-                sx={{ 
-                  fontSize:'small', 
-                  textTransform:'capitalize',
-                  p:1
-                  
-                }}
-                >Call Our Support Team
-                </Button>
-                </Link>
-      
-                <Link
-                target="_blank_"
-                  to={`mailto:[${DevAccountConfig.dev_email_1}]`}>
-                <Button 
-                startIcon={<EmailOutlined/>}
-                variant="outlined"
-                disableElevation
-                sx={{ 
-                  fontSize:'small',
-                  textTransform:'capitalize',
-                  p:1,
-                
-                }}
-                >Email Our Support Team
-                </Button>
-                </Link>
-              </Box>
-          )}
-
-          {/* display recommendation */}
-          {isRecommend && (
-            <RecommendStepper/>
-          )}
-
-          {/* display premium */}
-          {isPremium && (
-            <React.Fragment>
-
-           {isCheckout ? (
-           <React.Fragment>
-            <Box display={'flex'} gap={2} flexDirection={'column'} justifyContent={'center'} width={'100%'}>
-            {/* helper text */}
-            <Box display={'flex'} justifyContent={'center'} >
-            <FormHelperText>You are about to upgrade to a premium plan costing ${premiumOption}. Choose your supported payment method to complete the transaction.</FormHelperText>
-            </Box>
-            <Box  gap={1} display={'flex'} alignItems={'center'} justifyContent={'space-around'}>
-            {/* m-pesa payment */}
-              <Button size="small">
-                <Stack gap={1} >
-                  <Avatar alt="" src={MpesaLogo} variant="rounded" />
-                  <Typography
-                    variant="caption"
-                    color={"text.secondary"}
-                    fontWeight={"bold"}
-                  >
-                    Mpesa
-                  </Typography>
-                </Stack>
-              </Button>
-
-              {/* Paypal payment */}
-              <Button size="small">
-                <Stack gap={1} >
-                  <Avatar alt="" src={PaypalLogo} variant="rounded" />
-                  <Typography
-                    variant="caption"
-                    color={"text.secondary"}
-                    fontWeight={"bold"}
-                  >
-                    Paypal
-                  </Typography>
-                </Stack>
-              </Button>
-
-              {/* Google payment */}
-              <Button size="small">
-                <Stack gap={1} >
-                  <Avatar alt="" src={GoogleLogo} variant="rounded" />
-                  <Typography
-                    variant="caption"
-                    color={"text.secondary"}
-                    fontWeight={"bold"}
-                  >
-                    GPay
-                  </Typography>
-                </Stack>
-              </Button>
-
-              {/* Stripe Payment */}
-              <Button size="small">
-                <Stack gap={1} >
-                  <Avatar alt="" src={StripeLogo} variant="rounded" />
-                  <Typography
-                    variant="caption"
-                    color={"text.secondary"}
-                    fontWeight={"bold"}
-                  >
-                    Stripe
-                  </Typography>
-                </Stack>
-              </Button>
-            </Box>
-            </Box>
-           </React.Fragment>
-           ):(
-            <React.Fragment>
-             <ol style={{ marginTop:4 }}>
-            {PremiumData.map(data=>(
-              <Typography 
-              variant="body2"
-              key={data}
-              gutterBottom
-              component={'li'}>
-                {data}
-              </Typography>
-            ))}
-            </ol>
-
-            <Box
-            display={'flex'} 
-            alignItems={'center'}
-            flexWrap={'wrap'}
-            justifyContent={'center'}
-            gap={2}
+        {/* HELP */}
+        {isHelp && (
+          <Stack spacing={1} alignItems="center">
+            <Button
+              startIcon={<PhoneOutlined />}
+              variant="outlined"
+              component={Link}
+              to={`tel:${DevAccountConfig.dev_phone}`}
+              fullWidth
             >
+              Call Support
+            </Button>
 
-            {/* 1 dollars weekly */}
-              <Button 
-                startIcon={<StarBorderRounded/>}
-                onClick={(e)=>setPremiumOption(1)}
-                variant={premiumOption===1 ? 'contained':'outlined'}
-                color="secondary"
-                sx={{ 
-                  fontSize:'small',
-                  textTransform:'capitalize',
-                  p:1,
-                  borderRadius:'10px',
-                  fontWeight:'bold',
-                  border:'1px solid',
-                  borderColor:'divider'
-                
-                }}
-                >
-                $1 for 7 Days
-                </Button>
-
-                {/* 2 dollars 21 days */}
-                <Button 
-                startIcon={<StarHalfRounded/>}
-                variant={premiumOption===2 ? 'contained':'outlined'}
-                color="secondary"
-                onClick={(e)=>setPremiumOption(2)}
-                sx={{ 
-                  fontSize:'small',
-                  textTransform:'capitalize',
-                  p:1,
-                  borderRadius:'10px',
-                  fontWeight:'bold'
-                
-                }}
-                >
-                $2 For 21 Days
-                </Button>
-
-              
-              {/* 3 dollars monthly */}
-               <Button 
-                startIcon={<GradeRounded/>}
-                onClick={(e)=>setPremiumOption(3)}
-                variant={premiumOption===3 ? 'contained':'outlined'}
-                color="secondary"
-                sx={{ 
-                  fontSize:'small',
-                  textTransform:'capitalize',
-                  p:1,
-                  borderRadius:'10px',
-                  fontWeight:'bold'
-                
-                }}
-                >
-               $3 For 30 Days
-                </Button>
-            </Box>
-
-        </React.Fragment>
-           )}
-
-            </React.Fragment>
-          )}
-
-          </Box>
-        </DialogContent>
-
-        <DialogActions>
-
-         {/* continue btn for checkout in premium */}
-        {isPremium && !isCheckout && (
-           <Button 
-          color={isPremium ? "secondary":"primary"}
-          size="small"
-          variant="outlined"
-          endIcon={<NavigateNext/>}
-          onClick={handleCheckOut} 
-          sx={{ borderRadius:4, fontWeight:'bold',mr:5 }}>
-          Continue ${premiumOption}
-          </Button>
-        )}
-    
-        {/* back btn restores plan selection */}
-        {isCheckout && (
-          <Button 
-          color={isPremium ? "secondary":"primary"}
-          size="small"
-          onClick={handleCheckOut} 
-          sx={{ borderRadius:4 }}>
-          Back
-          </Button>
+            <Button
+              startIcon={<EmailOutlined />}
+              variant="outlined"
+              component={Link}
+              to={`mailto:${DevAccountConfig.dev_email_1}`}
+              fullWidth
+            >
+              Email Support
+            </Button>
+          </Stack>
         )}
 
-        {/* close dialog btn */}
-          <Button 
-          color={isPremium ? "secondary":"primary"}
-          size="small"
-          onClick={handleClose} 
-          sx={{ borderRadius:4 }}>
+        {/* RECOMMEND */}
+        {isRecommend && <RecommendStepper />}
+
+        {/* PREMIUM */}
+        {isPremium && (
+          <>
+            {!isCheckout ? (
+              <>
+                {/* FEATURES */}
+                <Box mb={2}>
+                  <Typography fontWeight={600} mb={1}>
+                    Premium Benefits
+                  </Typography>
+
+                  <Stack spacing={0.5}>
+                    {PremiumData.map((item) => (
+                      <Typography key={item} fontSize={13}>
+                        • {item}
+                      </Typography>
+                    ))}
+                  </Stack>
+                </Box>
+
+                {/* PLANS */}
+                <Stack spacing={1}>
+                  <Button
+                    startIcon={<StarBorderRounded />}
+                    variant={premiumOption === 1 ? "contained" : "outlined"}
+                    onClick={() => setPremiumOption(1)}
+                  >
+                    $1 / 7 Days
+                  </Button>
+
+                  <Button
+                    startIcon={<StarHalfRounded />}
+                    variant={premiumOption === 2 ? "contained" : "outlined"}
+                    onClick={() => setPremiumOption(2)}
+                  >
+                    $2 / 21 Days
+                  </Button>
+
+                  <Button
+                    startIcon={<GradeRounded />}
+                    variant={premiumOption === 3 ? "contained" : "outlined"}
+                    onClick={() => setPremiumOption(3)}
+                  >
+                    $3 / 30 Days
+                  </Button>
+                </Stack>
+
+                <Button
+                  fullWidth
+                  sx={{
+                    mt: 2,
+                    background:
+                      "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                    color: "#fff",
+                  }}
+                  endIcon={<NavigateNext />}
+                  onClick={handleCheckOut}
+                >
+                  Continue ${premiumOption}
+                </Button>
+              </>
+            ) : (
+              <>
+                {/* CHECKOUT */}
+                <Typography fontSize={13} mb={2}>
+                  Select payment method for ${premiumOption}
+                </Typography>
+
+                <Box
+                  display="grid"
+                  gridTemplateColumns="repeat(2,1fr)"
+                  gap={1.5}
+                >
+                  {[MpesaLogo, PaypalLogo, GoogleLogo, StripeLogo].map(
+                    (logo, i) => (
+                      <Button key={i} variant="outlined">
+                        <Stack alignItems="center">
+                          <Avatar src={logo} variant="rounded" />
+                          <Typography fontSize={11}>
+                            {["Mpesa", "Paypal", "GPay", "Stripe"][i]}
+                          </Typography>
+                        </Stack>
+                      </Button>
+                    )
+                  )}
+                </Box>
+
+                <Button onClick={handleCheckOut} sx={{ mt: 2 }}>
+                  Back
+                </Button>
+              </>
+            )}
+          </>
+        )}
+      </DialogContent>
+
+      {/* FOOTER */}
+      <Box px={2} pb={2}>
+        <Button fullWidth onClick={handleClose}>
           Close
-          </Button>
-
-       
-        </DialogActions>
-      </Dialog>
+        </Button>
+      </Box>
+    </Dialog>
   );
 }
