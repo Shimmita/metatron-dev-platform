@@ -1,14 +1,12 @@
 import {
   AccessTimeFilledRounded,
   ArrowCircleRightRounded,
-  BalanceRounded,
   CalendarMonthRounded,
   Done,
   LocationOnRounded,
   LockRounded,
   PaidRounded,
   PeopleRounded,
-  TravelExploreRounded,
   VerifiedRounded,
   WorkHistoryRounded
 } from "@mui/icons-material";
@@ -25,398 +23,220 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentJobs } from "../../../redux/CurrentJobs";
 import ApplyJobModal from "../../modal/ApplyJobModal";
+import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../../utilities/CustomDeviceSmallest";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
-const MAX_APPLICANTS=500
+const MAX_APPLICANTS = 500;
 
-function JobLayout_2({ 
-  isDarkMode, 
+function JobLayout_2({
   job,
   jobs,
-  isPreviewHR=false,
-  isLastIndex=false,
+  isPreviewHR = false,
+  isLastIndex = false,
   setPageNumber,
   pageNumber,
   setErrorMessage,
   isJobSearchGlobal
-
- }) {
+}) {
   const [openModal, setOpenApplyJobModal] = useState(false);
-  const [isFetching,setIsFetching]=useState(false)
+  const [isFetching, setIsFetching] = useState(false);
   const [isCopiedStatus, setIsCopiedStatus] = useState(false);
-  const theme = useTheme();
 
-  // redux states
-  const { user,isGuest } = useSelector((state) => state.currentUser);
-  const dispatch=useDispatch()
+  const { user, isGuest } = useSelector((state) => state.currentUser);
+  const dispatch = useDispatch();
 
-
-  // extract user email, for checks if job posted by the user or not
-  const email=user?.email || ""
-
-  // if not true the false is default
-  const isMyJob=email===job?.my_email || false
-
-  const handleShowingApply = () => {
-    setOpenApplyJobModal(true);
-  };
-  // extracting contents in job
-  const mandatorySkills = [...job?.skills];
+  const isMyJob = user?.email === job?.my_email;
   const websiteLink = job?.website?.trim();
+  const mandatorySkills = [...job?.skills];
+  const isDeactivated = job?.status === "inactive";
+  const isMaxApplicants = job?.applicants?.total === MAX_APPLICANTS;
 
-  // handle date display
   const handleDateDisplay = () => {
     const parent = job?.createdAt?.split("T")[0]?.split("-");
-    return `${parent[parent?.length - 1]}/${parent[parent?.length - 2]}/${
-      parent[0]
-    }`;
+    return `${parent[2]}/${parent[1]}/${parent[0]}`;
   };
 
-  // handle country length to only two names and code label
-  const handleCountryName = () => {
-    const parent = job.location.country.split(" ");
-    const countryCode = parent.pop();
-    const finalName =
-      parent.length > 2
-        ? `${parent[0]} ${parent[1]} ${countryCode}`
-        : job?.location?.country;
-
-    return finalName;
-  };
-
-  // format entry position level
-
-  const handleEntryPosition = () => {
-    if (job?.entry?.level?.split(" ")[0]?.includes("Entry")) {
-      return `An ${job?.entry?.level?.split(" ")[0]}`;
-    }
-    return job?.entry?.level?.split(" ")[0];
-  };
-
-
-  // job has been paused or deactivated by the poster
-  const isDeactivated=job?.status==="inactive"
-
-  // check if job reached maxima number of applicants
-  const isMaxApplicants=job?.applicants?.total===MAX_APPLICANTS
-
- const handleFetchMoreData=()=>{
-    // fetching to true
-    setIsFetching(true)
-    // axios api call to fetch more data
-    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/${user?._id}?page=${pageNumber}&limit=6`, {
-        withCredentials: true,
-      })
+  const handleFetchMoreData = () => {
+    setIsFetching(true);
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/${user?._id}?page=${pageNumber}&limit=6`)
       .then((res) => {
-        // update the redux of current post
-        if (res?.data) {
-          // more data update redux
-          if (res.data.length>0) {
-          dispatch(updateCurrentJobs([...jobs,...res.data]));  
-          }
-        } 
-
-        // update the page number for the next fetch
-        setPageNumber((prev)=>prev+1)
+        if (res?.data?.length > 0) {
+          dispatch(updateCurrentJobs([...jobs, ...res.data]));
+          setPageNumber((prev) => prev + 1);
+        }
       })
       .catch((err) => {
-        //  user login session expired show logout alert
-        if (err?.response?.data.login) {
-          window.location.reload();
-        }
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage(
-            "server unreachable"
-          );
-          return;
-        }
-        setErrorMessage(err?.response.data);
+        if (err?.response?.data.login) window.location.reload();
+        setErrorMessage(err?.code === "ERR_NETWORK" ? "System link lost" : err?.response?.data);
       })
-      .finally(() => {
-        // set is fetching to false
-        setIsFetching(false);
-      });
-  }
+      .finally(() => setIsFetching(false));
+  };
 
-  // handle getting of job link
-  const handleGetJobLink=async()=>{
-    const urlJob=`${window.location.href}?id=${job?._id}`
-      try {
+  const handleGetJobLink = async () => {
+    const urlJob = `${window.location.origin}${window.location.pathname}?id=${job?._id}`;
+    try {
       await navigator.clipboard.writeText(urlJob);
       setIsCopiedStatus(true);
-      setTimeout(() => {
-      setIsCopiedStatus(false)
-      }, 2000); 
+      setTimeout(() => setIsCopiedStatus(false), 2000);
     } catch (err) {
       console.error('Failed to Copy: ', err);
     }
-  }
+  };
 
   return (
-    <Box 
-      display={"flex"} 
+    <Box
+      display="flex"
       gap={2}
-      mb={isLastIndex && 3}
-      // small devices should have column
-      flexDirection={'column'}
-      justifyContent={"center"}
-      mt={CustomDeviceIsSmall()?2:0.5}
-      >
-      {/* card, for job content */}
+      mb={isLastIndex ? 4 : 0}
+      flexDirection="column"
+      alignItems="center"
+      mt={CustomDeviceIsSmall() ? 2 : 1}
+    >
       <Card
         elevation={0}
-        sx={{ 
-        border:'1px solid',
-        borderColor:'divider',
-        width:CustomDeviceIsSmall() && !CustomDeviceSmallest() ? 320:300,
-        borderRadius: `${theme.shape.borderRadius}px`,
-        boxShadow: theme.palette.mode === "dark"
-          ? "0 18px 36px rgba(0,0,0,0.18)"
-          : "0 20px 40px rgba(15,76,129,0.08)",
-        background: theme.palette.mode === "dark"
-          ? "linear-gradient(180deg, rgba(15,76,129,0.12), rgba(255,255,255,0.02))"
-          : "linear-gradient(180deg, rgba(15,76,129,0.05), rgba(255,255,255,0.96))",
-        }}
-      >
-      {/* job avatar */}
-    <Box
-    justifyContent={'center'}
-    display={'flex'}
-    sx={{ pt: 2 }}>
-      <Avatar
-        alt=""
-        className="border"
         sx={{
-          width: 52,
-          height: 52,
-          mt:isPreviewHR ? 0:1,
-          border: "2px solid",
-          borderColor: "background.paper",
-          boxShadow: theme.palette.mode === "dark"
-            ? "0 8px 18px rgba(0,0,0,0.28)"
-            : "0 10px 20px rgba(15,76,129,0.12)",
+          width: CustomDeviceIsSmall() && !CustomDeviceSmallest() ? 320 : 300,
+          background: "rgba(255, 255, 255, 0.03)", // Metatron Glass
+          backdropFilter: "blur(20px)",
+          border: '1px solid',
+          borderColor: 'rgba(255, 255, 255, 0.08)',
+          borderRadius: "14px",
+          transition: "all 0.3s ease",
+          "&:hover": {
+            borderColor: "primary.main",
+            boxShadow: "0 0 20px rgba(20, 210, 190, 0.15)",
+            transform: "translateY(-2px)"
+          }
         }}
-        src={getImageMatch(job?.logo)}
-      />
-      </Box>
-      
-      <Stack 
-      gap={1} 
-      mt={1} 
       >
-      {/* job title */}
-          <Typography variant="body1" 
-          color={"primary"} 
-          textAlign={'center'}
-          fontWeight={"bold"} 
-          sx={{ fontSize:'0.95rem', px: 2 }}>
+        {/* Header Section */}
+        <Box display="flex" justifyContent="center" pt={3}>
+          <Avatar
+            src={getImageMatch(job?.logo)}
+            sx={{
+              width: 56,
+              height: 56,
+              background: "rgba(255,255,255,0.05)",
+              border: "2px solid",
+              borderColor: "primary.main",
+              p: 0.5
+            }}
+          />
+        </Box>
+
+        <Stack spacing={1} mt={2} px={2} pb={3}>
+          <Typography variant="body1" color="primary" textAlign="center" fontWeight={700} sx={{ lineHeight: 1.2 }}>
             {job?.title}
           </Typography>
 
-  
-          <Typography
-          textAlign={'center'}
-            variant="body2"
-            fontWeight={"bold"}
-            textTransform={"capitalize"}
-            color={"text.secondary"}
-            sx={{ fontSize:'small' }}
-          >
-            {" "}
+          <Typography textAlign="center" variant="caption" fontWeight={600} sx={{ color: "text.secondary", opacity: 0.8 }}>
             {job?.organisation?.name}
           </Typography>
 
-        <Box display={"flex"} justifyContent={"center"}>
-          <AvatarGroup max={mandatorySkills?.length}>
-            {/* loop through the skills and their images matched using custom fn */}
-            {mandatorySkills?.map((skill) => (
-              <Tooltip title={skill} key={skill} arrow>
-                <Avatar
-                  alt={skill}
-                  className="border"
-                  sx={{ width: 30, height: 30 }}
-                  src={getImageMatch(skill)}
-                />
-              </Tooltip>
-            ))}
-          </AvatarGroup>
-        </Box>
-        
-        {/* divider centered */}
-        <Box display={'flex'} justifyContent={'center'} width={'100%'}>
-        <Divider component={'div'} sx={{ width: "78%" }}/>
-        </Box>
+          <Box display="flex" justifyContent="center" py={1}>
+            <AvatarGroup
 
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
-            <LocationOnRounded sx={{ width: 22, height: 22 }} />
-            <Typography variant="body2" sx={{ fontSize:'small' }}>
-              {job.location.state} | {handleCountryName()}{" "}
-            </Typography>
-          </Box>
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
-            <AccessTimeFilledRounded sx={{ width: 19, height: 19}} />
-            <Typography variant="body2" sx={{ fontSize:'small' }}>
-              Access {job?.jobtypeaccess?.access} | {job?.jobtypeaccess?.type}
-            </Typography>
-          </Box>
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
-            <PaidRounded sx={{ width: 20, height: 20 }} />
-            <Typography variant="body2" textTransform={"uppercase"} sx={{ fontSize:'small' }}>
-              {job?.salary}
-            </Typography>
+              sx={{ '& .MuiAvatar-root': { width: 28, height: 28, fontSize: 12, borderColor: "background.paper" } }}
+            >
+              {mandatorySkills.map((skill) => (
+                <Tooltip title={skill} key={skill} arrow>
+                  <Avatar alt={skill} src={getImageMatch(skill)} />
+                </Tooltip>
+              ))}
+            </AvatarGroup>
           </Box>
 
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
-            <WorkHistoryRounded sx={{ width: 20, height: 20 }} />
-            <Typography variant="body2" textTransform={"capitalize"} sx={{ fontSize:'small' }}>
-              {job?.entry?.years}
-            </Typography>
-          </Box>
+          <Divider sx={{ opacity: 0.08, my: 1 }} />
 
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
-            <BalanceRounded sx={{ width: 22, height: 22 }} />
-            <Typography variant="body2" textTransform={"capitalize"} sx={{ fontSize:'small' }}>
-              {handleEntryPosition()} Position Level
-            </Typography>
-          </Box>
+          {/* Job Metadata Sector */}
+          <Stack spacing={1.5} sx={{ "& .MuiSvgIcon-root": { fontSize: 18, color: "primary.main" } }}>
+            <JobDetail icon={<LocationOnRounded />} text={`${job.location.state} | ${job.location.country}`} />
+            <JobDetail icon={<AccessTimeFilledRounded />} text={`${job?.jobtypeaccess?.access} • ${job?.jobtypeaccess?.type}`} />
+            <JobDetail icon={<PaidRounded />} text={job?.salary} />
+            <JobDetail icon={<WorkHistoryRounded />} text={`${job?.entry?.years} Experience`} />
+            <JobDetail icon={<PeopleRounded />} text={websiteLink ? "External Portal" : `Applicants: ${job?.applicants?.total}/${job?.applicants_max || MAX_APPLICANTS}`} />
+            <JobDetail icon={<CalendarMonthRounded />} text={`Deployed: ${handleDateDisplay()}`} />
+          </Stack>
 
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
-            <PeopleRounded sx={{ width: 20, height: 20 }} />
-            <Typography variant="body2" sx={{ fontSize:'small' }}>
-              Current Applications {!(job?.website==="") ? "(N/A)":`${job?.applicants?.total}/${job?.applicants_max || MAX_APPLICANTS}`}
-            </Typography>
-          </Box>
-          <Box ml={'15%'} display={"flex"} gap={2} alignItems={"center"} pr={2}>
-            <CalendarMonthRounded sx={{ width: 20, height: 20 }} />
-            <Typography variant="body2" sx={{ fontSize:'small' }} >
-              Date Uploaded {handleDateDisplay()}
-            </Typography>
-          </Box>
-      </Stack>
+          {/* Action Sector */}
+          {!isPreviewHR && (
+            <Stack direction="row" spacing={1} mt={2} justifyContent="center">
+              <Button
+                fullWidth
+                size="small"
+                onClick={handleGetJobLink}
+                variant="outlined"
+                startIcon={isCopiedStatus ? <Done /> : undefined}
+                sx={{
+                  borderRadius: "10px",
+                  borderColor: isCopiedStatus ? "success.main" : "divider",
+                  color: isCopiedStatus ? "success.main" : "text.secondary"
+                }}
+              >
+                {isCopiedStatus ? "Copied" : "Share"}
+              </Button>
 
-      {/* displayed is not previewHR, probably hr definitely their jobs*/}
-      {!isPreviewHR && (
-        <React.Fragment>
-      
-      <Box
-      mt={1}
-      pb={2}
-      justifyContent={'center'}
-      width={'100%'}
-      gap={1}
-      flexDirection={'column'}
-      display={'flex'}>
-      {/* share the job */}
-      <Box 
-      display={'flex'} 
-      justifyContent={'center'}>
-      <Button
-      onClick={handleGetJobLink}
-      color={isCopiedStatus ? 'success':'primary'}
-      startIcon={isCopiedStatus ? <Done/>:undefined} 
-      sx={{
-        borderRadius:'20px',
-      fontSize:'small',
-      border: "1px solid",
-      borderColor: isCopiedStatus ? "success.main" : "divider",
-      textTransform:'capitalize' }}
-      size="small">
-        {isCopiedStatus ? "Copied":"Share"}
-      </Button>
-      </Box>
-      <Box 
-      display={'flex'} 
-      justifyContent={'center'}>
-      {websiteLink === "" ? (
-        <Button
-          variant={isDarkMode ? "outlined" : "contained"}
-          color="primary"
-          size="small"
-          disableElevation
-          startIcon={isDeactivated || isMaxApplicants||isGuest ? <LockRounded/> :<VerifiedRounded />}
-          disabled={job?.currentUserApplied || isMaxApplicants||isGuest}
-          onClick={handleShowingApply}
-          sx={{ borderRadius: "20px", fontSize:'small', textTransform:'capitalize' }}
+              <Button
+                fullWidth
+                size="small"
+                variant="contained"
+                disabled={job?.currentUserApplied || isMaxApplicants || isGuest || isDeactivated}
+                onClick={() => setOpenApplyJobModal(true)}
+                startIcon={isDeactivated || isMaxApplicants || isGuest ? <LockRounded /> : <VerifiedRounded />}
+                sx={{ borderRadius: "10px" }}
+              >
+                {job?.currentUserApplied ? "Applied" : isDeactivated ? "Paused" : "Apply"}
+              </Button>
+            </Stack>
+          )}
+        </Stack>
+      </Card>
+
+      {/* Infinite Scroll Controller */}
+      {isLastIndex && !isJobSearchGlobal && !isGuest && (
+        <IconButton
+          disabled={isFetching}
+          onClick={handleFetchMoreData}
+          sx={{ border: '1px solid', borderColor: 'divider', mt: 2 }}
         >
-          {job?.currentUserApplied ? "Applied":isDeactivated ? "Paused":isMaxApplicants ? "Closed":"Apply Job"}
-        </Button>
-      ) : (
-        <Button
-          variant={isDarkMode ? "outlined" : "contained"}
-          color="primary"
-          size="small"
-          disabled={isDeactivated||isGuest}
-          disableElevation
-          startIcon={isDeactivated || isGuest? <LockRounded/> :<TravelExploreRounded />}
-          onClick={handleShowingApply}
-          sx={{ 
-            borderRadius: "20px",
-            fontSize:'small',
-            textTransform:'capitalize' }}
-        >
-          {isDeactivated ? "paused":"apply job"}
-        </Button>
-        
+          {isFetching ? <CircularProgress size={24} /> : <ArrowCircleRightRounded color="primary" sx={{ fontSize: 32 }} />}
+        </IconButton>
       )}
-      </Box>
-      </Box>
-    </React.Fragment>
+
+      {/* show success snackbar when link copied  */}
+      {isCopiedStatus && (
+        <MetatronSnackbar open={isCopiedStatus} message={'job link copied'} />
       )}
-    </Card>
 
-    {/* next button zone, only if item is last index */}
-   {isLastIndex && !isJobSearchGlobal && !isGuest && (
-    <Box 
-    alignItems={'center'}
-    justifyContent={'center'}
-    display={'flex'}>
-    <IconButton 
-    disabled={isFetching}
-    onClick={handleFetchMoreData}
-    size="small"
-    sx={{ 
-      border:'1px solid',
-      borderColor:'divider'
-      }}
-      >
-      {isFetching ? 
-      <CircularProgress size={20}/>: 
-      <ArrowCircleRightRounded
-      color="primary"
-      sx={{ width:28,height:28}}/>}
-    </IconButton>
-    </Box>
-    )}
-
-     {/* show modal apply jobs */}
       {openModal && (
         <ApplyJobModal
-        title={job.title}
-        organisation={job.organisation}
-        requirements={job.requirements}
-        websiteLink={websiteLink}
-        openApplyJobModal={openModal}
-        setOpenApplyJobModal={setOpenApplyJobModal}
-        jobID={job?._id}
-        salary={job?.salary}
-        skills={job?.skills}
-        jobaccesstype={job?.jobtypeaccess}
-        location={job?.location}
-        isFullView={true}
-        isMyJob={isMyJob}
-        whitelist={job?.whitelist}
-      />
+          {...job}
+          openApplyJobModal={openModal}
+          setOpenApplyJobModal={setOpenApplyJobModal}
+          websiteLink={websiteLink}
+          isFullView={true}
+          isMyJob={isMyJob}
+        />
       )}
     </Box>
   );
 }
+
+// Sub-component for cleaner metadata rows
+const JobDetail = ({ icon, text }) => (
+  <Box display="flex" gap={1.5} alignItems="center" px={1}>
+    {icon}
+    <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500 }}>
+      {text}
+    </Typography>
+  </Box>
+);
 
 export default JobLayout_2;

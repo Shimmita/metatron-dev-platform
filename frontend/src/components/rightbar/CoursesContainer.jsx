@@ -4,25 +4,8 @@ import List from "@mui/material/List";
 import PopularCouses from "./layouts/PopularCourses";
 
 export default function CoursesContainer() {
-  const screenWidth = window.screen.availWidth;
   // simulation of the items in the list
   const items = Array.from(new Array(3));
-
-  // get the rightbar expanded appropritately
-  const rightBarExpaned = () => {
-    if (screenWidth > 1300) {
-      return 360;
-    }
-
-    if (screenWidth > 1250) {
-      return 350;
-    }
-
-    if (screenWidth > 1400) {
-      return 380;
-    }
-    return;
-  };
 
   return (
     <>
@@ -54,7 +37,7 @@ export default function CoursesContainer() {
         }}
       >
         <Box>
-          {items?.slice(0, 3).map((index) => (
+          {items?.slice(0, 5).map((index) => (
             <Box key={index}>
               <PopularCouses />
             </Box>

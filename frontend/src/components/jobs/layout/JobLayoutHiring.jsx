@@ -5,7 +5,7 @@ import {
   LocationCityRounded,
   PaidRounded,
   PeopleRounded,
-  WorkHistoryRounded
+  WorkHistoryRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -15,195 +15,184 @@ import {
   Divider,
   Stack,
   Tooltip,
-  Typography
+  Typography,
 } from "@mui/material";
 import React from "react";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
-function JobLayoutHiring({ job, textOption = "",setIsApplicantsTable,setFocusedJob }) {
- 
-  // extracting contents in job
-  const mandatorySkills = [...job?.skills];
+function JobLayoutHiring({ job, textOption = "", setIsApplicantsTable, setFocusedJob }) {
+  const mandatorySkills = [...(job?.skills || [])];
 
-  // handle date display
   const handleDateDisplay = () => {
-    const parent = job?.createdAt?.split("T")[0]?.split("-");
-    return `${parent[parent?.length - 1]}/${parent[parent?.length - 2]}/${
-      parent[0]
-    }`;
+    if (!job?.createdAt) return "N/A";
+    const date = new Date(job.createdAt);
+    return date.toLocaleDateString("en-GB"); // Format: DD/MM/YYYY
   };
 
-  // handle country length to only two names and code label
   const handleCountryName = () => {
+    if (!job?.location?.country) return "Remote";
     const parent = job.location.country.split(" ");
-    const countryCode = parent.pop();
-    const finalName =
-      parent.length > 2
-        ? `${parent[0]} ${parent[1]} ${countryCode}`
-        : job?.location?.country;
-
-    return finalName;
+    return parent.length > 2 ? `${parent[0]} ${parent[1]}` : job.location.country;
   };
 
-   // close the applicants table
-   const handleOpenApplicantsTable=()=>{
-    // update the focused job to be assessed
-    setFocusedJob(job)
-    // triggers the display of job applicants table
-    setIsApplicantsTable(true)
-  }
-
-
-  // format entry position level
-  const handleEntryPosition = () => {
-    if (job?.entry?.level?.split(" ")[0]?.includes("Entry")) {
-      return `An ${job?.entry?.level?.split(" ")[0]}`;
-    }
-    return job?.entry?.level?.split(" ")[0];
+  const handleOpenApplicantsTable = () => {
+    setFocusedJob(job);
+    setIsApplicantsTable(true);
   };
+
+  const unassessedCount = (job?.applicants?.total || 0) - (job?.applicants?.assessed || 0);
 
   return (
     <Stack
-      justifyContent={"center"}
-      mt={CustomDeviceIsSmall()?2:0.5}
-      alignItems={"center"}
-      classes={"job-card"}
-      bgcolor={'background.default'}
-      className="rounded-3 shadow"
-      mb={2}
-      height={
-        !(CustomDeviceIsSmall() || CustomDeviceTablet()) ? "80%" : undefined
-      }
-      p={2}
-      width={300}
+      className="metatron-job-card"
       sx={{
+        width: 300,
+        minHeight: 450,
+        p: 2.5,
+        m: 1,
+        borderRadius: "16px",
+        background: (theme) =>
+          theme.palette.mode === "dark"
+            ? "rgba(15, 23, 42, 0.6)"
+            : "rgba(255, 255, 255, 0.8)",
+        backdropFilter: "blur(12px)",
         border: "1px solid",
-        borderColor: "divider",
+        borderColor: (theme) =>
+          theme.palette.mode === "dark" ? "rgba(20, 210, 190, 0.2)" : "divider",
+        transition: "all 0.3s ease",
+        position: "relative",
+        "&:hover": {
+          borderColor: "primary.main",
+          transform: "translateY(-4px)",
+          boxShadow: "0 12px 24px rgba(0, 0, 0, 0.2)",
+        },
       }}
+      alignItems="center"
+      spacing={2}
     >
-      <Avatar
-        alt=""
-        className="border"
-        sx={{ width: 42, height: 42, }}
-        src={getImageMatch(job?.logo)}
-      />
+      {/* Top Section: Branding */}
+      <Box sx={{ position: "relative" }}>
+        <Avatar
+          src={getImageMatch(job?.logo)}
+          sx={{
+            width: 56,
+            height: 56,
+            border: "2px solid",
+            borderColor: "primary.main",
+            boxShadow: "0 0 15px rgba(20, 210, 190, 0.2)",
+            backgroundColor: "background.paper",
+          }}
+        />
+      </Box>
 
-      {/* job title */}
-      <Stack textAlign={"center"} gap={1} >
-        <Box display={"flex"} justifyContent={"center"}>
-          <Typography variant="body1" 
-          color={"primary"} 
-          fontWeight={"bold"} 
-          sx={{ fontSize:'small' }}>
-            {job?.title}
-          </Typography>
-        </Box>
-
-        {/* hiring org */}
-        <Box textAlign={"center"}
+      <Stack spacing={0.5} alignItems="center" textAlign="center" sx={{ width: "100%" }}>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 800,
+            color: "primary.main",
+            lineHeight: 1.2,
+            fontSize: "0.95rem",
+            textTransform: "uppercase",
+            letterSpacing: 0.5,
+          }}
         >
-          <Typography
-            variant="body2"
-            fontWeight={"bold"}
-            textTransform={"capitalize"}
-            color={"text.secondary"}
-            sx={{ fontSize:'small' }}
-          >
-            {" "}
-            {job?.organisation?.name}
-          </Typography>
-        </Box>
-
-         <Box display={"flex"} justifyContent={"center"}>
-        <AvatarGroup max={mandatorySkills?.length}>
-        {/* loop through the skills and their images matched using custom fn */}
-        {mandatorySkills?.map((skill) => (
-            <Tooltip title={skill} key={skill} arrow>
-            <Avatar
-                alt={skill}
-                className="border"
-                sx={{ width: 30, height: 30 }}
-                src={getImageMatch(skill)}
-            />
-            </Tooltip>
-        ))}
-        </AvatarGroup>
-        </Box>
-
-        {/* divider centered */}
-        <Box display={'flex'} justifyContent={'center'} width={'100%'}>
-        <Divider className="p-1 w-75" component={'div'}/>
-        </Box>
-
-        <React.Fragment>
-          <Box display={"flex"} gap={1} alignItems={"center"}>
-            <LocationCityRounded sx={{ width: 22, height: 22 }} />
-            <Typography variant="body2" sx={{ fontSize:'small' }}>
-              {handleCountryName()} | {job.location.state}{" "}
-            </Typography>
-          </Box>
-          <Box display={"flex"} gap={1} alignItems={"center"}>
-            <AccessTimeFilledRounded sx={{ width: 20, height: 20 }} />
-            <Typography variant="body2" sx={{ fontSize:'small' }}>
-              Access {job?.jobtypeaccess?.access} | {job?.jobtypeaccess?.type}
-            </Typography>
-          </Box>
-          <Box display={"flex"} gap={1} alignItems={"center"}>
-            <PaidRounded sx={{ width: 20, height: 20 }} />
-            <Typography variant="body2" textTransform={"uppercase"} sx={{ fontSize:'small' }}>
-              {job?.salary}
-            </Typography>
-          </Box>
-
-          <Box display={"flex"} gap={1} alignItems={"center"}>
-            <WorkHistoryRounded sx={{ width: 20, height: 20 }} />
-            <Typography variant="body2" textTransform={"capitalize"} sx={{ fontSize:'small' }}>
-              {job?.entry?.years}
-            </Typography>
-          </Box>
-
-          <Box display={"flex"} gap={1} alignItems={"center"}>
-            <BalanceRounded sx={{ width: 22, height: 22 }} />
-            <Typography variant="body2" textTransform={"capitalize"} sx={{ fontSize:'small' }}>
-              {handleEntryPosition()} Position Level
-            </Typography>
-          </Box>
-
-          <Box display={"flex"} gap={1} alignItems={"center"}>
-            <PeopleRounded sx={{ width: 20, height: 20 }} />
-            <Typography variant="body2" sx={{ fontSize:'small' }}>
-              Current Applications {!(job?.website==="") ? "(N/A)":`${job?.applicants?.total}/${job?.applicants_max}`}
-            </Typography>
-          </Box>
-          <Box display={"flex"} gap={1} alignItems={"center"}>
-            <CalendarMonthRounded sx={{ width: 20, height: 20 }} />
-            <Typography variant="body2" sx={{ fontSize:'small' }} >
-              Date Uploaded {handleDateDisplay()}
-            </Typography>
-          </Box>
-        </React.Fragment>
+          {job?.title}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            fontWeight: 600,
+            opacity: 0.8,
+            textTransform: "capitalize",
+          }}
+        >
+          {job?.organisation?.name}
+        </Typography>
       </Stack>
 
-      {/* control assessment */}
+      <AvatarGroup max={4} sx={{ "& .MuiAvatar-root": { width: 28, height: 28, fontSize: 12 } }}>
+        {mandatorySkills.map((skill) => (
+          <Tooltip title={skill} key={skill} arrow>
+            <Avatar alt={skill} src={getImageMatch(skill)} className="border" />
+          </Tooltip>
+        ))}
+      </AvatarGroup>
 
+      <Divider sx={{ width: "80%", opacity: 0.1 }} />
+
+      {/* Info Matrix */}
+      <Stack spacing={1.2} sx={{ width: "100%", px: 1 }}>
+        <InfoRow icon={<LocationCityRounded />} label={`${handleCountryName()} | ${job?.location?.state}`} />
+        <InfoRow icon={<AccessTimeFilledRounded />} label={`${job?.jobtypeaccess?.access} • ${job?.jobtypeaccess?.type}`} />
+        <InfoRow icon={<PaidRounded />} label={job?.salary || "Competitive"} />
+        <InfoRow icon={<WorkHistoryRounded />} label={`${job?.entry?.years || "0"} Experience`} />
+        <InfoRow icon={<BalanceRounded />} label={`${job?.entry?.level || "General"} Position`} />
+        <InfoRow
+          icon={<PeopleRounded />}
+          label={
+            job?.website !== ""
+              ? "External Portal"
+              : `Applicants: ${job?.applicants?.total || 0} / ${job?.applicants_max || 0}`
+          }
+          highlight={job?.applicants?.total > 0}
+        />
+        <InfoRow icon={<CalendarMonthRounded />} label={`Posted: ${handleDateDisplay()}`} />
+      </Stack>
+
+      {/* Action Sector */}
       {textOption === "Jobs Assessment" && (
         <Button
-        variant={"contained"}
-        color="primary"
-        size="small"
-        onClick={handleOpenApplicantsTable}
-        disableElevation
-        sx={{ borderRadius: "20px", fontWeight:'bold', my:1, width: "60%",fontSize:'x-small', textTransform:'capitalize', }}
+          fullWidth
+          variant="contained"
+          onClick={handleOpenApplicantsTable}
+          sx={{
+            mt: "auto !important",
+            borderRadius: "10px",
+            fontWeight: 800,
+            py: 1,
+            fontSize: "0.75rem",
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            background: "linear-gradient(90deg, #14D2BE, #0E9F8E)",
+            boxShadow: "0 4px 14px rgba(20, 210, 190, 0.3)",
+            "&:hover": {
+              background: "linear-gradient(90deg, #14D2BE, #1BEAD4)",
+              boxShadow: "0 6px 20px rgba(20, 210, 190, 0.4)",
+            },
+          }}
         >
-        Assess {job?.applicants?.total-job?.applicants?.assessed}
-    </Button>
+          Assess {unassessedCount} New
+        </Button>
       )}
-
-
     </Stack>
   );
 }
+
+// Reusable component for the info rows to keep the main layout clean
+const InfoRow = ({ icon, label, highlight }) => (
+  <Box display="flex" gap={1.5} alignItems="center">
+    {React.cloneElement(icon, {
+      sx: {
+        fontSize: 18,
+        color: highlight ? "primary.main" : "text.secondary",
+        opacity: 0.8,
+      },
+    })}
+    <Typography
+      variant="caption"
+      sx={{
+        fontSize: "0.78rem",
+        fontWeight: highlight ? 700 : 500,
+        color: highlight ? "primary.main" : "text.primary",
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+      }}
+    >
+      {label}
+    </Typography>
+  </Box>
+);
 
 export default JobLayoutHiring;

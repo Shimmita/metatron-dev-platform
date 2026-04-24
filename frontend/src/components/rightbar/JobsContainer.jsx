@@ -98,7 +98,7 @@ export default function JobsContainer() {
         }}
       >
         <Box>
-          {jobsTop?.slice(0, 3).map((jobTop, index) => (
+          {jobsTop?.slice(0, 5).map((jobTop, index) => (
             <Box key={jobTop?._id}>
               <FeaturedJobs
                 isLastIndex={index === jobsTop?.length - 1}

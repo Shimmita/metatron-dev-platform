@@ -1,25 +1,16 @@
 import {
-  Add,
-  ArrowCircleLeftRounded,
   DarkModeRounded,
-  DocumentScannerRounded,
   HelpRounded,
-  HighlightOffOutlined,
   InfoRounded,
   Menu,
   Refresh,
-  SettingsRounded,
-  TipsAndUpdatesRounded,
-  WorkRounded
+  TipsAndUpdatesRounded
 } from "@mui/icons-material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
   AppBar,
   Avatar,
   Button,
   CircularProgress,
-  Stack,
   Toolbar,
   Tooltip,
   useMediaQuery
@@ -28,11 +19,6 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import MuiDrawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
@@ -56,6 +42,7 @@ import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import HiringDrawer from "./HiringDrawer";
 import ApplicantsTable from "./layout/ApplicantsTable";
 import JobLayoutHiring from "./layout/JobLayoutHiring";
 import JobStatsLayout from "./layout/JobStatsLayouts";
@@ -121,33 +108,33 @@ const Drawer = styled(MuiDrawer, {
 
 
 export default function AllJobsHiringManager() {
-    // track axios progress
-    const [isFetching, setIsFetching] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const [openJobPostModal,setOpenJobPostModal]=useState(false)
-    const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
-    const[openAlertAbout,setOpenAlertAbout]=useState(false)
-    const [messageAbout,setMessageAbout]=useState("")
-    const [title,setTitle]=useState("")
+  // track axios progress
+  const [isFetching, setIsFetching] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openJobPostModal, setOpenJobPostModal] = useState(false)
+  const [openAlertGeneral, setOpenAlertGeneral] = useState(false)
+  const [openAlertAbout, setOpenAlertAbout] = useState(false)
+  const [messageAbout, setMessageAbout] = useState("")
+  const [title, setTitle] = useState("")
 
   // track theme
   const theme = useTheme();
 
-// smartphones and below
+  // smartphones and below
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   // redux states
-  const { 
+  const {
     currentMode,
-     isDefaultSpeedDial, 
-     isJobSearchGlobal,
-     isSidebarRighbar,
-     isOpenDrawerProfile,
-     isOpenMessageDrawer
-     } = useSelector(
+    isDefaultSpeedDial,
+    isJobSearchGlobal,
+    isSidebarRighbar,
+    isOpenDrawerProfile,
+    isOpenMessageDrawer
+  } = useSelector(
     (state) => state.appUI
   );
-  const isDarkMode=currentMode==='dark'
+  const isDarkMode = currentMode === 'dark'
 
   const { jobs } = useSelector((state) => state.currentJobs);
   const { user } = useSelector((state) => state.currentUser);
@@ -158,13 +145,13 @@ export default function AllJobsHiringManager() {
   const dispatch = useDispatch();
 
   // statistics tracker
-  const[isMyStats,setIsMyStats]=useState(false)
+  const [isMyStats, setIsMyStats] = useState(false)
 
   // job application table
-  const[isApplicantsTable,setIsApplicantsTable]=useState(false)
+  const [isApplicantsTable, setIsApplicantsTable] = useState(false)
 
   // manage jobs posted
-  const[isManageJobsTable,setIsManageJobsTable]=useState(false)
+  const [isManageJobsTable, setIsManageJobsTable] = useState(false)
 
   // selected option
   const [textOption, setTextOption] = useState(
@@ -172,33 +159,33 @@ export default function AllJobsHiringManager() {
   );
 
   // false right bar is no of use this route
-  useLayoutEffect(()=>{
+  useLayoutEffect(() => {
     // true tem, and the redux will reverse
-     dispatch(handleSidebarRightbar(true));
-  },[dispatch,isSidebarRighbar])
-  
+    dispatch(handleSidebarRightbar(true));
+  }, [dispatch, isSidebarRighbar])
+
 
   // holds drawer status
-  const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
-  
+  const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false : true);
+
   const [open, setOpen] = useState(
     !(CustomDeviceIsSmall() || CustomDeviceTablet())
   );
 
   // focused job for assessment and fetch prospective applicants
-  const[focusedJob,setFocusedJob]=useState({})
+  const [focusedJob, setFocusedJob] = useState({})
 
   // navigate to other routes
-  const navigate=useNavigate()
+  const navigate = useNavigate()
 
 
-   // handle navigation to hiring pane
-   const handleNavigateJobSeeker=()=>{
+  // handle navigation to hiring pane
+  const handleNavigateJobSeeker = () => {
     navigate('/jobs')
   }
 
- // handle opening of drawer profile
-const handleShowingProfileDrawer = () => {
+  // handle opening of drawer profile
+  const handleShowingProfileDrawer = () => {
     dispatch(showUserProfileDrawer());
   };
 
@@ -218,13 +205,13 @@ const handleShowingProfileDrawer = () => {
     dispatch(handleShowingSpeedDial(false));
   }
 
-   // false right bar is no of use this route
-    useLayoutEffect(()=>{
-       // updating right bar show false
-       if (isSidebarRighbar) {
-        dispatch(handleSidebarRightbar());
-      }
-    },[dispatch,isSidebarRighbar])
+  // false right bar is no of use this route
+  useLayoutEffect(() => {
+    // updating right bar show false
+    if (isSidebarRighbar) {
+      dispatch(handleSidebarRightbar());
+    }
+  }, [dispatch, isSidebarRighbar])
 
   // use effect for fetching jobs
   // fetch job posts from the backend (all,verified,nearby,recommended etc)
@@ -236,60 +223,53 @@ const handleShowingProfileDrawer = () => {
       return;
     }
 
-      // open jobs creation modal
-      if (textOption === "Upload New Job") {
-        setOpenJobPostModal(true)
-        return
-      }
+    // open jobs creation modal
+    if (textOption === "Upload New Job") {
+      setOpenJobPostModal(true)
+      return
+    }
 
-      // show alert general, displays about page
-      if (textOption==="About H.R Page") {
-        setTitle(textOption)
-        setMessageAbout(
-          `Metatron H.R Page helps you the recruiter to easily manage your job applicants 
-          on a click of a button. Assess your potential job applicants and get the exceptional candidates. 
-          Jobs with external job application links or those jobs which have an external website where potential candidates shall be 
-          redirected to complete their job application will not contain this feature since candidates will be managed externally from Metatron Developer 
-          Platform.
+    // show alert general, displays about page
+    if (textOption === "About H.R Page") {
+      setTitle(textOption)
+      setMessageAbout(
+        `Metatron H.R. gives recruiters a powerful, 
+        one click dashboard to effortlessly manage job applicants. Quickly evaluate candidates, surface top talent, and move the right people forward all within a unified experience. 
+        Important: Jobs that direct applicants to an external website for submission do not support this feature, as application handling takes place outside the Metatron Developer Platform. 
+        Only jobs that keep the entire application flow within Metatron benefit from the full management suite. 
+        Platform Integrity Notice Posting false, misleading, or “rogue” job listings is strictly forbidden. To protect our community, any account found violating this policy will be permanently 
+        deleted with or without prior notice at our sole discretion. 
+        Your account safe: only publish genuine opportunities for our valued users.`)
+      setOpenAlertAbout(true)
+      // refetch jobs
+      setTextOption("My Posted Jobs")
+      return
+    }
 
-          Rogue job posts are not allowed on the platform and when found, your account shall be deleted permanently with or 
-          without your consent in order to secure our reputation. Be advised to post genuine jobs to our esteemed end users on the platform to avoid 
-          permanent loss of your account.
-
+    // examine HR tips 
+    if (textOption === "Examine H.R Tips") {
+      setTitle(textOption)
+      setMessageAbout(
+        `Metatron H.R. gives recruiters a powerful, one‑click dashboard to effortlessly manage job applicants, evaluate candidates, 
+        and surface top talent all within a unified experience. 
+        The Explore Posted Jobs view lists every job you’ve published, showing both Verified Jobs 
+        (applications managed entirely within Metatron) and External Jobs (where applicants are redirected to an external site to complete their submission). For Verified Jobs, 
+        the Jobs Assessment window provides a complete toolkit to download candidate CVs, message applicants directly, preview profiles, and update application statuses to Pending, Proceed, or Reject—and we recommend messaging applicants after updating their status to keep them informed throughout the process. The Jobs Management panel lets you easily edit job details, toggle a posting between Active and Inactive, or permanently remove a job when it’s no longer accepting applications. To protect our community, posting false, misleading, or "rogue" job listings is strictly forbidden; any account found violating this policy will be permanently deleted—with or without prior notice—at our sole discretion, 
+        so keep your account safe by only publishing genuine opportunities for our valued users.
           `)
-        setOpenAlertAbout(true)
-        // refetch jobs
-        setTextOption("My Posted Jobs")
-        return
-      }
-
-      // examine HR tips 
-      if (textOption==="Examine H.R Tips") {
-        setTitle(textOption)
-        setMessageAbout(
-          `Explore Posted Jobs window displays all of your jobs posted on the platform. This includes verified jobs and external jobs. 
-          Verified Jobs are those which applications shall be conducted and managed within the platform while external jobs are those which potential 
-          applicants shall be redirected to the external website link to complete their application. 
-          Jobs Assessment window applies for all verified jobs i.e jobs without external website link and within this window Metatron Developer Platform has 
-          availed all the assessment tools to aid you the recruiter in managing your potential applicants. some of the tools includes: 
-          downloading applicants C.V, messaging applicants, previewing applicant's profile and updating application status (Pending, Proceed, Reject). It's therefore
-          recommended that after downloading applicant C.V and updating their application status, you message them to keep them posted.
-          Jobs Management window facilitates you to easily manage your uploaded jobs i.e editing and updating jobs, updating job status (active, inactive) and deleting jobs suppose 
-          they no longer open for applications
-          `)
-        setOpenAlertAbout(true)
-        // refetch jobs
-        setTextOption("My Posted Jobs")
-        return
-      }
+      setOpenAlertAbout(true)
+      // refetch jobs
+      setTextOption("My Posted Jobs")
+      return
+    }
 
 
-      // show the manage jobs table
-      if (textOption==="Jobs Management") {
-        setIsManageJobsTable(true)
-        return
-      }
-  
+    // show the manage jobs table
+    if (textOption === "Jobs Management") {
+      setIsManageJobsTable(true)
+      return
+    }
+
 
     // set is fetching to true
     setIsFetching(true);
@@ -305,7 +285,7 @@ const handleShowingProfileDrawer = () => {
           // update the redux of current post
           if (res?.data) {
             dispatch(updateCurrentJobs(res.data));
-          } 
+          }
         })
         .catch(async (err) => {
           console.log(err);
@@ -326,11 +306,11 @@ const handleShowingProfileDrawer = () => {
           setIsFetching(false);
           // false my stats
           setIsMyStats(false)
-          
+
         });
     }
 
-  
+
   }, [dispatch, textOption, user, isJobSearchGlobal]);
 
 
@@ -339,33 +319,33 @@ const handleShowingProfileDrawer = () => {
     setIsDrawerPane((prev) => !prev);
   };
 
-   // handle refresh of data
-    const handleRefreshData=()=>{
-      // set text to default explore events
-      setTextOption('My Posted Jobs')
-    }
-  
-      // UI theme dark light tweaking effect
-      const handleShowDarkMode = () => {
-      // update the redux theme boolean state
-      dispatch(resetDarkMode());
-    };
+  // handle refresh of data
+  const handleRefreshData = () => {
+    // set text to default explore events
+    setTextOption('My Posted Jobs')
+  }
+
+  // UI theme dark light tweaking effect
+  const handleShowDarkMode = () => {
+    // update the redux theme boolean state
+    dispatch(resetDarkMode());
+  };
 
   return (
-      <Suspense
-        fallback={
-          <Box height={"90vh"} display={"flex"} justifyContent={"center"}>
-            <Box display={"flex"} justifyContent={"center"}>
-              <CircularProgress size={20} />
-            </Box>
+    <Suspense
+      fallback={
+        <Box height={"90vh"} display={"flex"} justifyContent={"center"}>
+          <Box display={"flex"} justifyContent={"center"}>
+            <CircularProgress size={20} />
           </Box>
-        }
-      >
-        <Box
-        height={(CustomLandScape()|| CustomLandscapeWidest()) ?"86vh":"90vh"}
-         display={"flex"} 
-         sx={{
-          width:window.screen.availWidth-18,
+        </Box>
+      }
+    >
+      <Box
+        height={(CustomLandScape() || CustomLandscapeWidest()) ? "86vh" : "90vh"}
+        display={"flex"}
+        sx={{
+          width: window.screen.availWidth - 18,
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -373,39 +353,39 @@ const handleShowingProfileDrawer = () => {
           },
           // Hide scrollbar for IE, Edge and Firefox
           msOverflowStyle: "none",
-          scrollbarWidth: "none", 
+          scrollbarWidth: "none",
         }}>
-          <AppBar position="fixed" open={open}>
-            <Toolbar
-              sx={{
-                width: "100%",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                pt: 2,
-              }}
-            >
-              <Box>
-                <IconButton
-                  color="inherit"
-                  aria-label="open drawer"
-                  onClick={handleShowDrawerPane}
-                  edge="start"
-                  sx={[
-                    {
-                      marginRight: 5,
-                    },
-                    open && { display: "none" },
-                  ]}
-                >
-                  <Menu />
-                </IconButton>
+        <AppBar position="fixed" open={open}>
+          <Toolbar
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              pt: 2,
+            }}
+          >
+            <Box>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleShowDrawerPane}
+                edge="start"
+                sx={[
+                  {
+                    marginRight: 5,
+                  },
+                  open && { display: "none" },
+                ]}
+              >
+                <Menu />
+              </IconButton>
 
-              </Box>
+            </Box>
 
-              {/* main jobs title and the current selection */}
-              {CustomDeviceIsSmall() ? (
-                <Box width={"100%"}>
+            {/* main jobs title and the current selection */}
+            {CustomDeviceIsSmall() ? (
+              <Box width={"100%"}>
                 <Typography
                   noWrap
                   component="div"
@@ -418,444 +398,261 @@ const handleShowingProfileDrawer = () => {
 
                 {/* current navigation counter */}
                 <Box display={"flex"} justifyContent={"center"}>
-                  <Typography 
-                  variant="caption"
-                  fontWeight={'bold'}
-                  textTransform={'capitalize'}
+                  <Typography
+                    variant="caption"
+                    fontWeight={'bold'}
+                    textTransform={'capitalize'}
                   >
-                    {textOption} 
+                    {textOption}
                   </Typography>
                 </Box>
               </Box>
-              ):(
-                <Box width={"100%"}>
+            ) : (
+              <Box width={"100%"}>
                 <Typography
                   noWrap
                   component="div"
                   textAlign={"center"}
                   fontWeight={'bold'}
                   textTransform={"uppercase"}
-                  
-                  ml={open ? 30: 24}
+
+                  ml={open ? 30 : 24}
                 >
                   Metatron HR
                 </Typography>
 
                 {/* current navigation counter */}
                 <Box display={"flex"} justifyContent={"center"}>
-                  <Typography 
-                  variant="caption"
-                  fontWeight={'bold'}
-                  textTransform={'capitalize'}
-                  ml={open ? 30: 24}>
+                  <Typography
+                    variant="caption"
+                    fontWeight={'bold'}
+                    textTransform={'capitalize'}
+                    ml={open ? 30 : 24}>
                     - {textOption} -
                   </Typography>
                 </Box>
               </Box>
-              )}
+            )}
 
-              <Box display={'flex'}
+            <Box display={'flex'}
               gap={2}
-                alignItems={'center'} 
-                justifyContent={'flex-end'}>
+              alignItems={'center'}
+              justifyContent={'flex-end'}>
 
 
-                {/* dark mode */}
-                <IconButton  
-                onClick={handleShowDarkMode}> 
-                  <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
+              {/* dark mode */}
+              <IconButton
+                onClick={handleShowDarkMode}>
+                <Tooltip arrow title={isDarkMode ? "Light" : "Dark"}>
                   <DarkModeRounded
-                
-                    sx={{ color: "white", height:24, width:24,}}
+
+                    sx={{ color: "white", height: 24, width: 24, }}
                   />
-                </Tooltip> 
-                </IconButton>
+                </Tooltip>
+              </IconButton>
 
               {/* profile avatar */}
-            <Tooltip arrow title={"profile"}>
-            <IconButton onClick={handleShowingProfileDrawer}>
-            <Avatar
-                sx={{ width: 30, height: 30 }}
-                src={user?.avatar}
-                alt={""}
-            />
-            </IconButton>
-            </Tooltip>
+              <Tooltip arrow title={"profile"}>
+                <IconButton onClick={handleShowingProfileDrawer}>
+                  <Avatar
+                    sx={{ width: 30, height: 30 }}
+                    src={user?.avatar}
+                    alt={""}
+                  />
+                </IconButton>
+              </Tooltip>
 
             </Box>
 
-            </Toolbar>
-          </AppBar>
+          </Toolbar>
+        </AppBar>
 
-          <Drawer
-            variant="permanent"
-            open={open}
-            sx={{ display: isDrawerPane ? "block" : "none" }}
-          >
-            <DrawerHeader
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                backgroundColor:isDarkMode ? '#272727' :"#1976D2"
-              }}
-            >
-              {!open && (
-                <Box>
-                  <IconButton onClick={handleDrawerOpen}>
-                    <Menu  sx={{ color:'white' }} />
-                  </IconButton>
-                </Box>
-              )}
+        {/* show hiring drawer */}
+        <HiringDrawer
+          dispatch={dispatch}
+          isDrawerPane={isDrawerPane}
+          open={open}
+          setOpen={setOpen}
+          theme={theme}
+          isDarkMode={isDarkMode}
+          user={user}
+          setTextOption={setTextOption}
+          handleNavigateJobSeeker={handleNavigateJobSeeker}
+          handleIsJobsGlobalResults={handleIsJobsGlobalResults}
+          setIsDrawerPane={setIsDrawerPane}
+          textOption={textOption}
+        />
 
-              {open && (
-                <Box display={'flex'} gap={1} alignItems={'center'}>
-                    {/* icon right or left arrow */}
-                  <IconButton onClick={handleDrawerClose}>
-                    {theme.direction === "rtl" ? (
-                      <ChevronRightIcon  sx={{ color:'white' }}/>
-                    ) : (
-                      <ChevronLeftIcon sx={{ color:'white' }} />
-                    )}
-                  </IconButton>
 
-                  <Box
-                  display={'flex'} 
-                  flexDirection={'column'} 
-                  justifyContent={'center'} 
-                  alignItems={'center'}
-                  >
-                  {/* title hiring */}
-                  <Typography variant="body2" 
-                  sx={{color:'white'}} 
-                  mb={1}
-                  fontWeight={'bold'}
-                  textTransform={'uppercase'}>
-                    hiring Manager
-                  </Typography>
-                  {/* name of the current user */}
-                  <Typography 
-                  fontWeight={'bold'}
-                  variant="caption" 
-                  sx={{color:'white'}} 
-                  >
-                  - {user?.name?.substring(0,13)} -
-                  </Typography>
-                  </Box>
-
-                </Box>
-              )}
-            </DrawerHeader>
-            <Divider className=" w-100" component={"div"} />
-
-            {/* show hide drawer visibility when drawer is not expanded */}
-            {!open && (
-              <Stack justifyContent={"center"} mt={1}>
-                {/* hide drawer visibility */}
-                <Tooltip title={'close'} arrow>
-                <ListItemButton size="small" onClick={handleShowDrawerPane}>
-                  <ListItemIcon>
-                  <HighlightOffOutlined sx={{width:24,height:24}}/>
-                  </ListItemIcon>
-                </ListItemButton>
-                </Tooltip>
-              </Stack>
-            )}
-         
-            {/* job seeker options */}
-            <List>
-              {[
-                "My Posted Jobs",
-                "Upload New Job",
-                "Jobs Assessment",
-                "Jobs Management",
-                "About H.R Page",
-                "Examine H.R Tips"
-              ].map((text, index) => (
-                <ListItem
-                  key={text}
-                  disablePadding
-                  sx={{ display: "block" }}
-                  onClick={() => {
-                    // update the selected option
-                    setTextOption(text);
-                    // disable jobsSearch global results to false in redux
-                    dispatch(handleIsJobsGlobalResults(false));
-                  }}
-                >
-                  <ListItemButton
-                    sx={[
-                      {
-                        minHeight: 48,
-                        px: 2.5,
-                      },
-                      open
-                        ? {
-                            justifyContent: "initial",
-                          }
-                        : {
-                            justifyContent: "center",
-                          },
-                    ]}
-                  >
-                    <ListItemIcon
-                      sx={[
-                        {
-                          minWidth: 0,
-                          justifyContent: "center",
-                        },
-                        open
-                          ? {
-                              mr: 3,
-                            }
-                          : {
-                              mr: "auto",
-                            },
-                      ]}
-                    >
-                      <Tooltip title={text} arrow>
-                      {index === 0 ? (
-                        <WorkRounded
-                          color={text === textOption ? "primary" : "inherit"}
-                          sx={{width:20,height:20}}
-                        />
-                      ) : index === 2 ? (
-                        <DocumentScannerRounded
-                          color={text === textOption ? "primary" : "inherit"}
-                        />
-                      ) : index === 1 ? (
-                        <Add
-                          color={text === textOption ? "primary" : "inherit"}
-                        />
-                      ) :index===3 ? (
-                        <SettingsRounded
-                        sx={{width:22,height:22}}
-                        color={text === textOption ? "primary" : "inherit"}
-                      />
-                      ) : index===4 ? (
-                        <HelpRounded
-                        sx={{width:22,height:22}}
-                        color={text === textOption ? "primary" : "inherit"}
-                      />
-                      ) :(
-                        <TipsAndUpdatesRounded
-                        sx={{width:22,height:22}}
-                        color={text === textOption ? "primary" : "inherit"}
-                      />
-                      ) }
-                      </Tooltip>
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography
-                          variant="body2"
-                          color={text === textOption ? "primary" : "inherit"}
-                          fontWeight={text === textOption && "bold"}
-                        >
-                          {text}
-                        </Typography>
-                      }
-                      sx={[
-                        open
-                          ? {
-                              opacity: 1,
-                            }
-                          : {
-                              opacity: 0,
-                            },
-                      ]}
-                    />
-                  </ListItemButton>
-                   <Divider component={"li"} />
-                </ListItem>
-              ))}
-            </List>
-        
-              {/* hiring section */}
-              <Box my={1} display={'flex'} justifyContent={'center'}>
-
-              <Tooltip title='back' arrow>
-            <IconButton 
-            onClick={handleNavigateJobSeeker}
-            size="small">
-            <ArrowCircleLeftRounded />
-            </IconButton> 
-            </Tooltip>
-            
-            </Box>
-             {/* divider */}
-            <Divider component={'div'} className={'p-1'}/>
-
-          </Drawer>
-          {/* body of the jobs */}
+        {/* body of the jobs */}
+        <Box
+          width={"100%"}
+          display={"flex"}
+          height={"90vh"}
+          justifyContent={"center"}
+        >
+          {/* centering the content */}
           <Box
-            width={"100%"}
+            p={!CustomDeviceIsSmall() ? 2 : undefined}
             display={"flex"}
-            height={"90vh"}
+            gap={2}
+            maxHeight={"85vh"}
+            flexWrap={"wrap"}
             justifyContent={"center"}
+            sx={{
+              overflow: "auto",
+              // Hide scrollbar for Chrome, Safari and Opera
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+              // Hide scrollbar for IE, Edge and Firefox
+              msOverflowStyle: "none",
+              scrollbarWidth: "none",
+            }}
           >
-            {/* centering the content */}
-            <Box
-              p={!CustomDeviceIsSmall() ? 2 : undefined}
-              display={"flex"}
-              gap={2}
-              maxHeight={"85vh"}
-              flexWrap={"wrap"}
-              justifyContent={"center"}
-              sx={{
-                overflow: "auto",
-                // Hide scrollbar for Chrome, Safari and Opera
-                "&::-webkit-scrollbar": {
-                  display: "none",
-                },
-                // Hide scrollbar for IE, Edge and Firefox
-                msOverflowStyle: "none",
-                scrollbarWidth: "none",
-              }}
-            >
-              <React.Fragment>
+            <React.Fragment>
 
-                {/* if is applicants table vs jobs layout */}
-                {isApplicantsTable ? (
-                  <ApplicantsTable setIsApplicantsTable={setIsApplicantsTable} focusedJob={focusedJob} />
-                ):isManageJobsTable ? (
-                  <ManageJobsTable setIsManageJobsTable={setIsManageJobsTable} MyPostedJobs={jobs}/>
-                ) :(
-                  <React.Fragment>
+              {/* if is applicants table vs jobs layout */}
+              {isApplicantsTable ? (
+                <ApplicantsTable setIsApplicantsTable={setIsApplicantsTable} focusedJob={focusedJob} />
+              ) : isManageJobsTable ? (
+                <ManageJobsTable setIsManageJobsTable={setIsManageJobsTable} MyPostedJobs={jobs} />
+              ) : (
+                <React.Fragment>
                   {/* all jobs and verified jobs and Nearby that have no external link */}
-                {(textOption === "My Posted Jobs" ||
-                  textOption === "Jobs Assessment" ||
-                  textOption === "Search Jobs") && (
-                  <React.Fragment>
-                    {isFetching ? (
-                      <Box
-                        display={"flex"}
-                        justifyContent={"center"}
-                        alignItems={"center"}
-                        width={"100%"}
-                        flexDirection={"column"}
-                      >
-                        <CircularProgress size={"30px"} />
-                      </Box>
-                    ) : (
+                  {(textOption === "My Posted Jobs" ||
+                    textOption === "Jobs Assessment" ||
+                    textOption === "Search Jobs") && (
                       <React.Fragment>
-                        {/* rendered when are jobs greater than 1 */}
-                        {jobs &&
-                          jobs?.length > 0 &&
-                          jobs?.map((job) => (
-                            <>
-                              {/* if is stats displays different layout else job layout */}
-                              {isMyStats ? (
-                                <JobStatsLayout
-                                key={job?._id}
-                                isDarkMode={isDarkMode}
-                                job={job}
-                              />
-                              ):(
-                                <JobLayoutHiring
-                                textOption={textOption}
-                                key={job?._id}
-                                isDarkMode={isDarkMode}
-                                job={job}
-                                setFocusedJob={setFocusedJob}
-                                setIsApplicantsTable={setIsApplicantsTable}
-                              />
-                              )}
-                              {/* divider for small devices */}
-                              {CustomDeviceIsSmall() && (
-                                <Divider
-                                  className="mb-2 w-100"
-                                  component={"div"}
-                                />
-                              )}
-                            </>
-                          ))}
+                        {isFetching ? (
+                          <Box
+                            display={"flex"}
+                            justifyContent={"center"}
+                            alignItems={"center"}
+                            width={"100%"}
+                            flexDirection={"column"}
+                          >
+                            <CircularProgress size={"30px"} />
+                          </Box>
+                        ) : (
+                          <React.Fragment>
+                            {/* rendered when are jobs greater than 1 */}
+                            {jobs &&
+                              jobs?.length > 0 &&
+                              jobs?.map((job) => (
+                                <>
+                                  {/* if is stats displays different layout else job layout */}
+                                  {isMyStats ? (
+                                    <JobStatsLayout
+                                      key={job?._id}
+                                      isDarkMode={isDarkMode}
+                                      job={job}
+                                    />
+                                  ) : (
+                                    <JobLayoutHiring
+                                      textOption={textOption}
+                                      key={job?._id}
+                                      isDarkMode={isDarkMode}
+                                      job={job}
+                                      setFocusedJob={setFocusedJob}
+                                      setIsApplicantsTable={setIsApplicantsTable}
+                                    />
+                                  )}
+                                  {/* divider for small devices */}
+                                  {CustomDeviceIsSmall() && (
+                                    <Divider
+                                      className="mb-2 w-100"
+                                      component={"div"}
+                                    />
+                                  )}
+                                </>
+                              ))}
 
                             {/* rendered if are no jobs  */}
-                            {jobs?.length<1 && (
-                              <Box 
-                              height={'70vh'}
-                              display={'flex'}
-                              justifyContent={'center'}
-                              color={'text.secondary'}
-                              flexDirection={'column'}
-                              gap={2}
-                              alignItems={'center'}
+                            {jobs?.length < 1 && (
+                              <Box
+                                height={'70vh'}
+                                display={'flex'}
+                                justifyContent={'center'}
+                                color={'text.secondary'}
+                                flexDirection={'column'}
+                                gap={2}
+                                alignItems={'center'}
                               >
-                              {/* no events */}
-                              <Typography variant="body2">
-                                no more jobs posted
-                              </Typography>
-                              {/* show refresh button */}
-                              <Button 
-                              disableElevation
-                              onClick={handleRefreshData}
-                              size="small"
-                              variant="outlined"
-                              sx={{ borderRadius:3 }}
-                              startIcon={<Refresh/>}
-                              >refresh</Button>
+                                {/* no events */}
+                                <Typography variant="body2">
+                                  no more jobs posted
+                                </Typography>
+                                {/* show refresh button */}
+                                <Button
+                                  disableElevation
+                                  onClick={handleRefreshData}
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ borderRadius: 3 }}
+                                  startIcon={<Refresh />}
+                                >refresh</Button>
                               </Box>
                             )}
 
+                          </React.Fragment>
+                        )}
                       </React.Fragment>
                     )}
-                  </React.Fragment>
-                )}
-                  </React.Fragment>
-                )}
+                </React.Fragment>
+              )}
 
-              </React.Fragment>
-            </Box>
+            </React.Fragment>
           </Box>
+        </Box>
 
-          {/* open job posting modal */}
-          {openJobPostModal && (
-            <PostJobModal 
-            openModalJob={openJobPostModal} 
+        {/* open job posting modal */}
+        {openJobPostModal && (
+          <PostJobModal
+            openModalJob={openJobPostModal}
             setOpenModalJob={setOpenJobPostModal}
             isHiring={true}
             setTextOption={setTextOption}
-            />
-          )}
+          />
+        )}
 
-          {/* holds the notification and messaging drawer */}
-          {isOpenMessageDrawer && (
+        {/* holds the notification and messaging drawer */}
+        {isOpenMessageDrawer && (
           <ParentNotifMessageDrawer />
-          )}
+        )}
 
         {/* holds the profile drawer which contains user account info */}
         {isOpenDrawerProfile && (
-        <ProfileDrawer />
+          <ProfileDrawer />
         )}
 
-          {/* alert general of the error message */}
-          {errorMessage && (
-            <AlertGeneral 
+        {/* alert general of the error message */}
+        {errorMessage && (
+          <AlertGeneral
             title={'something went wrong!'}
             message={errorMessage}
             isError={true}
             openAlertGeneral={openAlertGeneral}
             setOpenAlertGeneral={setOpenAlertGeneral}
             setErrorMessage={setErrorMessage}
-            defaultIcon={<InfoRounded/>}
-            />
-          )}
+            defaultIcon={<InfoRounded />}
+          />
+        )}
 
-          {/* alert show about  */}
-          {openAlertAbout && (
-            <AlertGeneral 
+        {/* alert show about  */}
+        {openAlertAbout && (
+          <AlertGeneral
             title={title}
             message={messageAbout}
             openAlertGeneral={openAlertAbout}
             setOpenAlertGeneral={setOpenAlertAbout}
-            defaultIcon={title.includes('Examine') ? <TipsAndUpdatesRounded color="primary"/> :<HelpRounded color="info"/>}
-            />
-          )}
-  
-          {/* show success snackbar when redux snack state is updated */}
-          {messageSnack && <SnackBarSuccess message={messageSnack} />}
-        </Box>
-      </Suspense>
+            defaultIcon={title.includes('Examine') ? <TipsAndUpdatesRounded color="primary" /> : <HelpRounded color="info" />}
+          />
+        )}
+
+        {/* show success snackbar when redux snack state is updated */}
+        {messageSnack && <SnackBarSuccess message={messageSnack} />}
+      </Box>
+    </Suspense>
   );
 }

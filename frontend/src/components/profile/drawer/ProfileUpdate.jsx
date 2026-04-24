@@ -1,36 +1,27 @@
-import { CheckCircle, Close, UpdateRounded } from "@mui/icons-material";
+import { UpdateRounded } from "@mui/icons-material";
 import {
-  Alert,
   Autocomplete,
   Avatar,
-  AvatarGroup,
   Box,
   Button,
-  Chip,
-  Collapse,
+  CircularProgress,
   FormControlLabel,
-  IconButton,
+  LinearProgress,
   MenuItem,
-  Snackbar,
   Switch,
   TextField,
-  Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { updateUserCurrentUserRedux } from "../../../redux/CurrentUser";
 import RegisterAlertTitle from "../../auth/RegisterAlertTitle";
-import AllCountries from "../../data/AllCountries";
 import AllSkills from "../../data/AllSkillsData";
-import CountiesInKenya from "../../data/Counties";
 import SpecialisationJobs from "../../data/SpecialisationJobs";
+import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 import BrowserCompress from "../../utilities/BrowserCompress";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import { getImageMatch } from "../../utilities/getImageMatch";
-import { CircularProgress, LinearProgress } from "@mui/material";
-import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 
 const MAX_ABOUT = 200;
 

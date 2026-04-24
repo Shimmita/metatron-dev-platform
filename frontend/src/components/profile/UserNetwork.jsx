@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
 import { Box, CircularProgress, Stack, Typography } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 // Redux & Components
 import { updateCurrentNetwork } from "../../redux/CurrentNetwork";
-import UserNetworkLayout from "./UserNetworkLayout";
 import MetatronSnackbar from "../snackbar/MetatronSnackBar";
+import UserNetworkLayout from "./UserNetworkLayout";
 
 const UserNetwork = ({ otherUserID }) => {
   const dispatch = useDispatch();
-  
+
   /* ─── UI States ─── */
   const [isFetching, setIsFetching] = useState(false);
   const [notify, setNotify] = useState({
@@ -53,8 +53,8 @@ const UserNetwork = ({ otherUserID }) => {
           return;
         }
 
-        const errorMsg = err?.code === "ERR_NETWORK" 
-          ? "Metatron server is unreachable." 
+        const errorMsg = err?.code === "ERR_NETWORK"
+          ? "Metatron server is unreachable."
           : (err?.response?.data || "Failed to load network data.");
 
         setNotify({
@@ -68,9 +68,9 @@ const UserNetwork = ({ otherUserID }) => {
     };
 
     fetchNetwork();
-    
+
     // Dependencies optimized to prevent infinite loops
-  }, [dispatch, currentUserID, userNetworks, otherUserID, user?._id]);
+  }, [dispatch, currentUserID, userNetworks, otherUserID, user?._id, myNetwork]);
 
   return (
     <Box mt={2} sx={{ width: "100%", minHeight: "200px" }}>
