@@ -1,5 +1,5 @@
 import { FavoriteRounded, ForumRounded, GitHub } from "@mui/icons-material";
-import { Box, Button, CardActionArea } from "@mui/material";
+import { Box, Button, CardActionArea, Stack, Divider } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -17,166 +17,143 @@ export default function UserPostCard({
   deletePostID,
   setIsPostEditMode,
 }) {
-  // get redux states
   const { user } = useSelector((state) => state.currentUser);
-
-  // checks whether post belongs to the currently logged in user
   const isMyPost = user?._id === post?.post_owner?.ownerId;
-
   const dispatch = useDispatch();
-  //  update the post-detailed data with the current iterated post
-  // will lift-up the state and make the data available to root parent
+
   const handlePostDetails = async () => {
     await setPostDetailedData(post);
-
-    // false showing of the speed dial for tabs and small devices
     dispatch(handleShowingSpeedDial(false));
   };
 
-  // handle the image incorporated in the post for some is free logo
-  // other is custom uploaded to the cloud
   const handlePostImagePresent = () => {
-    // if the url name of the image present in the logo names use getImage fn
     const arrayFreeLogoName = getImageMatch("", true)[0];
     if (arrayFreeLogoName?.includes(post?.post_url)) {
-      // they used free logo images, return the matching image using getImage
       return getImageMatch(post?.post_url);
     }
-
-    // the user possibly uploaded the image to cloud thus return the url incorporated
     return post?.post_url;
   };
 
-  // handle the updating of the post of the current user
-  const handleUpdateMyPost = () => {
-    // set is edit or update  mode to true
-    setIsPostEditMode(true);
-    // set handle post details and also update is edit mode
-    handlePostDetails();
-  };
-
-  // handle deleting of the post belonging to the current user
-  const handleDeleteMyPost = () => {
-    // show delete alert confirmation in parent component
-    setShowDeleteAlert(true);
-
-    // update the current post for deletion
-    setDeletePostID(post?._id);
-  };
-
   return (
-    <Card elevation={0} className="mt-1">
-      <CardActionArea onClick={handlePostDetails}>
+    <Card 
+      elevation={0} 
+      sx={{ 
+        mt: 1,
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+        "&:hover": {
+          transform: "translateY(-4px)",
+          boxShadow: (theme) => `0 12px 30px ${theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.1)'}`,
+          borderColor: "primary.main",
+        }
+      }}
+    >
+      <CardActionArea onClick={handlePostDetails} sx={{ p: 0.5 }}>
         <CardMedia
           component="img"
-          className="rounded"
-          sx={{ maxHeight: 120 }}
+          sx={{ 
+            height: 140, 
+            borderRadius: "10px",
+            objectFit: "cover",
+            filter: "brightness(0.9)",
+          }}
           image={handlePostImagePresent()}
-          alt=""
+          alt={post?.post_title}
         />
-        <CardContent>
-          {/* post title */}
-          <Box display={"flex"} justifyContent={"center"}>
+        <CardContent sx={{ px: 1, pb: 1 }}>
+          {/* Title & Category Stack */}
+          <Stack spacing={0.5} alignItems="center">
             <Typography
               variant="body2"
-              fontWeight={"bold"}
-              textAlign={"center"}
+              fontWeight={700}
+              textAlign="center"
+              sx={{ color: "text.primary", lineHeight: 1.3 }}
             >
               {post?.post_title}
             </Typography>
-          </Box>
-          {/* post subcategory */}
-          <Box display={"flex"} justifyContent={"center"} mt={1}>
-            <Typography variant="caption" textAlign={"center"}>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: "primary.main", 
+                textTransform: "uppercase", 
+                fontWeight: 600,
+                letterSpacing: "0.05em"
+              }}
+            >
               {post?.post_category?.main}
             </Typography>
-          </Box>
+          </Stack>
+
+          <Divider sx={{ my: 1.5, opacity: 0.1 }} />
+
+          {/* Stats Row */}
           <Box
-            mt={1}
-            display={"flex"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-            width={"100%"}
-            className="border-bottom border-top py-1 "
+            display="flex"
+            justifyContent="space-around"
+            alignItems="center"
+            width="100%"
           >
-            {/* post likes */}
-            <Box display={"flex"} alignItems={"center"} gap={"4px"}>
-              <FavoriteRounded sx={{ width: 15, height: 15 }} />{" "}
-              <Typography
-                fontWeight={"bold"}
-                color={"text.secondary"}
-                variant="caption"
-              >
-                {post?.post_liked?.clicks}
-              </Typography>
-            </Box>
-
-            {/* github visits */}
-            <Box
-              display={"flex"}
-              justifyContent={"center"}
-              alignItems={"center"}
-              gap={"4px"}
-            >
-              <GitHub sx={{ width: 15, height: 15 }} />{" "}
-              <Typography
-                fontWeight={"bold"}
-                color={"text.secondary"}
-                variant="caption"
-              >
-                {post?.post_github?.clicks}
-              </Typography>
-            </Box>
-
-            {/* post comments */}
-            <Box display={"flex"} alignItems={"center"} gap={"4px"}>
-              <ForumRounded sx={{ width: 15, height: 15 }} />{" "}
-              <Typography
-                fontWeight={"bold"}
-                color={"text.secondary"}
-                variant="caption"
-              >
-                {post?.post_comments?.count}
-              </Typography>
-            </Box>
+            <StatItem icon={<FavoriteRounded sx={{ fontSize: 16 }} />} value={post?.post_liked?.clicks} color="#EF4444" />
+            <StatItem icon={<GitHub sx={{ fontSize: 16 }} />} value={post?.post_github?.clicks} color="text.primary" />
+            <StatItem icon={<ForumRounded sx={{ fontSize: 16 }} />} value={post?.post_comments?.count} color="info.main" />
           </Box>
         </CardContent>
       </CardActionArea>
 
-      {/* delete and update buttons if post belongs to the current user */}
+      {/* Admin Actions */}
       {isMyPost && (
-        <Box display={"flex"} justifyContent={"center"}>
-          <Box
-            display={"flex"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-            gap={1}
+        <Box 
+          sx={{ 
+            p: 1, 
+            pt: 0, 
+            display: "flex", 
+            justifyContent: "center", 
+            gap: 1 
+          }}
+        >
+          <Button
+            size="small"
+            disabled={!!deletePostID}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsPostEditMode(true);
+              handlePostDetails();
+            }}
+            sx={{ 
+              fontSize: "0.7rem", 
+              color: "primary.main",
+              "&:hover": { background: "rgba(20,210,190,0.08)" }
+            }}
           >
-            {/* update button */}
-            <Button
-              variant="text"
-              sx={{ fontSize: "small" }}
-              size="small"
-              disabled={deletePostID}
-              onClick={handleUpdateMyPost}
-              color="success"
-            >
-              update
-            </Button>
-            {/* delete button */}
-            <Button
-              variant="text"
-              sx={{ fontSize: "small" }}
-              size="small"
-              disabled={deletePostID}
-              onClick={handleDeleteMyPost}
-              color="warning"
-            >
-              delete
-            </Button>
-          </Box>
+            Edit
+          </Button>
+          <Button
+            size="small"
+            disabled={!!deletePostID}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowDeleteAlert(true);
+              setDeletePostID(post?._id);
+            }}
+            sx={{ 
+              fontSize: "0.7rem", 
+              color: "warning.main",
+              "&:hover": { background: "rgba(245,158,11,0.08)" }
+            }}
+          >
+            Delete
+          </Button>
         </Box>
       )}
     </Card>
   );
 }
+
+// Internal Helper for cleaner stats
+const StatItem = ({ icon, value, color }) => (
+  <Box display="flex" alignItems="center" gap="5px">
+    <Box sx={{ color: color, display: "flex" }}>{icon}</Box>
+    <Typography fontWeight={600} color="text.secondary" variant="caption">
+      {value || 0}
+    </Typography>
+  </Box>
+);

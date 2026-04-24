@@ -9,6 +9,7 @@ import {
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import axios from "axios";
+import { motion } from "framer-motion";
 import React, { Suspense, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleShowLogout, showUserProfileDrawer } from "../../../redux/AppUI";
@@ -22,22 +23,20 @@ import ProfileUpdate from "./ProfileUpdate";
 import UserProfileDrawer from "./UserProfileDrawer";
 
 
-  // handle the width of the drawer
-  const handleDrawerWidth=()=>{
-    if (CustomDeviceSmallest()) {
-      return 275
-    }else if(CustomDeviceIsSmall()){
-      return 330
-    } else if (CustomDeviceTablet()){
-      return 400
-    }
+// handle the width of the drawer
+const handleDrawerWidth = () => {
+  if (CustomDeviceSmallest()) {
+    return 275
+  } else if (CustomDeviceIsSmall()) {
+    return 330
+  } 
 
-    return 360
-  }
+  return 400
+}
 
 export default function ProfileDrawer() {
   // redux states
-  const { isOpenDrawerProfile,currentMode } = useSelector((state) => state.appUI);
+  const { isOpenDrawerProfile, currentMode } = useSelector((state) => state.appUI);
   const [temporaryProfileData, setTemporaryProfileData] = useState();
   const [isProfileUpdate, setIsProfileUpdate] = useState(false);
 
@@ -48,7 +47,7 @@ export default function ProfileDrawer() {
   const { user: nativeLoggedinUser, tempUserProfileID } = useSelector(
     (state) => state.currentUser
   );
-   const isDarkMode=currentMode==='dark'
+  const isDarkMode = currentMode === 'dark'
 
   // dispatch
   const dispatch = useDispatch();
@@ -101,12 +100,12 @@ export default function ProfileDrawer() {
   // handle opening of the logout alert via redux
   const handleShowLogoutAlert = () => {
     // close the drawer
-      dispatch(showUserProfileDrawer());
+    dispatch(showUserProfileDrawer());
     // show logout alert
-   dispatch(handleShowLogout(true))
+    dispatch(handleShowLogout(true))
   };
 
- 
+
 
   // handle showing of profile update
   const handleShowingProfileUpdate = () => {
@@ -116,108 +115,113 @@ export default function ProfileDrawer() {
 
   return (
     <React.Fragment>
-    <Drawer anchor={"right"} 
-    open={isOpenDrawerProfile} onClose={handleClose}
-    sx={{ 
-      backdropFilter:'blur(3px)'
-     }}
-    >
-      <Box
-        width={
-         handleDrawerWidth()
-        }
-        bgcolor={isDarkMode ?"background.default":"#f1f1f1"}
-        height={'100vh'}
+      <Drawer anchor={"right"}
+        open={isOpenDrawerProfile} onClose={handleClose}
+        sx={{
+          backdropFilter: 'blur(3px)'
+        }}
       >
-        <Box sx={{ flexGrow: 1 }}>
-          <AppBar
-          position="static" 
-          elevation={0} 
-          >
-            <Toolbar variant="dense" >
-              {!temporaryProfileData && (
-                <Box
-                display={'flex'}
-                justifyContent={'space-between'}
-                width={'100%'}
-                alignItems={'center'}
-                >
-
-                {/* settings*/}
-                 <Button 
-                 disableElevation
-                  startIcon={isProfileUpdate ? <UndoRounded/>:<Settings/>}
-                  size="small"
-                  sx={{ 
-                    borderRadius:'20px',
-                    fontSize:'x-small',
-                    color:'white'
-                   }}
-                  onClick={handleShowingProfileUpdate}>
-                    Settings
-                  </Button>
-
-                  {/* logout */}
-                  <Button 
-                  disableElevation
-                  startIcon={<PowerSettingsNewRounded/>}
-                  size="small"
-                  sx={{ 
-                    borderRadius:'20px',
-                    fontSize:'x-small',
-                    color:'white'
-                   }}
-                  onClick={handleShowLogoutAlert}>
-                    Logout
-                  </Button>
-
-                </Box>
-              )}
-            </Toolbar>
-          </AppBar>
-        </Box>
- 
-        {/* content */}
-        <Box bgcolor={'background.default'}>
-          <Suspense
-            fallback={
-              <Box height={"89vh"} display={"flex"} justifyContent={"center"}>
-                <Box display={"flex"} justifyContent={"center"}>
-                  <CircularProgress size={20} />
-                </Box>
-              </Box>
+        <motion.div initial={{ x: 100, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.25 }}
+          style={{ height: "100%" }}>
+          <Box
+            width={
+              handleDrawerWidth()
             }
+            bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
+            height={'100vh'}
           >
-            {/* render user profile component passing current user id no temporary data*/}
-            {isFetching ? (
-              <Box height={"89vh"}>
-                <Stack alignContent={"center"}>
-                  <CircularProgress size={25} />
-                </Stack>
-              </Box>
-            ) : (
-              <React.Fragment>
-                {/* show default profile if is no update setting clicked */}
-                {isProfileUpdate ? (
-                  <Box height={CustomDeviceTablet()||CustomDeviceIsSmall() ? "94vh":"92vh"}>
-                    <ProfileUpdate user={nativeLoggedinUser} />
+            <Box sx={{ flexGrow: 1 }}>
+              <AppBar
+                position="static"
+                elevation={0}
+              >
+                <Toolbar variant="dense" >
+                  {!temporaryProfileData && (
+                    <Box
+                      display={'flex'}
+                      justifyContent={'space-between'}
+                      width={'100%'}
+                      alignItems={'center'}
+                    >
+
+                      {/* settings*/}
+                      <Button
+                        disableElevation
+                        startIcon={isProfileUpdate ? <UndoRounded /> : <Settings />}
+                        size="small"
+                        sx={{
+                          borderRadius: '20px',
+                          fontSize: 'x-small',
+                          color: 'white'
+                        }}
+                        onClick={handleShowingProfileUpdate}>
+                        Settings
+                      </Button>
+
+                      {/* logout */}
+                      <Button
+                        disableElevation
+                        startIcon={<PowerSettingsNewRounded />}
+                        size="small"
+                        sx={{
+                          borderRadius: '20px',
+                          fontSize: 'x-small',
+                          color: 'white'
+                        }}
+                        onClick={handleShowLogoutAlert}>
+                        Logout
+                      </Button>
+
+                    </Box>
+                  )}
+                </Toolbar>
+              </AppBar>
+            </Box>
+
+            {/* content */}
+            <Box bgcolor={'background.default'}>
+              <Suspense
+                fallback={
+                  <Box height={"89vh"} display={"flex"} justifyContent={"center"}>
+                    <Box display={"flex"} justifyContent={"center"}>
+                      <CircularProgress size={20} />
+                    </Box>
+                  </Box>
+                }
+              >
+                {/* render user profile component passing current user id no temporary data*/}
+                {isFetching ? (
+                  <Box height={"89vh"}>
+                    <Stack alignContent={"center"}>
+                      <CircularProgress size={25} />
+                    </Stack>
                   </Box>
                 ) : (
-                  <Box height={CustomDeviceTablet()||CustomDeviceIsSmall() ? "94vh":"92vh"} p={"5px"}>
-                    {temporaryProfileData ? (
-                      <UserProfileDrawer profileData={temporaryProfileData} />
+                  <React.Fragment>
+                    {/* show default profile if is no update setting clicked */}
+                    {isProfileUpdate ? (
+                      <Box height={CustomDeviceTablet() || CustomDeviceIsSmall() ? "94vh" : "92vh"}>
+                        <ProfileUpdate user={nativeLoggedinUser} />
+                      </Box>
                     ) : (
-                      <UserProfileDrawer profileData={nativeLoggedinUser} />
+                      <Box height={CustomDeviceTablet() || CustomDeviceIsSmall() ? "94vh" : "92vh"} p={"5px"}>
+                        {temporaryProfileData ? (
+                          <UserProfileDrawer profileData={temporaryProfileData} />
+                        ) : (
+                          <UserProfileDrawer profileData={nativeLoggedinUser} />
+                        )}
+                      </Box>
                     )}
-                  </Box>
+                  </React.Fragment>
                 )}
-              </React.Fragment>
-            )}
-          </Suspense>
-        </Box>
-      </Box>
-    </Drawer>
-    {/* other more components */}
+              </Suspense>
+            </Box>
+          </Box>
+        </motion.div>
+      </Drawer>
+      {/* other more components */}
     </React.Fragment>
   );
 }

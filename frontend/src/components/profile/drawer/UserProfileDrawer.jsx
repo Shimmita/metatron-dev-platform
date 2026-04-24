@@ -1,621 +1,546 @@
 import {
-  Message,
-  PersonAdd,
-  PersonRemove
+  BookmarkRounded,
+  GridViewRounded,
+  MessageRounded,
+  PeopleRounded,
+  PersonAddRounded,
+  PersonRemoveRounded,
+  SendRounded,
+  CloseRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
   AvatarGroup,
+  Box,
   Button,
-  Divider,
+  CircularProgress,
+  IconButton,
   InputBase,
+  Skeleton,
   Tooltip,
   Typography,
 } from "@mui/material";
-import Box from "@mui/material/Box";
-import { styled } from "@mui/material/styles";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
 import axios from "axios";
 import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   resetClearShowMessageInput,
   resetDefaultBottomNav,
 } from "../../../redux/AppUI";
 import { updateMessageConnectRequest } from "../../../redux/CurrentSnackBar";
 import { updateUserCurrentUserRedux } from "../../../redux/CurrentUser";
+
 import PostDetailsInDrawer from "../../post/PostDetailsInDrawer";
 import SnackbarConnect from "../../snackbar/SnackbarConnect";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import { getImageMatch } from "../../utilities/getImageMatch";
 import UserPostFavoriteContainer from "./UserPostFavoriteContainer";
-const UserNetwork =lazy(()=>import("../UserNetwork")) ;
-const PostDetailsContainer = lazy(() =>
-  import("../../post/PostDetailsContiner")
-);
+import { appColors } from "../../../utils/colors";
+const UserNetwork          = lazy(() => import("../UserNetwork"));
+const PostDetailsContainer = lazy(() => import("../../post/PostDetailsContiner"));
 const UserPostContainDrawer = lazy(() => import("./UserPostContainDrawer"));
-const StyledTabs = styled((props) => (
-  <Tabs
-    {...props}
-    TabIndicatorProps={{ children: <span className="MuiTabs-indicatorSpan" /> }}
-  />
-))({
-  "& .MuiTabs-indicator": {
-    display: "flex",
-    justifyContent: "center",
-    backgroundColor: "transparent",
-  },
-  "& .MuiTabs-indicatorSpan": {
-    maxWidth: 20,
-    width: "100%",
-    backgroundColor: "transparent",
-  },
-});
 
-const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
-  ({ theme }) => ({
-    textTransform: "none",
-    fontWeight: theme.typography.caption,
-    fontSize: theme.typography.pxToRem(13),
-    padding: theme.typography.pxToRem(2),
-    color: "gray",
-    "&.Mui-selected": {
-      color: "primary",
-    },
-    "&.Mui-focusVisible": {
-      backgroundColor: "rgba(100, 95, 228, 0.32)",
-    },
-  })
+/* ─── Tab definition ────────────────────────────────────────────────── */
+const TABS = [
+  { label: "Posts",    icon: <GridViewRounded  sx={{ width: 14, height: 14 }} /> },
+  { label: "Saved",    icon: <BookmarkRounded  sx={{ width: 14, height: 14 }} /> },
+  { label: "People",   icon: <PeopleRounded    sx={{ width: 14, height: 14 }} /> },
+];
+
+/* ─── Styled tab bar ────────────────────────────────────────────────── */
+const TabBar = ({ value, onChange }) => (
+  <Box
+    display="flex"
+    sx={{
+      background: "rgba(255,255,255,0.03)",
+      borderRadius: "10px",
+      border: `1px solid ${appColors.divider}`,
+      p: "3px",
+      gap: "3px",
+    }}
+  >
+    {TABS.map((tab, i) => {
+      const active = value === i;
+      return (
+        <Box
+          key={tab.label}
+          onClick={() => onChange(i)}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          gap={0.6}
+          sx={{
+            flex: 1, py: "7px", px: 1,
+            borderRadius: "8px",
+            cursor: "pointer",
+            transition: "all 0.22s",
+            background: active ? "rgba(20,210,190,0.12)" : "transparent",
+            border: `1px solid ${active ? "rgba(20,210,190,0.3)" : "transparent"}`,
+          }}
+        >
+          <Box sx={{ color: active ? appColors.primary : appColors.textMuted, display: "flex" }}>
+            {tab.icon}
+          </Box>
+          <Typography
+            sx={{
+              fontSize: 11, fontWeight: active ? 600 : 400,
+              color: active ? appColors.primary : appColors.textMuted,
+              letterSpacing: "0.04em",
+            }}
+          >
+            {tab.label}
+          </Typography>
+        </Box>
+      );
+    })}
+  </Box>
 );
 
-// input base
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    transition: theme.transitions.create("width"),
-    width: "100%",
-  },
-}));
+/* ─── Action button ─────────────────────────────────────────────────── */
+const ProfileActionBtn = ({ icon, label, onClick, disabled, variant = "default" }) => {
+  const styles = {
+    default: {
+      bg: "rgba(255,255,255,0.05)",
+      border: appColors.divider,
+      color: appColors.textSecondary,
+      hoverBg: "rgba(20,210,190,0.1)",
+      hoverBorder: "rgba(20,210,190,0.35)",
+      hoverColor: appColors.primary,
+    },
+    danger: {
+      bg: "rgba(239,68,68,0.07)",
+      border: "rgba(239,68,68,0.18)",
+      color: "rgba(239,68,68,0.8)",
+      hoverBg: "rgba(239,68,68,0.14)",
+      hoverBorder: "rgba(239,68,68,0.4)",
+      hoverColor: "#EF4444",
+    },
+  }[variant];
 
+  return (
+    <Button
+      fullWidth
+      size="small"
+      startIcon={icon}
+      onClick={onClick}
+      disabled={disabled}
+      sx={{
+        borderRadius: "9px",
+        py: 0.85, fontSize: 11.5,
+        fontWeight: 500,
+        textTransform: "none",
+        background: styles.bg,
+        border: `1px solid ${styles.border}`,
+        color: styles.color,
+        transition: "all 0.22s",
+        "&:hover": { background: styles.hoverBg, borderColor: styles.hoverBorder, color: styles.hoverColor },
+        "&.Mui-disabled": { opacity: 0.35, color: styles.color },
+      }}
+    >
+      {label}
+    </Button>
+  );
+};
+
+/* ─── Skill avatars ─────────────────────────────────────────────────── */
+const SkillRow = ({ skills }) => {
+  if (!skills?.length) return null;
+  return (
+    <Box display="flex" alignItems="center" gap={1.2}>
+      <Typography sx={{ fontSize: 10, color: appColors.textMuted, letterSpacing: "0.14em", textTransform: "uppercase", flexShrink: 0 }}>
+        Skills
+      </Typography>
+      <AvatarGroup
+        max={skills.length}
+        sx={{
+          "& .MuiAvatar-root": {
+            width: 24, height: 24, fontSize: 9,
+            border: `1px solid ${appColors.border}`,
+            background: "#0D1B2A",
+          },
+        }}
+      >
+        {skills.map((skill) => (
+          <Tooltip title={skill} key={skill} arrow>
+            <Avatar alt={skill} src={getImageMatch(skill)} />
+          </Tooltip>
+        ))}
+      </AvatarGroup>
+    </Box>
+  );
+};
+
+/* ─── Message composer ──────────────────────────────────────────────── */
+const MessageComposer = ({ value, onChange, onSend, onClose, isSending }) => (
+  <Box
+    sx={{
+      background: "rgba(255,255,255,0.04)",
+      border: `1px solid ${appColors.divider}`,
+      borderRadius: "12px",
+      overflow: "hidden",
+    }}
+  >
+    <InputBase
+      multiline
+      fullWidth
+      minRows={3}
+      maxRows={6}
+      value={value}
+      onChange={onChange}
+      disabled={isSending}
+      placeholder="Write a message…"
+      sx={{
+        px: 2, pt: 1.5, pb: 1,
+        fontSize: 13,
+        color: appColors.textPrimary,
+        "& textarea::placeholder": { color: appColors.textMuted, opacity: 1 },
+      }}
+    />
+    <Box
+      display="flex"
+      justifyContent="flex-end"
+      gap={1}
+      sx={{
+        px: 1.5, py: 1,
+        borderTop: `1px solid ${appColors.divider}`,
+        background: "rgba(0,0,0,0.15)",
+      }}
+    >
+      <IconButton
+        size="small"
+        onClick={onClose}
+        disabled={isSending}
+        sx={{
+          width: 30, height: 30, borderRadius: "7px",
+          border: `1px solid ${appColors.divider}`,
+          color: appColors.textMuted,
+          "&:hover": { color: appColors.textPrimary },
+        }}
+      >
+        <CloseRounded sx={{ width: 13, height: 13 }} />
+      </IconButton>
+      <Button
+        size="small"
+        onClick={onSend}
+        disabled={value.trim().length < 1 || isSending}
+        endIcon={isSending ? <CircularProgress size={10} /> : <SendRounded sx={{ width: 12, height: 12 }} />}
+        sx={{
+          borderRadius: "7px", px: 1.5, py: 0.5,
+          fontSize: 11, fontWeight: 600,
+          textTransform: "none",
+          background: value.trim().length > 0 ? "rgba(20,210,190,0.15)" : "transparent",
+          border: `1px solid ${value.trim().length > 0 ? "rgba(20,210,190,0.35)" : appColors.divider}`,
+          color: value.trim().length > 0 ? appColors.primary : appColors.textMuted,
+          "&:hover": { background: "rgba(20,210,190,0.22)", borderColor: "rgba(20,210,190,0.5)" },
+          "&.Mui-disabled": { opacity: 0.35 },
+        }}
+      >
+        Send
+      </Button>
+    </Box>
+  </Box>
+);
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Main component
+═══════════════════════════════════════════════════════════════════════ */
 export default function UserProfileDrawer({ profileData }) {
-  const[isPostDetailedDrawer,setIsPostDetailedDrawer]=useState(false)
-  // get redux states
-  const { user } = useSelector((state) => state.currentUser);
-
-  const { messageConnectRequestSent } = useSelector(
-    (state) => state.currentSnackBar
-  );
-
-  const { currentMode, isMessageProfile } = useSelector((state) => state.appUI);
-   const isDarkMode=currentMode==='dark'
-  // for full post details rendering
-  const [postDetailedData, setPostDetailedData] = useState();
-  // for monitoring api request status
-  const [isConnecting, setIsConnecting] = useState(false);
-  // track if the focused post is on edit/update mode just viewing
-  const [isPostEditMode, setIsPostEditMode] = useState(false);
-  // controlling showing of message input view
-  const [isShowMessageInput, setIsShowMessageInput] = useState(
-    false || isMessageProfile
-  );
-  const [messageContent, setMessageContent] = useState("");
-  // will be used to check if users are friends
-  const [isFriend, setIsFriend] = useState();
-
-  // controls the tab to be displayed
-  const [profileSection, setProfileSection] = useState(0);
-
-  const handleChange = (event, newValue) => {
-    setProfileSection(newValue);
-  };
-
-
-  // for checking user relationships
-  useEffect(() => {
-    // map through ids of friends if the current user network
-    // has the id of the post owner, means are friends else false
-    if (user?.network?.includes(profileData?._id)) {
-      setIsFriend(true);
-    }
-  }, [profileData, user]);
-
-
-
-  // redux to stop showing of the speed dial
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(resetDefaultBottomNav(true));
-  });
 
+  const { user }                        = useSelector((s) => s.currentUser);
+  const { messageConnectRequestSent }   = useSelector((s) => s.currentSnackBar);
+  const { isMessageProfile }            = useSelector((s) => s.appUI);
 
+  const [postDetailedData, setPostDetailedData]     = useState(null);
+  const [isPostDetailedDrawer, setIsPostDetailedDrawer] = useState(false);
+  const [isPostEditMode, setIsPostEditMode]         = useState(false);
+  const [isConnecting, setIsConnecting]             = useState(false);
+  const [isFriend, setIsFriend]                     = useState(false);
+  const [profileSection, setProfileSection]         = useState(0);
+  const [showMessage, setShowMessage]               = useState(isMessageProfile || false);
+  const [messageContent, setMessageContent]         = useState("");
 
-  // check if is current user and manoeuver the display of follow and send message btb
   const isCurrentUser = user._id === profileData?._id;
+  const isOrg         = profileData?.account === "Organisation";
 
   const {
-    _id: currentUserId,
-    name,
-    avatar,
-    country,
-    county,
+    _id: currentUserId, name, avatar,
+    country, county,
     specialisationTitle: title,
   } = user || {};
-
-  // id of the target user requesting connect, its the id of the profile data
   const { _id: targetID } = profileData || {};
 
-  // handle display of message input
-  const handleShowMessageInput = () => {
-    // clear the message content
-    setMessageContent("");
-    setIsShowMessageInput((prev) => !prev);
+  useEffect(() => {
+    if (user?.network?.includes(profileData?._id)) setIsFriend(true);
+  }, [profileData, user]);
 
-    // false the redux state for showing message input when profile drawer launches
+  useEffect(() => { dispatch(resetDefaultBottomNav(true)); });
+
+  /* ── Actions ── */
+  const handleShowMessage = () => {
+    setMessageContent("");
+    setShowMessage((p) => !p);
     dispatch(resetClearShowMessageInput());
   };
 
-  // handle user connect request
-  const handleCreateConnect = () => {
-    const dataUserSendingRequest = {
-      senderId: currentUserId,
-      targetId: targetID,
-      country: CustomCountryName(country),
-      state: county,
-      name,
-      avatar,
-      title,
-      message: "requesting to connect",
-    };
+  const dispatchError = (err) =>
+    dispatch(updateMessageConnectRequest(
+      err?.code === "ERR_NETWORK" ? "Server unreachable, check your internet" : err?.response?.data
+    ));
 
-    // set is fetching to true
+  const handleConnect = () => {
     setIsConnecting(true);
-
-    // performing post request and passing data for body request
-    axios
-      .post(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/create`,
-        dataUserSendingRequest
-      )
-      .then((res) => {
-        // update the redux of current post
-        if (res?.data && res.data) {
-          dispatch(updateMessageConnectRequest(res.data));
-        }
-      })
-      .catch(async (err) => {
-        if (err?.code === "ERR_NETWORK") {
-          dispatch(
-            updateMessageConnectRequest(
-              "server is unreachable check your internet"
-            )
-          );
-          return;
-        }
-        dispatch(updateMessageConnectRequest(err?.response?.data));
-      })
-      .finally(() => {
-        // set is fetching to false
-        setIsConnecting(false);
-      });
+    axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/create`, {
+      senderId: currentUserId, targetId: targetID,
+      country: CustomCountryName(country), state: county,
+      name, avatar, title,
+      message: "requesting to connect",
+    })
+      .then((res) => { if (res?.data) dispatch(updateMessageConnectRequest(res.data)); })
+      .catch(dispatchError)
+      .finally(() => setIsConnecting(false));
   };
 
-  // handle unfriending a user
-  const handleRequestUnfriend = () => {
-    // set is fetching to true
+  const handleUnfriend = () => {
     setIsConnecting(true);
-
-    // performing delete request and passing id of the currently user and that of miniprofile user being
-    // viewed
-    axios
-      .delete(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/unfriend/${currentUserId}/${profileData?._id}`
-      )
+    axios.delete(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/unfriend/${currentUserId}/${profileData?._id}`)
       .then((res) => {
-        if (res?.data && res.data) {
-          // update the redux state of the currently logged in user from backend who is sender user
+        if (res?.data) {
           dispatch(updateUserCurrentUserRedux(res.data.senderUser));
-
-          // update the message of the snackbar
           dispatch(updateMessageConnectRequest(res.data.message));
-
-          // set is friend false
           setIsFriend(false);
         }
       })
-      .catch(async (err) => {
-        if (err?.code === "ERR_NETWORK") {
-          dispatch(
-            updateMessageConnectRequest(
-              "server is unreachable check your internet"
-            )
-          );
-          return;
-        }
-        dispatch(updateMessageConnectRequest(err?.response?.data));
-      })
-      .finally(() => {
-        // set is fetching to false
-        setIsConnecting(false);
-      });
+      .catch(dispatchError)
+      .finally(() => setIsConnecting(false));
   };
 
-  // handle sending of the message
-  const handleSendingMessage = async () => {
-    // conversationObject
-    const conversation = {
-      senderId: user._id,
-      content: messageContent,
-      participants: [user._id, profileData._id],
-    };
-
-    // call api request to post data to the backed
+  const handleSendMessage = async () => {
     try {
-      // set is fetching to true
       setIsConnecting(true);
-      const response = await axios.post(
+      const res = await axios.post(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/create`,
-        conversation
+        { senderId: user._id, content: messageContent, participants: [user._id, profileData._id] }
       );
-      //update the conversation with the one returned from the backend
-      if (response.data) {
-        dispatch(updateMessageConnectRequest("message has been sent"));
-        // clear the message content
+      if (res.data) {
+        dispatch(updateMessageConnectRequest("Message sent"));
         setMessageContent("");
       }
-    } catch (err) {
-      if (err?.code === "ERR_NETWORK") {
-        dispatch(
-          updateMessageConnectRequest(
-            "server is unreachable check your internet"
-          )
-        );
-        return;
-      }
-      dispatch(updateMessageConnectRequest(err?.response?.data));
-    } finally {
-      // close is fetching
-      setIsConnecting(false);
-    }
+    } catch (err) { dispatchError(err); }
+    finally { setIsConnecting(false); }
   };
 
+  /* ── Post detail view ── */
+  if (postDetailedData) {
+    return isPostDetailedDrawer ? (
+      <PostDetailsInDrawer
+        postDetailedData={postDetailedData}
+        setPostDetailedData={setPostDetailedData}
+        isDrawerFocused
+      />
+    ) : (
+      <PostDetailsContainer
+        postDetailedData={postDetailedData}
+        setPostDetailedData={setPostDetailedData}
+        isDrawerFocused
+        isPostEditMode={isPostEditMode}
+        setIsPostEditMode={setIsPostEditMode}
+      />
+    );
+  }
+
+  /* ── Main render ── */
   return (
     <Box
-      color={"text.primary"}
-      borderRadius={2} 
-      maxHeight={'91vh'}   
       sx={{
-        overflowX: "auto",
-        // Hide scrollbar for Chrome, Safari and Opera
-        "&::-webkit-scrollbar": {
-          display: "none",
+        height: "100%",
+        overflowY: "auto",
+        overflowX: "hidden",
+        "&::-webkit-scrollbar": { width: 3 },
+        "&::-webkit-scrollbar-thumb": {
+          background: "rgba(20,210,190,0.2)",
+          borderRadius: 2,
+          "&:hover": { background: "rgba(20,210,190,0.4)" },
         },
-        // Hide scrollbar for IE, Edge and Firefox
-        "-ms-overflow-style": "none",
-        "scrollbar-width": "none",
       }}
     >
-      {/* displayed for full post details when data is present */}
-      {postDetailedData ? (
-        <React.Fragment>
-          {isPostDetailedDrawer ?(
-            <React.Fragment>
-          {/* the post is detailed view and not edit mode */}
-           <PostDetailsInDrawer
-            postDetailedData={postDetailedData}
-            setPostDetailedData={setPostDetailedData}
-            isDrawerFocused={true}
-            />
-          
-            </React.Fragment>
-          ):(
-            <React.Fragment>
-              {/* post is in edit mode */}
-              <PostDetailsContainer
-              postDetailedData={postDetailedData}
-              setPostDetailedData={setPostDetailedData}
-              isDrawerFocused={true}
-              isPostEditMode={isPostEditMode}
-              setIsPostEditMode={setIsPostEditMode}
+      {/* ━━ HERO — avatar + identity ━━ */}
+      <Box
+        sx={{
+          position: "relative",
+          px: 2, pt: 2.5, pb: 2,
+          borderBottom: `1px solid ${appColors.divider}`,
+          background: "rgba(20,210,190,0.025)",
+        }}
+      >
+        {/* subtle top-center glow */}
+        <Box sx={{
+          position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)",
+          width: 180, height: 100, borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(20,210,190,0.09), transparent 70%)",
+          pointerEvents: "none",
+        }} />
+
+        {/* Avatar */}
+        <Box display="flex" justifyContent="center" mb={1.5}>
+          <Avatar
+            src={profileData?.avatar}
+            alt={profileData?.name}
+            sx={{
+              width: 72, height: 72,
+              border: `2px solid rgba(20,210,190,0.45)`,
+              boxShadow: `0 0 0 4px rgba(20,210,190,0.1)`,
+            }}
           />
-            </React.Fragment>
+        </Box>
+
+        {/* Name */}
+        <Typography
+          sx={{
+            fontFamily: "'Playfair Display', Georgia, serif",
+            fontSize: 16, fontWeight: 700,
+            color: appColors.textPrimary,
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+            textAlign: "center",
+          }}
+        >
+          {profileData?.name}
+        </Typography>
+
+        {/* Role */}
+        <Typography sx={{ fontSize: 12, color: appColors.textSecondary, textAlign: "center", mt: 0.4 }}>
+          {profileData?.specialisationTitle}
+        </Typography>
+
+        {/* Location + network row */}
+        <Box display="flex" justifyContent="center" gap={2} mt={1} flexWrap="wrap">
+          {profileData?.county && (
+            <Typography sx={{ fontSize: 11, color: appColors.textMuted }}>
+              📍 {profileData.county}
+            </Typography>
           )}
-            
-        </React.Fragment>
-        
-      ) : (
-        <Box 
-        px={2}
-         mt={1}>
-          {/* shown when there is profile info */}
-            <Box>
-              <Box 
-              display={"flex"}
-              mb={1} 
-              justifyContent={"center"}>
-                <Avatar 
-                src={user?.avatar}
-                alt="" 
-                sx={{ width: 80, height: 80 }} />
-              </Box>
+          {profileData?.network_count !== undefined && (
+            <Typography sx={{ fontSize: 11, color: appColors.textMuted }}>
+              👥 {profileData.network_count} connections
+            </Typography>
+          )}
+        </Box>
 
-              {/* skills */}
-              <Box
-                display={profileData?.account==="Organisation" ? "none":'flex'}
-                justifyContent={"center"}
-                mb={1}
-                gap={1}
-                alignItems={"center"}
-              >
-                {/* skills avatars */}
-                <Box display={"flex"} justifyContent={"center"}>
-                  <AvatarGroup max={profileData?.selectedSkills?.length}>
-                    {/* loop through the skills and their images matched using custom fn */}
-                    {profileData?.selectedSkills?.map((skill, index) => (
-                      <Tooltip title={skill} arrow key={skill}>
-                        <Avatar
-                          alt={skill}
-                          className="border"
-                          sx={{ width: 25, height: 25 }}
-                          src={getImageMatch(skill)}
-                        />
-                      </Tooltip>
-                    ))}
-                  </AvatarGroup>
-                </Box>
-              </Box>
-
-              {/* specialisation */}
-              <Box
-                display={"flex"}
-                justifyContent={"center"}
-                gap={1}
-                alignItems={"center"}
-              >
-                <Typography color={"text.secondary"} variant="body2">
-                  {profileData?.specialisationTitle}
-                </Typography>
-              </Box>
-
-              {/* name of the user */}
-              <Box display={"flex"} justifyContent={"center"} mb={1}>
-                <Typography
-                  fontWeight={"bold"}
-                  mt={1}
-                  variant="body1"
-                  textTransform={"uppercase"}
-                >
-                  {profileData?.name}
-                </Typography>
-              </Box>
-            
-              {!isCurrentUser && (
-                <React.Fragment>
-                  <Divider component={"div"} />
-                  <Box
-                    display={"flex"}
-                    justifyContent={"space-around"}
-                    alignItems={"center"}
-                    m={2}
-                  >
-                    {/* message */}
-                    <Button
-                      variant="outlined"
-                      disableElevation
-                      onClick={handleShowMessageInput}
-                      disabled={isShowMessageInput}
-                      startIcon={<Message />}
-                      sx={{ borderRadius: 5, fontWeight: "bold" }}
-                    >
-                      <Typography variant="body2">
-                        <small
-                          style={{
-                            fontSize: "small",
-                            textTransform: "capitalize",
-                          }}
-                        >
-                          Message
-                        </small>
-                      </Typography>
-                    </Button>
-
-                    {/* befriend or unfriend */}
-
-                    {isFriend ? (
-                      <Button
-                        variant="outlined"
-                        disableElevation
-                        startIcon={<PersonRemove />}
-                        disabled={isConnecting}
-                        color="warning"
-                        onClick={handleRequestUnfriend}
-                        sx={{ borderRadius: 5, fontWeight: "bold" }}
-                      >
-                        <Typography variant="body2">
-                          <small
-                            style={{
-                              fontSize: "small",
-                              textTransform: "capitalize",
-                            }}
-                          >
-                            remove
-                          </small>
-                        </Typography>
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outlined"
-                        disableElevation
-                        startIcon={<PersonAdd />}
-                        disabled={isConnecting}
-                        onClick={handleCreateConnect}
-                        sx={{ borderRadius: 5, fontWeight: "bold" }}
-                      >
-                        <Typography variant="body2">
-                          <small
-                            style={{
-                              fontSize: "small",
-                              textTransform: "capitalize",
-                            }}
-                          >
-                            Connect
-                          </small>
-                        </Typography>
-                      </Button>
-                    )}
-                  </Box>
-                </React.Fragment>
-              )}
-            </Box>
-
-            <Box display={"flex"} justifyContent={"center"} py={1}>
-              <Typography variant="caption" color="text.secondary">
-                {profileData?.about || "** No About**"}
-              </Typography>
-            </Box>
-
-            <Divider component={"div"} />
-            
-            <Box className="d-flex justify-content-center align-items-center">
-              <StyledTabs
-                value={profileSection}
-                onChange={handleChange}
-                aria-label="styled tabs"
-              >
-                {/* posts made by the user */}
-                <StyledTab
-                  label={
-                
-                 
-                    <Typography fontWeight={'bold'} variant="body2">
-                      Posts
-                    </Typography>
-                  }
-                />
-
-              {/* favorite posts */}
-              <StyledTab
-                  label={
-                                
-                    <Typography
-                     fontWeight={'bold'}
-                      variant="body2">
-                      Favorite
-                    </Typography>
-                  }
-                />
-
-                {/* user's connections of people */}
-                <StyledTab
-                  label={
-             
-                    <Typography
-                     fontWeight={'bold'}
-                      variant="body2">
-                      People
-                    </Typography>
-                  }
-                />
-
-              </StyledTabs>
-            </Box>
-
-            <Divider component={"div"} />
-
-            {/* show message input if state permits */}
-            {isShowMessageInput ? (
-              <Box
-                className="mx-1 rounded mt-2"
-                bgcolor={!isDarkMode && "whitesmoke"}
-              >
-                {/* message input */}
-                <StyledInputBase
-                  multiline
-                  fullWidth
-                  sx={{ padding: "20px" }}
-                  disabled={isConnecting}
-                  value={messageContent}
-                  onChange={(e) => setMessageContent(e.target.value)}
-                  placeholder="write message ..."
-                  inputProps={{ "aria-label": "search" }}
-                />
-                <Box display={"flex"} justifyContent={"flex-end"} mr={1}>
-                  <Box display={"flex"} gap={3} alignItems={"center"}>
-                    {/* close the message input */}
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      disabled={isConnecting}
-                      onClick={handleShowMessageInput}
-                      sx={{ borderRadius: "20px", fontSize: "10px" }}
-                    >
-                      close
-                    </Button>
-
-                    {/* send message */}
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      disabled={messageContent?.length < 1 || isConnecting}
-                      onClick={handleSendingMessage}
-                      color="success"
-                      sx={{
-                        textTransform: "capitalize",
-                        borderRadius: "20px",
-                        fontSize: "10px",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Send
-                    </Button>
-                  </Box>
-                </Box>
-              </Box>
-            ) : (
-              <React.Fragment>
-                {/* content of each tab goes here */}
-                <Box>
-                  <Suspense fallback={<div>loading...</div>}>
-                    {/* posts made by the user, and also favorite posts added by 
-                    the user 
-                    */}
-                    {(profileSection === 0 ) && (
-                      <UserPostContainDrawer
-                        userId={profileData?._id}
-                        setPostDetailedData={setPostDetailedData}
-                        setIsPostEditMode={setIsPostEditMode}
-                        setIsPostDetailedDrawer={setIsPostDetailedDrawer}
-                      />
-                    )}
-
-                    {/* show user favorite */}
-                    {profileSection === 1 && (
-                      <UserPostFavoriteContainer
-                      userId={profileData?._id}
-                      setPostDetailedData={setPostDetailedData}
-                      setIsPostEditMode={setIsPostEditMode}
-                      setIsPostDetailedDrawer={setIsPostDetailedDrawer}
-                      />
-                    )}
-
-                    {/* user network of people */}
-                    {profileSection === 2 && (
-                      <UserNetwork
-                        otherUserID={!isCurrentUser ? profileData?._id : null}
-                      />
-                    )}
-                  </Suspense>
-                </Box>
-              </React.Fragment>
-            )}
+        {/* Skills */}
+        {!isOrg && profileData?.selectedSkills?.length > 0 && (
+          <Box display="flex" justifyContent="center" mt={1.5}>
+            <SkillRow skills={profileData.selectedSkills} />
           </Box>
+        )}
+
+        {/* About */}
+        {profileData?.about && (
+          <Typography
+            sx={{
+              fontSize: 12, color: appColors.textSecondary,
+              textAlign: "center", mt: 1.5, lineHeight: 1.7,
+              display: "-webkit-box",
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {profileData.about}
+          </Typography>
+        )}
+      </Box>
+
+      {/* ━━ ACTION BUTTONS (other users only) ━━ */}
+      {!isCurrentUser && (
+        <Box
+          display="flex"
+          gap={1}
+          sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${appColors.divider}` }}
+        >
+          <ProfileActionBtn
+            icon={<MessageRounded sx={{ width: 14, height: 14 }} />}
+            label="Message"
+            onClick={handleShowMessage}
+            disabled={showMessage}
+          />
+          {isFriend ? (
+            <ProfileActionBtn
+              icon={<PersonRemoveRounded sx={{ width: 14, height: 14 }} />}
+              label="Remove"
+              onClick={handleUnfriend}
+              disabled={isConnecting}
+              variant="danger"
+            />
+          ) : (
+            <ProfileActionBtn
+              icon={<PersonAddRounded sx={{ width: 14, height: 14 }} />}
+              label="Connect"
+              onClick={handleConnect}
+              disabled={isConnecting}
+            />
+          )}
+        </Box>
       )}
 
-      {/* connect request response snackbar */}
-      {messageConnectRequestSent && (
-        <SnackbarConnect message={messageConnectRequestSent} />
+      {/* ━━ MESSAGE COMPOSER ━━ */}
+      {showMessage && (
+        <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${appColors.divider}` }}>
+          <Typography sx={{ fontSize: 10, color: appColors.textMuted, letterSpacing: "0.14em", textTransform: "uppercase", mb: 1 }}>
+            Send Message
+          </Typography>
+          <MessageComposer
+            value={messageContent}
+            onChange={(e) => setMessageContent(e.target.value)}
+            onSend={handleSendMessage}
+            onClose={handleShowMessage}
+            isSending={isConnecting}
+          />
+        </Box>
       )}
+
+      {/* ━━ TAB BAR ━━ */}
+      <Box sx={{ px: 2, pt: 1.5, pb: 1 }}>
+        <TabBar value={profileSection} onChange={setProfileSection} />
+      </Box>
+
+      {/* ━━ TAB CONTENT ━━ */}
+      <Box>
+        <Suspense
+          fallback={
+            <Box p={2} display="flex" flexDirection="column" gap={1.5}>
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} variant="rounded" height={72}
+                  sx={{ bgcolor: "rgba(255,255,255,0.05)", borderRadius: "10px" }} />
+              ))}
+            </Box>
+          }
+        >
+          {profileSection === 0 && (
+            <UserPostContainDrawer
+              userId={profileData?._id}
+              setPostDetailedData={setPostDetailedData}
+              setIsPostEditMode={setIsPostEditMode}
+              setIsPostDetailedDrawer={setIsPostDetailedDrawer}
+            />
+          )}
+          {profileSection === 1 && (
+            <UserPostFavoriteContainer
+              userId={profileData?._id}
+              setPostDetailedData={setPostDetailedData}
+              setIsPostEditMode={setIsPostEditMode}
+              setIsPostDetailedDrawer={setIsPostDetailedDrawer}
+            />
+          )}
+          {profileSection === 2 && (
+            <UserNetwork otherUserID={!isCurrentUser ? profileData?._id : null} />
+          )}
+        </Suspense>
+      </Box>
+
+      {/* Snackbar */}
+      {messageConnectRequestSent && <SnackbarConnect message={messageConnectRequestSent} />}
     </Box>
   );
 }

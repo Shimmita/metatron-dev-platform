@@ -1,59 +1,53 @@
-import { Alert, Box } from "@mui/material";
-import Fade from "@mui/material/Fade";
+import { Alert, Box, Snackbar } from "@mui/material";
 import Slide from "@mui/material/Slide";
-import Snackbar from "@mui/material/Snackbar";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 function SlideTransition(props) {
-  return <Slide {...props} direction="up" />;
+  return <Slide {...props} direction="down" />;
 }
 
 const SnackBarPostSuccess = ({ messageSnackPostTech }) => {
-  // redux states
-  const { isTabSideBar } = useSelector((state) => state.appUI);
-
   const dispatch = useDispatch();
 
-  const [state, setState] = React.useState({
-    open: true,
-    Transition: Fade,
-  });
+  const { isTabSideBar } = useSelector((state) => state.appUI);
 
-  const handleClick = (Transition) => () => {
-    setState({
-      open: messageSnackPostTech && true,
-      Transition,
-    });
-  };
+  const open = Boolean(messageSnackPostTech);
 
-  const handleClose = () => {
-    setState({
-      ...state,
-      open: false,
-    });
-    // clear the snack bar messages in the redux
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") return;
+
     dispatch(resetClearCurrentSnack());
   };
-
-  //call the fun to activate the snack
-  handleClick(SlideTransition);
 
   return (
     <Box>
       <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        TransitionComponent={SlideTransition}
         anchorOrigin={{
           vertical: "top",
-          horizontal: CustomDeviceTablet() && isTabSideBar ? "right" : "center",
+          horizontal:
+            CustomDeviceTablet() && isTabSideBar ? "right" : "center",
         }}
-        open={state.open}
-        onClose={handleClose}
-        TransitionComponent={state.Transition}
-        key={state.Transition.name}
       >
-        <Alert onClose={handleClose} severity="success" variant="filled">
+        <Alert
+          onClose={handleClose}
+          severity="success"
+          sx={{
+            borderRadius: "12px",
+            backdropFilter: "blur(12px)",
+            background: "rgba(68,183,0,0.12)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            color: "text.primary",
+            fontWeight: 600,
+            minWidth: "260px",
+          }}
+        >
           {messageSnackPostTech}
         </Alert>
       </Snackbar>

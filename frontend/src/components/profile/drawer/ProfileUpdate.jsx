@@ -11,7 +11,7 @@ import {
   FormControlLabel,
   IconButton,
   MenuItem,
-  styled,
+  Snackbar,
   Switch,
   TextField,
   Tooltip,
@@ -29,594 +29,242 @@ import SpecialisationJobs from "../../data/SpecialisationJobs";
 import BrowserCompress from "../../utilities/BrowserCompress";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import { CircularProgress, LinearProgress } from "@mui/material";
+import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
+const MAX_ABOUT = 200;
 
-let MAX_ABOUT = 200;
+const Section = ({ title, children }) => (
+  <Box mt={3}>
+    <Typography fontWeight={600} mb={1}>
+      {title}
+    </Typography>
+    <Box display="flex" flexDirection="column" gap={2}>
+      {children}
+    </Box>
+  </Box>
+);
 
 function ProfileUpdate({ user }) {
-  const [imagePreview, setImagePreview] = useState(user?.avatar);
-  const [responseMessage, setResponseMessage] = useState("");
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [openCustomTitle,setOpenCustomTitle]=useState(false)
-  // for monitoring api request status
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [about, setAbout] = useState(`${user?.about || ""}`);
-  const [selectedSkills, setSelectedSkills] = useState([
-    ...user?.selectedSkills,
-  ]);
-
-  const [specialisationTitle, setSpecialisationTitle] = useState(
-    `${user?.specialisationTitle}`
-  );
-  const [phone, setPhone] = useState(`${user?.phone}`);
-  const [country, setCountry] = useState(`${user?.country}`);
-  const [county, setCounty] = useState(`${user?.county}`);
-  const [gitHub, setGitHub] = useState(`${user?.gitHub}`);
-  const [linkedin, setLinkedin] = useState(`${user?.linkedin}`);
-  const [portfolio, setPortfolio] = useState(`${user?.portfolio}`);
-  const [oldPassword,setOldPassword]=useState("")
-  const [newPassword,setNewPassword]=useState("")
-  
-  // controls passwords toggle
-  const[togglePassword,setTogglePassword]=useState(true)
-
-  //   control the country selection
-  const [inputValue, setInputValue] = useState("");
-  const [options, setOptions] = useState(
-    AllCountries.map((val) => {
-      let country = `+${val.phone} ${val.label} (${val.code})`;
-      return country;
-    }).sort((a,b)=>a.localeCompare(b))
-  );
-
-  // redux
   const dispatch = useDispatch();
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
+  const [imagePreview, setImagePreview] = useState(user?.avatar);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [responseMessage, setResponseMessage] = useState("");
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [openCustomTitle, setOpenCustomTitle] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  //   handle file change
-  const handleFileChange = async (event) => {
-    let file = event.target.files[0];
-    // convert or compress the image
-    const compressedFile = await BrowserCompress(file);
-    // create a url for image preview
-    setImagePreview(URL.createObjectURL(compressedFile));
-    setAvatarFile(compressedFile);
-  };
+  const [about, setAbout] = useState(user?.about || "");
+  const [selectedSkills, setSelectedSkills] = useState([
+    ...(user?.selectedSkills || []),
+  ]);
+  const [specialisationTitle, setSpecialisationTitle] = useState(
+    user?.specialisationTitle || ""
+  );
 
-  const handleChange = (event, newValue) => {
-    if (newValue.length > 5) {
-      return; // Limit to 5 selections
-    }
-    setSelectedSkills(newValue);
-  };
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [country, setCountry] = useState(user?.country || "");
+  const [county, setCounty] = useState(user?.county || "");
 
-  const handleDelete = (skillToDelete) => {
-    setSelectedSkills((prevSkills) =>
-      prevSkills.filter((skill) => skill !== skillToDelete)
-    );
-  };
+  const [gitHub, setGitHub] = useState(user?.gitHub || "");
+  const [linkedin, setLinkedin] = useState(user?.linkedin || "");
+  const [portfolio, setPortfolio] = useState(user?.portfolio || "");
 
-  const handleAddNewCountry = () => {
-    if (inputValue && !options.includes(inputValue)) {
-      setOptions([...options, inputValue]);
-      setCountry(inputValue);
-      setInputValue("");
-    }
-  };
-  // clear an country
-  const handleDeleteCountry = () => {
-    setCountry(null);
-  };
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [togglePassword, setTogglePassword] = useState(true);
 
-  //   flag of country extraction
-  const handleFlagCountry = (option) => {
-    let split_res = option.split(" ");
-    return split_res[split_res.length - 1].substring(1, 3).toLowerCase();
-  };
-
-  // handle updating of the details
-  const userData = {
-    about,
-    selectedSkills,
-    specialisationTitle,
-    phone,
-    country,
-    county,
-    gitHub,
-    portfolio,
-    linkedin,
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    const compressed = await BrowserCompress(file);
+    setImagePreview(URL.createObjectURL(compressed));
+    setAvatarFile(compressed);
   };
 
   const handleUserUpdate = () => {
-    // appending old and new passwords 
+    const userData = {
+      about,
+      selectedSkills,
+      specialisationTitle,
+      phone,
+      country,
+      county,
+      gitHub,
+      portfolio,
+      linkedin,
+    };
+
     if (!togglePassword) {
-      userData.oldPassword=oldPassword
-      userData.newPassword=newPassword
+      userData.oldPassword = oldPassword;
+      userData.newPassword = newPassword;
     }
-    // set is connecting to true
-    setIsConnecting(true);
-    // if there is a file means user updating their profile image
+
     const formData = new FormData();
     formData.append("image", avatarFile);
     formData.append("user", JSON.stringify(userData));
 
-    // start the put request axios
+    setIsConnecting(true);
+
     axios
       .put(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/users/update/${user?._id}`,
         formData,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       )
       .then((res) => {
-        if (res?.data) {
-          // update current user redux
-          dispatch(updateUserCurrentUserRedux(res.data.data));
-          // update message response
-          setResponseMessage(res.data.message);
-        }
+        dispatch(updateUserCurrentUserRedux(res.data.data));
+        setResponseMessage(res.data.message);
       })
       .catch((err) => {
-        // there is an error
-        if (err?.code === "ERR_NETWORK") {
-          // update the snackbar notification of the error of connection
-          setResponseMessage("Network Error");
-          return;
-        }
-        // update the snackbar notification of error from the server
-        setResponseMessage(err?.response.data);
+        setResponseMessage(err?.response?.data || "Error");
+        setIsError(true);
       })
-      .finally(() => {
-        // set is fetching to false
-        setIsConnecting(false);
-      });
+      .finally(() => setIsConnecting(false));
   };
 
-  const handleClose = () => {
-    // clear any messages info
-    setResponseMessage("");
-  };
 
-  // handle clearing of the message
-  const handleClearMessage = () => {
-    setResponseMessage("");
-  };
-
-  // handle toggling of passwords to edit mode
-  const handleTogglePasswords=()=>{
-    setTogglePassword(prev=>!prev)
-  }
-
-
-  // handle update of the specialization change
-  const handleSpecialization=(e)=>{
-    setSpecialisationTitle(e.target.value)
-    if (e.target.value==="Zero Matched") {
-      setOpenCustomTitle(true)
-    }
-  }
 
   return (
-    <Box
-      p={1}
-      maxHeight={"90vh"}
-      sx={{
-        overflowX: "auto",
-        // Hide scrollbar for Chrome, Safari and Opera
-        "&::-webkit-scrollbar": {
-          display: "none",
-        },
-        // Hide scrollbar for IE, Edge and Firefox
-        "-ms-overflow-style": "none",
-        "scrollbar-width": "none",
-      }}
-    >
+    <Box p={2} maxHeight="90vh" sx={{ overflowY: "auto" }}>
+      {isConnecting && (
+        <LinearProgress
+          sx={{
+            mb: 2,
+            borderRadius: 2,
+            height: 4,
+          }}
+        />
+      )}
+
       <Box
-        display={"flex"}
-        gap={2}
-        py={3}
         px={CustomDeviceIsSmall() ? 1 : 3}
-        justifyContent={"center"}
-        flexDirection={"column"}
-        borderRadius={2}
-        sx={{ border: "1px solid", borderColor: "divider" }}
+        py={2}
+        sx={{
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 3,
+          background: "rgba(255,255,255,0.02)",
+        }}
       >
-        {/* display message response from the backend */}
-        {/* message from backend of connect request */}
-        {responseMessage && (
-            <Collapse in={responseMessage || false}>
-              <Alert
-                severity="info"
-                onClose={handleClose}
-                className="rounded"
-                action={
-                  <IconButton
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    onClick={handleClearMessage}
-                  >
-                    <Close fontSize="inherit" sx={{ width: 15, height: 15 }} />
-                  </IconButton>
-                }
-              >
-                {responseMessage}
-              </Alert>
-            </Collapse>
-        )}
 
-        {/* avatar image for updating */}
-        <Box
-          display={"flex"}
-          justifyContent={"center"}
-          alignItems={"center"}
-          flexDirection={"column"}
-          gap={1}
-        >
-          <Avatar
-            src={imagePreview}
-            alt={''}
-            sx={{ width: 90, height: 90 }}
-          />
-
-          {/* pick image icon button */}
-          <Button
-            component="label"
-            role={undefined}
-            variant="text"
-            size={"small"}
-            sx={{ borderRadius: 5 }}
-            tabIndex={-1}
-          >
-            change
-            <VisuallyHiddenInput
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              multiple
-            />
+        {/* AVATAR */}
+        <Box textAlign="center" mb={2}>
+          <Avatar src={imagePreview} sx={{ width: 90, height: 90, mx: "auto" }} />
+          <Button component="label" size="small">
+            Change
+            <input hidden type="file" onChange={handleFileChange} />
           </Button>
         </Box>
 
-        {/* skills avatars */}
-        <Box display={"flex"} justifyContent={"center"}>
-          {/* avatar skills */}
-          <AvatarGroup max={user?.selectedSkills?.length}>
-            {/* loop through the skills and their images matched using custom fn */}
-            {user?.selectedSkills?.map((skill, index) => (
-              <Tooltip title={skill} key={skill} arrow>
-                <Avatar
-                  alt={skill}
-                  className="border"
-                  sx={{ width: 32, height: 32 }}
-                  src={getImageMatch(skill)}
-                />
-              </Tooltip>
-            ))}
-          </AvatarGroup>
-        </Box>
+        {/* BASIC */}
+        <Section title="Basic Information">
+          <TextField label="Name" fullWidth disabled value={user?.name} />
+          <TextField label="Email" fullWidth disabled value={user?.email} />
+          <TextField label="Phone" fullWidth value={phone} onChange={(e) => setPhone(e.target.value)} />
+        </Section>
 
-        {/* skills in text */}
-        <Box
-          display={"flex"}
-          gap={1}
-          justifyContent={"center"}
-          alignItems={"center"}
-        >
-          {user?.selectedSkills?.map((skill, index) => (
-            <Typography variant="caption" key={index}>
-              {skill}
-            </Typography>
-          ))}
-        </Box>
+        {/* LOCATION */}
+        <Section title="Location">
+          <TextField label="Country" fullWidth value={country} onChange={(e) => setCountry(e.target.value)} />
+          <TextField label="County / City" fullWidth value={county} onChange={(e) => setCounty(e.target.value)} />
+        </Section>
 
-        {/* user name disabled from editing */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
+        {/* PROFESSIONAL */}
+        <Section title="Professional">
           <TextField
-            label={"Name"}
-            id="filled-basic-user-name"
-            disabled
-            fullWidth
-            value={user?.name}
-          />
-        </Box>
-
-        {/* display email */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
-          <TextField
-            label={"Email"}
-            id="filled-basic-user-email"
-            disabled
-            fullWidth
-            value={user?.email}
-          />
-        </Box>
-
-        {/* phone */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
-          <TextField
-            label={"Phone"}
-            id="filled-basic-user-phone"
-            fullWidth
-            disabled={isConnecting || responseMessage}
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </Box>
-
-        {/* country */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
-          <Autocomplete
-            disabled
-            value={country}
-            onChange={(event, newValue) => {
-              setCountry(newValue);
-            }}
-            inputValue={inputValue}
-            onInputChange={(event, newInputValue) => {
-              setInputValue(newInputValue);
-            }}
-            options={options}
-            freeSolo
-            sx={{ width: "100%" }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                disabled
-                label="Country"
-                sx={{ width: "100%" }}
-                fullWidth
-              />
-            )}
-            renderOption={(props, option) => (
-              <Typography display={"flex"} gap={1} {...props}>
-                {/* image */}
-                <img
-                  loading="lazy"
-                  width="20"
-                  srcSet={`https://flagcdn.com/w40/${handleFlagCountry(
-                    option
-                  )}.png 2x`}
-                  src={`https://flagcdn.com/w20/${handleFlagCountry(
-                    option
-                  )}.png`}
-                  alt=""
-                />
-                {/* country name */}
-                {option}
-              </Typography>
-            )}
-            renderTags={() =>
-              country ? (
-                <Chip
-                  disabled
-                  label={country}
-                  onDelete={handleDeleteCountry}
-                  deleteIcon={<CheckCircle />}
-                />
-              ) : null
-            }
-            noOptionsText={
-              <Chip
-                disabled
-                label={`Add "${inputValue}"`}
-                onClick={handleAddNewCountry}
-                icon={<CheckCircle />}
-                color="primary"
-                clickable
-              />
-            }
-          />
-        </Box>
-
-        {/* county */}
-        <Box 
-        display={"flex"} 
-        justifyContent={"center"}
-        width={"100%"} mt={1}>
-          {/* show this if country is contains kenya */}
-          {country?.trim().toLowerCase().includes("kenya") ? (
-            <TextField
-              required
-              select
-              disabled
-              id="County"
-              value={county}
-              label="County"
-              fullWidth
-              onChange={(e) => setCounty(e.target.value)}
-            >
-              {CountiesInKenya?.map((county) => (
-                  <MenuItem disabled key={county} value={county}>
-                    {county}
-                  </MenuItem>
-                ))}
-            </TextField>
-          ) : (
-            <TextField
-              required
-              id="county_state_other"
-              label="City"
-              fullWidth
-              disabled={isConnecting || responseMessage}
-              value={county}
-              onChange={(e) => setCounty(e.target.value)}
-              placeholder="my city or state"
-            />
-          )}
-        </Box>
-
-        {/* specialisation */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
-          <TextField
-            label={"Expertise"}
-            id="filled-basic-user-expertise"
-            fullWidth
             select
-            disabled={isConnecting || responseMessage}
-            value={SpecialisationJobs.filter(specialization=>specialization.includes(specialisationTitle))[0]}
-            onChange={handleSpecialization}
+            label="Expertise"
+            value={specialisationTitle}
+            onChange={(e) => setSpecialisationTitle(e.target.value)}
           >
-            {SpecialisationJobs?.map((specialisation) => (
-                  <MenuItem key={specialisation} value={specialisation}>
-                    {specialisation}
-                  </MenuItem>
-                ))}
+            {SpecialisationJobs.map((item) => (
+              <MenuItem key={item} value={item}>{item}</MenuItem>
+            ))}
           </TextField>
-        </Box>
 
-        {/* old password */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
-          <TextField
-            label={"Old Password"}
-            id="filled-basic-user-old-password"
-            fullWidth
-            disabled={isConnecting || responseMessage || togglePassword}
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-          />
-        </Box>
-
-          {/* new password */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
-          <TextField
-            label={"New Password"}
-            id="filled-basic-user-new-password"
-            fullWidth
-            disabled={isConnecting || responseMessage || togglePassword}
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
-        </Box>
-
-
-        {/* Github */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
-          <TextField
-            label={"GitHub"}
-            id="filled-basic-user-github"
-            fullWidth
-            disabled={isConnecting || responseMessage}
-            value={gitHub}
-            onChange={(e) => setGitHub(e.target.value)}
-          />
-        </Box>
-
-        {/* linkedin */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
-          <TextField
-            label={"Linkedin"}
-            id="filled-basic-user-linkedin"
-            fullWidth
-            disabled={isConnecting || responseMessage}
-            value={linkedin}
-            onChange={(e) => setLinkedin(e.target.value)}
-          />
-        </Box>
-
-        {/* portfolio */}
-        <Box display={"flex"} justifyContent={"center"} width={"100%"} mt={1}>
-          <TextField
-            label={"Website"}
-            id="filled-basic-user-portfolio"
-            fullWidth
-            disabled={isConnecting || responseMessage}
-            value={portfolio}
-            onChange={(e) => setPortfolio(e.target.value)}
-          />
-        </Box>
-
-
-        {/* skills update */}
-        <Box display={"flex"} justifyContent={"center"} mt={1}>
           <Autocomplete
             multiple
             options={AllSkills}
-            disabled={isConnecting || responseMessage}
             value={selectedSkills}
-            onChange={handleChange}
-            disableCloseOnSelect
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="outlined"
-                fullWidth
-                label="Skills"
-              />
-            )}
-            renderTags={(value, getTagProps) =>
-              value.map((skill, index) => (
-                <Chip
-                  label={skill}
-                  {...getTagProps({ index })}
-                  onDelete={() => handleDelete(skill)}
-                />
-              ))
-            }
+            onChange={(e, v) => setSelectedSkills(v)}
+            renderInput={(params) => <TextField {...params} label="Skills" />}
           />
-        </Box>
 
-        {/* about */}
-        <Box display={"flex"} justifyContent={"center"} mt={1}>
           <TextField
-            id="outlined-basic-about-text"
-            minRows={3}
-            maxRows={3}
-            error={about.length > MAX_ABOUT}
-            value={about}
-            label={`About Me ${MAX_ABOUT - about.length}`}
-            onChange={(e) => setAbout(e.target.value)}
-            fullWidth
-            disabled={isConnecting || responseMessage}
             multiline
-            variant="outlined"
+            minRows={3}
+            label={`About (${MAX_ABOUT - about.length})`}
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
+            error={about.length > MAX_ABOUT}
           />
-        </Box>
+        </Section>
 
-        {/* toggle password update */}
-        <Box ml={1}>
-        <FormControlLabel  control={<Switch size="small" onChange={handleTogglePasswords} />} label="update my password" />
-        </Box>
+        {/* LINKS */}
+        <Section title="Links">
+          <TextField label="GitHub" value={gitHub} onChange={(e) => setGitHub(e.target.value)} />
+          <TextField label="LinkedIn" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} />
+          <TextField label="Portfolio" value={portfolio} onChange={(e) => setPortfolio(e.target.value)} />
+        </Section>
 
-        {/* update button */}
-        <Box display={"flex"} justifyContent={"center"}>
-          <Button
-            disableElevation
-            startIcon={<UpdateRounded />}
-            variant="contained"
-            onClick={handleUserUpdate}
-            disabled={
-              isConnecting || responseMessage || about.length > MAX_ABOUT
-            }
-            sx={{ borderRadius: 2, width: "100%" }}
-          >
-            {" "}
-            Update Changes
-          </Button>
-        </Box>
+        {/* SECURITY */}
+        <Section title="Security">
+          <FormControlLabel
+            control={<Switch onChange={() => setTogglePassword(!togglePassword)} />}
+            label="Update Password"
+          />
+
+          {!togglePassword && (
+            <>
+              <TextField label="Old Password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+              <TextField label="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+            </>
+          )}
+        </Section>
+
+        {/* BUTTON */}
+        <Button
+          fullWidth
+          size="large"
+          disabled={isConnecting || about.length > MAX_ABOUT}
+          variant="contained"
+          startIcon={
+            isConnecting ? (
+              <CircularProgress size={16} sx={{ color: "white" }} />
+            ) : (
+              <UpdateRounded />
+            )
+          }
+          onClick={handleUserUpdate}
+          sx={{
+            mt: 3,
+            borderRadius: "12px",
+            background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+          }}
+        >
+          Save Changes
+        </Button>
       </Box>
 
-      {/* trigger show alert for custom title specialization */}
       {openCustomTitle && (
         <RegisterAlertTitle
           openAlert={openCustomTitle}
           setOpenAlert={setOpenCustomTitle}
           setSpecialisationTitle={setSpecialisationTitle}
+        />
+      )}
+
+      {/* show snackbar when there is response */}
+      {responseMessage && (
+        <MetatronSnackbar
+          open={Boolean(responseMessage)}
+          message={responseMessage}
+          isError={isError}
+          handleClose={() => {
+            setResponseMessage(null);
+            setIsError(false);
+          }}
         />
       )}
     </Box>

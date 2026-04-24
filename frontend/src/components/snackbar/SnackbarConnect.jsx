@@ -1,7 +1,5 @@
-import { Alert, Box } from "@mui/material";
-import Fade from "@mui/material/Fade";
+import { Alert, Box, Snackbar } from "@mui/material";
 import Slide from "@mui/material/Slide";
-import Snackbar from "@mui/material/Snackbar";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
@@ -12,55 +10,46 @@ function SlideTransition(props) {
 }
 
 const SnackbarConnect = ({ message, isWarning = false }) => {
-  // redux states
   const dispatch = useDispatch();
+
   const { messageConnectRequestSent } = useSelector(
     (state) => state.currentSnackBar
   );
 
-  const [state, setState] = React.useState({
-    open: message || messageConnectRequestSent ? true : false,
-    Transition: Fade,
-  });
-
-  const handleOpenSnackbar = (Transition) => () => {
-    setState({
-      open: true,
-      Transition,
-    });
-  };
+  const open = Boolean(message || messageConnectRequestSent);
+  const displayMessage = message || messageConnectRequestSent;
 
   const handleClose = () => {
-    setState({
-      ...state,
-      open: false,
-    });
-
-    // reset the redux state for snackbar which will reset snack info
     dispatch(resetClearCurrentSnack());
   };
-
-  //   call the open fun
-  handleOpenSnackbar(SlideTransition());
 
   return (
     <Box>
       <Snackbar
-        open={state.open}
+        open={open}
+        autoHideDuration={3000}
         onClose={handleClose}
-        TransitionComponent={state.Transition}
+        TransitionComponent={SlideTransition}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: CustomDeviceTablet ? "right" : "center",
+          horizontal: CustomDeviceTablet() ? "right" : "center",
         }}
-        key={state.Transition.name}
       >
         <Alert
           onClose={handleClose}
-          className="rounded"
           severity={isWarning ? "warning" : "info"}
+          sx={{
+            borderRadius: "12px",
+            backdropFilter: "blur(10px)",
+            background: isWarning
+              ? "rgba(255,193,7,0.1)"
+              : "rgba(20,210,190,0.1)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            color: "text.primary",
+            minWidth: "250px",
+          }}
         >
-          {message}
+          {displayMessage}
         </Alert>
       </Snackbar>
     </Box>

@@ -1,7 +1,5 @@
-import { Alert, Box } from "@mui/material";
-import Fade from "@mui/material/Fade";
+import { Alert, Box, Snackbar } from "@mui/material";
 import Slide from "@mui/material/Slide";
-import Snackbar from "@mui/material/Snackbar";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
@@ -12,48 +10,44 @@ function SlideTransition(props) {
 }
 
 const SnackBarSuccess = ({ message }) => {
-  // redux states
-  const { isTabSideBar } = useSelector((state) => state.appUI);
   const dispatch = useDispatch();
-  const [state, setState] = React.useState({
-    open: true,
-    Transition: Fade,
-  });
+  const { isTabSideBar } = useSelector((state) => state.appUI);
 
-  const handleOpenSnackbar = (Transition) => () => {
-    setState({
-      open: true,
-      Transition,
-    });
-  };
+  const open = Boolean(message);
 
-  const handleClose = () => {
-    setState({
-      ...state,
-      open: false,
-    });
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") return;
 
-    // reset the redux state for snackbar which will reset snack info
     dispatch(resetClearCurrentSnack());
   };
-
-  //   call the open fun
-  handleOpenSnackbar(SlideTransition());
 
   return (
     <Box>
       <Snackbar
-        open={state.open}
+        open={open}
+        autoHideDuration={3000}
         onClose={handleClose}
-        TransitionComponent={state.Transition}
+        TransitionComponent={SlideTransition}
         anchorOrigin={{
           vertical: "bottom",
-          horizontal: CustomDeviceTablet() && isTabSideBar ? "right" : "center",
+          horizontal:
+            CustomDeviceTablet() && isTabSideBar ? "right" : "center",
         }}
-        key={state.Transition.name}
       >
-        <Alert onClose={handleClose} severity="success" variant="filled">
-          {`${message}`}
+        <Alert
+          onClose={handleClose}
+          severity="success"
+          sx={{
+            borderRadius: "12px",
+            backdropFilter: "blur(12px)",
+            background: "rgba(68,183,0,0.12)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            color: "text.primary",
+            fontWeight: 600,
+            minWidth: "260px",
+          }}
+        >
+          {message}
         </Alert>
       </Snackbar>
     </Box>

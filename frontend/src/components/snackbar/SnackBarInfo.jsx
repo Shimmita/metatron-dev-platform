@@ -1,7 +1,6 @@
-import { PlayArrowRounded } from "@mui/icons-material";
-import { Box, Typography } from "@mui/material";
-import Snackbar from "@mui/material/Snackbar";
-import React, { useState } from "react";
+import { PlayArrowRounded, InfoRounded } from "@mui/icons-material";
+import { Alert, Box, Snackbar, Typography } from "@mui/material";
+import React from "react";
 import { useSelector } from "react-redux";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
@@ -13,126 +12,62 @@ const SnackBarInfo = ({
   setIsManagementSnack,
   managementMSG = "",
 }) => {
-  // redux states
   const { isTabSideBar } = useSelector((state) => state.appUI);
 
-  const [openSnackLast, setOpenSnackLast] = useState(false);
-  const [lastShown, setLastShown] = useState(false);
+  const isOpen = isManagementSnack || openSnack;
 
   const handleClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
+    if (reason === "clickaway") return;
 
-    setOpenSnack(false);
-    // open the snack last if not shown previously
-    if (!lastShown) {
-      setOpenSnackLast(true);
+    if (isManagementSnack) {
+      setIsManagementSnack(false);
+    } else {
+      setOpenSnack(false);
     }
   };
 
-  // handle closing of cert+intern info snack displya
-  const handleCLosingSnackLast = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
+  const message = isManagementSnack
+    ? managementMSG
+    : snackInfo || "Courses include completion certificates";
 
-    setOpenSnackLast(false);
-    // close the parent snack
-    setOpenSnack(false);
-    // set last is shown to true
-    setLastShown(true);
-  };
-
-  // close management snack
-  const handleCloseManagementSnack = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    // close the snack bar
-    setIsManagementSnack(false);
-  };
+  const icon = isManagementSnack ? (
+    <InfoRounded sx={{ width: 18, height: 18 }} />
+  ) : (
+    <PlayArrowRounded sx={{ width: 20, height: 20 }} />
+  );
 
   return (
-    <React.Fragment>
-      {/* for course management info */}
-      {isManagementSnack ? (
-        <Snackbar
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal:
-              CustomDeviceTablet() && isTabSideBar ? "right" : "center",
-          }}
-          open={isManagementSnack}
-          autoHideDuration={3000}
-          onClose={handleCloseManagementSnack}
-          message={
-            <Box
-              display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              gap={1}
-            >
-              <Typography variant="body2" fontWeight={"bold"}>
-                {managementMSG}
-              </Typography>
-            </Box>
-          }
-        />
-      ) : (
-        <React.Fragment>
-          {/* for course selection option and default info */}
-          {openSnackLast && !lastShown ? (
-            <Snackbar
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal:
-                  CustomDeviceTablet() && isTabSideBar ? "right" : "center",
-              }}
-              open={openSnackLast}
-              autoHideDuration={3000}
-              onClose={handleCLosingSnackLast}
-              message={
-                <Box
-                  display={"flex"}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                  gap={1}
-                >
-                  <Typography variant="body2" fontWeight={"bold"}>
-                    paid courses have certficate of completion
-                  </Typography>
-                </Box>
-              }
-            />
-          ) : (
-            <Snackbar
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal:
-                  CustomDeviceTablet() && isTabSideBar ? "right" : "center",
-              }}
-              open={openSnack}
-              autoHideDuration={4000}
-              onClose={handleClose}
-              message={
-                <Box
-                  display={"flex"}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                  gap={1}
-                >
-                  <PlayArrowRounded sx={{ width: 20, height: 20 }} />
-                  <Typography variant="body2" fontWeight={"bold"}>
-                    {snackInfo}
-                  </Typography>
-                </Box>
-              }
-            />
-          )}
-        </React.Fragment>
-      )}
-    </React.Fragment>
+    <Snackbar
+      open={isOpen}
+      autoHideDuration={3500}
+      onClose={handleClose}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal:
+          CustomDeviceTablet() && isTabSideBar ? "right" : "center",
+      }}
+    >
+      <Alert
+        onClose={handleClose}
+        severity="info"
+        icon={icon}
+        sx={{
+          borderRadius: "12px",
+          backdropFilter: "blur(12px)",
+          background: "rgba(20,210,190,0.1)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          color: "text.primary",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <Box display="flex" alignItems="center" gap={1}>
+          <Typography fontSize={13} fontWeight={600}>
+            {message}
+          </Typography>
+        </Box>
+      </Alert>
+    </Snackbar>
   );
 };
 

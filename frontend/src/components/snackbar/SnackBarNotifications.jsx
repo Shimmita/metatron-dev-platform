@@ -1,7 +1,5 @@
-import { Alert, Box } from "@mui/material";
-import Fade from "@mui/material/Fade";
+import { Alert, Box, Snackbar } from "@mui/material";
 import Slide from "@mui/material/Slide";
-import Snackbar from "@mui/material/Snackbar";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
@@ -10,50 +8,46 @@ function SlideTransition(props) {
   return <Slide {...props} direction="up" />;
 }
 
-const SnackBarNotifications = ({ message, isWarning = false }) => {
-  // redux states
+const SnackBarNotifications = ({
+  message,
+  isWarning = false,
+}) => {
   const dispatch = useDispatch();
-  const [state, setState] = React.useState({
-    open: message ? true : false,
-    Transition: Fade,
-  });
 
-  const handleOpenSnackbar = (Transition) => () => {
-    setState({
-      open: true,
-      Transition,
-    });
-  };
+  const open = Boolean(message);
 
-  const handleClose = () => {
-    setState({
-      ...state,
-      open: false,
-    });
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") return;
 
-    // reset the redux state for snackbar which will reset snack info
     dispatch(resetClearCurrentSnack());
   };
-
-  //   call the open fun
-  handleOpenSnackbar(SlideTransition());
 
   return (
     <Box>
       <Snackbar
-        open={state.open}
+        open={open}
+        autoHideDuration={3000}
         onClose={handleClose}
-        TransitionComponent={state.Transition}
+        TransitionComponent={SlideTransition}
         anchorOrigin={{
           vertical: "bottom",
           horizontal: "right",
         }}
-        key={state.Transition.name}
       >
         <Alert
           onClose={handleClose}
-          className="rounded"
           severity={isWarning ? "warning" : "info"}
+          sx={{
+            borderRadius: "12px",
+            backdropFilter: "blur(12px)",
+            background: isWarning
+              ? "rgba(255,193,7,0.12)"
+              : "rgba(20,210,190,0.12)",
+            border: "1px solid rgba(255,255,255,0.12)",
+            color: "text.primary",
+            minWidth: "260px",
+            fontWeight: 500,
+          }}
         >
           {message}
         </Alert>

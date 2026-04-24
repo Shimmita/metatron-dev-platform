@@ -3,7 +3,7 @@ import {
   Box,
   CircularProgress,
   Collapse,
-  IconButton,
+  Button,
   LinearProgress,
   Stack,
   Typography,
@@ -15,218 +15,152 @@ import { useDispatch, useSelector } from "react-redux";
 import { resetClearCurrentPosts } from "../../redux/CurrentPosts";
 import { updateMessageConnectRequest } from "../../redux/CurrentSnackBar";
 import SnackbarConnect from "../snackbar/SnackbarConnect";
-import "./UserPost.css";
 import UserPostCard from "./UserPostCard";
 
 function UserPostContainer({ userId, setPostDetailedData, setIsPostEditMode }) {
   const [isFetching, setIsFetching] = useState(true);
-  const [postsData, setPostsData] = useState();
+  const [postsData, setPostsData] = useState([]);
   const [erroMessage, setErrorMesssage] = useState("");
 
   const [showDeleteALert, setShowDeleteAlert] = useState(false);
   const [deletePostID, setDeletePostID] = useState();
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // redux states
   const { user } = useSelector((state) => state.currentUser);
-
-  const { messageConnectRequestSent } = useSelector(
-    (state) => state.currentSnackBar
-  );
-  // dispatch for redux to emit actions and store update
+  const { messageConnectRequestSent } = useSelector((state) => state.currentSnackBar);
   const dispatch = useDispatch();
 
-  // axios default credentials
-  axios.defaults.withCredentials = true;
   useEffect(() => {
-    // fetch details of the liked or reacted user based on their id
+    let isMounted = true;
+    setIsFetching(true);
+    
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/users/all/${userId}`, {
-        withCredentials: true,
-      })
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/users/all/${userId}`)
       .then((res) => {
-        if (res?.data) {
-          setPostsData(res.data);
-        }
+        if (res?.data && isMounted) setPostsData(res.data);
       })
       .catch((err) => {
-        // there is an error
-        if (err?.code === "ERR_NETWORK") {
-          // update the snackbar notification of the error of connection
-          setErrorMesssage("Network Error");
-          return;
-        }
-        // update the snackbar notification of error from the server
-        setErrorMesssage(err?.response.data);
+        if (!isMounted) return;
+        setErrorMesssage(err?.code === "ERR_NETWORK" ? "Metatron Link Failure" : "Access Denied");
       })
       .finally(() => {
-        // set is fetching to false
-        setIsFetching(false);
+        if (isMounted) setIsFetching(false);
       });
+
+    return () => { isMounted = false; };
   }, [userId]);
 
-  // complete post deletion, user agreed
   const handleCompletePostDelete = () => {
     setIsDeleting(true);
-    // delete the post by passing userId and postdID for further
-    // backend validation
     axios
-      .delete(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/delete/${user?._id}/${deletePostID}`,
-        {
-          withCredentials: true,
-        }
-      )
+      .delete(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/delete/${user?._id}/${deletePostID}`)
       .then((res) => {
         if (res?.data) {
-          // set post data to null for useEffect will re-render
-          setPostsData();
-
-          // update redux snack notfication message
+          // Filter local state for immediate UI feedback
+          setPostsData((prev) => prev.filter(p => p._id !== deletePostID));
           dispatch(updateMessageConnectRequest(res.data));
-
-          // update the redux of current posts suppose the post is present
-          // in the feed.
           dispatch(resetClearCurrentPosts());
         }
       })
       .catch((err) => {
-        if (err?.code === "ERR_NETWORK") {
-          dispatch(
-            updateMessageConnectRequest(
-              "server is unreachable check your internet"
-            )
-          );
-          return;
-        }
-        dispatch(updateMessageConnectRequest(err?.response?.data));
+        const msg = err?.code === "ERR_NETWORK" ? "Server unreachable" : "Delete failed";
+        dispatch(updateMessageConnectRequest(msg));
       })
       .finally(() => {
-        // set is fetching to false
         setIsDeleting(false);
-        //set showing delete alert false
-
         setShowDeleteAlert(false);
+        setDeletePostID(null);
       });
   };
 
-  // handle close alert delete
-  const handleClose = () => {
-    // close alert
-    setShowDeleteAlert(false);
-    // clear postID
-    setDeletePostID();
-  };
-
   return (
-    <React.Fragment>
-      {/* display delete confirmation when user owning post inquires deletion */}
-      <Box display={"flex"} justifyContent={"center"} p={1} mb={1}>
-        {showDeleteALert && (
-          <Collapse in={showDeleteALert || false}>
-            <Alert
-              severity="warning"
-              className="rounded-5"
-              action={
-                <Stack direction={"row"} alignItems={"center"} gap={1}>
-                  {/* yes btn */}
-                  <IconButton
-                    aria-label="close"
-                    color="inherit"
-                    disabled={isDeleting}
-                    size="small"
-                    onClick={handleCompletePostDelete}
-                  >
-                    <Typography
-                      variant="body2"
-                      color={"error"}
-                      fontWeight={"bold"}
-                    >
-                      Yes
-                    </Typography>
-                  </IconButton>
-                  |{/* no btn */}
-                  <IconButton
-                    aria-label="close"
-                    color="inherit"
-                    size="small"
-                    disabled={isDeleting}
-                    onClick={handleClose}
-                  >
-                    <Typography
-                      variant="body2"
-                      color={"inherit"}
-                      fontWeight={"bold"}
-                    >
-                      No
-                    </Typography>
-                  </IconButton>
-                </Stack>
-              }
-            >
-            <Box mb={1}>{isDeleting ? "Deleting...":"Delete ?"}</Box> 
-              {/* show progress when is deleting */}
-              {isDeleting && <LinearProgress color="inherit" />}
-            </Alert>
-          </Collapse>
-        )}
+    <Box sx={{ width: "100%", mt: 2 }}>
+      {/* ─── Deletion Confirmation Overlay ─── */}
+      <Box display={"flex"} justifyContent={"center"} sx={{ width: "100%", mb: 2 }}>
+        <Collapse in={showDeleteALert} sx={{ width: "100%", maxWidth: "500px" }}>
+          <Alert
+            severity="warning"
+            sx={{
+              background: "rgba(245, 158, 11, 0.1)",
+              border: "1px solid",
+              borderColor: "warning.main",
+              backdropFilter: "blur(10px)",
+              color: "text.primary",
+              borderRadius: "12px",
+            }}
+            action={
+              <Stack direction="row" spacing={1}>
+                <Button 
+                  size="small" 
+                  color="error" 
+                  variant="contained"
+                  disabled={isDeleting}
+                  onClick={handleCompletePostDelete}
+                  sx={{ fontWeight: 700, borderRadius: '8px' }}
+                >
+                  Confirm
+                </Button>
+                <Button 
+                  size="small" 
+                  color="inherit" 
+                  disabled={isDeleting}
+                  onClick={() => setShowDeleteAlert(false)}
+                >
+                  Abort
+                </Button>
+              </Stack>
+            }
+          >
+            <Typography variant="body2" fontWeight={600}>
+              {isDeleting ? "WIPING DATA..." : "PERMANENTLY DELETE POST?"}
+            </Typography>
+            {isDeleting && <LinearProgress color="warning" sx={{ mt: 1, height: 2, borderRadius: 1 }} />}
+          </Alert>
+        </Collapse>
       </Box>
 
-      <Box className="post-card-container">
-        {/* displayed when there is an error of request */}
-        {erroMessage && (
-          <Box width={"100%"}>
-            <Typography
-              mt={"8rem"}
-              textAlign={"center"}
-              fontWeight={"bold"}
-              color={"text.secondary"}
-              variant="body2"
-            >
-              {erroMessage}
+      {/* ─── Main Content Grid ─── */}
+      <Box 
+        sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
+          gap: 2,
+          px: 1 
+        }}
+      >
+        {isFetching ? (
+          <Box gridColumn="1 / -1" py={10} textAlign="center">
+            <CircularProgress size={30} sx={{ color: "primary.main" }} />
+            <Typography variant="body2" sx={{ mt: 2, color: "text.secondary", letterSpacing: 2 }}>
+              INITIALIZING SECTOR...
             </Typography>
           </Box>
-        )}
-        {/* displayed when fetching process is ongoing */}
-        {isFetching && (
-          <Box width={"100%"}>
-            <Box mt={8} display={"flex"} justifyContent={"center"}>
-              {/* progressbar */}
-              <CircularProgress size={"20px"} />
-              <Typography
-                mt={1}
-                textAlign={"center"}
-                fontWeight={"bold"}
-                color={"text.secondary"}
-                variant="body2"
-              >
-                loading
-              </Typography>
-            </Box>
+        ) : erroMessage ? (
+          <Box gridColumn="1 / -1" py={10} textAlign="center">
+            <Typography color="error" variant="body2" fontWeight={700}>
+              {erroMessage.toUpperCase()}
+            </Typography>
           </Box>
+        ) : (
+          postsData?.map((post) => (
+            <UserPostCard
+              key={post?._id}
+              post={post}
+              setPostDetailedData={setPostDetailedData}
+              setDeletePostID={setDeletePostID}
+              setShowDeleteAlert={setShowDeleteAlert}
+              deletePostID={deletePostID}
+              setIsPostEditMode={setIsPostEditMode}
+            />
+          ))
         )}
-
-        {/* rendered when there is data only */}
-        { postsData?.map((post) => (
-            <Box key={post?.id}>
-              <UserPostCard
-                post={post}
-                setPostDetailedData={setPostDetailedData}
-                setDeletePostID={setDeletePostID}
-                setShowDeleteAlert={setShowDeleteAlert}
-                deletePostID={deletePostID}
-                setIsPostEditMode={setIsPostEditMode}
-              />
-            </Box>
-          ))}
-
       </Box>
 
-      {/* show snack bar of any response of deletion, using snack connect */}
+      {/* ─── Footer Notifications ─── */}
       {messageConnectRequestSent && (
         <SnackbarConnect message={messageConnectRequestSent} />
       )}
-    </React.Fragment>
+    </Box>
   );
 }
 

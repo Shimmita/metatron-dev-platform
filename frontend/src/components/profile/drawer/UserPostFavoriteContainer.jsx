@@ -13,7 +13,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { resetClearCurrentPosts } from "../../../redux/CurrentPosts";
 import { updateMessageConnectRequest } from "../../../redux/CurrentSnackBar";
 import SnackbarConnect from "../../snackbar/SnackbarConnect";
-import "../UserPost.css";
 import UserPostCardDrawer from "./UserPostCardDrawer";
 
 function UserPostFavoriteContainer({
@@ -221,7 +220,7 @@ function UserPostFavoriteContainer({
           </Collapse>
         )}
       </Box>
-      <Box className="post-card-container">
+      <Box>
         {/* displayed when there is an error of request */}
         {errorMessage && (
           <Box width={"100%"}>

@@ -16,22 +16,34 @@ import AppLogo from "./images/logo_sm.png";
 import { appGradients } from "./utils/colors";
 import getAppTheme from "./utils/theme";
 import { RotatingLines } from "react-loader-spinner";
-const CertificateVerification = lazy(() => import("./components/auth/CertificateVerification"));
+
+/* LAZY */
+const CertificateVerification = lazy(() =>
+  import("./components/auth/CertificateVerification")
+);
 const RegPersonalCompletion = lazy(() =>
   import("./components/auth/RegPersonalCompletion")
 );
-const RecoverAuthLazy = lazy(() => import("./components/auth/RecoverAuth"));
+const RecoverAuthLazy = lazy(() =>
+  import("./components/auth/RecoverAuth")
+);
 const RegistrationAuthLazy = lazy(() =>
   import("./components/auth/RegistrationAuth")
 );
-const EmailVerificationAuth = lazy(() => import("./components/auth/EmailVerification"))
+const EmailVerificationAuth = lazy(() =>
+  import("./components/auth/EmailVerification")
+);
 
 const App = () => {
-  const theme = getAppTheme();
+  const { currentMode } = useSelector((state) => state.appUI);
+
+  const theme = getAppTheme(currentMode);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+
+      {/* GLOBAL STYLES */}
       <GlobalStyles
         styles={{
           "html, body, #root": {
@@ -39,78 +51,29 @@ const App = () => {
             overflowX: "hidden",
           },
           body: {
-            backgroundColor: theme.palette.background.default,
+            background:
+              theme.palette.mode === "dark"
+                ? theme.palette.background.default
+                : appGradients.soft,
             color: theme.palette.text.primary,
             minHeight: "100vh",
             scrollbarWidth: "none",
-            msOverflowStyle: "none",
-          },
-          "*": {
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
           },
           "*::-webkit-scrollbar": {
-            width: 0,
-            height: 0,
             display: "none",
           },
           "::selection": {
-            backgroundColor: theme.palette.primary.light,
-            color: "#ffffff",
+            backgroundColor: theme.palette.primary.main,
+            color: "#fff",
           },
         }}
       />
 
-      <Box
-        sx={{
-          bgcolor: theme.palette.background.default,
-          color: theme.palette.text.primary,
-        }}>
-        {/* error boundary to catch errors from lazily loaded components */}
-        <Suspense
-          fallback={
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 1,
-                flexDirection: "column",
-                minHeight: "100vh",
-                bgcolor: theme.palette.mode === "dark" ? theme.palette.background.default : appGradients.soft,
-                color: theme.palette.text.primary,
-                p: 2,
-              }}
-            >
-
-              <Avatar
-                sx={{ width: 100, height: 100 }}
-                src={AppLogo}
-                alt=""
-              />
-
-              <Typography
-                color={"primary"}
-                gutterBottom
-                variant="h4"
-                fontWeight={"bold"}
-              >
-                METATRON
-              </Typography>
-              <Box
-                display={"flex"}
-                justifyContent={"center"}>
-                <RotatingLines width={36} strokeColor="#14D2BE" />
-
-              </Box>
-
-            </Box>
-          }
-        >
-
+      {/* APP ROOT */}
+      <Box minHeight="100vh">
+        <Suspense fallback={<AppLoader theme={theme} />}>
           <Routes>
             <Route
-              exact
               path="/*"
               element={
                 <GuestCheck>
@@ -119,51 +82,62 @@ const App = () => {
               }
             />
 
-            {/* login route */}
+            <Route path="/auth/login" element={<LoginAuth />} />
             <Route
-              exact
-              path="/auth/login"
-              element={<LoginAuth />}
-            />
-            <Route
-              exact
-              path={"/auth/register/personal"}
+              path="/auth/register/personal"
               element={<RegistrationAuthLazy />}
             />
-            {/* completion of reg for a user/ac signing with auth provider */}
             <Route
-              exact
-              path={"/auth/register/personal/completion"}
+              path="/auth/register/personal/completion"
               element={<RegPersonalCompletion />}
             />
-
-            {/* email verification */}
             <Route
-              exact
-              path={"/auth/verification"}
+              path="/auth/verification"
               element={<EmailVerificationAuth />}
             />
-
-            {/* account recovery, forgot password route */}
-            <Route
-              exact
-              path={"/auth/recover"}
-              element={<RecoverAuthLazy />}
-            />
-
-            {/* cert verification */}
-            <Route
-              exact
-              path="/cert/verify"
-              element={
-                <CertificateVerification />
-              }
-            />
+            <Route path="/auth/recover" element={<RecoverAuthLazy />} />
+            <Route path="/cert/verify" element={<CertificateVerification />} />
           </Routes>
         </Suspense>
       </Box>
     </ThemeProvider>
   );
 };
+
+const AppLoader = ({ theme }) => (
+  <Box
+    display="flex"
+    alignItems="center"
+    justifyContent="center"
+    flexDirection="column"
+    minHeight="100vh"
+    sx={{
+      background:
+        theme.palette.mode === "dark"
+          ? theme.palette.background.default
+          : appGradients.soft,
+      gap: 2,
+    }}
+  >
+    <Avatar
+      src={AppLogo}
+      sx={{
+        width: 90,
+        height: 90,
+        boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+      }}
+    />
+
+    <Typography fontWeight={700} color="primary" variant="h4">
+      METATRON
+    </Typography>
+
+    <Typography fontSize={13} color="text.secondary">
+      Initializing Platform...
+    </Typography>
+
+    <RotatingLines width={40} strokeColor="#14D2BE" />
+  </Box>
+);
 
 export default App;
