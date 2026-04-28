@@ -414,7 +414,7 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
           // close the current modal
           setOpenModalCourse(false);
           // navigate to home route by default
-          navigate("/");
+          navigate("/explore");
 
         })
         .catch(async (err) => {

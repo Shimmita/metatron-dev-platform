@@ -1,10 +1,7 @@
 import {
   BoltRounded,
-  CheckCircleRounded,
   Close,
   CloudUploadRounded,
-  Done,
-  DownloadForOfflineRounded,
   LockRounded
 } from "@mui/icons-material";
 import {
@@ -12,20 +9,17 @@ import {
   Avatar,
   Box,
   Button,
+  Chip,
   CircularProgress,
-  Collapse,
-  Divider,
-  FormHelperText,
   IconButton,
   Modal,
   Stack,
   styled,
-  Tooltip,
   Typography,
-  useTheme,
+  useTheme
 } from "@mui/material";
 import axios from "axios";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
@@ -33,7 +27,6 @@ import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
 import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import CustomCountryName from "../utilities/CustomCountryName";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
@@ -73,7 +66,7 @@ const HeaderBar = styled(Box)(({ theme }) => ({
 const SectionCard = styled(Box)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
   border: `1px solid ${theme.palette.divider}`,
-  borderRadius: 0,
+  borderRadius: theme.shape.borderRadius,
   padding: theme.spacing(2),
   marginBottom: theme.spacing(2),
   boxShadow: theme.palette.mode === 'dark'
@@ -83,13 +76,11 @@ const SectionCard = styled(Box)(({ theme }) => ({
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
   marginBottom: theme.spacing(1),
-  fontWeight: 700,
   backgroundColor: theme.palette.primary.main,
   color: theme.palette.primary.contrastText,
   padding: theme.spacing(0.5, 1),
   borderRadius: theme.shape.borderRadius,
   display: 'inline-block',
-  fontSize: '0.9rem',
 }));
 
 
@@ -105,26 +96,26 @@ const ApplyJobModal = ({
   salary,
   skills,
   location,
-  isPreview=false,
-  isMyJob=false,
-  whitelist=""
-  
+  isPreview = false,
+  isMyJob = false,
+  whitelist = ""
+
 }) => {
   const { user } = useSelector((state) => state.currentUser);
   const [cvUpload, setCvUpload] = useState();
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [currentButton,setCurrentButton]=useState(user?.cvLink==="" ? 0:1)
+  const [currentButton, setCurrentButton] = useState(user?.cvLink === "" ? 0 : 1)
 
   // extract cvLink and name it cvName
-  const cvName=user?.cvLink || ""
+  const cvName = user?.cvLink || ""
   // redux states
   const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
-  const isDarkMode=currentMode==='dark'
+  const isDarkMode = currentMode === 'dark'
   const theme = useTheme();
   const dispatch = useDispatch();
 
- const handleCountryJob = (job) => {
+  const handleCountryJob = (job) => {
     const parent = job.split(" ");
     const finalName =
       parent.length > 2 ? `${parent[0]} ${parent[1]}` : parent[0];
@@ -133,23 +124,23 @@ const ApplyJobModal = ({
   };
 
   // based on the whitelist job filter, show/hide action btns
-  const isEligible=
-  whitelist==="All" ||
-  whitelist===""  ||
-  handleCountryJob(whitelist)===CustomCountryName(user?.country)
+  const isEligible =
+    whitelist === "All" ||
+    whitelist === "" ||
+    handleCountryJob(whitelist) === CustomCountryName(user?.country)
 
   // handle cv file change, upload it to the backend
   const handleCVFile = (event) => {
     // updating file for state tracking
     setCvUpload(event.target.files[0]);
     // formData
-    const formData=new FormData()
-    formData.append("file",event.target.files[0])
+    const formData = new FormData()
+    formData.append("file", event.target.files[0])
 
     // uploading status
     setIsUploading(true)
 
-     // performing post request
+    // performing post request
     axios
       .post(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/cv/upload/${user?._id}`,
@@ -189,69 +180,69 @@ const ApplyJobModal = ({
   };
 
   // handle current cv btn selection
-  const handleCurrentCv=()=>{
+  const handleCurrentCv = () => {
     setCurrentButton(1)
   }
 
   // handle current btn view cv
-  const handleDownloadCv=()=>{
+  const handleDownloadCv = () => {
     // update focused btn
     setCurrentButton(2)
 
     // uploading status
     setIsUploading(true)
-    
-      axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/cv/my/download`,{cvName}, {
-                  withCredentials: true,
-          })
-          .then((res) => {
-            // open new window to download the pdf separately
-            window.open(res.data,"_blank_")
-          })
-          .catch(async (err) => {
 
-            //  user login session expired show logout alert
-            if (err?.response?.data.login) {
-              window.location.reload();
-            }
-            if (err?.code === "ERR_NETWORK") {
-              setErrorMessage(
-                "server unreachable"
-              );
-              return;
-            }
-            setErrorMessage(err?.response.data);
-          })
-          .finally(() => {
-            setIsUploading(false);
-          });
+    axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/cv/my/download`, { cvName }, {
+      withCredentials: true,
+    })
+      .then((res) => {
+        // open new window to download the pdf separately
+        window.open(res.data, "_blank_")
+      })
+      .catch(async (err) => {
+
+        //  user login session expired show logout alert
+        if (err?.response?.data.login) {
+          window.location.reload();
+        }
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage(
+            "server unreachable"
+          );
+          return;
+        }
+        setErrorMessage(err?.response.data);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
 
   }
 
- 
+
   // handle uploading of the application document
   const handleJobApplication = () => {
 
-      // clear any error message
+    // clear any error message
     setErrorMessage("");
 
     // creating a jobItem object
-      const jobItem = {
-        jobID,
-        cvName,
-        applicant: {
-          name: user.name,
-          applicantID: user._id,
-          gender: user.gender,
-          country: user.country,
-        },
-      };
+    const jobItem = {
+      jobID,
+      cvName,
+      applicant: {
+        name: user.name,
+        applicantID: user._id,
+        gender: user.gender,
+        country: user.country,
+      },
+    };
 
- 
+
     // set is uploading true
     setIsUploading(true);
-   
- 
+
+
     // performing post request
     axios
       .post(
@@ -270,7 +261,7 @@ const ApplyJobModal = ({
         dispatch(updateCurrentSnackBar(res.data));
 
         // update success redux to trigger alert success
-        dispatch(updateCurrentSuccessRedux({title:'Job Application',message:`${res.data} job recruiter will review your application and provide feedback`}))
+        dispatch(updateCurrentSuccessRedux({ title: 'Job Application', message: `${res.data} job recruiter will review your application and provide feedback` }))
 
         // close the currently displayed modal
         handleClosingModal();
@@ -302,46 +293,56 @@ const ApplyJobModal = ({
   const handleCountryName = () => {
     const parent = location?.country?.split(" ");
     const countryCode = parent?.pop();
-    const finalName = parent?.length > 2? `${parent[0]} ${parent[1]} ${countryCode}` : location?.country;
-    
+    const finalName = parent?.length > 2 ? `${parent[0]} ${parent[1]} ${countryCode}` : location?.country;
+
     return finalName.split("(")[0];
   };
 
 
   // handle showing of website iframe
-  const handleShowWebsite=()=>{
+  const handleShowWebsite = () => {
     window.open(websiteLink, "_blank")
     // close the modal
     setOpenApplyJobModal(false)
   }
 
- // handle calculation of skills percentage 
-    const handleSkillsPercentage=()=>{
-      const userSkills=user?.selectedSkills || []
-      let results=0
+  // handle calculation of skills percentage 
+  const handleSkillsPercentage = () => {
+    const userSkills = user?.selectedSkills || []
+    let results = 0
 
-      // loop through user skill
-      for (const userSkill of userSkills) {
-        if (skills.includes(userSkill)) {
-          results=results+1
-        }
+    // loop through user skill
+    for (const userSkill of userSkills) {
+      if (skills.includes(userSkill)) {
+        results = results + 1
       }
-
-    return Math.ceil(results/skills.length*100)
-      
     }
+
+    return Math.ceil(results / skills.length * 100)
+
+  }
 
 
   // handle return width modal
-  const handleReturnWidthModal=()=>{
-    if (CustomLandScape() ||CustomLandscapeWidest() || 
-    (CustomDeviceTablet() && !isTabSideBar)) {
+  const handleReturnWidthModal = () => {
+    if (CustomLandScape() || CustomLandscapeWidest() ||
+      (CustomDeviceTablet() && !isTabSideBar)) {
       return "40%"
-    } else if (CustomDeviceTablet()){
+    } else if (CustomDeviceTablet()) {
       return "90%"
-    } 
+    }
     return "95%"
   }
+
+
+  const Section = ({ title, children }) => (
+    <Box>
+      <Typography fontWeight={700} mb={1}>
+        {title}
+      </Typography>
+      {children}
+    </Box>
+  );
 
 
 
@@ -349,469 +350,276 @@ const ApplyJobModal = ({
     <StyledModalJob
       keepMounted
       open={openApplyJobModal}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
+      onClose={handleClosingModal}
       sx={{
-        backdropFilter:'blur(5px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backdropFilter: 'blur(12px)',
+        p: { xs: 1, sm: 2 }, // Added padding for small screens
       }}
     >
       <Box
-        width={handleReturnWidthModal()}
-        borderRadius={3}
-        color={"text.primary"}
         sx={{
-          border:  "1px solid gray",
-          borderColor:'divider',
-          borderTopLeftRadius: theme.shape.borderRadius,
-          borderTopRightRadius: theme.shape.borderRadius,
+          width: '100%',
+          maxWidth: '520px', // Slightly wider for better text flow
+          height: { xs: '100%', sm: 'auto' }, // Full screen on mobile, auto on desktop
+          maxHeight: { xs: '100vh', sm: '90vh' },
+          bgcolor: isDarkMode ? 'rgba(13, 20, 32, 0.95)' : '#fff',
+          backdropFilter: 'blur(25px)',
+          borderRadius: { xs: 0, sm: 4 }, // Flat on mobile for more space
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.6)',
           overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <Box
-          bgcolor={"background.default"}
-          className="shadow-lg"
-          sx={{ 
-          border:  "1px solid gray",
-          borderColor:'divider',
-          }}
-        >
-          <HeaderBar>
-            {/* logo */}
-            <Box>
-              <Avatar sx={{ width: 50, height: 50 }} src={AppLogo} alt="logo" />
+        {/* ─── HEADER: Identity & Metadata ─── */}
+        <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'rgba(255,255,255,0.01)' }}>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Avatar
+              src={organisation.logo || AppLogo}
+              variant="rounded"
+              sx={{
+                width: 56,
+                height: 56,
+                borderRadius: 2.5,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: '0 8px 20px rgba(0,0,0,0.2)'
+              }}
+            />
+
+            <Box flex={1} minWidth={0}>
+              <Typography variant="body1" fontWeight={800} noWrap sx={{ letterSpacing: '-0.01em' }}>
+                {title}
+              </Typography>
+              <Typography variant="caption" color="primary" fontWeight={800} sx={{ display: 'block', mt: -0.2 }}>
+                {organisation.name}
+              </Typography>
+              <Typography variant="caption" sx={{ opacity: 0.6, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                {salary} P.M • {location.state}
+              </Typography>
             </Box>
 
-            {/*  title job application form */}
-            <Box display={'flex'} justifyContent={'center'} alignItems={'center'} flexDirection={'column'}>
-            <Typography variant="body1" fontWeight={"bold"}>
-              {title}
-            </Typography>
-
-             {/* org name */}
-          <Typography
-            variant="body2"
-            color={"text.secondary"}
-            textAlign={"center"}
-            gutterBottom
-          >
-            {organisation.name}
-          </Typography>
-
-           {/* salary */}
-           <Typography
-                variant="body2"
-                display={"flex"}
-                gutterBottom
-                color={"text.secondary"}
-                sx={{fontSize:'small' }}
-              >
-               {salary} P.M
-              </Typography>
-
-            <Typography
-                variant="caption"
-                display={"flex"}
-                gutterBottom
-                color={"text.secondary"}
-              >
-                {jobaccesstype?.type} | {jobaccesstype?.access} |  {location.state} | {handleCountryName()}
-              </Typography>
-
-            </Box>
-
-            {/*close icon */}
-             <Tooltip 
-              title={"close"}>
             <IconButton
               onClick={handleClosingModal}
-              disabled={isUploading || errorMessage}
-               sx={{
-                border:'1px solid',
-                borderColor:'divider',
-              }}
+              size="small"
+              sx={{ alignSelf: 'flex-start', bgcolor: 'action.hover' }}
             >
-                <Close  
-                sx={{ 
-                  width:12,
-                  height:12,
-                }}
-                />
+              <Close sx={{ fontSize: 18 }} />
             </IconButton>
-              </Tooltip>
-          </HeaderBar>
+          </Stack>
 
+          <Stack direction="row" spacing={1} justifyContent="center" mt={1.5} flexWrap="wrap" gap={1}>
+            {[jobaccesstype?.type, jobaccesstype?.access, handleCountryName()].map((tag) => (
+              <Box key={tag} sx={{ px: 1, py: 0.2, borderRadius: 1, bgcolor: 'rgba(20, 210, 190, 0.1)', border: '1px solid rgba(20, 210, 190, 0.2)' }}>
+                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, color: '#14D2BE' }}>{tag}</Typography>
+              </Box>
+            ))}
+          </Stack>
+        </Box>
 
-          {/* display error of missing filed if any */}
-
-          {(errorMessage || isUploading) && (
-            <Box
-            mt={1}
-            display={"flex"}
-            justifyContent={"center"}
-            mb={isUploading || errorMessage ? 1 : undefined}
-          >
-            {errorMessage && (
-              <Collapse in={errorMessage || false}>
-              <Alert
-                severity="info"
-                onClick={() => setErrorMessage("")}
-                className="rounded"
-                action={
-                  <IconButton aria-label="close" color="inherit" size="small">
-                    <Close fontSize="inherit" />
-                  </IconButton>
-                }
-              >
-                <FormHelperText>{errorMessage}</FormHelperText>
-              </Alert>
-            </Collapse>
-          )}
-
-            {isUploading && (
+        {/* ─── SCROLLABLE INTELLIGENCE ─── */}
+        <Box
+          sx={{
+            flex: 1,
+            overflowY: 'auto',
+            px: 2.5,
+            py: 2,
+            '&::-webkit-scrollbar': { width: '4px' },
+            '&::-webkit-scrollbar-thumb': { bgcolor: 'divider', borderRadius: '10px' },
+          }}
+        >
+          <Stack spacing={3}>
+            {/* Status Alerts */}
+            {(errorMessage || isUploading) && (
               <Box>
-              <CircularProgress size={"25px"} />
-            </Box>
-            )}
-            
-          </Box>
-          )}
-
-          {/* divider */}
-          <Divider className="p-1" component={'div'}/>
-        
-          <Box
-            mt={2}
-            maxHeight={"70vh"}
-            px={2}
-            sx={{
-              overflow: "auto",
-              // Hide scrollbar for Chrome, Safari and Opera
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
-              // Hide scrollbar for IE, Edge and Firefox
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
-            }}
-          >
-
-            <Stack gap={2}>
-              <SectionCard>
-                <SectionTitle variant="h6">About Us</SectionTitle>
-                {/* about org */}
-                <Stack >
-                  {/* about text */}
-                  <Typography variant="caption" >
-                    {organisation.about}
-                  </Typography>
-                </Stack>
-              </SectionCard>
-
-              <SectionCard>
-                <SectionTitle variant="h6">Skills</SectionTitle>
-                {/* skills */}
-                <Stack gap={1}>
-                  <Stack gap={2} 
-                  direction={'row'} 
-                  alignItems={'center'}
-                  justifyContent={'space-between'}
-                  >
-                  {/* skills text */}
-                  <Box>
-                  {skills?.map((skill, index) => (
-                    <Box
-                      component={"li"}
-                      display={"flex"}
-                      gap={2}
-                      alignItems={"center"}
-                      key={index}
-                      mb={1}
-                    >
-                    {/* avatar */}
-                      <Avatar
-                        key={index}
-                        alt={skill}
-                        className="border"
-                        sx={{ width: 30, height: 30 }}
-                        src={getImageMatch(skill)}
-                      />
-                      {/* text */}
-                      <Typography variant="caption">{skill}</Typography>
-                    </Box>
-                  ))}
-                  </Box>
-
-                  {/* progress */}
-                  <Box 
-                  display={'flex'} 
-                  width={'100%'} 
-                  justifyContent={'center'}>
-                  {/* circle */}
-                  <Box mr={!CustomDeviceIsSmall()? 10:undefined} className="circular-progress">
-                    <Box className="inner-circle"></Box>
-                    <Box className="progress-bar left"></Box>
-                    <Box className="progress-bar right"></Box>
-                    <Box className="progress-text">
-                    <Typography
-                    textAlign={'center'} 
-                    fontWeight={'bold'}>
-                      {handleSkillsPercentage()} %
-                    </Typography>
-                    <Typography>Matched</Typography>
-                    </Box>
-                  </Box>
-                  </Box>
-
+                {errorMessage && <Alert severity="error" sx={{ borderRadius: 2, fontSize: '0.75rem' }}>{errorMessage}</Alert>}
+                {isUploading && (
+                  <Stack direction="row" spacing={2} py={1} justifyContent="center" alignItems="center">
+                    <CircularProgress size={16} thickness={6} />
+                    <Typography variant="caption" fontWeight={700}>Synchronizing Credentials...</Typography>
                   </Stack>
-                </Stack>
-              </SectionCard>
+                )}
+              </Box>
+            )}
 
-              <SectionCard>
-                <SectionTitle variant="h6">Qualification</SectionTitle>
-                {/* qualifications */}
-                <Stack gap={1}>
-                  {/* Qualification data */}
-                  {requirements?.qualification.map((data) => (
-                  
-                    <Typography
-                      key={data}
-                      gutterBottom
-                      ml={2}
-                      component={'li'}
-                      variant="caption"
-                      >
-                      {data}
-                      </Typography>
-                  ))}
-                </Stack>
-              </SectionCard>
+            {/* About Section */}
+            <Box>
+              <Typography variant="overline" color="text.secondary" fontWeight={900} sx={{ opacity: 0.5 }}>About Us</Typography>
+              <Typography variant="body2" sx={{ mt: 1, opacity: 0.8, lineHeight: 1.7, fontSize: '0.825rem' }}>
+                {organisation.about}
+              </Typography>
+            </Box>
 
-              <SectionCard>
-                <SectionTitle variant="h6">Job Description</SectionTitle>
-                {/* Job Description */}
-                <Stack gap={1}>
-                  {/* Qualification data */}
-                  {requirements?.description.map((data) => (
-                  <Typography
-                      key={data}
-                      gutterBottom
-                      component={'li'}
-                      ml={2}
-                      variant="caption"
-                      >
-                      {data}
-                      </Typography>
-                  ))}
-                </Stack>
-              </SectionCard>
+            {/* Tech Stack / Skills */}
+            <Box>
+              <Typography variant="overline" color="text.secondary" fontWeight={900} sx={{ opacity: 0.5 }}>Tech Stack</Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
+                {skills?.map((skill, index) => (
+                  <Chip
+                    key={index}
+                    avatar={<Avatar src={getImageMatch(skill)} sx={{ p: 0.2 }} />}
+                    label={skill}
+                    size="medium"
+                    sx={{
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      bgcolor: 'transparent',
+                      border: '1px solid',
+                      borderColor: 'divider'
+                    }}
+                  />
+                ))}
+              </Box>
+            </Box>
 
-              {/* don't show action btns in preview mode */}
+            {/* Requirements & Qualifications Unified */}
+            <Stack spacing={2.5}>
+              {[
+                { label: 'Candidate Qualifications', data: requirements?.qualification },
+                { label: 'Operational Requirements', data: requirements?.description }
+              ].map((section) => (
+                <Box key={section.label}>
+                  <Typography variant="overline" color="primary" fontWeight={900} sx={{ letterSpacing: '0.05rem' }}>
+                    {section.label}
+                  </Typography>
+                  <Stack spacing={1.5} mt={1.5}>
+                    {section.data?.map((item, index) => (
+                      <Stack key={index} direction="row" spacing={2} alignItems="flex-start">
+                        <Box sx={{
+                          mt: 0.9,
+                          width: 5,
+                          height: 5,
+                          borderRadius: '50%',
+                          bgcolor: 'primary.main',
+                          boxShadow: '0 0 8px #14D2BE',
+                          flexShrink: 0
+                        }} />
+                        <Typography variant="body2" sx={{ opacity: 0.85, fontSize: '0.8rem', lineHeight: 1.5 }}>
+                          {item}
+                        </Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
+                </Box>
+              ))}
+            </Stack>
+          </Stack>
+        </Box>
 
-              {!isPreview && (
-                <SectionCard>
-                  <SectionTitle variant="h6">Application</SectionTitle>
-
-              {/* application section, show btn if user is eligible */}
-              {!isEligible  ? (
-                <Typography 
-                fontWeight={'bold'}
-                p={2} 
-                color={'primary'} 
-                variant="caption">
-                Unfortunately, recruiter of this role allows only applicants from 
-                their country.
+        {/* ─── ACTION FOOTER ─── */}
+        {/* ─── ACTION FOOTER ─── */}
+        {!isPreview && (
+          <Box sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'rgba(255,255,255,0.02)' }}>
+            {!isEligible ? (
+              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                <Typography variant="caption" sx={{ color: 'warning.main', textAlign: 'center', display: 'block', fontWeight: 700, letterSpacing: 0.5 }}>
+                  GEOGRAPHIC LOCK: APPLICATIONS RESTRICTED TO RECRUITER'S REGION
                 </Typography>
-              ):(
-                <Stack gap={1} mb={2}>
+              </Box>
+            ) : (
+              <Stack spacing={2}>
                 {websiteLink === "" ? (
-                  <React.Fragment>
-                    {/* curriculum vitae application */}
-                    <Box mb={1} >
-                    <Typography
-                    py={2}
-                    variant="caption"
-                    >
-                    Upload your latest version of Curriculum Vitae (CV) in
-                    the format of PDF only.
-                    </Typography>
-                        
-                      {cvUpload ? (
-                        <Box 
-                        display={'flex'}
-                        justifyContent={'center'}>
-                        <Typography
-                          mt={2}
-                          variant="caption"
-                          width={"100%"}
-                          display={"flex"}
-                          gap={2}
-                          alignItems={"center"}
-                          justifyContent={"center"}
-                          fontWeight={"bold"}
-                          className="text-success"
-                        >
-                          {`${cvUpload.name}`.substring(0, 30)}...
-                          {`${cvUpload.name}.`.split(".")[1]}
-                          <Done
-                            color="success"
-                            sx={{ width: 17, height: 17 }}
-                          />
-                        </Typography>
-                        </Box>
-                      ):user?.cvLink!=="" ?(
-                        <Box 
-                        display={'flex'}
-                        justifyContent={'center'}>
+                  <>
+                    {/* CV Metadata & Control Row */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 0.5 }}>
+                      <Box>
                         <Typography
                           variant="caption"
-                          width={"100%"}
-                          display={"flex"}
-                          mt={2}
-                          gap={2}
-                          alignItems={"center"}
-                          justifyContent={"center"}
-                          fontWeight={"bold"}
-                          className="text-success"
+                          fontWeight={900}
+                          color={user?.cvLink || cvUpload ? "primary.main" : "text.secondary"}
+                          sx={{ display: 'block', lineHeight: 1 }}
                         >
-                        {user?.cvLink?.split("-")[1]}
-                          <Done
-                            color="success"
-                            sx={{ width: 17, height: 17 }}
-                          />
+                          {user?.cvLink || cvUpload ? "CREDENTIALS VERIFIED" : "CREDENTIALS REQUIRED"}
                         </Typography>
-                        </Box>
-                      ):null}
 
-                      <Divider className="pt-2"/>
-
-                      <Box mt={1} 
-                      display={'flex'}
-                      justifyContent={'space-around'}
-                      gap={2}
-                      alignItems={'center'}>
-                       {/* upload cv */}
-                        <Button
-                          component="label"
-                          role={undefined}
-                          variant={currentButton===0 ? "outlined":"text"}
-                          disabled={errorMessage || isUploading}
-                          disableElevation
-                          tabIndex={-1}
-                          size="medium"
-                          sx={{
-                            textTransform: "none",
-                            fontWeight: "bold",
-                            fontSize:'x-small',
-                            borderRadius:5
-                          }}
-                          startIcon={<CloudUploadRounded />}
-                        >
-                          {user?.cvLink==="" ? "Upload":"Update"}
-
-                          <StyledInput
-                            type="file"
-                            accept="application/pdf"
-                            onChange={handleCVFile}
-                            single
-                          />
-                        </Button>
-
-                        {/* current cv */}
-                        <Button
-                          component="label"
-                          onClick={handleCurrentCv}
-                          variant={currentButton===1 ? "outlined":"text"}
-                          disabled={errorMessage || isUploading || user?.cvLink===""}
-                          disableElevation
-                          tabIndex={-1}
-                          size="medium"
-                          sx={{
-                            textTransform: "none",
-                            fontWeight: "bold",
-                            fontSize:'x-small',
-                            borderRadius:5
-                          }}
-                          startIcon={<CheckCircleRounded />}
-                        >
-                          Current
-                        
-                        </Button>
-
-                        {/* check current */}
-                        <Button
-                          component="label"
-                          variant={currentButton===2 ? "outlined":"text"}
-                          onClick={handleDownloadCv}
-                          disabled={errorMessage || isUploading || user?.cvLink===""}
-                          disableElevation
-                          tabIndex={-1}
-                          size="medium"
-                          sx={{
-                            textTransform: "none",
-                            fontWeight: "bold",
-                            fontSize:'x-small',
-                            borderRadius:5
-                          }}
-                          startIcon={<DownloadForOfflineRounded />}
-                        >
-                          View
-                        </Button>
+                        {/* Dynamic Metadata Text */}
+                        <Typography variant="caption" sx={{ fontSize: '0.65rem', opacity: 0.6, fontWeight: 600 }}>
+                          {cvUpload
+                            ? `Queued: ${cvUpload.name.substring(0, 15)}...`
+                            : user?.cvLink
+                              ? "Using stored profile CV"
+                              : "Please attach a PDF to proceed"}
+                        </Typography>
                       </Box>
+
+                      <Stack direction="row" spacing={1}>
+                        {/* Upload/Update Toggle */}
+                        <Button
+                          component="label"
+                          size="small"
+                          variant="text"
+                          sx={{ fontSize: 11, fontWeight: 800, color: 'text.primary' }}
+                          startIcon={<CloudUploadRounded sx={{ fontSize: 16 }} />}
+                        >
+                          {user?.cvLink ? "REPLACE" : "ATTACH"}
+                          <input type="file" hidden accept="application/pdf" onChange={handleCVFile} />
+                        </Button>
+
+                        {/* Conditional View Button: Only shows if a link exists in the profile */}
+                        {user?.cvLink && (
+                          <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={handleDownloadCv}
+                            sx={{
+                              fontSize: 10,
+                              fontWeight: 800,
+                              borderRadius: '6px',
+                              borderColor: 'divider',
+                              px: 1.5
+                            }}
+                          >
+                            VIEW
+                          </Button>
+                        )}
+                      </Stack>
                     </Box>
 
-                      {/* divider */}
-                  <Divider component={'div'} className="pb-1"/>
-
-                    {/* application btn */}
-                    <Box mt={1} display={"flex"} justifyContent={"center"}>
-                      <Button
-                        variant="contained"
-                        disableElevation
-                        disabled={ user?.cvLink==="" || isUploading || errorMessage || isMyJob}
-                        size="small"
-                        onClick={handleJobApplication}
-                        endIcon={isMyJob ? <LockRounded/>:<BoltRounded />}
-                        sx={{ borderRadius: "20px" }}
-                      >
-                        Complete Application
-                      </Button>
-                    </Box>
-                  </React.Fragment>
-                ) : (
-                  <React.Fragment>
-                    {/* job application is external */}
-                    <Typography
-                      variant="body2"
-                      className="px-1"
-                      color={"text.secondary"}
+                    {/* Final Submission Action */}
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      disabled={(!cvUpload && !user?.cvLink) || isUploading || isMyJob}
+                      onClick={handleJobApplication}
+                      endIcon={isMyJob ? <LockRounded /> : <BoltRounded />}
+                      sx={{
+                        borderRadius: 2,
+                        py: 1.5,
+                        fontWeight: 900,
+                        fontSize: '0.8rem',
+                        letterSpacing: '0.05rem',
+                        boxShadow: isDarkMode ? '0 8px 24px rgba(20, 210, 190, 0.25)' : '0 4px 12px rgba(0,0,0,0.1)',
+                        transition: 'all 0.3s ease',
+                        '&:hover': {
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 12px 30px rgba(20, 210, 190, 0.4)',
+                        }
+                      }}
                     >
-                      {" "}
-                      Click the continue button below for redirection to the
-                      recruiters webpage.
-                    </Typography>
-
-                    {/* application btn */}
-                    <Box mt={1} display={"flex"} justifyContent={"center"}>
-                      <Button
-                        variant="contained"
-                        disableElevation
-                        onClick={handleShowWebsite}
-                        size="small"
-                        sx={{ borderRadius: "20px" }}
-                      >
-                        Continue Application
-                      </Button>
-                    </Box>
-                  </React.Fragment>
+                      {isMyJob ? "AUTHOR LISTING" : "SUBMIT APPLICATION"}
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    onClick={handleShowWebsite}
+                    endIcon={<BoltRounded />}
+                    sx={{ borderRadius: 2, py: 1.5, fontWeight: 900 }}
+                  >
+                    CONTINUE TO EXTERNAL PORTAL
+                  </Button>
                 )}
               </Stack>
-              )}
-              
-                </SectionCard>
-              )}
-            </Stack>
+            )}
           </Box>
-        </Box>
+        )}
       </Box>
     </StyledModalJob>
   );

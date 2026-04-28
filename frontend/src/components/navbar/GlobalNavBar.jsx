@@ -1,5 +1,5 @@
-import { AppBar, Toolbar, Box, IconButton, Typography, Tooltip, Avatar, Button, Divider } from "@mui/material";
-import { Menu, DarkModeRounded, Person } from "@mui/icons-material";
+import { Menu, Person } from "@mui/icons-material";
+import { AppBar, Avatar, Box, Button, Divider, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 // Styled AppBar for smooth transition with the sidebar
@@ -123,12 +123,12 @@ export default function GlobalAppBar({
           ) : (
             <>
               <Tooltip title={isDarkMode ? "Light Mode" : "Dark Mode"}>
-                <IconButton 
+                  {/*  <IconButton
                   onClick={handleShowDarkMode}
                   sx={{ border: '1px solid rgba(255,255,255,0.05)' }}
                 >
                   <DarkModeRounded sx={{ fontSize: 20, color: "primary.main" }} />
-                </IconButton>
+                </IconButton> */}
               </Tooltip>
 
               <Divider orientation="vertical" flexItem sx={{ mx: 1, height: 24, alignSelf: 'center', opacity: 0.1 }} />

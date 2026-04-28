@@ -1,4 +1,4 @@
-import { LockRounded, PersonAdd, PostAddRounded, SchoolRounded, TvRounded, Work } from "@mui/icons-material";
+import { LockRounded, PostAddRounded, SchoolRounded, TvRounded, Work } from "@mui/icons-material";
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import SpeedDial from "@mui/material/SpeedDial";
@@ -39,10 +39,6 @@ const actionsAuth = [
   {
     icon: <LockRounded color="primary" sx={{ width: 33, height: 33 }} />,
     name: "Login",
-  },
-  {
-    icon: <PersonAdd color="primary" sx={{ width: 26, height: 26 }} />,
-    name: "Register",
   },
 ]
 
@@ -126,9 +122,7 @@ export default function BasicSpeedDial() {
                 if (action.name === "Login") {
                   navigate("/auth/login")
                 }
-                if (action.name === "Register") {
-                  navigate("/auth/register/personal")
-                }
+
               }}
               tooltipTitle={
                 <Typography

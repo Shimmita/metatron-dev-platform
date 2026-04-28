@@ -130,7 +130,7 @@ export default function MiniDrawer() {
   const navigate = useNavigate()
 
   const [textOption, setTextOption] = useState(
-    isJobSearchGlobal ? "Search Jobs" : "Explore Jobs"
+    !isGuest && isJobSearchGlobal ? "Search Jobs" : "Explore Jobs"
   );
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false : true);
   const [open, setOpen] = useState(
@@ -183,7 +183,7 @@ export default function MiniDrawer() {
     dispatch(updateCurrentBottomNav(1))
 
     // don't fetch any if isJob-search global to avoid overriding  data
-    if (isJobSearchGlobal) {
+    if (!isGuest && isJobSearchGlobal) {
       // increase page number for bypassing similar jobs in the array of next fetch
       setPageNumber(prev => prev + 1)
       // false my stats
@@ -502,7 +502,7 @@ export default function MiniDrawer() {
 
     }
 
-  }, [dispatch, textOption, user, isJobSearchGlobal]);
+  }, [dispatch, textOption, user, isGuest, isJobSearchGlobal]);
 
 
 

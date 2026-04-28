@@ -16,8 +16,9 @@ function Homepage() {
           px: { xs: 1, sm: 2, lg: 3 },
           pb: { xs: 10, md: 4 },
           display: "flex",
+          flexWrap: { xs: "nowrap", sm: "wrap", md: "nowrap" },
           alignItems: "flex-start",
-          gap: { md: 2, lg: 3 },
+          gap: { sm: 2, md: 2, lg: 3 },
         }}
       >
         <Sidebar />

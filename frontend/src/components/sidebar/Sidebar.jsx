@@ -1,9 +1,15 @@
 import {
+  AssignmentTurnedInRounded,
   CalendarMonthRounded,
+  GroupsRounded,
+  PsychologyRounded,
+  RocketLaunchRounded,
   SchoolRounded,
   Smartphone,
   TrendingUpRounded,
+  VerifiedUserRounded,
   WorkRounded,
+  WorkspacePremiumRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -88,6 +94,30 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const isDarkMode = currentMode === "dark";
   const cardRadius = `${Math.max(theme.shape.borderRadius - 2, 8)}px`;
+  const selectedSkillsCount = user?.selectedSkills?.length || 0;
+  const profileCompletionItems = [
+    {
+      label: "Skill graph",
+      value: selectedSkillsCount > 0 ? `${selectedSkillsCount} skills` : "Add skills",
+      icon: <PsychologyRounded fontSize="small" />,
+    },
+    {
+      label: "Network proof",
+      value: `${user?.network_count || 0} connections`,
+      icon: <GroupsRounded fontSize="small" />,
+    },
+    {
+      label: "Credential status",
+      value: user?.isVerified ? "Verified" : "Build trust",
+      icon: <VerifiedUserRounded fontSize="small" />,
+    },
+  ];
+
+  const platformReadiness = [
+    "Complete profile visibility for recruiters and instructors",
+    "Keep skills current for stronger AI course and job matching",
+    "Use certifications and milestones as proof of professional growth",
+  ];
 
   useLayoutEffect(() => {
     if (dataInsights.length > 0) {
@@ -142,9 +172,9 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
-        width: { md: 280, lg: 310, xl: 330 },
+        width: { sm: "100%", md: 280, lg: 310, xl: 330 },
         flexShrink: 0,
-        mt: { md: 2 },
+        mt: { sm: 1.5, md: 2 },
         display: {
           xs: "none",
           sm: CustomDeviceTablet()
@@ -159,7 +189,7 @@ const Sidebar = () => {
       <Box
         className="shadow"
         sx={{
-          position: "sticky",
+          position: { sm: "static", md: "sticky" },
           top: { md: 88 },
           alignSelf: "flex-start",
           width: "100%",
@@ -175,6 +205,13 @@ const Sidebar = () => {
             backdropFilter: "blur(25px)",
             border: "1px solid rgba(255,255,255,0.08)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+            maxHeight: { sm: "42vh", md: "none" },
+            overflowY: { sm: "auto", md: "visible" },
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
           }}
         >
           <BoxAvatarContent>
@@ -453,6 +490,83 @@ const Sidebar = () => {
                   >
                     Learn more
                   </Button>
+                </Box>
+              </Box>
+
+              <Box mt={1.5}>
+                <Box
+                  sx={{
+                    borderRadius: cardRadius,
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    backdropFilter: "blur(20px)",
+                    p: 1.5,
+                  }}
+                >
+                  <Box display="flex" alignItems="center" gap={1} mb={1.25}>
+                    <AssignmentTurnedInRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+                    <Typography variant="body2" fontWeight={700}>
+                      Professional readiness
+                    </Typography>
+                  </Box>
+
+                  <Stack spacing={1}>
+                    {profileCompletionItems.map((item) => (
+                      <Box
+                        key={item.label}
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        gap={1}
+                        sx={{
+                          borderRadius: cardRadius,
+                          px: 1,
+                          py: 0.85,
+                          background: "rgba(255,255,255,0.03)",
+                          border: "1px solid rgba(255,255,255,0.06)",
+                        }}
+                      >
+                        <Box display="flex" alignItems="center" gap={1} minWidth={0}>
+                          <Box sx={{ color: "#14D2BE", display: "flex" }}>{item.icon}</Box>
+                          <Typography variant="caption" noWrap>
+                            {item.label}
+                          </Typography>
+                        </Box>
+                        <Typography variant="caption" color="text.secondary" noWrap>
+                          {item.value}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+              </Box>
+
+              <Box mt={1.5}>
+                <Box
+                  sx={{
+                    borderRadius: cardRadius,
+                    background: "rgba(255,255,255,0.03)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    backdropFilter: "blur(20px)",
+                    p: 1.5,
+                  }}
+                >
+                  <Box display="flex" alignItems="center" gap={1} mb={1}>
+                    <WorkspacePremiumRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+                    <Typography variant="body2" fontWeight={700}>
+                      Trust layer
+                    </Typography>
+                  </Box>
+                  <Stack spacing={0.9}>
+                    {platformReadiness.map((item) => (
+                      <Box key={item} display="flex" alignItems="flex-start" gap={1}>
+                        <RocketLaunchRounded sx={{ color: "#14D2BE", fontSize: 15, mt: 0.25 }} />
+                        <Typography variant="caption" color="text.secondary">
+                          {item}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
                 </Box>
               </Box>
             </Box>

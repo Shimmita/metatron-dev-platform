@@ -1,14 +1,12 @@
-import { Box, CircularProgress } from "@mui/material";
+import { Box, CircularProgress, Fade } from "@mui/material";
 import React, { lazy, Suspense, useLayoutEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, Routes } from "react-router-dom";
-import BasicSpeedDial from "../custom/SpeedDial";
-
+import { Route, Routes, useLocation } from "react-router-dom";
 import { handleShowingSpeedDial } from "../../redux/AppUI";
 import GuestCheck from "../account/GuestCheck";
-import AlertGroupCommunity from "../alerts/AlertGroupCommunity";
-import AlertTutorial from "../alerts/AlertTutorial";
-import BottomNav from "../bottom/BottomNav";
+import BasicSpeedDial from "../custom/SpeedDial";
+
+// Lazy Components
 const EventsContainer = lazy(() => import("../events/EventsContainer"));
 const SnackBarPostSuccess = lazy(() => import("../snackbar/SnackBarPostSuccess"));
 const CoursesMainContainer = lazy(() => import("../courses/CoursesMainContainer"));
@@ -20,170 +18,105 @@ const AllJobsContainer = lazy(() => import("../jobs/AllJobsContainer"));
 const PageNotFound = lazy(() => import("../notfound/PageNotFound"));
 const PostDetailsContainer = lazy(() => import("../post/PostDetailsContiner"));
 const FeedDefaultContent = lazy(() => import("./FeedDefaultContent"));
-
+const BottomNav = lazy(() => import("../bottom/BottomNav"));
+const AlertGroupCommunity = lazy(() => import("../alerts/AlertGroupCommunity"));
+const AlertTutorial = lazy(() => import("../alerts/AlertTutorial"));
 
 const Feed = () => {
-  // redux states
+  const dispatch = useDispatch();
+  const location = useLocation();
+
+  const { user } = useSelector((state) => state.currentUser);
   const {
     isDefaultBottomNav,
     isDefaultSpeedDial,
     isLoadingPostLaunch,
     isPostDetailed,
+    currentMode
   } = useSelector((state) => state.appUI);
-  const { messageSnackPostTech } = useSelector(
-    (state) => state.currentSnackBar
-  );
+  const { messageSnackPostTech } = useSelector((state) => state.currentSnackBar);
 
-  const { user } = useSelector((state) => state.currentUser);
+  const isDarkMode = currentMode === 'dark';
+  const [openCommunity, setOpenCommunity] = React.useState(user?.isGroupTutorial || false);
 
-  const [openCommunity,setOpenCommunity] = React.useState(user?.isGroupTutorial || false)
-
-
-  const dispatch = useDispatch();
-
-  // restore default states which could've been bypassed unnecessarily
   useLayoutEffect(() => {
-    // restore speed dial it could have been not closed in previous histories
     dispatch(handleShowingSpeedDial(true));
-  }, [dispatch]);
+  }, [dispatch, location.pathname]); // Reset on route change
 
   return (
     <Box
       component="main"
-      color={"text.primary"}
       sx={{
         width: "100%",
-        minWidth: 0,
-        flex: 1,
-        mt: { xs: 1, md: 2 },
-        px: { xs: 0, md: 1 },
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        // Ensure content doesn't get hidden behind the floating BottomNav
+        pb: isDefaultBottomNav ? { xs: 12, md: 4 } : 0,
+        transition: "padding 0.3s ease",
       }}
     >
       <Suspense
         fallback={
           <Box
-            bgcolor={"background.default"}
-            color={"text.primary"}
-            style={{
+            sx={{
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              minHeight: "70vh",
+              minHeight: "80vh",
+              flexDirection: "column",
+              gap: 2
             }}
           >
-            {/* loader be shown before actual loading of content */}
-            <CircularProgress size={"2rem"} />
+            <CircularProgress size={40} thickness={4} sx={{ color: "primary.main" }} />
           </Box>
         }
       >
-
-        <Routes >
-          <Route path="/" element={
-            <GuestCheck>
-              <FeedDefaultContent />
-            </GuestCheck>} />
-
-          {/* events */}
-          <Route path="/events" element={
-            <GuestCheck>
-              <EventsContainer />
-            </GuestCheck>} />
-
-
-          {/* final selection route for courses */}
-          <Route path="/courses/available" element={
-            <GuestCheck>
-              <CoursesMainContainer />
-            </GuestCheck>} />
-          {/* instructor */}
-          <Route path="/courses/instructor" element={
-            <GuestCheck>
-              <CoursesInstrContainer />
-            </GuestCheck>
-          } />
-
-
-          {/* jobseeker pane */}
-          <Route path="/jobs" element={
-            <GuestCheck>
-              <AllJobsContainer />
-            </GuestCheck>} />
-
-          {/* hiring manager pane */}
-          <Route path="/jobs/hiring" element={
-            <GuestCheck>
-              <AllJobsHiringManager />
-            </GuestCheck>
-          } />
-
-          <Route
-            path="/posts/search/results"
-            element={<FeedDefaultSearch />}
-          />
-          <Route
-            path="/posts/details/:id"
-            element={
-              <GuestCheck>
-                <PostDetailsRouted />
-              </GuestCheck>}
-          />
-          <Route
-            path="/users/profile/posts/details"
-            element={
-              <GuestCheck>
-                <PostDetailsContainer />
-              </GuestCheck>}
-          />
-          {/* page not found; no urls matched */}
+        <Routes>
+          <Route path="/explore" element={<GuestCheck><FeedDefaultContent /></GuestCheck>} />
+          <Route path="/" element={<GuestCheck><FeedDefaultContent /></GuestCheck>} />
+          <Route path="/events" element={<GuestCheck><EventsContainer /></GuestCheck>} />
+          <Route path="/courses/available" element={<GuestCheck><CoursesMainContainer /></GuestCheck>} />
+          <Route path="/courses/instructor" element={<GuestCheck><CoursesInstrContainer /></GuestCheck>} />
+          <Route path="/jobs" element={<GuestCheck><AllJobsContainer /></GuestCheck>} />
+          <Route path="/jobs/hiring" element={<GuestCheck><AllJobsHiringManager /></GuestCheck>} />
+          <Route path="/posts/search/results" element={<FeedDefaultSearch />} />
+          <Route path="/posts/details/:id" element={<GuestCheck><PostDetailsRouted /></GuestCheck>} />
+          <Route path="/users/profile/posts/details" element={<GuestCheck><PostDetailsContainer /></GuestCheck>} />
           <Route path="*" element={<PageNotFound />} />
         </Routes>
 
-        {/* snack bar success shown when tech post uploaded  */}
-        {messageSnackPostTech && (
-          <SnackBarPostSuccess
-            messageSnackPostTech={messageSnackPostTech}
-          />
+        {/* ─── GLOBAL OVERLAYS ─── */}
+
+        {/* Floating SpeedDial - Positioned above BottomNav on mobile */}
+        {isDefaultBottomNav && isDefaultSpeedDial && !isPostDetailed && (
+          <Fade in timeout={500}>
+            <Box
+              sx={{
+                position: "fixed",
+                right: { xs: 20, md: 32 },
+                bottom: { xs: 100, md: 32 }, // Lifted higher on mobile to clear BottomNav
+                zIndex: 1100,
+              }}
+            >
+              <BasicSpeedDial />
+            </Box>
+          </Fade>
         )}
 
-        {/* decide bottom nav is to be show or not */}
-        <Box>
-          {isDefaultBottomNav && !isLoadingPostLaunch && <BottomNav />}
-        </Box>
-
-        {/* display speed dial in feed section only for mobile and no landscape */}
-        <Box>
-          {/* decide speed dial being shown or is floating button to refresh posts or  */}
-          {isDefaultBottomNav &&
-            isDefaultSpeedDial &&
-            !isPostDetailed && (
-              <Box
-                position={"fixed"}
-                sx={{
-                  right: { xs: 16, sm: 20, md: 28 },
-                  bottom: { xs: 88, sm: 78, md: 28 },
-                  zIndex: 1100,
-                }}
-              >
-                {/* if is post search meaning posts from redux need refresh to default so fab else dial  */}
-                <BasicSpeedDial />
-              </Box>
-            )}
-        </Box>
-
-
-        {/* show alert tutorial if user new */}
-        {user?.isTutorial && (
-          <AlertTutorial />
+        {/* Optimized Bottom Navigation */}
+        {isDefaultBottomNav && !isLoadingPostLaunch && (
+          <Suspense fallback={null}>
+            <BottomNav />
+          </Suspense>
         )}
 
-        {/* show group and comminities alert */}
-        {openCommunity && (
-          <AlertGroupCommunity openGroup={openCommunity} setOpenGroup={setOpenCommunity} />
-        )}
-
+        {/* Notifications & Tutorials */}
+        {messageSnackPostTech && <SnackBarPostSuccess messageSnackPostTech={messageSnackPostTech} />}
+        {user?.isTutorial && <AlertTutorial />}
+        {openCommunity && <AlertGroupCommunity openGroup={openCommunity} setOpenGroup={setOpenCommunity} />}
       </Suspense>
     </Box>
-
   );
 };
 

@@ -446,7 +446,7 @@ const CardFeed = ({
 
             <Box minWidth={0} flex={1}>
               <Box display="flex" alignItems="center" gap={0.8} flexWrap="wrap">
-                <Typography fontWeight={700} variant="body1" lineHeight={1.2}>
+                <Typography variant="body1" lineHeight={1.2}>
                   {ownerNameDisplay}
                 </Typography>
                 <VerifiedRounded color="primary" sx={{ width: 17, height: 17 }} />
@@ -484,7 +484,7 @@ const CardFeed = ({
                 border: "1px solid rgba(20,210,190,0.25)",
               }}
             >
-              <Typography variant="caption" fontWeight={700} color="primary">
+              <Typography variant="caption" color="primary">
                 {post?.post_category?.main}
               </Typography>
             </Box>
@@ -567,7 +567,7 @@ const CardFeed = ({
                     border: "1px solid rgba(68,183,0,0.18)",
                   }}
                 >
-                  <Typography variant="caption" color="success.main" fontWeight={700}>
+                  <Typography variant="caption" color="success.main">
                     {post?.favorite_count} saved
                   </Typography>
                 </Box>
@@ -588,8 +588,7 @@ const CardFeed = ({
               }}
             />
             <Box>
-              <Typography fontSize={{ xs: 16, sm: 18 }}
-                fontWeight={700}>
+              <Typography >
                 {post?.post_title}
               </Typography>
 
@@ -635,7 +634,6 @@ const CardFeed = ({
             <Typography
               color={isDarkMode ? "text.secondary" : "text.primary"}
               sx={{
-                fontSize: { xs: "0.9rem", sm: "0.95rem" },
                 lineHeight: 1.7,
                 letterSpacing: "0.01em",
               }}
@@ -644,7 +642,7 @@ const CardFeed = ({
             >
               {isFullDescription ? details : handleDetailsLength()}
               {detailsLong && !isFullDescription && (
-                <Box component="span" fontWeight={700} color="primary.main">
+                <Box component="span" color="primary.main">
                   {" "}
                   Read more
                 </Box>
@@ -678,7 +676,7 @@ const CardFeed = ({
                 overflow: "hidden",
                 border: "1px solid rgba(255,255,255,0.08)",
                 background: "rgba(255,255,255,0.02)",
-                aspectRatio: post?.post_type === "image" ? "1 / 1" : "16 / 9", 
+                aspectRatio: post?.post_type === "image" ? "1 / 1" : "16 / 9",
               }}
             >
               <Box
@@ -724,9 +722,8 @@ const CardFeed = ({
                   startIcon={icon}
                   sx={{
                     minWidth: { xs: "48%", sm: 120 },
-                     px: 1.5,
+                    px: 1.5,
                     py: 0.6,
-                    fontSize: 12, 
                     justifyContent: "flex-start",
                     borderRadius: 10,
                     color: "text.secondary",
@@ -984,12 +981,12 @@ const CardFeed = ({
                     mb: 1.5,
                   }}
                 >
-                  <Typography variant="caption" fontWeight={700} sx={{ color: "#BFDBFE" }}>
+                  <Typography variant="caption" sx={{ color: "#BFDBFE" }}>
                     Post preview
                   </Typography>
                 </Box>
 
-                <Typography variant="h5" fontWeight={700} lineHeight={1.2}>
+                <Typography variant="h5" lineHeight={1.2}>
                   {post?.post_title}
                 </Typography>
 
@@ -1040,7 +1037,7 @@ const CardFeed = ({
                   />
                   <Box>
                     <Box display="flex" alignItems="center" gap={0.7}>
-                      <Typography variant="body2" fontWeight={700}>
+                      <Typography variant="body2" >
                         {post?.post_owner?.ownername}
                       </Typography>
                       <VerifiedRounded sx={{ width: 16, height: 16, color: "#93C5FD" }} />

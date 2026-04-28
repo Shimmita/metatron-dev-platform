@@ -49,7 +49,7 @@ const EmailVerification = () => {
       .finally(() => setIsProcessing(false));
   };
 
-  const handleProceed = () => navigate("/");
+  const handleProceed = () => navigate("/explore");
 
   return (
     <Box

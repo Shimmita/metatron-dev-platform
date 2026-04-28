@@ -1,6 +1,5 @@
 import {
   Close,
-  DarkModeRounded,
   EmailRounded,
   ErrorOutline,
   FilterListRounded,
@@ -207,7 +206,7 @@ const Navbar = () => {
     // update the bottom nav counter
     dispatch(updateCurrentBottomNav(0));
     // navigate home page
-    navigate("/");
+    navigate("/explore");
   };
 
   // show the notification and messaging triggered by redux
@@ -835,13 +834,13 @@ const Navbar = () => {
                 {!CustomDeviceIsSmall() && (
                   <React.Fragment>
                     {/* change theme trigger */}
-                    <Tooltip arrow title={isDarkMode ? "Light" : "Dark"}>
+                    {/* <Tooltip arrow title={isDarkMode ? "Light" : "Dark"}>
                       <IconButton onClick={handleShowDarkMode}>
                         <DarkModeRounded
                           sx={{ height: 24, width: 24, color: "white" }}
                         />
                       </IconButton>
-                    </Tooltip>
+                    </Tooltip> */}
 
                   </React.Fragment>
                 )}

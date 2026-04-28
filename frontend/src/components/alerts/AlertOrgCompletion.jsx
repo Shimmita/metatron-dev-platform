@@ -94,7 +94,7 @@ export default function AlertOrgCompletion({
       const auth = getAuth();
       await signOut(auth);
     }
-    navigate("/");
+    navigate("/explore");
   };
 
   const handleClose = () => setOpenAlertProfile(false);

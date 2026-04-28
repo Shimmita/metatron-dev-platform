@@ -90,7 +90,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
 
   // handle home navigation
     const handleRefreshHome=()=>{
-      navigate('/')
+      navigate('/explore')
     }
 
 

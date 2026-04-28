@@ -6,7 +6,11 @@ import {
   MobileScreenShareRounded,
   PersonAdd,
   SchoolRounded,
-  VideoLibraryRounded
+  VideoLibraryRounded,
+  PlayCircleFilledRounded,
+  GroupRounded,
+  ShareRounded,
+  LocalLibraryRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -18,7 +22,8 @@ import {
   FormHelperText,
   Rating,
   Stack,
-  Typography
+  Typography,
+  ButtonBase
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { lazy, useState } from "react";
@@ -28,292 +33,208 @@ import pythonLogo from "../../../images/python.jpeg";
 import AlertSimilarCourses from "../../alerts/AlertSimilarCourses";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
+import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 const AccordionDescription = lazy(() => import("./AccordionDescription"));
 
 function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
   const theme = useTheme();
-  
+
   // redux state manager
-  const { user,isGuest } = useSelector((state) => state.currentUser);
-  const isMyCourse=user?._id===courseItem?.course_instructor?.instructorId
-  const [isOpenAccordion,setIsOpenAccordion]=useState(false)
-  const [showSimilar,setShowSimilar]=useState(false)
+  const { user, isGuest } = useSelector((state) => state.currentUser);
+  const isMyCourse = user?._id === courseItem?.course_instructor?.instructorId
+  const [isOpenAccordion, setIsOpenAccordion] = useState(false)
+  const [showSimilar, setShowSimilar] = useState(false)
   const [isCopiedStatus, setIsCopiedStatus] = useState(false);
-  
-  
+
+
   const handleOpenPlayer = () => {
-   setFocusedCourse(courseItem)
+    setFocusedCourse(courseItem)
   };
 
   // handle showing similar courses suggestion
-  const handleShowSimilarCourses=()=>{
+  const handleShowSimilarCourses = () => {
     setShowSimilar(true)
   }
 
   // handle get course link
-  const handleGetCourseLink=async()=>{
-    const urlCourse=`${window.location.href}?id=${courseItem?._id}`
-      try {
+  const handleGetCourseLink = async () => {
+    const urlCourse = `${window.location.href}?id=${courseItem?._id}`
+    try {
       await navigator.clipboard.writeText(urlCourse);
       setIsCopiedStatus(true);
       setTimeout(() => {
-      setIsCopiedStatus(false)
-      }, 2000); 
+        setIsCopiedStatus(false)
+      }, 2000);
     } catch (err) {
       console.error('Failed to Copy: ', err);
     }
   }
-  
+
   return (
-    <Box 
-      display={"flex"} 
-      justifyContent={"center"}
-      gap={2}
-      marginInline={!CustomDeviceIsSmall()?1:undefined}
-      mb={2}
-      flexDirection={'column'}
-    >
+    <Box display="flex" justifyContent="center" gap={2} mb={3} flexDirection="column">
       <Card
         elevation={0}
-        sx={{ 
-          border:'1px solid',
-          borderColor:'divider',
+        sx={{
           width: '100%',
           maxWidth: CustomDeviceTablet() ? 300 : 340,
-          minWidth: 280,
-          flexShrink: 0,
-          borderRadius: `${theme.shape.borderRadius}px`,
-          boxShadow: theme.palette.mode === "dark"
-            ? "0 18px 36px rgba(0,0,0,0.18)"
-            : "0 20px 40px rgba(15,76,129,0.08)",
-          background: theme.palette.mode === "dark"
-            ? "linear-gradient(180deg, rgba(15,76,129,0.12), rgba(255,255,255,0.02))"
-            : "linear-gradient(180deg, rgba(15,76,129,0.05), rgba(255,255,255,0.96))",
+          borderRadius: "20px",
+          background: isDarkMode ? "rgba(15, 23, 42, 0.8)" : "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid",
+          borderColor: isDarkMode ? "rgba(20, 210, 190, 0.2)" : "rgba(0,0,0,0.08)",
+          transition: "transform 0.3s ease",
+          "&:hover": { transform: "translateY(-5px)" }
         }}
       >
-        <CardContent>
-          {/* Header section with blue background */}
-          <Stack
-            bgcolor={isDarkMode ? 'rgba(15,76,129,0.3)':'primary.main'}
-            gap={0.5}
+        <CardContent sx={{ p: 0 }}>
+          {/* ─── PREMIUM HEADER BADGE ─── */}
+          <Box
             sx={{
-              borderRadius: `calc(${theme.shape.borderRadius}px - 4px)`,
-              p: 1.5,
-              boxShadow: theme.palette.mode === "dark"
-                ? "inset 0 1px 0 rgba(255,255,255,0.04)"
-                : "inset 0 1px 0 rgba(255,255,255,0.18)",
+              p: 2,
+              textAlign: "center",
+              background: isDarkMode
+                ? "linear-gradient(135deg, rgba(20, 210, 190, 0.2), rgba(15, 76, 129, 0.4))"
+                : "linear-gradient(135deg, #1976D2, #1565C0)",
+              borderRadius: "20px 20px 0 0",
+              position: "relative"
             }}
           >
-            {/* Course logo/avatar */}
-            <Box display={"flex"} justifyContent={"center"}>
-              <Avatar
-                alt="course logo"
-                sx={{
-                  width: 50,
-                  height: 50,
-                  border: "2px solid white",
-                  boxShadow: "0px 8px 20px rgba(0,0,0,0.15)",
-                }}
-                src={pythonLogo}
+            <Avatar
+              src={pythonLogo}
+              sx={{
+                width: 60,
+                height: 60,
+                margin: "0 auto",
+                mb: 1.5,
+                border: "3px solid #fff",
+                boxShadow: "0 8px 16px rgba(0,0,0,0.2)"
+              }}
+            />
+            <Typography variant="h6" sx={{ color: "#fff", fontWeight: 800, fontSize: "1rem", lineHeight: 1.2 }}>
+              {courseItem?.course_title}
+            </Typography>
+
+            <Stack direction="row" justifyContent="center" alignItems="center" spacing={1} sx={{ mt: 1 }}>
+              <Rating value={courseItem?.course_rate_count} readOnly size="small" precision={0.5}
+                sx={{ "& .MuiRating-iconFilled": { color: "#FFD700" } }}
               />
-            </Box>
-
-            {/* title */}
-            <Box display={'flex'} alignItems={'center'} justifyContent={'center'}>
-              <Typography
-                variant="body1"
-                textTransform={"capitalize"}
-                fontWeight="bold"
-                sx={{ color:'white', textAlign: 'center' }}
-              >
-                {courseItem?.course_title}
+              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.9)", fontWeight: 700 }}>
+                {courseItem?.course_rate_count?.toFixed(1)}
               </Typography>
-            </Box>
+            </Stack>
+          </Box>
 
-            {/* rating */}
-            <Box display={"flex"} gap={1} justifyContent={"center"} alignItems={"center"}>
-              <Rating
-                name="course-rating"
-                size="small"
-                value={courseItem?.course_rate_count}
-                readOnly
-                precision={0.5}
-              />
-              <Typography variant="caption" sx={{ color: 'white' }}>
-                {courseItem?.course_rate_count?.toFixed(1)} ({courseItem?.course_rate_count})
-              </Typography>
-            </Box>
-          </Stack>
-
-          {/* Content section */}
-          <Box mt={1.5}>
-            {/* lectures + student */}
-            <Box
-              display={"flex"}
-              alignItems={"center"}
-              gap={1}
-              justifyContent={"space-around"}
-              mb={1.5}
-            >
-              {/* lectures */}
-              <Box display={"flex"} gap={1} justifyContent={"center"} alignItems={"center"}>
-                <SchoolRounded color="primary" sx={{ width: 16, height: 16 }} />
-                <Typography variant="caption" color="text.secondary" fontWeight={"bold"}>
-                  {courseItem?.course_video_lectures?.length} lectures
+          <Box sx={{ p: 2 }}>
+            {/* ─── METADATA GRID ─── */}
+            <Stack direction="row" justifyContent="space-around" sx={{ mb: 2 }}>
+              <Box textAlign="center">
+                <LocalLibraryRounded sx={{ color: "primary.main", fontSize: 18 }} />
+                <Typography variant="caption" display="block" sx={{ fontWeight: 800, opacity: 0.7 }}>
+                  {courseItem?.course_video_lectures?.length} Modules
                 </Typography>
               </Box>
-
-              {/* students */}
-              <Box display={"flex"} gap={1} alignItems={"center"}>
-                <PersonAdd color="primary" sx={{ width: 16, height: 16 }} />
-                <Typography variant="caption" color="text.secondary" fontWeight={"bold"}>
-                  {courseItem?.student_count} students
+              <Divider orientation="vertical" flexItem sx={{ opacity: 0.1 }} />
+              <Box textAlign="center">
+                <GroupRounded sx={{ color: "primary.main", fontSize: 18 }} />
+                <Typography variant="caption" display="block" sx={{ fontWeight: 800, opacity: 0.7 }}>
+                  {courseItem?.student_count} Students
                 </Typography>
               </Box>
+            </Stack>
+
+            {/* ─── CLICKABLE INSTRUCTOR HUD ─── */}
+            <ButtonBase
+              sx={{
+                width: "100%",
+                p: 1,
+                borderRadius: "12px",
+                bgcolor: isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
+                display: "flex",
+                justifyContent: "flex-start",
+                gap: 1.5,
+                "&:hover": { bgcolor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)" }
+              }}
+            >
+              <Avatar src={courseItem?.course_instructor?.instructorAvatar} sx={{ width: 32, height: 32 }} />
+              <Box sx={{ textAlign: "left" }}>
+                <Typography variant="caption" sx={{ display: "block", color: "primary.main", fontWeight: 800, fontSize: "0.6rem" }}>
+                  INSTRUCTOR
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 700, fontSize: "0.75rem" }}>
+                  {courseItem?.course_instructor?.instructorName}
+                </Typography>
+              </Box>
+            </ButtonBase>
+
+            <Box sx={{ my: 1 }}>
+              <AccordionDescription description={courseItem?.course_description} setOpenAccordion={setIsOpenAccordion} />
             </Box>
 
-            <Divider />
-
-            {/* instructor details */}
-            <Box
-              display={"flex"}
-              alignItems={"center"}
-              justifyContent={"space-between"}
-              my={1.5}
-            >
-              <Box display={"flex"} alignItems={"center"} gap={1}>
-                {/* avatar */}
-                <Avatar
-                  src={courseItem?.course_instructor?.instructorAvatar}
-                  alt=""
-                  sx={{ width: 32, height: 32 }}
-                />
-                {/* instructor name */}
-                <Box>
-                  <Typography
-                    variant="body2"
-                    color={"text.primary"}
-                    textTransform={"capitalize"}
-                    fontWeight="bold"
+            {!isOpenAccordion && (
+              <>
+                {/* ─── UTILITY ACTIONS ─── */}
+                <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                  <Button
+                    fullWidth
+                    size="small"
+                    startIcon={<AutoAwesomeRounded />}
+                    onClick={handleShowSimilarCourses}
+                    sx={{ fontSize: "0.65rem", fontWeight: 800, borderRadius: "8px" }}
                   >
-                    {courseItem?.course_instructor?.instructorName}
+                    Similar
+                  </Button>
+                  <Button
+                    fullWidth
+                    size="small"
+                    color={isCopiedStatus ? "success" : "primary"}
+                    startIcon={isCopiedStatus ? <DoneRounded /> : <ShareRounded />}
+                    onClick={handleGetCourseLink}
+                    sx={{ fontSize: "0.65rem", fontWeight: 800, borderRadius: "8px" }}
+                  >
+                    {isCopiedStatus ? "Copied" : "Share"}
+                  </Button>
+                </Stack>
+
+                {/* ─── ENROLLMENT FOOTER ─── */}
+                <Box sx={{ textAlign: "center" }}>
+                  <Typography variant="caption" sx={{ display: "block", mb: 1, opacity: 0.6, fontWeight: 700 }}>
+                    {isGuest ? "Login to Enroll" : isMyCourse ? "Creator Access" : "Free Full Access"}
                   </Typography>
-                  <Typography variant="caption" color={"text.secondary"}>
-                    {courseItem?.course_instructor?.instructorTitle}
-                  </Typography>
+
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    disabled={isGuest}
+                    onClick={handleOpenPlayer}
+                    startIcon={isMyCourse ? <VideoLibraryRounded /> : <PlayCircleFilledRounded />}
+                    sx={{
+                      borderRadius: "12px",
+                      py: 1,
+                      fontWeight: 800,
+                      textTransform: "none",
+                      background: !isDarkMode ? "linear-gradient(90deg, #1976D2, #1565C0)" : "primary.main",
+                      boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)"
+                    }}
+                  >
+                    {isMyCourse ? "Enter Studio" : courseItem?.currentUserEnrolled ? "Continue Learning" : "Enroll & Start"}
+                  </Button>
                 </Box>
-              </Box>
-            </Box>
-
-            <Divider />
-
-            {/* description */}
-            <Box>
-              <AccordionDescription 
-                description={courseItem?.course_description}
-                setOpenAccordion={setIsOpenAccordion}
-              />
-            </Box>
-
-            <Divider />
-
-            {/* Action buttons */}
-            <Box 
-              p={1}
-              gap={1}
-              alignItems={'center'}
-              display={isOpenAccordion ? "none":'flex'}
-              justifyContent={'center'}
-            >
-              {/* similar courses */}
-              <Button 
-                sx={{
-                  fontSize:'small', 
-                  textTransform:'capitalize' 
-                }}
-                onClick={handleShowSimilarCourses}
-                size="small"
-                startIcon={<AutoAwesomeRounded/>}
-              >
-                similar Courses
-              </Button>
-              <Divider component={'div'} orientation="vertical"/>
-              {/* share courses */}
-              <Button 
-                sx={{
-                  fontSize:'small', 
-                  textTransform:'capitalize' 
-                }}
-                onClick={handleGetCourseLink}
-                size="small"
-                color={isCopiedStatus ? 'success':'primary'}
-                startIcon={isCopiedStatus ? <DoneRounded/>:<MobileScreenShareRounded/>}
-              >
-                {isCopiedStatus ? "Link Copied":"Share Course"}
-              </Button>
-            </Box>
-
-            <Divider />
-
-            {/* enroll course button */}
-            <Box
-              display={isOpenAccordion ? "none":'flex'}
-              justifyContent={"center"}
-              flexDirection={'column'}
-              width={"100%"}
-              p={1}
-            >
-              {/* helper text */}
-              <Box mb={1} display={'flex'} justifyContent={'center'}>
-                <FormHelperText>
-                  {isGuest ? "login and enroll free"
-                  :isMyCourse ? 'you uploaded this course'
-                  :'preview and enroll free'}
-                </FormHelperText>
-              </Box>
-              
-              {/* btn */}
-              <Box display={"flex"} justifyContent={"center"}>
-                {isMyCourse ? (
-                  <Button
-                    onClick={handleOpenPlayer}
-                    size="small"
-                    className="rounded-5"
-                    disabled={isGuest}
-                    variant={isDarkMode ? "outlined" : "contained"}
-                    startIcon={<VideoLibraryRounded />}
-                    sx={{
-                      textTransform: "capitalize",
-                      background: !isDarkMode && appGradients.primary,
-                    }}
-                    disableElevation
-                  >
-                    Preview Your Course
-                  </Button>
-                ):(
-                  <Button
-                    onClick={handleOpenPlayer}
-                    size="small"
-                    disabled={isGuest}
-                    className="rounded-5"
-                    variant={isDarkMode ? "outlined" : "contained"}
-                    startIcon={<CastForEducationRounded />}
-                    sx={{
-                      textTransform: "capitalize",
-                      background: !isDarkMode && appGradients.primary,
-                    }}
-                    disableElevation
-                  >
-                    {courseItem?.currentUserEnrolled ? "You Enrolled Learn":"Preview Course Free"}
-                  </Button>
-                )}
-              </Box>
-            </Box>
+              </>
+            )}
           </Box>
         </CardContent>
       </Card>
 
-      {/* show similar courses alert */}
+      {/* show snack success when link copied */}
+      {isCopiedStatus && (
+        <MetatronSnackbar
+          open={isCopiedStatus}
+          message={"Course link copied to clipboard!"}
+          handleClose={setIsCopiedStatus}
+
+        />
+      )}
+
       {showSimilar && (
         <AlertSimilarCourses
           openSimilarCourses={showSimilar}

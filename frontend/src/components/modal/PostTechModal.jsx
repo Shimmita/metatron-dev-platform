@@ -9,7 +9,6 @@ import {
   Box,
   Button,
   MenuItem,
-  Modal,
   styled,
   TextField,
   Typography,
@@ -301,7 +300,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           // close the current modal
           setOpenModalTech(false);
           // navigate to home route by default
-          navigate("/");
+          navigate("/explore");
           // update tab bottom nav to 0
           updateCurrentBottomNav(0);
           // update the redux of current posts suppose the post is present
@@ -358,8 +357,6 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     <ModalShell
       open={openModalTech}
     >
-
-
       {/* ── Header ── */}
       <ModalHeader
         title={title || "Tech Post"}
@@ -376,16 +373,16 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       />
 
       <ModalBody>
-        <Box mt={3} display={"flex"} flexDirection={"column"} gap={3}>
+        <Box display={"flex"} flexDirection={"column"}>
           <SectionCard>
             <SectionTitle variant="h6">Post Title</SectionTitle>
-            <Typography variant="body2" color={"text.secondary"}>
+            <Typography variant="body2" color={"text.secondary"} mb={2}>
               Provide relevant title for this post to help target users on
               the platform to bootstrap your objectives or motives at
               glance.
             </Typography>
 
-            <Box mt={2} className="w-100 mb-2">
+            <Box mt={2} className="w-100 ">
               <TextField
                 required
                 disabled={isUploading}
@@ -402,13 +399,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           <SectionCard>
             <SectionTitle variant="h6">Specialisation</SectionTitle>
             {/* post about */}
-            <Typography variant="body2" color={"text.secondary"}>
+            <Typography variant="body2" color={"text.secondary"} mb={2}>
               Provide area of specialisation in the Tech or IT Industry where
               your post is aimed to address in particular.
             </Typography>
 
-            <Box className="w-100 
-                  mb-2 ">
+            <Box className="w-100 ">
               <TextField
                 required
                 select
@@ -442,7 +438,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             {/* other category */}
             {postCategory.includes('Zero') && (
               <Box className="mb-2">
-                <Typography variant="body2" mb={2} color={"text.secondary"} >
+                <Typography variant="body2" mb={2} color={"text.secondary"} mb={2}>
                   You have selected option other, provide the other specialization or category
                   that your post aims to address.
                 </Typography>
@@ -463,11 +459,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "Containerization and Orchestration" && (
             <SectionCard>
               <SectionTitle variant="h6">Containerization Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"} p={1}>
+              <Typography variant="body2" color={"text.secondary"} mb={2}>
                 Containerization and Orchestration option that your post
                 aims to enlighten to other potential users on the platform.
               </Typography>
-              <Box className="w-100 mb-2 ">
+              <Box className="w-100">
                 <TextField
                   required
                   select
@@ -502,12 +498,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "Artificial Intelligence" && (
             <SectionCard>
               <SectionTitle variant="h6">AI/ML Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"} p={1}>
+              <Typography variant="body2" color={"text.secondary"} mb={2}>
                 Provide specific area of focus in the field of Machine
                 Learning and Artificial Intelligence, select option zero if
                 none matches to provide your preference.
               </Typography>
-              <Box className="w-100 mb-2 ">
+              <Box className="w-100 ">
                 <TextField
                   required
                   select
@@ -539,11 +535,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "Data Science and Analytics" && (
             <SectionCard>
               <SectionTitle variant="h6">Data Science Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"} p={1}>
+              <Typography variant="body2" color={"text.secondary"} mb={2}>
                 Select the area of focus in the field of data science and
                 analysis in particular.
               </Typography>
-              <Box className="w-100 mb-2 ">
+              <Box className="w-100 ">
                 <TextField
                   required
                   select
@@ -575,12 +571,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "Cybersecurity Engineering" && (
             <SectionCard>
               <SectionTitle variant="h6">Cybersecurity Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"} p={1}>
+              <Typography variant="body2" color={"text.secondary"} mb={2}>
                 Select the area of focus in the field of cybersecurity
                 engineering.This prevents being too general in broader
                 fields.
               </Typography>
-              <Box className="w-100 mb-2 ">
+              <Box className="w-100 ">
                 <TextField
                   required
                   disabled={isUploading}
@@ -612,13 +608,13 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "Desktop App Development" && (
             <SectionCard>
               <SectionTitle variant="h6">Desktop Development Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"} mt={3}>
+              <Typography variant="body2" color={"text.secondary"} mb={2}>
                 Desktop development stack used in your project. Desktop
                 applications usually runs on high-end devices such as
                 Laptops and PCs.
               </Typography>
 
-              <Box mt={4} className="w-100 mb-2 ">
+              <Box mt={4} className="w-100 ">
                 <TextField
                   required
                   select
@@ -650,12 +646,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "Game App Development" && (
             <SectionCard>
               <SectionTitle variant="h6">Game Development Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"}>
+              <Typography variant="body2" color={"text.secondary"} mb={2}>
                 Provide game application development technology that your
                 post is aimed to address in particular from the provided
                 options.
               </Typography>
-              <Box mt={4} className="w-100 mb-2 ">
+              <Box mt={4} className="w-100">
                 <TextField
                   required
                   disabled={isUploading}
@@ -690,12 +686,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "Programming Languages" && (
             <SectionCard>
               <SectionTitle variant="h6">Programming Language Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"}>
+              <Typography variant="body2" color={"text.secondary"} mb={2}>
                 Select programming language that you are interested to post
                 about from the options provided below.
               </Typography>
 
-              <Box mt={4} className="w-100 mb-2 ">
+              <Box mt={4} className="w-100">
                 <TextField
                   required
                   select
@@ -736,12 +732,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 gutterBottom
                 variant="body2"
                 color={"text.secondary"}
-                p={1}
+                mb={2}
               >
                 Select cloud provider in particular that you are interested
                 to address in your post.
               </Typography>
-              <Box className="w-100 mb-3 ">
+              <Box className="w-100">
                 <TextField
                   required
                   select
@@ -773,12 +769,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 gutterBottom
                 variant="body2"
                 color={"text.secondary"}
-                p={1}
+                mb={2}
               >
                 Select DevOps engineering platform or tool that was used as
                 reference for your post.
               </Typography>
-              <Box className="w-100 mb-3 ">
+              <Box className="w-100 ">
                 <TextField
                   required
                   select
@@ -813,11 +809,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "UI/UX Design" && (
             <SectionCard>
               <SectionTitle variant="h6">UI/UX Design Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"}>
+              <Typography variant="body2" color={"text.secondary"} mb={2}>
                 Provide UI/UX design tool which your post covers and aims to
                 enlighten potential target users on the platform.
               </Typography>
-              <Box mt={4} className="w-100 mb-2 ">
+              <Box className="w-100">
                 <TextField
                   required
                   select
@@ -853,12 +849,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             postCategory === "Fullstack App Development") && (
               <SectionCard>
                 <SectionTitle variant="h6">Frontend Details</SectionTitle>
-                <Typography variant="body2" color={"text.secondary"}>
+                <Typography variant="body2" mb={2} color={"text.secondary"}>
                   Which frontend technology are you interested in? If your post
                   is based on a bare HTML/CSS/Js version of a project, select
                   the option with (HTML).
                 </Typography>
-                <Box my={3} className="w-100">
+                <Box mb={2} className="w-100">
                   <TextField
                     required
                     select
@@ -888,11 +884,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 </Box>
 
                 {/* frontend UI library */}
-                <Typography variant="body2" color={"text.secondary"} p={1}>
+                <Typography variant="body2" color={"text.secondary"} mb={2}>
                   Which frontend UI/UX design library have you used in styling your {!frontend.includes("none") && frontend}
                   components for your project or milestone post.
                 </Typography>
-                <Box className="w-100 mb-2 ">
+                <Box className="w-100">
                   <TextField
                     required
                     select
@@ -916,12 +912,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             postCategory === "Fullstack App Development") && (
               <SectionCard>
                 <SectionTitle variant="h6">Backend Details</SectionTitle>
-                <Typography variant="body2" color={"text.secondary"} mt={3}>
+                <Typography variant="body2" color={"text.secondary"} mb={2}>
                   Which backend technology are you interested in? Suppose none
                   of the provided options matches your preference select
                   (other).
                 </Typography>
-                <Box mt={4} className="w-100">
+                <Box className="w-100">
                   <TextField
                     required
                     select
@@ -958,12 +954,12 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             postCategory === "Fullstack App Development") && (
               <SectionCard>
                 <SectionTitle variant="h6">Database Details</SectionTitle>
-                <Typography variant="body2" mt={3} color={"text.secondary"}>
+                <Typography variant="body2" mb={2} color={"text.secondary"}>
                   Which database did you link it with {backend} for this post.
                   suppose none of the provided options matches your preference
                   select (other).
                 </Typography>
-                <Box mt={4} className="w-100 ">
+                <Box className="w-100 ">
                   <TextField
                     required
                     select
@@ -998,7 +994,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "Native Android App Development" && (
             <SectionCard>
               <SectionTitle variant="h6">Android Development Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"}>
+              <Typography mb={2} variant="body2" color={"text.secondary"}>
                 Native Android application development stack is usually
                 based on Java or Kotlin. The recommended modern way of
                 writing android applications is by using Kotlin.
@@ -1038,7 +1034,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "Native IOS App Development" && (
             <SectionCard>
               <SectionTitle variant="h6">iOS Development Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"}>
+              <Typography mb={2} variant="body2" color={"text.secondary"}>
                 Provide the stack used in the development of your native
                 IOS application which your post is aimed to address.
               </Typography>
@@ -1076,7 +1072,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
           {postCategory === "Multiplatform Mobile Development" && (
             <SectionCard>
               <SectionTitle variant="h6">Multiplatform Development Details</SectionTitle>
-              <Typography variant="body2" color={"text.secondary"}>
+              <Typography variant="body2" mb={2} color={"text.secondary"}>
                 Provide multiplatform or cross-platform development
                 technology that you are interested in. Allows writing of a
                 single code base that runs on both Android and IOS devices.
@@ -1119,6 +1115,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             <SectionTitle variant="h6">Post Image</SectionTitle>
             <Typography
               gutterBottom
+              mb={2}
               variant="body2"
               color={"text.secondary"}>
               Add a clear cover image that helps people understand your update quickly as they scroll through the feed.
@@ -1233,6 +1230,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             {/* Github link */}
             <Typography
               variant="body2"
+              mb={2}
               color={"text.secondary"}>
               If this post relates to a live project, repository, or technical write-up, include the link so people can review the work directly.
             </Typography>
@@ -1256,6 +1254,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             {/* group tagging */}
             <Typography
               variant="body2"
+              mb={2}
               color={"text.secondary"}>
               Group tagging is optional, but it can help your post reach the most relevant technical community faster.
             </Typography>
@@ -1299,13 +1298,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             {/* description */}
             <Typography
               variant="body2"
+              mb={2}
               color={"text.secondary"}>
               Write a concise, professional summary that explains the context, the technical decisions, and the value of what you are sharing.
             </Typography>
 
             <Box mb={2}>
               <TextField
-                minRows={window.screen.availWidth <= 320 ? 5 : 10}
+                minRows={5}
                 multiline
                 disabled={isUploading}
                 contentEditable={false}

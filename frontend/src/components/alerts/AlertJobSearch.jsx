@@ -53,7 +53,7 @@ export default function AlertJobSearch({
   const [datePosted, setDatePosted] = useState("");
   const [category, setCategory] = useState("");
   const [access, setAccess] = useState("");
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.currentUser);

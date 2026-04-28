@@ -115,7 +115,7 @@ export default function AlertCountry({
     // close the dialog
     handleClose();
     // nav home if user not logged in then login page be shown
-    navigate("/");
+    navigate("/explore");
   };
 
 

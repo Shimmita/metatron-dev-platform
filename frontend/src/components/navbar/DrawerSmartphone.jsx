@@ -1,4 +1,3 @@
-import { DarkModeRounded } from "@mui/icons-material";
 import {
   Avatar,
   AvatarGroup,
@@ -7,17 +6,16 @@ import {
   Divider,
   Drawer,
   FormHelperText,
-  IconButton,
   styled,
   Tooltip,
   Typography
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { appGradients } from "../../utils/colors";
 import axios from "axios";
 import { useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetDarkMode } from "../../redux/AppUI";
+import { appGradients } from "../../utils/colors";
 import StepperStats from "../sidebar/StepperStats";
 import CustomCountryName from "../utilities/CustomCountryName";
 import { getImageMatch } from "../utilities/getImageMatch";
@@ -158,11 +156,11 @@ const DrawerSmartphone = ({
            textTransform={'uppercase'}>Metatron</Typography>
 
            {/* icon button */}
-          <IconButton onClick={handleShowDarkMode}> 
+            {/* <IconButton onClick={handleShowDarkMode}>
             <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
             <DarkModeRounded/>
-          </Tooltip> 
-          </IconButton>
+          </Tooltip>
+          </IconButton> */}
         </Box>
 
 

@@ -11,7 +11,7 @@ const MetatronSnackbar = ({
   message, 
   isError, 
   handleClose, 
-  duration = 2000 
+  duration = 3000 
 }) => {
   return (
     <Snackbar

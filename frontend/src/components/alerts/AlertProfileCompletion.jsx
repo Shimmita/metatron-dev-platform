@@ -109,7 +109,7 @@ export default function AlertProfileCompletion({
       const auth = getAuth();
       await signOut(auth);
     }
-    navigate("/");
+    navigate("/explore");
   };
 
   return (

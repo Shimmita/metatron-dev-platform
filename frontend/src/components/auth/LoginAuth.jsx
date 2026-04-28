@@ -1,9 +1,8 @@
 import {
   Close,
-  DarkModeRounded,
-  LightModeRounded,
   Lock,
   PersonAddRounded,
+  TravelExploreRounded,
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
@@ -25,12 +24,12 @@ import {
   TextField,
   Tooltip,
   Typography,
-  useTheme,
   useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 import axios from "axios";
-import React, { lazy, useEffect, useLayoutEffect, useState } from "react";
+import { lazy, useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -42,7 +41,7 @@ import OptionsMoreLogin from "./OptionsMoreLogin";
 const ModalPolicyTerms = lazy(() => import("./ModalPolicyTerms"));
 const ModalAccountInfo = lazy(() => import("./ModalAccountInfo"));
 
-/* ─── Design tokens ─────────────────────────────────────────────────── */
+/* ─── Design tokens (unchanged) ─── */
 const C = {
   bg: "#060D18",
   bgCard: "rgba(255,255,255,0.045)",
@@ -59,7 +58,7 @@ const C = {
   textHint: "rgba(240,244,250,0.35)",
 };
 
-/* ─── Ambient orb ────────────────────────────────────────────────────── */
+/* ─── Ambient orb (unchanged) ─── */
 const Orb = ({ top, left, size, color, delay = "0s" }) => (
   <Box
     sx={{
@@ -81,7 +80,7 @@ const Orb = ({ top, left, size, color, delay = "0s" }) => (
   />
 );
 
-/* ─── Dot-grid backdrop ───────────────────────────────────────────────── */
+/* ─── Dot-grid backdrop (unchanged) ─── */
 const DotGrid = () => (
   <Box
     sx={{
@@ -94,7 +93,7 @@ const DotGrid = () => (
   />
 );
 
-/* ─── Thin divider with label ─────────────────────────────────────────── */
+/* ─── Thin divider with label (unchanged) ─── */
 const Divider = ({ label }) => (
   <Box display="flex" alignItems="center" gap={1.5} my={2.5}>
     <Box flex={1} height="1px" bgcolor={C.border} />
@@ -105,11 +104,11 @@ const Divider = ({ label }) => (
   </Box>
 );
 
-/* ─── Shared input sx ─────────────────────────────────────────────────── */
+/* ─── Shared input sx (unchanged) ─── */
 const inputSx = {
   "& .MuiOutlinedInput-root": {
-    color: "#FFFFFF", // strong visible text
-    background: "rgba(255,255,255,0.08)", // slightly brighter
+    color: "#FFFFFF",
+    background: "rgba(255,255,255,0.08)",
     borderRadius: "12px",
     transition: "all 0.25s ease",
 
@@ -135,13 +134,13 @@ const inputSx = {
     },
 
     "&.Mui-focused": {
-      background: "rgba(20,210,190,0.06)", // subtle glow background
+      background: "rgba(20,210,190,0.06)",
       boxShadow: "0 0 0 3px rgba(20,210,190,0.25)",
     },
   },
 
   "& .MuiInputLabel-root": {
-    color: "rgba(255,255,255,0.6)", // brighter label
+    color: "rgba(255,255,255,0.6)",
     fontSize: 13,
     fontWeight: 500,
   },
@@ -151,7 +150,7 @@ const inputSx = {
   },
 
   "& .MuiInputLabel-root.MuiFormLabel-filled": {
-    color: "rgba(255,255,255,0.8)", // visible after typing
+    color: "rgba(255,255,255,0.8)",
   },
 
   "& input::placeholder": {
@@ -165,7 +164,7 @@ const inputSx = {
   },
 };
 
-/* ─── Main component ──────────────────────────────────────────────────── */
+/* ─── Main component ─── */
 const LoginAuth = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -189,7 +188,7 @@ const LoginAuth = () => {
 
   const openMore = Boolean(anchorEl);
 
-  useLayoutEffect(() => { if (!isGuest) navigate("/"); }, [isGuest]);
+  useLayoutEffect(() => { if (!isGuest) navigate("/explore"); }, [isGuest, navigate]);
 
   useEffect(() => {
     if (!message) return;
@@ -209,7 +208,7 @@ const LoginAuth = () => {
       );
       if (res.data?.email_verified) {
         dispatch(updateUserCurrentUserRedux(res.data));
-        navigate("/");
+        navigate("/explore");
       } else {
         navigate(`/auth/verification?${res.data}`);
       }
@@ -255,7 +254,7 @@ const LoginAuth = () => {
         }}
       >
         {/* Brand */}
-        <Box display="flex" alignItems="center" gap={1.5} sx={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+        <Box display="flex" alignItems="center" gap={1.5} sx={{ cursor: "pointer" }} onClick={() => navigate("/explore")}>
           <Avatar src={logo} sx={{ width: 32, height: 32 }} />
           <Box>
             <Typography
@@ -271,18 +270,13 @@ const LoginAuth = () => {
               METATRON
             </Typography>
             <Typography sx={{ fontSize: 9, letterSpacing: "0.22em", color: C.teal, textTransform: "uppercase" }}>
-              Tech Platform
+              Developer Platform
             </Typography>
           </Box>
         </Box>
 
         {/* Nav actions */}
         <Box display="flex" alignItems="center" gap={0.5}>
-          <Tooltip title={currentMode === "dark" ? "Light mode" : "Dark mode"}>
-            <IconButton onClick={toggleDarkMode} size="small" sx={{ color: C.textSec, "&:hover": { color: C.teal } }}>
-              {currentMode === "dark" ? <LightModeRounded fontSize="small" /> : <DarkModeRounded fontSize="small" />}
-            </IconButton>
-          </Tooltip>
           <Tooltip title="Register">
             <IconButton
               size="small"
@@ -307,18 +301,18 @@ const LoginAuth = () => {
       >
         <Box display="flex" width="100%" maxWidth={1080} alignItems="center" gap={{ xs: 0, md: 10 }}>
 
-          {/* Left panel */}
+          {/* Left panel – refined value proposition */}
           {isDesktop && (
             <Box flex={1} color={C.textPri}>
               {/* Eyebrow */}
               <Box display="flex" alignItems="center" gap={1} mb={3}>
                 <Box sx={{ width: 28, height: 2, bgcolor: C.teal, borderRadius: 1 }} />
                 <Typography sx={{ fontSize: 11, letterSpacing: "0.2em", color: C.teal, textTransform: "uppercase" }}>
-                  Platform Access
+                  Welcome to Metatron
                 </Typography>
               </Box>
 
-              {/* Headline */}
+              {/* Headline – stronger language */}
               <Typography
                 sx={{
                   fontFamily: "'Playfair Display', 'Georgia', serif",
@@ -329,22 +323,22 @@ const LoginAuth = () => {
                   color: C.textPri,
                 }}
               >
-                Tech Jobs. Events.
+                Your All-in-One
                 <Box component="span" sx={{ display: "block", color: C.teal }}>
-                  Courses.
+                  Tech Ecosystem.
                 </Box>
               </Typography>
 
               <Typography sx={{ fontSize: 15, color: C.textSec, maxWidth: 360, lineHeight: 1.75, mb: 5 }}>
-                A unified ecosystem for developers, engineers, and tech innovators.
+                Job board, events hub, and learning platform — built for developers, engineers, and IT professionals.
               </Typography>
 
-              {/* Feature pills */}
+              {/* Feature pills – turned into benefits */}
               {[
-                { label: "Developers Community", dot: C.teal },
-                { label: "Access and Apply IT Jobs", dot: C.teal },
-                { label: "AI-Powered Career Tooling", dot: C.gold },
-                { label: "Portfolio & Certifications", dot: C.teal },
+                { label: "Connect with a global developer community", dot: C.teal },
+                { label: "Access and apply to top IT jobs", dot: C.teal },
+                { label: "AI‑powered career insights & tools", dot: C.gold },
+                { label: "Build your portfolio & get certified", dot: C.teal },
               ].map(({ label, dot }) => (
                 <Box key={label} display="flex" alignItems="center" gap={1.5} mb={1.5}>
                   <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: dot, flexShrink: 0 }} />
@@ -362,7 +356,7 @@ const LoginAuth = () => {
             </Box>
           )}
 
-          {/* ── Login card ── */}
+          {/* ── Login card – refined headings ── */}
           <Box flex={{ xs: 1, md: "0 0 420px" }} maxWidth={{ xs: "100%", md: 420 }}>
             <Box
               sx={{
@@ -388,7 +382,7 @@ const LoginAuth = () => {
                 }}
               />
 
-              {/* Card header */}
+              {/* Card header – clearer call to action */}
               <Box textAlign="center" mb={3.5} sx={{ position: "relative" }}>
                 <Box
                   sx={{
@@ -409,10 +403,10 @@ const LoginAuth = () => {
                     color: C.textPri, letterSpacing: "0.02em",
                   }}
                 >
-                  Access Metatron
+                  Sign In to Metatron
                 </Typography>
                 <Typography sx={{ fontSize: 13, color: C.textSec, mt: 0.5 }}>
-                  Sign in to your Metatron account
+                  Access your developer dashboard and all platform features.
                 </Typography>
               </Box>
 
@@ -443,7 +437,7 @@ const LoginAuth = () => {
                   label="Email"
                   fullWidth
                   required
-                  value={email }
+                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   sx={inputSx}
                   InputProps={{
@@ -500,7 +494,7 @@ const LoginAuth = () => {
                 </Typography>
               </Box>
 
-              <Divider label="secure login" />
+              <Divider label="secure authentication" />
 
               {/* CTA */}
               <Button
@@ -528,7 +522,31 @@ const LoginAuth = () => {
                   "&.Mui-disabled": { background: "rgba(255,255,255,0.08)", color: C.textHint },
                 }}
               >
-                {isVerify ? "Verify Email" : "Continue"}
+                {isVerify ? "Verify Email" : "Sign In"}
+              </Button>
+
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={() => navigate("/explore")}
+                startIcon={<TravelExploreRounded fontSize="small" />}
+                sx={{
+                  mt: 1.25,
+                  py: 1.35,
+                  borderRadius: "10px",
+                  fontWeight: 600,
+                  fontSize: 14,
+                  textTransform: "none",
+                  color: C.textPri,
+                  borderColor: "rgba(20,210,190,0.38)",
+                  background: "rgba(20,210,190,0.04)",
+                  "&:hover": {
+                    borderColor: C.teal,
+                    background: "rgba(20,210,190,0.1)",
+                  },
+                }}
+              >
+                Explore as Guest
               </Button>
 
               {/* Register link */}

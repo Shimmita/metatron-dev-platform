@@ -91,7 +91,7 @@ export const SectionCard = styled(Box)(({ theme }) => ({
   }`,
   borderRadius: theme.shape.borderRadius + 4,
   padding: theme.spacing(2.25),
-  marginBottom: theme.spacing(2),
+  marginBottom: theme.spacing(1.2),
   boxShadow:
     theme.palette.mode === "dark"
       ? "0 18px 34px rgba(0,0,0,0.18)"
@@ -129,7 +129,7 @@ export const SectionTitle = styled(Typography)(({ theme }) => ({
 export const ModalBody = styled(Box)({
   maxHeight: "74vh",
   overflowY: "auto",
-  padding: "12px 14px 18px",
+  padding: "10px 14px 18px",
   // hide scrollbar — Chrome/Safari
   "&::-webkit-scrollbar": { display: "none" },
   // hide scrollbar — IE/Edge/Firefox
@@ -137,17 +137,6 @@ export const ModalBody = styled(Box)({
   scrollbarWidth: "none",
 });
 
-// ─── Status banner (error + loading) ─────────────────────────────────────────
-
-/**
- * Renders an inline error alert OR a centred spinner.
- * Place this once, directly below <HeaderBar />, in every modal.
- *
- * Props
- *   errorMessage   string  — current error text (falsy = hidden)
- *   onDismiss      fn      — called when the user clicks the alert
- *   isUploading    bool    — show spinner when true and no error
- */
 export const StatusBanner = ({ errorMessage, onDismiss, isUploading }) => {
   if (!errorMessage && !isUploading) return null;
 

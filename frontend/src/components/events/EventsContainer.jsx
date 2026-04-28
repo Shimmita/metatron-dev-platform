@@ -2,7 +2,6 @@ import {
   Add,
   AutoAwesome,
   CheckCircle,
-  DarkModeRounded,
   FindInPageRounded,
   HighlightOffOutlined,
   InfoRounded,
@@ -47,7 +46,9 @@ import {
   resetDarkMode,
   showUserProfileDrawer
 } from "../../redux/AppUI";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import { updateCurrentEvents } from "../../redux/CurrentEvents";
+import { appGradients } from "../../utils/colors";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertJobSearch from "../alerts/AlertJobSearch";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
@@ -58,8 +59,6 @@ import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import EventItem from "./layout/EventItem";
 import EventStatsLayout from "./layout/EventStatsLayout";
-import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
-import { appGradients } from "../../utils/colors";
 
 const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
 
@@ -155,7 +154,7 @@ export default function EventsContainer() {
   const[isMyStats,setIsMyStats]=useState(false)
 
   const [textOption, setTextOption] = useState(
-    isJobSearchGlobal ? "Search Events" : "Explore Events"
+    !isGuest && isJobSearchGlobal ? "Search Events" : "Explore Events"
   );
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
   const [open, setOpen] = useState(
@@ -209,7 +208,7 @@ export default function EventsContainer() {
       dispatch(updateCurrentBottomNav(2))
 
     // don't fetch any if isJob-search-events global to avoid overriding  data
-    if (isJobSearchGlobal) {
+    if (!isGuest && isJobSearchGlobal) {
       // false my stats
       setIsMyStats(false)
       return;
@@ -457,7 +456,7 @@ export default function EventsContainer() {
       });
   }
 
-  }, [dispatch, textOption, user, isJobSearchGlobal]);
+  }, [dispatch, textOption, user, isGuest, isJobSearchGlobal]);
 
 
      // UI theme dark light tweaking effect
@@ -610,14 +609,14 @@ export default function EventsContainer() {
                 ):(
                   <React.Fragment>
                 {/* dark mode */}
-                <IconButton  
-                onClick={handleShowDarkMode}> 
+                    {/* <IconButton
+                onClick={handleShowDarkMode}>
                   <Tooltip arrow title={isDarkMode ?  "Light": "Dark" }>
                   <DarkModeRounded
                     sx={{ color: "white", height:24, width:24,}}
                   />
-                </Tooltip> 
-                </IconButton>
+                </Tooltip>
+                </IconButton> */}
 
                   <Tooltip arrow title={"profile"}>
                 <IconButton onClick={handleShowingProfileDrawer}>
@@ -718,7 +717,9 @@ export default function EventsContainer() {
             )}
 
             <List>
-              {[
+              {(isGuest ? [
+                "Explore Events",
+              ] : [
                 "Explore Events",
                 "Search Events",
                 "Create Events",
@@ -726,11 +727,10 @@ export default function EventsContainer() {
                 "AI Selection",
                 "RSVP Events",
                 "Events Manager",
-              ].map((text, index) => (
+              ]).map((text, index) => (
                 <ListItem
                   key={text}
                   disablePadding
-                  sx={{ display:isGuest ? 'none': 'block' }}
                   onClick={() => {
                     // update the selected option
                     setTextOption(text);

@@ -1,181 +1,112 @@
+import React from "react";
 import {
-  HomeOutlined,
-  HomeRounded,
-  SchoolOutlined,
-  SchoolRounded,
-  TvRounded,
-  TvTwoTone,
-  WorkOutlineOutlined,
-  WorkRounded,
+  HomeOutlined, HomeRounded,
+  SchoolOutlined, SchoolRounded,
+  TvRounded, TvTwoTone,
+  WorkOutlineOutlined, WorkRounded,
 } from "@mui/icons-material";
-
-import {
-  BottomNavigation,
-  BottomNavigationAction,
-  Box,
-  Tooltip,
-} from "@mui/material";
-
+import { BottomNavigation, BottomNavigationAction, Box, Tooltip } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
-import {
-  handleShowingSpeedDial,
-  handleSidebarRightbar,
-} from "../../redux/AppUI";
+import { handleShowingSpeedDial, handleSidebarRightbar } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
 const BottomNav = () => {
-  const { isSidebarRighbar, currentMode, isTabSideBar } = useSelector(
-    (state) => state.appUI
-  );
-
+  const { isSidebarRighbar, currentMode } = useSelector((state) => state.appUI);
   const { position } = useSelector((state) => state.currentBottomNav);
 
   const isDarkMode = currentMode === "dark";
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  /* ─── Navigation Handlers ─── */
-  const handleReturnHome = () => {
-    if (!isSidebarRighbar) dispatch(handleSidebarRightbar());
-    dispatch(handleShowingSpeedDial(true));
-    navigate("/");
+  const handleNavClick = (path, pos, action) => {
+    dispatch(updateCurrentBottomNav(pos));
+    navigate(path);
+    if (action === "home") {
+      if (!isSidebarRighbar) dispatch(handleSidebarRightbar());
+      dispatch(handleShowingSpeedDial(true));
+    } else {
+      if (isSidebarRighbar) dispatch(handleSidebarRightbar());
+    }
   };
 
-  const handleJobContent = () => {
-    navigate("/jobs");
-    if (isSidebarRighbar) dispatch(handleSidebarRightbar());
-  };
-
-  const handleNavigateEvents = () => {
-    navigate("/events");
-    if (isSidebarRighbar) dispatch(handleSidebarRightbar());
-  };
-
-  const handleOpenCourses = () => {
-    navigate("/courses/available");
-    if (isSidebarRighbar) dispatch(handleSidebarRightbar());
-  };
-
-  /* ─── Icon Styling ─── */
-  const iconStyle = (active) => ({
-    width: 26,
-    height: 26,
-    color: active ? "#14D2BE" : "rgba(255,255,255,0.55)",
-    transition: "all 0.25s ease",
-  });
+  const navItems = [
+    { label: "Home", path: "/explore", icon: <HomeOutlined />, activeIcon: <HomeRounded />, title: "Home", action: "home" },
+    { label: "Jobs", path: "/jobs", icon: <WorkOutlineOutlined />, activeIcon: <WorkRounded />, title: "Tech Jobs" },
+    { label: "Events", path: "/events", icon: <TvTwoTone />, activeIcon: <TvRounded />, title: "Tech Events" },
+    { label: "Courses", path: "/courses/available", icon: <SchoolOutlined />, activeIcon: <SchoolRounded />, title: "Tech Courses" },
+  ];
 
   return (
     <Box
       sx={{
         position: "fixed",
-        bottom: 10,
-        left: 0,
-        right: 0,
-        display: "flex",
-        justifyContent: "center",
-        zIndex: 1200,
+        bottom: 20, // Raised slightly for a better "floating" feel
+        left: "50%",
+        transform: "translateX(-50%)", // Perfect centering logic
+        width: "auto",
+        zIndex: 1300,
+        pointerEvents: "none", // Ensures it doesn't block clicks in the gap
       }}
     >
       <BottomNavigation
         value={position}
-        onChange={(e, newValue) =>
-          dispatch(updateCurrentBottomNav(newValue))
-        }
         showLabels
         sx={{
-          width: "95%",
-          maxWidth: 420,
-          borderRadius: "18px",
+          pointerEvents: "auto", // Restore clicks for the nav itself
+          width: "90vw",
+          maxWidth: 400,
+          height: 65,
+          borderRadius: "24px",
           px: 1,
-          py: 0.5,
-
-          background: "rgba(255,255,255,0.05)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255,255,255,0.08)",
-
-          boxShadow: "0 10px 40px rgba(0,0,0,0.6)",
-
+          background: isDarkMode 
+            ? "rgba(15, 23, 42, 0.85)" 
+            : "rgba(255, 255, 255, 0.9)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid",
+          borderColor: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+          boxShadow: isDarkMode 
+            ? "0 10px 30px rgba(0,0,0,0.5)" 
+            : "0 10px 30px rgba(15, 76, 129, 0.15)",
+          
           "& .MuiBottomNavigationAction-root": {
-            color: "rgba(255,255,255,0.6)",
-            fontSize: 11,
-            transition: "all 0.25s ease",
-
+            minWidth: "auto",
+            padding: "6px 0",
+            color: isDarkMode ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            
             "&.Mui-selected": {
               color: "#14D2BE",
-              transform: "translateY(-2px)",
+              "& .MuiBottomNavigationAction-label": {
+                fontSize: "0.7rem",
+                fontWeight: 800,
+                mt: 0.5
+              },
+              "& svg": {
+                transform: "scale(1.1) translateY(-2px)",
+                color: "#14D2BE"
+              }
             },
-          },
+            "& .MuiBottomNavigationAction-label": {
+              fontSize: "0.65rem",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.05rem"
+            }
+          }
         }}
       >
-        {/* HOME */}
-        <Tooltip
-          title="Home"
-          arrow
-          style={{
-            marginLeft:
-              CustomDeviceTablet() && isTabSideBar ? "30%" : undefined,
-          }}
-        >
-          <BottomNavigationAction
-            label="Home"
-            onClick={handleReturnHome}
-            icon={
-              position === 0 ? (
-                <HomeRounded sx={iconStyle(true)} />
-              ) : (
-                <HomeOutlined sx={iconStyle(false)} />
-              )
-            }
-          />
-        </Tooltip>
-
-        {/* JOBS */}
-        <Tooltip title="Tech Jobs" arrow>
-          <BottomNavigationAction
-            label="Jobs"
-            onClick={handleJobContent}
-            icon={
-              position === 1 ? (
-                <WorkRounded sx={iconStyle(true)} />
-              ) : (
-                <WorkOutlineOutlined sx={iconStyle(false)} />
-              )
-            }
-          />
-        </Tooltip>
-
-        {/* EVENTS */}
-        <Tooltip title="Tech Events" arrow>
-          <BottomNavigationAction
-            label="Events"
-            onClick={handleNavigateEvents}
-            icon={
-              position === 2 ? (
-                <TvRounded sx={iconStyle(true)} />
-              ) : (
-                <TvTwoTone sx={iconStyle(false)} />
-              )
-            }
-          />
-        </Tooltip>
-
-        {/* COURSES */}
-        <Tooltip title="Tech Courses" arrow>
-          <BottomNavigationAction
-            label="Courses"
-            onClick={handleOpenCourses}
-            icon={
-              position === 3 ? (
-                <SchoolRounded sx={iconStyle(true)} />
-              ) : (
-                <SchoolOutlined sx={iconStyle(false)} />
-              )
-            }
-          />
-        </Tooltip>
+        {navItems.map((item, index) => (
+          <Tooltip key={index} title={item.title} arrow disableInteractive>
+            <BottomNavigationAction
+              label={item.label}
+              onClick={() => handleNavClick(item.path, index, item.action)}
+              icon={React.cloneElement(position === index ? item.activeIcon : item.icon, {
+                sx: { fontSize: 24, transition: "inherit" }
+              })}
+            />
+          </Tooltip>
+        ))}
       </BottomNavigation>
     </Box>
   );

@@ -123,7 +123,9 @@ export default function GlobalDrawer({
           </ListItem>
         )}
 
-        {navItems.map((item) => {
+        {navItems
+          .filter((item) => !isGuest || item.text === "Explore Jobs")
+          .map((item) => {
           const isActive = textOption === item.text;
           const showItem = item.isHR ? !isGuest : true; // Only show HR if not guest
 

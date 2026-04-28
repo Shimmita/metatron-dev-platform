@@ -1,9 +1,14 @@
 import {
+  AutoAwesomeRounded,
   CalendarMonthRounded,
+  ChecklistRtlRounded,
   Diversity3Rounded,
   InsightsRounded,
+  RocketLaunchRounded,
   SchoolRounded,
+  VerifiedUserRounded,
   WorkRounded,
+  WorkspacePremiumRounded,
 } from "@mui/icons-material";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -26,7 +31,7 @@ const RightbarAll = () => {
   const theme = useTheme();
 
   const { currentMode, isSidebarRighbar } = useSelector((state) => state.appUI);
-  const { isGuest } = useSelector((state) => state.currentUser);
+  const { isGuest, user } = useSelector((state) => state.currentUser);
   const { position } = useSelector((state) => state.currentBottomNav);
 
   const isDarkMode = currentMode === "dark";
@@ -85,16 +90,39 @@ const RightbarAll = () => {
   ];
 
   const currentSection = sections[activeSection] || sections[0];
+  const professionalTools = [
+    {
+      label: "AI matching",
+      description: "Courses, jobs and events can be ranked around the user's skill profile.",
+      icon: <AutoAwesomeRounded fontSize="small" />,
+    },
+    {
+      label: "Credential wallet",
+      description: "Certifications and completed learning paths become portable proof.",
+      icon: <WorkspacePremiumRounded fontSize="small" />,
+    },
+    {
+      label: "Verified activity",
+      description: "Profile trust grows through projects, milestones and platform history.",
+      icon: <VerifiedUserRounded fontSize="small" />,
+    },
+  ];
+
+  const actionQueue = [
+    user?.selectedSkills?.length ? "Review recommended courses" : "Add skills for better recommendations",
+    isGuest ? "Create an account to unlock networking" : "Check new connection requests",
+    "Track certificates and instructor-led progress",
+  ];
 
   return (
     <Box
       sx={{
-        width: { md: 300, lg: 330, xl: 350 },
+        width: { sm: "100%", md: 300, lg: 330, xl: 350 },
         flexShrink: 0,
-        mt: { md: 2 },
+        mt: { sm: 1.5, md: 2 },
         display: {
           xs: "none",
-          sm: "none",
+          sm: CustomDeviceIsSmall() ? "none" : position === 0 ? "block" : "none",
           md: position === 0 ? "block" : "none",
         },
       }}
@@ -102,7 +130,7 @@ const RightbarAll = () => {
       <Box
         className="shadow"
         sx={{
-          position: "sticky",
+          position: { sm: "static", md: "sticky" },
           top: { md: 88 },
           alignSelf: "flex-start",
           width: "100%",
@@ -120,8 +148,13 @@ const RightbarAll = () => {
             width: "100%",
             background: "rgba(255,255,255,0.04)",
             backdropFilter: "blur(25px)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+            maxHeight: { sm: "60vh", md: "none" },
+            overflowY: { sm: "auto", md: "visible" },
+            "&::-webkit-scrollbar": {
+              display: "none",
+            },
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
           }}
         >
           <Box
@@ -230,10 +263,79 @@ const RightbarAll = () => {
                 height: "100%",
                 background: "rgba(255,255,255,0.02)",
                 border: "1px solid rgba(255,255,255,0.06)",
-                borderRadius: cardRadius,
               }}
             >
               {currentSection.content}
+            </Box>
+
+            <Box
+              mt={1.5}
+              sx={{
+                borderRadius: cardRadius,
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                backdropFilter: "blur(10px)",
+                p: 1.5,
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={1} mb={1.25}>
+                <ChecklistRtlRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+                <Typography variant="body2" fontWeight={700} color="#F0F4FA">
+                  Professional toolkit
+                </Typography>
+              </Box>
+              <Stack spacing={1}>
+                {professionalTools.map((tool) => (
+                  <Box
+                    key={tool.label}
+                    display="flex"
+                    gap={1}
+                    sx={{
+                      borderRadius: cardRadius,
+                      px: 1,
+                      py: 1,
+                      background: "rgba(255,255,255,0.025)",
+                      border: "1px solid rgba(255,255,255,0.06)",
+                    }}
+                  >
+                    <Box sx={{ color: "#14D2BE", display: "flex", mt: 0.2 }}>
+                      {tool.icon}
+                    </Box>
+                    <Box minWidth={0}>
+                      <Typography variant="caption" fontWeight={700} color="#F0F4FA">
+                        {tool.label}
+                      </Typography>
+                      <Typography variant="caption" display="block" sx={{ color: "rgba(240,244,250,0.65)" }}>
+                        {tool.description}
+                      </Typography>
+                    </Box>
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+
+            <Box
+              mt={1.5}
+              sx={{
+                borderRadius: cardRadius,
+                background: "linear-gradient(135deg, rgba(15,168,143,0.18), rgba(20,210,190,0.08))",
+                border: "1px solid rgba(20,210,190,0.22)",
+                p: 1.5,
+              }}
+            >
+              <Box display="flex" alignItems="center" gap={1} mb={1}>
+                <RocketLaunchRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+                <Typography variant="body2" fontWeight={700} color="#F0F4FA">
+                  Next best actions
+                </Typography>
+              </Box>
+              <Stack spacing={0.8}>
+                {actionQueue.map((action) => (
+                  <Typography key={action} variant="caption" sx={{ color: "rgba(240,244,250,0.72)" }}>
+                    {action}
+                  </Typography>
+                ))}
+              </Stack>
             </Box>
 
             {CustomDeviceIsSmall() && currentSection.key === "jobs" && (

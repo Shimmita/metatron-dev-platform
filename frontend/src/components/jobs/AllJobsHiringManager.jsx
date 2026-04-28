@@ -441,7 +441,7 @@ export default function AllJobsHiringManager() {
 
 
               {/* dark mode */}
-              <IconButton
+              {/* <IconButton
                 onClick={handleShowDarkMode}>
                 <Tooltip arrow title={isDarkMode ? "Light" : "Dark"}>
                   <DarkModeRounded
@@ -449,7 +449,7 @@ export default function AllJobsHiringManager() {
                     sx={{ color: "white", height: 24, width: 24, }}
                   />
                 </Tooltip>
-              </IconButton>
+              </IconButton> */}
 
               {/* profile avatar */}
               <Tooltip arrow title={"profile"}>
