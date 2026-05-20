@@ -184,6 +184,40 @@ const ApplyJobModal = ({
     setCurrentButton(1)
   }
 
+  const handleCvDownloadResponse = async (res) => {
+    const contentType = res.headers["content-type"] || "";
+    const contentDisposition = res.headers["content-disposition"] || "";
+    const filename = contentDisposition.match(/filename="?([^"]+)"?/)?.[1] || "cv.pdf";
+
+    if (contentType.includes("application/pdf") || contentType.includes("application/octet-stream")) {
+      const blobUrl = window.URL.createObjectURL(new Blob([res.data], { type: contentType }));
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+      return;
+    }
+
+    const cvUrl = await res.data.text();
+    window.open(cvUrl, "_blank_")
+  }
+
+  const getRequestErrorMessage = async (err, fallback = "something went wrong") => {
+    const data = err?.response?.data;
+
+    if (data instanceof Blob) {
+      const text = await data.text();
+      return text || fallback;
+    }
+
+    if (typeof data === "string") return data;
+    if (data?.message) return data.message;
+    return err?.message || fallback;
+  }
+
   // handle current btn view cv
   const handleDownloadCv = () => {
     // update focused btn
@@ -194,11 +228,9 @@ const ApplyJobModal = ({
 
     axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/cv/my/download`, { cvName }, {
       withCredentials: true,
+      responseType: "blob",
     })
-      .then((res) => {
-        // open new window to download the pdf separately
-        window.open(res.data, "_blank_")
-      })
+      .then(handleCvDownloadResponse)
       .catch(async (err) => {
 
         //  user login session expired show logout alert
@@ -211,7 +243,7 @@ const ApplyJobModal = ({
           );
           return;
         }
-        setErrorMessage(err?.response.data);
+        setErrorMessage(await getRequestErrorMessage(err));
       })
       .finally(() => {
         setIsUploading(false);

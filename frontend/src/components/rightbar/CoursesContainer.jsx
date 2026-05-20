@@ -5,7 +5,7 @@ import PopularCouses from "./layouts/PopularCourses";
 
 export default function CoursesContainer() {
   // simulation of the items in the list
-  const items = Array.from(new Array(3));
+  const items = Array.from(new Array(9));
 
   return (
     <>
@@ -36,9 +36,21 @@ export default function CoursesContainer() {
           p: 0,
         }}
       >
-        <Box>
-          {items?.slice(0, 5).map((index) => (
-            <Box key={index}>
+        <Box
+          display="flex"
+          flexWrap="wrap"
+          gap={1}
+          sx={{ p: 1 }}
+        >
+          {items?.map((_, index) => (
+            <Box
+              key={index}
+              sx={{
+                flex: '1 1 250px',
+                minWidth: '200px',
+                maxWidth: '300px',
+              }}
+            >
               <PopularCouses />
             </Box>
           ))}

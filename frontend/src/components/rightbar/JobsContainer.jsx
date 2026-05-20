@@ -1,6 +1,5 @@
 import { InfoRounded, WorkRounded } from "@mui/icons-material";
-import { Box, CircularProgress, Typography } from "@mui/material";
-import List from "@mui/material/List";
+import { Box, CircularProgress, Typography, List } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -97,9 +96,21 @@ export default function JobsContainer() {
           backdropFilter: "blur(10px)",
         }}
       >
-        <Box>
+        <Box
+          display="flex"
+          flexWrap="wrap"
+          gap={1}
+          sx={{ p: 1 }}
+        >
           {jobsTop?.slice(0, 5).map((jobTop, index) => (
-            <Box key={jobTop?._id}>
+            <Box
+              key={jobTop?._id}
+              sx={{
+                flex: '1 1 250px',
+                minWidth: '200px',
+                maxWidth: '300px',
+              }}
+            >
               <FeaturedJobs
                 isLastIndex={index === jobsTop?.length - 1}
                 isLoading={isFetching}

@@ -13,18 +13,42 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import MoreMessageLayout from "./layout/MoreMessageLayout";
+import { appColors, appGradients } from "../../utils/colors";
 import AlertGeneral from "../alerts/AlertGeneral";
+import MoreMessageLayout from "./layout/MoreMessageLayout";
 
-// input base
+/* ─── Metatron design tokens ─── */
+const C = {
+  glassBg: appColors.bgCard,
+  glassBorder: appColors.border,
+  glassShadow: `0 20px 60px rgba(0,0,0,0.4), 0 0 20px ${appColors.glow}`,
+  teal: appColors.primary,
+  tealLight: appColors.primarySoft,
+  tealDark: appColors.primaryDark,
+  gold: appColors.accent,
+  textPrimary: appColors.textPrimary,
+  textSecondary: appColors.textSecondary,
+  textMuted: appColors.textMuted,
+  success: appColors.success,
+  warning: appColors.warning,
+  error: appColors.error,
+};
+
+/* ─── Styled input base (matches global) ─── */
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
+  color: C.textPrimary,
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
     transition: theme.transitions.create("width"),
     width: "100%",
+    backgroundColor: "transparent",
+    color: C.textPrimary,
+    "&::placeholder": {
+      color: C.textMuted,
+      opacity: 1,
+    },
   },
 }));
 
@@ -39,187 +63,144 @@ const ConversationDetailed = ({
   const [isEditingMessage, setIsEditingMessage] = useState(false);
   const [messageFocused, setMessageFocused] = useState();
 
-  // api request monitors
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const[openAlertGeneral,setOpenAlertGeneral]=useState(false)
-  
+  const [openAlertGeneral, setOpenAlertGeneral] = useState(false);
 
-  // accessing the redux states
   const { currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode=currentMode==='dark'
+  const isDarkMode = currentMode === "dark";
 
-
-  // controls more info for message
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
   const handleClickMoreMessage = (event) => setAnchorEl(event.currentTarget);
   const handleCloseMenu = () => setAnchorEl(null);
 
-  // determine the name and avatar of the conversation displayed.
+  /* determine the name and avatar for the top bar (the other participant) */
   const handleTopBarNameAvatar = () => {
-    // this prevents currently user being displayed on top-bar of conversation
     if (
       currentUserName?.toLowerCase() ===
       focusedConveration?.senderName?.toLowerCase()
     ) {
-      return [`TO: ${focusedConveration?.targetName}`, focusedConveration?.targetAvatar];
+      return [
+        `TO: ${focusedConveration?.targetName}`,
+        focusedConveration?.targetAvatar,
+      ];
     }
-
-    // return the sender name and avatar
-    return [`FROM: ${focusedConveration?.senderName}`, focusedConveration?.senderAvatar];
+    return [
+      `FROM: ${focusedConveration?.senderName}`,
+      focusedConveration?.senderAvatar,
+    ];
   };
 
-  // axios default credentials
   axios.defaults.withCredentials = true;
 
-  // fetch or get all conversations done by the current user
+  /* fetch conversation messages */
   useEffect(() => {
-    if (conversationMessages?.length > 0) {
-      return;
-    }
-    // set is fetching to true
+    if (conversationMessages?.length > 0) return;
     setIsFetching(true);
-
-    // performing get request for all messages with conversationId.
     axios
       .get(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/${focusedConveration?._id}`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       )
-      .then((res) => {
-        // update the states of conversations
-        setConversationMessages(res.data);
-      })
+      .then((res) => setConversationMessages(res.data))
       .catch((err) => {
-        console.log(err);
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage("server is unreachable!");
-          return;
-        }
-        setErrorMessage(err?.response.data);
-        setOpenAlertGeneral(true)
+        if (err?.code === "ERR_NETWORK") setErrorMessage("Server unreachable!");
+        else setErrorMessage(err?.response.data);
+        setOpenAlertGeneral(true);
       })
-      .finally(() => {
-        // set is fetching to false
-        setIsFetching(false);
-      });
+      .finally(() => setIsFetching(false));
   }, [conversationMessages, focusedConveration]);
 
-  const handleDateDisplay = () => {
-    const parent = focusedConveration?.updatedAt?.split("T")[0]?.split("-");
-    return `${parent[parent.length - 1]}/${parent[parent.length - 2]}/${
-      parent[0]
-    }`;
+  const handleDateDisplay = (dateStr) => {
+    const parent = dateStr?.split("T")[0]?.split("-");
+    return parent
+      ? `${parent[parent.length - 1]}/${parent[parent.length - 2]}/${parent[0]}`
+      : "";
   };
 
-  // handle sending of the reply to the backend
+  /* send a new message */
   const handleSendReplyMessage = async () => {
     const messageObject = {
       conversationId: focusedConveration._id,
       content: replyContent,
       senderId: currentUserID,
-      senderName:currentUserName
+      senderName: currentUserName,
     };
-
-    // call api request to post data to the backed
     try {
-      // set is fetching to true
       setIsFetching(true);
-
-      // api request
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/create`,
         messageObject
       );
-      // if response data means sent message thus back to conversation page
-      if (response.data) {
-        // set conversation to the response returned from the server which is last message sent
+      if (response.data)
         setConversationMessages((prev) => [...prev, response.data]);
-      }
     } catch (err) {
-      // error occurred during fetch query
-      console.error(err);
       setErrorMessage(err?.response.data);
-      setOpenAlertGeneral(true)
+      setOpenAlertGeneral(true);
     } finally {
-      // close is fetching
       setIsFetching(false);
-       // clear the reply
-       setReplyContent("");
+      setReplyContent("");
     }
   };
 
-  // handle updating or editing of the message content
+  /* update a message */
   const handleUpdateMessageContent = async () => {
-    // call api request to post data to the backed
     try {
-      // set is fetching to true
       setIsFetching(true);
-
-      // api request
       const response = await axios.put(
         `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/update/${messageFocused._id}`,
         { content: replyContent }
       );
-      // if response data means sent message thus back to conversation page
       if (response.data) {
-        // set conversation messages to [] this will re-render the ui and request the server data of messages
-        setConversationMessages([]);
-
-        // clear the reply
+        setConversationMessages([]); // trigger re-fetch
         setReplyContent("");
+        setIsEditingMessage(false);
       }
     } catch (err) {
-      // error occurred during fetch query
-      console.error(err);
       setErrorMessage(err?.response.data);
-      setOpenAlertGeneral(true)
+      setOpenAlertGeneral(true);
     } finally {
-      // close is fetching
       setIsFetching(false);
     }
   };
 
-  // handle deletion of the message based on its ID
+  /* delete a message */
   const handleDeletingOfMessage = async () => {
-    // call api request to post data to the backed
     try {
-      // set is fetching to true
       setIsFetching(true);
-
-      // api request
       const response = await axios.delete(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/delete/${messageFocused._id}`,
-        { content: replyContent }
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/delete/${messageFocused._id}`
       );
-      // if response data means sent message thus back to conversation page
-      if (response.data) {
-        // set conversation messages to [] this will re-render the ui and request the server data of messages
-        setConversationMessages([]);
-      }
+      if (response.data) setConversationMessages([]); // re-fetch
     } catch (err) {
-      // error occurred during fetch query
-      console.error(err);
       setErrorMessage(err?.response.data);
-      setOpenAlertGeneral(true)
+      setOpenAlertGeneral(true);
     } finally {
-      // close is fetching
       setIsFetching(false);
     }
   };
-
 
   return (
-    <Box 
-    bgcolor={"background.default"} 
-    height={"99vh"}>
-      {/* toolbar like */}
-      <AppBar 
-      position="sticky" 
-      color="transparent">
+    <Box
+      sx={{
+        height: "99vh",
+        background: isDarkMode ? appColors.bgDark : appColors.surfaceAlt,
+        position: "relative",
+      }}
+    >
+      {/* ─── Glass AppBar ─── */}
+      <AppBar
+        position="sticky"
+        sx={{
+          background: isDarkMode
+            ? `linear-gradient(135deg, ${appColors.bgDark}DD, ${appColors.secondarySoft}88)`
+            : appGradients.primary,
+          backdropFilter: "blur(20px)",
+          borderBottom: `1px solid ${appColors.border}`,
+          boxShadow: `0 4px 16px rgba(0,0,0,0.3), 0 0 12px ${appColors.glow}`,
+        }}
+      >
         <Toolbar
           variant="dense"
           sx={{
@@ -228,318 +209,245 @@ const ConversationDetailed = ({
             alignItems: "center",
           }}
         >
-          {/* avatar */}
           <Avatar
-            sx={{ height: 34, width: 34 }}
+            sx={{ width: 34, height: 34 }}
             src={handleTopBarNameAvatar()[1]}
             alt={handleTopBarNameAvatar()[0]?.split(" ")[1]}
           />
-          {/* name of the sender */}
           <Typography
             variant="body2"
-            fontWeight={"bold"}
-            color="text.secondary"
+            fontWeight="bold"
+            color="white"
           >
             {handleTopBarNameAvatar()[0]}
           </Typography>
-          {/* close btn */}
-          <IconButton onClick={handleConversationClicked}>
-            <Close sx={{ height: 14, width: 14 }} />
+          <IconButton onClick={handleConversationClicked} sx={{ color: "white" }}>
+            <Close sx={{ width: 15, height: 15 }} />
           </IconButton>
         </Toolbar>
       </AppBar>
 
+      {/* ─── Messages container ─── */}
       <Box
-        p={1}
-        display={"flex"}
-        flexDirection={"column"}
-        justifyContent={"space-between"}
-        maxHeight={"95vh"}
-        gap={3}
+        p={1.5}
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        maxHeight="90vh"
+        gap={2}
       >
-        <Box>
-          {
-            conversationMessages?.map((message) => (
-              <Stack key={message} gap={2}>
-                {/* current user message styling */}
-                {message.senderId === currentUserID ? (
-                  <Box>
-                    <Box
-                      sx={{
-                        border: "1px solid",
-                        borderColor: "divider",
-                        p: 1,
-                        m: 1,
-                        borderRadius: 1,
-                        bgcolor: isDarkMode ? "gray" : "lightblue",
-                      }}
-                    >
-                      {/* message content */}
-                      <Box>
-                        {/* more button */}
-                        <Box display={"flex"} justifyContent={"flex-end"}>
-                          <IconButton
-                            size="small"
-                            aria-label="more"
-                            onClick={(event) => {
-                              // call show more function
-                              handleClickMoreMessage(event);
-
-                              // set message passed to the current message
-                              setMessageFocused(message);
-                            }}
-                          >
-                            <MoreVertRounded sx={{ width: 12, height: 12 }} />
-                          </IconButton>
-                        </Box>
-                        <Box>
-                          <Typography variant="caption" fontWeight={"bold"}>
-                            {message?.content}
-                          </Typography>
-                        </Box>
-                        {/* caption  owner ref edited and time */}
-                        <Box
-                          mt={1}
-                          mr={1}
-                          display={"flex"}
-                          gap={1}
-                          alignItems={"center"}
-                        >
-                          {/*owner reference */}
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{
-                              fontSize: "x-small",
-                            }}
-                          >
-                            {"( You )"}
-                          </Typography>
-
-                          {/* edited or not */}
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{
-                              fontSize: "x-small",
-                            }}
-                          >
-                            {message?.isEdited && "edited"}
-                          </Typography>
-
-                          {/* caption time */}
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{
-                              fontSize: "x-small",
-                            }}
-                          >
-                            {" "}
-                            {handleDateDisplay(message?.createdAt)}{" "}
-                            {message?.createdAt?.split(".")[0]?.split("T")[1]}{" "}
-                          </Typography>
-                        </Box>
-
-                        {/* more message options, delete and update */}
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={openMenu}
-                          onClose={handleCloseMenu}
-                          MenuListProps={{ "aria-labelledby": "more-button" }}
-                          anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                          }}
-                          transformOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                          }}
-                        >
-                          <MoreMessageLayout
-                            setIsEditingMessage={setIsEditingMessage}
-                            handleCloseMenu={handleCloseMenu}
-                            messagePassed={messageFocused}
-                            setReplyContent={setReplyContent}
-                            handleDeletingOfMessage={handleDeletingOfMessage}
-                          />
-                        </Menu>
-                      </Box>
-                    </Box>
-                  </Box>
-                ) : (
-                  <Box>
-                    <Box
-                      sx={{
-                        p: 1,
-                        m: 1,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        borderRadius: 1,
-                        bgcolor: !isDarkMode ? "whitesmoke" : "black",
-                      }}
-                    >
-                      {/* message content */}
-                      <Box>
-                        <Typography
-                          variant="caption"
-                          fontWeight={"bold"}
-                          color={isDarkMode ? "text.primary" : "text.secondary"}
-                        >
-                          {message?.content}
-                        </Typography>
-                      </Box>
-
-                      {/* caption owner ref edited and time */}
-                      <Box
-                        mt={1}
-                        mr={1}
-                        display={"flex"}
-                        justifyContent={"flex-end"}
-                        alignItems={"center"}
-                        gap={1}
+        <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
+          {conversationMessages?.map((message, index) => (
+            <Stack key={index} gap={1.5} mb={1}>
+              {/* Own message (right aligned) */}
+              {message.senderId === currentUserID ? (
+                <Box display="flex" justifyContent="flex-end">
+                  <Box
+                    sx={{
+                      maxWidth: "75%",
+                      p: 0.5,
+                      border: `1px solid ${appColors.border}`,
+                      borderRadius: 1,
+                      background: isDarkMode
+                        ? `linear-gradient(135deg, ${appColors.primaryDark}66, ${appColors.primary}44)`
+                        : `${appColors.primary}14`,
+                      backdropFilter: "blur(12px)",
+                      position: "relative",
+                    }}
+                  >
+                    <Box display="flex" justifyContent="flex-end" mb={0.5}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => {
+                          handleClickMoreMessage(e);
+                          setMessageFocused(message);
+                        }}
+                        sx={{ color: C.textSecondary }}
                       >
-                        {/*owner reference */}
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{
-                            fontSize: "x-small",
-                            textTransform: "capitalize",
-                          }}
-                        >
-                          {`( ${
-                            focusedConveration?.senderName
-                              ?.toLowerCase()
-                              ?.split(" ")[0]
-                          } )`}
+                        <MoreVertRounded sx={{ width: 14, height: 14 }} />
+                      </IconButton>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: C.textPrimary }}>
+                      {message?.content}
+                    </Typography>
+                    <Box mt={1} display="flex" gap={1} alignItems="center" justifyContent="flex-end">
+                      <Typography variant="caption" sx={{ color: C.textMuted }}>
+                        ( You )
+                      </Typography>
+                      {message?.isEdited && (
+                        <Typography variant="caption" sx={{ color: C.textMuted }}>
+                          edited
                         </Typography>
-
-                        {/* edited or not */}
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{
-                            fontSize: "x-small",
-                          }}
-                        >
-                          {message?.isEdited && "edited"}
-                        </Typography>
-
-                        {/* caption time */}
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{
-                            fontSize: "x-small",
-                          }}
-                        >
-                          {" "}
-                          {handleDateDisplay(message?.createdAt)}{" "}
-                          {message?.createdAt?.split(".")[0]?.split("T")[1]}{" "}
-                        </Typography>
-                      </Box>
+                      )}
+                      <Typography variant="caption" sx={{ color: C.textMuted }}>
+                        {handleDateDisplay(message?.createdAt)}{" "}
+                        {message?.createdAt?.split(".")[0]?.split("T")[1]}
+                      </Typography>
                     </Box>
                   </Box>
-                )}
-              </Stack>
-            ))}
+                </Box>
+              ) : (
+                /* Other user's message (left aligned) */
+                <Box display="flex" justifyContent="flex-start">
+                  <Box
+                    sx={{
+                      maxWidth: "75%",
+                      p: 1,
+                      border: `1px solid ${appColors.border}`,
+                      borderRadius: 1,
+                      background: C.glassBg,
+                      backdropFilter: "blur(20px)",
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ color: C.textPrimary }}>
+                      {message?.content}
+                    </Typography>
+                    <Box mt={1} display="flex" gap={1} alignItems="center" justifyContent="flex-end">
+                      <Typography variant="caption" sx={{ color: C.textMuted, textTransform: "capitalize" }}>
+                        ( {focusedConveration?.senderName?.split(" ")[0]} )
+                      </Typography>
+                      {message?.isEdited && (
+                        <Typography variant="caption" sx={{ color: C.textMuted }}>
+                          edited
+                        </Typography>
+                      )}
+                      <Typography variant="caption" sx={{ color: C.textMuted }}>
+                        {handleDateDisplay(message?.createdAt)}{" "}
+                        {message?.createdAt?.split(".")[0]?.split("T")[1]}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+            </Stack>
+          ))}
+
+          {/* More options menu */}
+          <Menu
+            anchorEl={anchorEl}
+            open={openMenu}
+            onClose={handleCloseMenu}
+            MenuListProps={{ "aria-labelledby": "more-button" }}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
+            PaperProps={{
+              sx: {
+                background: "#0D1B2A",
+                border: `1px solid ${appColors.border}`,
+                borderRadius: 1,
+                mt: 1,
+              },
+            }}
+          >
+            <MoreMessageLayout
+              setIsEditingMessage={setIsEditingMessage}
+              handleCloseMenu={handleCloseMenu}
+              messagePassed={messageFocused}
+              setReplyContent={setReplyContent}
+              handleDeletingOfMessage={handleDeletingOfMessage}
+            />
+          </Menu>
         </Box>
 
-        <Box className="mx-1 rounded" bgcolor={!isDarkMode && "whitesmoke"}>
-          {/* message input */}
+        {/* ─── Message input area (glass) ─── */}
+        <Box
+          sx={{
+            borderRadius: 1,
+            border: `1px solid ${appColors.border}`,
+            background: C.glassBg,
+            backdropFilter: "blur(30px)",
+            p: 1.5,
+            boxShadow: C.glassShadow,
+          }}
+        >
           <StyledInputBase
             multiline
             fullWidth
-            sx={{ padding: "20px" }}
             disabled={isFetching}
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
-            placeholder="write message ..."
-            inputProps={{ "aria-label": "search" }}
+            placeholder="Write a message..."
+            inputProps={{ "aria-label": "message input" }}
           />
-          <Box display={"flex"} justifyContent={"flex-end"} mr={1}>
-            <Box display={"flex"} gap={1} alignItems={"center"}>
+          <Box display="flex" justifyContent="flex-end" mt={1}>
+            <Box display="flex" gap={1} alignItems="center">
               {isEditingMessage ? (
-                <React.Fragment>
+                <>
                   <Button
                     variant="outlined"
                     disabled={isFetching}
                     onClick={() => {
-                      // false message editing
                       setIsEditingMessage(false);
-
-                      // clear the reply content
                       setReplyContent("");
                     }}
                     size="small"
-                    sx={{ borderRadius: "20px", fontSize: "10px" }}
+                    sx={{
+                      borderRadius: "10px",
+                      fontSize: 11,
+                      color: C.textSecondary,
+                      borderColor: C.glassBorder,
+                      "&:hover": { borderColor: C.teal },
+                    }}
                   >
-                    close
+                    Cancel
                   </Button>
-
                   <Button
                     variant="outlined"
                     size="small"
                     disabled={replyContent?.length < 1 || isFetching}
                     onClick={handleUpdateMessageContent}
-                    color="success"
                     sx={{
-                      textTransform: "capitalize",
-                      borderRadius: "20px",
-                      fontSize: "10px",
-                      fontWeight: "bold",
+                      borderRadius: "10px",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: C.success,
+                      borderColor: C.success,
+                      "&:hover": {
+                        backgroundColor: `${C.success}14`,
+                      },
                     }}
                   >
-                    update
+                    Update
                   </Button>
-                </React.Fragment>
+                </>
               ) : (
-                <React.Fragment>
-                  <Button
-                    variant="outlined"
-                    disabled={isFetching}
-                    size="small"
-                    sx={{ borderRadius: "20px", fontSize: "10px" }}
-                  >
-                    AI
-                  </Button>
 
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    disabled={replyContent?.length < 1 || isFetching}
-                    onClick={handleSendReplyMessage}
-                    color="success"
-                    sx={{
-                      textTransform: "capitalize",
-                      borderRadius: "20px",
-                      fontSize: "10px",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Send
-                  </Button>
-                </React.Fragment>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  disabled={replyContent?.length < 1 || isFetching}
+                  onClick={handleSendReplyMessage}
+                  sx={{
+                    borderRadius: "10px",
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: C.success,
+                    borderColor: C.success,
+                    "&:hover": {
+                      backgroundColor: `${C.success}14`,
+                    },
+                  }}
+                >
+                  Send
+                </Button>
               )}
             </Box>
           </Box>
         </Box>
       </Box>
 
-       {/* alert general of the error message */}
-        {errorMessage && (
-          <AlertGeneral
-          title={'something went wrong!'}
+      {/* Error alert */}
+      {errorMessage && (
+        <AlertGeneral
+          title="Something went wrong!"
           message={errorMessage}
           isError={true}
           openAlertGeneral={openAlertGeneral}
           setOpenAlertGeneral={setOpenAlertGeneral}
           setErrorMessage={setErrorMessage}
-          defaultIcon={<InfoRounded/>}
-          />
-        )}
-
+          defaultIcon={<InfoRounded />}
+        />
+      )}
     </Box>
   );
 };

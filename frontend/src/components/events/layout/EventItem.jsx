@@ -204,11 +204,13 @@ function EventItem({
       mb={isLastIndex ? 4 : 2}
       flexDirection="column"
       mt={1}
+      sx={{ width: "100%", minWidth: 0, alignItems: "center" }}
     >
       <Card
         elevation={0}
         sx={{
-          width: CustomDeviceIsSmall() ? 350 : 340,
+          width: "100%",
+          maxWidth: CustomDeviceIsSmall() ? 350 : 360,
           borderRadius: "10px",
           position: "relative",
           overflow: "hidden",

@@ -12,7 +12,7 @@ import MuiDrawer from "@mui/material/Drawer";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
-import React, { Suspense, useEffect, useLayoutEffect, useState } from "react";
+import { Suspense, useEffect, useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -523,7 +523,7 @@ export default function MiniDrawer() {
         } else {
           // don't navigate alert you have not posted any jobs
           setGeneralTitle("Metatron H.R")
-          setMessageGeneral("seems you have not posted any jobs for evaluation. post and the system will help you in assessment!")
+          setMessageGeneral("seems you have not posted any jobs for evaluation. post and the system will help you with assessment!")
           setOpenAlertGeneral(true)
         }
       })
@@ -571,26 +571,19 @@ export default function MiniDrawer() {
   return (
     <Suspense
       fallback={
-        <Box height={"88vh"} display={"flex"} justifyContent={"center"}>
-          <Box display={"flex"} justifyContent={"center"}>
-            <CircularProgress size={20} />
-          </Box>
+        <Box height="88vh" display="flex" justifyContent="center" alignItems="center">
+          <CircularProgress size={24} />
         </Box>
       }
     >
       <Box
-        display={"flex"}
-        maxHeight={"85vh"}
         sx={{
-          width: isMyStats ? window.screen.availWidth - 32 : undefined,
-          overflow: "auto",
-          borderRadius: panelRadius,
-          "&::-webkit-scrollbar": { display: "none" },
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
+          width: "100%",
+          height: "100vh",
+          overflow: "hidden",
         }}
       >
-        {/* ---------- AppBar (Glass with brand gradient) ---------- */}
+        {/* ---------- AppBar ---------- */}
         <GlobalAppBar
           open={open}
           handleNavigateLogin={handleNavigateLogin}
@@ -605,6 +598,7 @@ export default function MiniDrawer() {
           user={user}
         />
 
+        {/* ---------- Drawer ---------- */}
         <GlobalDrawer
           open={open}
           setOpen={setOpen}
@@ -620,130 +614,119 @@ export default function MiniDrawer() {
           handleNavigateHiring={handleNavigateHiring}
         />
 
-        {/* body of the jobs */}
+        {/* ---------- MAIN CONTENT ---------- */}
         <Box
-          width={"100%"}
-          display={"flex"}
-          height={"90vh"}
-          justifyContent={"center"}
-          sx={{ px: { xs: 1, md: 2 } }}
+          sx={{
+            height: "calc(100vh - 64px)",
+            overflow: "hidden",
+            width: "100%",
+            transition: "all 0.25s ease",
+          }}
         >
-          {/* centering the content */}
           <Box
-            p={!CustomDeviceIsSmall() ? 2 : undefined}
-            display={"flex"}
-            gap={2}
-            maxHeight={"85vh"}
-            flexWrap={"wrap"}
-            justifyContent={"center"}
             sx={{
-              overflow: "auto",
               width: "100%",
-              borderRadius: panelRadius,
-              backgroundColor: theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.02)"
-                : "rgba(255,255,255,0.74)",
-              // Hide scrollbar for Chrome, Safari and Opera
-              "&::-webkit-scrollbar": {
-                display: "none",
+              height: "100%",
+              overflowY: "auto",
+              overflowX: "hidden",
+              pt: 5,
+              px: { xs: 1, md: 2 },
+
+              display: "grid",
+
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: open
+                  ? "repeat(auto-fit, minmax(220px, 1fr))"
+                  : "repeat(auto-fit, minmax(200px, 1fr))",
+                md: open
+                  ? "repeat(auto-fit, minmax(240px, 1fr))"
+                  : "repeat(auto-fit, minmax(220px, 1fr))",
               },
-              // Hide scrollbar for IE, Edge and Firefox
+
+              gap: 2,
+              alignItems: "stretch",
+
+              transition: "all 0.25s ease",
+              "&::-webkit-scrollbar": { display: "none" },
               msOverflowStyle: "none",
               scrollbarWidth: "none",
             }}
           >
-            <React.Fragment>
-              {/* all jobs and verified jobs and Nearby that have no external link */}
-              {(textOption === "Explore Jobs" ||
-                textOption === "Nearby Jobs" ||
-                textOption === "Verified Jobs" ||
-                textOption === "AI Selection" ||
-                textOption === "Applications" ||
-                textOption === "My Statistics" ||
-                textOption === "External Jobs" ||
-                textOption === "Search Jobs") && (
-                  <React.Fragment>
-                    {isFetching ? (
-                      <Box
-                        display={"flex"}
-                        justifyContent={"center"}
-                        alignItems={"center"}
-                        width={"100%"}
-                        flexDirection={"column"}
-                      >
-                        <CircularProgress size={"30px"} />
-                      </Box>
+            {/* ---------- LOADING ---------- */}
+            {isFetching ? (
+              <Box
+                gridColumn="1 / -1"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                minHeight="200px"
+              >
+                <CircularProgress size={30} />
+              </Box>
+            ) : (
+              <>
+                {/* ---------- JOBS ---------- */}
+                {jobs?.map((job, index) => (
+                  <Box key={job._id} sx={{ width: "100%" }}>
+                    {isMyStats ? (
+                      <JobStatsLayout
+                        isDarkMode={isDarkMode}
+                        job={job}
+                        user={user}
+                      />
                     ) : (
-                      <React.Fragment>
-                        {/* rendered when are jobs greater than 1 */}
-                        {jobs?.length > 0 &&
-                          jobs?.map((job, index) => (
-                            <>
-                              {/* if is stats displays different layout else job layout */}
-                              {isMyStats ? (
-                                <JobStatsLayout
-                                  key={job?._id}
-                                  isDarkMode={isDarkMode}
-                                  job={job}
-                                  user={user}
-                                />
-                              ) : (
-                                <Box
-                                  key={job?._id}>
-                                  <JobLayout
-                                    isLastIndex={index === jobs?.length - 1}
-                                    pageNumber={pageNumber}
-                                    setPageNumber={setPageNumber}
-                                    isDarkMode={isDarkMode}
-                                    job={job}
-                                    jobs={jobs}
-                                    setErrorMessage={setErrorMessage}
-                                    isJobSearchGlobal={isJobSearchGlobal}
-                                  />
-                                </Box>
-                              )}
-
-                            </>
-                          ))}
-
-                        {/* rendered if are no jobs  */}
-                        {jobs?.length < 1 && (
-                          <Box
-                            height={'70vh'}
-                            display={'flex'}
-                            justifyContent={'center'}
-                            color={'text.secondary'}
-                            flexDirection={'column'}
-                            gap={2}
-                            alignItems={'center'}
-                          >
-                            {/* no events */}
-                            <Typography variant="body2">
-                              no more jobs posted
-                            </Typography>
-                            {/* show refresh button */}
-                            <Button
-                              disableElevation
-                              onClick={handleRefreshData}
-                              size="small"
-                              variant="outlined"
-                              sx={{ borderRadius: 3 }}
-                              startIcon={<Refresh />}
-                            >refresh</Button>
-                          </Box>
-                        )}
-
-                      </React.Fragment>
+                      <JobLayout
+                        isLastIndex={index === jobs.length - 1}
+                        pageNumber={pageNumber}
+                        setPageNumber={setPageNumber}
+                        isDarkMode={isDarkMode}
+                        job={job}
+                        jobs={jobs}
+                        setErrorMessage={setErrorMessage}
+                        isJobSearchGlobal={isJobSearchGlobal}
+                      />
                     )}
-                  </React.Fragment>
+                  </Box>
+                ))}
+
+                {/* ---------- EMPTY STATE ---------- */}
+                {jobs?.length < 1 && (
+                  <Box
+                    gridColumn="1 / -1"
+                    height="60vh"
+                    display="flex"
+                    flexDirection="column"
+                    justifyContent="center"
+                    alignItems="center"
+                    gap={2}
+                    color="text.secondary"
+                  >
+                    <Typography variant="body2">
+                      no more jobs posted
+                    </Typography>
+
+                    <Button
+                      disableElevation
+                      onClick={handleRefreshData}
+                      size="small"
+                      variant="outlined"
+                      sx={{ borderRadius: 3 }}
+                      startIcon={<Refresh />}
+                    >
+                      refresh
+                    </Button>
+                  </Box>
                 )}
-            </React.Fragment>
+              </>
+            )}
           </Box>
         </Box>
 
-        {/* open alert general for no jobs */}
+        {/* ---------- ALERTS ---------- */}
         {openAlertGeneral && (
-          <AlertGeneral openAlertGeneral={openAlertGeneral}
+          <AlertGeneral
+            openAlertGeneral={openAlertGeneral}
             setOpenAlertGeneral={setOpenAlertGeneral}
             title={generalTitle}
             message={messageGeneral}
@@ -751,17 +734,9 @@ export default function MiniDrawer() {
           />
         )}
 
-        {/* holds the notification and messaging drawer */}
-        {isOpenMessageDrawer && (
-          <ParentNotifMessageDrawer />
-        )}
+        {isOpenMessageDrawer && <ParentNotifMessageDrawer />}
+        {isOpenDrawerProfile && <ProfileDrawer />}
 
-        {/* holds the profile drawer which contains user account info */}
-        {isOpenDrawerProfile && (
-          <ProfileDrawer />
-        )}
-
-        {/* show job search alert */}
         {openAlert && (
           <AlertJobSearch
             openAlert={openAlert}
@@ -769,10 +744,10 @@ export default function MiniDrawer() {
             isFullView={true}
           />
         )}
-        {/* alert general of the error message */}
+
         {errorMessage && (
           <AlertGeneral
-            title={'something went wrong!'}
+            title="something went wrong!"
             message={errorMessage}
             isError={true}
             openAlertGeneral={errorMessage}
@@ -782,8 +757,9 @@ export default function MiniDrawer() {
           />
         )}
 
-        {/* show success snackbar when redux snack state is updated */}
-        {messageSnack && <MetatronSnackbar open={messageSnack} message={messageSnack} />}
+        {messageSnack && (
+          <MetatronSnackbar open={messageSnack} message={messageSnack} />
+        )}
       </Box>
     </Suspense>
   );

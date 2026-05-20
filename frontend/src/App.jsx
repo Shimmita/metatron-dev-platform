@@ -55,6 +55,27 @@ const App = () => {
             msOverflowStyle: "none",
             "&::-webkit-scrollbar": { display: "none" },
           },
+          "*": {
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          },
+          "*::-webkit-scrollbar": {
+            display: "none",
+            width: 0,
+            height: 0,
+          },
+          "*::-webkit-scrollbar-thumb": {
+            background: "transparent",
+          },
+          ".MuiDialog-paper, .MuiDialogContent-root, .MuiDrawer-paper, .MuiPopover-paper, .MuiMenu-paper, .MuiModal-root": {
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+          },
+          ".MuiDialog-paper::-webkit-scrollbar, .MuiDialogContent-root::-webkit-scrollbar, .MuiDrawer-paper::-webkit-scrollbar, .MuiPopover-paper::-webkit-scrollbar, .MuiMenu-paper::-webkit-scrollbar, .MuiModal-root::-webkit-scrollbar": {
+            display: "none",
+            width: 0,
+            height: 0,
+          },
           "::selection": {
             backgroundColor: theme.palette.primary.main,
             color: "#fff",

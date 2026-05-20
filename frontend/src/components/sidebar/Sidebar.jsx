@@ -14,16 +14,14 @@ import {
 import {
   Avatar,
   AvatarGroup,
-  Badge,
   Box,
   Button,
   Divider,
-  FormHelperText,
   Skeleton,
   Stack,
   styled,
   Tooltip,
-  Typography,
+  Typography
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import axios from "axios";
@@ -37,34 +35,6 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../utilities/getImageMatch";
 import StepperStats from "./StepperStats";
 
-const StyledBadge = styled(Badge)(({ theme }) => ({
-  "& .MuiBadge-badge": {
-    backgroundColor: theme.palette.success.main,
-    color: theme.palette.success.main,
-    boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-    "&::after": {
-      position: "absolute",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      borderRadius: "50%",
-      animation: "ripple 1.5s infinite ease-in-out",
-      border: "1px solid currentColor",
-      content: '""',
-    },
-  },
-  "@keyframes ripple": {
-    "0%": {
-      transform: "scale(.5)",
-      opacity: 1,
-    },
-    "100%": {
-      transform: "scale(2.4)",
-      opacity: 0,
-    },
-  },
-}));
 
 const BoxAvatarContent = styled(Box)({
   display: "flex",
@@ -172,7 +142,7 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
-        width: { sm: "100%", md: 280, lg: 310, xl: 330 },
+        width: { sm: 210, md: 260, lg: 310, xl: 330 },
         flexShrink: 0,
         mt: { sm: 1.5, md: 2 },
         display: {
@@ -189,8 +159,8 @@ const Sidebar = () => {
       <Box
         className="shadow"
         sx={{
-          position: { sm: "static", md: "sticky" },
-          top: { md: 88 },
+          position: { sm: "sticky", md: "sticky" },
+          top: { sm: 88, md: 88 },
           alignSelf: "flex-start",
           width: "100%",
         }}
@@ -205,7 +175,7 @@ const Sidebar = () => {
             backdropFilter: "blur(25px)",
             border: "1px solid rgba(255,255,255,0.08)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
-            maxHeight: { sm: "42vh", md: "none" },
+            maxHeight: { sm: "calc(100vh - 104px)", md: "none" },
             overflowY: { sm: "auto", md: "visible" },
             "&::-webkit-scrollbar": {
               display: "none",
@@ -217,100 +187,125 @@ const Sidebar = () => {
           <BoxAvatarContent>
             <Box
               width={"100%"}
-              px={1.5}
-              py={2}
+              px={2} // Increased padding for better breathing room
+              py={2.5}
               sx={{
-                background: "linear-gradient(180deg, rgba(20,210,190,0.15), transparent)",
-                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                background: isDarkMode
+                  ? "linear-gradient(180deg, rgba(20,210,190,0.12) 0%, rgba(15, 23, 42, 0) 100%)"
+                  : "linear-gradient(180deg, rgba(20,210,190,0.08) 0%, transparent 100%)",
+                borderBottom: "1px solid",
+                borderColor: "divider",
               }}
             >
               {isLoadingRequest ? (
                 <Box width={"100%"}>
-                  <Box mb={1} display={"flex"} justifyContent={"center"}>
-                    <Skeleton variant="circular" width={80} height={80} />
-                  </Box>
-                  <Skeleton variant="rectangular" height={"20vh"} />
+                  <Stack spacing={2} direction="row" alignItems="center">
+                    <Skeleton variant="circular" width={70} height={70} />
+                    <Box flex={1}>
+                      <Skeleton variant="text" width="60%" height={24} />
+                      <Skeleton variant="text" width="40%" height={16} />
+                    </Box>
+                  </Stack>
                 </Box>
               ) : (
-                <Stack spacing={2}>
-                  <Box display={"flex"} alignItems={"center"} gap={2}>
-                    <StyledBadge
-                      overlap="circular"
-                      anchorOrigin={{
-                        vertical: "bottom",
-                        horizontal: "right",
-                      }}
-                      variant="dot"
-                    >
-                      <Avatar
-                        alt={user?.name || "Profile"}
-                        src={user?.avatar}
-                        sx={{
-                          width: 80,
-                          height: 80,
-                          background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
-                          boxShadow: "0 0 20px rgba(20,210,190,0.35)",
-                        }}
-                      />
-                    </StyledBadge>
+                <Stack spacing={2.5}>
+                  {/* ─── IDENTITY BLOCK ─── */}
+                  <Box display={"flex"} alignItems={"center"} gap={2.5}>
 
-                    <Box flex={1}>
+                    <Avatar
+                      alt={user?.name || "Profile"}
+                      src={user?.avatar}
+                      sx={{
+                        width: 70,
+                        height: 70,
+                        background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                        boxShadow: isDarkMode
+                          ? "0 0 25px rgba(20,210,190,0.2)"
+                          : "0 8px 16px rgba(20,210,190,0.15)",
+                        border: "2px solid",
+                        borderColor: "background.paper"
+                      }}
+                    />
+
+                    <Box flex={1} minWidth={0}>
                       <Typography
-                        variant={"body1"}
-                        fontWeight={700}
-                        color={"text.primary"}
-                        sx={{ lineHeight: 1.2 }}
+                        variant="body1"
+                        fontWeight={900}
+                        color="text.primary"
+                        sx={{ lineHeight: 1.1, fontSize: '1.05rem', letterSpacing: '-0.01em' }}
                       >
                         {user?.name || "Guest Mode"}
                       </Typography>
 
                       <Typography
                         variant="caption"
-                        textTransform={"none"}
-                        sx={{ display: "block", mt: 0.5 }}
+                        color="primary"
+                        fontWeight={700}
+                        sx={{ display: "block", mt: 0.3, opacity: 0.9, textTransform: 'uppercase', fontSize: '0.65rem' }}
                       >
-                        {user?.specialisationTitle || "Login or Register"}
+                        {user?.specialisationTitle || "Access Credentials Needed"}
                       </Typography>
 
-                      {isGuest ? (
-                        <Typography
-                          variant="caption"
-                          sx={{ display: "block", color: "success.main", mt: 0.5 }}
-                        >
-                          {usersCount}+ professionals on the platform
-                        </Typography>
-                      ) : (
-                        <Box mt={1}>
-                          <FormHelperText sx={{ px: 0, mx: 0, mb: 0.4 }}>
-                            {user?.county} {user?.county && user?.country ? "•" : ""}{" "}
-                            {CustomCountryName(user?.country)}
-                          </FormHelperText>
-                          <FormHelperText sx={{ px: 0, mx: 0 }}>
-                            {user?.network_count || 0} professional connections
-                          </FormHelperText>
-                        </Box>
-                      )}
+                      {/* Metadata Badges */}
+                      <Box mt={1} display="flex" flexWrap="wrap" gap={0.5}>
+                        {isGuest ? (
+                          <Box sx={{ px: 1, py: 0.2, borderRadius: 1, bgcolor: 'rgba(20, 210, 190, 0.1)', border: '1px solid rgba(20, 210, 190, 0.2)' }}>
+                            <Typography variant="caption" sx={{ color: "primary.main", fontWeight: 800, fontSize: '0.6rem' }}>
+                              {usersCount}+ PROFESSIONALS ONLINE
+                            </Typography>
+                          </Box>
+                        ) : (
+                          <>
+                            <Typography variant="caption" sx={{ opacity: 0.6, fontSize: '0.7rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              {user?.county && `${user.county} •`} {CustomCountryName(user?.country)}
+                            </Typography>
+                            <Typography variant="caption" sx={{ width: '100%', opacity: 0.8, fontWeight: 800, color: 'text.secondary', fontSize: '0.65rem' }}>
+                              {user?.network_count || 0} NETWORK CONNECTIONS
+                            </Typography>
+                          </>
+                        )}
+                      </Box>
                     </Box>
                   </Box>
 
+                  {/* ─── TECH STACK BLOCK ─── */}
                   {!isGuest && user?.account !== "Organisation" && (
-                    <Box>
-                      <Typography variant="caption" color="text.secondary">
-                        Skill profile
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        borderRadius: 2,
+                        bgcolor: 'rgba(255,255,255,0.02)',
+                        border: '1px solid',
+                        borderColor: 'divider'
+                      }}
+                    >
+                      <Typography variant="overline" sx={{ color: "text.secondary", fontWeight: 900, fontSize: '0.65rem', display: 'block', mb: 1 }}>
+                        Verified Capabilities
                       </Typography>
-                      <Box mt={1} display={"flex"} alignItems={"center"} gap={1}>
-                        <AvatarGroup max={user?.selectedSkills?.length || 0}>
+
+                      <Box display={"flex"} alignItems={"center"} gap={1.5}>
+                        <AvatarGroup
+                          max={5}
+                          sx={{
+                            '& .MuiAvatar-root': { width: 32, height: 32, fontSize: 12, border: '2px solid', borderColor: 'background.paper' }
+                          }}
+                        >
                           {user?.selectedSkills?.map((skill, index) => (
                             <Tooltip title={skill} arrow key={index}>
                               <Avatar
                                 alt={skill}
-                                className="border"
-                                sx={{ width: 28, height: 28 }}
+                                sx={{ bgcolor: 'background.default' }}
                                 src={getImageMatch(skill)}
                               />
                             </Tooltip>
                           ))}
                         </AvatarGroup>
+
+                        {user?.selectedSkills?.length > 5 && (
+                          <Typography variant="caption" fontWeight={700} color="primary">
+                            +{user.selectedSkills.length - 5} MORE
+                          </Typography>
+                        )}
                       </Box>
                     </Box>
                   )}
@@ -404,60 +399,82 @@ const Sidebar = () => {
                 <Box
                   sx={{
                     borderRadius: cardRadius,
+                    background: isDarkMode
+                      ? "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%)"
+                      : "rgba(255,255,255,0.8)",
+                    border: "1px solid",
                     borderColor: "divider",
-                    background: "rgba(255,255,255,0.03)",
-                    border: "1px solid rgba(255,255,255,0.08)",
                     backdropFilter: "blur(20px)",
-                    p: 1.5,
+                    p: 2, // Increased padding for a more professional "breathable" feel
                   }}
                 >
-                  <Typography variant="body2" fontWeight={700}>
-                    Top tools in demand
+                  <Typography variant="overline" color="primary" fontWeight={900} sx={{ display: 'block', lineHeight: 1 }}>
+                    Intelligence Feed
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Technologies showing up most often across hiring, learning, and community activity.
+                  <Typography variant="body2" fontWeight={800} sx={{ mt: 0.5 }}>
+                    Market-Dominant Stack
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.2, opacity: 0.7 }}>
+                    Real-time demand across hiring & community clusters.
                   </Typography>
 
-                  <Divider sx={{ my: 1.25 }} />
+                  <Divider sx={{ my: 1.5, opacity: 0.5 }} />
 
                   <Box
-                    alignItems={"center"}
-                    gap={1.5}
-                    mt={1}
-                    justifyContent={"center"}
-                    display={"flex"}
-                    flexWrap={"wrap"}
+                    display="grid"
+                    gridTemplateColumns="repeat(auto-fill, minmax(70px, 1fr))" // Structured grid for better alignment
+                    gap={1}
                   >
                     {dataTools.map((tool) => (
-                      <Box
-                        key={tool.title}
-                        justifyContent={"center"}
-                        flexDirection={"column"}
-                        display={"flex"}
-                        alignItems={"center"}
-                        sx={{
-                          minWidth: 64,
-                          px: 0.75,
-                          py: 0.5,
-                          borderRadius: cardRadius,
-                          bgcolor: isDarkMode
-                            ? "rgba(255,255,255,0.03)"
-                            : "rgba(15,76,129,0.04)",
-                        }}
-                      >
-                        <Tooltip title={tool.title} arrow>
-                          <Avatar sx={{ width: 30, height: 30 }} src={getImageMatch(tool.title)} />
-                        </Tooltip>
-                        <FormHelperText
+                      <Tooltip key={tool.title} title={tool.title} arrow placement="top">
+                        <Box
                           sx={{
-                            fontSize: "0.68rem",
-                            color: "text.secondary",
-                            textAlign: "center",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            py: 1.2,
+                            px: 0.5,
+                            borderRadius: 2, // Slightly tighter radius for the items
+                            bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
+                            border: "1px solid transparent",
+                            transition: "all 0.2s ease-in-out",
+                            cursor: "default",
+                            "&:hover": {
+                              bgcolor: "rgba(20, 210, 190, 0.08)",
+                              borderColor: "rgba(20, 210, 190, 0.3)",
+                              transform: "translateY(-2px)",
+                              "& .tool-icon": {
+                                filter: "drop-shadow(0 0 8px rgba(20, 210, 190, 0.4))"
+                              }
+                            },
                           }}
                         >
-                          {tool.title?.substring(0, 10)}
-                        </FormHelperText>
-                      </Box>
+                          <Avatar
+                            className="tool-icon"
+                            sx={{
+                              width: 28,
+                              height: 28,
+                              mb: 0.8,
+                              transition: "filter 0.2s ease",
+                              bgcolor: 'transparent'
+                            }}
+                            src={getImageMatch(tool.title)}
+                          />
+                          <Typography
+                            sx={{
+                              fontSize: "0.6rem",
+                              fontWeight: 700,
+                              color: "text.secondary",
+                              textAlign: "center",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.02em"
+                            }}
+                          >
+                            {tool.title?.length > 8 ? `${tool.title.substring(0, 7)}.` : tool.title}
+                          </Typography>
+                        </Box>
+                      </Tooltip>
                     ))}
                   </Box>
                 </Box>

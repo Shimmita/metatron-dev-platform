@@ -41,7 +41,7 @@ const BottomNav = () => {
     <Box
       sx={{
         position: "fixed",
-        bottom: 20, // Raised slightly for a better "floating" feel
+        bottom: 10, 
         left: "50%",
         transform: "translateX(-50%)", // Perfect centering logic
         width: "auto",

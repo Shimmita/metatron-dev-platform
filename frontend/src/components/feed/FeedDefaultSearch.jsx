@@ -34,11 +34,10 @@ const FeedDefaultSearch = () => {
   };
 
   return (
-    <Box sx={{ height: '85vh', overflow: 'hidden' }}>
+    <Box sx={{ overflow: 'hidden' }}>
       {postDetailedData ? (
         <Box
           sx={{
-            height: "85vh",
             p: 1,
             border: isDarkMode ? '1px solid' : 'none',
             borderColor: 'divider',
@@ -55,7 +54,6 @@ const FeedDefaultSearch = () => {
       ) : (
         <Box
           sx={{
-            height: "85vh",
             overflowY: "auto",
             "&::-webkit-scrollbar": { display: "none" },
             scrollbarWidth: "none",

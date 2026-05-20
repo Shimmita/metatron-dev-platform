@@ -1,5 +1,5 @@
-import { Add } from "@mui/icons-material";
-import { Box, Fab, Stack } from "@mui/material";
+import { Add, ForumRounded, SearchRounded } from "@mui/icons-material";
+import { Box, Fab, Stack, Typography, InputBase, IconButton } from "@mui/material";
 import axios from "axios";
 import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
@@ -8,81 +8,41 @@ import ConversationLayout from "./layout/ConversationLayout";
 import NewConversation from "./layout/NewConversation";
 
 export default function ConversationsContainer({ setMessageNotifClicked }) {
-
-    // hold the message clicked bool
-    const [messageClicked, setMessageClicked] = useState(false);
-
-    // control showing of new conversation when fab is clicked
-    const [fabNewConversation, setFabNewConversation] = useState(false);
-
-  // api request monitors
+  const [messageClicked, setMessageClicked] = useState(false);
+  const [fabNewConversation, setFabNewConversation] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [focusedConversation, setFocusedConversation] = useState();
 
-  // get redux states
   const { user } = useSelector((state) => state.currentUser);
   const { conversations } = useSelector((state) => state.currentConversation);
-  const { currentMode } = useSelector(
-      (state) => state.appUI
-    );
+  const { currentMode } = useSelector((state) => state.appUI);
 
-  // extracting user id
   const { _id: currentUserID } = user;
+  const isDarkMode = currentMode === 'dark';
 
-  // controls dark theme
-  const isDarkMode=currentMode==='dark'
-
-  // handle complete opening the focused conversation
   const handleOpenFocusedConversation = () => {
-
-    // show message details and hide all messages
-    setMessageClicked((prev) => !prev);
-
-    // hide the inbox and notification bars when message details is focused
-    // from the top most parent level
-    setMessageNotifClicked((prev) => !prev);
+    setMessageClicked(true);
+    setMessageNotifClicked(true); // Signal to parent to hide global tabs
   };
 
-  // handle fab clicked to show new conversation
   const handleFabClicked = useCallback(() => {
     setFabNewConversation((prev) => !prev);
   }, []);
 
-  // handle message clicked
   const handleConversationClicked = async () => {
-
-  
-
     if (focusedConversation) {
-      // update the attribute sender or target read the conversation based on the current user
-      // usually the current user should not be the one updated but target,
-      if (
-        currentUserID === focusedConversation?.lastSenderId ||
-        focusedConversation?.isTargetRead
-      ) {
-        // proceed to conversation details since last conversation message was read or user is the sender
+      if (currentUserID === focusedConversation?.lastSenderId || focusedConversation?.isTargetRead) {
         handleOpenFocusedConversation();
       } else {
-        // update that the target of the last message is viewed before opening the full conversation
-
         try {
-          // set is fetching to true
           setIsFetching(true);
-
-          // api request
           const response = await axios.put(
             `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/conversations/users/message/last/${focusedConversation?._id}`
           );
-          // if response data means updated the isTargetRead thus lets now open the conversation details
-          if (response.data) {
-            // proceed to conversation details since the owner is the current user
-            handleOpenFocusedConversation();
-          }
+          if (response.data) handleOpenFocusedConversation();
         } catch (err) {
-          // error occurred during fetch query
           console.error(err);
         } finally {
-          // close is fetching
           setIsFetching(false);
         }
       }
@@ -90,50 +50,76 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
   };
 
   return (
-    <Box>
-      {/* display new conversation component when fab clicked */}
+    <Box sx={{ position: 'relative', height: '100%' }}>
       {fabNewConversation ? (
-        <Box mt={1}>
-          <NewConversation
-            handleFabClicked={handleFabClicked}
-          />
+        <Box p={1}>
+          <NewConversation handleFabClicked={handleFabClicked} />
         </Box>
       ) : (
         <React.Fragment>
+          {/* ─── INBOX HEADER ─── */}
+          {!messageClicked && (
+            <Box p={2} pb={1}>
+              <Stack direction="row" alignItems="center" spacing={1} mb={2}>
+                <ForumRounded sx={{ color: 'primary.main', fontSize: 20 }} />
+                <Typography variant="body2" fontWeight={900} letterSpacing="0.05rem">
+                   Chat Window
+                </Typography>
+              </Stack>
+              
+              {/* Subtle Search bar within the inbox */}
+              <Box 
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  bgcolor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+                  borderRadius: '10px',
+                  px: 1.5,
+                  py: 0.5,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}
+              >
+                <SearchRounded sx={{ fontSize: 18, opacity: 0.4, mr: 1 }} />
+                <InputBase 
+                  placeholder="Search communications..." 
+                  sx={{ fontSize: '0.75rem', flex: 1, fontWeight: 600 }}
+                />
+              </Box>
+            </Box>
+          )}
+
           <Box
-            height={!messageClicked ? "70vh" : "90vh"}
+            height={!messageClicked ? "calc(100vh - 180px)" : "100vh"}
             sx={{
-              overflow: "auto",
-              // Hide scrollbar for Chrome, Safari and Opera
-              "&::-webkit-scrollbar": {
-                display: "none",
-              },
-              // Hide scrollbar for IE, Edge and Firefox
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
+              overflowY: "auto",
+              '&::-webkit-scrollbar': { display: 'none' },
+              msOverflowStyle: 'none',
+              scrollbarWidth: 'none',
+              transition: 'all 0.3s ease'
             }}
           >
-            {/* if message not clicked display all conversations summarily */}
             {!messageClicked ? (
-              <Stack p={1} gap={1}>
-                {
-                  conversations?.map((conversation, index) => (
-                    <ConversationLayout
-                      conversation={conversation}
-                      handleConversationClicked={handleConversationClicked}
-                      key={conversation}
-                      currentUserName={user?.name}
-                      currentUserID={currentUserID}
-                      setFocusedConversation={setFocusedConversation}
-                      isDarkMode={isDarkMode}
-                    />
-                  ))}
+              <Stack p={1} spacing={0.5}>
+                {conversations?.map((conversation) => (
+                  <ConversationLayout
+                    conversation={conversation}
+                    handleConversationClicked={handleConversationClicked}
+                    key={conversation._id || conversation}
+                    currentUserName={user?.name}
+                    currentUserID={currentUserID}
+                    setFocusedConversation={setFocusedConversation}
+                    isDarkMode={isDarkMode}
+                  />
+                ))}
               </Stack>
             ) : (
-              // show message details and pass props for altering its state of visibility
               <Box>
                 <ConversationDetailed
-                  handleConversationClicked={handleConversationClicked}
+                  handleConversationClicked={() => {
+                    setMessageClicked(false);
+                    setMessageNotifClicked(false);
+                  }}
                   focusedConveration={focusedConversation}
                   currentUserName={user?.name}
                   currentUserID={user?._id}
@@ -142,20 +128,43 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
             )}
           </Box>
 
-          {/* display a floating action btn */}
+          {/* ─── METATRON FAB ─── */}
           {!messageClicked && (
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 24,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 10
+              }}
+            >
               <Fab
-                color="primary"
                 variant="extended"
-                aria-label="floating button"
-                size="small"
+                size="medium"
                 disabled={isFetching}
                 onClick={handleFabClicked}
-                sx={{ left: "35%", paddingRight:1}}
+                sx={{
+                  bgcolor: '#14D2BE',
+                  color: '#fff',
+                  fontWeight: 900,
+                  fontSize: '0.7rem',
+                  letterSpacing: '0.1rem',
+                  px: 3,
+                  boxShadow: '0 8px 20px rgba(20, 210, 190, 0.3)',
+                  '&:hover': {
+                    bgcolor: '#0FA88F',
+                    transform: 'scale(1.05)',
+                  },
+                  '&.Mui-disabled': {
+                    bgcolor: 'rgba(20, 210, 190, 0.3)'
+                  }
+                }}
               >
-                <Add sx={{ mr: 1 }}/>
-                Compose
+                <Add sx={{ mr: 1, fontSize: 18 }} />
+                Message
               </Fab>
+            </Box>
           )}
         </React.Fragment>
       )}

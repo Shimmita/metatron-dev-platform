@@ -541,10 +541,12 @@ export default function CoursesMainContainer() {
       }
     >
       <Box
-        maxHeight={'85vh'}
-        display={"flex"}
-        width={window.screen.availWidth - 18}
-        sx={{ borderRadius: panelRadius, overflow: "auto" }}
+        sx={{
+          width: "100%",
+          height: "100vh",
+          borderRadius: panelRadius,
+          overflow: "hidden",
+        }}
       >
         <AppBar
           position="fixed"
@@ -893,34 +895,38 @@ export default function CoursesMainContainer() {
 
         </Drawer>
         <Box
-          height={'88vh'}
-          width={"100%"}
-          display={"flex"}
-          justifyContent={"center"}
-          sx={{ px: { xs: 1, md: 2 } }}
+          sx={{
+            height: "calc(100vh - 64px)",
+            width: "100%",
+            overflow: "hidden",
+          }}
         >
 
           <Box
-            p={2}
-            display={"flex"}
-            gap={2}
-            maxHeight={CustomDeviceIsSmall() || CustomDeviceTablet() ? "88vh" : "80vh"}
-            flexWrap={"wrap"}
-            justifyContent={"center"}
             sx={{
-              overflow: "auto",
               width: "100%",
+              height: "100%",
+              overflowY: "auto",
+              overflowX: "hidden",
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(auto-fit, minmax(260px, 1fr))",
+                md: "repeat(auto-fit, minmax(280px, 1fr))",
+              },
+              gap: 2,
+              alignItems: "start",
               borderRadius: panelRadius,
               backgroundColor: theme.palette.mode === "dark"
                 ? "rgba(255,255,255,0.02)"
                 : "rgba(255,255,255,0.74)",
-              // Hide scrollbar for Chrome, Safari and Opera
               "&::-webkit-scrollbar": {
                 display: "none",
               },
-              // Hide scrollbar for IE, Edge and Firefox
               msOverflowStyle: "none",
               scrollbarWidth: "none",
+              p: { xs: 1, md: 2 },
+              pt: { xs: 5, md: 6 },
             }}
           >
             <React.Fragment>
@@ -939,6 +945,7 @@ export default function CoursesMainContainer() {
                         alignItems={"center"}
                         width={"100%"}
                         flexDirection={"column"}
+                        sx={{ gridColumn: "1 / -1" }}
                       >
                         <CircularProgress size={"30px"} />
                       </Box>
@@ -949,12 +956,14 @@ export default function CoursesMainContainer() {
                           <>
                             {/* focused course */}
                             {focusedCourse && (
-                              <CoursePlayer
-                                openPlayer={focusedCourse}
-                                course={focusedCourse}
-                                setText={setTextOption}
-                                setFocusedCourse={setFocusedCourse}
-                              />
+                              <Box sx={{ gridColumn: "1 / -1" }}>
+                                <CoursePlayer
+                                  openPlayer={focusedCourse}
+                                  course={focusedCourse}
+                                  setText={setTextOption}
+                                  setFocusedCourse={setFocusedCourse}
+                                />
+                              </Box>
                             )}
 
                             {/* content will go here */}
@@ -977,6 +986,7 @@ export default function CoursesMainContainer() {
                                 flexDirection={'column'}
                                 gap={2}
                                 alignItems={'center'}
+                                sx={{ gridColumn: "1 / -1" }}
                               >
                                 {/* no events */}
                                 <Typography variant="body2">
@@ -998,9 +1008,11 @@ export default function CoursesMainContainer() {
                           <>
                             {/* certs table */}
                             {isCert && (
-                              <CertificatesTable
-                                certsData={certData}
-                              />
+                              <Box sx={{ gridColumn: "1 / -1", minWidth: 0 }}>
+                                <CertificatesTable
+                                  certsData={certData}
+                                />
+                              </Box>
                             )}
                           </>
                         )}

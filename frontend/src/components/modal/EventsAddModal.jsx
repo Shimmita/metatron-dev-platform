@@ -59,10 +59,18 @@ const HeaderBar = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "space-between",
   gap: theme.spacing(2),
-  backgroundColor: theme.palette.primary.main,
+  background:
+    theme.palette.mode === "dark"
+      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.background.default} 100%)`
+      : "linear-gradient(135deg, rgba(15,76,129,0.92) 0%, rgba(255,255,255,0.96) 100%)",
   color: theme.palette.primary.contrastText,
-  padding: theme.spacing(1.5),
+  padding: theme.spacing(1.5, 2, 1.75),
   flexWrap: "wrap",
+  borderBottom: `1px solid ${
+    theme.palette.mode === "dark"
+      ? "rgba(255,255,255,0.1)"
+      : "rgba(255,255,255,0.2)"
+  }`,
 }));
 
 const SectionCard = styled(Box)(({ theme }) => ({
@@ -77,14 +85,24 @@ const SectionCard = styled(Box)(({ theme }) => ({
 }));
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
-  marginBottom: theme.spacing(1),
+  display: "inline-block",
+  marginBottom: theme.spacing(1.25),
   fontWeight: 700,
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  padding: theme.spacing(0.5, 1),
-  borderRadius: theme.shape.borderRadius,
-  display: 'inline-block',
-  fontSize: '0.9rem',
+  fontSize: "0.78rem",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  background:
+    theme.palette.mode === "dark"
+      ? "rgba(255,255,255,0.08)"
+      : "rgba(15,76,129,0.08)",
+  color: theme.palette.primary.main,
+  padding: theme.spacing(0.55, 1.25),
+  borderRadius: 999,
+  border: `1px solid ${
+    theme.palette.mode === "dark"
+      ? "rgba(255,255,255,0.08)"
+      : "rgba(15,76,129,0.14)"
+  }`,
 }));
 
 const EventsAddModal = ({
@@ -335,7 +353,6 @@ const EventsAddModal = ({
     >
       <Box
         width={handleReturnWidthModal()}
-        borderRadius={3}
         color={"text.primary"}
         sx={{
           border:  "1px solid gray",
@@ -354,35 +371,48 @@ const EventsAddModal = ({
           }}
         >
           <HeaderBar>
-            {/* logo */}
-            <Box>
+            <Box display="flex" alignItems="center" gap={2} flex={1}>
               <Avatar sx={{ width: 50, height: 50 }} src={AppLogo} alt="" />
+              <Box>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight={700}
+                  sx={{ lineHeight: 1.3, wordBreak: "break-word" }}
+                >
+                  {title.length === 0 ? "Upload Tech Event" : title}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{
+                    opacity: 0.88,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                  }}
+                  display="block"
+                >
+                  Share your event with the community and help people discover it.
+                </Typography>
+              </Box>
             </Box>
-            {/* job title */}
-            <Typography
-              variant="body2"
-              width={"100%"}
-              fontWeight={"bold"}
-              textAlign={"center"}
-            >
-              {title.length===0 ? "Tech Event Upload":title}
-            </Typography>
 
-            {/*close icon */}
             <IconButton
               onClick={handleClosingEventPostModal}
-              disabled={isUploading || errorMessage}
+              disabled={isUploading || Boolean(errorMessage)}
               sx={{
-                border:'1px solid',
-                borderColor:'divider',
+                border: '1px solid',
+                borderColor: 'divider',
               }}
             >
-              <Tooltip title={"close"}>
-                <Close 
-                sx={{ 
-                  width:12,
-                  height:12,
-                }}/>
+              <Tooltip title="Close">
+                <Close
+                  sx={{
+                    width: 12,
+                    height: 12,
+                  }}
+                />
               </Tooltip>
             </IconButton>
           </HeaderBar>

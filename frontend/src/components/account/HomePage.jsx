@@ -13,12 +13,14 @@ function Homepage() {
           width: "100%",
           maxWidth: "1680px",
           mx: "auto",
-          px: { xs: 1, sm: 2, lg: 3 },
+          px: { xs: 1, sm: 1.5, md: 2, lg: 3 },
           pb: { xs: 10, md: 4 },
           display: "flex",
-          flexWrap: { xs: "nowrap", sm: "wrap", md: "nowrap" },
+          flexWrap: "nowrap",
+          justifyContent: "center",
           alignItems: "flex-start",
-          gap: { sm: 2, md: 2, lg: 3 },
+          gap: { xs: 0, sm: 1.5, md: 2, lg: 3 },
+          overflowX: "hidden",
         }}
       >
         <Sidebar />

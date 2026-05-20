@@ -6,6 +6,7 @@ import {
   GitHub,
   GradeOutlined,
   InfoRounded,
+  LocalOfferOutlined,
   LockRounded,
   MoreVertRounded,
   RefreshRounded,
@@ -52,6 +53,7 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
 import CardFeedMore from "./CardFeedMore";
+import PostImagePreviewDialog from "./PostImagePreviewDialog";
 
 const CardFeed = ({
   post,
@@ -809,278 +811,21 @@ const CardFeed = ({
         />
       )}
 
-      <Dialog
-        open={openImagePreview}
-        onClose={handleCloseImagePreview}
-        fullScreen
-        PaperProps={{
-          sx: {
-            background: "rgba(7, 16, 30, 0.42)",
-            backdropFilter: "blur(18px)",
-            WebkitBackdropFilter: "blur(18px)",
-            backgroundImage: "none",
-            boxShadow: "none",
-          },
-        }}
-        sx={{
-          "& .MuiBackdrop-root": {
-            background: "rgba(5, 12, 24, 0.58)",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
-          },
-        }}
-      >
-        <Box
-          sx={{
-            position: "relative",
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            p: { xs: 2, md: 3 },
-          }}
-        >
-          <Box
-            sx={{
-              position: "absolute",
-              top: { xs: 14, md: 22 },
-              left: { xs: 14, md: 22 },
-              zIndex: 2,
-            }}
-          >
-            <IconButton
-              onClick={handleCloseImagePreview}
-              aria-label="Close image preview"
-              sx={{
-                bgcolor: "rgba(255,255,255,0.14)",
-                color: "#fff",
-                border: "1px solid rgba(255,255,255,0.22)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                "&:hover": {
-                  bgcolor: "rgba(255,255,255,0.22)",
-                },
-              }}
-            >
-              <CloseRounded />
-            </IconButton>
-          </Box>
-
-          <Box
-            sx={{
-              position: "absolute",
-              top: { xs: 14, md: 22 },
-              right: { xs: 14, md: 22 },
-              zIndex: 2,
-            }}
-          >
-            <IconButton
-              onClick={handleDownloadImage}
-              aria-label="Download image"
-              sx={{
-                bgcolor: "rgba(255,255,255,0.14)",
-                color: "#fff",
-                border: "1px solid rgba(255,255,255,0.22)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                "&:hover": {
-                  bgcolor: "rgba(255,255,255,0.22)",
-                },
-              }}
-            >
-              <DownloadRounded />
-            </IconButton>
-          </Box>
-
-          <Box
-            sx={{
-              maxWidth: "min(96vw, 1460px)",
-              maxHeight: "90vh",
-              width: "100%",
-              height: "100%",
-              display: "grid",
-              gridTemplateColumns: {
-                xs: "1fr",
-                md: "1fr",
-                lg: "1.4fr 1fr"
-              }, borderRadius: "24px",
-              overflow: "hidden",
-              border: "1px solid rgba(255,255,255,0.18)",
-              bgcolor: "rgba(255,255,255,0.08)",
-              boxShadow: "0 24px 80px rgba(0,0,0,0.35)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-            }}
-          >
-            <Box
-              sx={{
-                minHeight: { xs: "54vh", lg: "100%" },
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                bgcolor: "rgba(0,0,0,0.16)",
-                p: { xs: 1.5, md: 2.5 },
-                borderRight: { lg: "1px solid rgba(255,255,255,0.12)" },
-              }}
-            >
-              {postImageSrc && (
-                <Box
-                  sx={{
-                    position: "relative",
-                    width: "100%",
-                    borderRadius: imageRadius,
-                    overflow: "hidden",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    background: "rgba(255,255,255,0.02)",
-                    aspectRatio: post?.post_type === "image" ? "1 / 1" : "16 / 9"
-                  }}
-                >
-                  <Box
-                    component="img"
-                    src={postImageSrc}
-                    alt={post?.post_title}
-                    loading="lazy"
-                    sx={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      display: "block",
-                      transition: "transform 0.4s ease",
-
-                      "&:hover": {
-                        transform: "scale(1.03)",
-                      },
-                    }}
-                  />
-                </Box>
-              )}
-            </Box>
-
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                p: { xs: 2, md: 2.5 },
-                color: "#F8FAFC",
-                background:
-                  "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04))",
-              }}
-            >
-              <Box>
-                <Box
-                  sx={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    px: 1.2,
-                    py: 0.45,
-                    borderRadius: 999,
-                    bgcolor: "rgba(255,255,255,0.10)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    mb: 1.5,
-                  }}
-                >
-                  <Typography variant="caption" sx={{ color: "#BFDBFE" }}>
-                    Post preview
-                  </Typography>
-                </Box>
-
-                <Typography variant="h5" lineHeight={1.2}>
-                  {post?.post_title}
-                </Typography>
-
-                <Typography
-                  variant="body2"
-                  sx={{
-                    mt: 1.25,
-                    color: "rgba(241,245,249,0.82)",
-                    lineHeight: 1.8,
-                  }}
-                >
-                  {detailsLong ? `${details.substring(0, 180)}...` : details}
-                </Typography>
-
-                {popupMeta.length > 0 && (
-                  <Box mt={2} display="flex" gap={0.8} flexWrap="wrap">
-                    {popupMeta.map((item) => (
-                      <Box
-                        key={item}
-                        sx={{
-                          px: 1,
-                          py: 0.45,
-                          borderRadius: 999,
-                          bgcolor: "rgba(255,255,255,0.08)",
-                          border: "1px solid rgba(255,255,255,0.12)",
-                        }}
-                      >
-                        <Typography variant="caption" sx={{ color: "rgba(241,245,249,0.86)" }}>
-                          {item}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-              </Box>
-
-              <Box mt={3}>
-                <Box display="flex" alignItems="center" gap={1.2}>
-                  <Avatar
-                    src={post?.post_owner?.owneravatar}
-                    alt={post?.post_owner?.ownername || "Author"}
-                    variant="rounded"
-                    sx={{
-                      width: 46,
-                      height: 46,
-                      borderRadius: "14px",
-                    }}
-                  />
-                  <Box>
-                    <Box display="flex" alignItems="center" gap={0.7}>
-                      <Typography variant="body2" >
-                        {post?.post_owner?.ownername}
-                      </Typography>
-                      <VerifiedRounded sx={{ width: 16, height: 16, color: "#93C5FD" }} />
-                    </Box>
-                    <Typography variant="caption" sx={{ color: "rgba(241,245,249,0.75)" }}>
-                      {post?.post_owner?.ownertitle}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {categoryTags.length > 0 && (
-                  <Box mt={2}>
-                    <Typography
-                      variant="caption"
-                      sx={{ color: "rgba(241,245,249,0.62)", display: "block", mb: 0.8 }}
-                    >
-                      Related topics
-                    </Typography>
-                    <Box display="flex" gap={0.75} flexWrap="wrap">
-                      {categoryTags.map((tag) => (
-                        <Box
-                          key={tag}
-                          sx={{
-                            px: 1,
-                            py: 0.35,
-                            borderRadius: 999,
-                            bgcolor: "rgba(255,255,255,0.08)",
-                            border: "1px solid rgba(255,255,255,0.12)",
-                          }}
-                        >
-                          <Typography variant="caption" sx={{ color: "#E2E8F0" }}>
-                            #{tag}
-                          </Typography>
-                        </Box>
-                      ))}
-                    </Box>
-                  </Box>
-                )}
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Dialog>
+     <PostImagePreviewDialog
+    details={details}
+    postTitle={post?.post_title}
+    postImageSrc={postImageSrc}
+    open={openImagePreview}
+    onClose={handleCloseImagePreview}
+    onDownload={handleDownloadImage}
+    detailsLong={detailsLong}
+    handleCloseImagePreview={handleCloseImagePreview}
+    post={post}
+    handleDownloadImage={handleDownloadImage}
+    openImagePreview={openImagePreview}
+    categoryTags={categoryTags}
+    popupMeta={popupMeta}
+     />
     </Card>
   );
 };

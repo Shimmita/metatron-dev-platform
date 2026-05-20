@@ -261,19 +261,11 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
             </Box>
           }
         >
-          <Box 
-          display={"flex"} 
-          height={'85vh'}
+          <Box
            sx={{
-            width:window.screen.availWidth-18,
-            overflow: "auto",
-            // Hide scrollbar for Chrome, Safari and Opera
-            "&::-webkit-scrollbar": {
-              display: "none",
-            },
-            // Hide scrollbar for IE, Edge and Firefox
-            msOverflowStyle: "none",
-            scrollbarWidth: "none", 
+            width: "100%",
+            height: "100vh",
+            overflow: "hidden",
            }}
           >
             <AppBar position="fixed" open={open}>
@@ -529,26 +521,32 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
             </Drawer>
             {/* body of the jobs */}
             <Box
-              width={"100%"}
-              display={"flex"}
-              height={"90vh"}
-              justifyContent={"center"}
+              sx={{
+                width: "100%",
+                height: "calc(100vh - 64px)",
+                overflow: "hidden",
+              }}
             >
               {/* centering the content */}
               <Box
-                p={!CustomDeviceIsSmall() ? 2 : undefined}
-                display={"flex"}
-                gap={2}
-                maxHeight={"85vh"}
-                flexWrap={"wrap"}
-                justifyContent={"center"}
                 sx={{
-                  overflow: "auto",
-                  // Hide scrollbar for Chrome, Safari and Opera
+                  width: "100%",
+                  height: "100%",
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                  display: "grid",
+                  gridTemplateColumns: {
+                    xs: "1fr",
+                    sm: "repeat(auto-fit, minmax(260px, 1fr))",
+                    md: "repeat(auto-fit, minmax(280px, 1fr))",
+                  },
+                  gap: 2,
+                  alignItems: "start",
+                  p: { xs: 1, md: 2 },
+                  pt: { xs: 5, md: 6 },
                   "&::-webkit-scrollbar": {
                     display: "none",
                   },
-                  // Hide scrollbar for IE, Edge and Firefox
                   msOverflowStyle: "none",
                   scrollbarWidth: "none",
                 }}
@@ -565,6 +563,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                           alignItems={"center"}
                           width={"100%"}
                           flexDirection={"column"}
+                          sx={{ gridColumn: "1 / -1" }}
                         >
                           <CircularProgress size={"30px"} />
                         </Box>
@@ -574,11 +573,13 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                           <>
                             {/* focused course */}
                           {focusedCourse && (
-                            <CoursePlayer 
-                            openPlayer={focusedCourse}
-                            course={focusedCourse}
-                            setFocusedCourse={setFocusedCourse}
-                            />
+                            <Box sx={{ gridColumn: "1 / -1" }}>
+                              <CoursePlayer
+                              openPlayer={focusedCourse}
+                              course={focusedCourse}
+                              setFocusedCourse={setFocusedCourse}
+                              />
+                            </Box>
                           )} 
 
                         {/* content will go here */}
@@ -601,6 +602,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                           flexDirection={'column'}
                           gap={2}
                           alignItems={'center'}
+                          sx={{ gridColumn: "1 / -1" }}
                           >
                           {/* no events */}
                           <Typography variant="body2">
@@ -619,11 +621,13 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                         )}
                           </>
                         ):(
-                          <ManageCoursesTable 
-                            coursesData={courses}
-                            setCourseManager={setIsCourseManager}
-                            setTextOption={setTextOption}
-                          />
+                          <Box sx={{ gridColumn: "1 / -1", minWidth: 0 }}>
+                            <ManageCoursesTable
+                              coursesData={courses}
+                              setCourseManager={setIsCourseManager}
+                              setTextOption={setTextOption}
+                            />
+                          </Box>
                         )}
                         
                           

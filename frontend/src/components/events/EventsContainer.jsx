@@ -488,20 +488,12 @@ export default function EventsContainer() {
           </Box>
         }
       >
-        <Box 
-        display={"flex"} 
-        maxHeight={'85vh'}
+        <Box
         sx={{
-          width:isMyStats ? window.screen.availWidth-32:undefined,
-          overflow: "auto",
+          width: "100%",
+          height: "100vh",
+          overflow: "hidden",
           borderRadius: panelRadius,
-          // Hide scrollbar for Chrome, Safari and Opera
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          // Hide scrollbar for IE, Edge and Firefox
-          msOverflowStyle: "none",
-          scrollbarWidth: "none", 
          }}
         >
           <AppBar
@@ -831,35 +823,39 @@ export default function EventsContainer() {
 
 
           </Drawer>
-             <Box 
-        height={'88vh'} 
-        width={"100%"}
-        display={"flex"}
-          justifyContent={"center"}
-          sx={{ px: { xs: 1, md: 2 } }}
+             <Box
+          sx={{
+            height: "calc(100vh - 64px)",
+            width: "100%",
+            overflow: "hidden",
+          }}
           >
-         
+
             <Box
-              display={"flex"}
-              mt={!CustomDeviceIsSmall() ? 1:undefined}
-              gap={2}
-              maxHeight={CustomDeviceIsSmall() || CustomDeviceTablet() ?"88vh":"80vh"}
-              flexWrap={"wrap"}
-              justifyContent={"center"}
               sx={{
-                overflow: "auto",
                 width: "100%",
+                height: "100%",
+                overflowY: "auto",
+                overflowX: "hidden",
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "1fr",
+                  sm: "repeat(auto-fit, minmax(260px, 1fr))",
+                  md: "repeat(auto-fit, minmax(280px, 1fr))",
+                },
+                gap: 2,
+                alignItems: "start",
                 borderRadius: panelRadius,
                 backgroundColor: theme.palette.mode === "dark"
                   ? "rgba(255,255,255,0.02)"
                   : "rgba(255,255,255,0.74)",
-                // Hide scrollbar for Chrome, Safari and Opera
                 "&::-webkit-scrollbar": {
                   display: "none",
                 },
-                // Hide scrollbar for IE, Edge and Firefox
                 msOverflowStyle: "none",
                 scrollbarWidth: "none",
+                p: { xs: 1, md: 2 },
+                pt: { xs: 5, md: 6 },
               }}
             >
               <React.Fragment>
@@ -888,9 +884,13 @@ export default function EventsContainer() {
                         {eventsData?.length > 0 && !isEventsStats &&
                           eventsData?.map((event,index) => (
                           
-                            <Box 
-                              mt={CustomDeviceIsSmall() && 2} 
-                              key={event?._id}>
+                            <Box
+                              key={event?._id}
+                              sx={{
+                                width: "100%",
+                                minWidth: 0,
+                              }}
+                            >
                               <EventItem 
                               isLastIndex={index===eventsData?.length-1}
                               pageNumber={pageNumber}
@@ -910,7 +910,7 @@ export default function EventsContainer() {
 
                           {/* rendered if events stats is true */}
                           {isEventsStats && focusedEvent && (
-                           <Box>
+                           <Box sx={{ gridColumn: "1 / -1" }}>
                             <EventStatsLayout 
                             setIsEventsStats={setIsEventsStats}
                             focusedEvent={focusedEvent}/>
@@ -949,7 +949,7 @@ export default function EventsContainer() {
                   </React.Fragment>
                 )}
               </React.Fragment>
-              </Box>
+            </Box>
           </Box>
 
            {/* open modal event */}

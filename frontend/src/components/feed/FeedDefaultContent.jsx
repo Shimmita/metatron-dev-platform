@@ -1,6 +1,6 @@
 import { Box, Stack, Typography, useTheme } from "@mui/material";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RotatingLines } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -133,14 +133,7 @@ const FeedDefaultContent = () => {
             </Box>
           )}
 
-          {/* 🔥 EMPTY STATE */}
-          {!isFetching && posts?.length === 0 && !errorMessage && (
-            <Box textAlign="center" mt={6}>
-              <Typography color="text.secondary">
-                No posts yet
-              </Typography>
-            </Box>
-          )}
+
 
           {/* 🔥 FEED */}
           {!isFetching && posts?.length > 0 && (

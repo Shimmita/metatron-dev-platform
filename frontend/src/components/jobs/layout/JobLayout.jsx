@@ -91,18 +91,11 @@ function JobLayout_2({
   };
 
   return (
-    <Box
-      display="flex"
-      gap={2}
-      mb={isLastIndex ? 4 : 0}
-      flexDirection="column"
-      alignItems="center"
-      mt={CustomDeviceIsSmall() ? 2 : 1}
-    >
+    <>
       <Card
         elevation={0}
         sx={{
-          width: CustomDeviceIsSmall() && !CustomDeviceSmallest() ? 320 : 300,
+          width: "100%",
           background: "rgba(255, 255, 255, 0.03)", // Metatron Glass
           backdropFilter: "blur(20px)",
           border: '1px solid',
@@ -225,7 +218,7 @@ function JobLayout_2({
           isMyJob={isMyJob}
         />
       )}
-    </Box>
+    </>
   );
 }
 

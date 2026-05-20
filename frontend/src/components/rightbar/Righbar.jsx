@@ -117,7 +117,7 @@ const RightbarAll = () => {
   return (
     <Box
       sx={{
-        width: { sm: "100%", md: 300, lg: 330, xl: 350 },
+        width: { sm: 230, md: 280, lg: 330, xl: 350 },
         flexShrink: 0,
         mt: { sm: 1.5, md: 2 },
         display: {
@@ -130,8 +130,8 @@ const RightbarAll = () => {
       <Box
         className="shadow"
         sx={{
-          position: { sm: "static", md: "sticky" },
-          top: { md: 88 },
+          position: { sm: "sticky", md: "sticky" },
+          top: { sm: 88, md: 88 },
           alignSelf: "flex-start",
           width: "100%",
         }}
@@ -148,7 +148,7 @@ const RightbarAll = () => {
             width: "100%",
             background: "rgba(255,255,255,0.04)",
             backdropFilter: "blur(25px)",
-            maxHeight: { sm: "60vh", md: "none" },
+            maxHeight: { sm: "calc(100vh - 104px)", md: "none" },
             overflowY: { sm: "auto", md: "visible" },
             "&::-webkit-scrollbar": {
               display: "none",

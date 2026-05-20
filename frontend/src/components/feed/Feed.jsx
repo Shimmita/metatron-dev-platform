@@ -31,12 +31,10 @@ const Feed = () => {
     isDefaultBottomNav,
     isDefaultSpeedDial,
     isLoadingPostLaunch,
-    isPostDetailed,
-    currentMode
+    isPostDetailed
   } = useSelector((state) => state.appUI);
   const { messageSnackPostTech } = useSelector((state) => state.currentSnackBar);
 
-  const isDarkMode = currentMode === 'dark';
   const [openCommunity, setOpenCommunity] = React.useState(user?.isGroupTutorial || false);
 
   useLayoutEffect(() => {
@@ -48,6 +46,9 @@ const Feed = () => {
       component="main"
       sx={{
         width: "100%",
+        maxWidth: { sm: 620, md: 700, lg: 780, xl: 880 },
+        minWidth: 0,
+        flex: { sm: "1 1 0" },
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",

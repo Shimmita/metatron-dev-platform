@@ -71,7 +71,14 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
   }
 
   return (
-    <Box display="flex" justifyContent="center" gap={2} mb={3} flexDirection="column">
+    <Box
+      display="flex"
+      justifyContent="center"
+      gap={2}
+      mb={3}
+      flexDirection="column"
+      sx={{ width: "100%", minWidth: 0, alignItems: "center" }}
+    >
       <Card
         elevation={0}
         sx={{
