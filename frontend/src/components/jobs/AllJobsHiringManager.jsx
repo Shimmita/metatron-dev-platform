@@ -334,7 +334,7 @@ export default function AllJobsHiringManager() {
   return (
     <Suspense
       fallback={
-        <Box height={"90vh"} display={"flex"} justifyContent={"center"}>
+        <Box minHeight={"90vh"} display={"flex"} justifyContent={"center"}>
           <Box display={"flex"} justifyContent={"center"}>
             <CircularProgress size={20} />
           </Box>
@@ -374,6 +374,7 @@ export default function AllJobsHiringManager() {
                 sx={[
                   {
                     marginRight: 5,
+                    display: { xs: "none", lg: "inline-flex" },
                   },
                   open && { display: "none" },
                 ]}
@@ -488,19 +489,24 @@ export default function AllJobsHiringManager() {
         <Box
           width={"100%"}
           display={"flex"}
-          height={"90vh"}
+          minHeight={"90vh"}
           justifyContent={"center"}
+          sx={{
+            pt: { xs: 9, lg: 10 },
+            pl: { xs: 0, lg: isDrawerPane ? `${open ? 260 : 70}px` : 0 },
+            transition: "padding 0.25s ease",
+          }}
         >
           {/* centering the content */}
           <Box
-            p={!CustomDeviceIsSmall() ? 2 : undefined}
+            p={{ xs: 1.25, md: 2 }}
             display={"flex"}
             gap={2}
-            maxHeight={"85vh"}
             flexWrap={"wrap"}
-            justifyContent={"center"}
+            justifyContent={{ xs: "center", lg: "flex-start" }}
+            width="100%"
             sx={{
-              overflow: "auto",
+              overflow: "visible",
               // Hide scrollbar for Chrome, Safari and Opera
               "&::-webkit-scrollbar": {
                 display: "none",
@@ -571,7 +577,7 @@ export default function AllJobsHiringManager() {
                             {/* rendered if are no jobs  */}
                             {jobs?.length < 1 && (
                               <Box
-                                height={'70vh'}
+                                minHeight={'70vh'}
                                 display={'flex'}
                                 justifyContent={'center'}
                                 color={'text.secondary'}

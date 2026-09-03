@@ -3,6 +3,7 @@ import { Alert, Box, Snackbar, Typography } from "@mui/material";
 import React from "react";
 import { useSelector } from "react-redux";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import { snackbarAlertSx, snackbarSx } from "./snackbarStyles";
 
 const SnackBarInfo = ({
   snackInfo,
@@ -46,20 +47,14 @@ const SnackBarInfo = ({
         horizontal:
           CustomDeviceTablet() && isTabSideBar ? "right" : "center",
       }}
+      sx={snackbarSx}
     >
       <Alert
         onClose={handleClose}
         severity="info"
         icon={icon}
-        sx={{
-          borderRadius: "12px",
-          backdropFilter: "blur(12px)",
-          background: "rgba(20,210,190,0.1)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          color: "text.primary",
-          display: "flex",
-          alignItems: "center",
-        }}
+        variant="outlined"
+        sx={snackbarAlertSx("info")}
       >
         <Box display="flex" alignItems="center" gap={1}>
           <Typography fontSize={13} fontWeight={600}>

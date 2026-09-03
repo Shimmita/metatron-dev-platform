@@ -62,7 +62,7 @@ export default function FeaturedEventsContainer() {
           );
           return;
         }
-        setErrorMessage(err?.response.data);
+        setErrorMessage(err?.response?.data || "Unable to load featured events.");
         setOpenAlertGeneral(true)
       })
       .finally(() => {

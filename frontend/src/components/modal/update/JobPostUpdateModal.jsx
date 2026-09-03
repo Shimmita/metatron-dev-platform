@@ -91,7 +91,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
 
   // redux states
-  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
    const isDarkMode=currentMode==='dark'
   const handleChangeMainSkills = (_, newValue) => {
     if (newValue.length > 5) {
@@ -314,14 +314,12 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
 
     // handle return width modal
     const handleReturnWidthModal=()=>{
-      if (CustomLandScape() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "50%"
+      if (CustomLandScape() || CustomLandscapeWidest()) {
+        return "min(92vw, 980px)"
       } else if (CustomDeviceTablet()){
-        return "90%"
-      } else if(CustomLandscapeWidest()){
-        return "35%"
+        return "calc(100vw - 32px)"
       }
-      return "100%"
+      return "calc(100vw - 16px)"
     }
 
 
@@ -330,9 +328,12 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
       keepMounted
       open={openModalJob}
       sx={{
-        marginLeft: CustomDeviceTablet() && isTabSideBar ? "34%" : undefined,
-        backdropFilter:'blur(5px)',
-
+        backdropFilter:'blur(10px)',
+        p: { xs: 1, sm: 2 },
+        "& .MuiBackdrop-root": {
+          background: "rgba(3,7,18,0.72)",
+          backdropFilter: "blur(10px)",
+        },
       }}
       // onClose={(e) => setOpenPostModal(false)}
       aria-labelledby="modal-modal-title"
@@ -342,21 +343,33 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
         width={handleReturnWidthModal()}
         color={"text.primary"}
         sx={{
-          border: isDarkMode && "1px solid gray",
-          marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
+          maxWidth: "980px",
+          maxHeight: { xs: "calc(100dvh - 16px)", sm: "calc(100dvh - 32px)" },
+          display: "flex",
+          flexDirection: "column",
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: "8px",
+          overflow: "hidden",
+          background: "background.paper",
+          boxShadow: "0 28px 90px rgba(0,0,0,0.62)",
         }}
       >
         <Box
           bgcolor={"background.default"}
-          borderRadius={3}
           className="shadow-lg"
+          sx={{
+            minHeight: 0,
+            display: "flex",
+            flexDirection: "column",
+          }}
         >
           {/* toolbar like box */}
           <Box
             display={"flex"}
             justifyContent={"space-between"}
             alignItems={"center"}
-           borderRadius={3}
+           borderRadius="8px"
             pt={1}
             pr={0.8}
             sx={{
@@ -434,17 +447,19 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
           </Box>
 
           <Box
-            maxHeight={"78vh"}
+            maxHeight={"calc(100dvh - 150px)"}
             className={"px-3"}
             sx={{
               overflow: "auto",
-              // Hide scrollbar for Chrome, Safari and Opera
               "&::-webkit-scrollbar": {
-                display: "none",
+                width: 6,
               },
-              // Hide scrollbar for IE, Edge and Firefox
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
+              "&::-webkit-scrollbar-thumb": {
+                background: "rgba(148,163,184,0.28)",
+                borderRadius: 999,
+              },
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(148,163,184,0.28) transparent",
             }}
           >
             <Box display={"flex"} flexDirection={"column"} gap={3} mt={3}>

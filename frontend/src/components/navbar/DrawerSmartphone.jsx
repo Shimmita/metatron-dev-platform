@@ -3,22 +3,33 @@ import {
   AvatarGroup,
   Badge,
   Box,
+  Button,
   Divider,
   Drawer,
   FormHelperText,
+  IconButton,
   styled,
   Tooltip,
   Typography
 } from "@mui/material";
+import {
+  ArticleRounded,
+  CalendarMonthRounded,
+  CloseRounded,
+  DashboardRounded,
+  SchoolRounded,
+  WorkRounded,
+} from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import axios from "axios";
 import { useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { resetDarkMode } from "../../redux/AppUI";
-import { appGradients } from "../../utils/colors";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import { appColors, appGradients } from "../../utils/colors";
 import StepperStats from "../sidebar/StepperStats";
 import CustomCountryName from "../utilities/CustomCountryName";
 import { getImageMatch } from "../utilities/getImageMatch";
+import { useNavigate } from "react-router-dom";
 
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -80,15 +91,24 @@ const DrawerSmartphone = ({
 
   const { user,isGuest,usersCount } = useSelector((state) => state.currentUser);
   const dispatch=useDispatch()
+  const navigate = useNavigate()
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [dataInsights,setDataInsights]=useState([])
   const [dataTools,setDataTools]=useState([])
   
-  // UI theme dark light tweaking effect
-    const handleShowDarkMode = () => {
-    // update the redux theme boolean state
-    dispatch(resetDarkMode());
+  const mobileNavItems = [
+    { label: "Dashboard", route: "/explore", nav: 0, icon: <DashboardRounded fontSize="small" /> },
+    { label: "Tech Gigs", route: "/jobs", nav: 1, icon: <WorkRounded fontSize="small" /> },
+    { label: "Events", route: "/events", nav: 2, icon: <CalendarMonthRounded fontSize="small" /> },
+    { label: "Courses", route: "/courses/available", nav: 3, icon: <SchoolRounded fontSize="small" /> },
+    { label: "Content", route: "/explore", nav: 0, icon: <ArticleRounded fontSize="small" /> },
+  ];
+
+  const handleNavigate = (item) => {
+    navigate(item.route);
+    dispatch(updateCurrentBottomNav(item.nav));
+    setOpenDrawer(false);
   };
 
    //fetch all insights from the backend
@@ -117,7 +137,7 @@ const DrawerSmartphone = ({
               );
               return;
             }
-            setErrorMessage(err?.response.data);
+            setErrorMessage(err?.response?.data || "Unable to load insights.");
     
           })
           .finally(() => {
@@ -128,12 +148,31 @@ const DrawerSmartphone = ({
 
 
   return (
-    <Drawer open={openDrawer} onClose={(e) => setOpenDrawer(false)}>
+    <Drawer
+      open={openDrawer}
+      onClose={(e) => setOpenDrawer(false)}
+      PaperProps={{
+        sx: {
+          width: { xs: "100vw", sm: 420 },
+          maxWidth: "100vw",
+          borderRight: "1px solid",
+          borderColor: isDarkMode ? appColors.border : "rgba(15,23,42,0.12)",
+          background: isDarkMode
+            ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(11,18,32,0.98))"
+            : appGradients.soft,
+          overflow: "hidden",
+        },
+      }}
+    >
       <Box 
-      px={0.5}
-      maxWidth={320} 
+      px={{ xs: 1.25, sm: 1.75 }}
+      width="100%"
       height={"100%"} 
-      bgcolor={'background.default'} 
+      sx={{
+        backgroundImage: isDarkMode
+          ? "linear-gradient(180deg, rgba(32,214,199,0.08), rgba(8,17,31,0.96))"
+          : "linear-gradient(180deg, #F8FAFC, #EEF7FF)",
+      }}
       >
       <Box 
       mt={0.5}
@@ -150,10 +189,24 @@ const DrawerSmartphone = ({
         >
         
           {/* title be shown in smallest devices */}
-          <Typography
-          fontWeight={'bold'}
-           textAlign={'center'} variant="body2"
-           textTransform={'uppercase'}>Metatron</Typography>
+          <Box>
+            <Typography fontWeight={900} variant="body2">
+              Metatron Dev
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Career intelligence hub
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={() => setOpenDrawer(false)}
+            sx={{
+              borderRadius: "8px",
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <CloseRounded sx={{ width: 17, height: 17 }} />
+          </IconButton>
 
            {/* icon button */}
             {/* <IconButton onClick={handleShowDarkMode}>
@@ -171,11 +224,13 @@ const DrawerSmartphone = ({
                     alignItems={'center'}
                     mb={1}
                     p={2}
-                    borderRadius={2}
+                    borderRadius={"8px"}
                     gap={2}
                     width={'100%'}
                   sx={{
-                    background: !isDarkMode && appGradients.soft,
+                    background: isDarkMode ? "rgba(255,255,255,0.045)" : appGradients.soft,
+                    border: "1px solid",
+                    borderColor: "divider",
                   }}
                       >
                       {/* avatar container */}
@@ -216,7 +271,7 @@ const DrawerSmartphone = ({
                             textTransform={"capitalize"}
                             >
                             {user?.specialisationTitle||"Login or Register"} <br/>
-                          {isGuest && usersCount + "+ Subscribers 🎉"}
+                          {isGuest && usersCount + "+ developers"}
                             </Typography>
 
                             {/* country */}
@@ -276,7 +331,36 @@ const DrawerSmartphone = ({
                         </Box>
                         </Box>
 
-                      <Box 
+                      <Box
+                        mt={1}
+                        width="100%"
+                        sx={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                          gap: 1,
+                        }}
+                      >
+                        {mobileNavItems.map((item) => (
+                          <Button
+                            key={item.label}
+                            onClick={() => handleNavigate(item)}
+                            startIcon={item.icon}
+                            variant="outlined"
+                            size="small"
+                            sx={{
+                              justifyContent: "flex-start",
+                              borderRadius: "8px",
+                              borderColor: "divider",
+                              minHeight: 42,
+                              fontSize: 11,
+                            }}
+                          >
+                            {item.label}
+                          </Button>
+                        ))}
+                      </Box>
+
+                      <Box
                       mt={3}
                     display={"flex"} 
                     justifyContent={"center"} >
@@ -294,10 +378,10 @@ const DrawerSmartphone = ({
                       mt={3}
                       py={0.1}
                       bgcolor={"background.default"}
-                      className=" rounded-4"
                       sx={{ 
-                        border:isDarkMode && "1px solid",
+                        border: "1px solid",
                         borderColor:"divider",
+                        borderRadius: "8px",
                     
                        }}
                       >

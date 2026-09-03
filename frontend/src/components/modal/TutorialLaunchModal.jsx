@@ -131,7 +131,7 @@ const TutorialLaunchModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextO
   };
 
   // redux states
-  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
       const isDarkMode=currentMode==='dark'
 
   // Handle input change for req
@@ -273,55 +273,52 @@ const TutorialLaunchModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextO
     const handleReturnWidthModal=()=>{
       if (
         CustomLandScape() 
-        ||CustomLandscapeWidest() || 
-        (CustomDeviceTablet() && !isTabSideBar)) {
-        return "40%"
+        ||CustomLandscapeWidest()) {
+        return "min(92vw, 940px)"
       } else if (CustomDeviceTablet()){
-        return "90%"
+        return "calc(100vw - 32px)"
       } 
-      return "95%"
+      return "calc(100vw - 16px)"
     }
-
-    // handle width of the modal, margin
-      const handleModalWidth=()=>{
-        if (CustomDeviceTablet() && isTabSideBar) {
-          return "36%"
-        } else if(CustomLandScape()){
-          return "-1%"
-        } else if(CustomLandscapeWidest()){
-          return "0%"
-        }
-      }
 
   return (
     <StyledModalEvent
       keepMounted
       open={openModalEventAdd}
       sx={{
-        backdropFilter:'blur(5px)',
-        marginLeft:handleModalWidth(),
+        backdropFilter:'blur(10px)',
+        p: { xs: 1, sm: 2 },
+        "& .MuiBackdrop-root": {
+          background: "rgba(3,7,18,0.72)",
+          backdropFilter: "blur(10px)",
+        },
       }}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
       <Box
         width={handleReturnWidthModal()}
-        borderRadius={3}
         bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
         color={"text.primary"}
         sx={{
-           border:  "1px solid gray",
+          maxWidth: "980px",
+          maxHeight: { xs: "calc(100dvh - 16px)", sm: "calc(100dvh - 32px)" },
+          display: "flex",
+          flexDirection: "column",
+           border:  "1px solid",
           borderColor:'divider',
-          marginRight: CustomDeviceTablet() && isTabSideBar ? 2 : undefined,
+          borderRadius: "8px",
+          overflow: "hidden",
+          boxShadow: "0 28px 90px rgba(0,0,0,0.62)",
         }}
       >
         <Box
           bgcolor={"background.default"}
-          borderRadius={3}
           className="shadow-lg"
           sx={{ 
-          border:  "1px solid gray",
-          borderColor:'divider',
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
            }}
         >
           {/* toolbar like box */}
@@ -397,17 +394,19 @@ const TutorialLaunchModal = ({ openModalEventAdd, setOpenModalEventAdd, setTextO
           </Box>
 
           <Box
-            maxHeight={"78vh"}
+            maxHeight={"calc(100dvh - 150px)"}
             className={"px-3"}
             sx={{
               overflow: "auto",
-              // Hide scrollbar for Chrome, Safari and Opera
               "&::-webkit-scrollbar": {
-                display: "none",
+                width: 6,
               },
-              // Hide scrollbar for IE, Edge and Firefox
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
+              "&::-webkit-scrollbar-thumb": {
+                background: "rgba(148,163,184,0.28)",
+                borderRadius: 999,
+              },
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(148,163,184,0.28) transparent",
             }}
           >
             <Box display={"flex"} flexDirection={"column"} gap={2} mt={3}>

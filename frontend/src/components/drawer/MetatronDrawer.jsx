@@ -6,6 +6,7 @@ import {
   DocumentScannerRounded,
   FindInPageRounded,
   HighlightOffOutlined,
+  HomeRounded,
   Menu,
   MyLocationRounded,
   TravelExploreRounded,
@@ -29,6 +30,9 @@ import {
   Stack,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
+import { handleShowingSpeedDial, handleSidebarRightbar } from "../../redux/AppUI";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 
 const DRAWER_WIDTH = 240;
 const HR_COLOR = "#FFD700";
@@ -47,6 +51,8 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== "ope
       }),
       overflowX: "hidden",
       borderRight: "1px solid rgba(255,255,255,0.08)",
+      display: "flex",
+      flexDirection: "column",
     },
   })
 );
@@ -65,7 +71,10 @@ export default function GlobalDrawer({
   handleIsJobsGlobalResults,
   handleNavigateHiring,
 }) {
+  const navigate = useNavigate();
+
   const navItems = [
+    { text: "Home", icon: <HomeRounded />, isHome: true },
     { text: "Explore Jobs", icon: <WorkRounded /> },
     { text: "AI Selection", icon: <AutoAwesome /> },
     { text: "Search Jobs", icon: <FindInPageRounded /> },
@@ -77,12 +86,20 @@ export default function GlobalDrawer({
     { text: "Metatron H.R", icon: <DocumentScannerRounded />, isHR: true },
   ];
 
+  const handleNavigateHome = () => {
+    dispatch(updateCurrentBottomNav(0));
+    dispatch(handleSidebarRightbar(true));
+    dispatch(handleShowingSpeedDial(true));
+    dispatch(handleIsJobsGlobalResults(false));
+    navigate("/explore");
+  };
+
   return (
     <StyledDrawer
       variant="permanent"
       open={open}
       sx={{
-        display: isDrawerPane ? "block" : "none",
+        display: { xs: "none", lg: isDrawerPane ? "block" : "none" },
         "& .MuiDrawer-paper": {
           background: isDarkMode ? "rgba(15,23,42,0.98)" : "rgba(255,255,255,0.95)",
           backdropFilter: "blur(20px)",
@@ -111,7 +128,7 @@ export default function GlobalDrawer({
       <Divider sx={{ opacity: 0.1 }} />
 
       {/* ─── NAVIGATION LIST ─── */}
-      <List sx={{ px: 1, pt: 1 }}>
+      <List sx={{ px: 1, pt: 1, flex: 1 }}>
         {/* Exit Logic */}
         {!open && (
           <ListItem disablePadding sx={{ mb: 1 }}>
@@ -124,7 +141,7 @@ export default function GlobalDrawer({
         )}
 
         {navItems
-          .filter((item) => !isGuest || item.text === "Explore Jobs")
+          .filter((item) => !isGuest || item.isHome || item.text === "Explore Jobs")
           .map((item) => {
           const isActive = textOption === item.text;
           const showItem = item.isHR ? !isGuest : true; // Only show HR if not guest
@@ -136,7 +153,9 @@ export default function GlobalDrawer({
               <ListItemButton
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (item.isHR) {
+                  if (item.isHome) {
+                    handleNavigateHome();
+                  } else if (item.isHR) {
                     handleNavigateHiring();
                   } else {
                     setTextOption(item.text);
@@ -190,6 +209,30 @@ export default function GlobalDrawer({
           );
         })}
       </List>
+      {open && !isGuest && (
+        <Box sx={{ px: 1.5, mt: "auto", mb: 2 }}>
+          <Box
+            sx={{
+              borderRadius: "8px",
+              border: "1px solid rgba(20,210,190,0.16)",
+              background: isDarkMode
+                ? "linear-gradient(135deg, rgba(20,210,190,0.10), rgba(59,130,246,0.06))"
+                : "linear-gradient(135deg, rgba(20,210,190,0.08), rgba(15,76,129,0.04))",
+              p: 1.5,
+            }}
+          >
+            <Typography variant="caption" color="primary.main" fontWeight={900}>
+              CAREER OPERATIONS
+            </Typography>
+            <Typography variant="body2" fontWeight={900} mt={0.5}>
+              Build a sharper application lane.
+            </Typography>
+            <Typography variant="caption" color="text.secondary" display="block" mt={0.5}>
+              Move from discovery to tracked applications, then review statistics weekly.
+            </Typography>
+          </Box>
+        </Box>
+      )}
     </StyledDrawer>
   );
 }

@@ -1,12 +1,13 @@
 import {
   FlagOutlined,
   InsightsOutlined,
+  NotificationsNoneRounded,
   PersonAddOutlined,
   PersonOutline,
   WorkOutlineOutlined,
 } from "@mui/icons-material";
 import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
-import { Box, Stack, Badge } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import MuiAccordion from "@mui/material/Accordion";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import MuiAccordionSummary, {
@@ -16,6 +17,7 @@ import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import React, { useState } from "react";
 import FriendRequest from "../../rightbar/layouts/FriendRequest";
+import { panelSx } from "../communicationStyles";
 import JobFeedBack from "./JobFeedBack";
 import PostReaction from "./PostReaction";
 import PostReported from "./PostReported";
@@ -110,6 +112,39 @@ export default function NotifAccordionLayout({
     </Box>
   );
 
+  const totalCount =
+    (reportedPost?.length || 0) +
+    (connectNotifications?.length || 0) +
+    (post_reactions?.length || 0) +
+    (profile_views?.length || 0) +
+    (jobFeedBacks?.length || 0);
+
+  if (totalCount < 1) {
+    return (
+      <Box
+        sx={(theme) => ({
+          ...panelSx(theme),
+          minHeight: 260,
+          m: 0.5,
+          p: 3,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+        })}
+      >
+        <NotificationsNoneRounded sx={{ fontSize: 38, color: "primary.main", mb: 1 }} />
+        <Typography variant="body2" fontWeight={900}>
+          You are all caught up
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{ maxWidth: 270, mt: 0.5 }}>
+          Career updates, profile views, content activity, and security alerts will appear here.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Stack sx={{ p: 1 }}>
       {/* Profile Views */}
@@ -119,7 +154,7 @@ export default function NotifAccordionLayout({
             {renderHeader(PersonOutline, "PROFILE ENGAGEMENT", profile_views.length)}
           </AccordionSummary>
           <AccordionDetails>
-            <Box maxHeight="60vh" sx={{ overflowY: "auto", scrollbarWidth: "none" }}>
+            <Box>
               {profile_views.map((viewer) => (
                 <ProfileViewReaction key={viewer?._id} profile_view={viewer} />
               ))}
@@ -135,7 +170,7 @@ export default function NotifAccordionLayout({
             {renderHeader(PersonAddOutlined, "PEER REQUESTS", connectNotifications.length)}
           </AccordionSummary>
           <AccordionDetails>
-            <Box maxHeight="60vh" sx={{ overflowY: "auto", scrollbarWidth: "none" }}>
+            <Box>
               {connectNotifications.map((connect, index) => (
                 <FriendRequest
                   key={connect?._id}
@@ -156,7 +191,7 @@ export default function NotifAccordionLayout({
             {renderHeader(WorkOutlineOutlined, "CAREER INTEL", jobFeedBacks.length)}
           </AccordionSummary>
           <AccordionDetails>
-            <Box maxHeight="60vh" sx={{ overflowY: "auto", scrollbarWidth: "none" }}>
+            <Box>
               {jobFeedBacks.map((job) => (
                 <JobFeedBack key={job?._id} jobFeedBack={job} />
               ))}
@@ -172,7 +207,7 @@ export default function NotifAccordionLayout({
             {renderHeader(InsightsOutlined, "CONTENT ENGAGEMENT", post_reactions.length)}
           </AccordionSummary>
           <AccordionDetails>
-            <Box maxHeight="60vh" sx={{ overflowY: "auto", scrollbarWidth: "none" }}>
+            <Box>
               {post_reactions.map((reaction, index) => (
                 <PostReaction key={index} reaction={reaction} isLastItem={post_reactions.length - 1 === index} />
               ))}
@@ -188,7 +223,7 @@ export default function NotifAccordionLayout({
             {renderHeader(FlagOutlined, "SECURITY ALERTS", reportedPost.length)}
           </AccordionSummary>
           <AccordionDetails>
-            <Box maxHeight="60vh" sx={{ overflowY: "auto", scrollbarWidth: "none" }}>
+            <Box>
               {reportedPost.map((report, index) => (
                 <PostReported key={index} report={report} isLastItem={reportedPost.length - 1 === index} />
               ))}

@@ -47,7 +47,7 @@ export default function AlertGeneral({
       <Box
         sx={{
           width: { xs: "90vw", sm: 420 },
-          borderRadius: "16px",
+          borderRadius: "8px",
           background: "rgba(255,255,255,0.05)",
           backdropFilter: "blur(30px)",
           border: "1px solid rgba(255,255,255,0.12)",

@@ -1,19 +1,16 @@
-import { Close, Edit, Send } from "@mui/icons-material";
+import { Close, PersonSearchRounded, Send } from "@mui/icons-material";
 import {
-  alpha,
   Avatar,
   Box,
   Button,
   CircularProgress,
   Divider,
   IconButton,
-  InputBase,
   ListItem,
   ListItemAvatar,
   ListItemText,
   MenuItem,
   Stack,
-  styled,
   TextField,
   Typography,
 } from "@mui/material";
@@ -21,50 +18,9 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CustomCountryName from "../../utilities/CustomCountryName";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { resetClearConversations } from "../../../redux/CurrentConversations";
-
-const Search = styled("div")(({ theme }) => ({
-  border: "1px solid",
-  borderColor: "gray",
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(1),
-    width: "auto",
-  },
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 1),
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  height: "20%",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  width: CustomDeviceIsSmall()
-    ? "32ch"
-    : CustomDeviceTablet()
-    ? "40ch"
-    : "45ch",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(3)})`,
-  },
-}));
+import { appColors } from "../../../utils/colors";
+import { avatarSx, iconButtonSx, panelSx, scrollAreaSx } from "../communicationStyles";
 
 function NewConversation({ handleFabClicked }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -151,240 +107,152 @@ function NewConversation({ handleFabClicked }) {
   };
 
   return (
-    <Box width={"100%"}>
-      <Box display={"flex"} alignItems={"center"}>
-        {/* icon button */}
-        <Box ml={3} p={1}>
-          <IconButton 
-          sx={{ border:'1px solid', borderColor:'divider' }}
-          onClick={handleFabClicked}>
-            <Close sx={{ width: 15, height: 15 }} />
-          </IconButton>
-        </Box>
-        {/* info */}
-        <Box 
-        mr={5}
-        display={"flex"} 
-        justifyContent={"center"} 
-        width={"100%"}>
-          <Typography variant="caption" textAlign={"center"}>
-            Compose New Conversation
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        spacing={1.5}
+        sx={{ px: 1, py: 1.25, borderBottom: "1px solid", borderColor: "divider" }}
+      >
+        <Box minWidth={0}>
+          <Typography variant="caption" color="primary.main" fontWeight={900}>
+            NEW THREAD
+          </Typography>
+          <Typography variant="body2" fontWeight={900}>
+            Compose Conversation
           </Typography>
         </Box>
-      </Box>
-      {/* divider */}
-      <Divider component={"div"} />
+        <IconButton sx={iconButtonSx} onClick={handleFabClicked}>
+          <Close sx={{ width: 15, height: 15 }} />
+        </IconButton>
+      </Stack>
 
-      <Stack
-        display={"flex"}
-        justifyContent={"center"}
-        mt={2}
-        width={"100%"}
-        maxHeight={"92vh"}
-        sx={{
-          overflow: "auto",
-          // Hide scrollbar for Chrome, Safari and Opera
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-          // Hide scrollbar for IE, Edge and Firefox
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
-        }}
-      >
-        {/* user search entry */}
-        <Box p={2}>
+      <Stack sx={{ flex: 1, minHeight: 0, p: { xs: 1, sm: 1.5 }, ...scrollAreaSx }} spacing={1.5}>
+        <Box sx={(theme) => ({ ...panelSx(theme), p: 1.5 })}>
+          <Stack direction="row" alignItems="center" spacing={1} mb={1.25}>
+            <PersonSearchRounded sx={{ width: 18, height: 18, color: appColors.primary }} />
+            <Typography variant="body2" fontWeight={900}>
+              Choose Recipient
+            </Typography>
+          </Stack>
           <TextField
-            label="search user"
+            label="Search developers, recruiters, mentors"
             fullWidth
-            variant="filled"
+            size="small"
+            variant="outlined"
             value={searchTerm}
             disabled={isUploading}
-            className="ms-3"
             onChange={handleSearch}
             autoComplete="off"
-            style={{ 
-            marginBottom: "1rem",
-            width: "90%" }}
           />
-          {isFetching ? (
-            <CircularProgress size={18} />
-          ) : (
-            <React.Fragment>
-              {/* control showing of dropdown */}
-              {isClosedDropDown && suggestions?.length > 0 ? (
-                <Stack direction={"row"} justifyContent={"center"}>
-                  <Button
-                    variant="text"
-                    size="small"
-                    disabled={isUploading}
-                    onClick={handleDisplayDropdown}
-                    sx={{
-                      textTransform: "lowercase",
-                      fontSize: "small",
-                    }}
-                  >
-                    open dropdown
-                  </Button>
-                </Stack>
-              ) : (
-                <React.Fragment>
-                  {suggestions && suggestions && (
-                    <Box
-                      maxHeight={330}
-                      sx={{
-                        overflow: "auto",
-                        // Hide scrollbar for Chrome, Safari and Opera
-                        "&::-webkit-scrollbar": {
-                          display: "none",
-                        },
-                        // Hide scrollbar for IE, Edge and Firefox
-                        msOverflowStyle: "none",
-                        scrollbarWidth: "none",
-                      }}
-                    >
-                      {suggestions.map((availableuser) => (
-                        <Box
-                         key={availableuser._id}
-                         >
-                        <MenuItem
-                          disabled={availableuser._id === user._id}
-                          onClick={() => {
-                            // extract the name of the currently selected user
-                            setSearchTerm(`${availableuser?.name}`);
 
-                            // update the value of user being searched
-                            if (availableuser._id !== user._id) {
-                              setUserSearched(availableuser);
-                            } 
-                            // set show message area since user wants to write message
-                            setShowMessageArea((prev) => !prev);
-                          }}
-                        >
-                          <ListItem>
-                            <ListItemAvatar>
-                              <Avatar
-                                src={availableuser.avatar}
-                                alt={availableuser?.name}
-                              />
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={
-                                <Typography variant="body2">
-                                  {availableuser?.name}
-                                </Typography>
-                              }
-                              secondary={
-                                <React.Fragment>
-                                  <Typography
-                                    variant="body2"
-                                    gutterBottom
-                                    component={"span"}
-                                    display={"inline-block"}
-                                    gap={2}
-                                    alignItems={"center"}
-                                  >
-                                    {CustomCountryName(availableuser?.country)}{" "}
-                                    | {availableuser?.county}
-                                  </Typography>
-
-                                  <Typography variant="body2" gutterBottom>
-                                    {availableuser?.specialisationTitle}
-                                  </Typography>
-                                </React.Fragment>
-                              }
-                            />
-                          </ListItem>
-                        </MenuItem>
-                        {/* divider */}
-                        <Divider component='div' variant="middle"/>
-                        </Box>
-                      ))}
-                      {/* close or hide dropdown panel */}
-                      {suggestions && suggestions.length > 0 && (
-                        <Stack direction={"row"} justifyContent={"center"}>
-                          <Button
-                            variant="text"
-                            size="small"
-                            disabled={isUploading}
-                            onClick={handleDisplayDropdown}
-                            sx={{
-                              textTransform: "lowercase",
-                              fontSize: "small",
-                            }}
-                          >
-                            close dropdown
-                          </Button>
-                        </Stack>
-                      )}
-                    </Box>
-                  )}
-                </React.Fragment>
-              )}
-            </React.Fragment>
-          )}
-
-          {/* input for writing message that will be sent to the user and create
-          conversation if not present */}
-
-          {showMessageArea && (
-            <Stack width={"100%"} mt={2} gap={1}>
-              <form onSubmit={handleSubmitConversation}>
-                <Search className="rounded">
-                  <SearchIconWrapper>
-                    <Edit sx={{ width: 17, height: 17 }} color="primary" />
-                  </SearchIconWrapper>
-                  <StyledInputBase
-                    placeholder={
-                      userSearched?.name?.length > 5
-                        ? `write your message to ${
-                            userSearched?.name?.split(" ")[0]
-                          } ...`
-                        : "write your message ..."
-                    }
-                    inputProps={{ "aria-label": "search" }}
-                    multiline
-                    minRows={10}
-                    maxRows={20}
-                    disabled={isUploading}
-                    value={messageContent}
-                    onChange={(e) => setMessageContent(e.target.value)}
-                    required
-                    fullWidth
-                  />
-                </Search>
-                {/* send btn */}
-                {isUploading ? (
-                  <Box
-                    display={"flex"}
-                    justifyContent={"center"}
-                    mt={2}
-                    gap={2}
-                    alignItems={"center"}
-                  >
-                    <CircularProgress
-                      size={20}
-                      aria-labelledby="loading progress"
-                    />
-                    <Typography
-                      variant="caption"
-                      color={"text.secondary"}
-                      fontWeight={"bold"}
-                    >
-                      sending...
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Box display={"flex"} justifyContent={"flex-end"}>
-                    <IconButton type="submit">
-                      <Send />
-                    </IconButton>
-                  </Box>
-                )}
-              </form>
+          {isFetching && (
+            <Stack direction="row" alignItems="center" spacing={1} mt={1.5}>
+              <CircularProgress size={16} />
+              <Typography variant="caption" color="text.secondary">
+                Searching network...
+              </Typography>
             </Stack>
           )}
+
+          {!isFetching && isClosedDropDown && suggestions?.length > 0 && (
+            <Box display="flex" justifyContent="center" mt={1.25}>
+              <Button size="small" onClick={handleDisplayDropdown} sx={{ textTransform: "none", fontWeight: 800 }}>
+                Show results
+              </Button>
+            </Box>
+          )}
+
+          {!isFetching && !isClosedDropDown && suggestions?.length > 0 && (
+            <Box sx={{ mt: 1.25, maxHeight: 330, ...scrollAreaSx }}>
+              {suggestions.map((availableuser) => (
+                <MenuItem
+                  key={availableuser._id}
+                  disabled={availableuser._id === user._id}
+                  onClick={() => {
+                    setSearchTerm(`${availableuser?.name}`);
+                    if (availableuser._id !== user._id) {
+                      setUserSearched(availableuser);
+                    }
+                    setShowMessageArea(true);
+                  }}
+                  sx={(theme) => ({
+                    ...panelSx(theme),
+                    mb: 0.75,
+                    p: 0,
+                    overflow: "hidden",
+                    whiteSpace: "normal",
+                  })}
+                >
+                  <ListItem sx={{ px: 1.25, py: 1 }}>
+                    <ListItemAvatar>
+                      <Avatar src={availableuser.avatar} alt={availableuser?.name} sx={avatarSx} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Typography variant="body2" fontWeight={900}>
+                          {availableuser?.name}
+                        </Typography>
+                      }
+                      secondary={
+                        <Box>
+                          <Typography variant="caption" color="text.secondary">
+                            {availableuser?.specialisationTitle || "Tech professional"}
+                          </Typography>
+                          <Typography variant="caption" color="text.disabled" display="block">
+                            {CustomCountryName(availableuser?.country)} | {availableuser?.county}
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </ListItem>
+                </MenuItem>
+              ))}
+              <Divider component="div" sx={{ my: 1 }} />
+              <Box display="flex" justifyContent="center">
+                <Button size="small" disabled={isUploading} onClick={handleDisplayDropdown} sx={{ textTransform: "none" }}>
+                  Hide results
+                </Button>
+              </Box>
+            </Box>
+          )}
         </Box>
+
+        {showMessageArea && (
+          <Box component="form" onSubmit={handleSubmitConversation} sx={(theme) => ({ ...panelSx(theme), p: 1.5 })}>
+            <Typography variant="caption" color="primary.main" fontWeight={900}>
+              MESSAGE
+            </Typography>
+            <TextField
+              placeholder={
+                userSearched?.name?.length > 1
+                  ? `Write your message to ${userSearched?.name?.split(" ")[0]}...`
+                  : "Write your message..."
+              }
+              multiline
+              minRows={7}
+              maxRows={12}
+              disabled={isUploading}
+              value={messageContent}
+              onChange={(e) => setMessageContent(e.target.value)}
+              required
+              fullWidth
+              sx={{ mt: 1 }}
+            />
+            <Box display="flex" justifyContent="flex-end" mt={1.25}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={isUploading || messageContent.trim().length < 1}
+                endIcon={isUploading ? <CircularProgress size={14} /> : <Send sx={{ width: 16, height: 16 }} />}
+                sx={{ borderRadius: "8px", textTransform: "none", fontWeight: 900 }}
+              >
+                {isUploading ? "Sending" : "Send Message"}
+              </Button>
+            </Box>
+          </Box>
+        )}
       </Stack>
     </Box>
   );

@@ -20,6 +20,7 @@ import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
 import { appColors } from "../../../utils/colors";
+import { iconButtonSx, notificationCardSx } from "../communicationStyles";
 
 /* ─── Metatron token shortcuts (consistent with global theme) ─── */
 const C = {
@@ -76,19 +77,7 @@ function ProfileViewReaction({ profile_view }) {
       }}
     >
       <ListItem
-        sx={{
-          borderRadius: "14px",
-          px: 2,
-          py: 1.5,
-          background: C.bgCard,
-          backdropFilter: "blur(25px)",
-          border: `1px solid ${C.border}`,
-          transition: "all 0.25s ease",
-          "&:hover": {
-            background: C.tealHover,
-            borderColor: C.tealBorder,
-          },
-        }}
+        sx={(theme) => notificationCardSx(theme, "default")}
       >
         {/* Avatar – clickable to view mini profile */}
         <ListItemAvatar onClick={handleShowMiniProfile}>
@@ -131,20 +120,12 @@ function ProfileViewReaction({ profile_view }) {
                 <Typography variant="caption" sx={{ color: C.textMuted, fontSize: 11 }}>
                   {getElapsedTime(profile_view?.createdAt)}
                 </Typography>
-                <Tooltip title="Clear" arrow>
+                <Tooltip title="Clear profile view" arrow>
                   <IconButton
                     size="small"
                     disabled={isFetching}
                     onClick={handleDeleteReaction}
-                    sx={{
-                      border: `1px solid ${C.border}`,
-                      color: C.textSecondary,
-                      "&:hover": {
-                        backgroundColor: "rgba(255,109,58,0.08)",
-                        borderColor: "rgba(255,109,58,0.3)",
-                        color: "#FF6D3A",
-                      },
-                    }}
+                    sx={iconButtonSx}
                   >
                     {isFetching ? (
                       <CircularProgress size={13} sx={{ color: C.teal }} />

@@ -7,10 +7,17 @@ import {
   IconButton,
   InputBase,
   Stack,
-  Tooltip
+  Tooltip,
+  Typography
 } from "@mui/material";
 
-import { Close, FullscreenOutlined, SendOutlined } from "@mui/icons-material";
+import {
+  ArticleRounded,
+  Close,
+  ForumRounded,
+  FullscreenOutlined,
+  SendOutlined,
+} from "@mui/icons-material";
 
 import axios from "axios";
 import React, { lazy, useState } from "react";
@@ -25,7 +32,7 @@ import {
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
 
-const MAX_TEXT_LENGTH=100
+const MAX_TEXT_LENGTH = 100
 
 const CommentContainer = lazy(() => import("./CommentContainer"));
 function PostDetailsContainer({
@@ -98,7 +105,7 @@ function PostDetailsContainer({
           return;
         }
 
-        setErrorMessage(err?.response.data);
+        setErrorMessage(err?.response?.data || "Unable to send comment.");
       })
       .finally(() => {
         setIsUploading(false);
@@ -141,28 +148,42 @@ function PostDetailsContainer({
 
   return (
   
-    <Stack 
-    gap={1} 
-    maxHeight={'80vh'}
-    sx={{
-      overflow: "auto",
-      // Hide scrollbar for Chrome, Safari and Opera
-      "&::-webkit-scrollbar": {
-        display: "none",
-      },
-      // Hide scrollbar for IE, Edge and Firefox
-      msOverflowStyle: "none",
-      scrollbarWidth: "none",
-    }}
+    <Stack
+      gap={1.25}
+      maxHeight={isDrawerFocused ? "100%" : "calc(100vh - 118px)"}
+      sx={{
+        overflow: "auto",
+        borderRadius: "8px",
+        border: "1px solid rgba(255,255,255,0.10)",
+        background: "linear-gradient(180deg, rgba(11,18,32,0.94), rgba(5,8,18,0.96))",
+        p: { xs: 1, sm: 1.25 },
+        "&::-webkit-scrollbar": {
+          display: "none",
+        },
+        msOverflowStyle: "none",
+        scrollbarWidth: "none",
+      }}
     >
       {isPostEditMode ? (
         <React.Fragment>
-          <Box 
-          display={"flex"} 
-          justifyContent={"flex-end"} 
-          alignItems={'center'} 
-          gap={2}
-          p={1}>
+          <Box
+            display={"flex"}
+            justifyContent={"space-between"}
+            alignItems={'center'}
+            gap={2}
+            p={1}
+          >
+            <Box display="flex" alignItems="center" gap={1}>
+              <ArticleRounded sx={{ color: "primary.main", fontSize: 18 }} />
+              <Box minWidth={0}>
+                <Typography fontWeight={900} fontSize={14}>
+                  Post Editor
+                </Typography>
+                <Typography variant="caption" color="text.secondary" noWrap>
+                  {postDetailedData?.post_title || "Focused post"}
+                </Typography>
+              </Box>
+            </Box>
             {/* full screen */}
           {isDrawerFocused && (
               <Tooltip arrow title={"wide"}>
@@ -219,19 +240,45 @@ function PostDetailsContainer({
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <Box display={"flex"} justifyContent={"flex-end"} alignItems={'center'}>
-           
-          {/* close button */}
-            <IconButton 
-            sx={{ 
-              border:'1px solid',
-              borderColor:'divider'
-             }}
-            onClick={handleClearPostDetailedData}>
-              <Close 
-              sx={{ width: 10, height: 10 }} 
-              color="primary" />
-            </IconButton>
+          <Box
+            display={"flex"}
+            justifyContent={"space-between"}
+            alignItems={'center'}
+            sx={{
+              px: 0.75,
+              py: 0.75,
+              borderBottom: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <Box display="flex" alignItems="center" gap={1} minWidth={0}>
+              <ForumRounded sx={{ color: "primary.main", fontSize: 18 }} />
+              <Box minWidth={0}>
+                <Typography fontWeight={900} fontSize={14}>
+                  Focused Post
+                </Typography>
+                <Typography variant="caption" color="text.secondary" noWrap>
+                  {postDetailedData?.post_comments?.count || 0} comments in discussion
+                </Typography>
+              </Box>
+            </Box>
+
+            <Tooltip arrow title="Close focused post">
+              <IconButton
+                sx={{
+                  width: 34,
+                  height: 34,
+                  background: "rgba(255,255,255,0.04)",
+                  "&:hover": {
+                    background: "rgba(32,214,199,0.10)",
+                  },
+                }}
+                onClick={handleClearPostDetailedData}
+              >
+                <Close
+                  sx={{ width: 16, height: 16 }}
+                  color="primary" />
+              </IconButton>
+            </Tooltip>
           </Box>
 
           {/* display error */}
@@ -262,8 +309,7 @@ function PostDetailsContainer({
               setPostDetailedData={setPostDetailedData}
             />
 
-            {/* all user comments container pass the comments of the post */}
-            <Box className='shadow-sm' mt={1}>
+            <Box mt={1.25}>
               <CommentContainer
                 post_comments={postDetailedData?.post_comments?.comments}
                 postId={postDetailedData?._id}
@@ -279,9 +325,13 @@ function PostDetailsContainer({
             alignItems={"center"}
             width={"100%"}
             p={1}
-            mb={3}
-            bgcolor={"background.default"}
-            className={'rounded shadow-sm'}
+            mb={1}
+            sx={{
+              borderRadius: "8px",
+              border: "1px solid rgba(255,255,255,0.10)",
+              background: "rgba(255,255,255,0.055)",
+              boxShadow: "0 16px 40px rgba(0,0,0,0.22)",
+            }}
           >
             {/* input for comment */}
             <Box width={"100%"} mx={1}>
@@ -292,9 +342,10 @@ function PostDetailsContainer({
                 maxRows={2}
                 disabled={isUploading}
                 className="w-100"
-                placeholder="write new comment ..."
+                placeholder="Add a clear, useful comment..."
                 sx={{
                   fontSize: "small",
+                  color: "text.primary",
                 }}
               />
             </Box>

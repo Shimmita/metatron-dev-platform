@@ -22,22 +22,21 @@ import {
   TextField,
   Tooltip,
   Typography,
-  useTheme,
 } from "@mui/material";
 import axios from "axios";
 import React, { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
+import { updateCurrentEvents } from "../../redux/CurrentEvents";
 import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
+import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import AllCountries from "../data/AllCountries";
+import AllSkills from "../data/AllSkillsData";
 import SpecialisationTech from "../data/SpecialisationTech";
 import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import AllSkills from "../data/AllSkillsData";
-import { updateCurrentEvents } from "../../redux/CurrentEvents";
-import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
 // styled modal
@@ -189,11 +188,6 @@ const EventsAddModal = ({
     return split_res[split_res.length - 1].substring(1, 3).toLowerCase();
   };
 
-  // redux states
-  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
-      const isDarkMode=currentMode==='dark'
-  const theme = useTheme();
-
   // Handle input change for req
   const handleTextChangeReq = (e, value) => {
     setReqText(value);
@@ -330,13 +324,12 @@ const EventsAddModal = ({
     const handleReturnWidthModal=()=>{
       if (
         CustomLandScape() 
-        ||CustomLandscapeWidest() || 
-        (CustomDeviceTablet() && !isTabSideBar)) {
-        return "40%"
+        ||CustomLandscapeWidest()) {
+        return "min(92vw, 940px)"
       } else if (CustomDeviceTablet()){
-        return "90%"
+        return "calc(100vw - 32px)"
       } 
-      return "95%"
+      return "calc(100vw - 16px)"
     }
 
  
@@ -346,7 +339,12 @@ const EventsAddModal = ({
       keepMounted
       open={openModalEventAdd}
       sx={{
-        backdropFilter:'blur(5px)',
+        backdropFilter:'blur(10px)',
+        p: { xs: 1, sm: 2 },
+        "& .MuiBackdrop-root": {
+          background: "rgba(3,7,18,0.72)",
+          backdropFilter: "blur(10px)",
+        },
       }}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
@@ -355,19 +353,25 @@ const EventsAddModal = ({
         width={handleReturnWidthModal()}
         color={"text.primary"}
         sx={{
-          border:  "1px solid gray",
+          maxWidth: "980px",
+          maxHeight: { xs: "calc(100dvh - 16px)", sm: "calc(100dvh - 32px)" },
+          display: "flex",
+          flexDirection: "column",
+          border:  "1px solid",
           borderColor:'divider',
-          borderTopLeftRadius: theme.shape.borderRadius,
-          borderTopRightRadius: theme.shape.borderRadius,
+          borderRadius: "8px",
           overflow: 'hidden',
+          background: "background.paper",
+          boxShadow: "0 28px 90px rgba(0,0,0,0.62)",
         }}
       >
         <Box
           bgcolor={"background.default"}
           className="shadow-lg"
           sx={{ 
-          border:  "1px solid gray",
-          borderColor:'divider',
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
           }}
         >
           <HeaderBar>
@@ -450,17 +454,19 @@ const EventsAddModal = ({
           </Box>
 
           <Box
-            maxHeight={"78vh"}
+            maxHeight={"calc(100dvh - 150px)"}
             className={"px-3"}
             sx={{
               overflow: "auto",
-              // Hide scrollbar for Chrome, Safari and Opera
               "&::-webkit-scrollbar": {
-                display: "none",
+                width: 6,
               },
-              // Hide scrollbar for IE, Edge and Firefox
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
+              "&::-webkit-scrollbar-thumb": {
+                background: "rgba(148,163,184,0.28)",
+                borderRadius: 999,
+              },
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(148,163,184,0.28) transparent",
             }}
           >
             <Box display={"flex"} flexDirection={"column"} gap={2} mt={3}>

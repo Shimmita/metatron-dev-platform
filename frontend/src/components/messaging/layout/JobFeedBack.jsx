@@ -4,6 +4,7 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  Stack,
   Tooltip,
   Typography
 } from "@mui/material";
@@ -21,7 +22,12 @@ import { updateCurrentBottomNav } from "../../../redux/CurrentBottomNav";
 import { deleteCurrentJobFeedBack } from "../../../redux/CurrentJobFeedBack";
 import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
-  
+import {
+  avatarSx,
+  iconButtonSx,
+  notificationCardSx,
+} from "../communicationStyles";
+
   function JobFeedBack({
     jobFeedBack,
   }) {
@@ -36,7 +42,7 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
   
 
     const handleCountryName = () => {
-      const parent = jobFeedBack?.country.split(" ");
+      const parent = jobFeedBack?.country?.split(" ") || [];
       const countryCode = parent.pop();
       const finalName =
         parent.length > 2
@@ -101,105 +107,65 @@ import { getElapsedTime } from "../../utilities/getElapsedTime";
       };
   
     return (
-       
-      <List
-        sx={{ 
-        display:'flex',
-        justifyContent:'center',
-        alignItems:'center',
-        width: "100%",
-        bgcolor: "background.paper",
-        p:1,
-        }}>
-        <ListItem className="rounded" 
-        sx={{ 
-        border: "1px solid",
-        borderColor: "divider" }}>
-          <ListItemAvatar >
-          <Tooltip title='profile' arrow>
-            <Avatar
-            src={jobFeedBack?.avatar}
-            variant="rounded"
-            sx={{
-              backgroundColor: "#1976D2",
-              color: "white",
-              width: 40,
-              height: 40,
-            }}
-            alt={jobFeedBack?.name?.split(" ")[0]}
-            aria-label="avatar"
-          />
-          </Tooltip>
-
+      <List sx={{ width: "100%", py: 0.5, bgcolor: "transparent" }}>
+        <ListItem sx={(theme) => notificationCardSx(theme, "success")}>
+          <ListItemAvatar sx={{ minWidth: 52 }}>
+            <Tooltip title="Recruiter profile" arrow>
+              <Avatar
+                src={jobFeedBack?.avatar}
+                variant="rounded"
+                sx={avatarSx}
+                alt={jobFeedBack?.name?.split(" ")[0]}
+                aria-label="avatar"
+              />
+            </Tooltip>
           </ListItemAvatar>
           <ListItemText
             primary={
-              <Box display={"flex"}
-              justifyContent={"space-between"}
-              alignItems={"center"}
-              width={"100%"}>
-              <Typography
-                sx={{ color: "text.primary" }}
-                fontWeight={"bold"}
-                variant="body2"
-              >
-                {jobFeedBack?.name}
-              </Typography>
-  
-              <Box display={"flex"} gap={"3px"} alignItems={"center"}>
-              {/* time elapsed since post created */}
-              <Typography variant="caption">
-                {getElapsedTime(jobFeedBack?.createdAt)}
-              </Typography>
-              &nbsp;
-              {/* delete reaction */}
-                <Tooltip title={'clear'} arrow>
-                <IconButton size="small" 
-                onClick={handleDeleteReaction} 
-                disabled={isFetching}
-                sx={{ 
-                border: "1px solid",
-                borderColor: "divider",
-              }}>
-                {isFetching ? (
-                  <CircularProgress size={13}/>
-                ):(
-                  <Close sx={{ width: 13, height: 13 }} />
-                )}
-              </IconButton>
-            </Tooltip>    
-            </Box>
-            </Box>
+              <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={1}>
+                <Box minWidth={0}>
+                  <Typography sx={{ color: "text.primary" }} fontWeight={900} variant="body2" noWrap>
+                    {jobFeedBack?.name}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {getElapsedTime(jobFeedBack?.createdAt)}
+                  </Typography>
+                </Box>
+                <Tooltip title="Clear feedback" arrow>
+                  <IconButton size="small" onClick={handleDeleteReaction} disabled={isFetching} sx={iconButtonSx}>
+                    {isFetching ? <CircularProgress size={13} /> : <Close sx={{ width: 13, height: 13 }} />}
+                  </IconButton>
+                </Tooltip>
+              </Stack>
             }
             secondary={
-              <Box>
-              
-              <React.Fragment>
-                  <Typography variant="body2" color={"text.secondary"}>
+              <Stack spacing={0.75} mt={0.8}>
+                <Typography variant="body2" color="text.primary" fontWeight={900}>
                   {jobFeedBack?.title}
                 </Typography>
-                <Typography variant="caption" color={"text.secondary"}>
+                <Typography variant="caption" color="text.secondary">
                   {handleCountryName()} | {jobFeedBack?.state}
                 </Typography>
-                <br/>
-                <Typography
-                  variant="caption"
-                  sx={{ color:'text.primary' }}
-                >
-                  - recruiter has viewed your c.v check for job results under my statistics option. <Button onClick={handleNavigateJobStats} endIcon={<ArrowForwardIos sx={{ width:10, height:10 }}/>} size="small" variant="text" sx={{ textTransform:'lowercase', fontSize:'small', borderRadius:5 }}>here</Button>
+                <Typography variant="caption" sx={{ color: "text.primary", lineHeight: 1.6 }}>
+                  A recruiter viewed your CV. Review the job performance signal under your statistics workspace.
                 </Typography>
-              </React.Fragment>
-                
-              </Box>
+                <Box display="flex" justifyContent="flex-end">
+                  <Button
+                    onClick={handleNavigateJobStats}
+                    endIcon={<ArrowForwardIos sx={{ width: 10, height: 10 }} />}
+                    size="small"
+                    variant="outlined"
+                    sx={{ textTransform: "none", fontSize: 11, fontWeight: 900, borderRadius: "8px" }}
+                  >
+                    View statistics
+                  </Button>
+                </Box>
+              </Stack>
             }
           />
-  
         </ListItem>
-        {/* show divider is is not last item */}
       </List>
-       
     );
   }
-  
+
   export default React.memo(JobFeedBack);
-  

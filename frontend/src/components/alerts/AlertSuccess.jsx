@@ -40,7 +40,7 @@ export default function AlertSuccess() {
       }}
       PaperProps={{
         sx: {
-          borderRadius: "18px",
+          borderRadius: "8px",
           background: "rgba(255,255,255,0.05)",
           backdropFilter: "blur(30px)",
           border: "1px solid rgba(255,255,255,0.12)",
@@ -61,7 +61,7 @@ export default function AlertSuccess() {
           sx={{
             width: 56,
             height: 56,
-            borderRadius: "16px",
+            borderRadius: "8px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",

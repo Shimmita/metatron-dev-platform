@@ -19,8 +19,6 @@ import PostDetailsFeed from "../post/PostDetailsFeed";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
   
   // styled modal
   const StyledModalJob = styled(Modal)({
@@ -44,13 +42,8 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 
     // redux states
     const {
-       currentMode, 
-      isTabSideBar,
       isPostFullDetailModal,
       postEditUniqueId } = useSelector((state) => state.appUI);
-      
-      // updating the isDark mode 
-      const isDarkMode=currentMode==='dark'
 
 
     // redux states
@@ -166,17 +159,6 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
         dispatch(handleShowingPostDetailedModal(false))
     };
 
-    // handle width of the global search
-      const handleModalWidth=()=>{
-        if (CustomDeviceTablet() && isTabSideBar) {
-          return "36%"
-        } else if(CustomLandScape()){
-          return "-1%"
-        } else if(CustomLandscapeWidest()){
-          return "0%"
-        }
-      }
-
     return (
       <StyledModalJob
         keepMounted
@@ -185,30 +167,41 @@ import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
         sx={{
-        backdropFilter:'blur(5px)',
+        backdropFilter:'blur(10px)',
+        p: { xs: 1, sm: 2 },
+        "& .MuiBackdrop-root": {
+          background: "rgba(3,7,18,0.72)",
+          backdropFilter: "blur(10px)",
+        },
       }}
       >
         <Box
-          width={CustomDeviceIsSmall() ? "100%":CustomDeviceTablet()?"80%":"40%"}
-          p={1}
-          borderRadius={3}
+          width={CustomDeviceIsSmall() ? "calc(100vw - 16px)":CustomDeviceTablet()?"calc(100vw - 32px)":"min(92vw, 760px)"}
           color={"text.primary"}
           sx={{
-            border: isDarkMode && "1px solid gray",
-            marginLeft:handleModalWidth()
+            maxWidth: "760px",
+            maxHeight: { xs: "calc(100dvh - 16px)", sm: "calc(100dvh - 32px)" },
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: "8px",
+            overflow: "hidden",
+            background: "background.paper",
+            boxShadow: "0 28px 90px rgba(0,0,0,0.62)",
           }}
         >
             <Box
-            maxHeight={"78vh"}
+            maxHeight={"calc(100dvh - 32px)"}
             sx={{
               overflow: "auto",
-              // Hide scrollbar for Chrome, Safari and Opera
               "&::-webkit-scrollbar": {
-                display: "none",
+                width: 6,
               },
-              // Hide scrollbar for IE, Edge and Firefox
-              msOverflowStyle: "none",
-              scrollbarWidth: "none",
+              "&::-webkit-scrollbar-thumb": {
+                background: "rgba(148,163,184,0.28)",
+                borderRadius: 999,
+              },
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(148,163,184,0.28) transparent",
             }}
             >
   

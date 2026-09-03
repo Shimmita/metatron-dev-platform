@@ -87,7 +87,14 @@ const App = () => {
         <Suspense fallback={<AppLoader isDarkMode={isDarkMode} />}>
           <Routes>
             {/* Landing Page */}
-            <Route path="/" element={<LoginAuth />} />
+            <Route
+              path="/"
+              element={
+                <GuestCheck>
+                  <HomePageLazy />
+                </GuestCheck>
+              }
+            />
 
             {/* Main Application Shell */}
             <Route

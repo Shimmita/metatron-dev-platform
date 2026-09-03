@@ -1,10 +1,11 @@
 import { Visibility, DoneAllRounded } from "@mui/icons-material";
-import { Badge, Box, CardActionArea, Divider, Avatar, List, ListItem, ListItemAvatar, ListItemText, Typography } from "@mui/material";
+import { Badge, Box, CardActionArea, Avatar, Typography } from "@mui/material";
 import React, { useMemo } from "react";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
+import { appColors } from "../../../utils/colors";
 
 export default function ConversationLayout({
   conversation,
@@ -39,19 +40,18 @@ export default function ConversationLayout({
   return (
     <Box
       sx={{
-        mb: 1,
-        borderRadius: "12px",
+        borderRadius: "8px",
         overflow: "hidden",
         border: "1px solid",
-        borderColor: isUnread ? "rgba(20, 210, 190, 0.3)" : "divider",
+        borderColor: isUnread ? "rgba(20, 210, 190, 0.38)" : "divider",
         bgcolor: isUnread 
-          ? (isDarkMode ? "rgba(20, 210, 190, 0.05)" : "rgba(20, 210, 190, 0.03)")
-          : "transparent",
+          ? (isDarkMode ? "rgba(20, 210, 190, 0.075)" : "rgba(20, 210, 190, 0.06)")
+          : (isDarkMode ? "rgba(255,255,255,0.035)" : "rgba(255,255,255,0.78)"),
         transition: "all 0.2s ease",
         "&:hover": {
-          bgcolor: isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+          bgcolor: isDarkMode ? "rgba(255,255,255,0.055)" : "rgba(255,255,255,0.96)",
           borderColor: "primary.main",
-          transform: "translateX(4px)"
+          transform: "translateY(-1px)"
         }
       }}
     >
@@ -71,7 +71,7 @@ export default function ConversationLayout({
             invisible={!isUnread}
             sx={{ 
               '& .MuiBadge-badge': { 
-                bgcolor: '#14D2BE', 
+                bgcolor: appColors.primary,
                 boxShadow: `0 0 0 2px ${isDarkMode ? '#121212' : '#fff'}`,
                 width: 10,
                 height: 10,
@@ -86,9 +86,9 @@ export default function ConversationLayout({
               sx={{ 
                 width: 48, 
                 height: 48, 
-                borderRadius: "12px",
+                borderRadius: "8px",
                 border: "1px solid",
-                borderColor: "divider"
+                borderColor: isUnread ? "rgba(32,214,199,0.42)" : "divider"
               }}
             />
           </Badge>
@@ -102,10 +102,14 @@ export default function ConversationLayout({
                 sx={{ 
                   color: isUnread ? "primary.main" : "text.primary",
                   fontSize: "0.85rem",
-                  letterSpacing: "-0.01em"
+                  letterSpacing: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  pr: 1
                 }}
               >
-                {partnerName?.toUpperCase()}
+                {partnerName}
               </Typography>
               
               <Typography variant="caption" sx={{ opacity: 0.5, fontSize: "0.65rem", fontWeight: 600 }}>

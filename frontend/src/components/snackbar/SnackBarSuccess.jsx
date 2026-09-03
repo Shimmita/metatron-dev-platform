@@ -4,6 +4,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
+import { snackbarAlertSx, snackbarSx } from "./snackbarStyles";
 
 function SlideTransition(props) {
   return <Slide {...props} direction="up" />;
@@ -33,19 +34,13 @@ const SnackBarSuccess = ({ message }) => {
           horizontal:
             CustomDeviceTablet() && isTabSideBar ? "right" : "center",
         }}
+        sx={snackbarSx}
       >
         <Alert
           onClose={handleClose}
           severity="success"
-          sx={{
-            borderRadius: "12px",
-            backdropFilter: "blur(12px)",
-            background: "rgba(68,183,0,0.12)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            color: "text.primary",
-            fontWeight: 600,
-            minWidth: "260px",
-          }}
+          variant="outlined"
+          sx={snackbarAlertSx("success")}
         >
           {message}
         </Alert>

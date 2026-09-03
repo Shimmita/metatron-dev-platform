@@ -10,8 +10,8 @@ import {
   Box,
   CardActionArea,
   CircularProgress,
-  Divider,
   IconButton,
+  Stack,
   Tooltip,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -30,6 +30,13 @@ import { updateNotificationSnackBar } from "../../../redux/CurrentSnackBar";
 import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
+import { appColors } from "../../../utils/colors";
+import {
+  avatarSx,
+  iconButtonSx,
+  metaPillSx,
+  notificationCardSx,
+} from "../communicationStyles";
 
 export default function PostReaction({ reaction }) {
   const [isFetching, setIsFetching] = useState(false);
@@ -94,237 +101,94 @@ export default function PostReaction({ reaction }) {
     navigate("posts/details/" + reaction?.postId);
   };
 
-  return (    
-        <List
-          sx={{ width: "100%", maxWidth: 400, bgcolor: "background.paper" }}
-        >
-          <ListItem alignItems="flex-start" className={'rounded'} sx={{ 
-             border: "1px solid",
-             borderColor: "divider",
-           }}>
-            <ListItemAvatar onClick={handleShowMiniProfile}>
-            <Tooltip title='profile' arrow> 
+  const ReactionIcon = reaction?.message?.toLowerCase().includes("github")
+    ? GitHub
+    : reaction?.message?.toLowerCase().includes("commented")
+    ? ForumRounded
+    : FavoriteRounded;
+
+  return (
+    <List sx={{ width: "100%", py: 0.5, bgcolor: "transparent" }}>
+      <ListItem sx={(theme) => notificationCardSx(theme, "default")}>
+        <ListItemAvatar onClick={handleShowMiniProfile} sx={{ minWidth: 52 }}>
+          <Tooltip title="View profile" arrow>
             <Avatar
-                 variant="rounded"
-                  src={reaction?.avatar}
-                  sx={{
-                    backgroundColor: "#1976D2",
-                    color: "white",
-                    width: 40,
-                    height: 40,
-                  }}
-                  alt={reaction?.name?.split(" ")[0]}
-                  aria-label="avatar"
-                />
-                </Tooltip>
-            </ListItemAvatar>
-            <ListItemText
-              primary={
-                <Box
-                  display={"flex"}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                  width={"100%"}
-                >
-                  {/* user name */}
-                  <Typography
-                    fontWeight={"bold"}
-                    variant="body2"
-                    width={"100%"}
-                    
-                  >
-                    {reaction?.name}
-                  </Typography>
-                  {/*delete button +progress if is fetch */}
-                  {isFetching ? (
-                    <CircularProgress size={"10px"} />
-                  ) : (
-                    <Box display={"flex"} gap={"3px"} alignItems={"center"}>
-                      {/* time elapsed since post created */}
-                      <Typography variant="caption">
-                        {getElapsedTime(reaction?.createdAt)}
-                      </Typography>
-                      &nbsp;
-                      {/* delete reaction */}
-                        <Tooltip title={'clear'} arrow>
-                        <IconButton size="small" 
-                        onClick={handleDeleteReaction} 
-                        disabled={isFetching}
-                        sx={{ 
-                        border: "1px solid",
-                        borderColor: "divider",
-                      }}>
-                        {isFetching ? (
-                          <CircularProgress size={13}/>
-                        ):(
-                          <Close sx={{ width: 13, height: 13 }} />
-                        )}
-                      </IconButton>
-                    </Tooltip>    
-                    </Box>
-                  )}
-                </Box>
-              }
-              secondary={
-                <CardActionArea onClick={handleNavigatePostDetailsRoute}>
-                  <React.Fragment>
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      sx={{
-                        color: "text.secondary",
-                        display: "inline",
-                        alignItems: "center",
-                      }}
-                    >
-                      {reaction?.title}
-                      <br/>
-                      <Typography variant="caption" color={"text.secondary"}>
-                        {reaction?.county} | {CustomCountryName(reaction?.country)}
-                      </Typography>
-                      <br/>
-                      {reaction?.message?.toLowerCase().includes("liked") && (
-                        <FavoriteRounded
-                          sx={{ width: 14, height: 14, }}
-                          color="primary"
-                          className="me-1"
-                        />
-                      )}
-
-
-                      {reaction?.message?.toLowerCase().includes("github") && (
-                        <GitHub
-                          sx={{ width: 14, height: 14 }}
-                          color="primary"
-                          className="me-1"
-                        />
-                      )}
-
-                      {reaction?.message
-                        ?.toLowerCase()
-                        .includes("commented") && (
-                        <ForumRounded
-                          sx={{ width: 14, height: 14 }}
-                          color="primary"
-                          className="me-1"
-                        />
-                      )}
-
-                      {/* message  */}
-                      <Typography variant="caption" sx={{ color:'text.primary' }}>
-
-                      {reaction?.message}
-                       </Typography>
-                      {/* mini-message of post section */}
-                    </Typography>
-
-                    <Typography variant="caption" sx={{ color:'text.primary' }}>
-
-                    {` — ${reaction?.minimessage}`}
-                       </Typography>
-
-                    {/* post counters */}
-                    <Box
-                      display={"flex"}
-                      justifyContent={"flex-end"}
-                      alignItems={"center"}
-                      mt={1}
-                      gap={1}
-                    >
-                      {/* stats svg */}
-                      <Box>
-                        <BarChartRounded sx={{ width: 16, height: 16 }} />
-                      </Box>
-                      <Box
-                      className={'rounded'}
-                        sx={{
-                          pe: 1,
-                          display: "inline-flex",
-                          alignItems: "center",
-                          border: "1px solid",
-                          borderColor: "divider",
-                          bgcolor: "background.paper",
-                          color: "text.secondary",
-                          "& svg": {
-                            m: 1,
-                          },
-                        }}
-                      >
-                        {/* likes count */}
-                      <Tooltip title={'likes'} arrow>
-                      <FavoriteRounded sx={{ width: 14, height: 14 }} />
-                        <Typography variant="caption">
-                          {reaction?.likes}
-                        </Typography>
-                      </Tooltip>
-
-                        {/* divider */}
-                        <Divider
-                          orientation="vertical"
-                          variant="middle"
-                          flexItem
-                          className="px-1"
-                          component={"div"}
-                        />
-
-                        {/* github counts */}
-                       <Tooltip title={'github views'} arrow>
-                       <GitHub sx={{ width: 14, height: 14 }} />
-                        <Typography variant="caption">
-                          {reaction?.github}
-                        </Typography>
-                       </Tooltip>
-
-                        {/* divider */}
-                        <Divider
-                          orientation="vertical"
-                          variant="middle"
-                          flexItem
-                          className="px-1"
-                          component={"div"}
-                        />
-
-                        {/* comments count */}
-                       <Tooltip title={'comments'} arrow>
-                       <ForumRounded sx={{ width: 14, height: 14 }} />
-                        <Typography variant="caption" className="pe-1">
-                          {reaction?.comments}
-                        </Typography>
-                       </Tooltip>
-
-                        {/* divider */}
-                        <Divider
-                          orientation="vertical"
-                          variant="middle"
-                          flexItem
-                          className="px-1"
-                          component={"div"}
-                        />
-
-                        {/* flags or number reports */}
-                       <Tooltip title={'reported'} arrow>
-                       <Flag sx={{ width: 14, height: 14 }} />
-                        <Typography variant="caption" className="pe-1">
-                          {reaction?.report_count}
-                        </Typography>
-                       </Tooltip>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                </CardActionArea>
-              }
+              variant="rounded"
+              src={reaction?.avatar}
+              sx={avatarSx}
+              alt={reaction?.name?.split(" ")[0]}
+              aria-label="avatar"
             />
-          </ListItem>
+          </Tooltip>
+        </ListItemAvatar>
+        <ListItemText
+          primary={
+            <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={1}>
+              <Box minWidth={0}>
+                <Typography variant="body2" fontWeight={900} noWrap>
+                  {reaction?.name}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {getElapsedTime(reaction?.createdAt)}
+                </Typography>
+              </Box>
+              <Tooltip title="Clear notification" arrow>
+                <IconButton size="small" onClick={handleDeleteReaction} disabled={isFetching} sx={iconButtonSx}>
+                  {isFetching ? <CircularProgress size={13} /> : <Close sx={{ width: 13, height: 13 }} />}
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          }
+          secondary={
+            <CardActionArea onClick={handleNavigatePostDetailsRoute} sx={{ borderRadius: "8px", mt: 0.8, p: 0.75 }}>
+              <Stack spacing={0.75}>
+                <Stack direction="row" alignItems="center" spacing={0.75}>
+                  <ReactionIcon sx={{ width: 16, height: 16, color: appColors.primary }} />
+                  <Typography variant="caption" color="text.primary" fontWeight={800}>
+                    {reaction?.message}
+                  </Typography>
+                </Stack>
+                <Typography variant="body2" color="text.primary" fontWeight={800}>
+                  {reaction?.title}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {reaction?.minimessage}
+                </Typography>
+                <Typography variant="caption" color="text.disabled">
+                  {reaction?.county} | {CustomCountryName(reaction?.country)}
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.75} flexWrap="wrap" useFlexGap>
+                  <Box sx={metaPillSx}>
+                    <FavoriteRounded sx={{ width: 13, height: 13 }} />
+                    <Typography variant="caption">{reaction?.likes || 0}</Typography>
+                  </Box>
+                  <Box sx={metaPillSx}>
+                    <GitHub sx={{ width: 13, height: 13 }} />
+                    <Typography variant="caption">{reaction?.github || 0}</Typography>
+                  </Box>
+                  <Box sx={metaPillSx}>
+                    <ForumRounded sx={{ width: 13, height: 13 }} />
+                    <Typography variant="caption">{reaction?.comments || 0}</Typography>
+                  </Box>
+                  <Box sx={metaPillSx}>
+                    <Flag sx={{ width: 13, height: 13 }} />
+                    <Typography variant="caption">{reaction?.report_count || 0}</Typography>
+                  </Box>
+                  <BarChartRounded sx={{ width: 15, height: 15, color: "text.disabled" }} />
+                </Stack>
+              </Stack>
+            </CardActionArea>
+          }
+        />
+      </ListItem>
 
-           {/* show mini profile */}
-          {showMiniProfile &&
-            <AlertMiniProfileView
-            openAlert={showMiniProfile}
-            setOpenAlert={setShowMiniProfile}
-            userId={reaction?.userId}
-          />}
-
-        </List>
-      
+      {showMiniProfile && (
+        <AlertMiniProfileView
+          openAlert={showMiniProfile}
+          setOpenAlert={setShowMiniProfile}
+          userId={reaction?.userId}
+        />
+      )}
+    </List>
   );
 }

@@ -175,7 +175,7 @@ export default function AlertMiniProfileView({ openAlert, setOpenAlert, userId }
             background: "rgba(8,18,32,0.92)",
             backdropFilter: "blur(40px)",
             border: `1px solid ${appColors.border}`,
-            borderRadius: "18px",
+            borderRadius: "8px",
             boxShadow: `0 28px 70px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.07)`,
             width: "100%",
             maxWidth: 400,

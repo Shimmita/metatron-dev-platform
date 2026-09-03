@@ -2,9 +2,13 @@ import {
   Add,
   AutoAwesome,
   CheckCircle,
+  EventAvailableRounded,
   FindInPageRounded,
   HighlightOffOutlined,
+  HomeRounded,
+  HubRounded,
   InfoRounded,
+  InsightsRounded,
   Menu,
   MyLocationRounded,
   Person,
@@ -18,6 +22,7 @@ import {
   AppBar,
   Avatar,
   Button,
+  Chip,
   CircularProgress,
   Stack,
   Toolbar,
@@ -60,7 +65,7 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import EventItem from "./layout/EventItem";
 import EventStatsLayout from "./layout/EventStatsLayout";
 
-const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
+const drawerWidth = CustomDeviceIsSmall() ? 200 : 250;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -477,6 +482,34 @@ export default function EventsContainer() {
       navigate("/auth/login")
     }
 
+    const handleNavigateHome = () => {
+      dispatch(updateCurrentBottomNav(0));
+      dispatch(handleSidebarRightbar(true));
+      dispatch(handleShowingSpeedDial(true));
+      dispatch(handleIsJobsGlobalResults(false));
+      navigate("/explore");
+    }
+
+    const eventMetrics = [
+      ["Sessions", eventsData?.length || 0, "Live events in this view"],
+      ["Workspace", textOption, "Current event lane"],
+      ["Attendance", textOption === "RSVP Events" ? "Confirmed" : "Open", "Participation status"],
+      ["Access", isGuest ? "Guest" : "Member", "Platform role"],
+    ];
+
+    const eventQuickModes = [
+      { label: "AI Selection", icon: <AutoAwesome /> },
+      { label: "Nearby Events", icon: <MyLocationRounded /> },
+      { label: "RSVP Events", icon: <CheckCircle /> },
+      { label: "Events Manager", icon: <Settings /> },
+    ].filter(() => !isGuest);
+
+    const eventGuidance = [
+      ["Learn live", "Use workshops and meetups to turn skills into real technical conversations."],
+      ["Grow network", "RSVP early, join active sessions, and follow builders in your stack."],
+      ["Host better", "Track event stats and create focused sessions for developer outcomes."],
+    ];
+
 
   return (
       <Suspense
@@ -491,9 +524,12 @@ export default function EventsContainer() {
         <Box
         sx={{
           width: "100%",
-          height: "100vh",
-          overflow: "hidden",
+          minHeight: "100%",
+          overflow: "visible",
           borderRadius: panelRadius,
+          background: isDarkMode
+            ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(8,17,31,0.98))"
+            : "linear-gradient(180deg, #F8FAFC, #EEF7FF)",
          }}
         >
           <AppBar
@@ -501,10 +537,11 @@ export default function EventsContainer() {
             open={open}
             sx={{
               background: theme.palette.mode === "dark"
-                ? "linear-gradient(135deg, rgba(8,21,38,0.96), rgba(15,76,129,0.88))"
+                ? "rgba(5,8,18,0.88)"
                 : appGradients.primary,
+              backdropFilter: "blur(22px) saturate(160%)",
               boxShadow: theme.palette.mode === "dark"
-                ? "0 18px 36px rgba(0,0,0,0.24)"
+                ? "0 12px 40px rgba(0,0,0,0.22)"
                 : "0 18px 36px rgba(15,76,129,0.14)",
               borderBottom: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.18)"}`,
             }}
@@ -527,6 +564,7 @@ export default function EventsContainer() {
                   sx={[
                     {
                       marginRight: 5,
+                      display: { xs: "none", lg: "inline-flex" },
                     },
                     open && { display: "none" },
                   ]}
@@ -535,59 +573,53 @@ export default function EventsContainer() {
                 </IconButton>
               </Box>
 
-              {/* main jobs title and the current selection */}
-              {CustomDeviceIsSmall() ? (
-                <Box width={"100%"}>
+              <Box width={"100%"} minWidth={0}>
                 <Typography
                   noWrap
                   component="div"
+                  fontWeight={900}
                   textAlign={"center"}
                   textTransform={"uppercase"}
-                >
-                  Metatron
-                </Typography>
-
-                {/* current navigation counter */}
-                <Box display={"flex"} justifyContent={"center"}>
-                  <Typography 
-                  variant="caption"
-                   textTransform={'capitalize'}
-                   >
-                    {textOption} 
-                  </Typography>
-                </Box>
-              </Box>
-              ):(
-                <Box width={"100%"}>
-                <Typography
-                  noWrap
-                  component="div"
-                  fontWeight={'bold'}
-                  textAlign={"center"}
-                  textTransform={"uppercase"}
-                  
-                  ml={open ? 30: 24}
+                  sx={{
+                    letterSpacing: "0.14rem",
+                    background: "linear-gradient(90deg, #FFFFFF, #20D6C7)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
                 >
                   Metatron Events
                 </Typography>
-
-                {/* current navigation counter */}
-                <Box display={"flex"} justifyContent={"center"}>
-                  <Typography 
+                <Typography
                   variant="caption"
-                  fontWeight={'bold'}
+                  fontWeight={800}
                   textTransform={'capitalize'}
-                  ml={open ? 30: 24}>
-                    - {textOption} -
-                  </Typography>
-                </Box>
+                  color="primary.main"
+                  display="block"
+                  textAlign="center"
+                  noWrap
+                >
+                  {textOption}
+                </Typography>
               </Box>
-              )}
               <Box 
               display={'flex'}
-                gap={2} 
+                gap={1} 
                 alignItems={'center'} 
                 justifyContent={'flex-end'}>
+                <Tooltip arrow title="Back to Home">
+                  <IconButton
+                    onClick={handleNavigateHome}
+                    sx={{
+                      border: "1px solid rgba(255,255,255,0.10)",
+                      color: "primary.main",
+                      width: 38,
+                      height: 38,
+                      "&:hover": { background: "rgba(32,214,199,0.08)" },
+                    }}
+                  >
+                    <HomeRounded sx={{ fontSize: 20 }} />
+                  </IconButton>
+                </Tooltip>
               
                 {isGuest ? (
                   <Button 
@@ -630,7 +662,7 @@ export default function EventsContainer() {
             variant="permanent"
             open={open}
             sx={{
-              display: isDrawerPane ? "block" : "none",
+              display: { xs: "none", lg: isDrawerPane ? "block" : "none" },
               "& .MuiDrawer-paper": {
                 borderRight: "1px solid",
                 borderColor: "divider",
@@ -638,6 +670,8 @@ export default function EventsContainer() {
                 backgroundImage: theme.palette.mode === "dark"
                   ? "linear-gradient(180deg, rgba(15,76,129,0.16), rgba(255,255,255,0.01))"
                   : "linear-gradient(180deg, rgba(15,76,129,0.08), rgba(255,255,255,0.92))",
+                display: "flex",
+                flexDirection: "column",
               },
             }}
           >
@@ -708,7 +742,43 @@ export default function EventsContainer() {
               </Stack>
             )}
 
-            <List>
+            <List sx={{ px: 1, pt: 1, flex: 1 }}>
+              <ListItem disablePadding sx={{ mb: 0.5 }}>
+                <ListItemButton
+                  onClick={handleNavigateHome}
+                  sx={{
+                    minHeight: 48,
+                    px: 2,
+                    borderRadius: "8px",
+                    justifyContent: open ? "initial" : "center",
+                    background: "rgba(255,255,255,0.035)",
+                    "&:hover": {
+                      background: "rgba(32,214,199,0.10)",
+                    },
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      justifyContent: "center",
+                      mr: open ? 3 : "auto",
+                      color: "primary.main",
+                    }}
+                  >
+                    <Tooltip title="Home" arrow>
+                      <HomeRounded />
+                    </Tooltip>
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2" color="primary.main" fontWeight={900}>
+                        Home
+                      </Typography>
+                    }
+                    sx={{ opacity: open ? 1 : 0 }}
+                  />
+                </ListItemButton>
+              </ListItem>
               {(isGuest ? [
                 "Explore Events",
               ] : [
@@ -734,7 +804,13 @@ export default function EventsContainer() {
                     sx={[
                       {
                         minHeight: 48,
-                        px: 2.5,
+                        px: 2,
+                        mb: 0.5,
+                        borderRadius: "8px",
+                        background: text === textOption ? "rgba(32,214,199,0.14)" : "transparent",
+                        "&:hover": {
+                          background: text === textOption ? "rgba(32,214,199,0.18)" : "rgba(255,255,255,0.05)",
+                        },
                       },
                       open
                         ? {
@@ -816,32 +892,75 @@ export default function EventsContainer() {
                       ]}
                     />
                   </ListItemButton>
-                   <Divider component={"li"} />
                 </ListItem>
               ))}
             </List>
+            {open && !isGuest && (
+              <Box sx={{ px: 1.5, mt: "auto", mb: 2 }}>
+                <Box
+                  sx={{
+                    borderRadius: "8px",
+                    border: "1px solid rgba(32,214,199,0.16)",
+                    background: isDarkMode
+                      ? "linear-gradient(135deg, rgba(32,214,199,0.10), rgba(124,58,237,0.08))"
+                      : "linear-gradient(135deg, rgba(32,214,199,0.08), rgba(15,76,129,0.05))",
+                    p: 1.5,
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" gap={1}>
+                    <HubRounded color="primary" sx={{ fontSize: 18 }} />
+                    <Typography variant="caption" color="primary.main" fontWeight={900}>
+                      EVENT OPERATIONS
+                    </Typography>
+                  </Stack>
+                  <Typography variant="body2" fontWeight={900} mt={0.75}>
+                    Turn sessions into network signal.
+                  </Typography>
+                  <Stack direction="row" alignItems="center" gap={0.75} mt={0.75}>
+                    <InsightsRounded color="primary" sx={{ fontSize: 16 }} />
+                    <Typography variant="caption" color="text.secondary">
+                      RSVP, stream, and review host analytics from one panel.
+                    </Typography>
+                  </Stack>
+                </Box>
+              </Box>
+            )}
 
 
           </Drawer>
              <Box
           sx={{
-            height: "calc(100vh - 64px)",
-            width: "100%",
-            overflow: "hidden",
+            minHeight: "calc(100vh - 64px)",
+            width: {
+              xs: "100%",
+              lg: isDrawerPane ? `calc(100% - ${open ? drawerWidth : 70}px)` : "100%",
+            },
+            ml: {
+              xs: 0,
+              lg: isDrawerPane ? `${open ? drawerWidth : 70}px` : 0,
+            },
+            overflow: "visible",
           }}
           >
 
             <Box
               sx={{
                 width: "100%",
-                height: "100%",
-                overflowY: "auto",
+                minHeight: "100%",
+                overflowY: "visible",
                 overflowX: "hidden",
                 display: "grid",
                 gridTemplateColumns: {
                   xs: "1fr",
-                  sm: "repeat(auto-fit, minmax(260px, 1fr))",
-                  md: "repeat(auto-fit, minmax(280px, 1fr))",
+                  sm: open
+                    ? "repeat(auto-fit, minmax(260px, 1fr))"
+                    : "repeat(auto-fit, minmax(280px, 1fr))",
+                  md: open
+                    ? "repeat(auto-fit, minmax(280px, 1fr))"
+                    : "repeat(auto-fit, minmax(320px, 1fr))",
+                  lg: open
+                    ? "repeat(auto-fit, minmax(300px, 1fr))"
+                    : "repeat(auto-fit, minmax(340px, 1fr))",
                 },
                 gap: 2,
                 alignItems: "start",
@@ -855,9 +974,133 @@ export default function EventsContainer() {
                 msOverflowStyle: "none",
                 scrollbarWidth: "none",
                 p: { xs: 1, md: 2 },
-                pt: { xs: 5, md: 6 },
+                pt: { xs: 9, md: 10 },
               }}
             >
+              <Box
+                sx={{
+                  gridColumn: "1 / -1",
+                  borderRadius: "8px",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  background: isDarkMode
+                    ? "linear-gradient(135deg, rgba(11,18,32,0.94), rgba(32,214,199,0.08), rgba(124,58,237,0.10))"
+                    : "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(238,247,255,0.92))",
+                  p: { xs: 2, md: 2.5 },
+                  boxShadow: isDarkMode
+                    ? "0 18px 50px rgba(0,0,0,0.28)"
+                    : "0 16px 32px rgba(15,76,129,0.08)",
+                }}
+              >
+                <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={2} justifyContent="space-between" alignItems={{ xs: "flex-start", md: "center" }}>
+                  <Box>
+                    <Box display="flex" alignItems="center" gap={1} mb={0.75}>
+                      <EventAvailableRounded sx={{ color: "primary.main", fontSize: 18 }} />
+                      <Typography variant="overline" color="primary.main">
+                        Tech Event Network
+                      </Typography>
+                    </Box>
+                    <Typography variant="h4" fontWeight={900} lineHeight={1.12}>
+                      {textOption}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" mt={0.75} maxWidth={720}>
+                      Discover meetups, workshops, launches, and community sessions built for developers, founders, and technical teams.
+                    </Typography>
+                  </Box>
+                  {!isGuest && (
+                    <Button
+                      disableElevation
+                      variant="contained"
+                      onClick={() => setTextOption("Create Events")}
+                      startIcon={<Add />}
+                      sx={{ minWidth: { xs: "100%", sm: 154, md: 138 } }}
+                    >
+                      Create Event
+                    </Button>
+                  )}
+                </Box>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", md: "repeat(4, minmax(0, 1fr))" },
+                    gap: 1,
+                    mt: 2,
+                  }}
+                >
+                  {eventMetrics.map(([label, value, helper]) => (
+                    <Box
+                      key={label}
+                      sx={{
+                        borderRadius: "8px",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: "rgba(255,255,255,0.045)",
+                        p: 1.2,
+                        minHeight: 72,
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        {label}
+                      </Typography>
+                      <Typography variant="body1" fontWeight={900} noWrap>
+                        {value}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" display="block" noWrap>
+                        {helper}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+                {eventQuickModes.length > 0 && (
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 2 }}>
+                    {eventQuickModes.map((mode) => (
+                      <Chip
+                        key={mode.label}
+                        clickable
+                        icon={mode.icon}
+                        label={mode.label}
+                        color={textOption === mode.label ? "primary" : "default"}
+                        variant={textOption === mode.label ? "filled" : "outlined"}
+                        onClick={() => {
+                          setTextOption(mode.label);
+                          dispatch(handleIsJobsGlobalResults(false));
+                        }}
+                        sx={{
+                          borderRadius: "8px",
+                          fontWeight: 800,
+                          background: textOption === mode.label ? undefined : "rgba(255,255,255,0.035)",
+                        }}
+                      />
+                    ))}
+                  </Stack>
+                )}
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", md: "repeat(3, minmax(0, 1fr))" },
+                    gap: 1,
+                    mt: 2,
+                  }}
+                >
+                  {eventGuidance.map(([title, copy]) => (
+                    <Box
+                      key={title}
+                      sx={{
+                        borderRadius: "8px",
+                        border: "1px solid rgba(255,255,255,0.07)",
+                        background: "rgba(5,8,18,0.18)",
+                        p: 1.25,
+                      }}
+                    >
+                      <Typography variant="body2" fontWeight={900}>
+                        {title}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {copy}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+
               <React.Fragment>
                 {/* all jobs and verified jobs and Nearby that have no external link */}
                 {(textOption === "Explore Events" ||
@@ -920,17 +1163,26 @@ export default function EventsContainer() {
                           {/* rendered if are no events  */}
                           {eventsData?.length<1 && (
                             <Box 
-                            height={'70vh'}
+                            minHeight={'70vh'}
                             display={'flex'}
                             justifyContent={'center'}
                             color={'text.secondary'}
                             flexDirection={'column'}
                             gap={2}
                             alignItems={'center'}
+                            sx={{
+                              gridColumn: "1 / -1",
+                              borderRadius: "8px",
+                              border: "1px solid rgba(255,255,255,0.08)",
+                              background: "rgba(255,255,255,0.035)",
+                            }}
                             >
                             {/* no events */}
-                            <Typography variant="body2">
-                              no more events posted
+                            <Typography variant="body1" fontWeight={800}>
+                              No events found
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" textAlign="center">
+                              This event view has no published sessions yet.
                             </Typography>
                             {/* show refresh button */}
                             <Button 

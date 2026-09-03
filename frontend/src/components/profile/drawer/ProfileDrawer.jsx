@@ -1,10 +1,12 @@
-import { PowerSettingsNewRounded, Settings, UndoRounded } from "@mui/icons-material";
+import { CloseRounded, PowerSettingsNewRounded, Settings, UndoRounded } from "@mui/icons-material";
 import {
   AppBar,
   Button,
   CircularProgress,
+  IconButton,
   Stack,
-  Toolbar
+  Toolbar,
+  Typography
 } from "@mui/material";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
@@ -16,23 +18,9 @@ import { handleShowLogout, showUserProfileDrawer } from "../../../redux/AppUI";
 import {
   resetClearTempUserIDRedux
 } from "../../../redux/CurrentUser";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import CustomDeviceSmallest from "../../utilities/CustomDeviceSmallest";
-import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
+import { appColors, appGradients } from "../../../utils/colors";
 import ProfileUpdate from "./ProfileUpdate";
 import UserProfileDrawer from "./UserProfileDrawer";
-
-
-// handle the width of the drawer
-const handleDrawerWidth = () => {
-  if (CustomDeviceSmallest()) {
-    return 275
-  } else if (CustomDeviceIsSmall()) {
-    return 330
-  } 
-
-  return 400
-}
 
 export default function ProfileDrawer() {
   // redux states
@@ -120,40 +108,70 @@ export default function ProfileDrawer() {
         sx={{
           backdropFilter: 'blur(3px)'
         }}
+        PaperProps={{
+          sx: {
+            width: { xs: "100vw", sm: 420, md: 460 },
+            maxWidth: "100vw",
+            overflow: "hidden",
+            borderLeft: "1px solid",
+            borderColor: isDarkMode ? appColors.border : "rgba(15,23,42,0.12)",
+            background: isDarkMode
+              ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(11,18,32,0.98))"
+              : appGradients.soft,
+            boxShadow: isDarkMode
+              ? "-18px 0 54px rgba(0,0,0,0.46)"
+              : "-18px 0 54px rgba(15,23,42,0.16)",
+          },
+        }}
       >
         <motion.div initial={{ x: 100, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.25 }}
           style={{ height: "100%" }}>
           <Box
-            width={
-              handleDrawerWidth()
-            }
-            bgcolor={isDarkMode ? "background.default" : "#f1f1f1"}
-            height={'100vh'}
+            sx={{
+              width: "100%",
+              height: "100vh",
+              display: "flex",
+              flexDirection: "column",
+              bgcolor: "transparent",
+            }}
           >
-            <Box sx={{ flexGrow: 1 }}>
+            <Box>
               <AppBar
                 position="static"
                 elevation={0}
+                sx={{
+                  background: isDarkMode
+                    ? "linear-gradient(135deg, rgba(11,18,32,0.96), rgba(15,159,145,0.18))"
+                    : appGradients.primary,
+                  borderBottom: "1px solid",
+                  borderColor: isDarkMode ? appColors.border : "rgba(255,255,255,0.25)",
+                }}
               >
-                <Toolbar variant="dense" >
-                  {!temporaryProfileData && (
-                    <Box
-                      display={'flex'}
-                      justifyContent={'space-between'}
-                      width={'100%'}
-                      alignItems={'center'}
-                    >
+                <Toolbar variant="dense" sx={{ gap: 1, minHeight: 58 }}>
+                  <Box minWidth={0} flex={1}>
+                    <Stack spacing={0.1}>
+                      <Box component="span" sx={{ color: "rgba(255,255,255,0.72)", fontSize: 10, fontWeight: 900 }}>
+                        PROFILE WORKSPACE
+                      </Box>
+                      <Box component="span" sx={{ color: "#fff", fontSize: 14, fontWeight: 900, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {temporaryProfileData?.name || nativeLoggedinUser?.name || "Metatron Profile"}
+                      </Box>
+                    </Stack>
+                  </Box>
 
+                  {!temporaryProfileData && (
+                    <Stack direction="row" spacing={0.75} alignItems="center">
                       {/* settings*/}
                       <Button
                         disableElevation
                         startIcon={isProfileUpdate ? <UndoRounded /> : <Settings />}
                         size="small"
                         sx={{
-                          borderRadius: '20px',
-                          fontSize: 'x-small',
+                          borderRadius: '8px',
+                          fontSize: 11,
+                          fontWeight: 900,
                           color: 'white'
                         }}
                         onClick={handleShowingProfileUpdate}>
@@ -166,25 +184,28 @@ export default function ProfileDrawer() {
                         startIcon={<PowerSettingsNewRounded />}
                         size="small"
                         sx={{
-                          borderRadius: '20px',
-                          fontSize: 'x-small',
+                          borderRadius: '8px',
+                          fontSize: 11,
+                          fontWeight: 900,
                           color: 'white'
                         }}
                         onClick={handleShowLogoutAlert}>
                         Logout
                       </Button>
-
-                    </Box>
+                    </Stack>
                   )}
+                  <IconButton onClick={handleClose} sx={{ color: "#fff", borderRadius: "8px" }}>
+                    <CloseRounded sx={{ width: 18, height: 18 }} />
+                  </IconButton>
                 </Toolbar>
               </AppBar>
             </Box>
 
             {/* content */}
-            <Box bgcolor={'background.default'}>
+            <Box sx={{ flex: 1, minHeight: 0, bgcolor: "transparent", overflow: "hidden" }}>
               <Suspense
                 fallback={
-                  <Box height={"89vh"} display={"flex"} justifyContent={"center"}>
+                  <Box height={"100%"} display={"flex"} justifyContent={"center"} alignItems="center">
                     <Box display={"flex"} justifyContent={"center"}>
                       <CircularProgress size={20} />
                     </Box>
@@ -193,7 +214,7 @@ export default function ProfileDrawer() {
               >
                 {/* render user profile component passing current user id no temporary data*/}
                 {isFetching ? (
-                  <Box height={"89vh"}>
+                  <Box height={"100%"} display="flex" alignItems="center" justifyContent="center">
                     <Stack alignContent={"center"}>
                       <CircularProgress size={25} />
                     </Stack>
@@ -201,12 +222,32 @@ export default function ProfileDrawer() {
                 ) : (
                   <React.Fragment>
                     {/* show default profile if is no update setting clicked */}
-                    {isProfileUpdate ? (
-                      <Box height={CustomDeviceTablet() || CustomDeviceIsSmall() ? "94vh" : "92vh"}>
+                    {errorMessage && tempUserProfileID ? (
+                      <Box height="100%" display="flex" alignItems="center" justifyContent="center" p={3}>
+                        <Box
+                          sx={{
+                            borderRadius: "8px",
+                            border: "1px solid",
+                            borderColor: "divider",
+                            p: 2,
+                            textAlign: "center",
+                            bgcolor: "background.paper",
+                          }}
+                        >
+                          <Typography variant="body2" fontWeight={900}>
+                            Profile unavailable
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {errorMessage}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    ) : isProfileUpdate ? (
+                      <Box height="100%">
                         <ProfileUpdate user={nativeLoggedinUser} />
                       </Box>
                     ) : (
-                      <Box height={CustomDeviceTablet() || CustomDeviceIsSmall() ? "94vh" : "92vh"} p={"5px"}>
+                      <Box height="100%" p={0.75}>
                         {temporaryProfileData ? (
                           <UserProfileDrawer profileData={temporaryProfileData} />
                         ) : (

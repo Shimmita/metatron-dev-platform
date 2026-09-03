@@ -33,13 +33,8 @@ const PostEditModal = () => {
   const [errorMessage, setErrorMessage] = useState("");
   // redux states
   const {
-     currentMode, 
-    isTabSideBar,
     isPostEditModal,
     postEditUniqueId } = useSelector((state) => state.appUI);
-
-  // updating the isDark mode 
-  const isDarkMode=currentMode==='dark'
 
   const dispatch=useDispatch()
 
@@ -94,23 +89,12 @@ const PostEditModal = () => {
 
     // handle return width modal
     const handleReturnWidthModal=()=>{
-      if (CustomLandScape() ||CustomLandscapeWidest() || (CustomDeviceTablet() && !isTabSideBar)) {
-        return "40%"
+      if (CustomLandScape() ||CustomLandscapeWidest()) {
+        return "min(92vw, 760px)"
       } else if (CustomDeviceTablet()){
-        return "90%"
+        return "calc(100vw - 32px)"
       } 
-      return "95%"
-    }
-
-   // handle width of the global search
-    const handleModalWidth=()=>{
-      if (CustomDeviceTablet() && isTabSideBar) {
-        return "36%"
-      } else if(CustomLandScape()){
-        return "-1%"
-      } else if(CustomLandscapeWidest()){
-        return "0%"
-      }
+      return "calc(100vw - 16px)"
     }
 
   return (
@@ -121,30 +105,41 @@ const PostEditModal = () => {
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
         sx={{
-        backdropFilter:'blur(5px)',
+        backdropFilter:'blur(10px)',
+        p: { xs: 1, sm: 2 },
+        "& .MuiBackdrop-root": {
+          background: "rgba(3,7,18,0.72)",
+          backdropFilter: "blur(10px)",
+        },
       }}
     >
       <Box
         width={handleReturnWidthModal()}
-        p={1}
-        borderRadius={3}
         color={"text.primary"}
         sx={{
-          border: isDarkMode && "1px solid gray",
-          marginLeft:handleModalWidth()
+          maxWidth: "760px",
+          maxHeight: { xs: "calc(100dvh - 16px)", sm: "calc(100dvh - 32px)" },
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: "8px",
+          overflow: "hidden",
+          background: "background.paper",
+          boxShadow: "0 28px 90px rgba(0,0,0,0.62)",
         }}
       >
       <Box
-        maxHeight={"75vh"}
+        maxHeight={"calc(100dvh - 32px)"}
         sx={{
           overflow: "auto",
-          // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
-            display: "none",
+            width: 6,
           },
-          // Hide scrollbar for IE, Edge and Firefox
-          msOverflowStyle: "none",
-          scrollbarWidth: "none",
+          "&::-webkit-scrollbar-thumb": {
+            background: "rgba(148,163,184,0.28)",
+            borderRadius: 999,
+          },
+          scrollbarWidth: "thin",
+          scrollbarColor: "rgba(148,163,184,0.28) transparent",
         }}
       >
 

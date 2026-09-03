@@ -4,6 +4,7 @@ import {
   CardActionArea,
   CircularProgress,
   IconButton,
+  Stack,
   Tooltip
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
@@ -20,6 +21,12 @@ import { showMessagingDrawer } from "../../../redux/AppUI";
 import { updateCurrentReportID } from "../../../redux/CurrentPostReported";
 import { getElapsedTime } from "../../utilities/getElapsedTime";
 import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
+import {
+  avatarSx,
+  iconButtonSx,
+  metaPillSx,
+  notificationCardSx,
+} from "../communicationStyles";
 
 export default function PostReported({ report }) {
   const [isFetching, setIsFetching] = useState(false);
@@ -77,154 +84,81 @@ export default function PostReported({ report }) {
     navigate("/posts/details/" + report?.postId);
   };
 
-  return (    
-        <List
-          sx={{ width: "100%", maxWidth: 400, bgcolor: "background.paper" }}
-        >
-          <ListItem alignItems="flex-start" className={'rounded'} sx={{ 
-             border: "1px solid",
-             borderColor: "divider",
-           }}>
-            <ListItemAvatar 
-            onClick={handleShowMiniProfile}>
-            <Tooltip title='profile' arrow>
+  return (
+    <List sx={{ width: "100%", py: 0.5, bgcolor: "transparent" }}>
+      <ListItem sx={(theme) => notificationCardSx(theme, "danger")}>
+        <ListItemAvatar onClick={handleShowMiniProfile} sx={{ minWidth: 52 }}>
+          <Tooltip title="View reporter profile" arrow>
             <Avatar
-            src={report?.reporter_avatar}
-            variant="rounded"
-            sx={{
-              backgroundColor: "#1976D2",
-              color: "white",
-              width: 40,
-              height: 40,
-            }}
-            alt={report?.name?.split(" ")[0]}
-            aria-label="avatar"
+              src={report?.reporter_avatar}
+              variant="rounded"
+              sx={avatarSx}
+              alt={report?.name?.split(" ")[0]}
+              aria-label="avatar"
             />
-            </Tooltip>
-            </ListItemAvatar>
-            <ListItemText
-              primary={
-                <Box
-                  display={"flex"}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                  width={"100%"}
+          </Tooltip>
+        </ListItemAvatar>
+        <ListItemText
+          primary={
+            <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={1}>
+              <Box minWidth={0}>
+                <Typography fontWeight={900} variant="body2" noWrap>
+                  {report?.reporter_name}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {getElapsedTime(report?.createdAt)}
+                </Typography>
+              </Box>
+              <Tooltip title="Clear report" arrow>
+                <IconButton
+                  size="small"
+                  onClick={handleDeleteReportReaction}
+                  disabled={isFetching}
+                  sx={(theme) => iconButtonSx(theme, "danger")}
                 >
-                  {/* reporter name */}
-                  <Typography
-                    fontWeight={"bold"}
-                    variant="body2"
-                    width={"100%"}
-                  >
-                    {report?.reporter_name}
+                  {isFetching ? <CircularProgress size={13} /> : <Close sx={{ width: 13, height: 13 }} />}
+                </IconButton>
+              </Tooltip>
+            </Stack>
+          }
+          secondary={
+            <CardActionArea onClick={handleNavigatePostDetailsRoute} sx={{ borderRadius: "8px", mt: 0.8, p: 0.75 }}>
+              <Stack spacing={0.8}>
+                <Typography variant="caption" color="text.secondary">
+                  {report?.reporter_speciality || "Platform member"}
+                </Typography>
+                <Typography variant="body2" color="text.primary" fontWeight={900}>
+                  {report?.post_title}
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.75}>
+                  <FlagRounded sx={{ width: 16, height: 16, color: "error.main" }} />
+                  <Typography variant="caption" color="text.primary" fontWeight={800}>
+                    {report?.report_title}
                   </Typography>
-                  {/*delete button +progress if is fetch */}
-                  {isFetching ? (
-                    <CircularProgress size={"10px"} />
-                  ) : (
-                    <Box display={"flex"} gap={"3px"} alignItems={"center"}>
-                      {/* time elapsed since post created */}
-                      <Typography variant="caption">
-                        {getElapsedTime(report?.createdAt)}
-                      </Typography>
-                      &nbsp;
-                      {/* delete reaction */}
-                      <Tooltip title={'clear'} arrow>
-                        <IconButton size="small" 
-                        onClick={handleDeleteReportReaction} 
-                        disabled={isFetching}
-                        sx={{ 
-                        border: "1px solid",
-                        borderColor: "divider",
-                      }}>
-                          {isFetching ? (
-                              <CircularProgress size={13}/>
-                            ):(
-                              <Close sx={{ width: 13, height: 13 }} />
-                            )}
-                      </IconButton>
-                      </Tooltip>
-                    </Box>
-                  )}
-                </Box>
-              }
-              secondary={
-                <CardActionArea onClick={handleNavigatePostDetailsRoute}>
-                  <React.Fragment>
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      sx={{
-                        color: "text.primary",
-                        display: "inline",
-                        alignItems: "center",
-                      }}
-                    >
-                      {/* reporter speciality */}
-                      <Typography variant="body2" gutterBottom>
-                        {report?.reporter_speciality}
-                      </Typography>{" "}
-                      {/* post title */} " {report?.post_title} " <br />
-                      {/* report about */}
-                      <FlagRounded
-                        sx={{ width: 16, height: 16 }}
-                        color="info"
-                        className="me-1"
-                      />
-                      {/* message  */}
-                      {report?.report_title}
-                      {/* mini-message of post section */}
-                    </Typography>
-                    {` — ${report?.report_message}`}
+                </Stack>
+                <Typography variant="caption" color="text.secondary">
+                  {report?.report_message}
+                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.75} justifyContent="space-between">
+                  <Box sx={metaPillSx}>
+                    <Flag sx={{ width: 13, height: 13 }} />
+                    <Typography variant="caption">Reported {report?.report_count || 0} times</Typography>
+                  </Box>
+                  <BarChartRounded sx={{ width: 15, height: 15, color: "text.disabled" }} />
+                </Stack>
+              </Stack>
+            </CardActionArea>
+          }
+        />
+      </ListItem>
 
-                    {/* box telling stats of report cases or count times */}
-                    <Box
-                      display={"flex"}
-                      justifyContent={"flex-end"}
-                      alignItems={"center"}
-                      mt={1}
-                      gap={1}
-                    >
-                      {/* stats svg */}
-                      <Box>
-                        <BarChartRounded sx={{ width: 16, height: 16 }} />
-                      </Box>
-                      <Box
-                      className={'rounded'}
-                        sx={{
-                          pe: 1,
-                          display: "inline-flex",
-                          alignItems: "center",
-                          border: "1px solid",
-                          borderColor: "divider",
-                          bgcolor: "background.paper",
-                          color: "text.secondary",
-                          "& svg": {
-                            m: 1,
-                          },
-                        }}
-                      >
-                        {/* likes count */}
-                        <Flag sx={{ width: 14, height: 14 }} />
-                        <Typography variant="caption" className="px-1">
-                          post reported {report?.report_count} times
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                </CardActionArea>
-              }
-            />
-          </ListItem>
-
-           {/* show mini profile */}
-            {isMiniProfile &&
-              <AlertMiniProfileView
-              openAlert={isMiniProfile}
-              setOpenAlert={setIsMiniProfile}
-              userId={report?.reporterId}
-          />}
-     
-        </List>
+      {isMiniProfile && (
+        <AlertMiniProfileView
+          openAlert={isMiniProfile}
+          setOpenAlert={setIsMiniProfile}
+          userId={report?.reporterId}
+        />
+      )}
+    </List>
   );
 }

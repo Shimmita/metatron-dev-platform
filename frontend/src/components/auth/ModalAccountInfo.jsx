@@ -6,7 +6,6 @@ import {
 import {
   Avatar,
   Box,
-  Divider,
   IconButton,
   Modal,
   Tooltip,
@@ -15,24 +14,19 @@ import {
   Backdrop,
 } from "@mui/material";
 
-import { useSelector } from "react-redux";
 import AppLogo from "../../images/logo_sm.png";
 import DataAccounts from "../data/DataAccounts";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
-import CustomModalHeight from "../utilities/CustomModalHeight";
 
 /* ─── Modal Container ─── */
 const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
-  const { currentMode } = useSelector((state) => state.appUI);
-  const isDarkMode = currentMode === "dark";
-
   /* ─── Responsive Width ─── */
   const handleModalWidth = () => {
-    if (CustomLandscapeWidest()) return "50%";
-    if (CustomDeviceTablet() || CustomLandScape()) return "80%";
-    return "95%";
+    if (CustomLandscapeWidest() || CustomLandScape()) return "min(92vw, 860px)";
+    if (CustomDeviceTablet()) return "calc(100vw - 32px)";
+    return "calc(100vw - 16px)";
   };
 
   return (
@@ -62,7 +56,11 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
           <Box
             width={handleModalWidth()}
             sx={{
-              borderRadius: "20px",
+              maxWidth: "860px",
+              maxHeight: { xs: "calc(100dvh - 16px)", sm: "calc(100dvh - 32px)" },
+              display: "flex",
+              flexDirection: "column",
+              borderRadius: "8px",
               background: "rgba(255,255,255,0.05)",
               backdropFilter: "blur(30px)",
               border: "1px solid rgba(255,255,255,0.12)",
@@ -108,12 +106,18 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
 
             {/* ─── Content ─── */}
             <Box
-              maxHeight={CustomModalHeight()}
+              maxHeight="calc(100dvh - 130px)"
               px={3}
               py={3}
               sx={{
                 overflowY: "auto",
-                "&::-webkit-scrollbar": { display: "none" },
+                "&::-webkit-scrollbar": { width: 6 },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "rgba(148,163,184,0.28)",
+                  borderRadius: 999,
+                },
+                scrollbarWidth: "thin",
+                scrollbarColor: "rgba(148,163,184,0.28) transparent",
               }}
             >
               <Box display="flex" flexDirection="column" gap={3}>

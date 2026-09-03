@@ -1,4 +1,4 @@
-import { Close, InfoRounded, MoreVertRounded } from "@mui/icons-material";
+import { ArrowBackIosNewRounded, InfoRounded, MoreVertRounded, SendRounded } from "@mui/icons-material";
 import {
   AppBar,
   Avatar,
@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { appColors, appGradients } from "../../utils/colors";
 import AlertGeneral from "../alerts/AlertGeneral";
+import { iconButtonSx, panelSx, scrollAreaSx } from "./communicationStyles";
 import MoreMessageLayout from "./layout/MoreMessageLayout";
 
 /* ─── Metatron design tokens ─── */
@@ -38,15 +39,15 @@ const C = {
 
 /* ─── Styled input base (matches global) ─── */
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: C.textPrimary,
+  color: theme.palette.text.primary,
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
     transition: theme.transitions.create("width"),
     width: "100%",
     backgroundColor: "transparent",
-    color: C.textPrimary,
+    color: theme.palette.text.primary,
     "&::placeholder": {
-      color: C.textMuted,
+      color: theme.palette.text.secondary,
       opacity: 1,
     },
   },
@@ -184,14 +185,17 @@ const ConversationDetailed = ({
   return (
     <Box
       sx={{
-        height: "99vh",
+        height: "100%",
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
         background: isDarkMode ? appColors.bgDark : appColors.surfaceAlt,
         position: "relative",
       }}
     >
-      {/* ─── Glass AppBar ─── */}
       <AppBar
-        position="sticky"
+        position="static"
+        elevation={0}
         sx={{
           background: isDarkMode
             ? `linear-gradient(135deg, ${appColors.bgDark}DD, ${appColors.secondarySoft}88)`
@@ -207,122 +211,114 @@ const ConversationDetailed = ({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            gap: 1,
+            minHeight: "56px",
           }}
         >
-          <Avatar
-            sx={{ width: 34, height: 34 }}
-            src={handleTopBarNameAvatar()[1]}
-            alt={handleTopBarNameAvatar()[0]?.split(" ")[1]}
-          />
-          <Typography
-            variant="body2"
-            fontWeight="bold"
-            color="white"
-          >
-            {handleTopBarNameAvatar()[0]}
-          </Typography>
-          <IconButton onClick={handleConversationClicked} sx={{ color: "white" }}>
-            <Close sx={{ width: 15, height: 15 }} />
+          <Stack direction="row" alignItems="center" spacing={1.1} minWidth={0}>
+            <Avatar
+              sx={{ width: 38, height: 38, borderRadius: "8px", border: "1px solid rgba(255,255,255,0.28)" }}
+              src={handleTopBarNameAvatar()[1]}
+              alt={handleTopBarNameAvatar()[0]?.split(" ")[1]}
+            />
+            <Box minWidth={0}>
+              <Typography variant="body2" fontWeight={900} color="white" noWrap>
+                {handleTopBarNameAvatar()[0]}
+              </Typography>
+              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.72)" }}>
+                Secure career thread
+              </Typography>
+            </Box>
+          </Stack>
+          <IconButton onClick={handleConversationClicked} sx={{ color: "white", borderRadius: "8px" }}>
+            <ArrowBackIosNewRounded sx={{ width: 15, height: 15 }} />
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      {/* ─── Messages container ─── */}
       <Box
-        p={1.5}
-        display="flex"
-        flexDirection="column"
-        justifyContent="space-between"
-        maxHeight="90vh"
-        gap={2}
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          p: { xs: 1, sm: 1.5 },
+          display: "flex",
+          flexDirection: "column",
+          gap: 1.5,
+        }}
       >
-        <Box sx={{ flex: 1, overflowY: "auto", pr: 1 }}>
-          {conversationMessages?.map((message, index) => (
-            <Stack key={index} gap={1.5} mb={1}>
-              {/* Own message (right aligned) */}
-              {message.senderId === currentUserID ? (
-                <Box display="flex" justifyContent="flex-end">
+        <Box sx={{ flex: 1, minHeight: 0, pr: 0.5, ...scrollAreaSx }}>
+          {conversationMessages?.length > 0 ? (
+            conversationMessages.map((message, index) => {
+              const isOwnMessage = message.senderId === currentUserID;
+              return (
+                <Box key={index} display="flex" justifyContent={isOwnMessage ? "flex-end" : "flex-start"} mb={1}>
                   <Box
-                    sx={{
-                      maxWidth: "75%",
-                      p: 0.5,
+                    sx={(theme) => ({
+                      maxWidth: { xs: "88%", sm: "78%" },
+                      p: 1.15,
                       border: `1px solid ${appColors.border}`,
-                      borderRadius: 1,
-                      background: isDarkMode
+                      borderRadius: "8px",
+                      background: isOwnMessage
                         ? `linear-gradient(135deg, ${appColors.primaryDark}66, ${appColors.primary}44)`
-                        : `${appColors.primary}14`,
-                      backdropFilter: "blur(12px)",
+                        : panelSx(theme).background,
+                      backdropFilter: "blur(16px)",
                       position: "relative",
-                    }}
+                      overflowWrap: "anywhere",
+                    })}
                   >
-                    <Box display="flex" justifyContent="flex-end" mb={0.5}>
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          handleClickMoreMessage(e);
-                          setMessageFocused(message);
-                        }}
-                        sx={{ color: C.textSecondary }}
-                      >
-                        <MoreVertRounded sx={{ width: 14, height: 14 }} />
-                      </IconButton>
-                    </Box>
-                    <Typography variant="body2" sx={{ color: C.textPrimary }}>
+                    {isOwnMessage && (
+                      <Box display="flex" justifyContent="flex-end" mb={0.25}>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            handleClickMoreMessage(e);
+                            setMessageFocused(message);
+                          }}
+                          sx={(theme) => ({ ...iconButtonSx(theme), width: 26, height: 26 })}
+                        >
+                          <MoreVertRounded sx={{ width: 14, height: 14 }} />
+                        </IconButton>
+                      </Box>
+                    )}
+                    <Typography variant="body2" sx={{ color: "text.primary", lineHeight: 1.6 }}>
                       {message?.content}
                     </Typography>
-                    <Box mt={1} display="flex" gap={1} alignItems="center" justifyContent="flex-end">
-                      <Typography variant="caption" sx={{ color: C.textMuted }}>
-                        ( You )
+                    <Box mt={0.9} display="flex" gap={0.8} alignItems="center" justifyContent="flex-end" flexWrap="wrap">
+                      <Typography variant="caption" sx={{ color: "text.secondary", textTransform: "capitalize" }}>
+                        {isOwnMessage ? "You" : focusedConveration?.senderName?.split(" ")[0]}
                       </Typography>
                       {message?.isEdited && (
-                        <Typography variant="caption" sx={{ color: C.textMuted }}>
+                        <Typography variant="caption" sx={{ color: "text.secondary" }}>
                           edited
                         </Typography>
                       )}
-                      <Typography variant="caption" sx={{ color: C.textMuted }}>
+                      <Typography variant="caption" sx={{ color: "text.secondary" }}>
                         {handleDateDisplay(message?.createdAt)}{" "}
                         {message?.createdAt?.split(".")[0]?.split("T")[1]}
                       </Typography>
                     </Box>
                   </Box>
                 </Box>
-              ) : (
-                /* Other user's message (left aligned) */
-                <Box display="flex" justifyContent="flex-start">
-                  <Box
-                    sx={{
-                      maxWidth: "75%",
-                      p: 1,
-                      border: `1px solid ${appColors.border}`,
-                      borderRadius: 1,
-                      background: C.glassBg,
-                      backdropFilter: "blur(20px)",
-                    }}
-                  >
-                    <Typography variant="body2" sx={{ color: C.textPrimary }}>
-                      {message?.content}
-                    </Typography>
-                    <Box mt={1} display="flex" gap={1} alignItems="center" justifyContent="flex-end">
-                      <Typography variant="caption" sx={{ color: C.textMuted, textTransform: "capitalize" }}>
-                        ( {focusedConveration?.senderName?.split(" ")[0]} )
-                      </Typography>
-                      {message?.isEdited && (
-                        <Typography variant="caption" sx={{ color: C.textMuted }}>
-                          edited
-                        </Typography>
-                      )}
-                      <Typography variant="caption" sx={{ color: C.textMuted }}>
-                        {handleDateDisplay(message?.createdAt)}{" "}
-                        {message?.createdAt?.split(".")[0]?.split("T")[1]}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </Box>
-              )}
-            </Stack>
-          ))}
+              );
+            })
+          ) : (
+            <Box
+              sx={(theme) => ({
+                ...panelSx(theme),
+                minHeight: 220,
+                p: 3,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+              })}
+            >
+              <Typography variant="body2" color="text.secondary">
+                {isFetching ? "Loading conversation..." : "No messages in this thread yet."}
+              </Typography>
+            </Box>
+          )}
 
-          {/* More options menu */}
           <Menu
             anchorEl={anchorEl}
             open={openMenu}
@@ -331,12 +327,12 @@ const ConversationDetailed = ({
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
             transformOrigin={{ vertical: "top", horizontal: "right" }}
             PaperProps={{
-              sx: {
-                background: "#0D1B2A",
-                border: `1px solid ${appColors.border}`,
-                borderRadius: 1,
+              sx: (theme) => ({
+                ...panelSx(theme),
+                borderRadius: "8px",
                 mt: 1,
-              },
+                overflow: "hidden",
+              }),
             }}
           >
             <MoreMessageLayout
@@ -349,16 +345,14 @@ const ConversationDetailed = ({
           </Menu>
         </Box>
 
-        {/* ─── Message input area (glass) ─── */}
         <Box
-          sx={{
-            borderRadius: 1,
+          sx={(theme) => ({
+            ...panelSx(theme),
+            borderRadius: "8px",
             border: `1px solid ${appColors.border}`,
-            background: C.glassBg,
             backdropFilter: "blur(30px)",
-            p: 1.5,
-            boxShadow: C.glassShadow,
-          }}
+            p: 1,
+          })}
         >
           <StyledInputBase
             multiline
@@ -368,6 +362,13 @@ const ConversationDetailed = ({
             onChange={(e) => setReplyContent(e.target.value)}
             placeholder="Write a message..."
             inputProps={{ "aria-label": "message input" }}
+            sx={{
+              px: 1,
+              py: 0.5,
+              fontSize: 13,
+              maxHeight: 140,
+              overflowY: "auto",
+            }}
           />
           <Box display="flex" justifyContent="flex-end" mt={1}>
             <Box display="flex" gap={1} alignItems="center">
@@ -382,7 +383,7 @@ const ConversationDetailed = ({
                     }}
                     size="small"
                     sx={{
-                      borderRadius: "10px",
+                      borderRadius: "8px",
                       fontSize: 11,
                       color: C.textSecondary,
                       borderColor: C.glassBorder,
@@ -397,7 +398,7 @@ const ConversationDetailed = ({
                     disabled={replyContent?.length < 1 || isFetching}
                     onClick={handleUpdateMessageContent}
                     sx={{
-                      borderRadius: "10px",
+                      borderRadius: "8px",
                       fontSize: 11,
                       fontWeight: 600,
                       color: C.success,
@@ -413,16 +414,16 @@ const ConversationDetailed = ({
               ) : (
 
                 <Button
-                  variant="outlined"
+                  variant="contained"
                   size="small"
                   disabled={replyContent?.length < 1 || isFetching}
                   onClick={handleSendReplyMessage}
+                  endIcon={<SendRounded sx={{ width: 14, height: 14 }} />}
                   sx={{
-                    borderRadius: "10px",
-                    fontSize: 10,
-                    fontWeight: 600,
-                    color: C.success,
-                    borderColor: C.success,
+                    borderRadius: "8px",
+                    fontSize: 11,
+                    fontWeight: 900,
+                    textTransform: "none",
                     "&:hover": {
                       backgroundColor: `${C.success}14`,
                     },

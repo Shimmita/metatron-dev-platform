@@ -16,7 +16,6 @@ import {
   Stack,
   styled,
   Typography,
-  useTheme
 } from "@mui/material";
 import axios from "axios";
 import { useState } from "react";
@@ -27,9 +26,6 @@ import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
 import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import CustomCountryName from "../utilities/CustomCountryName";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
 import './Progress.css';
 // styled modal
@@ -110,9 +106,8 @@ const ApplyJobModal = ({
   // extract cvLink and name it cvName
   const cvName = user?.cvLink || ""
   // redux states
-  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
   const isDarkMode = currentMode === 'dark'
-  const theme = useTheme();
   const dispatch = useDispatch();
 
   const handleCountryJob = (job) => {
@@ -355,18 +350,6 @@ const ApplyJobModal = ({
   }
 
 
-  // handle return width modal
-  const handleReturnWidthModal = () => {
-    if (CustomLandScape() || CustomLandscapeWidest() ||
-      (CustomDeviceTablet() && !isTabSideBar)) {
-      return "40%"
-    } else if (CustomDeviceTablet()) {
-      return "90%"
-    }
-    return "95%"
-  }
-
-
   const Section = ({ title, children }) => (
     <Box>
       <Typography fontWeight={700} mb={1}>
@@ -389,17 +372,21 @@ const ApplyJobModal = ({
         justifyContent: 'center',
         backdropFilter: 'blur(12px)',
         p: { xs: 1, sm: 2 }, // Added padding for small screens
+        "& .MuiBackdrop-root": {
+          background: "rgba(3,7,18,0.72)",
+          backdropFilter: "blur(10px)",
+        },
       }}
     >
       <Box
         sx={{
           width: '100%',
-          maxWidth: '520px', // Slightly wider for better text flow
-          height: { xs: '100%', sm: 'auto' }, // Full screen on mobile, auto on desktop
-          maxHeight: { xs: '100vh', sm: '90vh' },
+          maxWidth: { xs: "100%", sm: "640px", md: "720px" },
+          height: { xs: 'auto', sm: 'auto' },
+          maxHeight: { xs: 'calc(100dvh - 16px)', sm: 'calc(100dvh - 32px)' },
           bgcolor: isDarkMode ? 'rgba(13, 20, 32, 0.95)' : '#fff',
           backdropFilter: 'blur(25px)',
-          borderRadius: { xs: 0, sm: 4 }, // Flat on mobile for more space
+          borderRadius: "8px",
           border: '1px solid',
           borderColor: 'divider',
           boxShadow: '0 24px 80px rgba(0,0,0,0.6)',

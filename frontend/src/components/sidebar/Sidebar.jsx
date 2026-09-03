@@ -1,6 +1,8 @@
 import {
   AssignmentTurnedInRounded,
+  ArticleRounded,
   CalendarMonthRounded,
+  DashboardRounded,
   GroupsRounded,
   PsychologyRounded,
   RocketLaunchRounded,
@@ -31,7 +33,6 @@ import { useNavigate } from "react-router-dom";
 import { appColors, appGradients } from "../../utils/colors";
 import AlertGeneral from "../alerts/AlertGeneral";
 import CustomCountryName from "../utilities/CustomCountryName";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../utilities/getImageMatch";
 import StepperStats from "./StepperStats";
 
@@ -65,29 +66,54 @@ const Sidebar = () => {
   const isDarkMode = currentMode === "dark";
   const cardRadius = `${Math.max(theme.shape.borderRadius - 2, 8)}px`;
   const selectedSkillsCount = user?.selectedSkills?.length || 0;
-  const profileCompletionItems = [
+  const guestOverviewItems = [
     {
-      label: "Skill graph",
-      value: selectedSkillsCount > 0 ? `${selectedSkillsCount} skills` : "Add skills",
-      icon: <PsychologyRounded fontSize="small" />,
+      label: "Tech gigs",
+      value: "Preview roles",
+      icon: <WorkRounded fontSize="small" />,
     },
     {
-      label: "Network proof",
-      value: `${user?.network_count || 0} connections`,
-      icon: <GroupsRounded fontSize="small" />,
+      label: "Learning paths",
+      value: "Browse courses",
+      icon: <SchoolRounded fontSize="small" />,
     },
     {
-      label: "Credential status",
-      value: user?.isVerified ? "Verified" : "Build trust",
-      icon: <VerifiedUserRounded fontSize="small" />,
+      label: "Live network",
+      value: "Explore events",
+      icon: <CalendarMonthRounded fontSize="small" />,
     },
   ];
+  const profileCompletionItems = isGuest
+    ? guestOverviewItems
+    : [
+      {
+        label: "Skill graph",
+        value: selectedSkillsCount > 0 ? `${selectedSkillsCount} skills` : "Add skills",
+        icon: <PsychologyRounded fontSize="small" />,
+      },
+      {
+        label: "Network proof",
+        value: `${user?.network_count || 0} connections`,
+        icon: <GroupsRounded fontSize="small" />,
+      },
+      {
+        label: "Credential status",
+        value: user?.isVerified ? "Verified" : "Build trust",
+        icon: <VerifiedUserRounded fontSize="small" />,
+      },
+    ];
 
-  const platformReadiness = [
-    "Complete profile visibility for recruiters and instructors",
-    "Keep skills current for stronger AI course and job matching",
-    "Use certifications and milestones as proof of professional growth",
-  ];
+  const platformReadiness = isGuest
+    ? [
+      "Browse the dashboard, tech gigs, courses, events, and public content before signing in",
+      "Create an account to apply for gigs, enroll in courses, RSVP for events, and post updates",
+      "Build a developer profile recruiters, mentors, and technical communities can understand quickly",
+    ]
+    : [
+      "Complete profile visibility for recruiters and instructors",
+      "Keep skills current for stronger AI course and job matching",
+      "Use certifications and milestones as proof of professional growth",
+    ];
 
   useLayoutEffect(() => {
     if (dataInsights.length > 0) {
@@ -120,7 +146,13 @@ const Sidebar = () => {
 
   const primaryNavItems = [
     {
-      label: "Jobs",
+      label: "Dashboard",
+      description: "Career signals, content, and platform activity",
+      icon: <DashboardRounded fontSize="small" />,
+      route: "/explore",
+    },
+    {
+      label: "Tech Gigs",
       description: "Verified openings and hiring activity",
       icon: <WorkRounded fontSize="small" />,
       route: "/jobs",
@@ -137,6 +169,12 @@ const Sidebar = () => {
       icon: <CalendarMonthRounded fontSize="small" />,
       route: "/events",
     },
+    {
+      label: "Content",
+      description: "Posts, projects and proof-of-work updates",
+      icon: <ArticleRounded fontSize="small" />,
+      route: "/explore",
+    },
   ];
 
   return (
@@ -147,25 +185,23 @@ const Sidebar = () => {
         mt: { sm: 1.5, md: 2 },
         display: {
           xs: "none",
-          sm: CustomDeviceTablet()
-            ? isSidebarRighbar && isTabSideBar && position === 0
-              ? "block"
-              : "none"
-            : "none",
-          md: position === 0 ? "block" : "none",
+          sm: "none",
+          md: "none",
+          lg: isSidebarRighbar && isTabSideBar && position === 0 ? "block" : "none",
         },
       }}
     >
       <Box
         className="shadow"
         sx={{
-          position: { sm: "sticky", md: "sticky" },
-          top: { sm: 88, md: 88 },
+          position: { lg: "sticky" },
+          top: { lg: 88 },
           alignSelf: "flex-start",
           width: "100%",
         }}
       >
         <Box
+          data-metatron-rail="true"
           sx={{
             borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : appColors.border,
             overflow: "visible",
@@ -175,8 +211,9 @@ const Sidebar = () => {
             backdropFilter: "blur(25px)",
             border: "1px solid rgba(255,255,255,0.08)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
-            maxHeight: { sm: "calc(100vh - 104px)", md: "none" },
-            overflowY: { sm: "auto", md: "visible" },
+            maxHeight: "calc(100vh - 104px)",
+            overflowY: "auto",
+            overscrollBehavior: "contain",
             "&::-webkit-scrollbar": {
               display: "none",
             },
@@ -243,7 +280,7 @@ const Sidebar = () => {
                         fontWeight={700}
                         sx={{ display: "block", mt: 0.3, opacity: 0.9, textTransform: 'uppercase', fontSize: '0.65rem' }}
                       >
-                        {user?.specialisationTitle || "Access Credentials Needed"}
+                        {isGuest ? "Public platform preview" : user?.specialisationTitle}
                       </Typography>
 
                       {/* Metadata Badges */}
@@ -251,7 +288,7 @@ const Sidebar = () => {
                         {isGuest ? (
                           <Box sx={{ px: 1, py: 0.2, borderRadius: 1, bgcolor: 'rgba(20, 210, 190, 0.1)', border: '1px solid rgba(20, 210, 190, 0.2)' }}>
                             <Typography variant="caption" sx={{ color: "primary.main", fontWeight: 800, fontSize: '0.6rem' }}>
-                              {usersCount}+ PROFESSIONALS ONLINE
+                              {usersCount || "Many"} DEVELOPERS ON METATRON
                             </Typography>
                           </Box>
                         ) : (
@@ -267,6 +304,36 @@ const Sidebar = () => {
                       </Box>
                     </Box>
                   </Box>
+
+                  {isGuest && (
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        borderRadius: cardRadius,
+                        bgcolor: "rgba(255,255,255,0.03)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                      }}
+                    >
+                      <Typography variant="overline" color="primary" fontWeight={900} sx={{ display: "block", lineHeight: 1 }}>
+                        Visitor Access
+                      </Typography>
+                      <Typography variant="body2" fontWeight={800} mt={0.75}>
+                        Explore the developer marketplace.
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" display="block" mt={0.5}>
+                        Preview roles, courses, events, and community content. Sign in when you are ready to apply, enroll, RSVP, connect, or publish.
+                      </Typography>
+                      <Button
+                        onClick={() => navigate("/auth/login")}
+                        size="small"
+                        variant="contained"
+                        fullWidth
+                        sx={{ mt: 1.25, borderRadius: cardRadius, fontWeight: 900 }}
+                      >
+                        Sign in to unlock actions
+                      </Button>
+                    </Box>
+                  )}
 
                   {/* ─── TECH STACK BLOCK ─── */}
                   {!isGuest && user?.account !== "Organisation" && (
@@ -326,7 +393,7 @@ const Sidebar = () => {
                 <Box display="flex" alignItems="center" gap={1} mb={1.5}>
                   <TrendingUpRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
                   <Typography fontWeight={600} fontSize={13} color="#F0F4FA">
-                    Professional Pathways
+                    Growth Pathways
                   </Typography>
                 </Box>
                 <Stack spacing={1}>

@@ -79,7 +79,11 @@ export default function HiringDrawer({
     ];
 
     return (
-        <StyledDrawer variant="permanent" open={open} sx={{ display: isDrawerPane ? "block" : "none" }}>
+        <StyledDrawer
+            variant="permanent"
+            open={open}
+            sx={{ display: { xs: "none", lg: isDrawerPane ? "block" : "none" } }}
+        >
             {/* ─── HUD HEADER ─── */}
             <Box
                 sx={{

@@ -7,6 +7,7 @@ import {
   PersonRemoveRounded,
   SendRounded,
   CloseRounded,
+  LocationOnRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -417,13 +418,13 @@ export default function UserProfileDrawer({ profileData }) {
         {/* Location + network row */}
         <Box display="flex" justifyContent="center" gap={2} mt={1} flexWrap="wrap">
           {profileData?.county && (
-            <Typography sx={{ fontSize: 11, color: appColors.textMuted }}>
-              📍 {profileData.county}
+            <Typography sx={{ fontSize: 11, color: appColors.textMuted, display: "inline-flex", alignItems: "center", gap: 0.35 }}>
+              <LocationOnRounded sx={{ width: 13, height: 13 }} /> {profileData.county}
             </Typography>
           )}
           {profileData?.network_count !== undefined && (
-            <Typography sx={{ fontSize: 11, color: appColors.textMuted }}>
-              👥 {profileData.network_count} connections
+            <Typography sx={{ fontSize: 11, color: appColors.textMuted, display: "inline-flex", alignItems: "center", gap: 0.35 }}>
+              <PeopleRounded sx={{ width: 13, height: 13 }} /> {profileData.network_count} connections
             </Typography>
           )}
         </Box>

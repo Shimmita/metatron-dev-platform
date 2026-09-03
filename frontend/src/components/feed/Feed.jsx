@@ -2,7 +2,8 @@ import { Box, CircularProgress, Fade } from "@mui/material";
 import React, { lazy, Suspense, useLayoutEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { handleShowingSpeedDial } from "../../redux/AppUI";
+import { handleIsJobsGlobalResults, handleShowingSpeedDial, handleSidebarRightbar } from "../../redux/AppUI";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import GuestCheck from "../account/GuestCheck";
 import BasicSpeedDial from "../custom/SpeedDial";
 
@@ -36,9 +37,22 @@ const Feed = () => {
   const { messageSnackPostTech } = useSelector((state) => state.currentSnackBar);
 
   const [openCommunity, setOpenCommunity] = React.useState(user?.isGroupTutorial || false);
+  const isWorkspaceRoute = [
+    "/jobs",
+    "/jobs/hiring",
+    "/events",
+    "/courses/available",
+    "/courses/instructor",
+  ].some((route) => location.pathname.startsWith(route));
 
   useLayoutEffect(() => {
     dispatch(handleShowingSpeedDial(true));
+
+    if (location.pathname === "/" || location.pathname === "/explore") {
+      dispatch(updateCurrentBottomNav(0));
+      dispatch(handleSidebarRightbar(true));
+      dispatch(handleIsJobsGlobalResults(false));
+    }
   }, [dispatch, location.pathname]); // Reset on route change
 
   return (
@@ -46,14 +60,18 @@ const Feed = () => {
       component="main"
       sx={{
         width: "100%",
-        maxWidth: { sm: 620, md: 700, lg: 780, xl: 880 },
+        maxWidth: isWorkspaceRoute ? "100%" : { xs: "100%", lg: 780, xl: 880 },
         minWidth: 0,
-        flex: { sm: "1 1 0" },
-        minHeight: "100vh",
+        flex: isWorkspaceRoute ? "1 1 100%" : { sm: "1 1 0" },
+        minHeight: { xs: "100vh", lg: 0 },
+        height: { lg: "100%" },
+        overflowY: { lg: "auto" },
+        overflowX: "hidden",
+        overscrollBehavior: { lg: "contain" },
         display: "flex",
         flexDirection: "column",
         // Ensure content doesn't get hidden behind the floating BottomNav
-        pb: isDefaultBottomNav ? { xs: 12, md: 4 } : 0,
+        pb: isDefaultBottomNav ? { xs: 12, lg: 4 } : 0,
         transition: "padding 0.3s ease",
       }}
     >

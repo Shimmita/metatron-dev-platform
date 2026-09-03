@@ -1,5 +1,5 @@
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
-import { appColors } from "./colors";
+import { appColors, appGradients } from "./colors";
 
 const createAppTheme = (mode = "dark") => {
   const isDark = mode === "dark";
@@ -31,7 +31,7 @@ const createAppTheme = (mode = "dark") => {
   let theme = createTheme({
     palette,
     shape: {
-      borderRadius: 14,
+      borderRadius: 10,
     },
     typography: {
       // ─── Base Scaling ───
@@ -40,8 +40,8 @@ const createAppTheme = (mode = "dark") => {
       fontFamily: ["Inter", "Poppins", "Segoe UI", "sans-serif"].join(","),
 
       // ─── Refined Variant Scaling ───
-      h1: { fontSize: "2.125rem", fontWeight: 700, letterSpacing: "-0.04em" },
-      h2: { fontSize: "1.75rem", fontWeight: 700 },
+      h1: { fontSize: "2.125rem", fontWeight: 800, letterSpacing: "0" },
+      h2: { fontSize: "1.75rem", fontWeight: 800, letterSpacing: "0" },
       h3: { fontSize: "1.5rem", fontWeight: 600 },
       h4: { fontSize: "1.25rem", fontWeight: 600 },
       h5: { fontSize: "1.1rem", fontWeight: 600 },
@@ -73,6 +73,9 @@ const createAppTheme = (mode = "dark") => {
         styleOverrides: {
           body: {
             backgroundColor: palette.background.default,
+            backgroundImage: isDark
+              ? "linear-gradient(180deg, #050812 0%, #08111F 48%, #0B1220 100%)"
+              : "linear-gradient(180deg, #F8FAFC 0%, #EEF7FF 100%)",
             color: palette.text.primary,
             fontSize: "0.875rem", // Ensures the root body inherits the smaller scale
           },
@@ -83,7 +86,7 @@ const createAppTheme = (mode = "dark") => {
       MuiAppBar: {
         styleOverrides: {
           root: {
-            background: isDark ? "rgba(6,13,24,0.8)" : "rgba(255,255,255,0.8)",
+            background: isDark ? "rgba(5,8,18,0.86)" : "rgba(255,255,255,0.86)",
             backdropFilter: "blur(20px)",
             borderBottom: `1px solid ${appColors.border}`,
           },
@@ -97,7 +100,8 @@ const createAppTheme = (mode = "dark") => {
             background: appColors.bgCard,
             backdropFilter: "blur(25px)",
             border: `1px solid ${appColors.border}`,
-            boxShadow: isDark ? "0 20px 60px rgba(0,0,0,0.6)" : "0 10px 30px rgba(0,0,0,0.05)",
+            borderRadius: 8,
+            boxShadow: isDark ? "0 18px 44px rgba(0,0,0,0.46)" : "0 10px 30px rgba(0,0,0,0.05)",
           },
         },
       },
@@ -106,11 +110,11 @@ const createAppTheme = (mode = "dark") => {
       MuiButton: {
         styleOverrides: {
           root: {
-            borderRadius: 10,
+            borderRadius: 8,
             padding: "8px 16px", // Tightened padding for smaller font
           },
           contained: {
-            background: `linear-gradient(135deg, #0FA88F, #14D2BE)`,
+            background: appGradients.primary,
             boxShadow: `0 8px 25px ${appColors.glow}`,
             "&:hover": {
               boxShadow: `0 12px 35px ${appColors.glow}`,
@@ -147,23 +151,6 @@ const createAppTheme = (mode = "dark") => {
         },
       },
 
-      /* ─── Menu Items ─── */
-      MuiMenuItem: {
-        styleOverrides: {
-          root: {
-            fontSize: "0.825rem",
-            px: 1.5,
-            py: 0.8,
-            borderRadius: "8px",
-            mx: 0.5,
-            my: 0.2,
-            transition: "all 0.2s ease",
-            "&:hover": {
-              background: "rgba(20,210,190,0.08)",
-            },
-          },
-        },
-      },
       /* ─── Menus & Popovers (Readability Fix) ─── */
       MuiMenu: {
         styleOverrides: {
@@ -215,6 +202,81 @@ const createAppTheme = (mode = "dark") => {
             background: "#0D1B2A",
             border: `1px solid ${appColors.border}`,
             fontSize: "0.7rem", // Smaller tooltips
+          },
+        },
+      },
+
+      /* ─── Dialogs, Alerts & Modal Surfaces ─── */
+      MuiBackdrop: {
+        styleOverrides: {
+          root: {
+            backgroundColor: isDark ? "rgba(3,7,18,0.72)" : "rgba(15,23,42,0.22)",
+            backdropFilter: "blur(10px)",
+          },
+        },
+      },
+
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            background: isDark
+              ? "linear-gradient(180deg, rgba(11,18,32,0.98), rgba(5,8,18,0.94))"
+              : "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96))",
+            backdropFilter: "blur(28px)",
+            border: `1px solid ${isDark ? appColors.border : "rgba(15,76,129,0.14)"}`,
+            borderRadius: 8,
+            boxShadow: isDark
+              ? "0 28px 90px rgba(0,0,0,0.62)"
+              : "0 24px 70px rgba(15,76,129,0.18)",
+            overflow: "hidden",
+            maxHeight: "calc(100dvh - 24px)",
+            margin: 12,
+          },
+        },
+      },
+
+      MuiDialogContent: {
+        styleOverrides: {
+          root: {
+            padding: "18px",
+            overflowY: "auto",
+            "&::-webkit-scrollbar": { width: 6 },
+            "&::-webkit-scrollbar-thumb": {
+              background: "rgba(148,163,184,0.28)",
+              borderRadius: 999,
+            },
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(148,163,184,0.28) transparent",
+          },
+        },
+      },
+
+      MuiDialogActions: {
+        styleOverrides: {
+          root: {
+            padding: "14px 18px 18px",
+            gap: 8,
+            borderTop: `1px solid ${appColors.divider}`,
+          },
+        },
+      },
+
+      MuiAlert: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            border: `1px solid ${appColors.border}`,
+            background: isDark ? "rgba(15,23,42,0.86)" : "rgba(255,255,255,0.92)",
+            backdropFilter: "blur(18px)",
+            alignItems: "center",
+          },
+          message: {
+            fontSize: "0.78rem",
+            lineHeight: 1.5,
+          },
+          action: {
+            alignItems: "center",
+            paddingTop: 0,
           },
         },
       },

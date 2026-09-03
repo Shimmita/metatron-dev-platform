@@ -100,7 +100,7 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
           );
           return;
         }
-        setErrorMessage(err?.response.data);
+        setErrorMessage(err?.response?.data || "Unable to complete RSVP.");
       })
       .finally(() => {
         setIsFetching(false);

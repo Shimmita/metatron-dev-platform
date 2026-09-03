@@ -1,11 +1,6 @@
 import {
   AutoAwesomeRounded,
-  CastForEducationRounded,
   DoneRounded,
-  LockRounded,
-  MobileScreenShareRounded,
-  PersonAdd,
-  SchoolRounded,
   VideoLibraryRounded,
   PlayCircleFilledRounded,
   GroupRounded,
@@ -19,26 +14,19 @@ import {
   Card,
   CardContent,
   Divider,
-  FormHelperText,
   Rating,
   Stack,
   Typography,
   ButtonBase
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import { lazy, useState } from "react";
 import { useSelector } from "react-redux";
-import { appColors, appGradients } from "../../../utils/colors";
 import pythonLogo from "../../../images/python.jpeg";
 import AlertSimilarCourses from "../../alerts/AlertSimilarCourses";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 const AccordionDescription = lazy(() => import("./AccordionDescription"));
 
 function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
-  const theme = useTheme();
-
   // redux state manager
   const { user, isGuest } = useSelector((state) => state.currentUser);
   const isMyCourse = user?._id === courseItem?.course_instructor?.instructorId
@@ -83,7 +71,7 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
         elevation={0}
         sx={{
           width: '100%',
-          maxWidth: CustomDeviceTablet() ? 300 : 340,
+          maxWidth: "100%",
           borderRadius: "20px",
           background: isDarkMode ? "rgba(15, 23, 42, 0.8)" : "rgba(255, 255, 255, 0.95)",
           backdropFilter: "blur(12px)",

@@ -63,7 +63,7 @@ const EmailVerification = () => {
         width="100%"
         maxWidth={420}
         p={3}
-        borderRadius="18px"
+        borderRadius="8px"
         sx={{
           background: "rgba(255,255,255,0.05)",
           backdropFilter: "blur(20px)",

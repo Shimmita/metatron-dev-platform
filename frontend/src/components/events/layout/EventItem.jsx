@@ -37,7 +37,6 @@ import { updateCurrentSnackBar } from "../../../redux/CurrentSnackBar";
 import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 import CustomCountryName from "../../utilities/CustomCountryName";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
 function EventItem({
@@ -210,7 +209,7 @@ function EventItem({
         elevation={0}
         sx={{
           width: "100%",
-          maxWidth: CustomDeviceIsSmall() ? 350 : 360,
+          maxWidth: "100%",
           borderRadius: "10px",
           position: "relative",
           overflow: "hidden",

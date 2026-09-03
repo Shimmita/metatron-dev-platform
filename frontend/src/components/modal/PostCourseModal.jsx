@@ -12,7 +12,6 @@ import {
   styled,
   TextField,
   Typography,
-  useTheme
 } from "@mui/material";
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
@@ -24,9 +23,6 @@ import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionTech from "../data/SubsectionTech";
 import BrowserCompress from "../utilities/BrowserCompress";
 import CourseIcon from "../utilities/CourseIcon";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
 import {
   ModalBody,
@@ -82,14 +78,9 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
   const [previewImage, setPreviewImage] = useState(null);
   const [other, setOther] = useState("")
 
-  // redux states
-  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
-  const isDarkMode = currentMode === 'dark'
-
   const { user } = useSelector((state) => state.currentUser);
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const theme = useTheme()
 
   // for category 1, 2 and 3
   const [category1, setCategory1] = useState("");
@@ -431,18 +422,6 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
 
     }
   };
-
-  // handle return width modal
-  const handleReturnWidthModal = () => {
-    if (CustomLandScape() || CustomLandscapeWidest() ||
-      (CustomDeviceTablet() && !isTabSideBar)) {
-      return "40%"
-    } else if (CustomDeviceTablet()) {
-      return "90%"
-    }
-    return "95%"
-  }
-
 
   return (
     <ModalShell

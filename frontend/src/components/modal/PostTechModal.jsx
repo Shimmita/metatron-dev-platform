@@ -12,7 +12,6 @@ import {
   styled,
   TextField,
   Typography,
-  useTheme
 } from "@mui/material";
 import axios from "axios";
 import { lazy, useEffect, useState } from "react";
@@ -26,9 +25,6 @@ import SpecialisationTech from "../data/SpecialisationTech";
 import SubsectionTech from "../data/SubsectionTech";
 import BrowserCompress from "../utilities/BrowserCompress";
 import CourseIcon from "../utilities/CourseIcon";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../utilities/getImageMatch";
 import { ModalBody, ModalHeader, ModalShell, SectionCard, SectionTitle, StatusBanner } from "./ModalShared";
 
@@ -82,11 +78,6 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
   // control showing of logout user session expired
   const [openAlertLogout, setOpenAlertLogout] = useState(false);
-
-  // redux states
-  const { currentMode, isTabSideBar } = useSelector((state) => state.appUI);
-  const isDarkMode = currentMode === 'dark'
-  const theme = useTheme();
 
   const { user } = useSelector((state) => state.currentUser);
   const { groups: groupData } = useSelector((state) => state.currentGroups);
@@ -339,18 +330,6 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const handleClosingModal = () => {
     setOpenModalTech(false);
   };
-
-
-  // handle return width modal
-  const handleReturnWidthModal = () => {
-    if (CustomLandScape() || CustomLandscapeWidest() ||
-      (CustomDeviceTablet() && !isTabSideBar)) {
-      return "40%"
-    } else if (CustomDeviceTablet()) {
-      return "90%"
-    }
-    return "95%"
-  }
 
 
   return (

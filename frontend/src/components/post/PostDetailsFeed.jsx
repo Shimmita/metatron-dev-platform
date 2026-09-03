@@ -4,7 +4,6 @@ import {
   FavoriteRounded,
   ForumRounded,
   GitHub,
-  GradeOutlined,
   LockRounded,
   MoreVertRounded,
   UpdateRounded,
@@ -242,7 +241,7 @@ const PostDetailsFeed = ({
           return;
         }
 
-        setMessageResponse(err?.response.data);
+        setMessageResponse(err?.response?.data || "Unable to update reaction.");
       })
       .finally(() => {
         setIsUploading(false);
@@ -299,7 +298,7 @@ const PostDetailsFeed = ({
           return;
         }
 
-        setMessageResponse(err?.response.data);
+        setMessageResponse(err?.response?.data || "Unable to update post.");
       })
       .finally(() => {
         setIsUploading(false);
@@ -373,24 +372,39 @@ const PostDetailsFeed = ({
       )}
 
       <Card
-      className="rounded shadow-sm"
-        style={{
-          opacity: openMenu && !isDarkMode ? "0.8" : undefined,
-          borderColor:'divider'
-        }}
         elevation={0}
+        sx={{
+          opacity: openMenu && !isDarkMode ? 0.88 : 1,
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.10)",
+          background: isDarkMode
+            ? "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.035))"
+            : "rgba(255,255,255,0.96)",
+          boxShadow: isDarkMode
+            ? "0 18px 48px rgba(0,0,0,0.28)"
+            : "0 14px 34px rgba(15,76,129,0.08)",
+          overflow: "hidden",
+        }}
       >
         <CardHeader
-          sx={{ padding: 0, margin: 0 }}
+          sx={{
+            px: { xs: 1.25, sm: 1.75 },
+            py: 1.5,
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            "& .MuiCardHeader-content": { minWidth: 0 },
+          }}
           avatar={
-              <IconButton onClick={isGuest ? null:handleOpenMiniProfile}>
+              <IconButton onClick={isGuest ? null:handleOpenMiniProfile} sx={{ p: 0 }}>
               <Tooltip arrow title={isGuest? 'login':'profile'}>
                 <Avatar
                   src={postDetailedData?.post_owner?.owneravatar}
                   variant="rounded"
                   sx={{
-                    width: 50,
-                    height: 50,
+                    width: 48,
+                    height: 48,
+                    borderRadius: "8px",
+                    border: "1px solid rgba(32,214,199,0.28)",
+                    boxShadow: "0 0 20px rgba(32,214,199,0.14)",
                   }}
                   alt=""
                 >
@@ -399,15 +413,11 @@ const PostDetailsFeed = ({
               </IconButton>
           }
           action={
-            <Box
-              flexDirection={"row"}
-              display={"flex"}
-              mt={1}
-              alignItems={"center"}
-            >
+            <Box flexDirection={"row"} display={"flex"} alignItems={"center"} gap={0.5}>
               <Typography
                 className={postBelongsCurrentUser && "me-3"}
                 variant="caption"
+                color="text.secondary"
               >
                 {getElapsedTime(postDetailedData?.createdAt)}
               </Typography>
@@ -432,10 +442,7 @@ const PostDetailsFeed = ({
                     aria-label="more"
                     onClick={handleClickMoreVertPost}
                   >
-                    <MoreVertRounded
-                      color="primary"
-                      sx={{ width: 18, height: 18 }}
-                    />
+                    <MoreVertRounded color="primary" sx={{ width: 18, height: 18 }} />
                   </IconButton>
                 </Tooltip>
               )}
@@ -461,8 +468,8 @@ const PostDetailsFeed = ({
             </Box>
           }
           title={
-            <Box display="flex" alignItems="center" mt={1} gap={1}>
-              <Typography fontWeight="bold" variant={"body2"}>
+            <Box display="flex" alignItems="center" gap={1} minWidth={0}>
+              <Typography fontWeight={900} variant={"body2"} noWrap>
                 {CustomDeviceSmallest()
                   ? handleName()
                   : `${postDetailedData.post_owner.ownername}`}
@@ -473,13 +480,13 @@ const PostDetailsFeed = ({
           subheader={
             <Box>
               {/*occupation title */}
-              <Typography variant="body2">
+              <Typography variant="caption" color="text.secondary" noWrap>
                 {CustomDeviceSmallest()
                   ? handleOccupation()
                   : `${postDetailedData.post_owner.ownertitle}`}
               </Typography>
               {/* location */}
-              <Typography variant="body2">
+              <Typography variant="caption" color="text.secondary" noWrap>
                 {country} | {postDetailedData.post_location.state}{" "}
               </Typography>
             </Box>
@@ -487,14 +494,23 @@ const PostDetailsFeed = ({
         />
 
         <Box>
-          <CardContent>
+          <CardContent sx={{ px: { xs: 1.5, sm: 2 }, py: 2 }}>
             <Box mb={2} width={"100%"}>
-              <Box mb={1}>
+              <Box mb={1} display="flex" justifyContent="center">
                 {/* post specialization */}
                 <Typography
-                  variant="body2"
+                  variant="caption"
                   textAlign={"center"}
-                  fontWeight={"bold"}
+                  fontWeight={900}
+                  color="primary.main"
+                  sx={{
+                    px: 1.25,
+                    py: 0.45,
+                    borderRadius: "8px",
+                    background: "rgba(32,214,199,0.10)",
+                    border: "1px solid rgba(32,214,199,0.22)",
+                    textTransform: "uppercase",
+                  }}
                 >
                   {postDetailedData.post_category.main}
                 </Typography>
@@ -506,25 +522,10 @@ const PostDetailsFeed = ({
                 alignItems={"center"}
                 gap={2}
               >
-                <GradeOutlined
-                  sx={{
-                    width: 18,
-                    height: 18,
-                    color: isDarkMode ? "yellow" : "orange",
-                  }}
-                />
                 {/* title of the post */}
-                <Typography variant="body2">
+                <Typography variant="h6" fontWeight={900} textAlign="center" lineHeight={1.25}>
                   {postDetailedData.post_title}
                 </Typography>
-
-                <GradeOutlined
-                  sx={{
-                    width: 18,
-                    height: 18,
-                    color: isDarkMode ? "yellow" : "orange",
-                  }}
-                />
               </Box>
             </Box>
 
@@ -587,8 +588,8 @@ const PostDetailsFeed = ({
               >
                 <Box display={"flex"} justifyContent={"center"} width={"100%"}>
                   <Typography
-                  color={isDarkMode && 'text.secondary'}
-                  sx={{ fontSize:'small' }}
+                    color={isDarkMode ? 'text.secondary' : "text.primary"}
+                    sx={{ fontSize:'0.9rem', lineHeight: 1.8, whiteSpace: "pre-line" }}
                     variant={"body2"}
                     maxWidth={handleMaxTextWidth()}
                   >
@@ -614,20 +615,24 @@ const PostDetailsFeed = ({
           {/* display image or log if is not in edit mode */}
 
           {!isPostEditMode && (
-            <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+            <Box display={"flex"} justifyContent={"center"} width={"100%"} px={{ xs: 1.5, sm: 2 }} pb={2}>
               <Box
                 sx={{
-                  width: "92%",
+                  width: "100%",
                   display: "flex",
                   justifyContent: "center",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "rgba(255,255,255,0.03)",
                 }}
               >
                 <img 
                   style={{ 
                     height:CustomDeviceScreenSize(),
                     width:handleImageWidth(),
-                    objectFit:'fill',
-                    borderRadius:5,
+                    objectFit:'cover',
+                    borderRadius:0,
                   }}
                   src={handlePostImagePresent()}
                   loading="lazy"
@@ -641,9 +646,14 @@ const PostDetailsFeed = ({
         {!isPostEditMode && (
           <Box
             display="flex"
-            p={1}
+            px={1.25}
+            py={1}
             justifyContent="space-around"
             alignItems="center"
+            sx={{
+              borderTop: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.025)",
+            }}
           >
             {[
               {
@@ -673,7 +683,17 @@ const PostDetailsFeed = ({
                 title: "comment",
               },
             ].map(({ icon, count, title, onClick }) => (
-              <Box display="flex" alignItems="center" key={title}>
+              <Box
+                display="flex"
+                alignItems="center"
+                key={title}
+                sx={{
+                  px: 1,
+                  borderRadius: "8px",
+                  minWidth: 86,
+                  justifyContent: "center",
+                }}
+              >
                 <Tooltip title={title} arrow>
                   <Checkbox
                     onChange={onClick}

@@ -1,15 +1,23 @@
 import {
+  AutoAwesome,
+  BarChartRounded,
+  CloudDoneRounded,
   InfoRounded,
-  Refresh
+  MyLocationRounded,
+  Refresh,
+  TravelExploreRounded,
+  VerifiedRounded,
+  WorkRounded
 } from "@mui/icons-material";
 import {
   Button,
+  Chip,
   CircularProgress,
+  Stack,
   useMediaQuery
 } from "@mui/material";
 import Box from "@mui/material/Box";
-import MuiDrawer from "@mui/material/Drawer";
-import { styled, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
 import { Suspense, useEffect, useLayoutEffect, useState } from "react";
@@ -36,63 +44,8 @@ import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import JobLayout from "./layout/JobLayout";
 import JobStatsLayout from "./layout/JobStatsLayouts";
 
-const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
-
-const openedMixin = (theme) => ({
-  width: drawerWidth,
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: "hidden",
-});
-
-const closedMixin = (theme) => ({
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(8)} + 1px)`,
-  },
-});
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
-  ...theme.mixins.toolbar,
-}));
-
-const Drawer = styled(MuiDrawer, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-  whiteSpace: "nowrap",
-  boxSizing: "border-box",
-  variants: [
-    {
-      props: ({ open }) => open,
-      style: {
-        ...openedMixin(theme),
-        "& .MuiDrawer-paper": openedMixin(theme),
-      },
-    },
-    {
-      props: ({ open }) => !open,
-      style: {
-        ...closedMixin(theme),
-        "& .MuiDrawer-paper": closedMixin(theme),
-      },
-    },
-  ],
-}));
-
+const drawerWidth = 240;
+const collapsedDrawerWidth = 70;
 
 export default function MiniDrawer() {
   const [openAlertGeneral, setOpenAlertGeneral] = useState(false)
@@ -117,7 +70,6 @@ export default function MiniDrawer() {
   const { user, isGuest } = useSelector((state) => state.currentUser);
   const { messageSnack } = useSelector((state) => state.currentSnackBar);
   const theme = useTheme();
-  const panelRadius = `${theme.shape.borderRadius}px`;
 
   // trigger redux update
   const dispatch = useDispatch();
@@ -159,16 +111,6 @@ export default function MiniDrawer() {
 
   }, [dispatch, isSidebarRighbar])
 
-
-  // open drawer
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  // close drawer
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
 
   // handle showing of speed dial by making it off in this window of jobs
   if (isDefaultSpeedDial) {
@@ -568,6 +510,28 @@ export default function MiniDrawer() {
     navigate("/auth/login")
   }
 
+  const jobMetrics = [
+    ["Matched roles", jobs?.length || 0, "Live opportunities in this view"],
+    ["Workspace", textOption, "Current hiring lane"],
+    ["Profile", isGuest ? "Guest" : "Active", "Application readiness"],
+    ["Signal", isJobSearchGlobal ? "Search" : "Market", "Data source"],
+  ];
+
+  const jobQuickModes = [
+    { label: "AI Selection", icon: <AutoAwesome /> },
+    { label: "Verified Jobs", icon: <VerifiedRounded /> },
+    { label: "External Jobs", icon: <TravelExploreRounded /> },
+    { label: "Nearby Jobs", icon: <MyLocationRounded /> },
+    { label: "Applications", icon: <CloudDoneRounded /> },
+    { label: "My Statistics", icon: <BarChartRounded /> },
+  ].filter(() => !isGuest);
+
+  const jobGuidance = [
+    ["Apply smarter", "Prioritize roles where your stack, location, and seniority already match."],
+    ["Keep proof ready", "Attach projects, GitHub work, and outcomes before entering competitive roles."],
+    ["Track momentum", "Use applications and statistics to tighten your next move."],
+  ];
+
   return (
     <Suspense
       fallback={
@@ -579,8 +543,11 @@ export default function MiniDrawer() {
       <Box
         sx={{
           width: "100%",
-          height: "100vh",
-          overflow: "hidden",
+          minHeight: "100%",
+          overflow: "visible",
+          background: isDarkMode
+            ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(8,17,31,0.98))"
+            : "linear-gradient(180deg, #F8FAFC, #EEF7FF)",
         }}
       >
         {/* ---------- AppBar ---------- */}
@@ -617,31 +584,41 @@ export default function MiniDrawer() {
         {/* ---------- MAIN CONTENT ---------- */}
         <Box
           sx={{
-            height: "calc(100vh - 64px)",
-            overflow: "hidden",
-            width: "100%",
+            minHeight: "calc(100vh - 64px)",
+            overflow: "visible",
+            width: {
+              xs: "100%",
+              lg: isDrawerPane ? `calc(100% - ${open ? drawerWidth : collapsedDrawerWidth}px)` : "100%",
+            },
+            ml: {
+              xs: 0,
+              lg: isDrawerPane ? `${open ? drawerWidth : collapsedDrawerWidth}px` : 0,
+            },
             transition: "all 0.25s ease",
           }}
         >
           <Box
             sx={{
               width: "100%",
-              height: "100%",
-              overflowY: "auto",
+              minHeight: "100%",
+              overflowY: "visible",
               overflowX: "hidden",
-              pt: 5,
-              px: { xs: 1, md: 2 },
+              pt: { xs: 9, md: 10 },
+              px: { xs: 1.25, md: 2.5 },
 
               display: "grid",
 
               gridTemplateColumns: {
                 xs: "1fr",
                 sm: open
-                  ? "repeat(auto-fit, minmax(220px, 1fr))"
-                  : "repeat(auto-fit, minmax(200px, 1fr))",
+                  ? "repeat(auto-fit, minmax(260px, 1fr))"
+                  : "repeat(auto-fit, minmax(280px, 1fr))",
                 md: open
-                  ? "repeat(auto-fit, minmax(240px, 1fr))"
-                  : "repeat(auto-fit, minmax(220px, 1fr))",
+                  ? "repeat(auto-fit, minmax(280px, 1fr))"
+                  : "repeat(auto-fit, minmax(320px, 1fr))",
+                lg: open
+                  ? "repeat(auto-fit, minmax(300px, 1fr))"
+                  : "repeat(auto-fit, minmax(340px, 1fr))",
               },
 
               gap: 2,
@@ -653,6 +630,128 @@ export default function MiniDrawer() {
               scrollbarWidth: "none",
             }}
           >
+            <Box
+              sx={{
+                gridColumn: "1 / -1",
+                borderRadius: "8px",
+                border: "1px solid rgba(255,255,255,0.10)",
+                background: isDarkMode
+                  ? "linear-gradient(135deg, rgba(11,18,32,0.94), rgba(20,214,199,0.08), rgba(59,130,246,0.10))"
+                  : "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(238,247,255,0.92))",
+                p: { xs: 2, md: 2.5 },
+                boxShadow: isDarkMode
+                  ? "0 18px 50px rgba(0,0,0,0.28)"
+                  : "0 16px 32px rgba(15,76,129,0.08)",
+              }}
+            >
+              <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={2} justifyContent="space-between" alignItems={{ xs: "flex-start", md: "center" }}>
+                <Box>
+                  <Box display="flex" alignItems="center" gap={1} mb={0.75}>
+                    <WorkRounded sx={{ color: "primary.main", fontSize: 18 }} />
+                    <Typography variant="overline" color="primary.main">
+                      Tech Gig Marketplace
+                    </Typography>
+                  </Box>
+                  <Typography variant="h4" fontWeight={900} lineHeight={1.12}>
+                    {textOption}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" mt={0.75} maxWidth={680}>
+                    Explore verified engineering roles, recommended matches, applications, and hiring intelligence from one focused workspace.
+                  </Typography>
+                </Box>
+                <Button
+                  disableElevation
+                  variant="contained"
+                  onClick={handleRefreshData}
+                  startIcon={<Refresh />}
+                  sx={{ minWidth: { xs: "100%", sm: 150, md: 132 } }}
+                >
+                  Refresh
+                </Button>
+              </Box>
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", md: "repeat(4, minmax(0, 1fr))" },
+                  gap: 1,
+                  mt: 2,
+                }}
+              >
+                {jobMetrics.map(([label, value, helper]) => (
+                  <Box
+                    key={label}
+                    sx={{
+                      borderRadius: "8px",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      background: "rgba(255,255,255,0.045)",
+                      p: 1.2,
+                      minHeight: 72,
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      {label}
+                    </Typography>
+                    <Typography variant="body1" fontWeight={900} noWrap>
+                      {value}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" display="block" noWrap>
+                      {helper}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+              {jobQuickModes.length > 0 && (
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 2 }}>
+                  {jobQuickModes.map((mode) => (
+                    <Chip
+                      key={mode.label}
+                      clickable
+                      icon={mode.icon}
+                      label={mode.label}
+                      color={textOption === mode.label ? "primary" : "default"}
+                      variant={textOption === mode.label ? "filled" : "outlined"}
+                      onClick={() => {
+                        setTextOption(mode.label);
+                        dispatch(handleIsJobsGlobalResults(false));
+                      }}
+                      sx={{
+                        borderRadius: "8px",
+                        fontWeight: 800,
+                        background: textOption === mode.label ? undefined : "rgba(255,255,255,0.035)",
+                      }}
+                    />
+                  ))}
+                </Stack>
+              )}
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", md: "repeat(3, minmax(0, 1fr))" },
+                  gap: 1,
+                  mt: 2,
+                }}
+              >
+                {jobGuidance.map(([title, copy]) => (
+                  <Box
+                    key={title}
+                    sx={{
+                      borderRadius: "8px",
+                      border: "1px solid rgba(255,255,255,0.07)",
+                      background: "rgba(5,8,18,0.18)",
+                      p: 1.25,
+                    }}
+                  >
+                    <Typography variant="body2" fontWeight={900}>
+                      {title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {copy}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+
             {/* ---------- LOADING ---------- */}
             {isFetching ? (
               <Box
@@ -694,16 +793,24 @@ export default function MiniDrawer() {
                 {jobs?.length < 1 && (
                   <Box
                     gridColumn="1 / -1"
-                    height="60vh"
+                    minHeight="60vh"
                     display="flex"
                     flexDirection="column"
                     justifyContent="center"
                     alignItems="center"
                     gap={2}
                     color="text.secondary"
+                    sx={{
+                      borderRadius: "8px",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      background: "rgba(255,255,255,0.035)",
+                    }}
                   >
-                    <Typography variant="body2">
-                      no more jobs posted
+                    <Typography variant="body1" fontWeight={800}>
+                      No matching tech gigs yet
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" textAlign="center">
+                      The marketplace has no roles for this filter.
                     </Typography>
 
                     <Button

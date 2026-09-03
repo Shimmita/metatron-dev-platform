@@ -31,10 +31,10 @@ const BottomNav = () => {
   };
 
   const navItems = [
-    { label: "Home", path: "/explore", icon: <HomeOutlined />, activeIcon: <HomeRounded />, title: "Home", action: "home" },
-    { label: "Jobs", path: "/jobs", icon: <WorkOutlineOutlined />, activeIcon: <WorkRounded />, title: "Tech Jobs" },
+    { label: "Feed", path: "/explore", icon: <HomeOutlined />, activeIcon: <HomeRounded />, title: "Dashboard Feed", action: "home" },
+    { label: "Gigs", path: "/jobs", icon: <WorkOutlineOutlined />, activeIcon: <WorkRounded />, title: "Tech Gigs" },
     { label: "Events", path: "/events", icon: <TvTwoTone />, activeIcon: <TvRounded />, title: "Tech Events" },
-    { label: "Courses", path: "/courses/available", icon: <SchoolOutlined />, activeIcon: <SchoolRounded />, title: "Tech Courses" },
+    { label: "Learn", path: "/courses/available", icon: <SchoolOutlined />, activeIcon: <SchoolRounded />, title: "Tech Courses" },
   ];
 
   return (
@@ -47,26 +47,27 @@ const BottomNav = () => {
         width: "auto",
         zIndex: 1300,
         pointerEvents: "none", // Ensures it doesn't block clicks in the gap
+        display: { xs: "block", lg: "none" },
       }}
     >
       <BottomNavigation
         value={position}
         showLabels
         sx={{
-          pointerEvents: "auto", // Restore clicks for the nav itself
-          width: "90vw",
-          maxWidth: 400,
-          height: 65,
-          borderRadius: "24px",
+        pointerEvents: "auto", // Restore clicks for the nav itself
+          width: "92vw",
+          maxWidth: 430,
+          height: 68,
+          borderRadius: "18px",
           px: 1,
           background: isDarkMode 
-            ? "rgba(15, 23, 42, 0.85)" 
+            ? "rgba(5, 8, 18, 0.88)" 
             : "rgba(255, 255, 255, 0.9)",
-          backdropFilter: "blur(12px)",
+          backdropFilter: "blur(18px) saturate(160%)",
           border: "1px solid",
-          borderColor: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+          borderColor: isDarkMode ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.05)",
           boxShadow: isDarkMode 
-            ? "0 10px 30px rgba(0,0,0,0.5)" 
+            ? "0 18px 46px rgba(0,0,0,0.48), inset 0 1px 0 rgba(255,255,255,0.08)" 
             : "0 10px 30px rgba(15, 76, 129, 0.15)",
           
           "& .MuiBottomNavigationAction-root": {
@@ -77,6 +78,8 @@ const BottomNav = () => {
             
             "&.Mui-selected": {
               color: "#14D2BE",
+              borderRadius: "12px",
+              background: isDarkMode ? "rgba(32,214,199,0.08)" : "rgba(32,214,199,0.10)",
               "& .MuiBottomNavigationAction-label": {
                 fontSize: "0.7rem",
                 fontWeight: 800,

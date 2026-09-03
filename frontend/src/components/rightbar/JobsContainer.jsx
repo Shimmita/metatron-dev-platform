@@ -42,7 +42,11 @@ export default function JobsContainer() {
       })
       .catch(async (err) => {
         console.log(err);
-        setErrorMessage(err?.response.data);
+        if (err?.code === "ERR_NETWORK") {
+          setErrorMessage("Unable to load featured jobs.");
+          return;
+        }
+        setErrorMessage(err?.response?.data || "Unable to load featured jobs.");
         setOpenAlertGeneral(true)
       })
       .finally(() => {

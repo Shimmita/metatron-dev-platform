@@ -55,7 +55,7 @@ import CourseLayout from "./layout/CourseLayout";
 import CoursePlayer from "./layout/CoursePlayer";
 import ManageCoursesTable from "./layout/ManageCoursesTable";
   
-  const drawerWidth = CustomDeviceIsSmall ? 200 : 250;
+  const drawerWidth = CustomDeviceIsSmall() ? 200 : 250;
   
   const openedMixin = (theme) => ({
     width: drawerWidth,
@@ -254,7 +254,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
     return (
         <Suspense
           fallback={
-            <Box height={"90vh"} display={"flex"} justifyContent={"center"}>
+            <Box minHeight={"90vh"} display={"flex"} justifyContent={"center"}>
               <Box display={"flex"} justifyContent={"center"}>
                 <CircularProgress size={20} />
               </Box>
@@ -264,8 +264,8 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
           <Box
            sx={{
             width: "100%",
-            height: "100vh",
-            overflow: "hidden",
+            minHeight: "100%",
+            overflow: "visible",
            }}
           >
             <AppBar position="fixed" open={open}>
@@ -287,6 +287,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                     sx={[
                       {
                         marginRight: 5,
+                        display: { xs: "none", lg: "inline-flex" },
                       },
                       open && { display: "none" },
                     ]}
@@ -353,7 +354,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
             <Drawer
               variant="permanent"
               open={open}
-              sx={{ display: isDrawerPane ? "block" : "none" }}
+              sx={{ display: { xs: "none", lg: isDrawerPane ? "block" : "none" } }}
             >
               <DrawerHeader
                 sx={{
@@ -522,23 +523,37 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
             {/* body of the jobs */}
             <Box
               sx={{
-                width: "100%",
-                height: "calc(100vh - 64px)",
-                overflow: "hidden",
+                minHeight: "calc(100vh - 64px)",
+                width: {
+                  xs: "100%",
+                  lg: isDrawerPane ? `calc(100% - ${open ? drawerWidth : 70}px)` : "100%",
+                },
+                ml: {
+                  xs: 0,
+                  lg: isDrawerPane ? `${open ? drawerWidth : 70}px` : 0,
+                },
+                overflow: "visible",
               }}
             >
               {/* centering the content */}
               <Box
                 sx={{
                   width: "100%",
-                  height: "100%",
-                  overflowY: "auto",
+                  minHeight: "100%",
+                  overflowY: "visible",
                   overflowX: "hidden",
                   display: "grid",
                   gridTemplateColumns: {
                     xs: "1fr",
-                    sm: "repeat(auto-fit, minmax(260px, 1fr))",
-                    md: "repeat(auto-fit, minmax(280px, 1fr))",
+                    sm: open
+                      ? "repeat(auto-fit, minmax(260px, 1fr))"
+                      : "repeat(auto-fit, minmax(280px, 1fr))",
+                    md: open
+                      ? "repeat(auto-fit, minmax(280px, 1fr))"
+                      : "repeat(auto-fit, minmax(320px, 1fr))",
+                    lg: open
+                      ? "repeat(auto-fit, minmax(300px, 1fr))"
+                      : "repeat(auto-fit, minmax(340px, 1fr))",
                   },
                   gap: 2,
                   alignItems: "start",
@@ -595,7 +610,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                       {/* rendered if are no events  */}
                         {courses?.length<1 && (
                           <Box 
-                          height={'70vh'}
+                          minHeight={'70vh'}
                           display={'flex'}
                           justifyContent={'center'}
                           color={'text.secondary'}

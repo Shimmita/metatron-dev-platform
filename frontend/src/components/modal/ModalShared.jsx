@@ -66,7 +66,7 @@ export const HeaderBar = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   background:
     theme.palette.mode === "dark"
-      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${appColors.surfaceDark} 100%)`
+      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${appColors.bgPanel} 100%)`
       : appGradients.primary,
   color: theme.palette.primary.contrastText,
   padding: theme.spacing(1.5, 2, 1.75),
@@ -127,14 +127,16 @@ export const SectionTitle = styled(Typography)(({ theme }) => ({
  * Hides the scrollbar on all engines without losing scroll ability.
  */
 export const ModalBody = styled(Box)({
-  maxHeight: "74vh",
+  maxHeight: "min(74vh, calc(100dvh - 150px))",
   overflowY: "auto",
-  padding: "10px 14px 18px",
-  // hide scrollbar — Chrome/Safari
-  "&::-webkit-scrollbar": { display: "none" },
-  // hide scrollbar — IE/Edge/Firefox
-  msOverflowStyle: "none",
-  scrollbarWidth: "none",
+  padding: "14px 16px 18px",
+  "&::-webkit-scrollbar": { width: 6 },
+  "&::-webkit-scrollbar-thumb": {
+    background: "rgba(148,163,184,0.28)",
+    borderRadius: 999,
+  },
+  scrollbarWidth: "thin",
+  scrollbarColor: "rgba(148,163,184,0.28) transparent",
 });
 
 export const StatusBanner = ({ errorMessage, onDismiss, isUploading }) => {
@@ -270,18 +272,15 @@ export const ModalShell = ({ children, open, sx = {}, ...rest }) => {
 
   // Responsive width
   const width = (() => {
-    if (CustomLandscapeWidest()) return "44%";
-    if (CustomLandScape()) return "48%";
-    if (CustomDeviceTablet() && !isTabSideBar) return "58%";
-    if (CustomDeviceTablet()) return "90%";
-    return "96%";
+    if (CustomLandscapeWidest()) return "min(92vw, 980px)";
+    if (CustomLandScape()) return "min(92vw, 940px)";
+    if (CustomDeviceTablet()) return "calc(100vw - 32px)";
+    return "calc(100vw - 16px)";
   })();
 
   // Sidebar offset on landscape tablet
   const marginLeft = (() => {
-    if (CustomDeviceTablet() && isTabSideBar) return "36%";
-    if (CustomLandScape()) return "-1%";
-    if (CustomLandscapeWidest()) return "0%";
+    if (CustomDeviceTablet() && isTabSideBar) return "0%";
     return undefined;
   })();
 
@@ -289,7 +288,16 @@ export const ModalShell = ({ children, open, sx = {}, ...rest }) => {
     <StyledModal
       keepMounted
       open={open}
-      sx={{ backdropFilter: "blur(6px)", marginLeft, ...sx }}
+      sx={{
+        backdropFilter: "blur(8px)",
+        marginLeft,
+        p: { xs: 1, sm: 2 },
+        "& .MuiBackdrop-root": {
+          background: "rgba(3,7,18,0.72)",
+          backdropFilter: "blur(10px)",
+        },
+        ...sx,
+      }}
       {...rest}
     >
       <Box
@@ -297,14 +305,21 @@ export const ModalShell = ({ children, open, sx = {}, ...rest }) => {
         sx={{
           outline: "none",
           maxWidth: "980px",
-          border: `1px solid ${theme.palette.divider}`,
-          borderRadius: `${theme.shape.borderRadius * 2}px`,
+          maxHeight: { xs: "calc(100dvh - 16px)", sm: "calc(100dvh - 32px)" },
+          display: "flex",
+          flexDirection: "column",
+          border: `1px solid ${theme.palette.mode === "dark" ? appColors.border : "rgba(15,76,129,0.14)"}`,
+          borderRadius: "8px",
           overflow: "hidden",
-          bgcolor: "background.paper",
+          background:
+            theme.palette.mode === "dark"
+              ? "linear-gradient(180deg, rgba(11,18,32,0.98), rgba(5,8,18,0.94))"
+              : "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96))",
+          backdropFilter: "blur(28px)",
           boxShadow:
             theme.palette.mode === "dark"
-              ? "0 24px 56px rgba(0,0,0,0.45)"
-              : "0 20px 48px rgba(15,76,129,0.14)",
+              ? "0 28px 90px rgba(0,0,0,0.62)"
+              : "0 24px 70px rgba(15,76,129,0.18)",
         }}
       >
         {children}

@@ -18,7 +18,6 @@ import { useNavigate } from "react-router-dom";
 import { handleSidebarRightbar } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 import { appColors } from "../../utils/colors";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CoursesContainer from "./CoursesContainer";
 import FeaturedEventsContainer from "./FeaturedEventsContainer";
 import JobsContainer from "./JobsContainer";
@@ -122,21 +121,23 @@ const RightbarAll = () => {
         mt: { sm: 1.5, md: 2 },
         display: {
           xs: "none",
-          sm: CustomDeviceIsSmall() ? "none" : position === 0 ? "block" : "none",
-          md: position === 0 ? "block" : "none",
+          sm: "none",
+          md: "none",
+          lg: isSidebarRighbar && position === 0 ? "block" : "none",
         },
       }}
     >
       <Box
         className="shadow"
         sx={{
-          position: { sm: "sticky", md: "sticky" },
-          top: { sm: 88, md: 88 },
+          position: { lg: "sticky" },
+          top: { lg: 88 },
           alignSelf: "flex-start",
           width: "100%",
         }}
       >
         <Box
+          data-metatron-rail="true"
           sx={{
             border: "1px solid",
             borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : appColors.border,
@@ -148,8 +149,9 @@ const RightbarAll = () => {
             width: "100%",
             background: "rgba(255,255,255,0.04)",
             backdropFilter: "blur(25px)",
-            maxHeight: { sm: "calc(100vh - 104px)", md: "none" },
-            overflowY: { sm: "auto", md: "visible" },
+            maxHeight: "calc(100vh - 104px)",
+            overflowY: "auto",
+            overscrollBehavior: "contain",
             "&::-webkit-scrollbar": {
               display: "none",
             },
@@ -337,19 +339,6 @@ const RightbarAll = () => {
                 ))}
               </Stack>
             </Box>
-
-            {CustomDeviceIsSmall() && currentSection.key === "jobs" && (
-              <Box display={"flex"} justifyContent={"center"} width={"auto"} mt={1}>
-                <Button
-                  startIcon={<InsightsRounded sx={{ color: "#14D2BE", fontSize: 18 }} />}
-                  onClick={() => handleNavigate("/jobs", 1)}
-                  size="small"
-                  sx={{ textTransform: "capitalize", borderRadius: cardRadius }}
-                >
-                  more jobs
-                </Button>
-              </Box>
-            )}
           </Box>
         </Box>
       </Box>

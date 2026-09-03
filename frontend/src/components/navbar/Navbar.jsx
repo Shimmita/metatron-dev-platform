@@ -95,10 +95,13 @@ const LogoContent = styled(Box)({
 // search bar option
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
-  borderRadius: '10px',
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  borderRadius: '8px',
+  backgroundColor: alpha(theme.palette.common.white, 0.08),
+  border: "1px solid rgba(255,255,255,0.12)",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
   '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: alpha(theme.palette.common.white, 0.12),
+    borderColor: "rgba(32,214,199,0.34)",
   },
   marginLeft: 0,
   width: '100%',
@@ -119,9 +122,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     [theme.breakpoints.up('sm')]: {
-      width: '15ch',
+      width: '38ch',
       '&:focus': {
-        width: '20ch',
+        width: '48ch',
       },
     },
   },
@@ -549,13 +552,13 @@ const Navbar = () => {
         position="fixed"
         elevation={0}
         sx={{
-          backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
-          background: "rgba(6,13,24,0.75)",
-          backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(5,8,18,0.82)",
+          backdropFilter: "blur(22px) saturate(160%)",
+          borderBottom: "1px solid rgba(255,255,255,0.10)",
+          boxShadow: "0 12px 40px rgba(0,0,0,0.22)",
         }}>
-        <MetatronToolBar variant="dense">
+        <MetatronToolBar variant="dense" sx={{ minHeight: { xs: 64, md: 74 } }}>
           {/* lg screen toolbar */}
           <LogoContent
             sx={{
@@ -570,16 +573,22 @@ const Navbar = () => {
               display={"flex"}
               alignItems={"center"}
               gap={1}>
-              <Avatar alt="KE"
+              <Avatar alt="Metatron"
                 src={AppLogo}
-                sx={{ width: 50, height: 50 }} />
+                sx={{
+                  width: 42,
+                  height: 42,
+                  border: "1px solid rgba(32,214,199,0.26)",
+                  boxShadow: "0 0 22px rgba(32,214,199,0.16)",
+                }}
+              />
 
-              <Button onClick={handleHome} >
+              <Button onClick={handleHome} sx={{ px: 0.5 }}>
                 <Typography
                   sx={{
-                    fontWeight: 700,
-                    fontSize: 18,
-                    letterSpacing: "0.05em",
+                    fontWeight: 900,
+                    fontSize: 17,
+                    letterSpacing: "0.08em",
                     color: "#F0F4FA",
                   }}
                 >
@@ -662,7 +671,7 @@ const Navbar = () => {
           {/* visible on lap and ++ screens always */}
           {!(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
             <SearchBar sx={{
-              ml: 10
+              ml: { md: 5, lg: 10 },
             }}>
               <Box
                 sx={{
@@ -675,10 +684,10 @@ const Navbar = () => {
                 <form className="d-flex" onSubmit={handleSubmitGlobalSearch}>
                   <Search>
                     <StyledInputBase
-                      placeholder="search…"
+                      placeholder="Search jobs, courses, events, people..."
                       inputProps={{ 'aria-label': 'search' }}
                       sx={{
-                        borderRadius: '20px',
+                        borderRadius: '8px',
                         fontSize: 'small'
                       }}
                       type="text"

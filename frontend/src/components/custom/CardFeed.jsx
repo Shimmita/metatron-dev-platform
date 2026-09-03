@@ -402,7 +402,8 @@ const CardFeed = ({
       sx={{
         mt: 2,
         mb: isLastIndex ? 10 : 4,
-        maxWidth: { xs: "100%", sm: "540px", md: "560px", lg: "580px" },
+        width: "100%",
+        maxWidth: { xs: "100%", lg: "580px", xl: "640px" },
         mx: "auto",
         background: "rgba(255,255,255,0.04)",
         backdropFilter: "blur(25px)",

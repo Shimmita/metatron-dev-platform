@@ -1,6 +1,10 @@
-import { Menu, Person } from "@mui/icons-material";
+import { HomeRounded, Menu, Person } from "@mui/icons-material";
 import { AppBar, Avatar, Box, Button, Divider, IconButton, Toolbar, Tooltip, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { handleIsJobsGlobalResults, handleShowingSpeedDial, handleSidebarRightbar } from "../../redux/AppUI";
+import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 
 // Styled AppBar for smooth transition with the sidebar
 const MetatronBar = styled(AppBar, {
@@ -37,6 +41,17 @@ export default function GlobalAppBar({
   handleShowDarkMode, 
   handleShowingProfileDrawer 
 }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleNavigateHome = () => {
+    dispatch(updateCurrentBottomNav(0));
+    dispatch(handleSidebarRightbar(true));
+    dispatch(handleShowingSpeedDial(true));
+    dispatch(handleIsJobsGlobalResults(false));
+    navigate("/explore");
+  };
+
   return (
     <MetatronBar position="fixed" open={open} elevation={0}>
       <Toolbar
@@ -57,6 +72,7 @@ export default function GlobalAppBar({
             sx={{ 
               mr: 2, 
               color: "primary.main",
+              display: { xs: "none", lg: "inline-flex" },
               ...(open && { display: "none" }) 
             }}
           >
@@ -86,7 +102,7 @@ export default function GlobalAppBar({
               WebkitTextFillColor: "transparent",
             }}
           >
-            METATRON
+            METATRON JOBS
           </Typography>
           <Typography
             variant="caption"
@@ -99,12 +115,26 @@ export default function GlobalAppBar({
               mt: -0.5
             }}
           >
-            {textOption || "Job Matrix"}
+            {textOption || "Tech Gig Marketplace"}
           </Typography>
         </Box>
 
         {/* Right Actions: HUD Controls */}
-        <Box display="flex" gap={1.5} alignItems="center">
+        <Box display="flex" gap={1} alignItems="center">
+          <Tooltip title="Back to Home">
+            <IconButton
+              onClick={handleNavigateHome}
+              sx={{
+                border: "1px solid rgba(255,255,255,0.10)",
+                color: "primary.main",
+                width: 38,
+                height: 38,
+                "&:hover": { background: "rgba(20,210,190,0.08)" },
+              }}
+            >
+              <HomeRounded sx={{ fontSize: 20 }} />
+            </IconButton>
+          </Tooltip>
           {isGuest ? (
             <Button
               variant="outlined"

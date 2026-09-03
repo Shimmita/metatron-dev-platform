@@ -58,7 +58,7 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
           );
           return;
         }
-        setErrorMessage(err?.response.data);
+        setErrorMessage(err?.response?.data || "Unable to load network suggestions.");
         setOpenAlertGeneral(true)
       })
       .finally(() => {

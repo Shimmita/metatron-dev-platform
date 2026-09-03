@@ -1,4 +1,4 @@
-import { Close, DoneRounded, SendOutlined } from "@mui/icons-material";
+import { Close, DoneRounded, SendOutlined, SubdirectoryArrowRightRounded } from "@mui/icons-material";
 import { Alert, Badge, Box, Button, CircularProgress, Collapse, IconButton, InputBase, Stack, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
@@ -8,7 +8,6 @@ import ListItemText from "@mui/material/ListItemText";
 import axios from "axios";
 import React, { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
-import devImage from "../../images/dev.jpeg";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import AlertMiniProfileView from "../alerts/AlertMiniProfileView";
 
@@ -79,7 +78,7 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                 return;
               }
       
-              setErrorMessage(err?.response.data);
+              setErrorMessage(err?.response?.data || "Unable to update reply.");
 
               console.log(errorMessage)
             })
@@ -114,7 +113,7 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                 return;
               }
       
-              setErrorMessage(err?.response.data);
+              setErrorMessage(err?.response?.data || "Unable to delete reply.");
 
               console.log(errorMessage)
             })
@@ -132,15 +131,42 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
 
 
   return (
-    <List className="w-100 rounded" sx={{ bgcolor: "background.paper", border:'1px solid', borderColor:'divider', mt:1.5 }}>
-      <ListItem alignItems="flex-start">
+    <List
+      sx={{
+        width: "100%",
+        bgcolor: "transparent",
+        mt: 0.35,
+        ml: { xs: 0, sm: 1 },
+        p: 0,
+      }}
+    >
+      <ListItem
+        alignItems="flex-start"
+        sx={{
+          borderLeft: "2px solid rgba(32,214,199,0.20)",
+          borderBottom: "1px solid rgba(255,255,255,0.055)",
+          background: "transparent",
+          px: { xs: 0.75, sm: 1 },
+          py: 1,
+          "&:hover": {
+            background: "rgba(255,255,255,0.02)",
+          },
+        }}
+      >
+        <Box sx={{ color: "primary.main", mr: 1, mt: 0.8, display: { xs: "none", sm: "flex" } }}>
+          <SubdirectoryArrowRightRounded sx={{ fontSize: 17 }} />
+        </Box>
         <ListItemAvatar
           onClick={handleMiniProfileView}
          >
           <Avatar
             alt=""
-            src={devImage}
-            sx={{ width: 31, height: 31 }}
+            src={commenter?.avatar}
+            sx={{
+              width: 31,
+              height: 31,
+              border: "1px solid rgba(32,214,199,0.20)",
+            }}
           />
         </ListItemAvatar>
         <ListItemText
@@ -150,21 +176,25 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
               justifyContent={"space-between"}
               alignItems={"center"}
             >
-              <Typography variant={"body2"} component={'span'}  sx={{ color: "text.primary" }}>
+              <Typography variant={"body2"} component={'span'} fontWeight={900} sx={{ color: "text.primary" }}>
                 {commenter?.name}
 
                 {isCurrentUserComment && (
                     <Typography
                     ml={1}
                     variant={"caption"}
-                    sx={{ color: "text.secondary", fontSize:'x-small' }}
+                    sx={{
+                      color: "primary.main",
+                      fontSize:'x-small',
+                      fontWeight: 800,
+                    }}
                   >
                   {"(You)"}
                   </Typography>
                   )}
               </Typography>
 
-              <Typography variant={"caption"}>
+              <Typography variant={"caption"} color="text.secondary">
                 {getElapsedTime(commenter?.createdAt)}
               </Typography>
             </Box>
@@ -172,13 +202,8 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
           secondary={
             <Box>
               <Box>
-                <Typography
-                  variant={"caption"}
-                  color={"text.secondary"}
-                  display={"flex"}
-                  alignItems={"center"}
-                >
-                  {commenter?.title} | {commenter?.country}
+                <Typography variant={"caption"} color={"text.secondary"} display={"block"}>
+                  {[commenter?.title, commenter?.country].filter(Boolean).join(" | ")}
                 </Typography>
               </Box>
 
@@ -186,7 +211,7 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                 <Typography
                   variant={"body2"}
                   component={'span'}
-                  sx={{ color: "text.primary", fontSize:'small' }}
+                  sx={{ color: "text.primary", fontSize:'small', lineHeight: 1.75 }}
                 >
                   {commenter?.minimessage}
 
@@ -206,10 +231,10 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
               {isCurrentUserComment && (
                 <React.Fragment>
                 {/* edit button */}
-                <Button onClick={handleEditing} variant={isEditing ? 'outlined':'text'} size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>edit</Button>
+                <Button onClick={handleEditing} variant={isEditing ? 'outlined':'text'} size={'small'} sx={{ borderRadius:"8px", textTransform:'capitalize', fontSize:"x-small" }}>edit</Button>
 
                 {/* delete button */}
-                <Button disabled={isDeleteComment} onClick={handleDeleteComment} variant="text" color="warning" size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>delete</Button>
+                <Button disabled={isDeleteComment} onClick={handleDeleteComment} variant="text" color="warning" size={'small'} sx={{ borderRadius:"8px", textTransform:'capitalize', fontSize:"x-small" }}>delete</Button>
 
                 </React.Fragment>
               )}
@@ -225,9 +250,12 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                               width={"100%"}
                               p={1}
                               mt={1}
-                              bgcolor={"background.default"}
-                              className={'rounded'}
-                              sx={{ border:'1px solid', borderColor:'divider' }}
+                              sx={{
+                                borderRadius: "8px",
+                                border:'1px solid',
+                                borderColor:'divider',
+                                background: "rgba(255,255,255,0.045)",
+                              }}
                             >
                               {/* input for reply */}
                               <Box width={"100%"}>
@@ -238,7 +266,7 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                                   maxRows={2}
                                   disabled={isUploading}
                                   className="w-100"
-                                  placeholder={" edit text ..."}
+                                  placeholder={"Edit your reply..."}
                                   sx={{
                                     fontSize: "small",
                                   }}
@@ -274,7 +302,11 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                  <Collapse in={isDeleteComment || false}>
                  <Alert
                    severity="info"
-                   className="rounded"
+                   sx={{
+                    borderRadius: "8px",
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                   }}
                    action={
                      <Stack direction={"row"} alignItems={"center"} gap={1}>
                        {/* yes btn */}

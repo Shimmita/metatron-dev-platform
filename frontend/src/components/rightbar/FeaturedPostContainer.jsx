@@ -62,7 +62,7 @@ export default function FeaturedPostContainer() {
           );
           return;
         }
-        setErrorMessage(err?.response.data);
+        setErrorMessage(err?.response?.data || "Unable to load featured posts.");
         setOpenAlertGeneral(true)
       })
       .finally(() => {

@@ -1,4 +1,4 @@
-import { Close, DoneRounded, SendOutlined } from "@mui/icons-material";
+import { Close, DoneRounded, ReplyRounded, SendOutlined } from "@mui/icons-material";
 import { Alert, Badge, Box, Button, CircularProgress, Collapse, IconButton, InputBase, Stack, Typography } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
@@ -101,7 +101,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
               return;
             }
     
-            setErrorMessage(err?.response.data);
+            setErrorMessage(err?.response?.data || "Unable to send reply.");
 
           })
           .finally(() => {
@@ -141,7 +141,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 return;
               }
       
-              setErrorMessage(err?.response.data);
+              setErrorMessage(err?.response?.data || "Unable to update comment.");
 
               console.log(errorMessage)
             })
@@ -175,7 +175,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 return;
               }
       
-              setErrorMessage(err?.response.data);
+              setErrorMessage(err?.response?.data || "Unable to delete comment.");
 
               console.log(errorMessage)
             })
@@ -216,7 +216,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 return;
               }
       
-              setErrorMessage(err?.response.data);
+              setErrorMessage(err?.response?.data || "Unable to load replies.");
 
               console.log(errorMessage)
             })
@@ -232,17 +232,35 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
     }, []);
 
   return (
-    <List 
-    className="w-100 rounded" 
-    sx={{ bgcolor: "background.paper", 
-    borderBottom:'1px solid', 
-    borderColor:'divider' }}>
-      <ListItem alignItems="flex-start">
+    <List
+      sx={{
+        width: "100%",
+        bgcolor: "transparent",
+        p: 0,
+      }}
+    >
+      <ListItem
+        alignItems="flex-start"
+        sx={{
+          borderBottom: "1px solid rgba(255,255,255,0.075)",
+          background: "transparent",
+          alignItems: "flex-start",
+          px: { xs: 0.75, sm: 1 },
+          py: 1.4,
+          "&:hover": {
+            background: "rgba(255,255,255,0.025)",
+          },
+        }}
+      >
         <ListItemAvatar onClick={handleMiniProfileView}>
           <Avatar
             alt=""
             src={commenter?.avatar}
-            sx={{ width: 32, height: 32 }}
+            sx={{
+              width: 36,
+              height: 36,
+              border: "1px solid rgba(32,214,199,0.18)",
+            }}
           />
         </ListItemAvatar>
         <ListItemText
@@ -252,29 +270,33 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
               justifyContent={"space-between"}
               alignItems={"center"}
             >
-              <Typography 
-              variant={"body2"}
-              component={'span'}
-              alignItems={"center"}
-
-              
+              <Typography
+                variant={"body2"}
+                component={'span'}
+                alignItems={"center"}
+                fontWeight={900}
               >
                 {commenter?.name}  
                 {isCurrentUserComment && (
                   <Typography
                   ml={1}
                   variant={"caption"}
-                  sx={{ color: "text.secondary", fontSize:'x-small' }}
+                  sx={{
+                    color: "primary.main",
+                    fontSize:'x-small',
+                    fontWeight: 800,
+                  }}
                 >
                 {"(You)"}
                 </Typography>
                 )}
               </Typography>
 
-              <Typography 
+              <Typography
               variant={"caption"}
-              sx={{ 
-                fontSize:'x-small'
+              sx={{
+                fontSize:'x-small',
+                color: "text.secondary",
                }}
               >
                 {getElapsedTime(commenter?.createdAt)}
@@ -284,22 +306,8 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
           secondary={
             <Box>
               <Box>
-                <Typography
-                  variant={"caption"}
-                  color={"text.secondary"}
-                  display={"flex"}
-                  alignItems={"center"}
-                >
-                  {commenter?.title} 
-                </Typography>
-
-                <Typography
-                  variant={"caption"}
-                  color={"text.secondary"}
-                  display={"flex"}
-                  alignItems={"center"}
-                >
-                 {commenter?.country} | {commenter?.county}
+                <Typography variant={"caption"} color={"text.secondary"} display={"block"}>
+                  {[commenter?.title, commenter?.country, commenter?.county].filter(Boolean).join(" | ")}
                 </Typography>
                 
               </Box>
@@ -308,7 +316,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 <Typography
                   variant={"body2"}
                   component={'span'}
-                  sx={{ color: "text.primary", fontSize:'small' }}
+                  sx={{ color: "text.primary", fontSize:'small', lineHeight: 1.75 }}
                 >
                   {commenter?.minimessage}
 
@@ -328,7 +336,9 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
               display={'flex'} 
               alignItems={'center'} 
               gap={1} 
-              mt={1}>
+              mt={1}
+              flexWrap="wrap"
+              >
               {isCurrentUserComment ? (
                 <React.Fragment>
                 {/* edit button */}
@@ -336,7 +346,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 onClick={handleEditing} 
                 variant={isEditing ? 'outlined':'text'} 
                 size={'small'} 
-                sx={{ borderRadius:3, 
+                sx={{ borderRadius:"8px", 
                 textTransform:'capitalize', 
                 fontSize:"x-small" }}>
                   edit
@@ -349,18 +359,18 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 variant="text" 
                 color="warning" 
                 size={'small'} 
-                sx={{ borderRadius:3, 
+                sx={{ borderRadius:"8px", 
                 textTransform:'capitalize', 
                 fontSize:"x-small" }}>delete</Button>
                 {/* view replies button, only shown if the comment got at-least a comment */}
-                {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>{commenter?.replyCount} replied</Button>}
+                {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={{ borderRadius:"8px", textTransform:'capitalize', fontSize:"x-small" }}>{commenter?.replyCount} replied</Button>}
                 </React.Fragment>
               ):(
                 <React.Fragment>
                 {/* reply button */}
-               <Button onClick={handleShowReplyInput} variant={isOpenReply ? 'outlined':'text'} size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>reply</Button>
+               <Button startIcon={<ReplyRounded sx={{ fontSize: 14 }} />} onClick={handleShowReplyInput} variant={isOpenReply ? 'outlined':'text'} size={'small'} sx={{ borderRadius:"8px", textTransform:'capitalize', fontSize:"x-small" }}>reply</Button>
                {/* view replies button, only shown if the comment got at-least a comment */}
-               {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={{ borderRadius:3, textTransform:'capitalize', fontSize:"x-small" }}>{commenter?.replyCount} replied</Button>
+               {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={{ borderRadius:"8px", textTransform:'capitalize', fontSize:"x-small" }}>{commenter?.replyCount} replied</Button>
               
               }
                 </React.Fragment>
@@ -375,9 +385,12 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 width={"100%"}
                 p={1}
                 mt={1}
-                bgcolor={"background.default"}
-                className={'rounded'}
-                sx={{ border:'1px solid', borderColor:'divider' }}
+                sx={{
+                  borderRadius: "8px",
+                  border:'1px solid',
+                  borderColor:'divider',
+                  background: "rgba(255,255,255,0.045)",
+                }}
               >
                 {/* input for reply */}
                 <Box width={"100%"}>
@@ -388,7 +401,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                     maxRows={2}
                     disabled={isUploading}
                     className="w-100"
-                    placeholder={`${isOpenReply ? 'reply text':'edit text'} ...`}
+                    placeholder={isOpenReply ? "Write a focused reply..." : "Edit your comment..."}
                     sx={{
                       fontSize: "small",
                     }}
@@ -418,12 +431,16 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
 
               {/* delete alert when activated */}
               {isDeleteComment && (
-                <Box mt={1}>
+                <Box mt={1} maxWidth={360}>
 
                  <Collapse in={isDeleteComment || false}>
                  <Alert
                    severity="info"
-                   className="rounded"
+                   sx={{
+                    borderRadius: "8px",
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                   }}
                    action={
                      <Stack direction={"row"} alignItems={"center"} gap={1}>
                        {/* yes btn */}
