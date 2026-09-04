@@ -36,6 +36,7 @@ import CustomLandScape from "../../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../../utilities/CustomLandscapeWidest";
 import { getImageMatch } from "../../utilities/getImageMatch";
 import { updateCurrentSuccessRedux } from "../../../redux/CurrentSuccess";
+import { ModalWorkflowSteps } from "../ModalShared";
 const LogoutAlert = lazy(() => import("../../alerts/LogoutAlert"));
 
 // styled modal
@@ -322,6 +323,24 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
       return "calc(100vw - 16px)"
     }
 
+    const updateWorkflowSteps = [
+      { label: "Role", helper: "Title, organisation, and specialisation" },
+      { label: "Access", helper: "Job type, work mode, and documents" },
+      { label: "Criteria", helper: "Skills, seniority, and experience" },
+      { label: "Profile", helper: "Organisation summary and applicant guidance" },
+      { label: "Update", helper: "Review changes and publish" },
+    ];
+    const updateStepChecks = [
+      Boolean(jobTitle && organisationName && category),
+      Boolean(jobType.type && jobType.access && jobMainDoc),
+      Boolean(jobMainSkill.length > 0 && jobEntryType && jobExperience),
+      Boolean(posterAbout && requirementsQual.length > 0 && description.length > 0),
+      Boolean(jobTitle && category && organisationName),
+    ];
+    const updateActiveStepIndex = updateStepChecks.findIndex((isReady) => !isReady);
+    const updateActiveStep =
+      updateActiveStepIndex === -1 ? updateWorkflowSteps.length - 1 : updateActiveStepIndex;
+
 
   return (
     <StyledModalJob
@@ -445,6 +464,14 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
               )
             )}
           </Box>
+
+          <ModalWorkflowSteps
+            steps={updateWorkflowSteps.map((step, index) => ({
+              ...step,
+              completed: updateStepChecks[index],
+            }))}
+            activeStep={updateActiveStep}
+          />
 
           <Box
             maxHeight={"calc(100dvh - 150px)"}

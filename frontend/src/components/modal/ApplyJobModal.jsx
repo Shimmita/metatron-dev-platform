@@ -27,6 +27,7 @@ import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import CustomCountryName from "../utilities/CustomCountryName";
 import { getImageMatch } from "../utilities/getImageMatch";
+import { ModalWorkflowSteps } from "./ModalShared";
 import './Progress.css';
 // styled modal
 const StyledModalJob = styled(Modal)({
@@ -359,6 +360,19 @@ const ApplyJobModal = ({
     </Box>
   );
 
+  const applyWorkflowSteps = [
+    { label: "Review", helper: "Role, company, compensation, and work mode", completed: Boolean(title && organisation?.name) },
+    { label: "Match", helper: "Skill fit and geographic eligibility", completed: Boolean(isEligible) },
+    { label: "Credentials", helper: websiteLink === "" ? "Attach or confirm your CV" : "Continue through employer portal", completed: Boolean(websiteLink || cvUpload || user?.cvLink) },
+    { label: "Submit", helper: "Send application for recruiter review", completed: false },
+  ];
+  const applyActiveStep = !isEligible
+    ? 1
+    : websiteLink !== ""
+    ? 2
+    : cvUpload || user?.cvLink
+    ? 3
+    : 2;
 
 
   return (
@@ -438,10 +452,15 @@ const ApplyJobModal = ({
                 <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, color: '#14D2BE' }}>{tag}</Typography>
               </Box>
             ))}
-          </Stack>
-        </Box>
+	          </Stack>
+	        </Box>
 
-        {/* ─── SCROLLABLE INTELLIGENCE ─── */}
+          <ModalWorkflowSteps
+            steps={applyWorkflowSteps}
+            activeStep={applyActiveStep}
+          />
+
+	        {/* ─── SCROLLABLE INTELLIGENCE ─── */}
         <Box
           sx={{
             flex: 1,

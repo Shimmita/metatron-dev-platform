@@ -78,6 +78,14 @@ const ConversationDetailed = ({
 
   /* determine the name and avatar for the top bar (the other participant) */
   const handleTopBarNameAvatar = () => {
+    if (focusedConveration?.adminThread) {
+      const isAdminViewer = `${currentUserID}` === `${focusedConveration?.adminUserId}`;
+      return [
+        isAdminViewer ? `TO: ${focusedConveration?.targetName}` : "FROM: Admin",
+        isAdminViewer ? focusedConveration?.targetAvatar : focusedConveration?.senderAvatar,
+      ];
+    }
+
     if (
       currentUserName?.toLowerCase() ===
       focusedConveration?.senderName?.toLowerCase()
@@ -91,6 +99,15 @@ const ConversationDetailed = ({
       `FROM: ${focusedConveration?.senderName}`,
       focusedConveration?.senderAvatar,
     ];
+  };
+
+  const handleMessageAuthorLabel = (message, isOwnMessage) => {
+    if (isOwnMessage) return "You";
+    if (focusedConveration?.adminThread) {
+      const isAdminViewer = `${currentUserID}` === `${focusedConveration?.adminUserId}`;
+      return isAdminViewer ? focusedConveration?.targetName?.split(" ")[0] : "Admin";
+    }
+    return focusedConveration?.senderName?.split(" ")[0];
   };
 
   axios.defaults.withCredentials = true;
@@ -285,7 +302,7 @@ const ConversationDetailed = ({
                     </Typography>
                     <Box mt={0.9} display="flex" gap={0.8} alignItems="center" justifyContent="flex-end" flexWrap="wrap">
                       <Typography variant="caption" sx={{ color: "text.secondary", textTransform: "capitalize" }}>
-                        {isOwnMessage ? "You" : focusedConveration?.senderName?.split(" ")[0]}
+                        {handleMessageAuthorLabel(message, isOwnMessage)}
                       </Typography>
                       {message?.isEdited && (
                         <Typography variant="caption" sx={{ color: "text.secondary" }}>

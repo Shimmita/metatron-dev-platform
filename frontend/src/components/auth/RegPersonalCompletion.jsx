@@ -33,6 +33,69 @@ const AlertProfileCompletion = lazy(() =>
 );
 const RegisterAlertTitle = lazy(() => import("./RegisterAlertTitle"));
 
+const C = {
+  bg: "#050812",
+  card: "rgba(255,255,255,0.055)",
+  border: "rgba(255,255,255,0.1)",
+  teal: "#14D2BE",
+  text: "#F5F8FF",
+  muted: "rgba(245,248,255,0.58)",
+};
+
+const completionFieldSx = {
+  width: { xs: "100%", sm: "82%", md: "76%" },
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "8px",
+    background: "rgba(255,255,255,0.04)",
+  },
+};
+
+const CompletionProgress = ({ showNext, basicsReady, profileReady }) => (
+  <Box
+    sx={{
+      width: "100%",
+      maxWidth: 620,
+      mx: "auto",
+      mb: 3,
+      p: 1.25,
+      borderRadius: "8px",
+      border: `1px solid ${C.border}`,
+      background: "rgba(255,255,255,0.035)",
+    }}
+  >
+    <Box display="grid" gridTemplateColumns="repeat(3, minmax(0, 1fr))" gap={0.75}>
+      {[
+        ["Identity", basicsReady],
+        ["Career Profile", profileReady],
+        ["Verification", false],
+      ].map(([label, ready], index) => {
+        const active = showNext ? index === 1 : index === 0;
+        return (
+          <Box
+            key={label}
+            sx={{
+              borderRadius: "8px",
+              border: "1px solid",
+              borderColor: active ? "rgba(20,210,190,0.42)" : C.border,
+              background: ready ? "rgba(34,197,94,0.09)" : active ? "rgba(20,210,190,0.1)" : "transparent",
+              px: 1,
+              py: 0.75,
+              minHeight: 50,
+            }}
+          >
+            <Typography sx={{ color: active ? C.teal : C.muted, fontSize: 10, fontWeight: 900 }}>
+              {index + 1}. {label}
+            </Typography>
+            <Typography sx={{ color: ready ? "#22C55E" : C.muted, fontSize: 10 }}>
+              {ready ? "Ready" : active ? "In progress" : "Pending"}
+            </Typography>
+          </Box>
+        );
+      })}
+    </Box>
+  </Box>
+);
+
 const RegPersonalCompletion = () => {
   // redux to check when user signs with a provider
   const { username, email, token } = useSelector((state) => state.signUser);
@@ -66,6 +129,8 @@ const RegPersonalCompletion = () => {
 
   // control showing of the next and previous input detail
   const [showNext, setShowNext] = useState(false);
+  const basicsReady = Boolean(name && emailuser && phone && gender && county);
+  const profileReady = Boolean(educationLevel && eduInstitution && specialisationTitle && selectedSkills.length > 0);
 
   const handleChange = (event, newValue) => {
     if (newValue.length > 5) {
@@ -213,19 +278,29 @@ const RegPersonalCompletion = () => {
 
   return (
     <Box
-      height={"100vh"}
-      className={"container"}
+      minHeight={"100vh"}
       display={"flex"}
       justifyContent={"center"}
       alignItems={"center"}
-      sx={{ opacity: openAlertProfile ? ".5" : undefined }}
+      sx={{
+        opacity: openAlertProfile ? ".5" : undefined,
+        background: "linear-gradient(180deg, #050812 0%, #08111F 52%, #0B1220 100%)",
+        px: { xs: 1.25, sm: 2 },
+        py: 4,
+      }}
     >
       <Box
-        className={isDarkMode ? "rounded-4" : "shadow-lg rounded-4"}
-        border={isDarkMode ? "1px solid gray" : "none"}
+        className={isDarkMode ? "" : "shadow-lg"}
         width={"100%"}
-        height={CustomDeviceSmallest() ? "95vh" : undefined}
+        maxWidth={720}
+        maxHeight={CustomDeviceSmallest() ? "95vh" : "calc(100vh - 48px)"}
         sx={{
+          borderRadius: "8px",
+          border: `1px solid ${C.border}`,
+          background: C.card,
+          backdropFilter: "blur(28px)",
+          boxShadow: "0 24px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07)",
+          p: { xs: 2, sm: 3 },
           overflow: "auto",
           // Hide scrollbar for Chrome, Safari and Opera
           "&::-webkit-scrollbar": {
@@ -249,7 +324,7 @@ const RegPersonalCompletion = () => {
               gutterBottom
               color={"primary"}
             >
-              Metatron Foundation
+              Complete Your Metatron Profile
             </Typography>
 
             <Typography
@@ -264,7 +339,7 @@ const RegPersonalCompletion = () => {
               justifyContent={"center"}
             >
               <StarRounded sx={{ width: 20, height: 20 }} />
-              The Best IT Platform{" "}
+              Provider signup detected{" "}
               <StarRounded sx={{ width: 20, height: 20 }} />
             </Typography>
 
@@ -280,11 +355,17 @@ const RegPersonalCompletion = () => {
                 variant={CustomDeviceSmallest() ? "caption" : "body2"}
                 color={"text.secondary"}
               >
-                Personal Account Signup
+                Career profile onboarding
               </Typography>
               <WorkRounded color="primary" sx={{ width: 17, height: 17 }} />
             </Box>
           </Box>
+
+          <CompletionProgress
+            showNext={showNext}
+            basicsReady={basicsReady}
+            profileReady={profileReady}
+          />
 
           <Box
             display={"flex"}
@@ -302,7 +383,7 @@ const RegPersonalCompletion = () => {
                     id="name"
                     label="Name"
                     disabled={name?.trim() !== ""}
-                    className="w-75"
+                    sx={completionFieldSx}
                     onChange={(e) => setName(e.target.value.toUpperCase())}
                     value={name}
                     placeholder="Shirengo Michael"
@@ -316,7 +397,7 @@ const RegPersonalCompletion = () => {
                     label="Email"
                     display={"flex"}
                     justifyContent={"center"}
-                    className="w-75"
+                    sx={completionFieldSx}
                     disabled={email?.trim() !== ""}
                     value={emailuser}
                     onChange={(e) => setEmailUser(e.target.value.toLowerCase())}
@@ -329,7 +410,7 @@ const RegPersonalCompletion = () => {
                     required
                     id="phone"
                     label="Phone"
-                    className="w-75"
+                    sx={completionFieldSx}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+254xyz"
@@ -343,7 +424,7 @@ const RegPersonalCompletion = () => {
                     id="gender"
                     value={gender}
                     label="Gender"
-                    className="w-75"
+                    sx={completionFieldSx}
                     onChange={(e) => setGender(e.target.value)}
                   >
                     {GenderData &&
@@ -364,7 +445,7 @@ const RegPersonalCompletion = () => {
                       id="county"
                       value={county}
                       label="County"
-                      className="w-75"
+                      sx={completionFieldSx}
                       onChange={(e) => setCounty(e.target.value)}
                     >
                       {CountiesInKenya &&
@@ -381,7 +462,7 @@ const RegPersonalCompletion = () => {
                       required
                       id="county_other"
                       label="City or State"
-                      className="w-75"
+                      sx={completionFieldSx}
                       value={county}
                       onChange={(e) => setCounty(e.target.value)}
                       placeholder="my city or state"
@@ -400,7 +481,7 @@ const RegPersonalCompletion = () => {
                     id="educationLevel"
                     value={educationLevel}
                     label="Education Level"
-                    className="w-75"
+                    sx={completionFieldSx}
                     onChange={(e) => setEducationLevel(e.target.value)}
                   >
                     {EducationLevel &&
@@ -417,7 +498,7 @@ const RegPersonalCompletion = () => {
                   <Box display={"flex"} justifyContent={"center"}>
                     <Autocomplete
                       value={eduInstitution}
-                      className="w-75"
+                      sx={completionFieldSx}
                       onChange={(event, newValue) => {
                         setEduInstitution(newValue);
                       }}
@@ -464,7 +545,7 @@ const RegPersonalCompletion = () => {
                       required
                       id="institution-other"
                       label="Institution"
-                      className="w-75"
+                      sx={completionFieldSx}
                       value={eduInstitution}
                       onChange={(e) => setEduInstitution(e.target.value)}
                       placeholder="Education Instistution"
@@ -479,7 +560,7 @@ const RegPersonalCompletion = () => {
                     id="preferred title"
                     value={specialisationTitle}
                     label="Preferred Title"
-                    className="w-75"
+                    sx={completionFieldSx}
                     onChange={(e) => setSpecialisationTitle(e.target.value)}
                   >
                     {SpecialisationJobs &&
@@ -501,7 +582,7 @@ const RegPersonalCompletion = () => {
                     value={selectedSkills}
                     onChange={handleChange}
                     disableCloseOnSelect
-                    className="w-75"
+                    sx={completionFieldSx}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -525,7 +606,7 @@ const RegPersonalCompletion = () => {
             )}
 
             <Box display={"flex"} justifyContent={"center"}>
-              <Box className={"w-75"}>
+              <Box sx={{ width: { xs: "100%", sm: "82%", md: "76%" } }}>
                 {/* prev content toggle */}
                 {showNext && (
                   <Box>
@@ -566,8 +647,7 @@ const RegPersonalCompletion = () => {
                 <React.Fragment>
                   <Button
                     variant="contained"
-                    className="w-25"
-                    sx={{ borderRadius: "20px" }}
+                    sx={{ borderRadius: "8px", width: { xs: "100%", sm: 180 }, py: 1.1, fontWeight: 900, textTransform: "none" }}
                     disableElevation
                     onClick={handleShowNext}
                     type="submit"
@@ -579,8 +659,7 @@ const RegPersonalCompletion = () => {
                 <React.Fragment>
                   <Button
                     variant="contained"
-                    className="w-25"
-                    sx={{ borderRadius: "20px" }}
+                    sx={{ borderRadius: "8px", width: { xs: "100%", sm: 180 }, py: 1.1, fontWeight: 900, textTransform: "none" }}
                     disableElevation
                     disabled={openAlertProfile}
                     onClick={handleUserRegistration}

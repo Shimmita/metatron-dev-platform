@@ -52,12 +52,12 @@ import SubsectionJob from "../data/SubsectionJobs";
 import BrowserCompress from "../utilities/BrowserCompress";
 import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import { getImageMatch } from "../utilities/getImageMatch";
 import {
   ModalBody,
   ModalHeader,
   ModalShell,
+  ModalWorkflowSteps,
   SectionCard,
   SectionTitle,
   StatusBanner,
@@ -342,6 +342,24 @@ const PostJobModal = ({
     </Box>
   );
 
+  const jobWorkflowSteps = [
+    { label: "Company", helper: "Organisation, role title, and specialisation" },
+    { label: "Access", helper: "Job type, work mode, and brand logo" },
+    { label: "Criteria", helper: "Skills, documents, seniority, and compensation" },
+    { label: "Market", helper: "Location, applicant access, and company profile" },
+    { label: "Content", helper: "Qualifications and job description" },
+  ];
+  const jobStepChecks = [
+    Boolean(organisationName && jobTitle && category),
+    Boolean(jobType.type && jobType.access),
+    Boolean(jobMainSkill.length > 0 && jobMainDoc && jobSalary && jobEntryType && jobExperience),
+    Boolean(county && country && posterAbout.length > 20),
+    Boolean(requirementsQual.length > 0 && description.length > 0),
+  ];
+  const jobActiveStepIndex = jobStepChecks.findIndex((isReady) => !isReady);
+  const normalizedJobActiveStep =
+    jobActiveStepIndex === -1 ? jobWorkflowSteps.length - 1 : jobActiveStepIndex;
+
   // ── render ──────────────────────────────────────────────────────────────────
 
   return (
@@ -359,6 +377,14 @@ const PostJobModal = ({
         errorMessage={errorMessage}
         onDismiss={() => setErrorMessage("")}
         isUploading={isUploading}
+      />
+
+      <ModalWorkflowSteps
+        steps={jobWorkflowSteps.map((step, index) => ({
+          ...step,
+          completed: jobStepChecks[index],
+        }))}
+        activeStep={normalizedJobActiveStep}
       />
 
       {/* ── Scrollable content ── */}

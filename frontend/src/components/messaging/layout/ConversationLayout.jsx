@@ -18,12 +18,20 @@ export default function ConversationLayout({
   
   // ─── DATA RESOLVERS ───
   const { partnerName, partnerAvatar } = useMemo(() => {
+    if (conversation?.adminThread) {
+      const isAdminViewer = `${currentUserID}` === `${conversation?.adminUserId}`;
+      return {
+        partnerName: isAdminViewer ? conversation?.targetName : "Admin",
+        partnerAvatar: isAdminViewer ? conversation?.targetAvatar : conversation?.senderAvatar
+      };
+    }
+
     const isCurrentUserSender = currentUserName?.toLowerCase() === conversation?.senderName?.toLowerCase();
     return {
       partnerName: isCurrentUserSender ? conversation?.targetName : conversation?.senderName,
       partnerAvatar: isCurrentUserSender ? conversation?.targetAvatar : conversation?.senderAvatar
     };
-  }, [currentUserName, conversation]);
+  }, [currentUserID, currentUserName, conversation]);
 
   const isUnread = currentUserID !== conversation?.lastSenderId && !conversation?.isTargetRead;
 

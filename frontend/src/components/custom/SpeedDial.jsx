@@ -1,5 +1,5 @@
-import { LockRounded, PostAddRounded, SchoolRounded, TvRounded, Work } from "@mui/icons-material";
-import { Typography } from "@mui/material";
+import { LockRounded, PostAddRounded, SchoolRounded, ShieldRounded, TvRounded, Work } from "@mui/icons-material";
+import { Fab, Tooltip, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import SpeedDial from "@mui/material/SpeedDial";
 import SpeedDialAction from "@mui/material/SpeedDialAction";
@@ -11,6 +11,7 @@ import EventsAddModal from "../modal/EventsAddModal";
 import PostCourseModal from "../modal/PostCourseModal";
 import PostJobModal from "../modal/PostJobModal";
 import PostTechModal from "../modal/PostTechModal";
+import AdminControlPanel from "../admin/AdminControlPanel";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
@@ -59,12 +60,14 @@ export default function BasicSpeedDial() {
   const [openModalJob, setOpenModalJob] = React.useState(false);
   const [openModalCourse, setOpenModalCourse] = React.useState(false);
   const [openModalEvent, setOpenModalEvent] = React.useState(false);
+  const [openAdminPanel, setOpenAdminPanel] = React.useState(false);
 
   // redux states access
   const { isLoadingPostLaunch } = useSelector(
     (state) => state.appUI
   );
-  const { isGuest } = useSelector((state) => state.currentUser);
+  const { user, isGuest } = useSelector((state) => state.currentUser);
+  const isAdmin = !isGuest && user?.role === "admin";
 
   const [visible, setVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -94,10 +97,38 @@ export default function BasicSpeedDial() {
       sx={{
         transform: "translateZ(0px)",
         flexGrow: 1,
+        position: "relative",
+        width: 64,
+        height: isAdmin ? 136 : 64,
         visibility: isLoadingPostLaunch ? "hidden" : "visible",
 
       }}
     >
+      {isAdmin && (
+        <Tooltip title={<Typography p={1} fontWeight="bold" variant="body2">Admin Panel</Typography>} placement="left">
+          <Fab
+            color="primary"
+            aria-label="Admin Panel"
+            onClick={() => setOpenAdminPanel(true)}
+            sx={{
+              position: "absolute",
+              bottom: 74,
+              right: CustomDeviceSmallest() ? 5 : CustomDeviceTablet() ? 7 : 12,
+              width: 56,
+              height: 56,
+              background: "linear-gradient(135deg, #20D6C7, #3B82F6)",
+              color: "#ffffff",
+              boxShadow: "0 18px 40px rgba(32,214,199,0.28)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #0F9F91, #2563EB)",
+              },
+            }}
+          >
+            <ShieldRounded />
+          </Fab>
+        </Tooltip>
+      )}
+
       {isGuest ? (
         <SpeedDial
           ariaLabel="SpeedDial"
@@ -209,6 +240,13 @@ export default function BasicSpeedDial() {
           openModalEventAdd={openModalEvent}
           setOpenModalEventAdd={setOpenModalEvent}
         />}
+
+      {isAdmin && (
+        <AdminControlPanel
+          open={openAdminPanel}
+          onClose={() => setOpenAdminPanel(false)}
+        />
+      )}
     </Box>
   );
 }

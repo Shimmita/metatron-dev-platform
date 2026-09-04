@@ -173,6 +173,103 @@ export const StatusBanner = ({ errorMessage, onDismiss, isUploading }) => {
   );
 };
 
+export const ModalWorkflowSteps = ({ steps = [], activeStep = 0 }) => {
+  const theme = useTheme();
+  if (!steps.length) return null;
+
+  const completedCount = steps.filter((step, index) => step.completed ?? index < activeStep).length;
+  const progress = Math.min(100, Math.max(8, (completedCount / steps.length) * 100 || ((activeStep + 1) / steps.length) * 100));
+
+  return (
+    <Box
+      sx={{
+        px: { xs: 1.5, sm: 2 },
+        py: 1.25,
+        borderBottom: "1px solid",
+        borderColor: theme.palette.mode === "dark" ? appColors.divider : "rgba(15,76,129,0.1)",
+        background:
+          theme.palette.mode === "dark"
+            ? "rgba(255,255,255,0.025)"
+            : "rgba(255,255,255,0.64)",
+      }}
+    >
+      <Box display="flex" justifyContent="space-between" alignItems="center" gap={1} mb={1}>
+        <Typography variant="caption" color="text.secondary" fontWeight={800}>
+          Step {Math.min(activeStep + 1, steps.length)} of {steps.length}
+        </Typography>
+        <Typography variant="caption" color="primary.main" fontWeight={900}>
+          {completedCount}/{steps.length} ready
+        </Typography>
+      </Box>
+
+      <Box
+        sx={{
+          height: 4,
+          borderRadius: 8,
+          background: theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(15,76,129,0.1)",
+          overflow: "hidden",
+          mb: 1.25,
+        }}
+      >
+        <Box
+          sx={{
+            width: `${progress}%`,
+            height: "100%",
+            borderRadius: 8,
+            background: appGradients.primary,
+            transition: "width 220ms ease",
+          }}
+        />
+      </Box>
+
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", md: `repeat(${Math.min(steps.length, 4)}, minmax(0, 1fr))` },
+          gap: 0.75,
+        }}
+      >
+        {steps.map((step, index) => {
+          const isDone = step.completed ?? index < activeStep;
+          const isActive = index === activeStep && !isDone;
+
+          return (
+            <Box
+              key={step.label}
+              sx={{
+                borderRadius: "8px",
+                border: "1px solid",
+                borderColor: isActive
+                  ? "rgba(32,214,199,0.44)"
+                  : theme.palette.mode === "dark"
+                  ? appColors.divider
+                  : "rgba(15,76,129,0.1)",
+                background: isActive
+                  ? "rgba(32,214,199,0.1)"
+                  : isDone
+                  ? "rgba(34,197,94,0.08)"
+                  : "transparent",
+                px: 1,
+                py: 0.8,
+                minHeight: 58,
+              }}
+            >
+              <Typography variant="caption" color={isActive ? "primary.main" : "text.secondary"} fontWeight={900}>
+                {index + 1}. {step.label}
+              </Typography>
+              {step.helper && (
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ lineHeight: 1.35 }}>
+                  {step.helper}
+                </Typography>
+              )}
+            </Box>
+          );
+        })}
+      </Box>
+    </Box>
+  );
+};
+
 // ─── Standard header ──────────────────────────────────────────────────────────
 
 /**

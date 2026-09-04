@@ -30,6 +30,7 @@ import AppLogo from "../../images/logo_sm.png";
 import { updateCurrentEvents } from "../../redux/CurrentEvents";
 import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
 import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
+import { appColors, appGradients } from "../../utils/colors";
 import AllCountries from "../data/AllCountries";
 import AllSkills from "../data/AllSkillsData";
 import SpecialisationTech from "../data/SpecialisationTech";
@@ -37,6 +38,7 @@ import CourseIcon from "../utilities/CourseIcon";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
+import { ModalWorkflowSteps } from "./ModalShared";
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 
 // styled modal
@@ -60,8 +62,8 @@ const HeaderBar = styled(Box)(({ theme }) => ({
   gap: theme.spacing(2),
   background:
     theme.palette.mode === "dark"
-      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.background.default} 100%)`
-      : "linear-gradient(135deg, rgba(15,76,129,0.92) 0%, rgba(255,255,255,0.96) 100%)",
+      ? `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${appColors.bgPanel} 100%)`
+      : appGradients.primary,
   color: theme.palette.primary.contrastText,
   padding: theme.spacing(1.5, 2, 1.75),
   flexWrap: "wrap",
@@ -73,14 +75,21 @@ const HeaderBar = styled(Box)(({ theme }) => ({
 }));
 
 const SectionCard = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: 0,
-  padding: theme.spacing(2),
-  marginBottom: theme.spacing(2),
+  background:
+    theme.palette.mode === "dark"
+      ? "linear-gradient(180deg, rgba(15,23,42,0.98), rgba(15,23,42,0.88))"
+      : "linear-gradient(180deg, #FFFFFF 0%, #F8FBFF 100%)",
+  border: `1px solid ${
+    theme.palette.mode === "dark"
+      ? "rgba(255,255,255,0.08)"
+      : "rgba(15,76,129,0.12)"
+  }`,
+  borderRadius: "8px",
+  padding: theme.spacing(2.25),
+  marginBottom: theme.spacing(1.2),
   boxShadow: theme.palette.mode === 'dark'
-    ? '0 2px 8px rgba(0,0,0,0.15)'
-    : '0 2px 8px rgba(0,0,0,0.08)',
+    ? '0 18px 34px rgba(0,0,0,0.18)'
+    : '0 14px 30px rgba(15,76,129,0.08)',
 }));
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
@@ -332,7 +341,23 @@ const EventsAddModal = ({
       return "calc(100vw - 16px)"
     }
 
- 
+    const eventWorkflowSteps = [
+      { label: "Identity", helper: "Title and technical category" },
+      { label: "Schedule", helper: "Meeting link, date, and timezone context" },
+      { label: "Audience", helper: "Location and skills explored" },
+      { label: "Agenda", helper: "Topics and concise event description" },
+      { label: "Publish", helper: "Review and share with the community" },
+    ];
+    const eventStepChecks = [
+      Boolean(title && category),
+      Boolean(eventLink && eventDate),
+      Boolean(country && county && skills.length > 0),
+      Boolean(topicsRequirement.length >= 4 && about.length > 20 && about.length <= MAX_ABOUT),
+      Boolean(title && category && eventLink && country && county && topicsRequirement.length >= 4),
+    ];
+    const eventActiveStepIndex = eventStepChecks.findIndex((isReady) => !isReady);
+    const eventActiveStep =
+      eventActiveStepIndex === -1 ? eventWorkflowSteps.length - 1 : eventActiveStepIndex;
 
   return (
     <StyledModalEvent
@@ -452,6 +477,14 @@ const EventsAddModal = ({
               )
             )}
           </Box>
+
+          <ModalWorkflowSteps
+            steps={eventWorkflowSteps.map((step, index) => ({
+              ...step,
+              completed: eventStepChecks[index],
+            }))}
+            activeStep={eventActiveStep}
+          />
 
           <Box
             maxHeight={"calc(100dvh - 150px)"}

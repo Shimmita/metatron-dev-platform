@@ -8,8 +8,6 @@ import {
   Box,
   Button,
   MenuItem,
-  Modal,
-  styled,
   TextField,
   Typography,
 } from "@mui/material";
@@ -28,22 +26,13 @@ import {
   ModalBody,
   ModalHeader,
   ModalShell,
+  ModalWorkflowSteps,
   SectionCard,
   SectionTitle,
   StatusBanner,
   StyledInput,
 } from "./ModalShared";
 import VideoPreviewComponent from "./VideoPreviewComponent";
-
-
-// styled modal
-const StyledModalPost = styled(Modal)({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-});
-
-
 
 // array for image names and values
 const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
@@ -423,6 +412,24 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
     }
   };
 
+  const courseWorkflowSteps = [
+    { label: "Overview", helper: "Title and learner-facing description" },
+    { label: "Stack", helper: "Specialisation and technical focus" },
+    { label: "Brand", helper: "Course icon or logo treatment" },
+    { label: "Lectures", helper: "Sequential video lessons" },
+    { label: "Publish", helper: "Review readiness and submit" },
+  ];
+  const courseStepChecks = [
+    Boolean(title && description.length > 40 && description.length <= MAX_DESCRIPTION),
+    Boolean(postCategory && (!postCategory.includes("Zero") || other)),
+    Boolean(previewImage || freeLogo || imageUpload),
+    Boolean(videoFiles.length >= 3),
+    Boolean(videoFiles.length >= 3 && title && postCategory && description.length <= MAX_DESCRIPTION),
+  ];
+  const courseActiveStepIndex = courseStepChecks.findIndex((isReady) => !isReady);
+  const courseActiveStep =
+    courseActiveStepIndex === -1 ? courseWorkflowSteps.length - 1 : courseActiveStepIndex;
+
   return (
     <ModalShell
       open={openModalCourse}
@@ -443,6 +450,13 @@ const PostCourseModal = ({ openModalCourse, setOpenModalCourse }) => {
         isUploading={isUploading}
       />
 
+      <ModalWorkflowSteps
+        steps={courseWorkflowSteps.map((step, index) => ({
+          ...step,
+          completed: courseStepChecks[index],
+        }))}
+        activeStep={courseActiveStep}
+      />
 
       <ModalBody>
         <Box display={"flex"} flexDirection={"column"} gap={3}>

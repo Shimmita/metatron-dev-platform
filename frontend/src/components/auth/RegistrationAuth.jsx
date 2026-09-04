@@ -18,12 +18,12 @@ import {
   InputLabel,
   MenuItem,
   OutlinedInput,
+  Stack,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
 import React, { lazy, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 import AlertCountry from "../alerts/AlertCountry";
@@ -198,6 +198,114 @@ const AccountToggle = ({ account, setAccount, AccountVersion }) => (
   </Box>
 );
 
+const OnboardingInsightPanel = () => (
+  <Box
+    sx={{
+      display: { xs: "none", md: "flex" },
+      flexDirection: "column",
+      justifyContent: "space-between",
+      minHeight: 620,
+      p: 4,
+      borderRadius: "8px",
+      border: `1px solid ${C.border}`,
+      background: "linear-gradient(180deg, rgba(20,210,190,0.08), rgba(15,76,129,0.08), rgba(255,255,255,0.035))",
+      backdropFilter: "blur(28px)",
+      boxShadow: "0 24px 80px rgba(0,0,0,0.35)",
+    }}
+  >
+    <Box>
+      <Typography sx={{ fontSize: 11, letterSpacing: "0.2em", color: C.teal, textTransform: "uppercase", fontWeight: 900 }}>
+        Metatron Dev Network
+      </Typography>
+      <Typography sx={{ mt: 1.5, fontSize: 34, lineHeight: 1.08, color: C.textPri, fontWeight: 900 }}>
+        Build a profile that can win real tech opportunities.
+      </Typography>
+      <Typography sx={{ mt: 2, fontSize: 14, lineHeight: 1.8, color: C.textSec }}>
+        Create a career-ready identity for gigs, events, courses, mentorship, and technical content discovery.
+      </Typography>
+    </Box>
+
+    <Stack spacing={1.25}>
+      {[
+        ["Verified profile", "Your details shape how recruiters and peers discover you."],
+        ["Skill signal", "Selected tools help match you with relevant gigs and courses."],
+        ["Career workspace", "Move from signup into a dashboard built for consistent growth."],
+      ].map(([title, body]) => (
+        <Box
+          key={title}
+          sx={{
+            borderRadius: "8px",
+            border: `1px solid ${C.border}`,
+            background: "rgba(255,255,255,0.045)",
+            p: 1.5,
+          }}
+        >
+          <Typography sx={{ fontSize: 13, fontWeight: 900, color: C.textPri }}>
+            {title}
+          </Typography>
+          <Typography sx={{ mt: 0.35, fontSize: 12, color: C.textSec, lineHeight: 1.55 }}>
+            {body}
+          </Typography>
+        </Box>
+      ))}
+    </Stack>
+  </Box>
+);
+
+const RegistrationProgress = ({ showNext, basicsReady, profileReady, isPersonal }) => {
+  const rows = [
+    { label: "Credentials", ready: basicsReady },
+    { label: isPersonal ? "Career Profile" : "Organisation Profile", ready: profileReady },
+    { label: "Verification", ready: false },
+  ];
+
+  return (
+    <Box
+      sx={{
+        border: `1px solid ${C.border}`,
+        borderRadius: "8px",
+        p: 1.25,
+        mb: 3,
+        background: "rgba(255,255,255,0.035)",
+      }}
+    >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+        <Typography sx={{ color: C.textSec, fontSize: 11, fontWeight: 800 }}>
+          Registration progress
+        </Typography>
+        <Typography sx={{ color: C.teal, fontSize: 11, fontWeight: 900 }}>
+          {showNext ? "Profile setup" : "Account setup"}
+        </Typography>
+      </Box>
+      <Box display="grid" gridTemplateColumns="repeat(3, minmax(0, 1fr))" gap={0.75}>
+        {rows.map((row, index) => {
+          const active = showNext ? index === 1 : index === 0;
+          return (
+            <Box
+              key={row.label}
+              sx={{
+                borderRadius: "8px",
+                border: `1px solid ${active ? "rgba(20,210,190,0.42)" : C.border}`,
+                background: row.ready ? "rgba(34,197,94,0.09)" : active ? "rgba(20,210,190,0.1)" : "transparent",
+                px: 0.8,
+                py: 0.75,
+                minHeight: 52,
+              }}
+            >
+              <Typography sx={{ color: active ? C.teal : C.textSec, fontSize: 10, fontWeight: 900 }}>
+                {index + 1}. {row.label}
+              </Typography>
+              <Typography sx={{ color: row.ready ? "#22C55E" : C.textHint, fontSize: 10 }}>
+                {row.ready ? "Ready" : active ? "In progress" : "Pending"}
+              </Typography>
+            </Box>
+          );
+        })}
+      </Box>
+    </Box>
+  );
+};
+
 /* ═══════════════════════════════════════════════════════════════════════
    Main component
 ═══════════════════════════════════════════════════════════════════════ */
@@ -230,7 +338,10 @@ const RegistrationAuth = () => {
 
   const isPersonal = account === "Personal";
 
-  const { currentMode } = useSelector((s) => s.appUI);
+  const basicsReady = Boolean(name && email && phone && password && (!isPersonal || gender));
+  const profileReady = isPersonal
+    ? Boolean(specialisationTitle && selectedSkills.length > 0 && educationLevel && eduInstitution && county)
+    : Boolean(specialisationTitle && about.length > 20 && county);
 
   const handleChange = (_, newValue) => {
     if (newValue.length > 5) return;
@@ -303,12 +414,12 @@ const RegistrationAuth = () => {
       alignItems="center"
       justifyContent="center"
       sx={{
-        background: C.bg,
+        background: "linear-gradient(180deg, #050812 0%, #08111F 52%, #0B1220 100%)",
         position: "relative",
-        overflow: "hidden",
+        overflow: "auto",
         opacity: openAlertProfile ? 0.5 : 1,
         transition: "opacity 0.3s",
-        px: 2,
+        px: { xs: 1.25, sm: 2, md: 3 },
         py: 4,
       }}
     >
@@ -318,18 +429,31 @@ const RegistrationAuth = () => {
       <Orb top="40%"   left="45%"  size={250} color="radial-gradient(circle,rgba(200,169,110,0.1),transparent)" delay="2s" />
       <DotGrid />
 
-      {/* ── Card ── */}
       <Box
         sx={{
           position: "relative",
           zIndex: 1,
           width: "100%",
-          maxWidth: 480,
+          maxWidth: 1040,
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", md: "minmax(320px, 0.92fr) minmax(420px, 1fr)" },
+          gap: { xs: 2, md: 2.5 },
+          alignItems: "stretch",
+        }}
+      >
+        <OnboardingInsightPanel />
+
+        {/* ── Card ── */}
+        <Box
+          sx={{
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
           background: C.bgCard,
           backdropFilter: "blur(30px)",
           border: `1px solid ${C.border}`,
-          borderRadius: "20px",
-          p: { xs: 3, sm: 4 },
+          borderRadius: "8px",
+          p: { xs: 2, sm: 3 },
           boxShadow: "0 24px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07)",
           overflow: "hidden",
           maxHeight: "96vh",
@@ -338,8 +462,8 @@ const RegistrationAuth = () => {
           "&::-webkit-scrollbar": { display: "none" },
           msOverflowStyle: "none",
           scrollbarWidth: "none",
-        }}
-      >
+          }}
+        >
         {/* card inner glow */}
         <Box
           sx={{
@@ -379,6 +503,12 @@ const RegistrationAuth = () => {
 
         {/* ── Step indicator ── */}
         <StepDots current={showNext ? 1 : 0} total={2} />
+        <RegistrationProgress
+          showNext={showNext}
+          basicsReady={basicsReady}
+          profileReady={profileReady}
+          isPersonal={isPersonal}
+        />
 
         {/* ════════════════════════════════
             STEP 1 — Core credentials
@@ -712,6 +842,7 @@ const RegistrationAuth = () => {
             </Box>
           </Typography>
         </Box>
+      </Box>
       </Box>
 
       {/* ── Modals / Alerts ── */}
