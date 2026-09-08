@@ -345,7 +345,15 @@ const ConversationDetailed = ({
             transformOrigin={{ vertical: "top", horizontal: "right" }}
             PaperProps={{
               sx: (theme) => ({
-                ...panelSx(theme),
+                border: `1px solid ${appColors.border}`,
+                background:
+                  theme.palette.mode === "dark"
+                    ? "linear-gradient(180deg, #0B0B0B 0%, #050505 100%)"
+                    : "linear-gradient(180deg, #FFFFFF 0%, #F7F3EA 100%)",
+                boxShadow:
+                  theme.palette.mode === "dark"
+                    ? "0 24px 70px rgba(0,0,0,0.72)"
+                    : "0 22px 55px rgba(20,15,5,0.16)",
                 borderRadius: "8px",
                 mt: 1,
                 overflow: "hidden",

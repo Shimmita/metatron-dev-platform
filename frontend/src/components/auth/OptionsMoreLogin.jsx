@@ -43,7 +43,7 @@ function OptionsMoreLogin({
     <MenuItem
       onClick={onClick}
       sx={{
-        borderRadius: "10px",
+        borderRadius: "8px",
         mx: 1,
         my: 0.5,
         px: 1.5,
@@ -53,7 +53,7 @@ function OptionsMoreLogin({
         gap: 1.5,
         transition: "0.2s ease",
         "&:hover": {
-          background: "rgba(255,255,255,0.08)",
+          background: "rgba(214,178,94,0.12)",
           transform: "translateX(3px)",
         },
       }}
@@ -77,7 +77,7 @@ function OptionsMoreLogin({
       <Divider sx={{ my: 0.5, opacity: 0.3 }} />
 
       <MenuOption
-        icon={<InfoRounded color="success" />}
+        icon={<InfoRounded color="primary" />}
         label="Help Information"
         onClick={handleShowingModalInfo}
       />

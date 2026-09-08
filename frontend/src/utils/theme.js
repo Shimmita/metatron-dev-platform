@@ -174,14 +174,79 @@ const createAppTheme = (mode = "dark") => {
       MuiMenu: {
         styleOverrides: {
           paper: {
-            // Increase opacity slightly (from 0.04 to 0.12 or higher) to block noise
             background: isDark
-              ? "rgba(8, 8, 8, 0.92)" // Solid enough to block background text
-              : "rgba(255, 255, 255, 0.94)",
-            backdropFilter: "blur(20px)", // Heavy blur to diffuse underlying noise
+              ? "linear-gradient(180deg, #0B0B0B 0%, #050505 100%)"
+              : "linear-gradient(180deg, #FFFFFF 0%, #F7F3EA 100%)",
+            backgroundColor: isDark ? "#0B0B0B" : "#FFFFFF",
+            backdropFilter: "none",
             border: `1px solid ${appColors.border}`,
-            boxShadow: "0 18px 60px rgba(0,0,0,0.52)",
+            boxShadow: isDark
+              ? "0 24px 70px rgba(0,0,0,0.72), 0 0 0 1px rgba(214,178,94,0.08)"
+              : "0 22px 55px rgba(20,15,5,0.16)",
             marginTop: "8px",
+            borderRadius: 8,
+            overflow: "hidden",
+            color: isDark ? appColors.textPrimary : "#171717",
+          },
+        },
+      },
+
+      MuiPopover: {
+        styleOverrides: {
+          paper: {
+            background: isDark
+              ? "linear-gradient(180deg, #0B0B0B 0%, #050505 100%)"
+              : "linear-gradient(180deg, #FFFFFF 0%, #F7F3EA 100%)",
+            backgroundColor: isDark ? "#0B0B0B" : "#FFFFFF",
+            backdropFilter: "none",
+            border: `1px solid ${appColors.border}`,
+            boxShadow: isDark
+              ? "0 24px 70px rgba(0,0,0,0.72), 0 0 0 1px rgba(214,178,94,0.08)"
+              : "0 22px 55px rgba(20,15,5,0.16)",
+            borderRadius: 8,
+            color: isDark ? appColors.textPrimary : "#171717",
+          },
+        },
+      },
+
+      MuiAutocomplete: {
+        styleOverrides: {
+          paper: {
+            background: isDark
+              ? "linear-gradient(180deg, #0B0B0B 0%, #050505 100%)"
+              : "linear-gradient(180deg, #FFFFFF 0%, #F7F3EA 100%)",
+            backgroundColor: isDark ? "#0B0B0B" : "#FFFFFF",
+            border: `1px solid ${appColors.border}`,
+            borderRadius: 8,
+            boxShadow: isDark
+              ? "0 24px 70px rgba(0,0,0,0.72)"
+              : "0 22px 55px rgba(20,15,5,0.16)",
+            color: isDark ? appColors.textPrimary : "#171717",
+            overflow: "hidden",
+          },
+          listbox: {
+            padding: 6,
+            background: "transparent",
+            maxHeight: 280,
+            "& .MuiAutocomplete-option": {
+              borderRadius: 8,
+              margin: "3px 0",
+              minHeight: 38,
+              fontSize: "0.825rem",
+              color: isDark ? appColors.textSecondary : "#3A3326",
+              '&[aria-selected="true"]': {
+                background: "rgba(214,178,94,0.20)",
+                color: isDark ? appColors.textPrimary : "#171717",
+              },
+              "&.Mui-focused": {
+                background: "rgba(214,178,94,0.14)",
+                color: isDark ? appColors.textPrimary : "#171717",
+              },
+            },
+          },
+          noOptions: {
+            color: isDark ? appColors.textSecondary : "#3A3326",
+            background: isDark ? "#0B0B0B" : "#FFFFFF",
           },
         },
       },
@@ -199,13 +264,15 @@ const createAppTheme = (mode = "dark") => {
             transition: "all 0.2s ease",
             // Ensure text is high contrast
             color: isDark ? "#F7F3EA" : "#171717",
+            backgroundColor: "transparent",
 
             "&:hover": {
               background: "rgba(214,178,94,0.16)",
-              color: appColors.primarySoft,
+              color: isDark ? appColors.primarySoft : appColors.primaryDark,
             },
             "&.Mui-selected": {
               background: "rgba(214,178,94,0.22)",
+              color: isDark ? appColors.textPrimary : "#171717",
               "&:hover": {
                 background: "rgba(214,178,94,0.28)",
               },

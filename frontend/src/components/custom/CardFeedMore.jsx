@@ -214,11 +214,11 @@ function CardFeedMore({
   return (
     <Box
       sx={{
-        borderRadius: "16px",
-        background: "rgba(255,255,255,0.05)",
-        backdropFilter: "blur(20px)",
-        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: "8px",
+        background: "#0B0B0B",
+        border: "1px solid rgba(214,178,94,0.22)",
         overflow: "hidden",
+        minWidth: 230,
       }}
     >
       {isFriend ? (
@@ -293,9 +293,8 @@ function CardFeedMore({
       <MenuItem onClick={handleAddFavorite} disabled={isFetching}>
         <ListItemText>
           <StarRounded
-            sx={{ width: 26, height: 26 }}
-            color="success"
-            sx={{ mr: 1.2 }}   />
+            color="primary"
+            sx={{ width: 24, height: 24, mr: 1.2 }}   />
         </ListItemText>
         <ListItemText
           sx={{ textTransform: "capitalize" }}
@@ -316,14 +315,13 @@ function CardFeedMore({
 
           {isCopiedStatus ? (
             <DoneRounded
-              sx={{ width: 24, height: 24 }}
-              color='success'
+              sx={{ width: 24, height: 24, mr: 1.2 }}
+              color="primary"
              />
           ) : (
             <LinkRounded
-              sx={{ width: 24, height: 24 }}
-              color='secondary'
-              sx={{ mr: 1.2 }} />
+              color="primary"
+              sx={{ width: 24, height: 24, mr: 1.2 }} />
           )}
 
         </ListItemText>

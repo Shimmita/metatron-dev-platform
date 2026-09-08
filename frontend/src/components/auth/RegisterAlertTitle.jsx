@@ -45,9 +45,11 @@ export default function RegisterAlertTitle({
       PaperProps={{
         sx: {
           borderRadius: "8px",
-          background: "rgba(255,255,255,0.05)",
-          backdropFilter: "blur(30px)",
-          border: "1px solid rgba(255,255,255,0.12)",
+          background: isDarkMode
+            ? "linear-gradient(180deg, #0B0B0B 0%, #050505 100%)"
+            : "linear-gradient(180deg, #FFFFFF 0%, #F7F3EA 100%)",
+          backdropFilter: "none",
+          border: "1px solid rgba(214,178,94,0.22)",
           boxShadow: "0 25px 80px rgba(0,0,0,0.6)",
         },
       }}
@@ -101,7 +103,7 @@ export default function RegisterAlertTitle({
             fullWidth
             variant="outlined"
             onClick={handleDismiss}
-            sx={{ borderRadius: "12px" }}
+            sx={{ borderRadius: "8px" }}
           >
             Cancel
           </Button>
@@ -112,10 +114,10 @@ export default function RegisterAlertTitle({
             disabled={!customTitle.trim()}
             onClick={handleSave}
             sx={{
-              borderRadius: "12px",
+              borderRadius: "8px",
               background:
                 "linear-gradient(135deg,#8B6F2A,#D6B25E)",
-              color: "#fff",
+              color: "#080808",
             }}
           >
             Save

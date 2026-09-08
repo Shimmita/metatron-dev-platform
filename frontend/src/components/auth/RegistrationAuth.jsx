@@ -61,34 +61,15 @@ const C = {
   danger:      "#FF6B6B",
 };
 
-/* ─── Ambient orb ─────────────────────────────────────────────────── */
-const Orb = ({ top, left, right, bottom, size, color, delay = "0s" }) => (
-  <Box
-    sx={{
-      position: "absolute",
-      top, left, right, bottom,
-      width: size, height: size,
-      borderRadius: "50%",
-      background: color,
-      filter: "blur(90px)",
-      opacity: 0.4,
-      animation: `orbPulse 9s ease-in-out ${delay} infinite`,
-      pointerEvents: "none",
-      "@keyframes orbPulse": {
-        "0%,100%": { transform: "scale(1)", opacity: 0.4 },
-        "50%":     { transform: "scale(1.15)", opacity: 0.6 },
-      },
-    }}
-  />
-);
-
 /* ─── Dot-grid backdrop ─────────────────────────────────────────────── */
 const DotGrid = () => (
   <Box
     sx={{
       position: "absolute", inset: 0,
-      backgroundImage: "radial-gradient(circle, rgba(214,178,94,0.1) 1px, transparent 1px)",
+      backgroundImage:
+        "linear-gradient(rgba(214,178,94,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(214,178,94,0.06) 1px, transparent 1px)",
       backgroundSize: "28px 28px",
+      maskImage: "linear-gradient(180deg, rgba(0,0,0,0.85), transparent 85%)",
       pointerEvents: "none",
     }}
   />
@@ -117,7 +98,7 @@ const inputSx = {
   "& .MuiOutlinedInput-root": {
     color: C.textPri,
     background: C.bgInput,
-    borderRadius: "10px",
+    borderRadius: "8px",
     transition: "box-shadow 0.25s",
     "& fieldset": { borderColor: C.border, borderWidth: "1px" },
     "&:hover fieldset": { borderColor: "rgba(255,255,255,0.2)" },
@@ -163,7 +144,7 @@ const AccountToggle = ({ account, setAccount, AccountVersion }) => (
     sx={{
       background: "rgba(255,255,255,0.04)",
       border: `1px solid ${C.border}`,
-      borderRadius: "12px",
+      borderRadius: "8px",
       p: "4px",
       mb: 3,
     }}
@@ -175,7 +156,7 @@ const AccountToggle = ({ account, setAccount, AccountVersion }) => (
         sx={{
           flex: 1,
           py: 1,
-          borderRadius: "9px",
+          borderRadius: "8px",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
@@ -218,18 +199,18 @@ const OnboardingInsightPanel = () => (
         Metatron Dev Network
       </Typography>
       <Typography sx={{ mt: 1.5, fontSize: 34, lineHeight: 1.08, color: C.textPri, fontWeight: 900 }}>
-        Build a profile that can win real tech opportunities.
+        Create your command profile for real tech opportunities.
       </Typography>
       <Typography sx={{ mt: 2, fontSize: 14, lineHeight: 1.8, color: C.textSec }}>
-        Create a career-ready identity for gigs, events, courses, mentorship, and technical content discovery.
+        Set up a professional identity that powers gig discovery, course matching, event access, networking, and technical content.
       </Typography>
     </Box>
 
     <Stack spacing={1.25}>
       {[
         ["Verified profile", "Your details shape how recruiters and peers discover you."],
-        ["Skill signal", "Selected tools help match you with relevant gigs and courses."],
-        ["Career workspace", "Move from signup into a dashboard built for consistent growth."],
+        ["Skill intelligence", "Selected tools help match you with relevant gigs, learning paths, and events."],
+        ["Career workspace", "Move from signup into a dashboard built for practical growth and proof of work."],
       ].map(([title, body]) => (
         <Box
           key={title}
@@ -423,20 +404,25 @@ const RegistrationAuth = () => {
         py: 4,
       }}
     >
-      {/* Ambient orbs */}
-      <Orb top="-8%"   left="-6%"  size={480} color="radial-gradient(circle,rgba(214,178,94,0.3),transparent)" delay="0s" />
-      <Orb bottom="-6%" right="-4%" size={360} color="radial-gradient(circle,rgba(139,111,42,0.45),transparent)" delay="4s" />
-      <Orb top="40%"   left="45%"  size={250} color="radial-gradient(circle,rgba(200,169,110,0.1),transparent)" delay="2s" />
       <DotGrid />
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle at 18% 0%, rgba(214,178,94,0.16), transparent 34%), linear-gradient(135deg, rgba(255,255,255,0.05), transparent 42%)",
+          pointerEvents: "none",
+        }}
+      />
 
       <Box
         sx={{
           position: "relative",
           zIndex: 1,
           width: "100%",
-          maxWidth: 1040,
+          maxWidth: 1120,
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", md: "minmax(320px, 0.92fr) minmax(420px, 1fr)" },
+          gridTemplateColumns: { xs: "1fr", md: "minmax(320px, 0.86fr) minmax(460px, 1fr)" },
           gap: { xs: 2, md: 2.5 },
           alignItems: "stretch",
         }}
@@ -449,14 +435,14 @@ const RegistrationAuth = () => {
           position: "relative",
           zIndex: 1,
           width: "100%",
-          background: C.bgCard,
-          backdropFilter: "blur(30px)",
+          background: "linear-gradient(180deg, rgba(13,13,13,0.98), rgba(5,5,5,0.96))",
+          backdropFilter: "blur(24px)",
           border: `1px solid ${C.border}`,
           borderRadius: "8px",
           p: { xs: 2, sm: 3 },
           boxShadow: "0 24px 80px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.07)",
           overflow: "hidden",
-          maxHeight: "96vh",
+          maxHeight: { xs: "none", md: "96vh" },
           overflowY: "auto",
           /* Hide scrollbar */
           "&::-webkit-scrollbar": { display: "none" },
@@ -464,12 +450,15 @@ const RegistrationAuth = () => {
           scrollbarWidth: "none",
           }}
         >
-        {/* card inner glow */}
+        {/* card inner accent */}
         <Box
           sx={{
-            position: "absolute", top: -60, left: -60,
-            width: 200, height: 200, borderRadius: "50%",
-            background: `radial-gradient(circle, ${C.tealDim}, transparent 70%)`,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            background: "linear-gradient(90deg, #8B6F2A, #D6B25E, #FFF2C2)",
             pointerEvents: "none",
           }}
         />
@@ -486,15 +475,16 @@ const RegistrationAuth = () => {
 
           <Typography
             sx={{
-              fontFamily: "'Playfair Display', 'Georgia', serif",
-              fontWeight: 700, fontSize: CustomDeviceSmallest() ? 20 : 24,
-              color: C.textPri, letterSpacing: "0.02em",
+              fontWeight: 900,
+              fontSize: CustomDeviceSmallest() ? 20 : 26,
+              color: C.textPri,
+              letterSpacing: 0,
             }}
           >
-            Join Metatron
+            Join Metatron Dev
           </Typography>
           <Typography sx={{ fontSize: 12, color: C.textSec, mt: 0.5 }}>
-            Build your developer profile today
+            Build a verified technology profile in two focused steps.
           </Typography>
         </Box>
 
@@ -557,10 +547,9 @@ const RegistrationAuth = () => {
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 sx={inputSx}
-                SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0B0B0B", border: `1px solid ${C.border}` } } } }}
               >
                 {GenderData?.map((g) => (
-                  <MenuItem key={g} value={g} sx={{ color: C.textSec, "&:hover": { color: C.textPri } }}>{g}</MenuItem>
+                  <MenuItem key={g} value={g}>{g}</MenuItem>
                 ))}
               </TextField>
             )}
@@ -604,10 +593,10 @@ const RegistrationAuth = () => {
               value={specialisationTitle}
               onChange={(e) => setSpecialisationTitle(e.target.value)}
               sx={inputSx}
-              SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0B0B0B", border: `1px solid ${C.border}`, maxHeight: 260 } } } }}
+              SelectProps={{ MenuProps: { PaperProps: { sx: { maxHeight: 280 } } } }}
             >
               {(isPersonal ? SpecialisationJobs : OrgSpecializations)?.map((t) => (
-                <MenuItem key={t} value={t} sx={{ color: C.textSec, "&:hover": { color: C.textPri } }}>{t}</MenuItem>
+                <MenuItem key={t} value={t}>{t}</MenuItem>
               ))}
             </TextField>
 
@@ -622,10 +611,9 @@ const RegistrationAuth = () => {
                   value={educationLevel}
                   onChange={(e) => setEducationLevel(e.target.value)}
                   sx={inputSx}
-                  SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0B0B0B", border: `1px solid ${C.border}` } } } }}
                 >
                   {EducationLevel?.map((l) => (
-                    <MenuItem key={l} value={l} sx={{ color: C.textSec, "&:hover": { color: C.textPri } }}>{l}</MenuItem>
+                    <MenuItem key={l} value={l}>{l}</MenuItem>
                   ))}
                 </TextField>
 
@@ -640,7 +628,14 @@ const RegistrationAuth = () => {
                     freeSolo
                     sx={inputSx}
                     renderInput={(p) => <TextField {...p} label="Institution" variant="outlined" fullWidth />}
-                    renderOption={(p, o) => <li key={o} {...p} style={{ color: C.textSec }}>{o}</li>}
+                    renderOption={(props, option) => {
+                      const { key, ...optionProps } = props;
+                      return (
+                        <li key={key} {...optionProps} style={{ ...props.style, color: C.textSec }}>
+                          {option}
+                        </li>
+                      );
+                    }}
                     renderTags={() =>
                       eduInstitution ? (
                         <Chip label={eduInstitution} onDelete={handleDeleteInstitution} deleteIcon={<CheckCircle />} sx={chipSx} />
@@ -655,11 +650,6 @@ const RegistrationAuth = () => {
                         clickable
                       />
                     }
-                    PaperComponent={({ children }) => (
-                      <Box sx={{ background: "#0B0B0B", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
-                        {children}
-                      </Box>
-                    )}
                   />
                 ) : (
                   <TextField
@@ -694,21 +684,19 @@ const RegistrationAuth = () => {
                     />
                   )}
                   renderTags={(v, getTagProps) =>
-                    v.map((skill, i) => (
+                    v.map((skill, i) => {
+                      const { key, ...tagProps } = getTagProps({ index: i });
+                      return (
                       <Chip
+                        key={key}
                         label={skill}
-                        {...getTagProps({ index: i })}
+                        {...tagProps}
                         onDelete={() => handleDelete(skill)}
-                        key={i}
                         sx={chipSx}
                       />
-                    ))
+                      );
+                    })
                   }
-                  PaperComponent={({ children }) => (
-                    <Box sx={{ background: "#0B0B0B", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
-                      {children}
-                    </Box>
-                  )}
                 />
               </>
             )}
@@ -724,7 +712,14 @@ const RegistrationAuth = () => {
                 freeSolo
                 sx={inputSx}
                 renderInput={(p) => <TextField {...p} label="County, City or State" variant="outlined" fullWidth />}
-                renderOption={(p, o) => <li {...p} style={{ color: C.textSec }}>{o}</li>}
+                renderOption={(props, option) => {
+                  const { key, ...optionProps } = props;
+                  return (
+                    <li key={key} {...optionProps} style={{ ...props.style, color: C.textSec }}>
+                      {option}
+                    </li>
+                  );
+                }}
                 renderTags={() =>
                   county ? (
                     <Chip label={county} onDelete={handleDeleteCounty} deleteIcon={<CheckCircle />} sx={chipSx} />
@@ -739,11 +734,6 @@ const RegistrationAuth = () => {
                     clickable
                   />
                 }
-                PaperComponent={({ children }) => (
-                  <Box sx={{ background: "#0B0B0B", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
-                    {children}
-                  </Box>
-                )}
               />
             ) : (
               <TextField
@@ -809,7 +799,7 @@ const RegistrationAuth = () => {
               endIcon={!showNext ? <ArrowForwardIosRounded sx={{ width: 13, height: 13 }} /> : null}
               sx={{
                 py: 1.5,
-                borderRadius: "10px",
+                borderRadius: "8px",
                 fontWeight: 600,
                 fontSize: 14,
                 letterSpacing: "0.04em",
