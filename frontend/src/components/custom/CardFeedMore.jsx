@@ -231,7 +231,7 @@ function CardFeedMore({
             primary={<Typography
               fontSize={13}
               sx={{
-                color: "rgba(240,244,250,0.85)",
+                color: "rgba(255,253,247,0.85)",
                 fontWeight: 500,
               }}
             >{owner_post}</Typography>}
@@ -246,7 +246,7 @@ function CardFeedMore({
               mr: 1.2,
 
               ".MuiMenuItem-root:hover &": {
-                color: "#14D2BE",
+                color: "#D6B25E",
               }
             }}  />
           </ListItemText>
@@ -255,7 +255,7 @@ function CardFeedMore({
             primary={<Typography
               fontSize={13}
               sx={{
-                color: "rgba(240,244,250,0.85)",
+                color: "rgba(255,253,247,0.85)",
                 fontWeight: 500,
               }}
             >{owner_post}</Typography>}
@@ -272,7 +272,7 @@ function CardFeedMore({
               mr: 1.2,
 
             ".MuiMenuItem-root:hover &": {
-              color: "#14D2BE",
+              color: "#D6B25E",
             }
           }} />
         </ListItemText>
@@ -281,7 +281,7 @@ function CardFeedMore({
           primary={<Typography
             fontSize={13}
             sx={{
-              color: "rgba(240,244,250,0.85)",
+              color: "rgba(255,253,247,0.85)",
               fontWeight: 500,
             }}
           >{owner_post}</Typography>}
@@ -302,7 +302,7 @@ function CardFeedMore({
           primary={<Typography
             fontSize={13}
             sx={{
-              color: "rgba(240,244,250,0.85)",
+              color: "rgba(255,253,247,0.85)",
               fontWeight: 500,
             }}
           >Add to Favorites</Typography>}
@@ -332,7 +332,7 @@ function CardFeedMore({
           primary={<Typography
             fontSize={13}
             sx={{
-              color: "rgba(240,244,250,0.85)",
+              color: "rgba(255,253,247,0.85)",
               fontWeight: 500,
             }}
           >
@@ -352,7 +352,7 @@ function CardFeedMore({
           primary={<Typography
             fontSize={13}
             sx={{
-              color: "rgba(240,244,250,0.85)",
+              color: "rgba(255,253,247,0.85)",
               fontWeight: 500,
             }}
           >Report this Post</Typography>}

@@ -9,9 +9,8 @@ import React from "react";
 export default function RightBarStepper({
   corouselCounter,
   setCorouselCounter,
+  maxStep = 4,
 }) {
-  const maxStep = 4;
-
   const handleNext = () => {
     setCorouselCounter((prevActiveStep) => prevActiveStep + 1);
   };

@@ -72,8 +72,8 @@ export default function StepperStats({ dataInsights }) {
                   transition: "all 0.25s ease",
 
                   "&:hover": {
-                    background: "rgba(20,210,190,0.06)",
-                    borderColor: "rgba(20,210,190,0.3)",
+                    background: "rgba(214,178,94,0.06)",
+                    borderColor: "rgba(214,178,94,0.3)",
                   },
                 }}
               >
@@ -86,8 +86,8 @@ export default function StepperStats({ dataInsights }) {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    background: "rgba(20,210,190,0.1)",
-                    boxShadow: "0 0 10px rgba(20,210,190,0.2)",
+                    background: "rgba(214,178,94,0.1)",
+                    boxShadow: "0 0 10px rgba(214,178,94,0.2)",
                     flexShrink: 0,
                   }}
                 >
@@ -99,7 +99,7 @@ export default function StepperStats({ dataInsights }) {
                   <Typography
                     fontSize={13}
                     fontWeight={600}
-                    color="#F0F4FA"
+                    color="#FFFDF7"
                     mb={0.3}
                   >
                     {insight.title}
@@ -108,7 +108,7 @@ export default function StepperStats({ dataInsights }) {
                   <Typography
                     fontSize={11.5}
                     sx={{
-                      color: "rgba(240,244,250,0.6)",
+                      color: "rgba(255,253,247,0.6)",
                       lineHeight: 1.5,
                     }}
                   >

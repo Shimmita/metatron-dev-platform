@@ -9,6 +9,16 @@ import {
 } from "@mui/material";
 import React from "react";
 
+const toDisplayMessage = (value, fallback = "Something went wrong. Please try again.") => {
+  if (!value) return fallback;
+  if (typeof value === "string") return value;
+  if (value instanceof Error) return value.message || fallback;
+  if (typeof value === "object") {
+    return value.message || value.error || value.detail || fallback;
+  }
+  return String(value);
+};
+
 export default function AlertGeneral({
   openAlertGeneral,
   setOpenAlertGeneral,
@@ -18,18 +28,21 @@ export default function AlertGeneral({
   setErrorMessage,
   isError = false,
 }) {
+  const displayTitle = toDisplayMessage(title, isError ? "Something went wrong" : "Notice");
+  const displayMessage = toDisplayMessage(message);
+
   const handleClose = () => {
     if (isError) {
-      setErrorMessage("");
-      setOpenAlertGeneral(false);
+      setErrorMessage?.("");
+      setOpenAlertGeneral?.(false);
     } else {
-      setOpenAlertGeneral(false);
+      setOpenAlertGeneral?.(false);
     }
   };
 
   return (
     <Dialog
-      open={openAlertGeneral}
+      open={Boolean(openAlertGeneral)}
       onClose={handleClose}
       closeAfterTransition
       slots={{ backdrop: Backdrop }}
@@ -76,8 +89,8 @@ export default function AlertGeneral({
               borderRadius: "10px",
               background: isError
                 ? "rgba(255,100,100,0.15)"
-                : "rgba(20,210,190,0.15)",
-              color: isError ? "#EF4444" : "#14D2BE",
+                : "rgba(214,178,94,0.15)",
+              color: isError ? "#EF4444" : "#D6B25E",
             }}
           >
             {defaultIcon}
@@ -86,9 +99,9 @@ export default function AlertGeneral({
           <Typography
             fontSize={14}
             fontWeight={600}
-            sx={{ color: "#F0F4FA" }}
+            sx={{ color: "#FFFDF7" }}
           >
-            {title}
+            {displayTitle}
           </Typography>
         </Box>
 
@@ -102,11 +115,11 @@ export default function AlertGeneral({
           <Typography
             fontSize={13}
             sx={{
-              color: "rgba(240,244,250,0.7)",
+              color: "rgba(255,253,247,0.7)",
               lineHeight: 1.6,
             }}
           >
-            {message}
+            {displayMessage}
           </Typography>
         </DialogContent>
 
@@ -122,12 +135,12 @@ export default function AlertGeneral({
             sx={{
               borderRadius: "10px",
               px: 2,
-              background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
               color: "#fff",
               fontSize: 12,
 
               "&:hover": {
-                background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+                background: "linear-gradient(135deg,#8B6F2A,#FFF2C2)",
               },
             }}
           >

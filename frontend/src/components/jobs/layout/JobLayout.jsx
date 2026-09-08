@@ -16,6 +16,7 @@ import {
   Box,
   Button,
   Card,
+  Chip,
   CircularProgress,
   Divider,
   IconButton,
@@ -29,8 +30,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentJobs } from "../../../redux/CurrentJobs";
 import ApplyJobModal from "../../modal/ApplyJobModal";
 import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import CustomDeviceSmallest from "../../utilities/CustomDeviceSmallest";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
 const MAX_APPLICANTS = 500;
@@ -54,9 +53,12 @@ function JobLayout_2({
 
   const isMyJob = user?.email === job?.my_email;
   const websiteLink = job?.website?.trim();
-  const mandatorySkills = [...job?.skills];
+  const mandatorySkills = Array.isArray(job?.skills) ? job.skills : [];
   const isDeactivated = job?.status === "inactive";
   const isMaxApplicants = job?.applicants?.total === MAX_APPLICANTS;
+  const handleGuestApply = () => {
+    setErrorMessage?.("access denied, please login to continue with your request!");
+  };
 
   const handleDateDisplay = () => {
     const parent = job?.createdAt?.split("T")[0]?.split("-");
@@ -96,46 +98,67 @@ function JobLayout_2({
         elevation={0}
         sx={{
           width: "100%",
-          background: "rgba(255, 255, 255, 0.03)", // Metatron Glass
+          background: "rgba(255, 255, 255, 0.03)",
           backdropFilter: "blur(20px)",
           border: '1px solid',
           borderColor: 'rgba(255, 255, 255, 0.08)',
-          borderRadius: "14px",
+          borderRadius: "8px",
           transition: "all 0.3s ease",
           "&:hover": {
             borderColor: "primary.main",
-            boxShadow: "0 0 20px rgba(20, 210, 190, 0.15)",
+            boxShadow: "0 0 20px rgba(214,178,94, 0.15)",
             transform: "translateY(-2px)"
           }
         }}
       >
-        {/* Header Section */}
-        <Box display="flex" justifyContent="center" pt={3}>
+        <Box
+          display="flex"
+          alignItems="flex-start"
+          gap={1.5}
+          p={2}
+          sx={{
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            background: "linear-gradient(135deg, rgba(214,178,94,0.10), rgba(255,255,255,0.02))",
+          }}
+        >
           <Avatar
             src={getImageMatch(job?.logo)}
             sx={{
-              width: 56,
-              height: 56,
+              width: 50,
+              height: 50,
               background: "rgba(255,255,255,0.05)",
-              border: "2px solid",
+              border: "1px solid",
               borderColor: "primary.main",
-              p: 0.5
+              p: 0.5,
+              flexShrink: 0,
             }}
+          />
+
+          <Box minWidth={0} flex={1}>
+            <Typography variant="body1" color="primary" fontWeight={900} sx={{ lineHeight: 1.22 }}>
+              {job?.title}
+            </Typography>
+            <Typography variant="caption" fontWeight={700} sx={{ color: "text.secondary" }} noWrap>
+              {job?.organisation?.name}
+            </Typography>
+            <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}>
+              <Chip size="small" label={job?.jobtypeaccess?.type || "Tech role"} />
+              <Chip size="small" label={job?.jobtypeaccess?.access || "Flexible"} variant="outlined" />
+            </Stack>
+          </Box>
+
+          <Chip
+            size="small"
+            label={isDeactivated ? "Paused" : isMaxApplicants ? "Closed" : "Active"}
+            color="primary"
+            variant={isDeactivated || isMaxApplicants ? "outlined" : "filled"}
+            sx={{ borderRadius: "8px", fontWeight: 800, flexShrink: 0 }}
           />
         </Box>
 
-        <Stack spacing={1} mt={2} px={2} pb={3}>
-          <Typography variant="body1" color="primary" textAlign="center" fontWeight={700} sx={{ lineHeight: 1.2 }}>
-            {job?.title}
-          </Typography>
-
-          <Typography textAlign="center" variant="caption" fontWeight={600} sx={{ color: "text.secondary", opacity: 0.8 }}>
-            {job?.organisation?.name}
-          </Typography>
-
-          <Box display="flex" justifyContent="center" py={1}>
+        <Stack spacing={1.25} px={2} py={2}>
+          <Box display="flex" justifyContent="flex-start">
             <AvatarGroup
-
               sx={{ '& .MuiAvatar-root': { width: 28, height: 28, fontSize: 12, borderColor: "background.paper" } }}
             >
               {mandatorySkills.map((skill) => (
@@ -146,7 +169,7 @@ function JobLayout_2({
             </AvatarGroup>
           </Box>
 
-          <Divider sx={{ opacity: 0.08, my: 1 }} />
+          <Divider sx={{ opacity: 0.08 }} />
 
           {/* Job Metadata Sector */}
           <Stack spacing={1.5} sx={{ "& .MuiSvgIcon-root": { fontSize: 18, color: "primary.main" } }}>
@@ -169,8 +192,8 @@ function JobLayout_2({
                 startIcon={isCopiedStatus ? <Done /> : undefined}
                 sx={{
                   borderRadius: "10px",
-                  borderColor: isCopiedStatus ? "success.main" : "divider",
-                  color: isCopiedStatus ? "success.main" : "text.secondary"
+                  borderColor: isCopiedStatus ? "primary.main" : "divider",
+                  color: isCopiedStatus ? "primary.main" : "text.secondary"
                 }}
               >
                 {isCopiedStatus ? "Copied" : "Share"}
@@ -180,12 +203,12 @@ function JobLayout_2({
                 fullWidth
                 size="small"
                 variant="contained"
-                disabled={job?.currentUserApplied || isMaxApplicants || isGuest || isDeactivated}
-                onClick={() => setOpenApplyJobModal(true)}
+                disabled={job?.currentUserApplied || isMaxApplicants || isDeactivated}
+                onClick={isGuest ? handleGuestApply : () => setOpenApplyJobModal(true)}
                 startIcon={isDeactivated || isMaxApplicants || isGuest ? <LockRounded /> : <VerifiedRounded />}
                 sx={{ borderRadius: "10px" }}
               >
-                {job?.currentUserApplied ? "Applied" : isDeactivated ? "Paused" : "Apply"}
+                {isGuest ? "Login to Apply" : job?.currentUserApplied ? "Applied" : isDeactivated ? "Paused" : "Apply"}
               </Button>
             </Stack>
           )}

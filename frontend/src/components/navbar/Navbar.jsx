@@ -64,10 +64,16 @@ import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import DrawerSmartphone from './DrawerSmartphone';
-const MetatronToolBar = styled(Toolbar)({
+const MetatronToolBar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
-});
+  width: "100%",
+  maxWidth: "1188px",
+  margin: "0 auto",
+  [theme.breakpoints.down("lg")]: {
+    maxWidth: "100%",
+  },
+}));
 
 const SearchBar = styled("div")(({ theme }) => ({
   paddingBottom: "2px",
@@ -81,7 +87,7 @@ const IconsContainer = styled(Box)(({ theme }) => ({
   justifyContent: "space-evenly",
   gap: "10px",
   [theme.breakpoints.up("sm")]: {
-    gap: "30px",
+    gap: "22px",
   },
 }));
 
@@ -101,7 +107,7 @@ const Search = styled('div')(({ theme }) => ({
   boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
   '&:hover': {
     backgroundColor: alpha(theme.palette.common.white, 0.12),
-    borderColor: "rgba(32,214,199,0.34)",
+    borderColor: "rgba(214,178,94,0.34)",
   },
   marginLeft: 0,
   width: '100%',
@@ -122,9 +128,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
     [theme.breakpoints.up('sm')]: {
-      width: '38ch',
+      width: '30ch',
       '&:focus': {
-        width: '48ch',
+        width: '38ch',
       },
     },
   },
@@ -553,12 +559,12 @@ const Navbar = () => {
         elevation={0}
         sx={{
           WebkitBackdropFilter: "blur(12px)",
-          background: "rgba(5,8,18,0.82)",
-          backdropFilter: "blur(22px) saturate(160%)",
+          background: "rgba(5,5,5,0.88)",
+          backdropFilter: "blur(18px) saturate(150%)",
           borderBottom: "1px solid rgba(255,255,255,0.10)",
-          boxShadow: "0 12px 40px rgba(0,0,0,0.22)",
+          boxShadow: "0 8px 28px rgba(0,0,0,0.24)",
         }}>
-        <MetatronToolBar variant="dense" sx={{ minHeight: { xs: 64, md: 74 } }}>
+        <MetatronToolBar variant="dense" sx={{ minHeight: { xs: 56, md: 56 }, py: 0 }}>
           {/* lg screen toolbar */}
           <LogoContent
             sx={{
@@ -576,10 +582,10 @@ const Navbar = () => {
               <Avatar alt="Metatron"
                 src={AppLogo}
                 sx={{
-                  width: 42,
-                  height: 42,
-                  border: "1px solid rgba(32,214,199,0.26)",
-                  boxShadow: "0 0 22px rgba(32,214,199,0.16)",
+                  width: 34,
+                  height: 34,
+                  border: "1px solid rgba(214,178,94,0.26)",
+                  boxShadow: "0 0 22px rgba(214,178,94,0.16)",
                 }}
               />
 
@@ -587,9 +593,9 @@ const Navbar = () => {
                 <Typography
                   sx={{
                     fontWeight: 900,
-                    fontSize: 17,
+                    fontSize: 15,
                     letterSpacing: "0.08em",
-                    color: "#F0F4FA",
+                    color: "#FFFDF7",
                   }}
                 >
                   METATRON
@@ -645,7 +651,7 @@ const Navbar = () => {
                     <Avatar
                       alt=""
                       src={AppLogo}
-                      sx={{ width: 38, height: 38 }}
+                      sx={{ width: 32, height: 32 }}
                     />
                   </IconButton>
 
@@ -654,9 +660,9 @@ const Navbar = () => {
                     <Typography
                       sx={{
                         fontWeight: 700,
-                        fontSize: 18,
+                        fontSize: 15,
                         letterSpacing: "0.05em",
-                        color: "#F0F4FA",
+                        color: "#FFFDF7",
                       }}
                     >
                       METATRON
@@ -671,7 +677,7 @@ const Navbar = () => {
           {/* visible on lap and ++ screens always */}
           {!(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
             <SearchBar sx={{
-              ml: { md: 5, lg: 10 },
+              ml: { md: 3, lg: 4 },
             }}>
               <Box
                 sx={{

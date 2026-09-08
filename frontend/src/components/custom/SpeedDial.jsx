@@ -116,11 +116,11 @@ export default function BasicSpeedDial() {
               right: CustomDeviceSmallest() ? 5 : CustomDeviceTablet() ? 7 : 12,
               width: 56,
               height: 56,
-              background: "linear-gradient(135deg, #20D6C7, #3B82F6)",
-              color: "#ffffff",
-              boxShadow: "0 18px 40px rgba(32,214,199,0.28)",
+              background: "linear-gradient(135deg, #D6B25E, #FFFFFF)",
+              color: "#080808",
+              boxShadow: "0 18px 40px rgba(214,178,94,0.28)",
               "&:hover": {
-                background: "linear-gradient(135deg, #0F9F91, #2563EB)",
+                background: "linear-gradient(135deg, #8B6F2A, #FFF2C2)",
               },
             }}
           >

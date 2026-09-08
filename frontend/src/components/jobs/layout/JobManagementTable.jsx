@@ -69,7 +69,7 @@ const MetatronTable = ({
                                     fontSize: "0.75rem",
                                     textTransform: "uppercase",
                                     letterSpacing: 1,
-                                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? "#1e293b" : "#f8fafc",
+                                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? "#171717" : "#F7F3EA",
                                     color: "primary.main",
                                     borderBottom: (theme) => `2px solid ${theme.palette.divider}`,
                                 }}
@@ -86,7 +86,7 @@ const MetatronTable = ({
                             <TableRow
                                 hover
                                 key={job._id || index}
-                                sx={{ "&:hover": { backgroundColor: "rgba(20, 210, 190, 0.04) !important" } }}
+                                sx={{ "&:hover": { backgroundColor: "rgba(214,178,94, 0.04) !important" } }}
                             >
                                 {columnsHeader.map((column) => (
                                     <TableCell

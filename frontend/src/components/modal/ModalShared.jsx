@@ -87,7 +87,7 @@ export const SectionCard = styled(Box)(({ theme }) => ({
   border: `1px solid ${
     theme.palette.mode === "dark"
       ? "rgba(255,255,255,0.08)"
-      : "rgba(15,76,129,0.12)"
+      : "rgba(139,111,42,0.12)"
   }`,
   borderRadius: theme.shape.borderRadius + 4,
   padding: theme.spacing(2.25),
@@ -95,7 +95,7 @@ export const SectionCard = styled(Box)(({ theme }) => ({
   boxShadow:
     theme.palette.mode === "dark"
       ? "0 18px 34px rgba(0,0,0,0.18)"
-      : "0 14px 30px rgba(15,76,129,0.08)",
+      : "0 14px 30px rgba(139,111,42,0.08)",
 }));
 
 /** Pill-shaped section label */
@@ -109,14 +109,14 @@ export const SectionTitle = styled(Typography)(({ theme }) => ({
   background:
     theme.palette.mode === "dark"
       ? "rgba(255,255,255,0.08)"
-      : "rgba(15,76,129,0.08)",
+      : "rgba(139,111,42,0.08)",
   color: theme.palette.primary.main,
   padding: theme.spacing(0.55, 1.25),
   borderRadius: 999,
   border: `1px solid ${
     theme.palette.mode === "dark"
       ? "rgba(255,255,255,0.08)"
-      : "rgba(15,76,129,0.14)"
+      : "rgba(139,111,42,0.14)"
   }`,
 }));
 
@@ -186,7 +186,7 @@ export const ModalWorkflowSteps = ({ steps = [], activeStep = 0 }) => {
         px: { xs: 1.5, sm: 2 },
         py: 1.25,
         borderBottom: "1px solid",
-        borderColor: theme.palette.mode === "dark" ? appColors.divider : "rgba(15,76,129,0.1)",
+        borderColor: theme.palette.mode === "dark" ? appColors.divider : "rgba(139,111,42,0.1)",
         background:
           theme.palette.mode === "dark"
             ? "rgba(255,255,255,0.025)"
@@ -206,7 +206,7 @@ export const ModalWorkflowSteps = ({ steps = [], activeStep = 0 }) => {
         sx={{
           height: 4,
           borderRadius: 8,
-          background: theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(15,76,129,0.1)",
+          background: theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(139,111,42,0.1)",
           overflow: "hidden",
           mb: 1.25,
         }}
@@ -240,14 +240,14 @@ export const ModalWorkflowSteps = ({ steps = [], activeStep = 0 }) => {
                 borderRadius: "8px",
                 border: "1px solid",
                 borderColor: isActive
-                  ? "rgba(32,214,199,0.44)"
+                  ? "rgba(214,178,94,0.44)"
                   : theme.palette.mode === "dark"
                   ? appColors.divider
-                  : "rgba(15,76,129,0.1)",
+                  : "rgba(139,111,42,0.1)",
                 background: isActive
-                  ? "rgba(32,214,199,0.1)"
+                  ? "rgba(214,178,94,0.1)"
                   : isDone
-                  ? "rgba(34,197,94,0.08)"
+                  ? "rgba(214,178,94,0.08)"
                   : "transparent",
                 px: 1,
                 py: 0.8,
@@ -405,18 +405,18 @@ export const ModalShell = ({ children, open, sx = {}, ...rest }) => {
           maxHeight: { xs: "calc(100dvh - 16px)", sm: "calc(100dvh - 32px)" },
           display: "flex",
           flexDirection: "column",
-          border: `1px solid ${theme.palette.mode === "dark" ? appColors.border : "rgba(15,76,129,0.14)"}`,
+          border: `1px solid ${theme.palette.mode === "dark" ? appColors.border : "rgba(139,111,42,0.14)"}`,
           borderRadius: "8px",
           overflow: "hidden",
           background:
             theme.palette.mode === "dark"
-              ? "linear-gradient(180deg, rgba(11,18,32,0.98), rgba(5,8,18,0.94))"
+              ? "linear-gradient(180deg, rgba(13,13,13,0.98), rgba(5,8,18,0.94))"
               : "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96))",
           backdropFilter: "blur(28px)",
           boxShadow:
             theme.palette.mode === "dark"
               ? "0 28px 90px rgba(0,0,0,0.62)"
-              : "0 24px 70px rgba(15,76,129,0.18)",
+              : "0 24px 70px rgba(139,111,42,0.18)",
         }}
       >
         {children}

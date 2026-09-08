@@ -1,12 +1,15 @@
 import {
+  AddCircleRounded,
   ArticleRounded,
   CalendarMonthRounded,
+  ErrorOutlineRounded,
+  InsightsRounded,
   RocketLaunchRounded,
   SchoolRounded,
   TrendingUpRounded,
   WorkRounded,
 } from "@mui/icons-material";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { RotatingLines } from "react-loader-spinner";
@@ -40,7 +43,7 @@ const FeedDefaultContent = () => {
   const { currentMode, isDefaultSpeedDial } = useSelector(
     (state) => state.appUI
   );
-  const { user } = useSelector((state) => state.currentUser);
+  const { user, isGuest } = useSelector((state) => state.currentUser);
 
   const [postDetailedData, setPostDetailedData] = useState();
   const [platformTotals, setPlatformTotals] = useState({
@@ -56,10 +59,10 @@ const FeedDefaultContent = () => {
   const firstName = user?.name?.split(" ")?.[0] || "Builder";
   const metricValue = (value) => value === null || value === undefined ? "..." : formatMetric(value);
   const dashboardStats = [
-    { label: "Active gigs", value: metricValue(platformTotals.techGigs), status: "Jobs DB", icon: <WorkRounded fontSize="small" /> },
-    { label: "Events", value: metricValue(platformTotals.events), status: "Events DB", icon: <CalendarMonthRounded fontSize="small" /> },
-    { label: "Courses", value: metricValue(platformTotals.courses), status: "Courses DB", icon: <SchoolRounded fontSize="small" /> },
-    { label: "Build posts", value: metricValue(platformTotals.posts), status: "Posts DB", icon: <ArticleRounded fontSize="small" /> },
+    { label: "Active gigs", value: metricValue(platformTotals.techGigs), status: "Jobs", icon: <WorkRounded fontSize="small" /> },
+    { label: "Events", value: metricValue(platformTotals.events), status: "Events", icon: <CalendarMonthRounded fontSize="small" /> },
+    { label: "Courses", value: metricValue(platformTotals.courses), status: "Courses", icon: <SchoolRounded fontSize="small" /> },
+    { label: "Build posts", value: metricValue(platformTotals.posts), status: "Posts", icon: <ArticleRounded fontSize="small" /> },
   ];
   const focusCards = [
     {
@@ -68,6 +71,7 @@ const FeedDefaultContent = () => {
       action: "Open Jobs",
       route: "/jobs",
       nav: 1,
+      metricKey: "techGigs",
       icon: <TrendingUpRounded fontSize="small" />,
     },
     {
@@ -76,6 +80,7 @@ const FeedDefaultContent = () => {
       action: "View Courses",
       route: "/courses/available",
       nav: 3,
+      metricKey: "courses",
       icon: <SchoolRounded fontSize="small" />,
     },
     {
@@ -84,14 +89,20 @@ const FeedDefaultContent = () => {
       action: "See Events",
       route: "/events",
       nav: 2,
+      metricKey: "events",
       icon: <CalendarMonthRounded fontSize="small" />,
     },
-  ];
+  ].filter((card) => platformTotals[card.metricKey] === null || Number(platformTotals[card.metricKey]) > 0);
 
   const handleDashboardRoute = (route, navPosition) => {
     navigate(route);
     dispatch(updateCurrentBottomNav(navPosition));
   };
+  const feedStatusChips = [
+    isGuest ? "Guest preview" : "Member workspace",
+    `${metricValue(platformTotals.posts)} build posts`,
+    "Live career signal",
+  ];
 
   // ensure speed dial is visible
   if (!isDefaultSpeedDial) {
@@ -173,10 +184,11 @@ const FeedDefaultContent = () => {
     <Box
       sx={{
         minHeight: "calc(100vh - 120px)",
-        px: { xs: 1, sm: 2 },
+        px: { xs: 1, sm: 1.25, lg: 0 },
         width: "100%",
-        maxWidth: { xs: "100%", lg: 760, xl: 860 },
+        maxWidth: { xs: "100%", lg: 540, xl: 580 },
         mx: "auto",
+        pb: { xs: 1, lg: 2 },
       }}
     >
       {/* 🔥 POST DETAIL VIEW */}
@@ -196,15 +208,15 @@ const FeedDefaultContent = () => {
           <Box
             sx={{
               mt: { xs: 1.5, md: 2 },
-              p: { xs: 2, sm: 2.5 },
+              p: { xs: 1.5, sm: 2 },
               borderRadius: "8px",
               border: "1px solid rgba(255,255,255,0.10)",
               background: isDarkMode
-                ? "linear-gradient(135deg, rgba(10,18,32,0.92), rgba(11,18,32,0.78) 54%, rgba(32,214,199,0.10))"
+                ? "linear-gradient(135deg, rgba(5,5,5,0.96), rgba(18,18,18,0.92) 52%, rgba(214,178,94,0.13))"
                 : "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(238,247,255,0.86))",
               boxShadow: isDarkMode
                 ? "0 20px 60px rgba(0,0,0,0.28)"
-                : "0 16px 36px rgba(15,76,129,0.08)",
+                : "0 16px 36px rgba(139,111,42,0.08)",
               overflow: "hidden",
               position: "relative",
             }}
@@ -214,7 +226,7 @@ const FeedDefaultContent = () => {
                 position: "absolute",
                 inset: 0,
                 backgroundImage:
-                  "linear-gradient(90deg, rgba(32,214,199,0.04) 1px, transparent 1px), linear-gradient(rgba(32,214,199,0.04) 1px, transparent 1px)",
+                  "linear-gradient(90deg, rgba(214,178,94,0.04) 1px, transparent 1px), linear-gradient(rgba(214,178,94,0.04) 1px, transparent 1px)",
                 backgroundSize: "32px 32px",
                 pointerEvents: "none",
               }}
@@ -230,15 +242,31 @@ const FeedDefaultContent = () => {
                   <Stack direction="row" alignItems="center" spacing={1} mb={1}>
                     <RocketLaunchRounded sx={{ color: "primary.main", fontSize: 18 }} />
                     <Typography variant="overline" color="primary.main">
-                      Metatron Dev Command
+                      Metatron Dev Console
                     </Typography>
                   </Stack>
-                  <Typography variant="h4" fontWeight={900} lineHeight={1.12}>
-                    Good to see you, {firstName}.
+                    <Typography variant="h5" fontWeight={900} lineHeight={1.12}>
+                    Build, learn, connect, and move faster, {firstName}.
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" mt={0.75} maxWidth={560}>
-                    Jobs, learning, events, and developer content are organized into one growth workspace.
+                    <Typography variant="body2" color="text.secondary" mt={0.75} maxWidth={500}>
+                    A focused technology feed for project drops, hiring signals, courses, events, and practical community momentum.
                   </Typography>
+                  <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap mt={1.5}>
+                    {feedStatusChips.map((chip) => (
+                      <Chip
+                        key={chip}
+                        size="small"
+                        label={chip}
+                        sx={{
+                          borderRadius: "8px",
+                          fontWeight: 800,
+                          color: "primary.main",
+                          border: "1px solid rgba(214,178,94,0.22)",
+                          background: "rgba(214,178,94,0.08)",
+                        }}
+                      />
+                    ))}
+                  </Stack>
                 </Box>
                 <Button
                   disableElevation
@@ -256,7 +284,7 @@ const FeedDefaultContent = () => {
                   display: "grid",
                   gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", md: "repeat(4, minmax(0, 1fr))" },
                   gap: 1,
-                  mt: 2.5,
+                  mt: 2,
                 }}
               >
                 {dashboardStats.map((stat) => (
@@ -266,8 +294,8 @@ const FeedDefaultContent = () => {
                       borderRadius: "8px",
                       border: "1px solid rgba(255,255,255,0.10)",
                       background: isDarkMode ? "rgba(255,255,255,0.055)" : "rgba(255,255,255,0.92)",
-                      p: 1.25,
-                      minHeight: 84,
+                      p: 1,
+                      minHeight: 76,
                     }}
                   >
                     <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
@@ -276,7 +304,7 @@ const FeedDefaultContent = () => {
                         {stat.status}
                       </Typography>
                     </Stack>
-                    <Typography variant="h5" fontWeight={900} mt={1}>
+                    <Typography variant="h6" fontWeight={900} mt={0.75}>
                       {stat.value}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
@@ -288,23 +316,24 @@ const FeedDefaultContent = () => {
             </Box>
           </Box>
 
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", sm: "repeat(3, minmax(0, 1fr))" },
-              gap: 1.25,
-              mt: 1.5,
-            }}
-          >
-            {focusCards.map((card) => (
+          {focusCards.length > 0 && (
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "repeat(3, minmax(0, 1fr))" },
+                gap: 1,
+                mt: 1.25,
+              }}
+            >
+              {focusCards.map((card) => (
               <Box
                 key={card.title}
                 sx={{
                   borderRadius: "8px",
                   border: "1px solid rgba(255,255,255,0.09)",
                   background: isDarkMode ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.9)",
-                  p: 1.5,
-                  minHeight: 150,
+                  p: 1.15,
+                  minHeight: 124,
                   display: "flex",
                   flexDirection: "column",
                 }}
@@ -325,14 +354,18 @@ const FeedDefaultContent = () => {
                   {card.action}
                 </Button>
               </Box>
-            ))}
-          </Box>
+              ))}
+            </Box>
+          )}
 
           <Stack direction="row" alignItems="center" justifyContent="space-between" mt={2.5} mb={-0.5}>
             <Box>
-              <Typography variant="body1" fontWeight={900}>
-                Developer Signal Feed
-              </Typography>
+              <Stack direction="row" alignItems="center" gap={0.75}>
+                <InsightsRounded sx={{ color: "primary.main", fontSize: 18 }} />
+                <Typography variant="body1" fontWeight={900}>
+                  Developer Signal Feed
+                </Typography>
+              </Stack>
               <Typography variant="caption" color="text.secondary">
                 Projects, insights, launches, and practical community updates.
               </Typography>
@@ -342,7 +375,7 @@ const FeedDefaultContent = () => {
           {/* 🔥 LOADER */}
           {isFetching && (
             <Stack alignItems="center" mt={6} spacing={1}>
-              <RotatingLines width={32} strokeColor="#14D2BE" />
+              <RotatingLines width={32} strokeColor="#D6B25E" />
               <Typography variant="caption" color="text.secondary">
                 Loading your feed...
               </Typography>
@@ -351,10 +384,22 @@ const FeedDefaultContent = () => {
 
           {/* 🔥 ERROR */}
           {errorMessage && (
-            <Box textAlign="center" mt={4}>
-              <Typography color="error" variant="body2">
-                {errorMessage}
-              </Typography>
+            <Box
+              mt={3}
+              sx={{
+                borderRadius: "8px",
+                border: "1px solid rgba(214,178,94,0.22)",
+                background: "rgba(214,178,94,0.08)",
+                px: 1.5,
+                py: 1.25,
+              }}
+            >
+              <Stack direction="row" alignItems="center" gap={1}>
+                <ErrorOutlineRounded sx={{ color: "primary.main", fontSize: 18 }} />
+                <Typography color="text.primary" variant="body2" fontWeight={800}>
+                  {typeof errorMessage === "string" ? errorMessage : "Unable to load this feed request."}
+                </Typography>
+              </Stack>
             </Box>
           )}
 
@@ -367,7 +412,7 @@ const FeedDefaultContent = () => {
               {(CustomDeviceIsSmall() || CustomDeviceTablet()) && (
                 <Box
                   sx={{
-                    borderRadius: "12px",
+                    borderRadius: "8px",
                     border: "1px solid",
                     borderColor: "divider",
                     bgcolor: "background.paper",
@@ -393,6 +438,35 @@ const FeedDefaultContent = () => {
                 />
               ))}
             </Stack>
+          )}
+
+          {!isFetching && (!posts || posts?.length < 1) && (
+            <Box
+              sx={{
+                mt: 2,
+                minHeight: 280,
+                borderRadius: "8px",
+                border: "1px solid rgba(255,255,255,0.10)",
+                background: isDarkMode
+                  ? "linear-gradient(135deg, rgba(13,13,13,0.94), rgba(214,178,94,0.08))"
+                  : "rgba(255,255,255,0.92)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                px: 2,
+              }}
+            >
+              <Stack alignItems="center" spacing={1.2} maxWidth={360}>
+                <AddCircleRounded sx={{ color: "primary.main", fontSize: 34 }} />
+                <Typography variant="body1" fontWeight={900}>
+                  No build posts yet
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  When developers publish milestones, projects, and technical insights, they will appear here.
+                </Typography>
+              </Stack>
+            </Box>
           )}
         </>
       )}

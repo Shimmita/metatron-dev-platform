@@ -44,6 +44,15 @@ const columnsHeader = [
 
 ];
 
+const getRequestMessage = (err, fallback = "Unable to load event stats.") => {
+  if (err?.code === "ERR_NETWORK") return "Server unreachable. Please try again later.";
+  const payload = err?.response?.data || err;
+  if (typeof payload === "string") return payload;
+  if (payload?.message) return payload.message;
+  if (payload?.error) return payload.error;
+  return fallback;
+};
+
 
 export default function EventStatsLayout({setIsEventsStats, focusedEvent}) {
   const [page, setPage] = React.useState(0);
@@ -101,22 +110,16 @@ export default function EventStatsLayout({setIsEventsStats, focusedEvent}) {
             .then((res) => {
               // update the redux of current post
               if (res?.data) {
-                setEventStats(res.data)
+                setEventStats(Array.isArray(res.data) ? res.data : [])
               } 
             })
             .catch(async (err) => {
 
               //  user login session expired show logout alert
-              if (err?.response?.data.login) {
+              if (err?.response?.data?.login) {
                 window.location.reload();
               }
-              if (err?.code === "ERR_NETWORK") {
-                setErrorMessage(
-                  "server unreachable"
-                );
-                return;
-              }
-              setErrorMessage(err?.response.data);
+              setErrorMessage(getRequestMessage(err));
             })
             .finally(() => {
               setIsFetching(false);

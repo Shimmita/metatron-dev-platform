@@ -80,7 +80,7 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
                       placeItems: "center",
                       border: "1px solid",
                       borderColor: "divider",
-                      background: isDarkMode ? "rgba(32,214,199,0.12)" : "rgba(32,214,199,0.08)",
+                      background: isDarkMode ? "rgba(214,178,94,0.12)" : "rgba(214,178,94,0.08)",
                     }}
                   >
                     <ForumRounded sx={{ color: 'primary.main', fontSize: 18 }} />
@@ -208,13 +208,13 @@ export default function ConversationsContainer({ setMessageNotifClicked }) {
                   fontSize: '0.76rem',
                   px: 2.4,
                   borderRadius: "8px",
-                  boxShadow: '0 12px 28px rgba(32, 214, 199, 0.28)',
+                  boxShadow: '0 12px 28px rgba(214,178,94, 0.28)',
                   '&:hover': {
                     bgcolor: appColors.primarySoft,
                     transform: 'translateY(-1px)',
                   },
                   '&.Mui-disabled': {
-                    bgcolor: 'rgba(20, 210, 190, 0.3)'
+                    bgcolor: 'rgba(214,178,94, 0.3)'
                   }
                 }}
               >

@@ -12,6 +12,7 @@ import { getElapsedTime } from "../utilities/getElapsedTime";
 import AlertMiniProfileView from "../alerts/AlertMiniProfileView";
 
 const MAX_TEXT_LENGTH=100
+const firstName = (value = "") => value.trim().split(/\s+/)[0] || "Member";
 
 export default function CommentsReply({ comment: commenter, setPostDetailedData, setRepliesData }) {
   const [isUploading, setIsUploading] = useState(false);  
@@ -20,6 +21,19 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
   const[isEditing,setIsEditing]=useState(false)
   const[isDeleteComment,setIsDeleteComment]=useState(false)
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
+  const microButtonSx = {
+    borderRadius: "8px",
+    textTransform: "capitalize",
+    fontSize: "x-small",
+    fontWeight: 900,
+    color: "text.secondary",
+    borderColor: "rgba(214,178,94,0.28)",
+    "&:hover": {
+      color: "primary.main",
+      borderColor: "rgba(214,178,94,0.45)",
+      background: "rgba(214,178,94,0.08)",
+    },
+  };
 
     // axios default credentials
     axios.defaults.withCredentials = true;
@@ -143,13 +157,13 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
       <ListItem
         alignItems="flex-start"
         sx={{
-          borderLeft: "2px solid rgba(32,214,199,0.20)",
+          borderLeft: "2px solid rgba(214,178,94,0.20)",
           borderBottom: "1px solid rgba(255,255,255,0.055)",
-          background: "transparent",
+          background: "rgba(255,255,255,0.015)",
           px: { xs: 0.75, sm: 1 },
           py: 1,
           "&:hover": {
-            background: "rgba(255,255,255,0.02)",
+            background: "rgba(214,178,94,0.04)",
           },
         }}
       >
@@ -165,7 +179,8 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
             sx={{
               width: 31,
               height: 31,
-              border: "1px solid rgba(32,214,199,0.20)",
+              border: "1px solid rgba(214,178,94,0.24)",
+              boxShadow: "0 0 10px rgba(214,178,94,0.10)",
             }}
           />
         </ListItemAvatar>
@@ -177,7 +192,7 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
               alignItems={"center"}
             >
               <Typography variant={"body2"} component={'span'} fontWeight={900} sx={{ color: "text.primary" }}>
-                {commenter?.name}
+                {firstName(commenter?.name)}
 
                 {isCurrentUserComment && (
                     <Typography
@@ -231,10 +246,10 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
               {isCurrentUserComment && (
                 <React.Fragment>
                 {/* edit button */}
-                <Button onClick={handleEditing} variant={isEditing ? 'outlined':'text'} size={'small'} sx={{ borderRadius:"8px", textTransform:'capitalize', fontSize:"x-small" }}>edit</Button>
+                <Button onClick={handleEditing} variant={isEditing ? 'outlined':'text'} size={'small'} sx={microButtonSx}>edit</Button>
 
                 {/* delete button */}
-                <Button disabled={isDeleteComment} onClick={handleDeleteComment} variant="text" color="warning" size={'small'} sx={{ borderRadius:"8px", textTransform:'capitalize', fontSize:"x-small" }}>delete</Button>
+                <Button disabled={isDeleteComment} onClick={handleDeleteComment} variant="text" size={'small'} sx={microButtonSx}>delete</Button>
 
                 </React.Fragment>
               )}
@@ -252,9 +267,8 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                               mt={1}
                               sx={{
                                 borderRadius: "8px",
-                                border:'1px solid',
-                                borderColor:'divider',
-                                background: "rgba(255,255,255,0.045)",
+                                border:'1px solid rgba(214,178,94,0.18)',
+                                background: "rgba(214,178,94,0.055)",
                               }}
                             >
                               {/* input for reply */}
@@ -269,6 +283,7 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                                   placeholder={"Edit your reply..."}
                                   sx={{
                                     fontSize: "small",
+                                    color: "text.primary",
                                   }}
                                 />
                               </Box>
@@ -304,8 +319,9 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                    severity="info"
                    sx={{
                     borderRadius: "8px",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(214,178,94,0.08)",
+                    border: "1px solid rgba(214,178,94,0.22)",
+                    color: "text.primary",
                    }}
                    action={
                      <Stack direction={"row"} alignItems={"center"} gap={1}>
@@ -317,9 +333,8 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                          disabled={isUploading}
                          onClick={handleCompleteCommentReplyDeletion}
                        >
-                        {isUploading ? <CircularProgress size={15} /> :<DoneRounded color="warning" sx={{ width:16,height:16 }}/>}
+                        {isUploading ? <CircularProgress size={15} /> :<DoneRounded color="primary" sx={{ width:16,height:16 }}/>}
                        </IconButton>
-                       |{/* no btn */}
                        <IconButton
                          aria-label="close"
                          color="inherit"
@@ -327,14 +342,14 @@ export default function CommentsReply({ comment: commenter, setPostDetailedData,
                          disabled={isUploading}
                          onClick={handleDeleteComment}
                        >
-                        {isUploading ? <CircularProgress size={15} /> :<Close color={'info'} sx={{ width:15,height:15 }}/>}
+                        {isUploading ? <CircularProgress size={15} /> :<Close color="primary" sx={{ width:15,height:15 }}/>}
                        </IconButton>
                      </Stack>
                    }
                  >
                    <Box mb={1}>
                      <Typography variant="body2">
-                       {isUploading ? "deleting...":"delete ?"}
+                       {isUploading ? "Deleting..." : "Delete reply?"}
                      </Typography>
                    </Box>
                

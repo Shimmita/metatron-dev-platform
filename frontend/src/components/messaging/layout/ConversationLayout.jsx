@@ -51,9 +51,9 @@ export default function ConversationLayout({
         borderRadius: "8px",
         overflow: "hidden",
         border: "1px solid",
-        borderColor: isUnread ? "rgba(20, 210, 190, 0.38)" : "divider",
+        borderColor: isUnread ? "rgba(214,178,94, 0.38)" : "divider",
         bgcolor: isUnread 
-          ? (isDarkMode ? "rgba(20, 210, 190, 0.075)" : "rgba(20, 210, 190, 0.06)")
+          ? (isDarkMode ? "rgba(214,178,94, 0.075)" : "rgba(214,178,94, 0.06)")
           : (isDarkMode ? "rgba(255,255,255,0.035)" : "rgba(255,255,255,0.78)"),
         transition: "all 0.2s ease",
         "&:hover": {
@@ -96,7 +96,7 @@ export default function ConversationLayout({
                 height: 48, 
                 borderRadius: "8px",
                 border: "1px solid",
-                borderColor: isUnread ? "rgba(32,214,199,0.42)" : "divider"
+                borderColor: isUnread ? "rgba(214,178,94,0.42)" : "divider"
               }}
             />
           </Badge>

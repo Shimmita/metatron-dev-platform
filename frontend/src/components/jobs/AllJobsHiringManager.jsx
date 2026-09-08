@@ -39,7 +39,6 @@ import PostJobModal from "../modal/PostJobModal";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CustomLandScape from "../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import HiringDrawer from "./HiringDrawer";
@@ -48,7 +47,7 @@ import JobLayoutHiring from "./layout/JobLayoutHiring";
 import JobStatsLayout from "./layout/JobStatsLayouts";
 import ManageJobsTable from "./layout/ManageJobsTable";
 
-const drawerWidth = CustomDeviceIsSmall ? 200 : 270;
+const drawerWidth = CustomDeviceIsSmall() ? 200 : 270;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -168,9 +167,7 @@ export default function AllJobsHiringManager() {
   // holds drawer status
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false : true);
 
-  const [open, setOpen] = useState(
-    !(CustomDeviceIsSmall() || CustomDeviceTablet())
-  );
+  const [open, setOpen] = useState(false);
 
   // focused job for assessment and fetch prospective applicants
   const [focusedJob, setFocusedJob] = useState({})
@@ -374,7 +371,7 @@ export default function AllJobsHiringManager() {
                 sx={[
                   {
                     marginRight: 5,
-                    display: { xs: "none", lg: "inline-flex" },
+                    display: { xs: "none", lg: isDrawerPane ? "none" : "inline-flex" },
                   },
                   open && { display: "none" },
                 ]}

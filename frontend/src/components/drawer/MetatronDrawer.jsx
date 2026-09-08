@@ -5,14 +5,12 @@ import {
   CloudDoneRounded,
   DocumentScannerRounded,
   FindInPageRounded,
-  HighlightOffOutlined,
   HomeRounded,
   Menu,
   MyLocationRounded,
   TravelExploreRounded,
   VerifiedRounded,
   WorkRounded,
-  ChevronLeft as ChevronLeftIcon,
 } from "@mui/icons-material";
 
 import {
@@ -61,7 +59,6 @@ export default function GlobalDrawer({
   open,
   setOpen,
   isDrawerPane,
-  setIsDrawerPane,
   textOption,
   setTextOption,
   isDarkMode,
@@ -101,13 +98,13 @@ export default function GlobalDrawer({
       sx={{
         display: { xs: "none", lg: isDrawerPane ? "block" : "none" },
         "& .MuiDrawer-paper": {
-          background: isDarkMode ? "rgba(15,23,42,0.98)" : "rgba(255,255,255,0.95)",
+          background: isDarkMode ? "rgba(8,8,8,0.98)" : "rgba(255,255,255,0.95)",
           backdropFilter: "blur(20px)",
         },
       }}
     >
       {/* ─── HUD HEADER ─── */}
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: open ? "space-between" : "center", px: 2, height: 70 }}>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: open ? "space-between" : "center", px: 2, height: 56 }}>
         {!open ? (
           <IconButton onClick={() => setOpen(true)}>
             <Menu sx={{ color: "primary.main" }} />
@@ -119,27 +116,17 @@ export default function GlobalDrawer({
               <Typography variant="body2" sx={{ fontWeight: 700 }}>{user?.name?.split(" ")[0] || "Guest"}</Typography>
             </Stack>
             <IconButton onClick={() => setOpen(false)}>
-              <ChevronLeftIcon sx={{ fontSize: 20 }} />
+              <Menu sx={{ color: "primary.main", fontSize: 20 }} />
             </IconButton>
           </>
         )}
       </Box>
 
-      <Divider sx={{ opacity: 0.1 }} />
+      {open && <Divider sx={{ opacity: 0.1 }} />}
 
       {/* ─── NAVIGATION LIST ─── */}
+      {open && (
       <List sx={{ px: 1, pt: 1, flex: 1 }}>
-        {/* Exit Logic */}
-        {!open && (
-          <ListItem disablePadding sx={{ mb: 1 }}>
-            <ListItemButton onClick={() => setIsDrawerPane(false)} sx={{ justifyContent: "center", borderRadius: "10px" }}>
-              <Tooltip title="Exit Sector" placement="right">
-                <HighlightOffOutlined sx={{ color: "error.main" }} />
-              </Tooltip>
-            </ListItemButton>
-          </ListItem>
-        )}
-
         {navItems
           .filter((item) => !isGuest || item.isHome || item.text === "Explore Jobs")
           .map((item) => {
@@ -163,12 +150,12 @@ export default function GlobalDrawer({
                   }
                 }}
                 sx={{
-                  minHeight: 48,
+                  minHeight: 44,
                   justifyContent: open ? "initial" : "center",
                   px: 2.5,
                   borderRadius: "10px",
                   transition: "all 0.2s ease",
-                  backgroundColor: isActive ? "rgba(20, 210, 190, 0.15)" : "transparent",
+                  backgroundColor: isActive ? "rgba(214,178,94, 0.15)" : "transparent",
                   
                   // 🔥 HR UNIQUE OVERRIDE
                   ...(item.isHR && {
@@ -209,15 +196,16 @@ export default function GlobalDrawer({
           );
         })}
       </List>
+      )}
       {open && !isGuest && (
         <Box sx={{ px: 1.5, mt: "auto", mb: 2 }}>
           <Box
             sx={{
               borderRadius: "8px",
-              border: "1px solid rgba(20,210,190,0.16)",
+              border: "1px solid rgba(214,178,94,0.16)",
               background: isDarkMode
-                ? "linear-gradient(135deg, rgba(20,210,190,0.10), rgba(59,130,246,0.06))"
-                : "linear-gradient(135deg, rgba(20,210,190,0.08), rgba(15,76,129,0.04))",
+                ? "linear-gradient(135deg, rgba(214,178,94,0.10), rgba(255,255,255,0.06))"
+                : "linear-gradient(135deg, rgba(214,178,94,0.08), rgba(139,111,42,0.04))",
               p: 1.5,
             }}
           >

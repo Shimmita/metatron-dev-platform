@@ -1,5 +1,4 @@
 import {
-  HighlightOffOutlined,
   InfoRounded,
   Menu,
   NotificationsRounded,
@@ -8,15 +7,12 @@ import {
   SupportAgentRounded,
   UploadFileRounded
 } from "@mui/icons-material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
   AppBar,
   Avatar,
   Badge,
   Button,
   CircularProgress,
-  Stack,
   Toolbar,
   Tooltip,
   useMediaQuery
@@ -50,7 +46,6 @@ import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CourseLayout from "./layout/CourseLayout";
 import CoursePlayer from "./layout/CoursePlayer";
 import ManageCoursesTable from "./layout/ManageCoursesTable";
@@ -156,9 +151,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
   
     const [textOption, setTextOption] = useState("Uploaded Courses");
     const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
-    const [open, setOpen] = useState(
-      !(CustomDeviceIsSmall() || CustomDeviceTablet()) && true
-    );
+    const [open, setOpen] = useState(false);
    
   
     const [isFetching, setIsFetching] = useState(false);
@@ -287,7 +280,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                     sx={[
                       {
                         marginRight: 5,
-                        display: { xs: "none", lg: "inline-flex" },
+                        display: { xs: "none", lg: isDrawerPane ? "none" : "inline-flex" },
                       },
                       open && { display: "none" },
                     ]}
@@ -361,7 +354,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
-                  backgroundColor:isDarkMode ? "#272727":"#1976D2"
+                  backgroundColor:isDarkMode ? "#272727":"#D6B25E"
                 }}
               >
                 {!open && (
@@ -376,11 +369,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                 <Box display={'flex'} gap={1} alignItems={'center'}>
                 {/* icon right or left arrow */}
               <IconButton onClick={handleDrawerClose}>
-                {theme.direction === "rtl" ? (
-                  <ChevronRightIcon  sx={{ color:'white' }}/>
-                ) : (
-                  <ChevronLeftIcon sx={{ color:'white' }} />
-                )}
+                <Menu sx={{ color:'white' }} />
               </IconButton>
               <Box 
               display={'flex'} 
@@ -412,18 +401,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
               </DrawerHeader>
               <Divider className=" w-100" component={"div"} />
   
-              {/* show hide drawer visibility when drawer is not expanded */}
-              {!open && (
-                <Stack justifyContent={"center"} mt={1}>
-                  {/* hide drawer visibility */}
-                  <ListItemButton size="small" onClick={handleShowDrawerPane}>
-                    <ListItemIcon>
-                    <HighlightOffOutlined sx={{width:24,height:24}}/>
-                    </ListItemIcon>
-                  </ListItemButton>
-                </Stack>
-              )}
-  
+              {open && (
               <List>
                 {[
                   "Uploaded Courses",
@@ -508,15 +486,16 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
                   </ListItem>
                 ))}
               </List>
+              )}
   
-            {/* divider */}
-            <Divider component={'div'} className={'p-1'}/>
-            {/* navigates to instructor page */}
             {open && (
+              <React.Fragment>
+                <Divider component={'div'} className={'p-1'}/>
                 <Button
                 size="small" 
                 sx={{mt:1,}} 
                 onClick={handleNavigateAvailableCourses}>Courses Page</Button>
+              </React.Fragment>
             )}
   
             </Drawer>

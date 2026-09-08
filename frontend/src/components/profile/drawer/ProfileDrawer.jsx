@@ -18,7 +18,7 @@ import { handleShowLogout, showUserProfileDrawer } from "../../../redux/AppUI";
 import {
   resetClearTempUserIDRedux
 } from "../../../redux/CurrentUser";
-import { appColors, appGradients } from "../../../utils/colors";
+import { appColors } from "../../../utils/colors";
 import ProfileUpdate from "./ProfileUpdate";
 import UserProfileDrawer from "./UserProfileDrawer";
 
@@ -110,17 +110,13 @@ export default function ProfileDrawer() {
         }}
         PaperProps={{
           sx: {
-            width: { xs: "100vw", sm: 420, md: 460 },
+            width: { xs: "100vw", sm: 440, md: 500, lg: 520 },
             maxWidth: "100vw",
             overflow: "hidden",
             borderLeft: "1px solid",
-            borderColor: isDarkMode ? appColors.border : "rgba(15,23,42,0.12)",
-            background: isDarkMode
-              ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(11,18,32,0.98))"
-              : appGradients.soft,
-            boxShadow: isDarkMode
-              ? "-18px 0 54px rgba(0,0,0,0.46)"
-              : "-18px 0 54px rgba(15,23,42,0.16)",
+            borderColor: appColors.border,
+            background: "linear-gradient(180deg, rgba(5,5,5,0.98), rgba(13,13,13,0.98))",
+            boxShadow: "-18px 0 54px rgba(0,0,0,0.46)",
           },
         }}
       >
@@ -143,8 +139,8 @@ export default function ProfileDrawer() {
                 elevation={0}
                 sx={{
                   background: isDarkMode
-                    ? "linear-gradient(135deg, rgba(11,18,32,0.96), rgba(15,159,145,0.18))"
-                    : appGradients.primary,
+                    ? "linear-gradient(135deg, rgba(5,5,5,0.98), rgba(139,111,42,0.22))"
+                    : "linear-gradient(135deg, #050505 0%, #8B6F2A 100%)",
                   borderBottom: "1px solid",
                   borderColor: isDarkMode ? appColors.border : "rgba(255,255,255,0.25)",
                 }}

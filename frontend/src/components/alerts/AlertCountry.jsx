@@ -141,7 +141,7 @@ export default function AlertCountry({
             alignItems={"center"}
             sx={{
               background: !isDarkMode && 
-              "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+              "linear-gradient(180deg, rgba(214,178,94,0.32), rgba(255,242,194,0.22), transparent)",
           }}
           >
             {/* logo+ title  */}

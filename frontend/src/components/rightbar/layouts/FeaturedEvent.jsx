@@ -1,4 +1,4 @@
-import { Add } from "@mui/icons-material";
+import { Add, LockRounded } from "@mui/icons-material";
 import {
   Avatar,
   AvatarGroup,
@@ -24,6 +24,14 @@ import { updateCurrentSnackBar } from "../../../redux/CurrentSnackBar";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import { getImageMatch } from "../../utilities/getImageMatch";
 
+const getRequestMessage = (err, fallback = "Unable to complete RSVP.") => {
+  if (err?.code === "ERR_NETWORK") return "Server unreachable. Please try again later.";
+  const payload = err?.response?.data || err;
+  if (typeof payload === "string") return payload;
+  if (payload?.message) return payload.message;
+  if (payload?.error) return payload.error;
+  return fallback;
+};
 
 function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
   const [isFetching, setIsFetching] = useState(false);
@@ -32,7 +40,7 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
     (state) => state.appUI
   );
-  const { user } = useSelector((state) => state.currentUser);
+  const { user, isGuest } = useSelector((state) => state.currentUser);
   const { eventsTop } = useSelector((state) => state.currentEventsTop);
 
   const dispatch = useDispatch()
@@ -54,6 +62,11 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
 
   // handle creating of rsvp
   const handleCreateRSVP = () => {
+    if (isGuest) {
+      setErrorMessage("access denied, please login to continue with your request!");
+      return;
+    }
+
     // eventRSVP object
     const rsvpObject = {
       userId: user?._id,
@@ -91,16 +104,10 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
       })
       .catch(async (err) => {
         //  user login session expired show logout alert
-        if (err?.response?.data.login) {
+        if (err?.response?.data?.login) {
           window.location.reload();
         }
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage(
-            "server unreachable!"
-          );
-          return;
-        }
-        setErrorMessage(err?.response?.data || "Unable to complete RSVP.");
+        setErrorMessage(getRequestMessage(err));
       })
       .finally(() => {
         setIsFetching(false);
@@ -121,8 +128,8 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
             transition: "all 0.25s ease",
 
             "&:hover": {
-              background: "rgba(20,210,190,0.06)",
-              borderColor: "rgba(20,210,190,0.3)",
+              background: "rgba(214,178,94,0.06)",
+              borderColor: "rgba(214,178,94,0.3)",
             },
           }}>
             <ListItemAvatar>
@@ -178,8 +185,8 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
             transition: "all 0.25s ease",
 
             "&:hover": {
-              background: "rgba(20,210,190,0.06)",
-              borderColor: "rgba(20,210,190,0.3)",
+              background: "rgba(214,178,94,0.06)",
+              borderColor: "rgba(214,178,94,0.3)",
             },
           }}>
             <ListItemAvatar>
@@ -197,14 +204,14 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
             <ListItemText
               primary={
                 // title of the event
-                <Typography fontSize={13} fontWeight={600} color="#F0F4FA">
+                <Typography fontSize={13} fontWeight={600} color="#FFFDF7">
                   {eventTop?.title}
                 </Typography>
               }
               secondary={
                 <Box>
                   {/* event category */}
-                  <Typography variant="body2" sx={{ color: "rgba(240,244,250,0.65)" }}>
+                  <Typography variant="body2" sx={{ color: "rgba(255,253,247,0.65)" }}>
                     {eventTop?.category} Event
                   </Typography>
 
@@ -213,7 +220,7 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
                     {/* state */}
                     <Typography
                       variant="caption"
-                      sx={{ color: "rgba(240,244,250,0.65)" }}
+                      sx={{ color: "rgba(255,253,247,0.65)" }}
                     >
                       {eventTop?.location?.state}
 
@@ -222,7 +229,7 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
                     {/* divider */}
                     <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
                     {/* country */}
-                    <Typography ml={1} variant="caption" sx={{ color: "rgba(240,244,250,0.65)" }}>
+                    <Typography ml={1} variant="caption" sx={{ color: "rgba(255,253,247,0.65)" }}>
                       {CustomCountryName(eventTop?.location?.country)}
                     </Typography>
 
@@ -259,7 +266,7 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
               {/* applicants counter */}
               <Box>
                 <Typography variant="caption" sx={{
-                  color: "rgba(240,244,250,0.6)",
+                  color: "rgba(255,253,247,0.6)",
                   fontSize: 11,
                 }} fontWeight={'bold'}>
                   {eventTop?.users?.count} rsvp
@@ -272,18 +279,18 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
                   disableElevation
                   size="small"
                   onClick={handleCreateRSVP}
-                  startIcon={isFetching ? <CircularProgress size={13} /> : <Add />}
+                  startIcon={isFetching ? <CircularProgress size={13} /> : isGuest ? <LockRounded /> : <Add />}
                   disabled={isUserMadeRSVP || isMyEvent || isFetching}
                   sx={{
                     borderRadius: "10px",
-                    background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                    background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                     color: "#fff",
                     px: 1.5,
                     py: 0.4,
                     fontSize: "0.7rem",
 
                     "&:hover": {
-                      background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+                      background: "linear-gradient(135deg,#8B6F2A,#FFF2C2)",
                     },
 
                     "&:disabled": {
@@ -292,7 +299,7 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
                     }
                   }}
                 >
-                  {isUserMadeRSVP ? "Saved" : "RSVP"}
+                  {isGuest ? "Login" : isUserMadeRSVP ? "Saved" : "RSVP"}
                 </Button>
               </React.Fragment>
 

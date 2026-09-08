@@ -448,8 +448,8 @@ const ApplyJobModal = ({
 
           <Stack direction="row" spacing={1} justifyContent="center" mt={1.5} flexWrap="wrap" gap={1}>
             {[jobaccesstype?.type, jobaccesstype?.access, handleCountryName()].map((tag) => (
-              <Box key={tag} sx={{ px: 1, py: 0.2, borderRadius: 1, bgcolor: 'rgba(20, 210, 190, 0.1)', border: '1px solid rgba(20, 210, 190, 0.2)' }}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, color: '#14D2BE' }}>{tag}</Typography>
+              <Box key={tag} sx={{ px: 1, py: 0.2, borderRadius: 1, bgcolor: 'rgba(214,178,94, 0.1)', border: '1px solid rgba(214,178,94, 0.2)' }}>
+                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, color: '#D6B25E' }}>{tag}</Typography>
               </Box>
             ))}
 	          </Stack>
@@ -535,7 +535,7 @@ const ApplyJobModal = ({
                           height: 5,
                           borderRadius: '50%',
                           bgcolor: 'primary.main',
-                          boxShadow: '0 0 8px #14D2BE',
+                          boxShadow: '0 0 8px #D6B25E',
                           flexShrink: 0
                         }} />
                         <Typography variant="body2" sx={{ opacity: 0.85, fontSize: '0.8rem', lineHeight: 1.5 }}>
@@ -632,11 +632,11 @@ const ApplyJobModal = ({
                         fontWeight: 900,
                         fontSize: '0.8rem',
                         letterSpacing: '0.05rem',
-                        boxShadow: isDarkMode ? '0 8px 24px rgba(20, 210, 190, 0.25)' : '0 4px 12px rgba(0,0,0,0.1)',
+                        boxShadow: isDarkMode ? '0 8px 24px rgba(214,178,94, 0.25)' : '0 4px 12px rgba(0,0,0,0.1)',
                         transition: 'all 0.3s ease',
                         '&:hover': {
                           transform: 'translateY(-2px)',
-                          boxShadow: '0 12px 30px rgba(20, 210, 190, 0.4)',
+                          boxShadow: '0 12px 30px rgba(214,178,94, 0.4)',
                         }
                       }}
                     >

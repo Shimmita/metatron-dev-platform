@@ -60,9 +60,9 @@ const Feed = () => {
       component="main"
       sx={{
         width: "100%",
-        maxWidth: isWorkspaceRoute ? "100%" : { xs: "100%", lg: 780, xl: 880 },
+        maxWidth: isWorkspaceRoute ? "100%" : { xs: "100%", lg: 540, xl: 580 },
         minWidth: 0,
-        flex: isWorkspaceRoute ? "1 1 100%" : { sm: "1 1 0" },
+        flex: isWorkspaceRoute ? "1 1 100%" : { sm: "1 1 0", lg: "0 0 540px", xl: "0 0 580px" },
         minHeight: { xs: "100vh", lg: 0 },
         height: { lg: "100%" },
         overflowY: { lg: "auto" },
@@ -70,8 +70,8 @@ const Feed = () => {
         overscrollBehavior: { lg: "contain" },
         display: "flex",
         flexDirection: "column",
-        // Ensure content doesn't get hidden behind the floating BottomNav
-        pb: isDefaultBottomNav ? { xs: 12, lg: 4 } : 0,
+        // Keep the last feed items clear of the floating navigation dock.
+        pb: isDefaultBottomNav ? { xs: 14, md: 15, lg: 16 } : 0,
         transition: "padding 0.3s ease",
       }}
     >
@@ -107,14 +107,14 @@ const Feed = () => {
 
         {/* ─── GLOBAL OVERLAYS ─── */}
 
-        {/* Floating SpeedDial - Positioned above BottomNav on mobile */}
+        {/* Floating SpeedDial */}
         {isDefaultBottomNav && isDefaultSpeedDial && !isPostDetailed && (
           <Fade in timeout={500}>
             <Box
               sx={{
                 position: "fixed",
                 right: { xs: 20, md: 32 },
-                bottom: { xs: 100, md: 32 }, // Lifted higher on mobile to clear BottomNav
+                bottom: { xs: 100, md: 32 },
                 zIndex: 1100,
               }}
             >

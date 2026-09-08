@@ -18,12 +18,12 @@ const Pill = ({ label, teal = false }) => (
       px: 1.2,
       py: "3px",
       borderRadius: "20px",
-      background: teal ? "rgba(20,210,190,0.12)" : "rgba(255,255,255,0.07)",
-      border: `1px solid ${teal ? "rgba(20,210,190,0.28)" : appColors.border}`,
+      background: teal ? "rgba(214,178,94,0.12)" : "rgba(255,255,255,0.07)",
+      border: `1px solid ${teal ? "rgba(214,178,94,0.28)" : appColors.border}`,
       cursor: "default",
       transition: "all 0.2s",
       "&:hover": {
-        background: teal ? "rgba(20,210,190,0.2)" : "rgba(255,255,255,0.12)",
+        background: teal ? "rgba(214,178,94,0.2)" : "rgba(255,255,255,0.12)",
       },
     }}
   >
@@ -49,7 +49,7 @@ const GlassBtn = ({ icon, label, onClick }) => (
         color: appColors.textSecondary,
         transition: "all 0.2s",
         "&:hover": {
-          background: "rgba(20,210,190,0.15)",
+          background: "rgba(214,178,94,0.15)",
           borderColor: appColors.primary,
           color: appColors.textPrimary,
         },
@@ -206,7 +206,7 @@ export default function PostImagePreviewDialog({
             overflowY: "auto",
             "&::-webkit-scrollbar": { width: 3 },
             "&::-webkit-scrollbar-thumb": {
-              background: "rgba(20,210,190,0.2)",
+              background: "rgba(214,178,94,0.2)",
               borderRadius: 2,
             },
           }}
@@ -285,8 +285,8 @@ export default function PostImagePreviewDialog({
                 sx={{
                   width: 42,
                   height: 42,
-                  border: `1.5px solid rgba(20,210,190,0.35)`,
-                  boxShadow: `0 0 0 3px rgba(20,210,190,0.08)`,
+                  border: `1.5px solid rgba(214,178,94,0.35)`,
+                  boxShadow: `0 0 0 3px rgba(214,178,94,0.08)`,
                 }}
               >
                 <PersonRounded />
@@ -364,8 +364,8 @@ export default function PostImagePreviewDialog({
                   gap: 0.8,
                   transition: "all 0.2s",
                   "&:hover": {
-                    background: "rgba(20,210,190,0.1)",
-                    borderColor: "rgba(20,210,190,0.35)",
+                    background: "rgba(214,178,94,0.1)",
+                    borderColor: "rgba(214,178,94,0.35)",
                     color: appColors.primary,
                   },
                 }}

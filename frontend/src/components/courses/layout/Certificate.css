@@ -38,7 +38,7 @@
 .cert-course,
 .cert-instructor,
 .cert-date {
-  color: #2980b9;
+  color: #8B6F2A;
   font-weight: bold;
 }
 
@@ -51,7 +51,8 @@
 .download-btn {
   margin-top: 20px;
   padding: 10px 20px;
-  background-color: #2980b9;
+  background-color: #D6B25E;
+  color: #080808;
   color: white;
   border: none;
   border-radius: 5px;

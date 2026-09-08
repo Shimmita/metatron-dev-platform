@@ -148,7 +148,7 @@ export default function AlertProfileCompletion({
         sx={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
       >
         <Avatar src={avatarPath || logo} />
-        <Typography fontSize={14} fontWeight={600} color="#F0F4FA">
+        <Typography fontSize={14} fontWeight={600} color="#FFFDF7">
           Complete Your Profile
         </Typography>
       </Box>
@@ -156,7 +156,7 @@ export default function AlertProfileCompletion({
       {/* STEP INDICATOR */}
       {!successMsg && (
         <Box px={2} pt={1}>
-          <Typography fontSize={11} sx={{ color: "rgba(240,244,250,0.5)" }}>
+          <Typography fontSize={11} sx={{ color: "rgba(255,253,247,0.5)" }}>
             Step {step + 1} of 2
           </Typography>
         </Box>
@@ -178,14 +178,14 @@ export default function AlertProfileCompletion({
             <CircularProgress />
           </Box>
         ) : successMsg ? (
-          <Typography sx={{ color: "#22C55E", textAlign: "center" }}>
+          <Typography sx={{ color: "#D6B25E", textAlign: "center" }}>
             {successMsg}
           </Typography>
         ) : step === 0 ? (
           <>
             <Typography
               fontSize={13}
-              sx={{ color: "rgba(240,244,250,0.7)", mb: 1 }}
+              sx={{ color: "rgba(255,253,247,0.7)", mb: 1 }}
             >
               Tell us about yourself
             </Typography>
@@ -203,7 +203,7 @@ export default function AlertProfileCompletion({
           <>
             <Typography
               fontSize={13}
-              sx={{ color: "rgba(240,244,250,0.7)", mb: 1 }}
+              sx={{ color: "rgba(255,253,247,0.7)", mb: 1 }}
             >
               Upload your profile picture
             </Typography>
@@ -243,7 +243,7 @@ export default function AlertProfileCompletion({
                 onClick={handleNext}
                 disabled={!about || about.length > MAX_ABOUT}
                 sx={{
-                  background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                  background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                   color: "#fff",
                 }}
               >
@@ -254,7 +254,7 @@ export default function AlertProfileCompletion({
                 onClick={handleCompleteRegistration}
                 disabled={!avatarFile}
                 sx={{
-                  background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                  background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                   color: "#fff",
                 }}
               >
@@ -267,7 +267,7 @@ export default function AlertProfileCompletion({
             onClick={handleLogin}
             sx={{
               margin: "auto",
-              background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
               color: "#fff",
             }}
           >

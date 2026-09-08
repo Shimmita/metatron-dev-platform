@@ -34,12 +34,12 @@ const AlertProfileCompletion = lazy(() =>
 const RegisterAlertTitle = lazy(() => import("./RegisterAlertTitle"));
 
 const C = {
-  bg: "#050812",
+  bg: "#050505",
   card: "rgba(255,255,255,0.055)",
   border: "rgba(255,255,255,0.1)",
-  teal: "#14D2BE",
-  text: "#F5F8FF",
-  muted: "rgba(245,248,255,0.58)",
+  teal: "#D6B25E",
+  text: "#FFFDF7",
+  muted: "rgba(255,253,247,0.58)",
 };
 
 const completionFieldSx = {
@@ -76,8 +76,8 @@ const CompletionProgress = ({ showNext, basicsReady, profileReady }) => (
             sx={{
               borderRadius: "8px",
               border: "1px solid",
-              borderColor: active ? "rgba(20,210,190,0.42)" : C.border,
-              background: ready ? "rgba(34,197,94,0.09)" : active ? "rgba(20,210,190,0.1)" : "transparent",
+              borderColor: active ? "rgba(214,178,94,0.42)" : C.border,
+              background: ready ? "rgba(214,178,94,0.09)" : active ? "rgba(214,178,94,0.1)" : "transparent",
               px: 1,
               py: 0.75,
               minHeight: 50,
@@ -86,7 +86,7 @@ const CompletionProgress = ({ showNext, basicsReady, profileReady }) => (
             <Typography sx={{ color: active ? C.teal : C.muted, fontSize: 10, fontWeight: 900 }}>
               {index + 1}. {label}
             </Typography>
-            <Typography sx={{ color: ready ? "#22C55E" : C.muted, fontSize: 10 }}>
+            <Typography sx={{ color: ready ? "#D6B25E" : C.muted, fontSize: 10 }}>
               {ready ? "Ready" : active ? "In progress" : "Pending"}
             </Typography>
           </Box>
@@ -284,7 +284,7 @@ const RegPersonalCompletion = () => {
       alignItems={"center"}
       sx={{
         opacity: openAlertProfile ? ".5" : undefined,
-        background: "linear-gradient(180deg, #050812 0%, #08111F 52%, #0B1220 100%)",
+        background: "linear-gradient(180deg, #050505 0%, #0B0B0B 52%, #111111 100%)",
         px: { xs: 1.25, sm: 2 },
         py: 4,
       }}
@@ -633,7 +633,7 @@ const RegPersonalCompletion = () => {
                   <Link to={"/auth/login"} className="text-decoration-none">
                     <Typography
                       variant="body2"
-                      sx={{ color: isDarkMode ? "#90CAF9" : "#1876D2" }}
+                      sx={{ color: isDarkMode ? "#F8E7B0" : "#8B6F2A" }}
                     >
                       login
                     </Typography>

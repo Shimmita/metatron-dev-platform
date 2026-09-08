@@ -1,6 +1,5 @@
 import {
   AutoAwesomeOutlined,
-  HighlightOffOutlined,
   HomeRounded,
   InfoRounded,
   LocalLibraryOutlined,
@@ -15,8 +14,6 @@ import {
   VideoLibraryOutlined,
   WavesOutlined
 } from "@mui/icons-material";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
   AppBar,
   Avatar,
@@ -59,7 +56,6 @@ import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import CertificatesTable from "./layout/CertificatesTable";
 import CourseLayout from "./layout/CourseLayout";
 import CoursePlayer from "./layout/CoursePlayer";
@@ -163,9 +159,7 @@ export default function CoursesMainContainer() {
     !isGuest && isJobSearchGlobal ? "Course Search" : "Explore Courses"
   );
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false : true);
-  const [open, setOpen] = useState(
-    !(CustomDeviceIsSmall() || CustomDeviceTablet() || isGuest)
-  );
+  const [open, setOpen] = useState(false);
 
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -269,7 +263,7 @@ export default function CoursesMainContainer() {
       }
       else {
         axios
-          .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/${user?._id}`, {
+          .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}${isGuest ? "/courses/all/top" : `/courses/all/${user?._id}`}`, {
             withCredentials: true,
           })
           .then((res) => {
@@ -577,21 +571,29 @@ export default function CoursesMainContainer() {
           borderRadius: panelRadius,
           overflow: "visible",
           background: isDarkMode
-            ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(8,17,31,0.98))"
-            : "linear-gradient(180deg, #F8FAFC, #EEF7FF)",
+            ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(10,10,10,0.98))"
+            : "linear-gradient(180deg, #F7F3EA, #F7F3EA)",
         }}
       >
         <AppBar
           position="fixed"
           open={open}
           sx={{
+            width: {
+              xs: "100%",
+              lg: isDrawerPane ? `calc(100% - ${open ? drawerWidth : 70}px)` : "100%",
+            },
+            ml: {
+              xs: 0,
+              lg: isDrawerPane ? `${open ? drawerWidth : 70}px` : 0,
+            },
             background: theme.palette.mode === "dark"
-              ? "rgba(5,8,18,0.88)"
+              ? "rgba(5,5,5,0.9)"
               : appGradients.primary,
-            backdropFilter: "blur(22px) saturate(160%)",
+            backdropFilter: "blur(18px) saturate(150%)",
             boxShadow: theme.palette.mode === "dark"
-              ? "0 12px 40px rgba(0,0,0,0.22)"
-              : "0 18px 36px rgba(15,76,129,0.14)",
+              ? "0 8px 28px rgba(0,0,0,0.28)"
+              : "0 12px 28px rgba(139,111,42,0.14)",
             borderBottom: `1px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.18)"}`,
           }}
         >
@@ -601,7 +603,9 @@ export default function CoursesMainContainer() {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              pt: 2,
+              minHeight: 56,
+              py: 0,
+              px: { xs: 1.25, md: 2 },
             }}
           >
             <Box>
@@ -613,7 +617,7 @@ export default function CoursesMainContainer() {
                 sx={[
                   {
                     marginRight: 5,
-                    display: { xs: "none", lg: "inline-flex" },
+                    display: { xs: "none", lg: isDrawerPane ? "none" : "inline-flex" },
                   },
                   open && { display: "none" },
                 ]}
@@ -631,8 +635,9 @@ export default function CoursesMainContainer() {
                 textAlign={"center"}
                 textTransform={"uppercase"}
                 sx={{
-                  letterSpacing: "0.14rem",
-                  background: "linear-gradient(90deg, #FFFFFF, #20D6C7)",
+                  letterSpacing: "0.12rem",
+                  fontSize: 14,
+                  background: "linear-gradient(90deg, #FFFFFF, #D6B25E)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
@@ -660,9 +665,9 @@ export default function CoursesMainContainer() {
                   sx={{
                     border: "1px solid rgba(255,255,255,0.10)",
                     color: "primary.main",
-                    width: 38,
-                    height: 38,
-                    "&:hover": { background: "rgba(32,214,199,0.08)" },
+                    width: 34,
+                    height: 34,
+                    "&:hover": { background: "rgba(214,178,94,0.08)" },
                   }}
                 >
                   <HomeRounded sx={{ fontSize: 20 }} />
@@ -715,8 +720,8 @@ export default function CoursesMainContainer() {
               borderColor: "divider",
               backgroundColor: theme.palette.background.paper,
               backgroundImage: theme.palette.mode === "dark"
-                ? "linear-gradient(180deg, rgba(15,76,129,0.16), rgba(255,255,255,0.01))"
-                : "linear-gradient(180deg, rgba(15,76,129,0.08), rgba(255,255,255,0.92))",
+                ? "linear-gradient(180deg, rgba(139,111,42,0.16), rgba(255,255,255,0.01))"
+                : "linear-gradient(180deg, rgba(139,111,42,0.08), rgba(255,255,255,0.92))",
               display: "flex",
               flexDirection: "column",
             },
@@ -724,11 +729,12 @@ export default function CoursesMainContainer() {
         >
           <DrawerHeader
             sx={{
+              minHeight: 56,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
               background: theme.palette.mode === "dark"
-                ? "linear-gradient(135deg, rgba(8,21,38,0.96), rgba(15,76,129,0.82))"
+                ? "linear-gradient(135deg, rgba(12,12,12,0.96), rgba(139,111,42,0.82))"
                 : appGradients.primary,
             }}
           >
@@ -744,11 +750,7 @@ export default function CoursesMainContainer() {
               <Box display={'flex'} gap={1} alignItems={'center'}>
                 {/* icon right or left arrow */}
                 <IconButton onClick={handleDrawerClose}>
-                  {theme.direction === "rtl" ? (
-                    <ChevronRightIcon sx={{ color: 'white' }} />
-                  ) : (
-                    <ChevronLeftIcon sx={{ color: 'white' }} />
-                  )}
+                  <Menu sx={{ color: 'white' }} />
                 </IconButton>
                 <Box
                   display={'flex'}
@@ -784,30 +786,19 @@ export default function CoursesMainContainer() {
           </DrawerHeader>
           <Divider className=" w-100" component={"div"} />
 
-          {/* show hide drawer visibility when drawer is not expanded */}
-          {!open && (
-            <Stack justifyContent={"center"} mt={1}>
-              {/* hide drawer visibility */}
-              <ListItemButton size="small" onClick={handleShowDrawerPane}>
-                <ListItemIcon>
-                  <HighlightOffOutlined sx={{ width: 24, height: 24 }} />
-                </ListItemIcon>
-              </ListItemButton>
-            </Stack>
-          )}
-
+          {open && (
           <List sx={{ px: 1, pt: 1, flex: 1 }}>
             <ListItem disablePadding sx={{ mb: 0.5 }}>
               <ListItemButton
                 onClick={handleNavigateHome}
                 sx={{
-                  minHeight: 48,
+                  minHeight: 44,
                   px: 2,
                   borderRadius: "8px",
                   justifyContent: open ? "initial" : "center",
                   background: "rgba(255,255,255,0.035)",
                   "&:hover": {
-                    background: "rgba(32,214,199,0.10)",
+                    background: "rgba(214,178,94,0.10)",
                   },
                 }}
               >
@@ -857,13 +848,13 @@ export default function CoursesMainContainer() {
                 <ListItemButton
                   sx={[
                     {
-                      minHeight: 48,
+                      minHeight: 44,
                       px: 2,
                       mb: 0.5,
                       borderRadius: "8px",
-                      background: text === textOption ? "rgba(32,214,199,0.14)" : "transparent",
+                      background: text === textOption ? "rgba(214,178,94,0.14)" : "transparent",
                       "&:hover": {
-                        background: text === textOption ? "rgba(32,214,199,0.18)" : "rgba(255,255,255,0.05)",
+                        background: text === textOption ? "rgba(214,178,94,0.18)" : "rgba(255,255,255,0.05)",
                       },
                     },
                     open
@@ -949,55 +940,40 @@ export default function CoursesMainContainer() {
               </ListItem>
             ))}
           </List>
+          )}
 
-          {!isGuest && (
-            <React.Fragment>
-              {/* navigates to instructor page */}
-              {open ? (
-                <Box
-                  width={'100%'}
-                  display={'flex'}
-                  justifyContent={'center'}>
-                  <Button
-                    size="small"
-                    startIcon={<SupportAgentRounded />}
-                    color="secondary"
-                    disableElevation
-                    sx={{
-                      my: 1, px: 1,
-                      borderRadius: 5,
-                      width: '90%',
-                      fontWeight: 'bold',
-                      border: '1px solid',
-                      borderColor: 'divider'
-                    }}
-                    onClick={handleNavigateInstructor}>
-                    I'M Instructor
-                  </Button>
-                </Box>
-              ) : (
-                <ListItemButton size="small" >
-                  <Tooltip title={"Instructor Page"} arrow>
-                    <ListItemIcon
-                      onClick={handleNavigateInstructor}>
-                      <SupportAgentRounded
-                        color="secondary"
-                        sx={{ width: 24, height: 24 }} />
-                    </ListItemIcon>
-                  </Tooltip>
-                </ListItemButton>
-              )}
-            </React.Fragment>
+          {open && !isGuest && (
+            <Box
+              width={'100%'}
+              display={'flex'}
+              justifyContent={'center'}>
+              <Button
+                size="small"
+                startIcon={<SupportAgentRounded />}
+                color="secondary"
+                disableElevation
+                sx={{
+                  my: 1, px: 1,
+                  borderRadius: 5,
+                  width: '90%',
+                  fontWeight: 'bold',
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }}
+                onClick={handleNavigateInstructor}>
+                I'M Instructor
+              </Button>
+            </Box>
           )}
           {open && !isGuest && (
             <Box sx={{ px: 1.5, mt: "auto", mb: 2 }}>
               <Box
                 sx={{
                   borderRadius: "8px",
-                  border: "1px solid rgba(32,214,199,0.16)",
+                  border: "1px solid rgba(214,178,94,0.16)",
                   background: isDarkMode
-                    ? "linear-gradient(135deg, rgba(32,214,199,0.10), rgba(242,184,75,0.08))"
-                    : "linear-gradient(135deg, rgba(32,214,199,0.08), rgba(15,76,129,0.05))",
+                    ? "linear-gradient(135deg, rgba(214,178,94,0.10), rgba(242,184,75,0.08))"
+                    : "linear-gradient(135deg, rgba(214,178,94,0.08), rgba(139,111,42,0.05))",
                   p: 1.5,
                 }}
               >
@@ -1021,7 +997,7 @@ export default function CoursesMainContainer() {
         </Drawer>
         <Box
           sx={{
-            minHeight: "calc(100vh - 64px)",
+            minHeight: "calc(100vh - 56px)",
             width: {
               xs: "100%",
               lg: isDrawerPane ? `calc(100% - ${open ? drawerWidth : 70}px)` : "100%",
@@ -1037,6 +1013,8 @@ export default function CoursesMainContainer() {
           <Box
             sx={{
               width: "100%",
+              maxWidth: { xs: "100%", lg: "1128px", xl: "1188px" },
+              mx: "auto",
               minHeight: "100%",
               overflowY: "visible",
               overflowX: "hidden",
@@ -1050,10 +1028,10 @@ export default function CoursesMainContainer() {
                   ? "repeat(auto-fit, minmax(280px, 1fr))"
                   : "repeat(auto-fit, minmax(320px, 1fr))",
                 lg: open
-                  ? "repeat(auto-fit, minmax(300px, 1fr))"
-                  : "repeat(auto-fit, minmax(340px, 1fr))",
+                  ? "repeat(auto-fit, minmax(360px, 1fr))"
+                  : "repeat(auto-fit, minmax(390px, 1fr))",
               },
-              gap: 2,
+              gap: 1.5,
               alignItems: "start",
               borderRadius: panelRadius,
               backgroundColor: theme.palette.mode === "dark"
@@ -1064,8 +1042,9 @@ export default function CoursesMainContainer() {
               },
               msOverflowStyle: "none",
               scrollbarWidth: "none",
-              p: { xs: 1, md: 2 },
-              pt: { xs: 9, md: 10 },
+              p: { xs: 1, md: 1.75, lg: 2 },
+              pt: { xs: 7.5, md: 7.5 },
+              pb: { xs: 13, md: 14, lg: 15 },
             }}
           >
             <Box
@@ -1074,12 +1053,12 @@ export default function CoursesMainContainer() {
                 borderRadius: "8px",
                 border: "1px solid rgba(255,255,255,0.10)",
                 background: isDarkMode
-                  ? "linear-gradient(135deg, rgba(11,18,32,0.94), rgba(32,214,199,0.08), rgba(242,184,75,0.10))"
+                  ? "linear-gradient(135deg, rgba(13,13,13,0.94), rgba(214,178,94,0.08), rgba(242,184,75,0.10))"
                   : "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(238,247,255,0.92))",
-                p: { xs: 2, md: 2.5 },
+                p: { xs: 1.5, md: 2 },
                 boxShadow: isDarkMode
                   ? "0 18px 50px rgba(0,0,0,0.28)"
-                  : "0 16px 32px rgba(15,76,129,0.08)",
+                  : "0 16px 32px rgba(139,111,42,0.08)",
               }}
             >
               <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={2} justifyContent="space-between" alignItems={{ xs: "flex-start", md: "center" }}>
@@ -1090,10 +1069,10 @@ export default function CoursesMainContainer() {
                       Tech Learning Studio
                     </Typography>
                   </Box>
-                  <Typography variant="h4" fontWeight={900} lineHeight={1.12}>
+                  <Typography variant="h5" fontWeight={900} lineHeight={1.12}>
                     {textOption}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" mt={0.75} maxWidth={720}>
+                  <Typography variant="body2" color="text.secondary" mt={0.5} maxWidth={760}>
                     Build role-ready skills through practical courses, AI-guided recommendations, certificates, and instructor-led tracks.
                   </Typography>
                 </Box>
@@ -1124,8 +1103,8 @@ export default function CoursesMainContainer() {
                       borderRadius: "8px",
                       border: "1px solid rgba(255,255,255,0.08)",
                       background: "rgba(255,255,255,0.045)",
-                      p: 1.2,
-                      minHeight: 72,
+                      p: 1,
+                      minHeight: 64,
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">
@@ -1236,6 +1215,7 @@ export default function CoursesMainContainer() {
                                 isDarkMode={isDarkMode}
                                 courseItem={course}
                                 setFocusedCourse={setFocusedCourse}
+                                setErrorMessage={setErrorMessage}
                               />
                             ))}
 

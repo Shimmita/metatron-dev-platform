@@ -51,7 +51,7 @@ const ModalAccountInfo = lazy(() => import("./ModalAccountInfo"));
 const DotGrid = () => (
   <Box sx={{
     position: "absolute", inset: 0,
-    backgroundImage: "linear-gradient(90deg, rgba(32,214,199,0.04) 1px, transparent 1px), linear-gradient(rgba(32,214,199,0.04) 1px, transparent 1px)",
+    backgroundImage: "linear-gradient(90deg, rgba(214,178,94,0.04) 1px, transparent 1px), linear-gradient(rgba(214,178,94,0.04) 1px, transparent 1px)",
     backgroundSize: "34px 34px", pointerEvents: "none",
   }} />
 );
@@ -100,7 +100,7 @@ const inputSx = {
   "& .MuiInputLabel-root": { color: appColors.textMuted, fontSize: 14 },
   "& .MuiInputLabel-root.Mui-focused": { color: appColors.primary },
   "& input:-webkit-autofill": {
-    WebkitBoxShadow: "0 0 0 100px #0A1625 inset",
+    WebkitBoxShadow: "0 0 0 100px #0B0B0B inset",
     WebkitTextFillColor: appColors.textPrimary,
   },
 };
@@ -214,7 +214,7 @@ const LoginAuth = () => {
           content: '""',
           position: "absolute",
           inset: 0,
-          background: "linear-gradient(135deg, rgba(32,214,199,0.14), transparent 34%, rgba(242,184,75,0.06) 67%, rgba(124,58,237,0.11))",
+          background: "linear-gradient(135deg, rgba(214,178,94,0.14), transparent 34%, rgba(242,184,75,0.06) 67%, rgba(191,164,106,0.11))",
           pointerEvents: "none",
         },
       }}
@@ -261,7 +261,7 @@ const LoginAuth = () => {
                 border: `1px solid ${appColors.divider}`,
                 color: appColors.textSecondary,
                 background: "rgba(255,255,255,0.04)",
-                "&:hover": { background: "rgba(20,210,190,0.08)", color: appColors.primary, borderColor: "rgba(20,210,190,0.3)" },
+                "&:hover": { background: "rgba(214,178,94,0.08)", color: appColors.primary, borderColor: "rgba(214,178,94,0.3)" },
               }}
             >
               Explore
@@ -407,7 +407,7 @@ const LoginAuth = () => {
                 position: "absolute", top: -60, left: "50%",
                 transform: "translateX(-50%)",
                 width: 260, height: 160, borderRadius: "50%",
-                background: "radial-gradient(circle, rgba(20,210,190,0.12), transparent 70%)",
+                background: "radial-gradient(circle, rgba(214,178,94,0.12), transparent 70%)",
                 pointerEvents: "none",
               }} />
 
@@ -416,7 +416,7 @@ const LoginAuth = () => {
                 <Box sx={{
                   width: 58, height: 58, borderRadius: "8px",
                   border: `1px solid ${appColors.border}`,
-                  background: "rgba(20,210,190,0.08)",
+                  background: "rgba(214,178,94,0.08)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   mx: "auto", mb: 2,
                 }}>
@@ -440,8 +440,8 @@ const LoginAuth = () => {
                   severity="info"
                   sx={{
                     mb: 2, borderRadius: "10px",
-                    background: "rgba(20,210,190,0.08)",
-                    border: "1px solid rgba(20,210,190,0.22)",
+                    background: "rgba(214,178,94,0.08)",
+                    border: "1px solid rgba(214,178,94,0.22)",
                     color: appColors.textPrimary,
                     "& .MuiAlert-icon": { color: appColors.primary },
                   }}
@@ -511,12 +511,12 @@ const LoginAuth = () => {
                   py: 1.4, borderRadius: "10px",
                   fontWeight: 600, fontSize: 13.5,
                   letterSpacing: "0.04em", textTransform: "none",
-                  background: "linear-gradient(135deg, #0FA88F, #14D2BE)",
+                  background: "linear-gradient(135deg, #8B6F2A, #D6B25E)",
                   boxShadow: `0 8px 28px ${appColors.glow}`,
                   transition: "all 0.25s",
                   "&:hover": {
-                    background: "linear-gradient(135deg, #0BBFA5, #1EE8D2)",
-                    boxShadow: "0 12px 36px rgba(20,210,190,0.42)",
+                    background: "linear-gradient(135deg, #8B6F2A, #FFF2C2)",
+                    boxShadow: "0 12px 36px rgba(214,178,94,0.42)",
                     transform: "translateY(-1px)",
                   },
                   "&:active": { transform: "translateY(0)" },
@@ -533,7 +533,7 @@ const LoginAuth = () => {
       {/* Menu */}
       <Menu
         anchorEl={anchorEl} open={openMore} onClose={() => setAnchorEl(null)}
-        PaperProps={{ sx: { background: "#0D1B2A", border: `1px solid ${appColors.border}`, borderRadius: "12px", mt: 1 } }}
+        PaperProps={{ sx: { background: "#0B0B0B", border: `1px solid ${appColors.border}`, borderRadius: "12px", mt: 1 } }}
       >
         <OptionsMoreLogin
           handleClose={() => setAnchorEl(null)}

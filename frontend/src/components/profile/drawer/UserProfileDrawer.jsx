@@ -76,8 +76,8 @@ const TabBar = ({ value, onChange }) => (
             borderRadius: "8px",
             cursor: "pointer",
             transition: "all 0.22s",
-            background: active ? "rgba(20,210,190,0.12)" : "transparent",
-            border: `1px solid ${active ? "rgba(20,210,190,0.3)" : "transparent"}`,
+            background: active ? "rgba(214,178,94,0.12)" : "transparent",
+            border: `1px solid ${active ? "rgba(214,178,94,0.3)" : "transparent"}`,
           }}
         >
           <Box sx={{ color: active ? appColors.primary : appColors.textMuted, display: "flex" }}>
@@ -105,17 +105,17 @@ const ProfileActionBtn = ({ icon, label, onClick, disabled, variant = "default" 
       bg: "rgba(255,255,255,0.05)",
       border: appColors.divider,
       color: appColors.textSecondary,
-      hoverBg: "rgba(20,210,190,0.1)",
-      hoverBorder: "rgba(20,210,190,0.35)",
+      hoverBg: "rgba(214,178,94,0.1)",
+      hoverBorder: "rgba(214,178,94,0.35)",
       hoverColor: appColors.primary,
     },
     danger: {
-      bg: "rgba(239,68,68,0.07)",
-      border: "rgba(239,68,68,0.18)",
-      color: "rgba(239,68,68,0.8)",
-      hoverBg: "rgba(239,68,68,0.14)",
-      hoverBorder: "rgba(239,68,68,0.4)",
-      hoverColor: "#EF4444",
+      bg: "rgba(255,255,255,0.04)",
+      border: "rgba(214,178,94,0.18)",
+      color: appColors.textSecondary,
+      hoverBg: "rgba(214,178,94,0.10)",
+      hoverBorder: "rgba(214,178,94,0.38)",
+      hoverColor: appColors.primary,
     },
   }[variant];
 
@@ -158,7 +158,7 @@ const SkillRow = ({ skills }) => {
           "& .MuiAvatar-root": {
             width: 24, height: 24, fontSize: 9,
             border: `1px solid ${appColors.border}`,
-            background: "#0D1B2A",
+            background: "#0B0B0B",
           },
         }}
       >
@@ -230,10 +230,10 @@ const MessageComposer = ({ value, onChange, onSend, onClose, isSending }) => (
           borderRadius: "7px", px: 1.5, py: 0.5,
           fontSize: 11, fontWeight: 600,
           textTransform: "none",
-          background: value.trim().length > 0 ? "rgba(20,210,190,0.15)" : "transparent",
-          border: `1px solid ${value.trim().length > 0 ? "rgba(20,210,190,0.35)" : appColors.divider}`,
+          background: value.trim().length > 0 ? "rgba(214,178,94,0.15)" : "transparent",
+          border: `1px solid ${value.trim().length > 0 ? "rgba(214,178,94,0.35)" : appColors.divider}`,
           color: value.trim().length > 0 ? appColors.primary : appColors.textMuted,
-          "&:hover": { background: "rgba(20,210,190,0.22)", borderColor: "rgba(20,210,190,0.5)" },
+          "&:hover": { background: "rgba(214,178,94,0.22)", borderColor: "rgba(214,178,94,0.5)" },
           "&.Mui-disabled": { opacity: 0.35 },
         }}
       >
@@ -271,12 +271,13 @@ export default function UserProfileDrawer({ profileData }) {
     specialisationTitle: title,
   } = user || {};
   const { _id: targetID } = profileData || {};
+  const firstName = profileData?.name?.trim()?.split(/\s+/)?.[0] || "Member";
 
   useEffect(() => {
-    if (user?.network?.includes(profileData?._id)) setIsFriend(true);
+    setIsFriend(Boolean(user?.network?.includes(profileData?._id)));
   }, [profileData, user]);
 
-  useEffect(() => { dispatch(resetDefaultBottomNav(true)); });
+  useEffect(() => { dispatch(resetDefaultBottomNav(true)); }, [dispatch]);
 
   /* ── Actions ── */
   const handleShowMessage = () => {
@@ -360,9 +361,9 @@ export default function UserProfileDrawer({ profileData }) {
         overflowX: "hidden",
         "&::-webkit-scrollbar": { width: 3 },
         "&::-webkit-scrollbar-thumb": {
-          background: "rgba(20,210,190,0.2)",
+          background: "rgba(214,178,94,0.2)",
           borderRadius: 2,
-          "&:hover": { background: "rgba(20,210,190,0.4)" },
+          "&:hover": { background: "rgba(214,178,94,0.4)" },
         },
       }}
     >
@@ -372,17 +373,9 @@ export default function UserProfileDrawer({ profileData }) {
           position: "relative",
           px: 2, pt: 2.5, pb: 2,
           borderBottom: `1px solid ${appColors.divider}`,
-          background: "rgba(20,210,190,0.025)",
+          background: "linear-gradient(135deg, rgba(214,178,94,0.08), rgba(255,255,255,0.025))",
         }}
       >
-        {/* subtle top-center glow */}
-        <Box sx={{
-          position: "absolute", top: -30, left: "50%", transform: "translateX(-50%)",
-          width: 180, height: 100, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(20,210,190,0.09), transparent 70%)",
-          pointerEvents: "none",
-        }} />
-
         {/* Avatar */}
         <Box display="flex" justifyContent="center" mb={1.5}>
           <Avatar
@@ -390,8 +383,8 @@ export default function UserProfileDrawer({ profileData }) {
             alt={profileData?.name}
             sx={{
               width: 72, height: 72,
-              border: `2px solid rgba(20,210,190,0.45)`,
-              boxShadow: `0 0 0 4px rgba(20,210,190,0.1)`,
+              border: `2px solid rgba(214,178,94,0.45)`,
+              boxShadow: `0 0 0 4px rgba(214,178,94,0.1)`,
             }}
           />
         </Box>
@@ -399,11 +392,9 @@ export default function UserProfileDrawer({ profileData }) {
         {/* Name */}
         <Typography
           sx={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: 16, fontWeight: 700,
+            fontSize: 17, fontWeight: 900,
             color: appColors.textPrimary,
-            textTransform: "uppercase",
-            letterSpacing: "0.04em",
+            letterSpacing: 0,
             textAlign: "center",
           }}
         >
@@ -489,7 +480,7 @@ export default function UserProfileDrawer({ profileData }) {
       {showMessage && (
         <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${appColors.divider}` }}>
           <Typography sx={{ fontSize: 10, color: appColors.textMuted, letterSpacing: "0.14em", textTransform: "uppercase", mb: 1 }}>
-            Send Message
+            Message {firstName}
           </Typography>
           <MessageComposer
             value={messageContent}

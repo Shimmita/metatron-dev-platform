@@ -8,12 +8,10 @@ import { resetClearCurrentConnectTop } from "../../redux/CurrentConnect";
 import { resetClearCurrentConnectNotif } from "../../redux/CurrentConnectNotif";
 import { resetClearConversations } from "../../redux/CurrentConversations";
 import { resetClearCurrentCourses } from "../../redux/CurrentCourses";
-import { resetClearCurrentEventsTop } from "../../redux/CurrentEventsTop";
 import { resetClearCurrentGlobalSearch } from "../../redux/CurrentGlobalSearch";
 import { resetClearCurrentGroupCommunities } from "../../redux/CurrentGroups";
 import { resetClearCurrentJobFeedBack } from "../../redux/CurrentJobFeedBack";
 import { resetJobSearch } from "../../redux/CurrentJobSearch";
-import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
 import { resetClearPeopleData } from "../../redux/CurrentModal";
 import { resetClearCurrentNetwork } from "../../redux/CurrentNetwork";
 import { resetClearCurrentPostReactions } from "../../redux/CurrentPostReactions";
@@ -57,13 +55,7 @@ const GuestCheck = ({ children }) => {
     
           // reset courses
           dispatch(resetClearCurrentCourses())
-    
-          // reset clear events any
-          dispatch(resetClearCurrentEventsTop())
-    
-          // reset clear top events
-          dispatch(resetClearCurrentEventsTop())
-    
+
           // reset clear global search
           dispatch(resetClearCurrentGlobalSearch())
     
@@ -73,14 +65,8 @@ const GuestCheck = ({ children }) => {
           // reset clear
           dispatch(resetClearCurrentJobFeedBack())
     
-          // reset clear jobs
-          dispatch(resetClearCurrentJobsTop())
-    
           // reset clear job search
           dispatch(resetJobSearch())
-    
-          // clear jobs top
-          dispatch(resetClearCurrentJobsTop())
     
           // clear modal people details
           dispatch(resetClearPeopleData())

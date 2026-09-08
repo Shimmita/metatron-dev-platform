@@ -37,7 +37,7 @@ const OnlineBadge = styled(Badge)(() => ({
   "& .MuiBadge-badge": {
     backgroundColor: appColors.success,
     color: appColors.success,
-    boxShadow: `0 0 0 2px #081220`,
+    boxShadow: `0 0 0 2px #0B0B0B`,
     "&::after": {
       position: "absolute",
       top: 0, left: 0,
@@ -66,12 +66,12 @@ const ActionBtn = ({ icon, label, onClick, disabled }) => (
           borderRadius: "9px",
           border: `1px solid ${disabled ? "rgba(255,255,255,0.05)" : appColors.border}`,
           background: disabled ? "transparent" : "rgba(255,255,255,0.04)",
-          color: disabled ? "rgba(255,255,255,0.12)" : "rgba(240,244,250,0.55)",
+          color: disabled ? "rgba(255,255,255,0.12)" : "rgba(255,253,247,0.55)",
           transition: "all 0.2s",
           "&:hover": disabled ? {} : {
             color: appColors.primary,
             borderColor: appColors.glow,
-            background: "rgba(20,210,190,0.1)",
+            background: "rgba(214,178,94,0.1)",
             transform: "translateY(-2px)",
             boxShadow: `0 4px 12px ${appColors.glow}`,
           },
@@ -161,8 +161,8 @@ export default function AlertMiniProfileView({ openAlert, setOpenAlert, userId }
   /* relation */
   const relationLabel  = isSelf ? "You" : isFriends ? "Connected" : null;
   const relationColor  = isSelf ? appColors.accent : appColors.primary;
-  const relationBg     = isSelf ? "rgba(200,169,110,0.12)" : "rgba(20,210,190,0.1)";
-  const relationBorder = isSelf ? "rgba(200,169,110,0.28)" : "rgba(20,210,190,0.28)";
+  const relationBg     = isSelf ? "rgba(200,169,110,0.12)" : "rgba(214,178,94,0.1)";
+  const relationBorder = isSelf ? "rgba(200,169,110,0.28)" : "rgba(214,178,94,0.28)";
 
   return (
     <>
@@ -186,14 +186,6 @@ export default function AlertMiniProfileView({ openAlert, setOpenAlert, userId }
         }}
         sx={{ "& .MuiBackdrop-root": { backdropFilter: "blur(6px)", background: "rgba(6,13,24,0.65)" } }}
       >
-        {/* Top teal glow */}
-        <Box sx={{
-          position: "absolute", top: -50, left: "50%", transform: "translateX(-50%)",
-          width: 220, height: 130, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(20,210,190,0.13), transparent 70%)",
-          pointerEvents: "none", zIndex: 0,
-        }} />
-
         {/* Close */}
         <IconButton
           onClick={handleClose}
@@ -257,8 +249,8 @@ export default function AlertMiniProfileView({ openAlert, setOpenAlert, userId }
                       alt={miniProfileData?.name}
                       sx={{
                         width: 62, height: 62, flexShrink: 0,
-                        border: `1.5px solid rgba(20,210,190,0.5)`,
-                        boxShadow: `0 0 0 3px rgba(20,210,190,0.12)`,
+                        border: `1.5px solid rgba(214,178,94,0.5)`,
+                        boxShadow: `0 0 0 3px rgba(214,178,94,0.12)`,
                       }}
                     />
                   </OnlineBadge>
@@ -279,11 +271,10 @@ export default function AlertMiniProfileView({ openAlert, setOpenAlert, userId }
                     <Typography
                       noWrap
                       sx={{
-                        fontFamily: "'Playfair Display', Georgia, serif",
-                        fontSize: 16, fontWeight: 700,
+                        fontSize: 16,
+                        fontWeight: 900,
                         color: appColors.textPrimary,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.04em",
+                        letterSpacing: 0,
                       }}
                     >
                       {miniProfileData?.name}
@@ -343,7 +334,7 @@ export default function AlertMiniProfileView({ openAlert, setOpenAlert, userId }
                         width: 28, height: 28,
                         fontSize: 10,
                         border: `1px solid ${appColors.border}`,
-                        background: "#0D1B2A",
+                        background: "#0B0B0B",
                       },
                     }}
                   >

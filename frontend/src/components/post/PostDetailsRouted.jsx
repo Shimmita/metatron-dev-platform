@@ -56,19 +56,26 @@ function PostDetailsRouted() {
   }, [postId, dispatch]);
 
   return (
-    <Box height={'88vh'}>
+    <Box
+      sx={{
+        width: "100%",
+        maxWidth: { xs: "100%", lg: 580 },
+        mx: "auto",
+        minHeight: "calc(100vh - 72px)",
+        px: { xs: 1, sm: 1.25, lg: 0 },
+        pt: { xs: 1, sm: 1.5 },
+      }}
+    >
       <Box
-        maxHeight={"80vh"}
-        className={'rounded'}
         sx={{
-          border: isDarkMode && "1px solid",
-          borderColor:"divider",
-          overflowX: "auto",
-          // Hide scrollbar for Chrome, Safari and Opera
+          border: "1px solid",
+          borderColor: isDarkMode ? "rgba(255,255,255,0.10)" : "rgba(139,111,42,0.12)",
+          borderRadius: "8px",
+          overflowX: "hidden",
+          background: isDarkMode ? "rgba(8,8,8,0.82)" : "rgba(255,255,255,0.88)",
           "&::-webkit-scrollbar": {
             display: "none",
           },
-          // Hide scrollbar for IE, Edge and Firefox
           "-ms-overflow-style": "none",
           "scrollbar-width": "none",
         }}
@@ -96,7 +103,7 @@ function PostDetailsRouted() {
           </Box>
         )}
       </Box>
-      </Box>
+    </Box>
   );
 }
 

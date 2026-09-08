@@ -55,7 +55,7 @@ const AccordionSummary = styled((props) => (
     minHeight: 52,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
-    backgroundColor: theme.palette.mode === 'dark' ? "rgba(20, 210, 190, 0.08)" : "rgba(20, 210, 190, 0.05)",
+    backgroundColor: theme.palette.mode === 'dark' ? "rgba(214,178,94, 0.08)" : "rgba(214,178,94, 0.05)",
   },
   [`& .${accordionSummaryClasses.expandIconWrapper}.${accordionSummaryClasses.expanded}`]: {
     transform: "rotate(90deg)",
@@ -103,7 +103,7 @@ export default function NotifAccordionLayout({
         px: 1, 
         py: 0.1, 
         borderRadius: 1, 
-        boxShadow: '0 0 10px rgba(20, 210, 190, 0.3)' 
+        boxShadow: '0 0 10px rgba(214,178,94, 0.3)' 
       }}>
         <Typography variant="caption" fontWeight={900} color="white" sx={{ fontSize: '0.65rem' }}>
           {count}

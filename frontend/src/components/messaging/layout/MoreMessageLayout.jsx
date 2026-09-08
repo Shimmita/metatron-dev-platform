@@ -40,7 +40,7 @@ function MoreMessageLayout({
         sx={{
           borderRadius: "8px",
           minHeight: 38,
-          "&:hover": { background: "rgba(32,214,199,0.1)" },
+          "&:hover": { background: "rgba(214,178,94,0.1)" },
         }}
       >
         <Stack direction="row" alignItems="center" spacing={1.2}>

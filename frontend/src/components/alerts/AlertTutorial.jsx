@@ -122,14 +122,14 @@ export default function AlertTutorial() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(20,210,190,0.15)",
-            color: "#14D2BE",
+            background: "rgba(214,178,94,0.15)",
+            color: "#D6B25E",
           }}
         >
           <TipsAndUpdatesRounded />
         </Box>
 
-        <Typography fontSize={14} fontWeight={600} color="#F0F4FA">
+        <Typography fontSize={14} fontWeight={600} color="#FFFDF7">
           Welcome to Metatron Developer
         </Typography>
       </Box>
@@ -149,7 +149,7 @@ export default function AlertTutorial() {
               width: `${((activeStep + 1) / totalSteps) * 100}%`,
               height: "100%",
               background:
-                "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                "linear-gradient(135deg,#8B6F2A,#D6B25E)",
               transition: "width 0.3s ease",
             }}
           />
@@ -158,7 +158,7 @@ export default function AlertTutorial() {
         <Typography
           fontSize={11}
           mt={0.5}
-          sx={{ color: "rgba(240,244,250,0.5)" }}
+          sx={{ color: "rgba(255,253,247,0.5)" }}
         >
           Step {activeStep + 1} of {totalSteps}
         </Typography>
@@ -202,7 +202,7 @@ export default function AlertTutorial() {
           <Typography
             fontSize={14}
             fontWeight={600}
-            color="#F0F4FA"
+            color="#FFFDF7"
             mb={1}
           >
             {TutorialData[activeStep].description}
@@ -215,7 +215,7 @@ export default function AlertTutorial() {
                 component="li"
                 fontSize={12}
                 sx={{
-                  color: "rgba(240,244,250,0.65)",
+                  color: "rgba(255,253,247,0.65)",
                   mb: 0.6,
                 }}
               >
@@ -257,12 +257,12 @@ export default function AlertTutorial() {
             sx={{
               borderRadius: "10px",
               background:
-                "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                "linear-gradient(135deg,#8B6F2A,#D6B25E)",
               color: "#fff",
 
               "&:hover": {
                 background:
-                  "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+                  "linear-gradient(135deg,#8B6F2A,#FFF2C2)",
               },
             }}
           >

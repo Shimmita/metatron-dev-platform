@@ -131,14 +131,14 @@ export default function AlertOrgCompletion({
         <CircularProgress sx={{ my: 4 }} />
       ) : successMsg ? (
         <>
-          <Typography color="#22C55E" mb={2}>
+          <Typography color="#D6B25E" mb={2}>
             {successMsg}
           </Typography>
 
           <Button
             onClick={handleLogin}
             sx={{
-              background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
               color: "#fff",
             }}
           >
@@ -153,13 +153,13 @@ export default function AlertOrgCompletion({
             sx={{ width: 70, height: 70, mx: "auto", mb: 1 }}
           />
 
-          <Typography fontSize={15} fontWeight={600} color="#F0F4FA">
+          <Typography fontSize={15} fontWeight={600} color="#FFFDF7">
             Organization Profile
           </Typography>
 
           <Typography
             fontSize={12}
-            sx={{ color: "rgba(240,244,250,0.6)", mb: 2 }}
+            sx={{ color: "rgba(255,253,247,0.6)", mb: 2 }}
           >
             Upload your organization logo
           </Typography>
@@ -199,7 +199,7 @@ export default function AlertOrgCompletion({
             onClick={handleCompleteRegistration}
             sx={{
               mt: 2,
-              background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
               color: "#fff",
             }}
           >

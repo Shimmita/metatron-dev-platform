@@ -46,18 +46,18 @@ const MAX_ABOUT = 400;
 
 /* ─── Design tokens (shared with LoginAuth) ────────────────────────── */
 const C = {
-  bg:          "#060D18",
+  bg:          "#050505",
   bgCard:      "rgba(255,255,255,0.045)",
   bgInput:     "rgba(255,255,255,0.06)",
   border:      "rgba(255,255,255,0.09)",
-  borderFocus: "rgba(20,210,190,0.55)",
-  teal:        "#14D2BE",
-  tealDim:     "rgba(20,210,190,0.18)",
-  tealGlow:    "rgba(20,210,190,0.28)",
+  borderFocus: "rgba(214,178,94,0.55)",
+  teal:        "#D6B25E",
+  tealDim:     "rgba(214,178,94,0.18)",
+  tealGlow:    "rgba(214,178,94,0.28)",
   gold:        "#C8A96E",
-  textPri:     "#F0F4FA",
-  textSec:     "rgba(240,244,250,0.55)",
-  textHint:    "rgba(240,244,250,0.32)",
+  textPri:     "#FFFDF7",
+  textSec:     "rgba(255,253,247,0.55)",
+  textHint:    "rgba(255,253,247,0.32)",
   danger:      "#FF6B6B",
 };
 
@@ -87,7 +87,7 @@ const DotGrid = () => (
   <Box
     sx={{
       position: "absolute", inset: 0,
-      backgroundImage: "radial-gradient(circle, rgba(20,210,190,0.1) 1px, transparent 1px)",
+      backgroundImage: "radial-gradient(circle, rgba(214,178,94,0.1) 1px, transparent 1px)",
       backgroundSize: "28px 28px",
       pointerEvents: "none",
     }}
@@ -130,7 +130,7 @@ const inputSx = {
   "& .MuiAutocomplete-popupIndicator": { color: C.textHint },
   "& .MuiAutocomplete-clearIndicator": { color: C.textHint },
   "& input:-webkit-autofill": {
-    WebkitBoxShadow: `0 0 0 100px #0A1625 inset`,
+    WebkitBoxShadow: `0 0 0 100px #0B0B0B inset`,
     WebkitTextFillColor: C.textPri,
   },
 };
@@ -138,11 +138,11 @@ const inputSx = {
 /* ─── Chip sx (skills, county, institution) ─────────────────────────── */
 const chipSx = {
   background: C.tealDim,
-  border: `1px solid rgba(20,210,190,0.3)`,
+  border: `1px solid rgba(214,178,94,0.3)`,
   color: C.teal,
   fontSize: 11,
   height: 24,
-  "& .MuiChip-deleteIcon": { color: "rgba(20,210,190,0.6)", "&:hover": { color: C.teal } },
+  "& .MuiChip-deleteIcon": { color: "rgba(214,178,94,0.6)", "&:hover": { color: C.teal } },
 };
 
 /* ─── Section label ─────────────────────────────────────────────────── */
@@ -182,8 +182,8 @@ const AccountToggle = ({ account, setAccount, AccountVersion }) => (
           justifyContent: "center",
           gap: 0.75,
           transition: "all 0.25s",
-          background: account === v ? "rgba(20,210,190,0.15)" : "transparent",
-          border: account === v ? `1px solid rgba(20,210,190,0.35)` : "1px solid transparent",
+          background: account === v ? "rgba(214,178,94,0.15)" : "transparent",
+          border: account === v ? `1px solid rgba(214,178,94,0.35)` : "1px solid transparent",
         }}
       >
         {v === "Personal"
@@ -208,7 +208,7 @@ const OnboardingInsightPanel = () => (
       p: 4,
       borderRadius: "8px",
       border: `1px solid ${C.border}`,
-      background: "linear-gradient(180deg, rgba(20,210,190,0.08), rgba(15,76,129,0.08), rgba(255,255,255,0.035))",
+      background: "linear-gradient(180deg, rgba(214,178,94,0.08), rgba(139,111,42,0.08), rgba(255,255,255,0.035))",
       backdropFilter: "blur(28px)",
       boxShadow: "0 24px 80px rgba(0,0,0,0.35)",
     }}
@@ -285,8 +285,8 @@ const RegistrationProgress = ({ showNext, basicsReady, profileReady, isPersonal 
               key={row.label}
               sx={{
                 borderRadius: "8px",
-                border: `1px solid ${active ? "rgba(20,210,190,0.42)" : C.border}`,
-                background: row.ready ? "rgba(34,197,94,0.09)" : active ? "rgba(20,210,190,0.1)" : "transparent",
+                border: `1px solid ${active ? "rgba(214,178,94,0.42)" : C.border}`,
+                background: row.ready ? "rgba(214,178,94,0.09)" : active ? "rgba(214,178,94,0.1)" : "transparent",
                 px: 0.8,
                 py: 0.75,
                 minHeight: 52,
@@ -295,7 +295,7 @@ const RegistrationProgress = ({ showNext, basicsReady, profileReady, isPersonal 
               <Typography sx={{ color: active ? C.teal : C.textSec, fontSize: 10, fontWeight: 900 }}>
                 {index + 1}. {row.label}
               </Typography>
-              <Typography sx={{ color: row.ready ? "#22C55E" : C.textHint, fontSize: 10 }}>
+              <Typography sx={{ color: row.ready ? "#D6B25E" : C.textHint, fontSize: 10 }}>
                 {row.ready ? "Ready" : active ? "In progress" : "Pending"}
               </Typography>
             </Box>
@@ -414,7 +414,7 @@ const RegistrationAuth = () => {
       alignItems="center"
       justifyContent="center"
       sx={{
-        background: "linear-gradient(180deg, #050812 0%, #08111F 52%, #0B1220 100%)",
+        background: "linear-gradient(180deg, #050505 0%, #0B0B0B 52%, #111111 100%)",
         position: "relative",
         overflow: "auto",
         opacity: openAlertProfile ? 0.5 : 1,
@@ -424,8 +424,8 @@ const RegistrationAuth = () => {
       }}
     >
       {/* Ambient orbs */}
-      <Orb top="-8%"   left="-6%"  size={480} color="radial-gradient(circle,rgba(20,210,190,0.3),transparent)" delay="0s" />
-      <Orb bottom="-6%" right="-4%" size={360} color="radial-gradient(circle,rgba(15,76,129,0.45),transparent)" delay="4s" />
+      <Orb top="-8%"   left="-6%"  size={480} color="radial-gradient(circle,rgba(214,178,94,0.3),transparent)" delay="0s" />
+      <Orb bottom="-6%" right="-4%" size={360} color="radial-gradient(circle,rgba(139,111,42,0.45),transparent)" delay="4s" />
       <Orb top="40%"   left="45%"  size={250} color="radial-gradient(circle,rgba(200,169,110,0.1),transparent)" delay="2s" />
       <DotGrid />
 
@@ -557,7 +557,7 @@ const RegistrationAuth = () => {
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
                 sx={inputSx}
-                SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0D1B2A", border: `1px solid ${C.border}` } } } }}
+                SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0B0B0B", border: `1px solid ${C.border}` } } } }}
               >
                 {GenderData?.map((g) => (
                   <MenuItem key={g} value={g} sx={{ color: C.textSec, "&:hover": { color: C.textPri } }}>{g}</MenuItem>
@@ -604,7 +604,7 @@ const RegistrationAuth = () => {
               value={specialisationTitle}
               onChange={(e) => setSpecialisationTitle(e.target.value)}
               sx={inputSx}
-              SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0D1B2A", border: `1px solid ${C.border}`, maxHeight: 260 } } } }}
+              SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0B0B0B", border: `1px solid ${C.border}`, maxHeight: 260 } } } }}
             >
               {(isPersonal ? SpecialisationJobs : OrgSpecializations)?.map((t) => (
                 <MenuItem key={t} value={t} sx={{ color: C.textSec, "&:hover": { color: C.textPri } }}>{t}</MenuItem>
@@ -622,7 +622,7 @@ const RegistrationAuth = () => {
                   value={educationLevel}
                   onChange={(e) => setEducationLevel(e.target.value)}
                   sx={inputSx}
-                  SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0D1B2A", border: `1px solid ${C.border}` } } } }}
+                  SelectProps={{ MenuProps: { PaperProps: { sx: { background: "#0B0B0B", border: `1px solid ${C.border}` } } } }}
                 >
                   {EducationLevel?.map((l) => (
                     <MenuItem key={l} value={l} sx={{ color: C.textSec, "&:hover": { color: C.textPri } }}>{l}</MenuItem>
@@ -656,7 +656,7 @@ const RegistrationAuth = () => {
                       />
                     }
                     PaperComponent={({ children }) => (
-                      <Box sx={{ background: "#0D1B2A", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
+                      <Box sx={{ background: "#0B0B0B", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
                         {children}
                       </Box>
                     )}
@@ -705,7 +705,7 @@ const RegistrationAuth = () => {
                     ))
                   }
                   PaperComponent={({ children }) => (
-                    <Box sx={{ background: "#0D1B2A", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
+                    <Box sx={{ background: "#0B0B0B", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
                       {children}
                     </Box>
                   )}
@@ -740,7 +740,7 @@ const RegistrationAuth = () => {
                   />
                 }
                 PaperComponent={({ children }) => (
-                  <Box sx={{ background: "#0D1B2A", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
+                  <Box sx={{ background: "#0B0B0B", border: `1px solid ${C.border}`, borderRadius: "10px", overflow: "hidden" }}>
                     {children}
                   </Box>
                 )}
@@ -792,7 +792,7 @@ const RegistrationAuth = () => {
                     border: `1px solid ${C.border}`,
                     borderRadius: "8px",
                     width: 38, height: 38,
-                    "&:hover": { color: C.teal, borderColor: "rgba(20,210,190,0.4)" },
+                    "&:hover": { color: C.teal, borderColor: "rgba(214,178,94,0.4)" },
                   }}
                 >
                   <ArrowBackIosNewRounded sx={{ width: 14, height: 14 }} />
@@ -814,12 +814,12 @@ const RegistrationAuth = () => {
                 fontSize: 14,
                 letterSpacing: "0.04em",
                 textTransform: "none",
-                background: `linear-gradient(135deg, #0FA88F 0%, ${C.teal} 100%)`,
+                background: `linear-gradient(135deg, #8B6F2A 0%, ${C.teal} 100%)`,
                 boxShadow: `0 8px 28px ${C.tealGlow}`,
                 transition: "all 0.25s",
                 "&:hover": {
-                  background: `linear-gradient(135deg, #0BBFA5 0%, #1EE8D2 100%)`,
-                  boxShadow: `0 12px 36px rgba(20,210,190,0.42)`,
+                  background: `linear-gradient(135deg, #8B6F2A 0%, #FFF2C2 100%)`,
+                  boxShadow: `0 12px 36px rgba(214,178,94,0.42)`,
                   transform: "translateY(-1px)",
                 },
                 "&:active": { transform: "translateY(0)" },

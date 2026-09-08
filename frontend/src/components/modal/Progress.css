@@ -25,7 +25,7 @@
   position: absolute;
   width: 50%;
   height: 100%;
-  background-color: #4CAF50; /* Color of the progress indicator */
+  background-color: #D6B25E; /* Gold progress indicator */
   transform-origin: right center; /* Pivot point for rotation */
   transition: transform 0.5s linear; /* Smooth animation */
 }

@@ -14,32 +14,32 @@ const BpIcon = styled("span")(({ theme }) => ({
   backgroundImage:
     "linear-gradient(180deg,hsla(0,0%,100%,.8),hsla(0,0%,100%,0))",
   ".Mui-focusVisible &": {
-    outline: "2px auto rgba(19,124,189,.6)",
+    outline: "2px auto rgba(214,178,94,.6)",
     outlineOffset: 2,
   },
   "input:hover ~ &": {
     backgroundColor: "#ebf1f5",
     ...theme.applyStyles("dark", {
-      backgroundColor: "#30404d",
+      backgroundColor: "#171717",
     }),
   },
   "input:disabled ~ &": {
     boxShadow: "none",
     background: "rgba(206,217,224,.5)",
     ...theme.applyStyles("dark", {
-      background: "rgba(57,75,89,.5)",
+      background: "rgba(214,178,94,.14)",
     }),
   },
   ...theme.applyStyles("dark", {
     boxShadow: "0 0 0 1px rgb(16 22 26 / 40%)",
-    backgroundColor: "#394b59",
+    backgroundColor: "#1A1A1A",
     backgroundImage:
       "linear-gradient(180deg,hsla(0,0%,100%,.05),hsla(0,0%,100%,0))",
   }),
 }));
 
 const BpCheckedIcon = styled(BpIcon)({
-  backgroundColor: "#137cbd",
+  backgroundColor: "#D6B25E",
   backgroundImage:
     "linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))",
   "&::before": {
@@ -50,11 +50,11 @@ const BpCheckedIcon = styled(BpIcon)({
     content: '""',
   },
   "input:hover ~ &": {
-    backgroundColor: "#106ba3",
+    backgroundColor: "#8B6F2A",
   },
 });
 
-// Inspired by blue-print
+// Inspired by black-gold grid
 function BpRadio(props) {
   return (
     <Radio

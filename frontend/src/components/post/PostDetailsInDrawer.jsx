@@ -8,6 +8,7 @@ import {
   InputBase,
   Stack,
   Tooltip,
+  Typography,
 } from "@mui/material";
 
 import { Close, FullscreenOutlined, SendOutlined } from "@mui/icons-material";
@@ -145,18 +146,39 @@ function PostDetailsInDrawer({
     gap={1} 
     >
       
-    <Box display={"flex"} justifyContent={"flex-end"} alignItems={'center'}>
-      <Tooltip arrow title={"wide"}>
-        {/* full screen toggle, close drawer show modal */}
-        <IconButton onClick={handleShowPostDetailedNoDrawer}>
-        <FullscreenOutlined sx={{ width: 18, height: 18 }} color="primary" />
-        </IconButton>
-    </Tooltip>
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      gap={1}
+      sx={{
+        p: 1,
+        borderRadius: "8px",
+        border: "1px solid rgba(255,255,255,0.10)",
+        background: "linear-gradient(135deg, rgba(13,13,13,0.94), rgba(214,178,94,0.08))",
+      }}
+    >
+      <Box minWidth={0}>
+        <Typography variant="body2" fontWeight={900}>
+          Focused Post
+        </Typography>
+        <Typography variant="caption" color="text.secondary" noWrap>
+          Review and comment
+        </Typography>
+      </Box>
+      <Stack direction="row" spacing={0.5}>
+        <Tooltip arrow title={"Open wide"}>
+          <IconButton onClick={handleShowPostDetailedNoDrawer}>
+            <FullscreenOutlined sx={{ width: 18, height: 18 }} color="primary" />
+          </IconButton>
+        </Tooltip>
 
-    {/* close button */}
-    <IconButton onClick={handleClearPostDetailedData}>
-        <Close sx={{ width: 15, height: 15 }} color="primary" />
-    </IconButton>
+        <Tooltip arrow title={"Close focused post"}>
+          <IconButton onClick={handleClearPostDetailedData}>
+            <Close sx={{ width: 15, height: 15 }} color="primary" />
+          </IconButton>
+        </Tooltip>
+      </Stack>
     </Box>
 
     {/* display error */}
@@ -205,9 +227,11 @@ function PostDetailsInDrawer({
         width={"100%"}
         p={1}
         mb={5}
-        bgcolor={"background.default"}
-        className={'rounded'}
-        sx={{ border:'1px solid', borderColor:'divider' }}
+        sx={{
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.10)",
+          background: "rgba(255,255,255,0.055)",
+        }}
         >
         {/* input for comment */}
         <Box width={"100%"} mx={1}>
@@ -218,7 +242,7 @@ function PostDetailsInDrawer({
             maxRows={2}
             disabled={isUploading}
             className="w-100"
-            placeholder="write new comment ..."
+            placeholder="Add a clear, useful comment..."
             sx={{
                 fontSize: "small",
             }}

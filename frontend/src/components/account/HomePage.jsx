@@ -64,30 +64,30 @@ function Homepage() {
         backgroundImage: (theme) =>
           theme.palette.mode === "dark"
             ? [
-              "linear-gradient(90deg, rgba(32,214,199,0.03) 1px, transparent 1px)",
-              "linear-gradient(rgba(32,214,199,0.03) 1px, transparent 1px)",
-              "linear-gradient(135deg, rgba(32,214,199,0.12), transparent 34%, rgba(242,184,75,0.06) 72%, rgba(124,58,237,0.10))",
+              "linear-gradient(90deg, rgba(214,178,94,0.03) 1px, transparent 1px)",
+              "linear-gradient(rgba(214,178,94,0.03) 1px, transparent 1px)",
+              "linear-gradient(135deg, rgba(214,178,94,0.12), transparent 34%, rgba(242,184,75,0.06) 72%, rgba(191,164,106,0.10))",
             ].join(",")
-            : "linear-gradient(180deg, #F8FAFC 0%, #EEF7FF 100%)",
+            : "linear-gradient(180deg, #F7F3EA 0%, #F7F3EA 100%)",
         backgroundSize: "42px 42px, 42px 42px, 100% 100%",
         backgroundAttachment: "fixed",
       }}
     >
-      <Navbar />
+      {!isWorkspaceRoute && <Navbar />}
       <Box
         sx={{
           width: "100%",
-          maxWidth: isWorkspaceRoute ? "none" : "1740px",
+          maxWidth: isWorkspaceRoute ? "none" : { xs: "100%", lg: "1128px", xl: "1188px" },
           mx: "auto",
-          px: isWorkspaceRoute ? { xs: 0, lg: 0 } : { xs: 1, sm: 1.5, md: 2, lg: 2.5 },
+          px: isWorkspaceRoute ? { xs: 0, lg: 0 } : { xs: 1, sm: 1.5, md: 2, lg: 1.5, xl: 0 },
           pb: { xs: 10, lg: 4 },
           display: "flex",
           flexWrap: "nowrap",
           justifyContent: "center",
           alignItems: "flex-start",
-          gap: { xs: 0, sm: 1.5, md: 2, lg: 2.5 },
+          gap: { xs: 0, sm: 1.5, md: 2, lg: 2 },
           overflowX: "hidden",
-          height: { lg: "calc(100vh - 56px)" },
+          height: { lg: isWorkspaceRoute ? "100vh" : "calc(100vh - 56px)" },
           overflowY: { lg: "hidden" },
         }}
       >

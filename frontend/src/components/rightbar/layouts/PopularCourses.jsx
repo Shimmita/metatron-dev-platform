@@ -1,3 +1,4 @@
+import { LockRounded } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -15,11 +16,12 @@ import React from "react";
 import { useSelector } from "react-redux";
 import Python from "../../../images/python.jpeg";
 
-function PopularCouses() {
+function PopularCouses({ courseTop }) {
   // redux states
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
     (state) => state.appUI
   );
+  const { isGuest } = useSelector((state) => state.currentUser);
 
   return (
     <React.Fragment>
@@ -35,8 +37,8 @@ function PopularCouses() {
             transition: "all 0.25s ease",
 
             "&:hover": {
-              background: "rgba(20,210,190,0.06)",
-              borderColor: "rgba(20,210,190,0.3)",
+              background: "rgba(214,178,94,0.06)",
+              borderColor: "rgba(214,178,94,0.3)",
             },
           }}>
             <ListItemAvatar>
@@ -83,14 +85,14 @@ function PopularCouses() {
             transition: "all 0.25s ease",
 
             "&:hover": {
-              background: "rgba(20,210,190,0.06)",
-              borderColor: "rgba(20,210,190,0.3)",
+              background: "rgba(214,178,94,0.06)",
+              borderColor: "rgba(214,178,94,0.3)",
             },
           }}>
             <ListItemAvatar>
               <Avatar
                 variant="rounded"
-                src={Python}
+                src={courseTop?.course_logo?.logoLink || Python}
                 sx={{
                   background: "rgba(255,255,255,0.08)",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -98,7 +100,7 @@ function PopularCouses() {
                   maxWidth: 36,
                   maxHeight: 36,
                 }}
-                alt="S"
+                alt={courseTop?.course_title?.[0] || "C"}
                 aria-label="avatar"
               />
             </ListItemAvatar>
@@ -106,13 +108,13 @@ function PopularCouses() {
               primary={<Typography
                 fontSize={13}
                 fontWeight={600}
-                color="#F0F4FA"
+                color="#FFFDF7"
               >
-                Python Course
+                {courseTop?.course_title || "Course"}
               </Typography>}
               secondary={
-                <Typography variant="body2" sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}>
-                  Advanced
+                <Typography variant="body2" sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}>
+                  {courseTop?.course_category?.main || "Practical track"}
                 </Typography>
               }
             />
@@ -121,20 +123,21 @@ function PopularCouses() {
               <Button
                 disableElevation
                 size="small"
+                startIcon={isGuest ? <LockRounded /> : undefined}
                 sx={{
                   borderRadius: "10px",
-                  background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                  background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                   color: "#fff",
                   px: 1.5,
                   py: 0.4,
                   fontSize: "0.7rem",
 
                   "&:hover": {
-                    background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+                    background: "linear-gradient(135deg,#8B6F2A,#FFF2C2)",
                   },
                 }}
               >
-                Enroll
+                {isGuest ? "Login" : "Enroll"}
               </Button>
             </Box>
           </ListItem>

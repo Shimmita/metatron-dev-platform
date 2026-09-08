@@ -69,6 +69,15 @@ const BoxAvatarContent = styled(Box)({
   gap: "1rem",
 });
 
+const getRequestMessage = (err, fallback = "Unable to load insights.") => {
+  if (err?.code === "ERR_NETWORK") return "Server is unreachable. Please try again later.";
+  const payload = err?.response?.data || err;
+  if (typeof payload === "string") return payload;
+  if (payload?.message) return payload.message;
+  if (payload?.error) return payload.error;
+  return fallback;
+};
+
   const Root = styled('div')(({ theme }) => ({
   width: '100%',
   ...theme.typography.body2,
@@ -126,18 +135,12 @@ const DrawerSmartphone = ({
           .then((res) => {
             // update the redux of current post
             if (res?.data) {
-              setDataInsights(res.data.insights)
-              setDataTools(res.data.tools)
+              setDataInsights(Array.isArray(res.data.insights) ? res.data.insights : [])
+              setDataTools(Array.isArray(res.data.tools) ? res.data.tools : [])
             }
           })
           .catch((err) => {
-            if (err?.code === "ERR_NETWORK") {
-              setErrorMessage(
-                "Server is unreachable "
-              );
-              return;
-            }
-            setErrorMessage(err?.response?.data || "Unable to load insights.");
+            setErrorMessage(getRequestMessage(err));
     
           })
           .finally(() => {
@@ -158,7 +161,7 @@ const DrawerSmartphone = ({
           borderRight: "1px solid",
           borderColor: isDarkMode ? appColors.border : "rgba(15,23,42,0.12)",
           background: isDarkMode
-            ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(11,18,32,0.98))"
+            ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(13,13,13,0.98))"
             : appGradients.soft,
           overflow: "hidden",
         },
@@ -170,8 +173,8 @@ const DrawerSmartphone = ({
       height={"100%"} 
       sx={{
         backgroundImage: isDarkMode
-          ? "linear-gradient(180deg, rgba(32,214,199,0.08), rgba(8,17,31,0.96))"
-          : "linear-gradient(180deg, #F8FAFC, #EEF7FF)",
+          ? "linear-gradient(180deg, rgba(214,178,94,0.08), rgba(10,10,10,0.96))"
+          : "linear-gradient(180deg, #F7F3EA, #F7F3EA)",
       }}
       >
       <Box 

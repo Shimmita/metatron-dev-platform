@@ -49,8 +49,8 @@ const jobStatus = ["active", "inactive"]
 
 const StyledBadgeActive = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
-    backgroundColor: "#44b700",
-    color: "#44b700",
+    backgroundColor: "#D6B25E",
+    color: "#D6B25E",
     boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
     "&::after": {
       position: "absolute",
@@ -303,7 +303,7 @@ export default function ManageJobsTable({ setIsManageJobsTable, MyPostedJobs }) 
             marginLeft: 1,
             button: {
               color: appColors.textSecondary,
-              "&:hover": { backgroundColor: "rgba(20,210,190,0.08)" },
+              "&:hover": { backgroundColor: "rgba(214,178,94,0.08)" },
               "&.Mui-disabled": { opacity: 0.4 },
             },
           },

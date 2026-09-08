@@ -1,14 +1,12 @@
 import {
-  CloseRounded,
-  DownloadRounded,
+  CodeRounded,
   FavoriteRounded,
   ForumRounded,
   GitHub,
-  GradeOutlined,
   InfoRounded,
-  LocalOfferOutlined,
   LockRounded,
   MoreVertRounded,
+  OpenInNewRounded,
   RefreshRounded,
   VerifiedRounded,
 } from "@mui/icons-material";
@@ -20,7 +18,6 @@ import {
   CardActionArea,
   CardContent,
   CircularProgress,
-  Dialog,
   Divider,
   FormHelperText,
   IconButton,
@@ -47,9 +44,6 @@ import SnackbarConnect from "../snackbar/SnackbarConnect";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
 import CardFeedMore from "./CardFeedMore";
@@ -88,7 +82,7 @@ const CardFeed = ({
   const theme = useTheme();
   const isDarkMode = currentMode === "dark";
   const panelRadius = `${theme.shape.borderRadius}px`;
-  const imageRadius = `${Math.max(theme.shape.borderRadius - 2, 10)}px`;
+  const imageRadius = panelRadius;
 
   const { _id, avatar, name, specialisationTitle: title, country, county } = user || {};
   const { clicks: post_like_cicks } = post.post_liked || {};
@@ -149,14 +143,10 @@ const CardFeed = ({
   const handleName = () => {
     const titleParts = post?.post_owner?.ownername?.split(" ") || [];
     const first = titleParts[0] || "";
-    const second = titleParts[1] ? titleParts[1].substring(0, 1) : "";
-
-    return [first, second].filter(Boolean).join(" ");
+    return first;
   };
 
-  const ownerNameDisplay = CustomDeviceSmallest()
-    ? handleName()
-    : `${post?.post_owner?.ownername || ""}`;
+  const ownerNameDisplay = handleName() || "Member";
   const ownerTitleDisplay = CustomDeviceSmallest()
     ? handleOccupation()
     : `${post?.post_owner?.ownertitle || ""}`;
@@ -169,6 +159,7 @@ const CardFeed = ({
   const popupMeta = [post?.post_category?.main, locationLabel, getElapsedTime(post?.createdAt)]
     .filter(Boolean);
   const engagementSummary = actionItems => actionItems.reduce((sum, item) => sum + (item.count || 0), 0);
+  const actionLabel = (value) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
 
   useEffect(() => {
     const postID = `${post.post_owner?.ownerId}`;
@@ -329,20 +320,6 @@ const CardFeed = ({
       });
   };
 
-  const handleMaxTextWidth = () => {
-    if (CustomLandscapeWidest()) {
-      return "90%";
-    }
-    if (CustomDeviceTablet()) {
-      return "95%";
-    }
-    if (CustomLandScape()) {
-      return "93%";
-    }
-
-    return "98%";
-  };
-
   const postImageSrc = handlePostImagePresent();
 
   const actionItems = [
@@ -359,7 +336,7 @@ const CardFeed = ({
           sx={{
             width: 18,
             height: 18,
-            color: currentUserLiked ? "#14D2BE" : "rgba(255,255,255,0.6)"
+            color: currentUserLiked ? "#D6B25E" : "rgba(255,255,255,0.6)"
           }}
         />
       ),
@@ -401,29 +378,41 @@ const CardFeed = ({
       elevation={0}
       sx={{
         mt: 2,
-        mb: isLastIndex ? 10 : 4,
+        mb: isLastIndex ? { xs: 18, md: 22, lg: 24 } : 4,
+        scrollMarginBottom: isLastIndex ? { xs: "150px", md: "160px", lg: "170px" } : undefined,
         width: "100%",
-        maxWidth: { xs: "100%", lg: "580px", xl: "640px" },
+        maxWidth: "100%",
         mx: "auto",
-        background: "rgba(255,255,255,0.04)",
+        position: "relative",
+        background: isDarkMode
+          ? "linear-gradient(180deg, rgba(18,18,18,0.96), rgba(5,5,5,0.98))"
+          : "rgba(255,255,255,0.96)",
         backdropFilter: "blur(25px)",
-        border: "1px solid rgba(255,255,255,0.08)",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
-
         border:
           theme.palette.mode === "dark"
             ? "1px solid rgba(255,255,255,0.08)"
-            : "1px solid rgba(15,76,129,0.12)",
+            : "1px solid rgba(139,111,42,0.12)",
         borderRadius: panelRadius,
+        boxShadow: isDarkMode
+          ? "0 18px 48px rgba(0,0,0,0.42)"
+          : "0 14px 34px rgba(139,111,42,0.08)",
         opacity: openMenu && !isDarkMode ? 0.98 : 1,
         overflow: "hidden",
         transition: "transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease",
         "&:hover": {
-          transform: "translateY(-3px)",
-          boxShadow: "0 30px 80px rgba(0,0,0,0.75)",
+          transform: "translateY(-2px)",
+          boxShadow: isDarkMode
+            ? "0 26px 70px rgba(0,0,0,0.56)"
+            : "0 22px 50px rgba(139,111,42,0.14)",
         }
       }}
     >
+      <Box
+        sx={{
+          height: 3,
+          background: "linear-gradient(90deg, #8B6F2A, #D6B25E, rgba(255,242,194,0.86))",
+        }}
+      />
       <Box px={1.5} pt={1.5} pb={1}>
         <Box display="flex" justifyContent="space-between" gap={1.2}>
           <Box display="flex" gap={1.2} flex={1} minWidth={0}>
@@ -438,9 +427,9 @@ const CardFeed = ({
                   sx={{
                     width: 48,
                     height: 48,
-                    borderRadius: "14px",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    boxShadow: "0 0 10px rgba(20,210,190,0.2)",
+                    borderRadius: "8px",
+                    border: "1px solid rgba(214,178,94,0.28)",
+                    boxShadow: "0 0 12px rgba(214,178,94,0.18)",
                   }}
                   alt=""
                 />
@@ -449,7 +438,7 @@ const CardFeed = ({
 
             <Box minWidth={0} flex={1}>
               <Box display="flex" alignItems="center" gap={0.8} flexWrap="wrap">
-                <Typography variant="body1" lineHeight={1.2}>
+                <Typography variant="body1" fontWeight={900} lineHeight={1.2}>
                   {ownerNameDisplay}
                 </Typography>
                 <VerifiedRounded color="primary" sx={{ width: 17, height: 17 }} />
@@ -460,7 +449,7 @@ const CardFeed = ({
                       px: 0.75,
                       py: 0.15,
                       borderRadius: 999,
-                      bgcolor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(15,76,129,0.08)",
+                      bgcolor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(139,111,42,0.08)",
                       color: "text.secondary",
                     }}
                   >
@@ -472,6 +461,9 @@ const CardFeed = ({
               <Typography variant="body2" color="text.secondary" sx={{ mt: 0.35 }}>
                 {ownerTitleDisplay}
               </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.2 }}>
+                {getElapsedTime(post?.createdAt)}
+              </Typography>
             </Box>
           </Box>
 
@@ -480,22 +472,16 @@ const CardFeed = ({
               sx={{
                 px: 1.1,
                 py: 0.4,
-                borderRadius: 999,
-                border: "1px solid",
-                borderColor: "rgba(255,255,255,0.12)",
-                background: "rgba(20,210,190,0.08)",
-                border: "1px solid rgba(20,210,190,0.25)",
+                borderRadius: "8px",
+                background: "linear-gradient(135deg, rgba(214,178,94,0.14), rgba(255,255,255,0.035))",
+                border: "1px solid rgba(214,178,94,0.25)",
               }}
             >
-              <Typography variant="caption" color="primary">
+              <Typography variant="caption" color="primary.main" fontWeight={900}>
                 {post?.post_category?.main}
               </Typography>
             </Box>
             <Box display="flex" alignItems="center">
-              <Typography pt={0.5} variant="caption" mr={postBelongsCurrentUser ? 0 : 0.5}>
-                {getElapsedTime(post?.createdAt)}
-              </Typography>
-
               {isGuest ? (
                 <Box pl={1}>
                   <Tooltip title="login" arrow>
@@ -566,32 +552,32 @@ const CardFeed = ({
                     px: 1,
                     py: 0.35,
                     borderRadius: 999,
-                    bgcolor: isDarkMode ? "rgba(68,183,0,0.1)" : "rgba(68,183,0,0.08)",
-                    border: "1px solid rgba(68,183,0,0.18)",
+                    bgcolor: isDarkMode ? "rgba(214,178,94,0.1)" : "rgba(214,178,94,0.08)",
+                    border: "1px solid rgba(214,178,94,0.18)",
                   }}
                 >
-                  <Typography variant="caption" color="success.main">
+                  <Typography variant="caption" color="primary.main" fontWeight={800}>
                     {post?.favorite_count} saved
                   </Typography>
                 </Box>
               )}
             </Box>
-            <Typography variant="caption" color="text.secondary">
-              {engagementSummary(actionItems)} total interactions
+            <Typography variant="caption" color="text.secondary" fontWeight={700}>
+              {engagementSummary(actionItems)} signals
             </Typography>
           </Box>
 
           <Box mt={1.25} display="flex" alignItems="flex-start" gap={1}>
-            <GradeOutlined
+            <CodeRounded
               sx={{
                 width: 18,
                 height: 18,
                 mt: 0.4,
-                color: isDarkMode ? "warning.light" : "warning.main",
+                color: "primary.main",
               }}
             />
-            <Box>
-              <Typography >
+            <Box minWidth={0}>
+              <Typography variant="h6" fontWeight={900} lineHeight={1.24}>
                 {post?.post_title}
               </Typography>
 
@@ -603,12 +589,9 @@ const CardFeed = ({
                       sx={{
                         px: 1,
                         py: 0.3,
-                        borderRadius: 999,
-                        border: "1px solid",
-                        borderColor: "rgba(255,255,255,0.12)",
-                        background: "rgba(20,210,190,0.08)",
-                        background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: "8px",
+                        background: isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(139,111,42,0.06)",
+                        border: "1px solid rgba(214,178,94,0.16)",
                       }}
                     >
                       <Typography variant="caption" color="text.secondary">
@@ -625,11 +608,11 @@ const CardFeed = ({
         <CardActionArea onClick={handleFullDescription} disabled={!detailsLong} sx={{ borderRadius: imageRadius }}>
           <Box
             sx={{
-              borderRadius: imageRadius,
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              backdropFilter: "blur(10px)", border: "1px solid",
-              borderColor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(15,76,129,0.08)",
+              borderRadius: "8px",
+              background: isDarkMode ? "rgba(255,255,255,0.035)" : "rgba(139,111,42,0.035)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid",
+              borderColor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(139,111,42,0.08)",
               px: { xs: 1.25, sm: 1.5 },
               py: 1.35,
             }}
@@ -638,14 +621,15 @@ const CardFeed = ({
               color={isDarkMode ? "text.secondary" : "text.primary"}
               sx={{
                 lineHeight: 1.7,
-                letterSpacing: "0.01em",
+                letterSpacing: 0,
+                whiteSpace: "pre-line",
               }}
               variant="body2"
               maxWidth="100%"
             >
               {isFullDescription ? details : handleDetailsLength()}
               {detailsLong && !isFullDescription && (
-                <Box component="span" color="primary.main">
+                <Box component="span" color="primary.main" fontWeight={900}>
                   {" "}
                   Read more
                 </Box>
@@ -662,10 +646,10 @@ const CardFeed = ({
             onClick={handleOpenImagePreview}
             sx={{
               width: "100%",
-              borderRadius: imageRadius,
+              borderRadius: "8px",
               overflow: "hidden",
               border: "1px solid",
-              borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(15,76,129,0.12)",
+              borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(139,111,42,0.12)",
               background: "rgba(255,255,255,0.02)",
               backdropFilter: "blur(10px)",
               borderTop: "1px solid rgba(255,255,255,0.06)",
@@ -675,11 +659,12 @@ const CardFeed = ({
               sx={{
                 position: "relative",
                 width: "100%",
-                borderRadius: imageRadius,
+                borderRadius: "8px",
                 overflow: "hidden",
                 border: "1px solid rgba(255,255,255,0.08)",
-                background: "rgba(255,255,255,0.02)",
-                aspectRatio: post?.post_type === "image" ? "1 / 1" : "16 / 9",
+                background: isDarkMode ? "#050505" : "rgba(255,255,255,0.7)",
+                aspectRatio: { xs: "4 / 3", sm: post?.post_type === "image" ? "4 / 3" : "16 / 9" },
+                maxHeight: { sm: 560 },
               }}
             >
               <Box
@@ -707,11 +692,11 @@ const CardFeed = ({
       <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
       <Box
         display="flex"
-        p={1.25}
+        p={1.1}
         justifyContent="center"
         alignItems="center"
         sx={{
-          bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "rgba(15,76,129,0.02)",
+          bgcolor: isDarkMode ? "rgba(255,255,255,0.02)" : "rgba(139,111,42,0.02)",
         }}
       >
         <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" justifyContent="center" width="100%">
@@ -723,27 +708,27 @@ const CardFeed = ({
                   disabled={disabled}
                   variant="text"
                   startIcon={icon}
+                  endIcon={key === "github" && post_github_link ? <OpenInNewRounded sx={{ width: 14, height: 14 }} /> : undefined}
                   sx={{
                     minWidth: { xs: "48%", sm: 120 },
                     px: 1.5,
                     py: 0.6,
-                    justifyContent: "flex-start",
-                    borderRadius: 10,
+                    justifyContent: "center",
+                    borderRadius: "8px",
                     color: "text.secondary",
-                    background: "rgba(255,255,255,0.03)",
+                    background: isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(139,111,42,0.035)",
                     border: "1px solid rgba(255,255,255,0.08)",
-                    color: "rgba(255,255,255,0.7)",
                     transition: "all 0.25s ease",
 
                     "&:hover": {
-                      background: "rgba(20,210,190,0.08)",
-                      borderColor: "rgba(20,210,190,0.4)",
-                      color: "#14D2BE",
+                      background: "rgba(214,178,94,0.08)",
+                      borderColor: "rgba(214,178,94,0.4)",
+                      color: "#D6B25E",
                       transform: "translateY(-1px)",
                     }
                   }}
                 >
-                  {title} {count}
+                  {actionLabel(title)} {count || 0}
                 </Button>
               </span>
             </Tooltip>
@@ -756,19 +741,28 @@ const CardFeed = ({
           justifyContent={"center"}
           display={"flex"}
           flexDirection={"column"}
-          p={1}
           sx={{
+            px: 1,
+            pt: 1,
+            pb: { xs: 2, lg: 2.5 },
             borderTop: "1px solid",
             borderColor: "rgba(255,255,255,0.12)",
-            background: "rgba(20,210,190,0.08)",
+            background: "linear-gradient(135deg, rgba(214,178,94,0.13), rgba(255,255,255,0.035))",
           }}
         >
           <Button
             startIcon={isFetching ? <CircularProgress size={14} /> : <RefreshRounded />}
             size="small"
+            variant={hasMorePosts ? "contained" : "outlined"}
+            disableElevation
             className="fw-bold"
             onClick={handleFetchMoreData}
             disabled={isFetching}
+            sx={{
+              borderRadius: "8px",
+              alignSelf: "center",
+              minWidth: 170,
+            }}
           >
             {hasMorePosts ? "Load More" : "Refresh Now"}
           </Button>

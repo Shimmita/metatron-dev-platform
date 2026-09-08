@@ -43,9 +43,9 @@ const MetatronApplicantsTable = ({
     // Status Color Logic
     const getStatusColor = (status) => {
         const s = status?.toLowerCase();
-        if (s === "proceed") return "#14D2BE"; // Metatron Cyan
+        if (s === "proceed") return "#D6B25E"; // Metatron Gold
         if (s === "rejected") return "#FF5252"; // Error Red
-        return "#4FC3F7"; // Info Blue
+        return "#D6B25E"; // Metatron Gold
     };
 
     return (
@@ -73,7 +73,7 @@ const MetatronApplicantsTable = ({
                                         fontSize: "0.75rem",
                                         textTransform: "uppercase",
                                         letterSpacing: 1,
-                                        backgroundColor: (theme) => theme.palette.mode === 'dark' ? "#1e293b" : "#f8fafc",
+                                        backgroundColor: (theme) => theme.palette.mode === 'dark' ? "#171717" : "#F7F3EA",
                                         color: "primary.main",
                                     }}
                                 >

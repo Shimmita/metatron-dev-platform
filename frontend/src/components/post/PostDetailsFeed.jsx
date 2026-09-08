@@ -1,4 +1,5 @@
 import {
+  CodeRounded,
   Close,
   Edit,
   FavoriteRounded,
@@ -6,6 +7,7 @@ import {
   GitHub,
   LockRounded,
   MoreVertRounded,
+  OpenInNewRounded,
   UpdateRounded,
   VerifiedRounded
 } from "@mui/icons-material";
@@ -19,7 +21,6 @@ import {
   CardActionArea,
   CardContent,
   CardHeader,
-  Checkbox,
   Collapse,
   IconButton,
   InputBase,
@@ -36,11 +37,7 @@ import AlertReportPost from "../alerts/AlertReportPost";
 import CardFeedMore from "../custom/CardFeedMore";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceScreenSize from "../utilities/CustomDeviceScreenSize";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
-import CustomLandScape from "../utilities/CustomLandscape";
-import CustomLandscapeWidest from "../utilities/CustomLandscapeWidest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
 const AlertMiniProfileView = lazy(() =>
@@ -50,9 +47,10 @@ const AlertMiniProfileView = lazy(() =>
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  backgroundColor: alpha(theme.palette.primary.main, 0.08),
+  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
   "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: alpha(theme.palette.primary.main, 0.12),
   },
   marginLeft: 0,
   width: "100%",
@@ -142,7 +140,7 @@ const PostDetailsFeed = ({
 
     
   // controls the length of description shown for each devices
-  const max_description = CustomDeviceIsSmall()? 122: CustomLandScape() ? 182  : 220;
+  const max_description = CustomDeviceIsSmall() ? 122 : 220;
   const details = postDetailedData?.post_body || "";
   const detailsLong = details.length > max_description;
 
@@ -182,11 +180,8 @@ const PostDetailsFeed = ({
 
   // handle the length of owner title for smallest devices
   const handleName = () => {
-    const title = postDetailedData?.post_owner?.ownername?.split(" ");
-    const first = title[0];
-    let second = title[1][0]
-
-    return first + " " + second;
+    const title = postDetailedData?.post_owner?.ownername?.split(" ") || [];
+    return title[0] || "Member";
   };
 
   // check if the current userID matches the ownerID of the post
@@ -313,35 +308,50 @@ const PostDetailsFeed = ({
   };
 
  
-  // handle max text width
-  const handleMaxTextWidth=()=>{
-    if (CustomLandscapeWidest()) {
-      return "90%"
-    }else if(CustomDeviceTablet()){
-      return "95%"
-    } else if(CustomLandScape()){
-      return "93%"
-    }
-
-    return "98%"
-  }
-  
-  // handle image width
-    const handleImageWidth=()=>{
-      if(CustomDeviceIsSmall()){
-        return "100%"
-      } else if(CustomDeviceTablet()){
-        return "95%"
-      }else{
-        return "92%"
-      } 
-    }
-
-
   // handle open profile
-    const handleOpenMiniProfile=()=>{
+  const handleOpenMiniProfile=()=>{
       setOpenMiniProfileAlert(true)
       }
+
+  const postImageSrc = handlePostImagePresent();
+  const categoryTags = [
+    postDetailedData?.post_category?.sub1,
+    postDetailedData?.post_category?.sub2,
+    postDetailedData?.post_category?.sub3,
+    postDetailedData?.post_category?.sub4,
+  ].filter((item) => item && !item.toLowerCase().includes("other"));
+  const locationLabel = [country, postDetailedData?.post_location?.state]
+    .filter(Boolean)
+    .join(" | ");
+  const actionLabel = (value) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+  const actionItems = [
+    {
+      icon: (
+        <FavoriteRounded
+          sx={{ width: 18, height: 18 }}
+          color={currentUserLiked ? "primary" : undefined}
+        />
+      ),
+      count: post_likes,
+      title: "like",
+      onClick: handlePostLikes,
+    },
+    {
+      icon: <GitHub sx={{ width: 18, height: 18 }} />,
+      count: post_github_clicks,
+      title: "Github",
+    },
+    {
+      icon: (
+        <ForumRounded
+          sx={{ width: 18, height: 18 }}
+          color={currentUserCommented ? "primary" : undefined}
+        />
+      ),
+      count: post_comment_count,
+      title: "comment",
+    },
+  ];
 
   return (
     <React.Fragment>
@@ -351,7 +361,13 @@ const PostDetailsFeed = ({
           <Alert
             severity="info"
             onClose={handleClose}
-            className="rounded mb-1"
+            sx={{
+              mb: 1,
+              borderRadius: "8px",
+              border: "1px solid rgba(214,178,94,0.24)",
+              background: "rgba(214,178,94,0.08)",
+              color: "text.primary",
+            }}
             action={
               <Stack direction={"row"} alignItems={"center"} gap={1}>
                 {/* yes btn */}
@@ -378,14 +394,20 @@ const PostDetailsFeed = ({
           borderRadius: "8px",
           border: "1px solid rgba(255,255,255,0.10)",
           background: isDarkMode
-            ? "linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.035))"
+            ? "linear-gradient(180deg, rgba(18,18,18,0.96), rgba(5,5,5,0.98))"
             : "rgba(255,255,255,0.96)",
           boxShadow: isDarkMode
             ? "0 18px 48px rgba(0,0,0,0.28)"
-            : "0 14px 34px rgba(15,76,129,0.08)",
+            : "0 14px 34px rgba(139,111,42,0.08)",
           overflow: "hidden",
         }}
       >
+        <Box
+          sx={{
+            height: 3,
+            background: "linear-gradient(90deg, #8B6F2A, #D6B25E, rgba(255,242,194,0.86))",
+          }}
+        />
         <CardHeader
           sx={{
             px: { xs: 1.25, sm: 1.75 },
@@ -403,8 +425,8 @@ const PostDetailsFeed = ({
                     width: 48,
                     height: 48,
                     borderRadius: "8px",
-                    border: "1px solid rgba(32,214,199,0.28)",
-                    boxShadow: "0 0 20px rgba(32,214,199,0.14)",
+                    border: "1px solid rgba(214,178,94,0.28)",
+                    boxShadow: "0 0 20px rgba(214,178,94,0.14)",
                   }}
                   alt=""
                 >
@@ -470,9 +492,7 @@ const PostDetailsFeed = ({
           title={
             <Box display="flex" alignItems="center" gap={1} minWidth={0}>
               <Typography fontWeight={900} variant={"body2"} noWrap>
-                {CustomDeviceSmallest()
-                  ? handleName()
-                  : `${postDetailedData.post_owner.ownername}`}
+                {handleName()}
               </Typography>
               <VerifiedRounded color="primary" sx={{ width: 18, height: 18 }} />
             </Box>
@@ -487,7 +507,7 @@ const PostDetailsFeed = ({
               </Typography>
               {/* location */}
               <Typography variant="caption" color="text.secondary" noWrap>
-                {country} | {postDetailedData.post_location.state}{" "}
+                {locationLabel}
               </Typography>
             </Box>
           }
@@ -507,8 +527,8 @@ const PostDetailsFeed = ({
                     px: 1.25,
                     py: 0.45,
                     borderRadius: "8px",
-                    background: "rgba(32,214,199,0.10)",
-                    border: "1px solid rgba(32,214,199,0.22)",
+                    background: "rgba(214,178,94,0.10)",
+                    border: "1px solid rgba(214,178,94,0.22)",
                     textTransform: "uppercase",
                   }}
                 >
@@ -520,8 +540,9 @@ const PostDetailsFeed = ({
                 display={"flex"}
                 justifyContent={"center"}
                 alignItems={"center"}
-                gap={2}
+                gap={1}
               >
+                <CodeRounded sx={{ color: "primary.main", fontSize: 20 }} />
                 {/* title of the post */}
                 <Typography variant="h6" fontWeight={900} textAlign="center" lineHeight={1.25}>
                   {postDetailedData.post_title}
@@ -537,11 +558,7 @@ const PostDetailsFeed = ({
                 flexDirection={"column"}
               >
                 <Search
-                  className="rounded"
                   sx={{
-                    mr: 2,
-                    border: "1px solid",
-                    borderColor: "divider",
                     width:'100%'
                   }}
                 >
@@ -570,14 +587,13 @@ const PostDetailsFeed = ({
                         postDetailedData?.post_body?.trim()?.length
                     }
                     onClick={completePostUpdating}
-                    variant="outlined"
-                    color="success"
+                    variant="contained"
                     sx={{
-                      borderRadius: 5,
+                      borderRadius: "8px",
                       fontWeight: "bold",
                     }}
                   >
-                    complete updating
+                    Complete Update
                   </Button>
                 </Box>
               </Box>
@@ -586,12 +602,23 @@ const PostDetailsFeed = ({
                 onClick={handleFullDescription}
                 disabled={!detailsLong}
               >
-                <Box display={"flex"} justifyContent={"center"} width={"100%"}>
+                <Box
+                  display={"flex"}
+                  justifyContent={"center"}
+                  width={"100%"}
+                  sx={{
+                    borderRadius: "8px",
+                    border: "1px solid rgba(255,255,255,0.07)",
+                    background: isDarkMode ? "rgba(255,255,255,0.035)" : "rgba(139,111,42,0.035)",
+                    px: { xs: 1.25, sm: 1.5 },
+                    py: 1.35,
+                  }}
+                >
                   <Typography
                     color={isDarkMode ? 'text.secondary' : "text.primary"}
                     sx={{ fontSize:'0.9rem', lineHeight: 1.8, whiteSpace: "pre-line" }}
                     variant={"body2"}
-                    maxWidth={handleMaxTextWidth()}
+                    maxWidth="100%"
                   >
                     {!isFullDescription && handleDetailsLength()}
                     {detailsLong && !isFullDescription && (
@@ -602,7 +629,7 @@ const PostDetailsFeed = ({
                         color={"primary"}
                         sx={{ fontSize:'small' }}
                       >
-                        &nbsp; more
+                        &nbsp; Read more
                       </Typography>
                     )}
                     {isFullDescription && details}
@@ -610,11 +637,32 @@ const PostDetailsFeed = ({
                 </Box>
               </CardActionArea>
             )}
+
+            {!isPostEditMode && categoryTags.length > 0 && (
+              <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" mt={1.25}>
+                {categoryTags.map((tag) => (
+                  <Box
+                    key={tag}
+                    sx={{
+                      px: 1,
+                      py: 0.3,
+                      borderRadius: "8px",
+                      background: isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(139,111,42,0.06)",
+                      border: "1px solid rgba(214,178,94,0.16)",
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      #{tag}
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+            )}
           </CardContent>
 
           {/* display image or log if is not in edit mode */}
 
-          {!isPostEditMode && (
+          {!isPostEditMode && postImageSrc && (
             <Box display={"flex"} justifyContent={"center"} width={"100%"} px={{ xs: 1.5, sm: 2 }} pb={2}>
               <Box
                 sx={{
@@ -625,18 +673,21 @@ const PostDetailsFeed = ({
                   overflow: "hidden",
                   border: "1px solid rgba(255,255,255,0.08)",
                   background: "rgba(255,255,255,0.03)",
+                  aspectRatio: { xs: "4 / 3", sm: "16 / 9" },
                 }}
               >
-                <img 
-                  style={{ 
-                    height:CustomDeviceScreenSize(),
-                    width:handleImageWidth(),
-                    objectFit:'cover',
-                    borderRadius:0,
+                <Box
+                  component="img"
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
                   }}
-                  src={handlePostImagePresent()}
+                  src={postImageSrc}
                   loading="lazy"
-                  alt="" />
+                  alt={postDetailedData?.post_title || "Post media"}
+                />
               </Box>
             </Box>
           )}
@@ -650,67 +701,42 @@ const PostDetailsFeed = ({
             py={1}
             justifyContent="space-around"
             alignItems="center"
-            sx={{
-              borderTop: "1px solid rgba(255,255,255,0.08)",
-              background: "rgba(255,255,255,0.025)",
+          sx={{
+            borderTop: "1px solid rgba(255,255,255,0.08)",
+              background: "rgba(255,255,255,0.02)",
             }}
           >
-            {[
-              {
-                icon: (
-                  <FavoriteRounded
-                  sx={{ width: 18, height: 18 }}
-                    color={currentUserLiked ? "primary" : undefined}
-                  />
-                ),
-                count: post_likes,
-                title: "like",
-                onClick: handlePostLikes,
-              },
-              {
-                icon: <GitHub sx={{ width: 18, height: 18 }} />,
-                count: post_github_clicks,
-                title: "Github",
-              },
-              {
-                icon: (
-                  <ForumRounded
-                  sx={{ width: 18, height: 18 }}
-                    color={currentUserCommented ? "primary" : undefined}
-                  />
-                ),
-                count: post_comment_count,
-                title: "comment",
-              },
-            ].map(({ icon, count, title, onClick }) => (
-              <Box
-                display="flex"
-                alignItems="center"
-                key={title}
-                sx={{
-                  px: 1,
-                  borderRadius: "8px",
-                  minWidth: 86,
-                  justifyContent: "center",
-                }}
-              >
-                <Tooltip title={title} arrow>
-                  <Checkbox
-                    onChange={onClick}
-                    icon={icon}
-                    checkedIcon={icon}
-                    disabled={isUploading||isGuest}
-                  />
+            <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" justifyContent="center" width="100%">
+              {actionItems.map(({ icon, count, title, onClick }) => (
+                <Tooltip key={title} title={title} arrow>
+                  <span>
+                    <Button
+                      onClick={onClick}
+                      disabled={isUploading || isGuest || !onClick}
+                      variant="text"
+                      startIcon={icon}
+                      endIcon={title === "Github" ? <OpenInNewRounded sx={{ width: 14, height: 14 }} /> : undefined}
+                      sx={{
+                        minWidth: { xs: "48%", sm: 118 },
+                        px: 1.5,
+                        py: 0.6,
+                        borderRadius: "8px",
+                        color: "text.secondary",
+                        background: isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(139,111,42,0.035)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        "&:hover": {
+                          background: "rgba(214,178,94,0.08)",
+                          borderColor: "rgba(214,178,94,0.4)",
+                          color: "primary.main",
+                        },
+                      }}
+                    >
+                      {actionLabel(title)} {count || 0}
+                    </Button>
+                  </span>
                 </Tooltip>
-                <Typography
-                  fontWeight="bold"
-                  variant="body2"
-                  color="text.secondary"
-                >
-                  {count}
-                </Typography>
-              </Box>
-            ))}
+              ))}
+            </Stack>
           </Box>
         )}
       </Card>

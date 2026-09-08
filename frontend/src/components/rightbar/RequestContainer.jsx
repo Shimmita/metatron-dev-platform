@@ -94,8 +94,8 @@ export default function RequestContainer({ isLoadingPostLaunch }) {
           py={1.5}
         >
           <Box display="flex" alignItems="center" gap={1}>
-            <PeopleRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
-            <Typography fontSize={13} fontWeight={600} color="#F0F4FA">
+            <PeopleRounded sx={{ color: "#D6B25E", fontSize: 18 }} />
+            <Typography fontSize={13} fontWeight={600} color="#FFFDF7">
               Network Suggestions
             </Typography>
           </Box>

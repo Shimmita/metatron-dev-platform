@@ -122,10 +122,10 @@ export default function AlertReportPost({
         </Box>
 
         <Box>
-          <Typography fontSize={14} fontWeight={600} color="#F0F4FA">
+          <Typography fontSize={14} fontWeight={600} color="#FFFDF7">
             Report Content
           </Typography>
-          <Typography fontSize={11} sx={{ color: "rgba(240,244,250,0.5)" }}>
+          <Typography fontSize={11} sx={{ color: "rgba(255,253,247,0.5)" }}>
             Help keep Metatron safe
           </Typography>
         </Box>
@@ -136,7 +136,7 @@ export default function AlertReportPost({
         <Typography
           fontSize={13}
           fontWeight={600}
-          sx={{ color: "#F0F4FA" }}
+          sx={{ color: "#FFFDF7" }}
         >
           {post?.post_title}
         </Typography>
@@ -147,7 +147,7 @@ export default function AlertReportPost({
         <Box px={2}>
           <Typography
             fontSize={12}
-            sx={{ color: "#14D2BE", textAlign: "center" }}
+            sx={{ color: "#D6B25E", textAlign: "center" }}
           >
             {message}
           </Typography>

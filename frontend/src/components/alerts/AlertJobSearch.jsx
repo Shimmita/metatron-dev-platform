@@ -215,8 +215,8 @@ export default function AlertJobSearch({
                 {...getTagProps({ index })}
                 onDelete={() => handleDeleteTitle(skill)}
                 sx={{
-                  bgcolor: "rgba(20,210,190,0.15)",
-                  color: "#14D2BE",
+                  bgcolor: "rgba(214,178,94,0.15)",
+                  color: "#D6B25E",
                 }}
               />
             ))
@@ -274,7 +274,7 @@ export default function AlertJobSearch({
             onClick={handleCloseAlert}
             startIcon={<PreviewRounded />}
             sx={{
-              background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
               color: "#fff",
             }}
           >
@@ -287,7 +287,7 @@ export default function AlertJobSearch({
             startIcon={<PageviewRounded />}
             disabled={isFetching}
             sx={{
-              background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+              background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
               color: "#fff",
             }}
           >

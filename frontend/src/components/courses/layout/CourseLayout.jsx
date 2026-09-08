@@ -5,7 +5,8 @@ import {
   PlayCircleFilledRounded,
   GroupRounded,
   ShareRounded,
-  LocalLibraryRounded
+  LocalLibraryRounded,
+  LockRounded
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -26,7 +27,7 @@ import AlertSimilarCourses from "../../alerts/AlertSimilarCourses";
 import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 const AccordionDescription = lazy(() => import("./AccordionDescription"));
 
-function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
+function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse, setErrorMessage }) {
   // redux state manager
   const { user, isGuest } = useSelector((state) => state.currentUser);
   const isMyCourse = user?._id === courseItem?.course_instructor?.instructorId
@@ -36,6 +37,11 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
 
 
   const handleOpenPlayer = () => {
+    if (isGuest) {
+      setErrorMessage?.("access denied, please login to continue with your request!");
+      return;
+    }
+
     setFocusedCourse(courseItem)
   };
 
@@ -72,48 +78,60 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
         sx={{
           width: '100%',
           maxWidth: "100%",
-          borderRadius: "20px",
+          borderRadius: "8px",
           background: isDarkMode ? "rgba(15, 23, 42, 0.8)" : "rgba(255, 255, 255, 0.95)",
           backdropFilter: "blur(12px)",
           border: "1px solid",
-          borderColor: isDarkMode ? "rgba(20, 210, 190, 0.2)" : "rgba(0,0,0,0.08)",
-          transition: "transform 0.3s ease",
-          "&:hover": { transform: "translateY(-5px)" }
+          borderColor: isDarkMode ? "rgba(214,178,94, 0.2)" : "rgba(0,0,0,0.08)",
+          transition: "transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
+          "&:hover": {
+            transform: "translateY(-2px)",
+            borderColor: "primary.main",
+            boxShadow: isDarkMode ? "0 18px 42px rgba(0,0,0,0.34)" : "0 18px 36px rgba(139,111,42,0.10)",
+          }
         }}
       >
         <CardContent sx={{ p: 0 }}>
           {/* ─── PREMIUM HEADER BADGE ─── */}
           <Box
             sx={{
-              p: 2,
-              textAlign: "center",
+              p: 1.75,
+              textAlign: "left",
               background: isDarkMode
-                ? "linear-gradient(135deg, rgba(20, 210, 190, 0.2), rgba(15, 76, 129, 0.4))"
-                : "linear-gradient(135deg, #1976D2, #1565C0)",
-              borderRadius: "20px 20px 0 0",
+                ? "linear-gradient(135deg, rgba(214,178,94, 0.2), rgba(139,111,42, 0.4))"
+                : "linear-gradient(135deg, #D6B25E, #8B6F2A)",
+              borderRadius: "8px 8px 0 0",
               position: "relative"
             }}
           >
-            <Avatar
-              src={pythonLogo}
-              sx={{
-                width: 60,
-                height: 60,
-                margin: "0 auto",
-                mb: 1.5,
-                border: "3px solid #fff",
-                boxShadow: "0 8px 16px rgba(0,0,0,0.2)"
-              }}
-            />
-            <Typography variant="h6" sx={{ color: "#fff", fontWeight: 800, fontSize: "1rem", lineHeight: 1.2 }}>
-              {courseItem?.course_title}
-            </Typography>
+            <Stack direction="row" spacing={1.5} alignItems="flex-start">
+              <Avatar
+                src={pythonLogo}
+                variant="rounded"
+                sx={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: "8px",
+                  border: "1px solid rgba(255,255,255,0.7)",
+                  boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+                  flexShrink: 0,
+                }}
+              />
+              <Box minWidth={0} flex={1}>
+                <Typography variant="h6" sx={{ color: "#fff", fontWeight: 900, fontSize: "1rem", lineHeight: 1.22 }}>
+                  {courseItem?.course_title}
+                </Typography>
+                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.78)", fontWeight: 700 }}>
+                  Practical developer course
+                </Typography>
+              </Box>
+            </Stack>
 
-            <Stack direction="row" justifyContent="center" alignItems="center" spacing={1} sx={{ mt: 1 }}>
+            <Stack direction="row" justifyContent="flex-start" alignItems="center" spacing={1} sx={{ mt: 1.25 }}>
               <Rating value={courseItem?.course_rate_count} readOnly size="small" precision={0.5}
                 sx={{ "& .MuiRating-iconFilled": { color: "#FFD700" } }}
               />
-              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.9)", fontWeight: 700 }}>
+              <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.9)", fontWeight: 800 }}>
                 {courseItem?.course_rate_count?.toFixed(1)}
               </Typography>
             </Stack>
@@ -121,15 +139,15 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
 
           <Box sx={{ p: 2 }}>
             {/* ─── METADATA GRID ─── */}
-            <Stack direction="row" justifyContent="space-around" sx={{ mb: 2 }}>
-              <Box textAlign="center">
+	            <Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
+	              <Box textAlign="left">
                 <LocalLibraryRounded sx={{ color: "primary.main", fontSize: 18 }} />
                 <Typography variant="caption" display="block" sx={{ fontWeight: 800, opacity: 0.7 }}>
                   {courseItem?.course_video_lectures?.length} Modules
                 </Typography>
               </Box>
               <Divider orientation="vertical" flexItem sx={{ opacity: 0.1 }} />
-              <Box textAlign="center">
+	              <Box textAlign="right">
                 <GroupRounded sx={{ color: "primary.main", fontSize: 18 }} />
                 <Typography variant="caption" display="block" sx={{ fontWeight: 800, opacity: 0.7 }}>
                   {courseItem?.student_count} Students
@@ -142,7 +160,7 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
               sx={{
                 width: "100%",
                 p: 1,
-                borderRadius: "12px",
+                borderRadius: "8px",
                 bgcolor: isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)",
                 display: "flex",
                 justifyContent: "flex-start",
@@ -155,8 +173,8 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
                 <Typography variant="caption" sx={{ display: "block", color: "primary.main", fontWeight: 800, fontSize: "0.6rem" }}>
                   INSTRUCTOR
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, fontSize: "0.75rem" }}>
-                  {courseItem?.course_instructor?.instructorName}
+                <Typography variant="body2" sx={{ fontWeight: 800, fontSize: "0.75rem" }}>
+                  {courseItem?.course_instructor?.instructorName?.split(" ")?.[0] || "Instructor"}
                 </Typography>
               </Box>
             </ButtonBase>
@@ -181,7 +199,7 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
                   <Button
                     fullWidth
                     size="small"
-                    color={isCopiedStatus ? "success" : "primary"}
+	                    color="primary"
                     startIcon={isCopiedStatus ? <DoneRounded /> : <ShareRounded />}
                     onClick={handleGetCourseLink}
                     sx={{ fontSize: "0.65rem", fontWeight: 800, borderRadius: "8px" }}
@@ -199,19 +217,18 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse }) {
                   <Button
                     fullWidth
                     variant="contained"
-                    disabled={isGuest}
                     onClick={handleOpenPlayer}
-                    startIcon={isMyCourse ? <VideoLibraryRounded /> : <PlayCircleFilledRounded />}
+                    startIcon={isGuest ? <LockRounded /> : isMyCourse ? <VideoLibraryRounded /> : <PlayCircleFilledRounded />}
                     sx={{
-                      borderRadius: "12px",
+                      borderRadius: "8px",
                       py: 1,
                       fontWeight: 800,
                       textTransform: "none",
-                      background: !isDarkMode ? "linear-gradient(90deg, #1976D2, #1565C0)" : "primary.main",
-                      boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)"
+                      background: !isDarkMode ? "linear-gradient(90deg, #D6B25E, #8B6F2A)" : "primary.main",
+                      boxShadow: "0 4px 12px rgba(214,178,94, 0.3)"
                     }}
                   >
-                    {isMyCourse ? "Enter Studio" : courseItem?.currentUserEnrolled ? "Continue Learning" : "Enroll & Start"}
+                    {isGuest ? "Login to Enroll" : isMyCourse ? "Enter Studio" : courseItem?.currentUserEnrolled ? "Continue Learning" : "Enroll & Start"}
                   </Button>
                 </Box>
               </>

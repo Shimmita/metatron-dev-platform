@@ -19,6 +19,7 @@ import currentConnectRequestReducer from "./CurrentConnect";
 import currentConnectNotifReducer from "./CurrentConnectNotif";
 import currentConversationReducer from './CurrentConversations';
 import currentCoursesReducer from "./CurrentCourses";
+import currentCoursesTopReducer from "./CurrentCoursesTop";
 import currentEventsReducer from './CurrentEvents';
 import currentEventsTopReducer from './CurrentEventsTop';
 import currentGlobalSearchReducer from "./CurrentGlobalSearch";
@@ -71,6 +72,7 @@ const rootReducer = combineReducers({
   currentEvents:currentEventsReducer,
   currentEventsTop:currentEventsTopReducer,
   currentCourses:currentCoursesReducer,
+  currentCoursesTop:currentCoursesTopReducer,
   currentSuccess:currentSuccessReducer,
   currentGroups:currentGroupsReducer,
 

@@ -24,7 +24,7 @@ import { getImageMatch } from "../../utilities/getImageMatch";
 const MAX_APPLICANTS = 500
 
 
-function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
+function FeaturedJobs({ isLoading, jobTop, isLastIndex, setErrorMessage }) {
   const [openApplyJobModal, setOpenApplyJobModal] = useState();
   // redux states
   const { isLoadingPostLaunch: isLoadingRequest } = useSelector(
@@ -49,6 +49,11 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
 
   // handle opening of apply job modal
   const handleOpeningApplyJob = () => {
+    if (isGuest) {
+      setErrorMessage?.("access denied, please login to continue with your request!");
+      return;
+    }
+
     setOpenApplyJobModal(true);
   };
 
@@ -73,8 +78,8 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
             transition: "all 0.25s ease",
 
             "&:hover": {
-              background: "rgba(20,210,190,0.06)",
-              borderColor: "rgba(20,210,190,0.3)",
+              background: "rgba(214,178,94,0.06)",
+              borderColor: "rgba(214,178,94,0.3)",
             },
           }}>
             <ListItemAvatar>
@@ -115,8 +120,8 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
             transition: "all 0.25s ease",
 
             "&:hover": {
-              background: "rgba(20,210,190,0.06)",
-              borderColor: "rgba(20,210,190,0.3)",
+              background: "rgba(214,178,94,0.06)",
+              borderColor: "rgba(214,178,94,0.3)",
             },
           }}>
             <ListItemAvatar>
@@ -136,7 +141,7 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
                 <Typography
                   fontSize={13}
                   fontWeight={600}
-                  color="#F0F4FA"
+                  color="#FFFDF7"
                 >
                   {jobTop?.title}
                 </Typography>
@@ -144,7 +149,7 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
               secondary={
                 <Box>
                   {/* poster */}
-                  <Typography variant="body2" sx={{ color: "rgba(240,244,250,0.65)" }}>
+                  <Typography variant="body2" sx={{ color: "rgba(255,253,247,0.65)" }}>
                     {jobTop?.organisation?.name}
                   </Typography>
 
@@ -153,7 +158,7 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
                     {/* state */}
                     <Typography
                       variant="caption"
-                      sx={{ color: "rgba(240,244,250,0.65)" }}
+                      sx={{ color: "rgba(255,253,247,0.65)" }}
                     >
                       {jobTop?.location?.state}
                     </Typography>
@@ -161,7 +166,7 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
                     {/* divider */}
                    <Divider sx={{ borderColor: "rgba(255,255,255,0.06)" }} />
                     {/* country */}
-                    <Typography ml={1} variant="caption" sx={{ color: "rgba(240,244,250,0.65)" }}>
+                    <Typography ml={1} variant="caption" sx={{ color: "rgba(255,253,247,0.65)" }}>
                       {handleCountryName(jobTop && jobTop)}
                     </Typography>
                   </Box>
@@ -195,7 +200,7 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
               {/* applicants counter */}
               <Box>
                 <Typography variant="caption" sx={{
-                  color: "rgba(240,244,250,0.6)",
+                  color: "rgba(255,253,247,0.6)",
                   fontSize: 11,
                 }}>
                   {!(jobTop?.website === "") ? "website" : `${jobTop?.applicants?.total}/${jobTop?.applicants_max || MAX_APPLICANTS} `}
@@ -209,17 +214,17 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
                   size="small"
                   onClick={handleOpeningApplyJob}
                   startIcon={isDeactivated || isGuest || isMaxApplicants ? <LockRounded /> : !(jobTop?.website === "") ? <TravelExploreRounded /> : <Verified />}
-                  disabled={jobTop?.currentUserApplied || isDeactivated || isMaxApplicants || isGuest}
+                  disabled={jobTop?.currentUserApplied || isDeactivated || isMaxApplicants}
                   sx={{
                     borderRadius: "10px",
-                    background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                    background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                     color: "#fff",
                     px: 1.5,
                     py: 0.4,
                     fontSize: "0.7rem",
 
                     "&:hover": {
-                      background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+                      background: "linear-gradient(135deg,#8B6F2A,#FFF2C2)",
                     },
 
                     "&:disabled": {
@@ -228,7 +233,7 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex }) {
                     }
                   }}
                 >
-                  {jobTop?.currentUserApplied ? "Applied" : isDeactivated ? "Paused" : isMaxApplicants ? "Closed" : "Apply"}
+                  {isGuest ? "Login" : jobTop?.currentUserApplied ? "Applied" : isDeactivated ? "Paused" : isMaxApplicants ? "Closed" : "Apply"}
                 </Button>
               </React.Fragment>
 

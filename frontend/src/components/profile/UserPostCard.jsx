@@ -121,7 +121,7 @@ export default function UserPostCard({
             sx={{ 
               fontSize: "0.7rem", 
               color: "primary.main",
-              "&:hover": { background: "rgba(20,210,190,0.08)" }
+              "&:hover": { background: "rgba(214,178,94,0.08)" }
             }}
           >
             Edit

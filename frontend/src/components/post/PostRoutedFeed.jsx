@@ -8,9 +8,10 @@ import {
   IconButton,
   InputBase,
   Stack,
+  Typography,
 } from "@mui/material";
 
-import { Close, RefreshRounded, SendOutlined } from "@mui/icons-material";
+import { ArrowBackRounded, Close, SendOutlined } from "@mui/icons-material";
 
 import axios from "axios";
 import React, { lazy, useState } from "react";
@@ -88,14 +89,13 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
       });
   };
 
-  // handle home navigation
-    const handleRefreshHome=()=>{
+  const handleBackToFeed=()=>{
       navigate('/explore')
     }
 
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1.25}>
 
       {/* display error */}
       {errorMessage && (
@@ -118,17 +118,36 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
         </Box>
       )}
 
-         {/* refresh btn */}
-          <Box 
-          display={'flex'} 
-          justifyContent={'center'}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        gap={1}
+        sx={{
+          p: 1,
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.10)",
+          background: "linear-gradient(135deg, rgba(13,13,13,0.94), rgba(214,178,94,0.08))",
+        }}
+      >
+        <Box minWidth={0}>
+          <Typography variant="body2" fontWeight={900}>
+            Focused Post
+          </Typography>
+          <Typography variant="caption" color="text.secondary" noWrap>
+            Opened from notifications
+          </Typography>
+        </Box>
           <Button
-          onClick={handleRefreshHome}
-          startIcon={<RefreshRounded/>} 
-          size="small" variant="contained" sx={{borderRadius:3}}>
-            refresh
+          onClick={handleBackToFeed}
+          startIcon={<ArrowBackRounded />} 
+          size="small"
+          variant="contained"
+          sx={{ borderRadius: "8px", flexShrink: 0 }}
+        >
+            Back to feed
           </Button>
-          </Box>
+      </Box>
 
       {/* card container */}
       <Box p={0}>
@@ -142,7 +161,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
           <React.Fragment>
 
         {/* all user comments container pass the comments of the post */}
-        <Box className='shadow-sm' mt={1}>
+        <Box mt={1}>
           <CommentContainer
             post_comments={postDetailedData?.post_comments.comments}
           />
@@ -154,10 +173,13 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
         justifyContent={"space-between"}
         alignItems={"center"}
         width={"100%"}
-        className='rounded shadow-sm'
         p={2}
         mt={1}
-        bgcolor={"background.default"}
+        sx={{
+          borderRadius: "8px",
+          border: "1px solid rgba(255,255,255,0.10)",
+          background: "rgba(255,255,255,0.055)",
+        }}
       >
         {/* input for comment */}
         <Box className='rounded' width={"100%"}>
@@ -168,7 +190,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
             maxRows={2}
             disabled={isUploading}
             className="w-100 rounded"
-            placeholder="comment here..."
+            placeholder="Add a clear, useful comment..."
             sx={{
               fontSize: "small",
             }}

@@ -43,6 +43,7 @@ function FriendRequest({
   const { messageConnectRequestSent } = useSelector(
     (state) => state.currentSnackBar
   );
+  const displayName = connect_request?.name?.trim()?.split(/\s+/)?.[0] || "Member";
 
   const {
     _id: currentUserId,
@@ -220,8 +221,8 @@ function FriendRequest({
             transition: "all 0.25s ease",
 
             "&:hover": {
-              background: "rgba(20,210,190,0.06)",
-              borderColor: "rgba(20,210,190,0.3)",
+              background: "rgba(214,178,94,0.06)",
+              borderColor: "rgba(214,178,94,0.3)",
             },
           }}>
             <ListItemAvatar>
@@ -258,7 +259,7 @@ function FriendRequest({
           <ListItem
             className="rounded"
             sx={{
-              borderRadius: "12px",
+              borderRadius: "8px",
               mb: 0.8,
               px: 1.2,
               py: 1,
@@ -267,8 +268,8 @@ function FriendRequest({
               transition: "all 0.25s ease",
 
               "&:hover": {
-                background: "rgba(20,210,190,0.06)",
-                borderColor: "rgba(20,210,190,0.3)",
+                background: "rgba(214,178,94,0.06)",
+                borderColor: "rgba(214,178,94,0.3)",
               },
             }}>
             <ListItemAvatar onClick={handleShowMiniProfile}>
@@ -282,6 +283,7 @@ function FriendRequest({
                     color: "white",
                     width: 40,
                     height: 40,
+                    borderRadius: "8px",
                   }}
                   alt={connect_request?.name?.split(" ")[0]}
                   aria-label="avatar"
@@ -297,6 +299,7 @@ function FriendRequest({
                       color: "white",
                       width: 40,
                       height: 40,
+                      borderRadius: "8px",
                     }}
                     alt={connect_request?.name?.split(" ")[0]}
                     aria-label="avatar"
@@ -310,12 +313,13 @@ function FriendRequest({
                   fontWeight={"bold"}
                   variant="body2"
                   sx={{
-                    color: "#F0F4FA",
-                    fontWeight: 600,
+                    color: "#FFFDF7",
+                    fontWeight: 900,
                     fontSize: 13,
+                    letterSpacing: 0,
                   }}
                 >
-                  {connect_request?.name}
+                  {displayName}
                 </Typography>
               }
               secondary={
@@ -323,16 +327,16 @@ function FriendRequest({
                   {/* location of the user */}
                   {isAcceptFriends ? (
                     <React.Fragment>
-                      <Typography variant="body2" sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}>
+                      <Typography variant="body2" sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}>
                         {connect_request?.title}
                       </Typography>
-                      <Typography variant="caption" sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}>
+                      <Typography variant="caption" sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}>
                         {connect_request?.country} | {connect_request?.state}
                       </Typography>
                       <br />
                       <Typography
                         variant="caption"
-                        sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}
+                        sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}
                       >
                         - is {connect_request?.message} -
                       </Typography>
@@ -340,11 +344,11 @@ function FriendRequest({
                   ) : (
                     <React.Fragment>
                       {/* specialisation of the user */}
-                      <Typography variant="body2" sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}>
+                      <Typography variant="body2" sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}>
                         {connect_request?.specialisationTitle}
                       </Typography>
 
-                      <Typography variant="caption" sx={{ color: "rgba(240,244,250,0.65)", fontSize: 12 }}>
+                      <Typography variant="caption" sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}>
                         {connect_request?.county} | {" "}
                         {CustomCountryName(connect_request?.country)}
                       </Typography>
@@ -395,7 +399,7 @@ function FriendRequest({
                       {/* time  */}
                       <Box>
                         <Typography variant="caption" sx={{
-                          color: "rgba(240,244,250,0.5)",
+                          color: "rgba(255,253,247,0.5)",
                           fontSize: 11,
                         }}>
                           {getElapsedTime(connect_request?.createdAt)}
@@ -412,8 +416,8 @@ function FriendRequest({
                           <IconButton
                             size="small"
                             sx={{
-                              color: "#14D2BE",
-                              "&:hover": { background: "rgba(20,210,190,0.1)" }
+                              color: "#D6B25E",
+                              "&:hover": { background: "rgba(214,178,94,0.1)" }
                             }}
                             onClick={handleAcceptConnectRequestFriends}
                           >
@@ -429,7 +433,10 @@ function FriendRequest({
                             onClick={handleRejectConnectRequest}
                             sx={{
                               color: "rgba(255,255,255,0.6)",
-                              "&:hover": { color: "#FF6D3A" }
+                              "&:hover": {
+                                color: "#D6B25E",
+                                background: "rgba(214,178,94,0.08)",
+                              }
                             }}
                           >
                             <Close sx={{ width: 17, height: 17 }} />
@@ -460,9 +467,9 @@ function FriendRequest({
                               color: "rgba(255,255,255,0.7)",
 
                               "&:hover": {
-                                background: "rgba(20,210,190,0.08)",
-                                borderColor: "rgba(20,210,190,0.4)",
-                                color: "#14D2BE",
+                                background: "rgba(214,178,94,0.08)",
+                                borderColor: "rgba(214,178,94,0.4)",
+                                color: "#D6B25E",
                               }
                             }}
                             onClick={handleSendConnectRequest}

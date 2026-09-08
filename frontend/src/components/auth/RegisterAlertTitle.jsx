@@ -114,7 +114,7 @@ export default function RegisterAlertTitle({
             sx={{
               borderRadius: "12px",
               background:
-                "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                "linear-gradient(135deg,#8B6F2A,#D6B25E)",
               color: "#fff",
             }}
           >

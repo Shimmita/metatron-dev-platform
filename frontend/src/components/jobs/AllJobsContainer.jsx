@@ -39,8 +39,6 @@ import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 import GlobalAppBar from "../navbar/GlobalNavBar";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import MetatronSnackbar from "../snackbar/MetatronSnackBar";
-import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
-import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 import JobLayout from "./layout/JobLayout";
 import JobStatsLayout from "./layout/JobStatsLayouts";
 
@@ -85,9 +83,7 @@ export default function MiniDrawer() {
     !isGuest && isJobSearchGlobal ? "Search Jobs" : "Explore Jobs"
   );
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false : true);
-  const [open, setOpen] = useState(
-    !(CustomDeviceIsSmall() || CustomDeviceTablet() || isGuest)
-  );
+  const [open, setOpen] = useState(false);
 
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -186,7 +182,7 @@ export default function MiniDrawer() {
       } else {
 
         axios
-          .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/${user?._id}`, {
+          .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}${isGuest ? "/jobs/all/top/guest" : `/jobs/all/${user?._id}`}`, {
             withCredentials: true,
           })
           .then((res) => {
@@ -546,8 +542,8 @@ export default function MiniDrawer() {
           minHeight: "100%",
           overflow: "visible",
           background: isDarkMode
-            ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(8,17,31,0.98))"
-            : "linear-gradient(180deg, #F8FAFC, #EEF7FF)",
+            ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(10,10,10,0.98))"
+            : "linear-gradient(180deg, #F7F3EA, #F7F3EA)",
         }}
       >
         {/* ---------- AppBar ---------- */}
@@ -559,6 +555,7 @@ export default function MiniDrawer() {
           handleNavigateHiring={handleNavigateHiring}
           handleShowDrawerPane={handleShowDrawerPane}
           handleShowingProfileDrawer={handleShowingProfileDrawer}
+          isDrawerPane={isDrawerPane}
           isDarkMode={isDarkMode}
           textOption={textOption}
           isGuest={isGuest}
@@ -584,7 +581,7 @@ export default function MiniDrawer() {
         {/* ---------- MAIN CONTENT ---------- */}
         <Box
           sx={{
-            minHeight: "calc(100vh - 64px)",
+            minHeight: "calc(100vh - 56px)",
             overflow: "visible",
             width: {
               xs: "100%",
@@ -600,11 +597,14 @@ export default function MiniDrawer() {
           <Box
             sx={{
               width: "100%",
+              maxWidth: { xs: "100%", lg: "1128px", xl: "1188px" },
+              mx: "auto",
               minHeight: "100%",
               overflowY: "visible",
               overflowX: "hidden",
-              pt: { xs: 9, md: 10 },
-              px: { xs: 1.25, md: 2.5 },
+              pt: { xs: 7.5, md: 7.5 },
+              px: { xs: 1, md: 2, lg: 2.5 },
+              pb: { xs: 13, md: 14, lg: 15 },
 
               display: "grid",
 
@@ -617,11 +617,11 @@ export default function MiniDrawer() {
                   ? "repeat(auto-fit, minmax(280px, 1fr))"
                   : "repeat(auto-fit, minmax(320px, 1fr))",
                 lg: open
-                  ? "repeat(auto-fit, minmax(300px, 1fr))"
-                  : "repeat(auto-fit, minmax(340px, 1fr))",
+                  ? "repeat(auto-fit, minmax(360px, 1fr))"
+                  : "repeat(auto-fit, minmax(390px, 1fr))",
               },
 
-              gap: 2,
+              gap: 1.5,
               alignItems: "stretch",
 
               transition: "all 0.25s ease",
@@ -636,12 +636,12 @@ export default function MiniDrawer() {
                 borderRadius: "8px",
                 border: "1px solid rgba(255,255,255,0.10)",
                 background: isDarkMode
-                  ? "linear-gradient(135deg, rgba(11,18,32,0.94), rgba(20,214,199,0.08), rgba(59,130,246,0.10))"
+                  ? "linear-gradient(135deg, rgba(13,13,13,0.94), rgba(214,178,94,0.08), rgba(255,255,255,0.10))"
                   : "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(238,247,255,0.92))",
-                p: { xs: 2, md: 2.5 },
+                p: { xs: 1.5, md: 2 },
                 boxShadow: isDarkMode
                   ? "0 18px 50px rgba(0,0,0,0.28)"
-                  : "0 16px 32px rgba(15,76,129,0.08)",
+                  : "0 16px 32px rgba(139,111,42,0.08)",
               }}
             >
               <Box display="flex" flexDirection={{ xs: "column", md: "row" }} gap={2} justifyContent="space-between" alignItems={{ xs: "flex-start", md: "center" }}>
@@ -652,10 +652,10 @@ export default function MiniDrawer() {
                       Tech Gig Marketplace
                     </Typography>
                   </Box>
-                  <Typography variant="h4" fontWeight={900} lineHeight={1.12}>
+                  <Typography variant="h5" fontWeight={900} lineHeight={1.12}>
                     {textOption}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" mt={0.75} maxWidth={680}>
+                  <Typography variant="body2" color="text.secondary" mt={0.5} maxWidth={760}>
                     Explore verified engineering roles, recommended matches, applications, and hiring intelligence from one focused workspace.
                   </Typography>
                 </Box>
@@ -684,8 +684,8 @@ export default function MiniDrawer() {
                       borderRadius: "8px",
                       border: "1px solid rgba(255,255,255,0.08)",
                       background: "rgba(255,255,255,0.045)",
-                      p: 1.2,
-                      minHeight: 72,
+                      p: 1,
+                      minHeight: 64,
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">
@@ -728,7 +728,7 @@ export default function MiniDrawer() {
                   display: "grid",
                   gridTemplateColumns: { xs: "1fr", md: "repeat(3, minmax(0, 1fr))" },
                   gap: 1,
-                  mt: 2,
+                  mt: 1.5,
                 }}
               >
                 {jobGuidance.map(([title, copy]) => (

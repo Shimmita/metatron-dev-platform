@@ -12,11 +12,15 @@ import {
 } from "@mui/icons-material";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import axios from "axios";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { handleSidebarRightbar } from "../../redux/AppUI";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
+import { updateCurrentCoursesTop } from "../../redux/CurrentCoursesTop";
+import { updateCurrentEventsTop } from "../../redux/CurrentEventsTop";
+import { updateCurrentJobsTop } from "../../redux/CurrentJobsTop";
 import { appColors } from "../../utils/colors";
 import CoursesContainer from "./CoursesContainer";
 import FeaturedEventsContainer from "./FeaturedEventsContainer";
@@ -32,9 +36,54 @@ const RightbarAll = () => {
   const { currentMode, isSidebarRighbar } = useSelector((state) => state.appUI);
   const { isGuest, user } = useSelector((state) => state.currentUser);
   const { position } = useSelector((state) => state.currentBottomNav);
+  const { jobsTop } = useSelector((state) => state.currentJobsTop);
+  const { coursesTop } = useSelector((state) => state.currentCoursesTop);
+  const { eventsTop } = useSelector((state) => state.currentEventsTop);
 
   const isDarkMode = currentMode === "dark";
   const cardRadius = `${Math.max(theme.shape.borderRadius - 2, 8)}px`;
+  const hasData = (items) => Array.isArray(items) && items.length > 0;
+  const isPreviewLoading = [jobsTop, coursesTop, eventsTop].some((items) => items === null);
+  const isPreviewFetchInFlight = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!isGuest && !user?._id) {
+      return;
+    }
+
+    if ([jobsTop, coursesTop, eventsTop].every((items) => Array.isArray(items))) {
+      return;
+    }
+
+    if (isPreviewFetchInFlight.current) {
+      return;
+    }
+
+    let isMounted = true;
+    isPreviewFetchInFlight.current = true;
+    const userId = isGuest ? "guest" : user?._id;
+    const currentJobs = Array.isArray(jobsTop) ? jobsTop : [];
+    const currentCourses = Array.isArray(coursesTop) ? coursesTop : [];
+    const currentEvents = Array.isArray(eventsTop) ? eventsTop : [];
+
+    Promise.allSettled([
+      axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/top/${userId}`, { withCredentials: true }),
+      axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/top`, { withCredentials: true }),
+      axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/top`, { withCredentials: true }),
+    ]).then(([jobsResult, coursesResult, eventsResult]) => {
+      if (!isMounted) return;
+
+      dispatch(updateCurrentJobsTop(jobsResult.status === "fulfilled" ? jobsResult.value?.data || [] : currentJobs));
+      dispatch(updateCurrentCoursesTop(coursesResult.status === "fulfilled" ? coursesResult.value?.data || [] : currentCourses));
+      dispatch(updateCurrentEventsTop(eventsResult.status === "fulfilled" ? eventsResult.value?.data || [] : currentEvents));
+    }).finally(() => {
+      isPreviewFetchInFlight.current = false;
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [coursesTop, dispatch, eventsTop, isGuest, jobsTop, user?._id]);
 
   const handleNavigate = (route, bottomIndex) => {
     navigate(route);
@@ -45,8 +94,8 @@ const RightbarAll = () => {
     }
   };
 
-  const sections = [
-    {
+  const liveSections = [
+    ...(hasData(jobsTop) ? [{
       key: "jobs",
       label: "Jobs",
       description: "Current openings matched to platform demand.",
@@ -54,8 +103,8 @@ const RightbarAll = () => {
       cta: "View all jobs",
       onClick: () => handleNavigate("/jobs", 1),
       content: <JobsContainer />,
-    },
-    {
+    }] : []),
+    ...(hasData(coursesTop) ? [{
       key: "courses",
       label: "Courses",
       description: "Learning tracks that support career progression.",
@@ -63,8 +112,8 @@ const RightbarAll = () => {
       cta: "Browse courses",
       onClick: () => handleNavigate("/courses/available", 3),
       content: <CoursesContainer />,
-    },
-    {
+    }] : []),
+    ...(hasData(eventsTop) ? [{
       key: "events",
       label: "Events",
       description: "Professional sessions, showcases and community events.",
@@ -72,7 +121,7 @@ const RightbarAll = () => {
       cta: "See events",
       onClick: () => handleNavigate("/events", 2),
       content: <FeaturedEventsContainer />,
-    },
+    }] : []),
     ...(!isGuest
       ? [
         {
@@ -81,12 +130,60 @@ const RightbarAll = () => {
           description: "People and collaboration opportunities around you.",
           icon: <Diversity3Rounded fontSize="small" />,
           cta: "Grow your network",
-          onClick: () => setActiveSection(3),
+          onClick: () => {},
           content: <RequestContainer />,
         },
       ]
       : []),
   ];
+  const fallbackSection = {
+    key: "overview",
+    label: isPreviewLoading ? "Loading" : "Overview",
+    description: isPreviewLoading
+      ? "Checking live platform signals from the database."
+      : "No live opportunity previews are available yet.",
+    icon: <InsightsRounded fontSize="small" />,
+    cta: isGuest ? "Sign in" : "Refresh",
+    onClick: () => {
+      if (isGuest) {
+        navigate("/auth/login");
+        return;
+      }
+
+      dispatch(updateCurrentJobsTop(null));
+      dispatch(updateCurrentCoursesTop(null));
+      dispatch(updateCurrentEventsTop(null));
+    },
+    content: (
+      <Box
+        sx={{
+          p: 1.5,
+          minHeight: 110,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          borderRadius: cardRadius,
+          background: "linear-gradient(135deg, rgba(214,178,94,0.12), rgba(255,255,255,0.025))",
+        }}
+      >
+        <Typography variant="body2" fontWeight={800} color="#FFFDF7">
+          {isPreviewLoading ? "Loading live previews" : "Workspace ready"}
+        </Typography>
+        <Typography variant="caption" sx={{ color: "rgba(255,253,247,0.68)", mt: 0.5 }}>
+          {isPreviewLoading
+            ? "Jobs, courses, and events will appear here when records are available."
+            : "The rail stays available for toolkit and next-action guidance."}
+        </Typography>
+      </Box>
+    ),
+  };
+  const sections = liveSections.length > 0 ? liveSections : [fallbackSection];
+
+  React.useEffect(() => {
+    if (activeSection >= sections.length) {
+      setActiveSection(0);
+    }
+  }, [activeSection, sections.length]);
 
   const currentSection = sections[activeSection] || sections[0];
   const professionalTools = [
@@ -116,7 +213,7 @@ const RightbarAll = () => {
   return (
     <Box
       sx={{
-        width: { sm: 230, md: 280, lg: 330, xl: 350 },
+        width: { sm: 230, md: 280, lg: 300, xl: 316 },
         flexShrink: 0,
         mt: { sm: 1.5, md: 2 },
         display: {
@@ -131,7 +228,7 @@ const RightbarAll = () => {
         className="shadow"
         sx={{
           position: { lg: "sticky" },
-          top: { lg: 88 },
+          top: { lg: 64 },
           alignSelf: "flex-start",
           width: "100%",
         }}
@@ -143,13 +240,13 @@ const RightbarAll = () => {
             borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : appColors.border,
             boxShadow: isDarkMode
               ? "0 18px 45px rgba(0,0,0,0.18)"
-              : "0 20px 40px rgba(15,76,129,0.08)",
+              : "0 20px 40px rgba(139,111,42,0.08)",
             overflow: "visible",
             borderRadius: `${theme.shape.borderRadius + 6}px ${theme.shape.borderRadius + 6}px 0 0`,
             width: "100%",
             background: "rgba(255,255,255,0.04)",
             backdropFilter: "blur(25px)",
-            maxHeight: "calc(100vh - 104px)",
+            maxHeight: "calc(100vh - 76px)",
             overflowY: "auto",
             overscrollBehavior: "contain",
             "&::-webkit-scrollbar": {
@@ -163,13 +260,13 @@ const RightbarAll = () => {
             px={2}
             py={2}
             sx={{
-              background: "linear-gradient(180deg, rgba(20,210,190,0.15), transparent)",
+              background: "linear-gradient(180deg, rgba(214,178,94,0.15), transparent)",
               borderBottom: "1px solid rgba(255,255,255,0.06)",
             }}
           >
             <Box display={"flex"} alignItems={"center"} gap={1} mb={0.75}>
-              <InsightsRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
-              <Typography variant="body2" fontWeight={700} color="#F0F4FA">
+              <InsightsRounded sx={{ color: "#D6B25E", fontSize: 18 }} />
+              <Typography variant="body2" fontWeight={700} color="#FFFDF7">
                 Career dashboard
               </Typography>
             </Box>
@@ -195,7 +292,7 @@ const RightbarAll = () => {
                     py: 0.9,
                     background:
                       activeSection === index
-                        ? "linear-gradient(135deg,#0FA88F,#14D2BE)"
+                        ? "linear-gradient(135deg,#8B6F2A,#D6B25E)"
                         : "rgba(255,255,255,0.03)",
 
                     border: "1px solid rgba(255,255,255,0.08)",
@@ -204,8 +301,8 @@ const RightbarAll = () => {
                     transition: "all 0.25s ease",
 
                     "&:hover": {
-                      background: "rgba(20,210,190,0.08)",
-                      borderColor: "rgba(20,210,190,0.4)",
+                      background: "rgba(214,178,94,0.08)",
+                      borderColor: "rgba(214,178,94,0.4)",
                     },
                     flexShrink: 0,
                   }}
@@ -227,13 +324,13 @@ const RightbarAll = () => {
             >
               <Typography variant="body2"
                 sx={{
-                  color: "#F0F4FA",
+                  color: "#FFFDF7",
                   fontWeight: 600,
                 }}>
                 {currentSection.label}
               </Typography>
               <Typography variant="caption" sx={{
-                color: "rgba(240,244,250,0.65)",
+                color: "rgba(255,253,247,0.65)",
               }}>
                 {currentSection.description}
               </Typography>
@@ -241,15 +338,15 @@ const RightbarAll = () => {
                 <Button
                   onClick={currentSection.onClick}
                   size="small"
-                  startIcon={<InsightsRounded sx={{ color: "#14D2BE", fontSize: 18 }} />}
+                  startIcon={<InsightsRounded sx={{ color: "#D6B25E", fontSize: 18 }} />}
                   sx={{
                     borderRadius: 10,
-                    background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                    background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                     color: "#fff",
                     px: 2,
 
                     "&:hover": {
-                      background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+                      background: "linear-gradient(135deg,#8B6F2A,#FFF2C2)",
                     }
                   }}
                 >
@@ -281,8 +378,8 @@ const RightbarAll = () => {
               }}
             >
               <Box display="flex" alignItems="center" gap={1} mb={1.25}>
-                <ChecklistRtlRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
-                <Typography variant="body2" fontWeight={700} color="#F0F4FA">
+                <ChecklistRtlRounded sx={{ color: "#D6B25E", fontSize: 18 }} />
+                <Typography variant="body2" fontWeight={700} color="#FFFDF7">
                   Professional toolkit
                 </Typography>
               </Box>
@@ -300,14 +397,14 @@ const RightbarAll = () => {
                       border: "1px solid rgba(255,255,255,0.06)",
                     }}
                   >
-                    <Box sx={{ color: "#14D2BE", display: "flex", mt: 0.2 }}>
+                    <Box sx={{ color: "#D6B25E", display: "flex", mt: 0.2 }}>
                       {tool.icon}
                     </Box>
                     <Box minWidth={0}>
-                      <Typography variant="caption" fontWeight={700} color="#F0F4FA">
+                      <Typography variant="caption" fontWeight={700} color="#FFFDF7">
                         {tool.label}
                       </Typography>
-                      <Typography variant="caption" display="block" sx={{ color: "rgba(240,244,250,0.65)" }}>
+                      <Typography variant="caption" display="block" sx={{ color: "rgba(255,253,247,0.65)" }}>
                         {tool.description}
                       </Typography>
                     </Box>
@@ -320,20 +417,20 @@ const RightbarAll = () => {
               mt={1.5}
               sx={{
                 borderRadius: cardRadius,
-                background: "linear-gradient(135deg, rgba(15,168,143,0.18), rgba(20,210,190,0.08))",
-                border: "1px solid rgba(20,210,190,0.22)",
+                background: "linear-gradient(135deg, rgba(214,178,94,0.18), rgba(214,178,94,0.08))",
+                border: "1px solid rgba(214,178,94,0.22)",
                 p: 1.5,
               }}
             >
               <Box display="flex" alignItems="center" gap={1} mb={1}>
-                <RocketLaunchRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
-                <Typography variant="body2" fontWeight={700} color="#F0F4FA">
+                <RocketLaunchRounded sx={{ color: "#D6B25E", fontSize: 18 }} />
+                <Typography variant="body2" fontWeight={700} color="#FFFDF7">
                   Next best actions
                 </Typography>
               </Box>
               <Stack spacing={0.8}>
                 {actionQueue.map((action) => (
-                  <Typography key={action} variant="caption" sx={{ color: "rgba(240,244,250,0.72)" }}>
+                  <Typography key={action} variant="caption" sx={{ color: "rgba(255,253,247,0.72)" }}>
                     {action}
                   </Typography>
                 ))}

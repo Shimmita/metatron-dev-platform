@@ -24,6 +24,15 @@ const rightBarExpanded = () => {
   }
 };
 
+const getRequestMessage = (err, fallback = "Unable to load featured events.") => {
+  if (err?.code === "ERR_NETWORK") return "Server is unreachable. Please try again later.";
+  const payload = err?.response?.data || err;
+  if (typeof payload === "string") return payload;
+  if (payload?.message) return payload.message;
+  if (payload?.error) return payload.error;
+  return fallback;
+};
+
 export default function FeaturedEventsContainer() {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -32,6 +41,7 @@ export default function FeaturedEventsContainer() {
 
   // redux states
   const { eventsTop } = useSelector((state) => state.currentEventsTop);
+
   // fetch posts from the backend
   useEffect(() => {
     // check if there is no posts then fetch else don't api calls
@@ -56,13 +66,7 @@ export default function FeaturedEventsContainer() {
       .catch(async (err) => {
         console.log(err);
 
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage(
-            "Server is unreachable check your internet connection"
-          );
-          return;
-        }
-        setErrorMessage(err?.response?.data || "Unable to load featured events.");
+        setErrorMessage(getRequestMessage(err));
         setOpenAlertGeneral(true)
       })
       .finally(() => {
@@ -70,6 +74,10 @@ export default function FeaturedEventsContainer() {
         setIsFetching(false);
       });
   }, [dispatch, eventsTop]);
+
+  if (Array.isArray(eventsTop) && eventsTop.length === 0) {
+    return null;
+  }
 
   return (
     <React.Fragment>
@@ -82,8 +90,8 @@ export default function FeaturedEventsContainer() {
           py={1.5}
         >
           <Box display="flex" alignItems="center" gap={1}>
-            <TvRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
-            <Typography fontSize={13} fontWeight={600} color="#F0F4FA">
+            <TvRounded sx={{ color: "#D6B25E", fontSize: 18 }} />
+            <Typography fontSize={13} fontWeight={600} color="#FFFDF7">
               Featured Events
             </Typography>
           </Box>

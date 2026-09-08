@@ -129,8 +129,8 @@ export default function AlertFilterFeed({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(20,210,190,0.15)",
-            color: "#14D2BE",
+            background: "rgba(214,178,94,0.15)",
+            color: "#D6B25E",
           }}
         >
           <SortRounded />
@@ -177,15 +177,15 @@ export default function AlertFilterFeed({
                 py: 1,
                 borderRadius: "10px",
                 background: selectedOptions.includes(data)
-                  ? "rgba(20,210,190,0.08)"
+                  ? "rgba(214,178,94,0.08)"
                   : "rgba(255,255,255,0.02)",
                 border: selectedOptions.includes(data)
-                  ? "1px solid rgba(20,210,190,0.4)"
+                  ? "1px solid rgba(214,178,94,0.4)"
                   : "1px solid rgba(255,255,255,0.06)",
                 transition: "all 0.2s ease",
 
                 "&:hover": {
-                  background: "rgba(20,210,190,0.06)",
+                  background: "rgba(214,178,94,0.06)",
                 },
               }}>
                 <Box
@@ -206,7 +206,7 @@ export default function AlertFilterFeed({
                         color: "rgba(255,255,255,0.5)",
 
                         "&.Mui-checked": {
-                          color: "#14D2BE",
+                          color: "#D6B25E",
                         },
                       }}
                     />}
@@ -215,8 +215,8 @@ export default function AlertFilterFeed({
                         variant={'body2'}
                         sx={{
                           color: selectedOptions.includes(data)
-                            ? "#14D2BE"
-                            : "rgba(240,244,250,0.7)",
+                            ? "#D6B25E"
+                            : "rgba(255,253,247,0.7)",
                           fontSize: 13,
                         }}
                       >
@@ -255,11 +255,11 @@ export default function AlertFilterFeed({
           disabled={selectedOptions?.length < 1 || isFetching}
           sx={{
             borderRadius: "10px",
-            background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+            background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
             color: "#fff",
 
             "&:hover": {
-              background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+              background: "linear-gradient(135deg,#8B6F2A,#FFF2C2)",
             },
 
             "&:disabled": {

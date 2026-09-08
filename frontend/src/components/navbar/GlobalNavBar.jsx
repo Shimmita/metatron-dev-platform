@@ -8,21 +8,21 @@ import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
 
 // Styled AppBar for smooth transition with the sidebar
 const MetatronBar = styled(AppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-  background: `rgba(15, 23, 42, 0.75)`, // Deep navy glass base
-  backdropFilter: "blur(20px) saturate(180%)",
+  shouldForwardProp: (prop) => prop !== "open" && prop !== "isDrawerPane",
+})(({ theme, open, isDrawerPane }) => ({
+  background: `rgba(5, 5, 5, 0.9)`,
+  backdropFilter: "blur(18px) saturate(150%)",
   borderBottom: `1px solid rgba(255, 255, 255, 0.08)`,
   boxShadow: open 
     ? "none" 
-    : "0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(20, 210, 190, 0.1)",
+    : "0 8px 28px rgba(0, 0, 0, 0.28), 0 0 15px rgba(214,178,94, 0.1)",
   transition: theme.transitions.create(["margin", "width", "background"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  ...(open && {
-    width: `calc(100% - 240px)`, // Match your drawer width
-    marginLeft: `240px`,
+  ...(isDrawerPane && {
+    width: `calc(100% - ${open ? 240 : 70}px)`,
+    marginLeft: `${open ? 240 : 70}px`,
     transition: theme.transitions.create(["margin", "width"], {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
@@ -39,7 +39,8 @@ export default function GlobalAppBar({
   user, 
   handleNavigateLogin, 
   handleShowDarkMode, 
-  handleShowingProfileDrawer 
+  handleShowingProfileDrawer,
+  isDrawerPane = true,
 }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -53,13 +54,15 @@ export default function GlobalAppBar({
   };
 
   return (
-    <MetatronBar position="fixed" open={open} elevation={0}>
+    <MetatronBar position="fixed" open={open} isDrawerPane={isDrawerPane} elevation={0}>
       <Toolbar
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          height: 70,
+          minHeight: 56,
+          height: 56,
+          px: { xs: 1.25, md: 2 },
         }}
       >
         {/* Left: Menu Trigger */}
@@ -72,7 +75,7 @@ export default function GlobalAppBar({
             sx={{ 
               mr: 2, 
               color: "primary.main",
-              display: { xs: "none", lg: "inline-flex" },
+              display: { xs: "none", lg: isDrawerPane ? "none" : "inline-flex" },
               ...(open && { display: "none" }) 
             }}
           >
@@ -91,13 +94,13 @@ export default function GlobalAppBar({
           }}
         >
           <Typography
-            variant="h6"
+            variant="body1"
             noWrap
             sx={{
               fontWeight: 800,
-              letterSpacing: "0.2rem",
+              letterSpacing: "0.14rem",
               textTransform: "uppercase",
-              background: "linear-gradient(90deg, #FFFFFF, #14D2BE)",
+              background: "linear-gradient(90deg, #FFFFFF, #D6B25E)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
             }}
@@ -112,7 +115,7 @@ export default function GlobalAppBar({
               letterSpacing: "0.1rem",
               color: "primary.main",
               opacity: 0.8,
-              mt: -0.5
+              mt: -0.35
             }}
           >
             {textOption || "Tech Gig Marketplace"}
@@ -129,7 +132,7 @@ export default function GlobalAppBar({
                 color: "primary.main",
                 width: 38,
                 height: 38,
-                "&:hover": { background: "rgba(20,210,190,0.08)" },
+                "&:hover": { background: "rgba(214,178,94,0.08)" },
               }}
             >
               <HomeRounded sx={{ fontSize: 20 }} />
@@ -145,7 +148,7 @@ export default function GlobalAppBar({
                 borderRadius: "8px",
                 borderColor: "rgba(255,255,255,0.2)",
                 color: "white",
-                "&:hover": { borderColor: "primary.main", background: "rgba(20,210,190,0.05)" }
+                "&:hover": { borderColor: "primary.main", background: "rgba(214,178,94,0.05)" }
               }}
             >
               Sign In
@@ -168,11 +171,11 @@ export default function GlobalAppBar({
                   <Avatar 
                     src={user?.avatar} 
                     sx={{ 
-                      width: 34, 
-                      height: 34, 
+                      width: 30, 
+                      height: 30, 
                       border: '2px solid', 
                       borderColor: 'primary.main',
-                      boxShadow: '0 0 10px rgba(20, 210, 190, 0.3)'
+                      boxShadow: '0 0 10px rgba(214,178,94, 0.3)'
                     }} 
                   />
                 </IconButton>

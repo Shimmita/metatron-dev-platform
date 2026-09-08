@@ -84,7 +84,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                 <Avatar src={AppLogo} sx={{ width: 36, height: 36 }} />
                 <Typography
                   fontWeight={600}
-                  sx={{ color: "#F0F4FA", letterSpacing: "0.03em" }}
+                  sx={{ color: "#FFFDF7", letterSpacing: "0.03em" }}
                 >
                   Account Intelligence
                 </Typography>
@@ -96,7 +96,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                   onClick={() => setOpenModalInfo(false)}
                   sx={{
                     color: "rgba(255,255,255,0.6)",
-                    "&:hover": { color: "#14D2BE" },
+                    "&:hover": { color: "#D6B25E" },
                   }}
                 >
                   <Close />
@@ -130,7 +130,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                       sx={{
                         width: 40,
                         height: 40,
-                        color: "#14D2BE",
+                        color: "#D6B25E",
                       }}
                     />
                   </Box>
@@ -140,7 +140,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                     textAlign="center"
                     fontWeight={600}
                     fontSize={15}
-                    color="#F0F4FA"
+                    color="#FFFDF7"
                     mb={2}
                   >
                     Registered Accounts
@@ -162,7 +162,7 @@ const ModalAccountInfo = ({ openModalInfo, setOpenModalInfo }) => {
                         component="li"
                         fontSize={13}
                         sx={{
-                          color: "rgba(240,244,250,0.7)",
+                          color: "rgba(255,253,247,0.7)",
                           lineHeight: 1.6,
                         }}
                       >

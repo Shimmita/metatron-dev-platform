@@ -384,7 +384,7 @@ export default function AlertGroupCommunity({
                       transition: "0.2s",
                       background:
                         !group.isMember &&
-                        "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                        "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                       color: !group.isMember ? "#fff" : undefined,
                       "&:hover": {
                         transform: "scale(1.03)",

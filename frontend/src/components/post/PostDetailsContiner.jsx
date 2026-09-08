@@ -2,6 +2,7 @@ import {
   Alert,
   Badge,
   Box,
+  Button,
   CircularProgress,
   Collapse,
   IconButton,
@@ -12,6 +13,7 @@ import {
 } from "@mui/material";
 
 import {
+  ArrowBackRounded,
   ArticleRounded,
   Close,
   ForumRounded,
@@ -155,8 +157,9 @@ function PostDetailsContainer({
         overflow: "auto",
         borderRadius: "8px",
         border: "1px solid rgba(255,255,255,0.10)",
-        background: "linear-gradient(180deg, rgba(11,18,32,0.94), rgba(5,8,18,0.96))",
+        background: "linear-gradient(180deg, rgba(13,13,13,0.98), rgba(5,5,5,0.96))",
         p: { xs: 1, sm: 1.25 },
+        pb: { xs: 2, lg: 3 },
         "&::-webkit-scrollbar": {
           display: "none",
         },
@@ -245,9 +248,11 @@ function PostDetailsContainer({
             justifyContent={"space-between"}
             alignItems={'center'}
             sx={{
-              px: 0.75,
-              py: 0.75,
+              px: 1,
+              py: 1,
               borderBottom: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: "8px",
+              background: "linear-gradient(135deg, rgba(214,178,94,0.12), rgba(255,255,255,0.035))",
             }}
           >
             <Box display="flex" alignItems="center" gap={1} minWidth={0}>
@@ -262,22 +267,27 @@ function PostDetailsContainer({
               </Box>
             </Box>
 
-            <Tooltip arrow title="Close focused post">
-              <IconButton
+            <Tooltip arrow title="Back to feed">
+              <Button
+                size="small"
+                startIcon={<ArrowBackRounded sx={{ width: 17, height: 17 }} />}
                 sx={{
-                  width: 34,
-                  height: 34,
+                  borderRadius: "8px",
+                  minWidth: { xs: 36, sm: 108 },
+                  px: { xs: 1, sm: 1.25 },
                   background: "rgba(255,255,255,0.04)",
+                  color: "primary.main",
+                  fontWeight: 900,
                   "&:hover": {
-                    background: "rgba(32,214,199,0.10)",
+                    background: "rgba(214,178,94,0.10)",
                   },
                 }}
                 onClick={handleClearPostDetailedData}
               >
-                <Close
-                  sx={{ width: 16, height: 16 }}
-                  color="primary" />
-              </IconButton>
+                <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+                  Feed
+                </Box>
+              </Button>
             </Tooltip>
           </Box>
 
@@ -287,8 +297,13 @@ function PostDetailsContainer({
               <Collapse in={errorMessage || false}>
                 <Alert
                   severity="info"
-                  className="rounded"
                   onClick={() => setErrorMessage("")}
+                  sx={{
+                    borderRadius: "8px",
+                    border: "1px solid rgba(214,178,94,0.24)",
+                    background: "rgba(214,178,94,0.08)",
+                    color: "text.primary",
+                  }}
                   action={
                     <IconButton aria-label="close" color="inherit" size="small">
                       <Close fontSize="inherit" />
@@ -327,9 +342,13 @@ function PostDetailsContainer({
             p={1}
             mb={1}
             sx={{
+              position: "sticky",
+              bottom: 0,
+              zIndex: 2,
               borderRadius: "8px",
               border: "1px solid rgba(255,255,255,0.10)",
-              background: "rgba(255,255,255,0.055)",
+              background: "rgba(13,13,13,0.94)",
+              backdropFilter: "blur(18px)",
               boxShadow: "0 16px 40px rgba(0,0,0,0.22)",
             }}
           >

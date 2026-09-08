@@ -5,7 +5,7 @@ export const drawerPaperSx = (theme) => ({
   maxWidth: "100vw",
   background:
     theme.palette.mode === "dark"
-      ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(11,18,32,0.98))"
+      ? "linear-gradient(180deg, rgba(5,8,18,0.98), rgba(13,13,13,0.98))"
       : "linear-gradient(180deg, rgba(248,250,252,0.98), rgba(238,247,255,0.98))",
   backdropFilter: "blur(24px)",
   borderLeft: "1px solid",
@@ -22,11 +22,11 @@ export const scrollAreaSx = {
   overflowX: "hidden",
   "&::-webkit-scrollbar": { width: 5 },
   "&::-webkit-scrollbar-thumb": {
-    background: "rgba(32,214,199,0.22)",
+    background: "rgba(214,178,94,0.22)",
     borderRadius: 8,
   },
   scrollbarWidth: "thin",
-  scrollbarColor: "rgba(32,214,199,0.22) transparent",
+  scrollbarColor: "rgba(214,178,94,0.22) transparent",
 };
 
 export const panelSx = (theme) => ({
@@ -46,14 +46,14 @@ export const panelSx = (theme) => ({
 export const notificationCardSx = (theme, tone = "default") => {
   const toneBorder = {
     default: theme.palette.mode === "dark" ? appColors.border : "rgba(15,23,42,0.1)",
-    success: "rgba(34,197,94,0.26)",
+    success: "rgba(214,178,94,0.26)",
     warning: "rgba(245,158,11,0.28)",
     danger: "rgba(239,68,68,0.3)",
   };
 
   const toneBg = {
     default: theme.palette.mode === "dark" ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.9)",
-    success: theme.palette.mode === "dark" ? "rgba(34,197,94,0.08)" : "rgba(34,197,94,0.07)",
+    success: theme.palette.mode === "dark" ? "rgba(214,178,94,0.08)" : "rgba(214,178,94,0.07)",
     warning: theme.palette.mode === "dark" ? "rgba(245,158,11,0.08)" : "rgba(245,158,11,0.07)",
     danger: theme.palette.mode === "dark" ? "rgba(239,68,68,0.08)" : "rgba(239,68,68,0.07)",
   };
@@ -68,11 +68,11 @@ export const notificationCardSx = (theme, tone = "default") => {
     background: toneBg[tone],
     transition: "background 180ms ease, border-color 180ms ease, transform 180ms ease",
     "&:hover": {
-      borderColor: "rgba(32,214,199,0.36)",
+      borderColor: "rgba(214,178,94,0.36)",
       background:
         theme.palette.mode === "dark"
-          ? "rgba(32,214,199,0.075)"
-          : "rgba(32,214,199,0.07)",
+          ? "rgba(214,178,94,0.075)"
+          : "rgba(214,178,94,0.07)",
       transform: "translateY(-1px)",
     },
   };
@@ -102,8 +102,8 @@ export const iconButtonSx = (theme, tone = "default") => ({
   background: theme.palette.mode === "dark" ? "rgba(255,255,255,0.035)" : "rgba(255,255,255,0.72)",
   "&:hover": {
     color: tone === "danger" ? appColors.error : appColors.primary,
-    borderColor: tone === "danger" ? "rgba(239,68,68,0.42)" : "rgba(32,214,199,0.4)",
-    background: tone === "danger" ? "rgba(239,68,68,0.1)" : "rgba(32,214,199,0.1)",
+    borderColor: tone === "danger" ? "rgba(239,68,68,0.42)" : "rgba(214,178,94,0.4)",
+    background: tone === "danger" ? "rgba(239,68,68,0.1)" : "rgba(214,178,94,0.1)",
   },
 });
 

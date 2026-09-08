@@ -50,7 +50,7 @@ const certUnderDev = true
 const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setText }) => {
 
   // redux states
-  const { user } = useSelector((state) => state.currentUser);
+  const { user, isGuest } = useSelector((state) => state.currentUser);
   const { currentMode } = useSelector((state) => state.appUI);
   const isDarkMode = currentMode === 'dark'
   const dispatch = useDispatch()
@@ -84,6 +84,11 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
 
   // handle course enrollment
   const handleEnrollCourse = () => {
+    if (isGuest) {
+      setTitle("Course Enrollment")
+      setErrorMessage("access denied, please login to continue with your request!")
+      return
+    }
 
 
     // user must pre-rate the course before enrollment
@@ -305,7 +310,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
       >
         <Box
           sx={{
-            background: !isDarkMode && "linear-gradient(180deg, #42a5f5, #64b5f6, transparent)",
+            background: !isDarkMode && "linear-gradient(180deg, rgba(214,178,94,0.32), rgba(255,242,194,0.22), transparent)",
             overflow: "auto",
             // Hide scrollbar for Chrome, Safari and Opera
             "&::-webkit-scrollbar": {

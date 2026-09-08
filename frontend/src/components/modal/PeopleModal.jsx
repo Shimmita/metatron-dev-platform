@@ -158,12 +158,12 @@ const PeopleModal = ({
                     color: "text.secondary",
                     bgcolor: isDarkMode
                       ? "rgba(255,255,255,0.03)"
-                      : "rgba(15,76,129,0.03)",
+                      : "rgba(139,111,42,0.03)",
                   },
                   "& .Mui-selected": {
                     bgcolor: isDarkMode
                       ? "rgba(255,255,255,0.08)"
-                      : "rgba(15,76,129,0.08)",
+                      : "rgba(139,111,42,0.08)",
                     color: "primary.main",
                   },
                   "& .MuiTabs-indicator": {

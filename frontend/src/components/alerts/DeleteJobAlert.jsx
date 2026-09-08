@@ -123,13 +123,13 @@ export default function DeleteJobAlert({
         </Box>
 
         <Box>
-          <Typography fontSize={14} fontWeight={600} color="#F0F4FA">
+          <Typography fontSize={14} fontWeight={600} color="#FFFDF7">
             {title}
           </Typography>
 
           <Typography
             fontSize={11}
-            sx={{ color: "rgba(240,244,250,0.5)" }}
+            sx={{ color: "rgba(255,253,247,0.5)" }}
           >
             {applicants}{" "}
             {applicants === 1 ? "applicant affected" : "applicants affected"}
@@ -154,7 +154,7 @@ export default function DeleteJobAlert({
         <Typography
           fontSize={13}
           sx={{
-            color: "rgba(240,244,250,0.7)",
+            color: "rgba(255,253,247,0.7)",
             lineHeight: 1.6,
           }}
         >

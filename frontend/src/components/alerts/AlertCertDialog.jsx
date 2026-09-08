@@ -52,7 +52,7 @@ const AlertCertDialog = ({ certData, setCertData }) => {
       TransitionComponent={(props) => <div {...props} />}
       PaperProps={{
         sx: {
-          background: "rgba(10,18,32,0.9)",
+          background: "rgba(10,10,10,0.9)",
           backdropFilter: "blur(20px)",
         },
       }}
@@ -77,7 +77,7 @@ const AlertCertDialog = ({ certData, setCertData }) => {
             onClick={handleDownload}
             sx={{
               background:
-                "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                "linear-gradient(135deg,#8B6F2A,#D6B25E)",
               color: "#fff",
             }}
           >

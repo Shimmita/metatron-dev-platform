@@ -5,6 +5,7 @@ import {
   Delete,
   Done,
   InfoOutlined,
+  LockRounded,
   LocationOnRounded,
   ScheduleRounded,
   ShareRounded,
@@ -38,6 +39,16 @@ import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import { getImageMatch } from "../../utilities/getImageMatch";
+
+const getRequestMessage = (err, fallback = "Unable to update event.") => {
+  if (err?.code === "ERR_NETWORK") return "Server unreachable. Please try again later.";
+  const payload = err?.response?.data || err;
+  if (typeof payload === "string") return payload;
+  if (payload?.message) return payload.message;
+  if (payload?.error) return payload.error;
+  return fallback;
+};
+const firstName = (value = "") => value.trim().split(/\s+/)[0] || "Host";
 
 function EventItem({
   isDarkMode = false,
@@ -76,6 +87,10 @@ function EventItem({
 
   const dispatch = useDispatch();
 
+  const handleGuestRSVP = () => {
+    setErrorMessage("access denied, please login to continue with your request!");
+  };
+
   // RSVP create
   const handleCreateRSVP = () => {
     const rsvpObject = {
@@ -101,9 +116,8 @@ function EventItem({
         }
       })
       .catch((err) => {
-        if (err?.response?.data.login) window.location.reload();
-        if (err?.code === "ERR_NETWORK") setErrorMessage("server unreachable!");
-        else setErrorMessage(err?.response.data);
+        if (err?.response?.data?.login) window.location.reload();
+        setErrorMessage(getRequestMessage(err, "Unable to RSVP for this event."));
       })
       .finally(() => setIsFetching(false));
   };
@@ -122,9 +136,8 @@ function EventItem({
         }
       })
       .catch((err) => {
-        if (err?.response?.data.login) window.location.reload();
-        if (err?.code === "ERR_NETWORK") setErrorMessage("server unreachable!");
-        else setErrorMessage(err?.response.data);
+        if (err?.response?.data?.login) window.location.reload();
+        setErrorMessage(getRequestMessage(err, "Unable to remove this RSVP."));
       })
       .finally(() => setIsFetching(false));
   };
@@ -144,9 +157,8 @@ function EventItem({
         }
       })
       .catch((err) => {
-        if (err?.response?.data.login) window.location.reload();
-        if (err?.code === "ERR_NETWORK") setErrorMessage("server unreachable!");
-        else setErrorMessage(err?.response.data);
+        if (err?.response?.data?.login) window.location.reload();
+        setErrorMessage(getRequestMessage(err, "Unable to delete this event."));
       })
       .finally(() => setIsFetching(false));
   };
@@ -173,9 +185,8 @@ function EventItem({
         setPageNumber((prev) => prev + 1);
       })
       .catch((err) => {
-        if (err?.response?.data.login) window.location.reload();
-        if (err?.code === "ERR_NETWORK") setErrorMessage("server unreachable");
-        else setErrorMessage(err?.response.data);
+        if (err?.response?.data?.login) window.location.reload();
+        setErrorMessage(getRequestMessage(err, "Unable to load more events."));
       })
       .finally(() => setIsFetching(false));
   };
@@ -210,7 +221,7 @@ function EventItem({
         sx={{
           width: "100%",
           maxWidth: "100%",
-          borderRadius: "10px",
+          borderRadius: "8px",
           position: "relative",
           overflow: "hidden",
           background: isDarkMode
@@ -218,13 +229,13 @@ function EventItem({
             : "rgba(255, 255, 255, 0.9)",
           backdropFilter: "blur(16px)",
           border: "1px solid",
-          borderColor: isDarkMode ? "rgba(20, 210, 190, 0.2)" : "rgba(0, 0, 0, 0.08)",
+          borderColor: isDarkMode ? "rgba(214,178,94, 0.2)" : "rgba(0, 0, 0, 0.08)",
           transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           "&:hover": {
-            transform: "translateY(-6px)",
+            transform: "translateY(-2px)",
             borderColor: "primary.main",
             boxShadow: isDarkMode
-              ? "0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(20, 210, 190, 0.1)"
+              ? "0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(214,178,94, 0.1)"
               : "0 20px 40px rgba(0,0,0,0.1)",
           },
         }}
@@ -232,10 +243,10 @@ function EventItem({
         {/* ─── HUD HEADER ─── */}
         <Box
           sx={{
-            p: 2,
+            p: 1.75,
             background: isDarkMode
-              ? "linear-gradient(135deg, rgba(20, 210, 190, 0.15), transparent)"
-              : "linear-gradient(135deg, rgba(25, 118, 210, 0.05), transparent)",
+              ? "linear-gradient(135deg, rgba(214,178,94, 0.15), transparent)"
+              : "linear-gradient(135deg, rgba(214,178,94, 0.05), transparent)",
           }}
         >
           <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
@@ -251,7 +262,7 @@ function EventItem({
             </Typography>
           </Stack>
 
-          <Typography variant="h6" sx={{ fontWeight: 800, mt: 1, lineHeight: 1.2, color: isDarkMode ? "#fff" : "#1e293b" }}>
+          <Typography variant="h6" sx={{ fontWeight: 800, mt: 1, lineHeight: 1.2, color: isDarkMode ? "#fff" : "#171717" }}>
             {event?.title}
           </Typography>
 
@@ -263,7 +274,7 @@ function EventItem({
           </Stack>
         </Box>
 
-        <CardContent sx={{ pt: 0 }}>
+        <CardContent sx={{ px: 1.75, pt: 0, pb: 1.75 }}>
           <Box sx={{ position: 'relative', mb: 2 }}>
             <Typography
               variant="body2"
@@ -296,7 +307,7 @@ function EventItem({
               {isExpanded ? (
                 <><UnfoldLessRounded sx={{ fontSize: 14, mr: 0.5 }} /> Show Less</>
               ) : (
-                <><UnfoldMoreRounded sx={{ fontSize: 14, mr: 0.5 }} /> Read Full Brief</>
+                <><UnfoldMoreRounded sx={{ fontSize: 14, mr: 0.5 }} /> Read Full</>
               )}
             </ButtonBase>
           </Box>
@@ -307,9 +318,9 @@ function EventItem({
               sx={{
                 mb: 2,
                 p: 1.5,
-                borderRadius: "12px",
-                bgcolor: isDarkMode ? "rgba(20, 210, 190, 0.05)" : "rgba(25, 118, 210, 0.05)",
-                border: "1px dashed rgba(20, 210, 190, 0.3)"
+                borderRadius: "8px",
+                bgcolor: isDarkMode ? "rgba(214,178,94, 0.05)" : "rgba(214,178,94, 0.05)",
+                border: "1px dashed rgba(214,178,94, 0.3)"
               }}
             >
               <Typography variant="caption" sx={{ fontWeight: 800, color: "primary.main", display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -337,9 +348,9 @@ function EventItem({
             sx={{
               display: "flex",
               alignItems: "center",
-              p: 1.2,
+              p: 1,
               width: "100%", // Ensures the hit area covers the full width
-              borderRadius: "12px",
+              borderRadius: "8px",
               textAlign: "left", // Reset text align for ButtonBase
               bgcolor: isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
               border: "1px solid transparent",
@@ -347,8 +358,8 @@ function EventItem({
               cursor: isGuest ? "default" : "pointer",
               "&:hover": {
                 bgcolor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
-                borderColor: isDarkMode ? "rgba(20, 210, 190, 0.3)" : "rgba(25, 118, 210, 0.2)",
-                transform: isGuest ? "none" : "scale(1.01)",
+                borderColor: isDarkMode ? "rgba(214,178,94, 0.3)" : "rgba(214,178,94, 0.2)",
+                transform: isGuest ? "none" : "translateY(-1px)",
               },
             }}
           >
@@ -360,7 +371,7 @@ function EventItem({
                 height: 34,
                 border: "2px solid",
                 borderColor: "primary.main",
-                boxShadow: isDarkMode ? "0 0 8px rgba(20, 210, 190, 0.2)" : "none",
+                boxShadow: isDarkMode ? "0 0 8px rgba(214,178,94, 0.2)" : "none",
               }}
             />
 
@@ -378,8 +389,8 @@ function EventItem({
               >
                 Host
               </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 700, fontSize: "0.78rem" }}>
-                {event?.ownerName}
+              <Typography variant="body2" sx={{ fontWeight: 800, fontSize: "0.78rem" }}>
+                {firstName(event?.ownerName)}
               </Typography>
             </Box>
 
@@ -410,8 +421,8 @@ function EventItem({
                 fontWeight: 800,
                 textTransform: "uppercase",
                 letterSpacing: 1,
-                bgcolor: isUserMadeRSVP ? "rgba(20, 210, 190, 0.1)" : "rgba(0,0,0,0.05)",
-                color: isUserMadeRSVP ? "#14D2BE" : "text.secondary",
+                bgcolor: isUserMadeRSVP ? "rgba(214,178,94, 0.1)" : "rgba(0,0,0,0.05)",
+                color: isUserMadeRSVP ? "#D6B25E" : "text.secondary",
               }}
             >
               {isUserMadeRSVP ? `RSVP Confirmed (+${event?.users?.count})` : `${event?.users?.count} Attending`}
@@ -437,11 +448,20 @@ function EventItem({
                 <Button
                   fullWidth
                   variant="outlined"
-                  color="error"
                   size="small"
                   startIcon={<Delete />}
                   onClick={isRSVP ? handleDeleteRSVP : handleDeleteMyEvent}
-                  sx={{ borderRadius: "10px", fontWeight: 800, textTransform: "none" }}
+                  sx={{
+                    borderRadius: "10px",
+                    fontWeight: 800,
+                    textTransform: "none",
+                    borderColor: "rgba(214,178,94,0.28)",
+                    color: "primary.main",
+                    "&:hover": {
+                      borderColor: "primary.main",
+                      background: "rgba(214,178,94,0.08)",
+                    },
+                  }}
                 >
                   Remove
                 </Button>
@@ -453,20 +473,20 @@ function EventItem({
                   size="small"
                   onClick={handleGetEventLink}
                   startIcon={isCopiedStatus ? <Done /> : <ShareRounded />}
-                  sx={{ borderRadius: "10px", fontWeight: 800, minWidth: "100px", color: isCopiedStatus ? "success.main" : "inherit" }}
+	                  sx={{ borderRadius: "10px", fontWeight: 800, minWidth: "100px", color: isCopiedStatus ? "primary.main" : "inherit" }}
                 >
                   {isCopiedStatus ? "Linked" : "Share"}
                 </Button>
                 <Button
                   fullWidth
                   variant="contained"
-                  disabled={isFetching || isUserMadeRSVP || isMyOwnEvent || isGuest}
-                  onClick={handleCreateRSVP}
-                  startIcon={isFetching ? <CircularProgress size={16} color="inherit" /> : <CheckCircleRounded />}
+                  disabled={isFetching || isUserMadeRSVP || isMyOwnEvent}
+                  onClick={isGuest ? handleGuestRSVP : handleCreateRSVP}
+                  startIcon={isFetching ? <CircularProgress size={16} color="inherit" /> : isGuest ? <LockRounded /> : <CheckCircleRounded />}
                   sx={{
                     borderRadius: "10px",
                     fontWeight: 800,
-                    background: isUserMadeRSVP ? "rgba(20, 210, 190, 0.2)" : "primary.main",
+                    background: isUserMadeRSVP ? "rgba(214,178,94, 0.2)" : "primary.main",
                   }}
                 >
                   {isMyOwnEvent ? "Owner" : isUserMadeRSVP ? "Joined" : "RSVP Now"}

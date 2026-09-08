@@ -65,9 +65,9 @@ export default function AlertSuccess() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(34,197,94,0.15)",
-            color: "#22C55E",
-            boxShadow: "0 0 25px rgba(34,197,94,0.25)",
+            background: "rgba(214,178,94,0.15)",
+            color: "#D6B25E",
+            boxShadow: "0 0 25px rgba(214,178,94,0.25)",
           }}
         >
           <CheckCircleRounded sx={{ fontSize: 30 }} />
@@ -79,7 +79,7 @@ export default function AlertSuccess() {
         <Typography
           fontSize={15}
           fontWeight={600}
-          color="#F0F4FA"
+          color="#FFFDF7"
         >
           {title}
         </Typography>
@@ -90,7 +90,7 @@ export default function AlertSuccess() {
         <Typography
           fontSize={13}
           sx={{
-            color: "rgba(240,244,250,0.7)",
+            color: "rgba(255,253,247,0.7)",
             lineHeight: 1.6,
           }}
         >
@@ -105,11 +105,11 @@ export default function AlertSuccess() {
           sx={{
             borderRadius: "10px",
             px: 3,
-            background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+            background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
             color: "#fff",
 
             "&:hover": {
-              background: "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+              background: "linear-gradient(135deg,#8B6F2A,#FFF2C2)",
             },
           }}
         >

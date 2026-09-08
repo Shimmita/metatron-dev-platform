@@ -11,7 +11,7 @@ export default function JobsContainer() {
   // screen width of the device
   const screenWidth = window.screen.availWidth;
   // redux states
-  const { user } = useSelector((state) => state.currentUser);
+  const { user, isGuest } = useSelector((state) => state.currentUser);
   const { jobsTop } = useSelector((state) => state.currentJobsTop);
   const [isFetching, setIsFetching] = useState(false);
   const [openAlertGeneral, setOpenAlertGeneral] = useState(false)
@@ -31,7 +31,7 @@ export default function JobsContainer() {
 
     // performing get request and passing userId 
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/top/${user?._id}`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/top/${isGuest ? "guest" : user?._id}`, {
         withCredentials: true,
       })
       .then((res) => {
@@ -53,7 +53,11 @@ export default function JobsContainer() {
         // set is fetching to false
         setIsFetching(false);
       });
-  }, [dispatch, jobsTop, user]);
+  }, [dispatch, jobsTop, user, isGuest]);
+
+  if (Array.isArray(jobsTop) && jobsTop.length === 0) {
+    return null;
+  }
 
 
   // get the right-bar expanded appropriately
@@ -81,8 +85,8 @@ export default function JobsContainer() {
         py={1.5}
       >
         <Box display="flex" alignItems="center" gap={1}>
-          <WorkRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
-          <Typography fontSize={13} fontWeight={600} color="#F0F4FA">
+          <WorkRounded sx={{ color: "#D6B25E", fontSize: 18 }} />
+          <Typography fontSize={13} fontWeight={600} color="#FFFDF7">
             Featured Opportunities
           </Typography>
         </Box>
@@ -106,7 +110,7 @@ export default function JobsContainer() {
           gap={1}
           sx={{ p: 1 }}
         >
-          {jobsTop?.slice(0, 5).map((jobTop, index) => (
+          {jobsTop?.slice(0, 3).map((jobTop, index) => (
             <Box
               key={jobTop?._id}
               sx={{
@@ -118,7 +122,8 @@ export default function JobsContainer() {
               <FeaturedJobs
                 isLastIndex={index === jobsTop?.length - 1}
                 isLoading={isFetching}
-                jobTop={jobTop} />
+                jobTop={jobTop}
+                setErrorMessage={setErrorMessage} />
             </Box>
           ))}
         </Box>

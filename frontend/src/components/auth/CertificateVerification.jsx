@@ -115,7 +115,7 @@ const CertificateVerification = () => {
             {/* TITLE */}
             <Box textAlign="center" mb={2}>
               <VerifiedRounded
-                sx={{ fontSize: 40, color: "#14D2BE" }}
+                sx={{ fontSize: 40, color: "#D6B25E" }}
               />
               <Typography fontWeight={600} mt={1}>
                 Verify Certificate
@@ -164,7 +164,7 @@ const CertificateVerification = () => {
               sx={{
                 borderRadius: "12px",
                 background:
-                  "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                  "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                 color: "#fff",
               }}
             >
@@ -178,7 +178,7 @@ const CertificateVerification = () => {
               <Box textAlign="center" mt={2}>
                 <Typography fontSize={12} color="text.secondary">
                   Back to{" "}
-                  <Link to="/" style={{ color: "#14D2BE" }}>
+                  <Link to="/" style={{ color: "#D6B25E" }}>
                     Login
                   </Link>
                 </Typography>

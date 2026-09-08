@@ -100,14 +100,14 @@ export default function AlertSimilarCourses({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(20,210,190,0.15)",
-            color: "#14D2BE",
+            background: "rgba(214,178,94,0.15)",
+            color: "#D6B25E",
           }}
         >
           <SchoolRounded />
         </Box>
 
-        <Typography fontSize={14} fontWeight={600} color="#F0F4FA">
+        <Typography fontSize={14} fontWeight={600} color="#FFFDF7">
           Similar Courses
         </Typography>
       </Box>
@@ -119,7 +119,7 @@ export default function AlertSimilarCourses({
           sx={{
             color: errorMessage
               ? "#F59E0B"
-              : "rgba(240,244,250,0.6)",
+              : "rgba(255,253,247,0.6)",
           }}
         >
           {errorMessage || courseName}
@@ -145,8 +145,8 @@ export default function AlertSimilarCourses({
                 transition: "all 0.25s ease",
 
                 "&:hover": {
-                  background: "rgba(20,210,190,0.06)",
-                  borderColor: "rgba(20,210,190,0.3)",
+                  background: "rgba(214,178,94,0.06)",
+                  borderColor: "rgba(214,178,94,0.3)",
                 },
               }}
             >
@@ -166,14 +166,14 @@ export default function AlertSimilarCourses({
                   <Typography
                     fontSize={13}
                     fontWeight={600}
-                    color="#F0F4FA"
+                    color="#FFFDF7"
                   >
                     {course?.course_title}
                   </Typography>
 
                   <Typography
                     fontSize={12}
-                    sx={{ color: "rgba(240,244,250,0.6)" }}
+                    sx={{ color: "rgba(255,253,247,0.6)" }}
                   >
                     {course?.course_instructor?.instructorName}
                   </Typography>
@@ -188,7 +188,7 @@ export default function AlertSimilarCourses({
                     />
                     <Typography
                       fontSize={11}
-                      sx={{ color: "rgba(240,244,250,0.5)" }}
+                      sx={{ color: "rgba(255,253,247,0.5)" }}
                     >
                       {course?.course_rate_count}
                     </Typography>
@@ -204,12 +204,12 @@ export default function AlertSimilarCourses({
                         fontSize: 11,
                         px: 1.5,
                         background:
-                          "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                          "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                         color: "#fff",
 
                         "&:hover": {
                           background:
-                            "linear-gradient(135deg,#0BBFA5,#1EE8D2)",
+                            "linear-gradient(135deg,#8B6F2A,#FFF2C2)",
                         },
                       }}
                     >
@@ -228,10 +228,10 @@ export default function AlertSimilarCourses({
             mt={4}
             gap={1}
           >
-            <MenuBookRounded sx={{ color: "#14D2BE" }} />
+            <MenuBookRounded sx={{ color: "#D6B25E" }} />
             <Typography
               fontSize={13}
-              sx={{ color: "rgba(240,244,250,0.6)" }}
+              sx={{ color: "rgba(255,253,247,0.6)" }}
             >
               No Similar Courses Found
             </Typography>

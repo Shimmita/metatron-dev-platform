@@ -37,7 +37,7 @@ const StyledTabs = styled((props) => (
   "& .MuiTabs-indicator": {
     display: "flex",
     justifyContent: "center",
-    backgroundColor: "rgba(20, 210, 190, 0.15)",
+    backgroundColor: "rgba(214,178,94, 0.15)",
     borderRadius: "6px",
     height: "100%",
   },
@@ -163,7 +163,7 @@ export default function ParentNotifMessageDrawer() {
             <Suspense
               fallback={
                 <Box display="flex" justifyContent="center" alignItems="center" height="50vh">
-                  <CircularProgress size={20} thickness={6} sx={{ color: '#14D2BE' }} />
+                  <CircularProgress size={20} thickness={6} sx={{ color: '#D6B25E' }} />
                 </Box>
               }
             >

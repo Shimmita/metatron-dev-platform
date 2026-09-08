@@ -14,6 +14,7 @@ import { getElapsedTime } from "../utilities/getElapsedTime";
 import CommentsReply from "./CommentsReply";
 
 const MAX_TEXT_LENGTH=100
+const firstName = (value = "") => value.trim().split(/\s+/)[0] || "Member";
 
 export default function CommentUser({ comment: commenter, postId, setPostDetailedData }) {
   const[isUploading, setIsUploading] = useState(false);  
@@ -25,6 +26,19 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
   const[isDeleteComment,setIsDeleteComment]=useState(false)
   const[repliesData,setRepliesData]=useState([])
   const [openMiniProfileAlert, setOpenMiniProfileAlert] = useState(false);
+  const microButtonSx = {
+    borderRadius: "8px",
+    textTransform: "capitalize",
+    fontSize: "x-small",
+    fontWeight: 900,
+    color: "text.secondary",
+    borderColor: "rgba(214,178,94,0.28)",
+    "&:hover": {
+      color: "primary.main",
+      borderColor: "rgba(214,178,94,0.45)",
+      background: "rgba(214,178,94,0.08)",
+    },
+  };
   
 
     // axios default credentials
@@ -242,13 +256,13 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
       <ListItem
         alignItems="flex-start"
         sx={{
-          borderBottom: "1px solid rgba(255,255,255,0.075)",
-          background: "transparent",
+          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          background: "linear-gradient(90deg, rgba(255,255,255,0.018), transparent)",
           alignItems: "flex-start",
           px: { xs: 0.75, sm: 1 },
           py: 1.4,
           "&:hover": {
-            background: "rgba(255,255,255,0.025)",
+            background: "rgba(214,178,94,0.045)",
           },
         }}
       >
@@ -259,7 +273,8 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
             sx={{
               width: 36,
               height: 36,
-              border: "1px solid rgba(32,214,199,0.18)",
+              border: "1px solid rgba(214,178,94,0.24)",
+              boxShadow: "0 0 12px rgba(214,178,94,0.12)",
             }}
           />
         </ListItemAvatar>
@@ -276,7 +291,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 alignItems={"center"}
                 fontWeight={900}
               >
-                {commenter?.name}  
+                {firstName(commenter?.name)}
                 {isCurrentUserComment && (
                   <Typography
                   ml={1}
@@ -344,11 +359,9 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 {/* edit button */}
                 <Button 
                 onClick={handleEditing} 
-                variant={isEditing ? 'outlined':'text'} 
-                size={'small'} 
-                sx={{ borderRadius:"8px", 
-                textTransform:'capitalize', 
-                fontSize:"x-small" }}>
+                  variant={isEditing ? 'outlined':'text'} 
+                  size={'small'} 
+                sx={microButtonSx}>
                   edit
                 </Button>
 
@@ -357,20 +370,17 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 disabled={isDeleteComment} 
                 onClick={handleDeleteComment} 
                 variant="text" 
-                color="warning" 
                 size={'small'} 
-                sx={{ borderRadius:"8px", 
-                textTransform:'capitalize', 
-                fontSize:"x-small" }}>delete</Button>
+                sx={microButtonSx}>delete</Button>
                 {/* view replies button, only shown if the comment got at-least a comment */}
-                {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={{ borderRadius:"8px", textTransform:'capitalize', fontSize:"x-small" }}>{commenter?.replyCount} replied</Button>}
+                {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={microButtonSx}>{commenter?.replyCount} replied</Button>}
                 </React.Fragment>
               ):(
                 <React.Fragment>
                 {/* reply button */}
-               <Button startIcon={<ReplyRounded sx={{ fontSize: 14 }} />} onClick={handleShowReplyInput} variant={isOpenReply ? 'outlined':'text'} size={'small'} sx={{ borderRadius:"8px", textTransform:'capitalize', fontSize:"x-small" }}>reply</Button>
+               <Button startIcon={<ReplyRounded sx={{ fontSize: 14 }} />} onClick={handleShowReplyInput} variant={isOpenReply ? 'outlined':'text'} size={'small'} sx={microButtonSx}>reply</Button>
                {/* view replies button, only shown if the comment got at-least a comment */}
-               {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={{ borderRadius:"8px", textTransform:'capitalize', fontSize:"x-small" }}>{commenter?.replyCount} replied</Button>
+               {commenter?.replyCount>0 && <Button onClick={handleShowCommentReplies} variant={isOpenReplyComments ? 'outlined':'text'} size={'small'} sx={microButtonSx}>{commenter?.replyCount} replied</Button>
               
               }
                 </React.Fragment>
@@ -387,9 +397,8 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 mt={1}
                 sx={{
                   borderRadius: "8px",
-                  border:'1px solid',
-                  borderColor:'divider',
-                  background: "rgba(255,255,255,0.045)",
+                  border:'1px solid rgba(214,178,94,0.18)',
+                  background: "rgba(214,178,94,0.055)",
                 }}
               >
                 {/* input for reply */}
@@ -404,6 +413,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                     placeholder={isOpenReply ? "Write a focused reply..." : "Edit your comment..."}
                     sx={{
                       fontSize: "small",
+                      color: "text.primary",
                     }}
                   />
                 </Box>
@@ -438,8 +448,9 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                    severity="info"
                    sx={{
                     borderRadius: "8px",
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(214,178,94,0.08)",
+                    border: "1px solid rgba(214,178,94,0.22)",
+                    color: "text.primary",
                    }}
                    action={
                      <Stack direction={"row"} alignItems={"center"} gap={1}>
@@ -451,11 +462,10 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                          disabled={isUploading}
                          onClick={handleCompleteCommentDeletion}
                        >
-                        {isUploading ? <CircularProgress size={15} /> :<DoneRounded color="warning" sx={{ width:16,height:16 }}/>}
+                        {isUploading ? <CircularProgress size={15} /> :<DoneRounded color="primary" sx={{ width:16,height:16 }}/>}
 
                          
                        </IconButton>
-                       |{/* no btn */}
                        <IconButton
                          aria-label="close"
                          color="inherit"
@@ -463,14 +473,14 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                          disabled={isUploading}
                          onClick={handleDeleteComment}
                        >
-                        {isUploading ? <CircularProgress size={15} /> :<Close color={'info'} sx={{ width:15,height:15 }}/>}
+                        {isUploading ? <CircularProgress size={15} /> :<Close color="primary" sx={{ width:15,height:15 }}/>}
                        </IconButton>
                      </Stack>
                    }
                  >
                    <Box mb={1}>
                      <Typography variant="body2">
-                     {isUploading ? "deleting...":"delete ?"}
+                     {isUploading ? "Deleting..." : "Delete comment?"}
                      </Typography>
                    </Box>
                

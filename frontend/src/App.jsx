@@ -78,7 +78,77 @@ const App = () => {
           },
           "::selection": {
             backgroundColor: theme.palette.primary.main,
-            color: "#fff",
+            color: "#080808",
+          },
+          ".MuiPaper-root": {
+            backgroundImage: "none",
+          },
+          ".MuiAvatar-root": {
+            boxShadow: "0 0 0 1px rgba(214,178,94,0.18)",
+          },
+          ".MuiIconButton-root": {
+            transition: "background 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease",
+          },
+          ".MuiIconButton-root:hover": {
+            color: "#D6B25E",
+            backgroundColor: "rgba(214,178,94,0.10)",
+          },
+          ".MuiTab-root.Mui-selected": {
+            color: "#D6B25E",
+          },
+          ".MuiTabs-indicator": {
+            backgroundColor: "#D6B25E",
+          },
+          ".MuiTableCell-head": {
+            color: "#F8E7B0",
+            fontWeight: 900,
+            background: "rgba(214,178,94,0.08)",
+          },
+          ".MuiTableRow-root:hover": {
+            backgroundColor: "rgba(214,178,94,0.055)",
+          },
+          ".btn-primary, .btn-info, .btn-success": {
+            color: "#080808",
+            background: "linear-gradient(135deg, #8B6F2A 0%, #D6B25E 55%, #FFF2C2 100%)",
+            borderColor: "rgba(214,178,94,0.56)",
+            boxShadow: "0 12px 30px rgba(214,178,94,0.18)",
+          },
+          ".btn-primary:hover, .btn-info:hover, .btn-success:hover": {
+            color: "#080808",
+            background: "linear-gradient(135deg, #D6B25E 0%, #FFF2C2 100%)",
+            borderColor: "rgba(214,178,94,0.72)",
+          },
+          ".btn-outline-primary, .btn-outline-success": {
+            color: "#D6B25E",
+            borderColor: "rgba(214,178,94,0.44)",
+          },
+          ".btn-outline-primary:hover, .btn-outline-success:hover": {
+            color: "#080808",
+            backgroundColor: "#D6B25E",
+            borderColor: "#D6B25E",
+          },
+          ".text-primary, .text-success": {
+            color: "#D6B25E !important",
+          },
+          ".bg-primary, .bg-success": {
+            backgroundColor: "#D6B25E !important",
+            color: "#080808 !important",
+          },
+          ".border-primary, .border-success": {
+            borderColor: "rgba(214,178,94,0.62) !important",
+          },
+          ".alert-success": {
+            color: "#F8E7B0",
+            backgroundColor: "rgba(214,178,94,0.12)",
+            borderColor: "rgba(214,178,94,0.36)",
+          },
+          ".MuiAlert-standardSuccess, .MuiAlert-filledSuccess, .MuiAlert-outlinedSuccess": {
+            color: "#F8E7B0",
+            backgroundColor: "rgba(214,178,94,0.12)",
+            borderColor: "rgba(214,178,94,0.36)",
+          },
+          ".MuiSvgIcon-colorSuccess": {
+            color: "#D6B25E",
           },
         }}
       />
@@ -130,7 +200,7 @@ const AppLoader = ({ isDarkMode }) => (
         justifyContent: "center",
         flexDirection: "column",
         minHeight: "100vh",
-        background: isDarkMode ? "#0F172A" : appGradients.soft, // Custom slate dark for loader
+        background: isDarkMode ? appGradients.page : appGradients.soft,
         gap: 3,
       }}
     >
@@ -140,8 +210,8 @@ const AppLoader = ({ isDarkMode }) => (
           sx={{
             width: 100,
             height: 100,
-            boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
-            border: "2px solid rgba(20, 210, 190, 0.2)",
+            boxShadow: "0 24px 60px rgba(0,0,0,0.55), 0 0 42px rgba(214,178,94,0.18)",
+            border: "2px solid rgba(214,178,94, 0.2)",
             p: 1,
             bgcolor: "rgba(255,255,255,0.05)"
           }}
@@ -153,9 +223,9 @@ const AppLoader = ({ isDarkMode }) => (
             sx={{ 
               fontWeight: 900, 
               letterSpacing: "0.5rem", 
-              color: "#14D2BE",
+              color: "#D6B25E",
               textTransform: "uppercase",
-              textShadow: "0 0 20px rgba(20, 210, 190, 0.3)"
+              textShadow: "0 0 20px rgba(214,178,94, 0.3)"
             }}
           >
             METATRON
@@ -170,7 +240,7 @@ const AppLoader = ({ isDarkMode }) => (
       </Stack>
 
       <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 4 }}>
-        <RotatingLines width="24" strokeColor="#14D2BE" strokeWidth="4" />
+        <RotatingLines width="24" strokeColor="#D6B25E" strokeWidth="4" />
         <Typography 
           sx={{ 
             fontSize: 12, 

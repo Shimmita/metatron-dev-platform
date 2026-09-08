@@ -1,11 +1,8 @@
 import {
     Add,
     ArrowBackRounded,
-    ChevronLeft as ChevronLeftIcon,
-    ChevronRight as ChevronRightIcon,
     DocumentScannerRounded,
     HelpRounded,
-    HighlightOffOutlined,
     Menu,
     SettingsRounded,
     TipsAndUpdatesRounded,
@@ -56,7 +53,6 @@ export default function HiringDrawer({
     open,
     setOpen,
     isDrawerPane,
-    setIsDrawerPane,
     isDarkMode,
     user,
     textOption,
@@ -92,8 +88,8 @@ export default function HiringDrawer({
                     alignItems: "center",
                     justifyContent: open ? "space-between" : "center",
                     px: 2,
-                    background: isDarkMode ? "rgba(20, 210, 190, 0.05)" : "rgba(25, 118, 210, 0.05)",
-                    borderBottom: `1px solid ${isDarkMode ? "rgba(20, 210, 190, 0.2)" : "rgba(0,0,0,0.1)"}`,
+                    background: isDarkMode ? "rgba(214,178,94, 0.05)" : "rgba(214,178,94, 0.05)",
+                    borderBottom: `1px solid ${isDarkMode ? "rgba(214,178,94, 0.2)" : "rgba(0,0,0,0.1)"}`,
                 }}
             >
                 {!open ? (
@@ -111,25 +107,15 @@ export default function HiringDrawer({
                             </Typography>
                         </Stack>
                         <IconButton onClick={() => setOpen(false)}>
-                            {theme.direction === "rtl" ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                            <Menu sx={{ color: "primary.main" }} />
                         </IconButton>
                     </>
                 )}
             </Box>
 
             {/* ─── ACTION LIST ─── */}
+            {open && (
             <List sx={{ px: 1, py: 2 }}>
-                {!open && (
-                    <ListItemButton
-                        onClick={() => setIsDrawerPane(false)}
-                        sx={{ justifyContent: "center", borderRadius: "10px", mb: 2 }}
-                    >
-                        <Tooltip title="Close Sector" placement="right">
-                            <HighlightOffOutlined sx={{ color: "error.main" }} />
-                        </Tooltip>
-                    </ListItemButton>
-                )}
-
                 {hiringItems.map((item) => {
                     const isActive = textOption === item.text;
                     const isBackToJobs = item.text === "Back To Jobs";
@@ -205,6 +191,7 @@ export default function HiringDrawer({
                 })}
 
             </List>
+            )}
 
         </StyledDrawer>
     );

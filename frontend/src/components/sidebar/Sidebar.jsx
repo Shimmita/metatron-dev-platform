@@ -45,6 +45,15 @@ const BoxAvatarContent = styled(Box)({
   gap: "1rem",
 });
 
+const getRequestMessage = (err, fallback = "Unable to load insights.") => {
+  if (err?.code === "ERR_NETWORK") return "Server is unreachable. Please try again later.";
+  const payload = err?.response?.data || err;
+  if (typeof payload === "string") return payload;
+  if (payload?.message) return payload.message;
+  if (payload?.error) return payload.error;
+  return fallback;
+};
+
 const Sidebar = () => {
   const [openMobileApp, setOpenMobileApp] = useState(false);
   const [dataInsights, setDataInsights] = useState([]);
@@ -128,16 +137,12 @@ const Sidebar = () => {
       })
       .then((res) => {
         if (res?.data) {
-          setDataInsights(res.data.insights);
-          setDataTools(res.data.tools);
+          setDataInsights(Array.isArray(res.data.insights) ? res.data.insights : []);
+          setDataTools(Array.isArray(res.data.tools) ? res.data.tools : []);
         }
       })
       .catch((err) => {
-        if (err?.code === "ERR_NETWORK") {
-          setErrorMessage("Server is unreachable ");
-          return;
-        }
-        setErrorMessage(err?.response?.data || "Unable to load insights.");
+        setErrorMessage(getRequestMessage(err));
       })
       .finally(() => {
         setIsFetching(false);
@@ -180,7 +185,7 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
-        width: { sm: 210, md: 260, lg: 310, xl: 330 },
+        width: { sm: 210, md: 260, lg: 248, xl: 260 },
         flexShrink: 0,
         mt: { sm: 1.5, md: 2 },
         display: {
@@ -195,7 +200,7 @@ const Sidebar = () => {
         className="shadow"
         sx={{
           position: { lg: "sticky" },
-          top: { lg: 88 },
+          top: { lg: 64 },
           alignSelf: "flex-start",
           width: "100%",
         }}
@@ -211,7 +216,7 @@ const Sidebar = () => {
             backdropFilter: "blur(25px)",
             border: "1px solid rgba(255,255,255,0.08)",
             boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
-            maxHeight: "calc(100vh - 104px)",
+            maxHeight: "calc(100vh - 76px)",
             overflowY: "auto",
             overscrollBehavior: "contain",
             "&::-webkit-scrollbar": {
@@ -228,8 +233,8 @@ const Sidebar = () => {
               py={2.5}
               sx={{
                 background: isDarkMode
-                  ? "linear-gradient(180deg, rgba(20,210,190,0.12) 0%, rgba(15, 23, 42, 0) 100%)"
-                  : "linear-gradient(180deg, rgba(20,210,190,0.08) 0%, transparent 100%)",
+                  ? "linear-gradient(180deg, rgba(214,178,94,0.12) 0%, rgba(15, 23, 42, 0) 100%)"
+                  : "linear-gradient(180deg, rgba(214,178,94,0.08) 0%, transparent 100%)",
                 borderBottom: "1px solid",
                 borderColor: "divider",
               }}
@@ -255,10 +260,10 @@ const Sidebar = () => {
                       sx={{
                         width: 70,
                         height: 70,
-                        background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                        background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                         boxShadow: isDarkMode
-                          ? "0 0 25px rgba(20,210,190,0.2)"
-                          : "0 8px 16px rgba(20,210,190,0.15)",
+                          ? "0 0 25px rgba(214,178,94,0.2)"
+                          : "0 8px 16px rgba(214,178,94,0.15)",
                         border: "2px solid",
                         borderColor: "background.paper"
                       }}
@@ -286,7 +291,7 @@ const Sidebar = () => {
                       {/* Metadata Badges */}
                       <Box mt={1} display="flex" flexWrap="wrap" gap={0.5}>
                         {isGuest ? (
-                          <Box sx={{ px: 1, py: 0.2, borderRadius: 1, bgcolor: 'rgba(20, 210, 190, 0.1)', border: '1px solid rgba(20, 210, 190, 0.2)' }}>
+                          <Box sx={{ px: 1, py: 0.2, borderRadius: 1, bgcolor: 'rgba(214,178,94, 0.1)', border: '1px solid rgba(214,178,94, 0.2)' }}>
                             <Typography variant="caption" sx={{ color: "primary.main", fontWeight: 800, fontSize: '0.6rem' }}>
                               {usersCount || "Many"} DEVELOPERS ON METATRON
                             </Typography>
@@ -391,8 +396,8 @@ const Sidebar = () => {
                 }}
               >
                 <Box display="flex" alignItems="center" gap={1} mb={1.5}>
-                  <TrendingUpRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
-                  <Typography fontWeight={600} fontSize={13} color="#F0F4FA">
+                  <TrendingUpRounded sx={{ color: "#D6B25E", fontSize: 18 }} />
+                  <Typography fontWeight={600} fontSize={13} color="#FFFDF7">
                     Growth Pathways
                   </Typography>
                 </Box>
@@ -416,8 +421,8 @@ const Sidebar = () => {
                         transition: "all 0.25s ease",
 
                         "&:hover": {
-                          background: "rgba(20,210,190,0.08)",
-                          borderColor: "rgba(20,210,190,0.4)",
+                          background: "rgba(214,178,94,0.08)",
+                          borderColor: "rgba(214,178,94,0.4)",
                           transform: "translateY(-1px)",
                         }
                       }}
@@ -508,11 +513,11 @@ const Sidebar = () => {
                             transition: "all 0.2s ease-in-out",
                             cursor: "default",
                             "&:hover": {
-                              bgcolor: "rgba(20, 210, 190, 0.08)",
-                              borderColor: "rgba(20, 210, 190, 0.3)",
+                              bgcolor: "rgba(214,178,94, 0.08)",
+                              borderColor: "rgba(214,178,94, 0.3)",
                               transform: "translateY(-2px)",
                               "& .tool-icon": {
-                                filter: "drop-shadow(0 0 8px rgba(20, 210, 190, 0.4))"
+                                filter: "drop-shadow(0 0 8px rgba(214,178,94, 0.4))"
                               }
                             },
                           }}
@@ -588,7 +593,7 @@ const Sidebar = () => {
                   }}
                 >
                   <Box display="flex" alignItems="center" gap={1} mb={1.25}>
-                    <AssignmentTurnedInRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+                    <AssignmentTurnedInRounded sx={{ color: "#D6B25E", fontSize: 18 }} />
                     <Typography variant="body2" fontWeight={700}>
                       Professional readiness
                     </Typography>
@@ -611,7 +616,7 @@ const Sidebar = () => {
                         }}
                       >
                         <Box display="flex" alignItems="center" gap={1} minWidth={0}>
-                          <Box sx={{ color: "#14D2BE", display: "flex" }}>{item.icon}</Box>
+                          <Box sx={{ color: "#D6B25E", display: "flex" }}>{item.icon}</Box>
                           <Typography variant="caption" noWrap>
                             {item.label}
                           </Typography>
@@ -636,7 +641,7 @@ const Sidebar = () => {
                   }}
                 >
                   <Box display="flex" alignItems="center" gap={1} mb={1}>
-                    <WorkspacePremiumRounded sx={{ color: "#14D2BE", fontSize: 18 }} />
+                    <WorkspacePremiumRounded sx={{ color: "#D6B25E", fontSize: 18 }} />
                     <Typography variant="body2" fontWeight={700}>
                       Trust layer
                     </Typography>
@@ -644,7 +649,7 @@ const Sidebar = () => {
                   <Stack spacing={0.9}>
                     {platformReadiness.map((item) => (
                       <Box key={item} display="flex" alignItems="flex-start" gap={1}>
-                        <RocketLaunchRounded sx={{ color: "#14D2BE", fontSize: 15, mt: 0.25 }} />
+                        <RocketLaunchRounded sx={{ color: "#D6B25E", fontSize: 15, mt: 0.25 }} />
                         <Typography variant="caption" color="text.secondary">
                           {item}
                         </Typography>

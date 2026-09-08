@@ -231,7 +231,7 @@ function ProfileUpdate({ user }) {
           sx={{
             mt: 3,
             borderRadius: "12px",
-            background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+            background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
           }}
         >
           Save Changes

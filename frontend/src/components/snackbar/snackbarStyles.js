@@ -1,21 +1,21 @@
 const severityStyles = {
   success: {
-    color: "#22C55E",
-    bg: "rgba(34,197,94,0.12)",
-    border: "rgba(34,197,94,0.36)",
-    shadow: "rgba(34,197,94,0.18)",
+    color: "#F8E7B0",
+    bg: "rgba(214,178,94,0.13)",
+    border: "rgba(214,178,94,0.4)",
+    shadow: "rgba(214,178,94,0.2)",
   },
   info: {
-    color: "#20D6C7",
-    bg: "rgba(32,214,199,0.12)",
-    border: "rgba(32,214,199,0.36)",
-    shadow: "rgba(32,214,199,0.18)",
+    color: "#D6B25E",
+    bg: "rgba(214,178,94,0.12)",
+    border: "rgba(214,178,94,0.36)",
+    shadow: "rgba(214,178,94,0.18)",
   },
   warning: {
-    color: "#F59E0B",
-    bg: "rgba(245,158,11,0.13)",
-    border: "rgba(245,158,11,0.38)",
-    shadow: "rgba(245,158,11,0.18)",
+    color: "#F0B93A",
+    bg: "rgba(240,185,58,0.13)",
+    border: "rgba(240,185,58,0.38)",
+    shadow: "rgba(240,185,58,0.18)",
   },
   error: {
     color: "#EF4444",
@@ -47,7 +47,7 @@ export const snackbarAlertSx = (severity = "info") => {
     fontWeight: 800,
     background: (theme) =>
       theme.palette.mode === "dark"
-        ? `linear-gradient(135deg, rgba(11,18,32,0.94), ${tone.bg})`
+        ? `linear-gradient(135deg, rgba(5,5,5,0.96), ${tone.bg})`
         : `linear-gradient(135deg, rgba(255,255,255,0.98), ${tone.bg})`,
     border: "1px solid",
     borderColor: tone.border,

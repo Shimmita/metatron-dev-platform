@@ -46,7 +46,7 @@ const inputSx = {
   "& .MuiInputLabel-root.Mui-focused": { color: appColors.primary },
   "& .MuiSvgIcon-root": { color: appColors.textMuted },
   "& input:-webkit-autofill": {
-    WebkitBoxShadow: "0 0 0 100px #0A1625 inset",
+    WebkitBoxShadow: "0 0 0 100px #0B0B0B inset",
     WebkitTextFillColor: appColors.textPrimary,
   },
 };
@@ -57,7 +57,7 @@ const DotGrid = () => (
       position: "absolute",
       inset: 0,
       backgroundImage:
-        "linear-gradient(90deg, rgba(32,214,199,0.04) 1px, transparent 1px), linear-gradient(rgba(32,214,199,0.04) 1px, transparent 1px)",
+        "linear-gradient(90deg, rgba(214,178,94,0.04) 1px, transparent 1px), linear-gradient(rgba(214,178,94,0.04) 1px, transparent 1px)",
       backgroundSize: "34px 34px",
       pointerEvents: "none",
     }}
@@ -90,11 +90,11 @@ const RecoverySteps = ({ activeStep, steps }) => (
             sx={{
               borderRadius: "8px",
               border: "1px solid",
-              borderColor: isActive ? "rgba(32,214,199,0.42)" : appColors.border,
+              borderColor: isActive ? "rgba(214,178,94,0.42)" : appColors.border,
               background: isDone
-                ? "rgba(34,197,94,0.09)"
+                ? "rgba(214,178,94,0.09)"
                 : isActive
-                ? "rgba(32,214,199,0.1)"
+                ? "rgba(214,178,94,0.1)"
                 : "transparent",
               px: 1,
               py: 0.8,
@@ -261,7 +261,7 @@ const RecoverAuth = () => {
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(135deg, rgba(32,214,199,0.14), transparent 34%, rgba(242,184,75,0.06) 67%, rgba(124,58,237,0.11))",
+            "linear-gradient(135deg, rgba(214,178,94,0.14), transparent 34%, rgba(242,184,75,0.06) 67%, rgba(191,164,106,0.11))",
           pointerEvents: "none",
         },
       }}
@@ -332,7 +332,7 @@ const RecoverAuth = () => {
             borderRadius: "8px",
             border: `1px solid ${appColors.border}`,
             background:
-              "linear-gradient(180deg, rgba(32,214,199,0.08), rgba(59,130,246,0.08), rgba(255,255,255,0.035))",
+              "linear-gradient(180deg, rgba(214,178,94,0.08), rgba(255,255,255,0.08), rgba(255,255,255,0.035))",
             backdropFilter: "blur(28px)",
             boxShadow: "0 24px 80px rgba(0,0,0,0.35)",
           }}
@@ -393,7 +393,7 @@ const RecoverAuth = () => {
                 height: 58,
                 borderRadius: "8px",
                 border: `1px solid ${appColors.border}`,
-                background: "rgba(32,214,199,0.08)",
+                background: "rgba(214,178,94,0.08)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -511,7 +511,7 @@ const RecoverAuth = () => {
                     borderRadius: "8px",
                     fontWeight: 900,
                     textTransform: "none",
-                    background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                    background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                     boxShadow: `0 8px 28px ${appColors.glow}`,
                   }}
                 >
@@ -600,7 +600,7 @@ const RecoverAuth = () => {
                     borderRadius: "8px",
                     fontWeight: 900,
                     textTransform: "none",
-                    background: "linear-gradient(135deg,#0FA88F,#14D2BE)",
+                    background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
                     boxShadow: `0 8px 28px ${appColors.glow}`,
                   }}
                 >

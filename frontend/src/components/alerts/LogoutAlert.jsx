@@ -204,7 +204,7 @@ export default function LogoutAlert() {
           }}
         />
 
-        <Typography fontSize={14} fontWeight={600} color="#F0F4FA">
+        <Typography fontSize={14} fontWeight={600} color="#FFFDF7">
           Confirm Logout
         </Typography>
       </Box>
@@ -214,7 +214,7 @@ export default function LogoutAlert() {
         <Typography
           fontSize={13}
           sx={{
-            color: "rgba(240,244,250,0.7)",
+            color: "rgba(255,253,247,0.7)",
             lineHeight: 1.6,
           }}
         >

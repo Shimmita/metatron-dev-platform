@@ -1,4 +1,4 @@
-import { PersonRemoveOutlined } from "@mui/icons-material";
+import { ArrowForwardRounded, PersonRemoveOutlined } from "@mui/icons-material";
 import { AvatarGroup, Box, IconButton, Tooltip, Typography, CircularProgress } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
@@ -8,17 +8,29 @@ import ListItemText from "@mui/material/ListItemText";
 import axios from "axios";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
+import { showUserProfileDrawer } from "../../redux/AppUI";
+import { updateTempUserIDRedux, updateUserCurrentUserRedux } from "../../redux/CurrentUser";
 import { updateCurrentNetworkID } from "../../redux/CurrentNetwork";
 import CustomCountryName from "../utilities/CustomCountryName";
 import { getImageMatch } from "../utilities/getImageMatch";
 
-export default function UserNetworkLayout({ network }) {
+export default function UserNetworkLayout({ network, canRemove = true }) {
   const [isFetching, setIsFetching] = useState(false);
   const dispatch = useDispatch();
   
   const { user } = useSelector((state) => state.currentUser);
+  const { isOpenDrawerProfile } = useSelector((state) => state.appUI);
   const currentUserId = user?._id;
+  const firstName = network?.name?.trim()?.split(/\s+/)?.[0] || "Member";
+
+  const handleViewProfile = () => {
+    if (network?._id) {
+      dispatch(updateTempUserIDRedux(network._id));
+      if (!isOpenDrawerProfile) {
+        dispatch(showUserProfileDrawer());
+      }
+    }
+  };
 
   const handleUnfriendFriend = () => {
     setIsFetching(true);
@@ -43,40 +55,40 @@ export default function UserNetworkLayout({ network }) {
   };
 
   return (
-    <List 
+    <List
       sx={{ 
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         width: "100%",
-        // Apply Metatron Glassmorphism
         background: "rgba(255, 255, 255, 0.03)",
         backdropFilter: "blur(10px)",
-        borderRadius: "14px",
-        p: 1.5,
-        mb: 2,
+        borderRadius: "8px",
+        p: 1.15,
+        mb: 1,
         border: "1px solid",
         borderColor: "rgba(255, 255, 255, 0.08)",
         transition: "all 0.3s ease",
         "&:hover": {
           borderColor: "primary.main",
-          background: "rgba(20, 210, 190, 0.05)",
+          background: "rgba(214,178,94, 0.05)",
           boxShadow: "0 8px 32px rgba(0,0,0,0.4)"
         }
       }}
     >
-      <ListItem disableGutters sx={{ alignItems: 'flex-start' }}>
-        <ListItemAvatar>
+      <ListItem disableGutters sx={{ alignItems: 'flex-start', minWidth: 0 }}>
+        <ListItemAvatar onClick={handleViewProfile} sx={{ cursor: "pointer" }}>
           <Tooltip title="View Profile" arrow>
             <Avatar
               src={network?.avatar}
               variant="rounded"
               sx={{
-                background: "linear-gradient(135deg, #0FA88F, #14D2BE)",
+                background: "linear-gradient(135deg, #8B6F2A, #D6B25E)",
                 border: "1px solid rgba(255,255,255,0.2)",
                 width: 48,
                 height: 48,
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                borderRadius: "8px",
               }}
               alt={network?.name}
             />
@@ -84,14 +96,16 @@ export default function UserNetworkLayout({ network }) {
         </ListItemAvatar>
         
         <ListItemText
-          sx={{ ml: 1 }}
+          sx={{ ml: 1, minWidth: 0 }}
           primary={
             <Typography
-              sx={{ color: "text.primary", letterSpacing: "0.02em" }}
-              fontWeight={600}
+              onClick={handleViewProfile}
+              sx={{ color: "rgba(255,253,247,0.94)", letterSpacing: 0, cursor: "pointer" }}
+              fontWeight={900}
               variant="subtitle2"
+              noWrap
             >
-              {network?.name}
+              {firstName}
             </Typography>
           }
           secondary={
@@ -100,7 +114,7 @@ export default function UserNetworkLayout({ network }) {
                 {network?.specialisationTitle || "Developer"}
               </Typography>
               
-              <Typography variant="caption" sx={{ color: "text.secondary", opacity: 0.8 }}>
+              <Typography variant="caption" sx={{ color: "rgba(255,253,247,0.68)", opacity: 0.8 }} noWrap>
                 {CustomCountryName(network?.country)} • {network?.county}
               </Typography>
 
@@ -132,29 +146,51 @@ export default function UserNetworkLayout({ network }) {
         />
       </ListItem>
 
-      <Box ml={2}>
+      <Box ml={1} display="flex" alignItems="center">
+        {!canRemove ? (
+          <Tooltip title="View Profile" arrow>
+            <IconButton
+              onClick={handleViewProfile}
+              sx={{
+                border: '1px solid rgba(214,178,94,0.22)',
+                borderRadius: '8px',
+                color: 'primary.main',
+                backgroundColor: 'rgba(214,178,94,0.06)',
+                '&:hover': {
+                  backgroundColor: 'rgba(214,178,94,0.12)',
+                  borderColor: 'primary.main',
+                },
+              }}
+            >
+              <ArrowForwardRounded sx={{ width: 18, height: 18 }} />
+            </IconButton>
+          </Tooltip>
+        ) : (
         <Tooltip title="Remove Connection" arrow>
           <IconButton
             disabled={isFetching}
             onClick={handleUnfriendFriend}
             sx={{ 
               border: '1px solid',
-              borderColor: 'rgba(239, 68, 68, 0.2)',
-              borderRadius: '10px',
-              backgroundColor: 'rgba(239, 68, 68, 0.05)',
+              borderColor: 'rgba(214,178,94,0.22)',
+              borderRadius: '8px',
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              color: 'rgba(255,253,247,0.68)',
               '&:hover': {
-                backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                borderColor: 'error.main'
+                backgroundColor: 'rgba(214,178,94,0.10)',
+                borderColor: 'primary.main',
+                color: 'primary.main',
               }
             }}
           >
             {isFetching ? (
-              <CircularProgress size={20} color="error" />
+              <CircularProgress size={20} color="primary" />
             ) : (
-              <PersonRemoveOutlined sx={{ width: 20, height: 20, color: 'error.main' }} />
+              <PersonRemoveOutlined sx={{ width: 20, height: 20, color: 'inherit' }} />
             )}
           </IconButton>  
         </Tooltip>
+        )}
       </Box>
     </List>
   );

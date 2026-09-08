@@ -36,7 +36,7 @@ const CertVerified = ({ certificateData }) => {
             position: "absolute",
             top: 16,
             right: 16,
-            bgcolor: "#14D2BE",
+            bgcolor: "#D6B25E",
             color: "#fff",
             fontWeight: "bold",
           }}

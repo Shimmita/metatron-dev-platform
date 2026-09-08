@@ -27,7 +27,7 @@ const BootLoader = () => (
     minHeight="100vh"
     sx={{
       background:
-        "linear-gradient(180deg, rgba(15,76,129,0.95), rgba(35,181,221,0.15), transparent)",
+        "radial-gradient(circle at 50% 20%, rgba(214,178,94,0.22), transparent 34%), linear-gradient(180deg, #050505 0%, #0B0B0B 58%, #111111 100%)",
       gap: 2,
     }}
   >
@@ -36,19 +36,21 @@ const BootLoader = () => (
       sx={{
         width: 90,
         height: 90,
-        boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+        boxShadow: "0 24px 60px rgba(0,0,0,0.55), 0 0 42px rgba(214,178,94,0.18)",
+        border: "1px solid rgba(214,178,94,0.28)",
+        bgcolor: "rgba(255,255,255,0.05)",
       }}
     />
 
-    <Typography fontWeight={700} color="primary" variant="h4">
+    <Typography fontWeight={900} color="primary" variant="h4" sx={{ letterSpacing: 4 }}>
       METATRON
     </Typography>
 
-    <Typography fontSize={13} color="text.secondary">
+    <Typography fontSize={13} color="rgba(255,253,247,0.68)">
       Preparing your workspace...
     </Typography>
 
-    <RotatingLines width={40} strokeColor="#14D2BE" />
+    <RotatingLines width={40} strokeColor="#D6B25E" />
   </Box>
 );
 

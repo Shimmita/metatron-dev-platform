@@ -58,7 +58,7 @@ function JobLayoutHiring({ job, textOption = "", setIsApplicantsTable, setFocuse
         backdropFilter: "blur(12px)",
         border: "1px solid",
         borderColor: (theme) =>
-          theme.palette.mode === "dark" ? "rgba(20, 210, 190, 0.2)" : "divider",
+          theme.palette.mode === "dark" ? "rgba(214,178,94, 0.2)" : "divider",
         transition: "all 0.3s ease",
         position: "relative",
         "&:hover": {
@@ -79,7 +79,7 @@ function JobLayoutHiring({ job, textOption = "", setIsApplicantsTable, setFocuse
             height: 56,
             border: "2px solid",
             borderColor: "primary.main",
-            boxShadow: "0 0 15px rgba(20, 210, 190, 0.2)",
+            boxShadow: "0 0 15px rgba(214,178,94, 0.2)",
             backgroundColor: "background.paper",
           }}
         />
@@ -154,11 +154,11 @@ function JobLayoutHiring({ job, textOption = "", setIsApplicantsTable, setFocuse
             fontSize: "0.75rem",
             textTransform: "uppercase",
             letterSpacing: 1,
-            background: "linear-gradient(90deg, #14D2BE, #0E9F8E)",
-            boxShadow: "0 4px 14px rgba(20, 210, 190, 0.3)",
+            background: "linear-gradient(90deg, #D6B25E, #8B6F2A)",
+            boxShadow: "0 4px 14px rgba(214,178,94, 0.3)",
             "&:hover": {
-              background: "linear-gradient(90deg, #14D2BE, #1BEAD4)",
-              boxShadow: "0 6px 20px rgba(20, 210, 190, 0.4)",
+              background: "linear-gradient(90deg, #D6B25E, #FFF2C2)",
+              boxShadow: "0 6px 20px rgba(214,178,94, 0.4)",
             },
           }}
         >

@@ -78,8 +78,8 @@ const PageNotFound = ({ message = "The requested sector is currently unreachable
               px: 4,
               py: 1.5,
               fontWeight: 800,
-              bgcolor: "#14D2BE",
-              "&:hover": { bgcolor: "#0fbba8" }
+              bgcolor: "#D6B25E",
+              "&:hover": { bgcolor: "#FFF2C2", color: "#080808" }
             }}
           >
             Return to Base

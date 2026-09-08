@@ -82,14 +82,14 @@ const SectionCard = styled(Box)(({ theme }) => ({
   border: `1px solid ${
     theme.palette.mode === "dark"
       ? "rgba(255,255,255,0.08)"
-      : "rgba(15,76,129,0.12)"
+      : "rgba(139,111,42,0.12)"
   }`,
   borderRadius: "8px",
   padding: theme.spacing(2.25),
   marginBottom: theme.spacing(1.2),
   boxShadow: theme.palette.mode === 'dark'
     ? '0 18px 34px rgba(0,0,0,0.18)'
-    : '0 14px 30px rgba(15,76,129,0.08)',
+    : '0 14px 30px rgba(139,111,42,0.08)',
 }));
 
 const SectionTitle = styled(Typography)(({ theme }) => ({
@@ -102,14 +102,14 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   background:
     theme.palette.mode === "dark"
       ? "rgba(255,255,255,0.08)"
-      : "rgba(15,76,129,0.08)",
+      : "rgba(139,111,42,0.08)",
   color: theme.palette.primary.main,
   padding: theme.spacing(0.55, 1.25),
   borderRadius: 999,
   border: `1px solid ${
     theme.palette.mode === "dark"
       ? "rgba(255,255,255,0.08)"
-      : "rgba(15,76,129,0.14)"
+      : "rgba(139,111,42,0.14)"
   }`,
 }));
 
