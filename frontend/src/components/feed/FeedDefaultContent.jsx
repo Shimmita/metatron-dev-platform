@@ -1,9 +1,14 @@
 import {
   AddCircleRounded,
   ArticleRounded,
+  AutoGraphRounded,
+  BoltRounded,
   CalendarMonthRounded,
   ErrorOutlineRounded,
+  HubRounded,
   InsightsRounded,
+  PublicRounded,
+  QueryStatsRounded,
   RocketLaunchRounded,
   SchoolRounded,
   TrendingUpRounded,
@@ -34,10 +39,12 @@ import MobileTabCorousel from "../rightbar/MobileTabCorousel";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
+const FEED_PAGE_SIZE = 12;
+
 const FeedDefaultContent = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [pageNumber, setPageNumber] = useState(1);
+  const [pageNumber, setPageNumber] = useState(2);
 
   const { posts } = useSelector((state) => state.currentPosts);
   const { currentMode, isDefaultSpeedDial } = useSelector(
@@ -47,10 +54,16 @@ const FeedDefaultContent = () => {
 
   const [postDetailedData, setPostDetailedData] = useState();
   const [platformTotals, setPlatformTotals] = useState({
+    developers: null,
     techGigs: null,
+    jobs: null,
     events: null,
     courses: null,
     posts: null,
+  });
+  const [platformAnalytics, setPlatformAnalytics] = useState({
+    analytics: {},
+    leaders: {},
   });
 
   const dispatch = useDispatch();
@@ -58,11 +71,79 @@ const FeedDefaultContent = () => {
   const isDarkMode = currentMode === "dark";
   const firstName = user?.name?.split(" ")?.[0] || "Builder";
   const metricValue = (value) => value === null || value === undefined ? "..." : formatMetric(value);
+  const rawMetric = (value) => Number(value) || 0;
+  const analytics = platformAnalytics.analytics || {};
+  const leaders = platformAnalytics.leaders || {};
+  const opportunityCount = analytics.opportunities ?? (
+    rawMetric(platformTotals.techGigs) +
+    rawMetric(platformTotals.events) +
+    rawMetric(platformTotals.courses)
+  );
+  const topSkill = leaders.jobSkill?.label || leaders.userSkill?.label || "AI";
+  const topBuildCategory = leaders.postCategory?.label || "Project builds";
+  const topLearningCategory = leaders.courseCategory?.label || "Software Engineering";
+  const topEventCategory = leaders.eventCategory?.label || "Tech meetups";
   const dashboardStats = [
     { label: "Active gigs", value: metricValue(platformTotals.techGigs), status: "Jobs", icon: <WorkRounded fontSize="small" /> },
     { label: "Events", value: metricValue(platformTotals.events), status: "Events", icon: <CalendarMonthRounded fontSize="small" /> },
     { label: "Courses", value: metricValue(platformTotals.courses), status: "Courses", icon: <SchoolRounded fontSize="small" /> },
     { label: "Build posts", value: metricValue(platformTotals.posts), status: "Posts", icon: <ArticleRounded fontSize="small" /> },
+  ];
+  const analyticsCards = [
+    {
+      label: "Opportunity Index",
+      value: metricValue(opportunityCount),
+      helper: `${metricValue(platformTotals.techGigs)} active jobs, ${metricValue(analytics.upcomingEvents ?? platformTotals.events)} upcoming events, ${metricValue(platformTotals.courses)} courses`,
+      icon: <AutoGraphRounded fontSize="small" />,
+    },
+    {
+      label: "Remote Access",
+      value: `${analytics.remoteJobShare ?? 0}%`,
+      helper: `${metricValue(analytics.remoteJobs)} active remote roles available`,
+      icon: <PublicRounded fontSize="small" />,
+    },
+    {
+      label: "External Reach",
+      value: metricValue(rawMetric(analytics.externalJobs) + rawMetric(analytics.externalEvents) + rawMetric(analytics.externalCourses)),
+      helper: "Global links from jobs, events, and courses",
+      icon: <HubRounded fontSize="small" />,
+    },
+    {
+      label: "Community Pulse",
+      value: metricValue(analytics.totalEngagement),
+      helper: `${metricValue(analytics.eventRsvps)} RSVPs and ${metricValue(analytics.courseStudents)} learners tracked`,
+      icon: <BoltRounded fontSize="small" />,
+    },
+  ];
+  const intelligenceCards = [
+    {
+      label: "Most Requested Skill",
+      value: topSkill,
+      helper: leaders.jobSkill?.count
+        ? `${metricValue(leaders.jobSkill.count)} role signals mention it`
+        : "Demand signal updates as jobs arrive",
+      icon: <QueryStatsRounded fontSize="small" />,
+    },
+    {
+      label: "Build Trend",
+      value: topBuildCategory,
+      helper: leaders.postCategory?.count
+        ? `${metricValue(leaders.postCategory.count)} posts in this lane`
+        : "Projects and milestone posts shape this lane",
+      icon: <ArticleRounded fontSize="small" />,
+    },
+    {
+      label: "Learning Demand",
+      value: topLearningCategory,
+      helper: `${analytics.externalCourseShare ?? 0}% of courses link to global providers`,
+      icon: <SchoolRounded fontSize="small" />,
+    },
+    {
+      label: "Live Network",
+      value: topEventCategory,
+      helper: `${metricValue(analytics.upcomingEvents)} upcoming sessions visible now`,
+      icon: <CalendarMonthRounded fontSize="small" />,
+    },
   ];
   const focusCards = [
     {
@@ -127,15 +208,25 @@ const FeedDefaultContent = () => {
       .then((res) => {
         if (isMounted && res?.data?.totals) {
           setPlatformTotals(res.data.totals);
+          setPlatformAnalytics({
+            analytics: res.data.analytics || {},
+            leaders: res.data.leaders || {},
+          });
         }
       })
       .catch(() => {
         if (isMounted) {
           setPlatformTotals({
+            developers: 0,
             techGigs: 0,
+            jobs: 0,
             events: 0,
             courses: 0,
             posts: 0,
+          });
+          setPlatformAnalytics({
+            analytics: {},
+            leaders: {},
           });
         }
       });
@@ -153,13 +244,13 @@ const FeedDefaultContent = () => {
     dispatch(handleLoadingPostLaunch(true));
 
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all?page=1&limit=${FEED_PAGE_SIZE}`, {
         withCredentials: true,
       })
       .then((res) => {
         if (res?.data) {
           dispatch(updateCurrentPosts(res.data));
-          setPageNumber((prev) => prev + 1);
+          setPageNumber(2);
         }
       })
       .catch((err) => {
@@ -313,6 +404,101 @@ const FeedDefaultContent = () => {
                   </Box>
                 ))}
               </Box>
+
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" },
+                  gap: 1,
+                  mt: 1.25,
+                }}
+              >
+                {analyticsCards.map((item) => (
+                  <Box
+                    key={item.label}
+                    sx={{
+                      borderRadius: "8px",
+                      border: "1px solid rgba(214,178,94,0.18)",
+                      background: isDarkMode
+                        ? "linear-gradient(135deg, rgba(214,178,94,0.10), rgba(255,255,255,0.045))"
+                        : "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(214,178,94,0.08))",
+                      p: 1.15,
+                      minHeight: 96,
+                    }}
+                  >
+                    <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+                      <Stack direction="row" alignItems="center" gap={0.75} minWidth={0}>
+                        <Box sx={{ color: "primary.main", display: "flex" }}>{item.icon}</Box>
+                        <Typography variant="caption" color="text.secondary" fontWeight={900} noWrap>
+                          {item.label}
+                        </Typography>
+                      </Stack>
+                      <Typography variant="h6" color="primary.main" fontWeight={900} noWrap>
+                        {item.value}
+                      </Typography>
+                    </Stack>
+                    <Typography variant="caption" color="text.secondary" display="block" mt={1} lineHeight={1.45}>
+                      {item.helper}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+
+              <Box
+                sx={{
+                  mt: 1.25,
+                  borderRadius: "8px",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  background: isDarkMode ? "rgba(5,8,18,0.34)" : "rgba(255,255,255,0.74)",
+                  p: 1.15,
+                }}
+              >
+                <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1} mb={1}>
+                  <Stack direction="row" alignItems="center" gap={0.75}>
+                    <InsightsRounded sx={{ color: "primary.main", fontSize: 18 }} />
+                    <Typography variant="body2" fontWeight={900}>
+                      Signal Radar
+                    </Typography>
+                  </Stack>
+                  <Typography variant="caption" color="text.secondary" fontWeight={800}>
+                    {isGuest ? "Preview" : "Live"}
+                  </Typography>
+                </Stack>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", md: "repeat(4, minmax(0, 1fr))" },
+                    gap: 1,
+                  }}
+                >
+                  {intelligenceCards.map((item) => (
+                    <Box
+                      key={item.label}
+                      sx={{
+                        borderRadius: "8px",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        background: isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(247,243,234,0.72)",
+                        p: 1,
+                        minHeight: 92,
+                        minWidth: 0,
+                      }}
+                    >
+                      <Stack direction="row" alignItems="center" gap={0.75} mb={0.7}>
+                        <Box sx={{ color: "primary.main", display: "flex", flexShrink: 0 }}>{item.icon}</Box>
+                        <Typography variant="caption" color="text.secondary" fontWeight={850} noWrap>
+                          {item.label}
+                        </Typography>
+                      </Stack>
+                      <Typography variant="body2" fontWeight={900} noWrap>
+                        {item.value}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" display="block" mt={0.4} lineHeight={1.4}>
+                        {item.helper}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
             </Box>
           </Box>
 
@@ -426,7 +612,7 @@ const FeedDefaultContent = () => {
               {/* POSTS */}
               {posts.map((post, index) => (
                 <CardFeed
-                  key={index}
+                  key={post?._id || index}
                   post={post}
                   posts={posts}
                   isLastIndex={index === posts.length - 1}

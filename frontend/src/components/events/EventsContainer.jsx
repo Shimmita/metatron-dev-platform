@@ -127,6 +127,8 @@ const getRequestMessage = (err, fallback = "Unable to load events.") => {
   return fallback;
 };
 
+const EVENT_PAGE_SIZE = 12;
+
 
 
 
@@ -134,7 +136,7 @@ export default function EventsContainer() {
   const [openModalEvent,setOpenModalEvent]=useState(false)
   const [isEventsStats,setIsEventsStats]=useState(false)
   const [focusedEvent,setFocusedEvent]=useState(null)
-  const [pageNumber,setPageNumber]=useState(1)
+  const [pageNumber,setPageNumber]=useState(2)
   
   // redux states
   const { 
@@ -268,7 +270,7 @@ export default function EventsContainer() {
             }else {
 
             axios
-              .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}${isGuest ? "/events/all/top" : "/events/all"}`, {
+              .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all?page=1&limit=${EVENT_PAGE_SIZE}`, {
                 withCredentials: true,
               })
               .then((res) => {
@@ -276,6 +278,7 @@ export default function EventsContainer() {
                 if (res?.data) {
                   dispatch(updateCurrentEvents(res.data))
                 } 
+                setPageNumber(2)
               })
               .catch(async (err) => {
                 //  user login session expired show logout alert
@@ -1114,6 +1117,7 @@ export default function EventsContainer() {
                               isRSVP={textOption === "RSVP Events"}
                               setIsEventsStats={setIsEventsStats}
                               setFocusedEvent={setFocusedEvent}
+                              canLoadMore={textOption === "Explore Events" && !window.location.href?.includes("?")}
                               />
                             </Box>
                            

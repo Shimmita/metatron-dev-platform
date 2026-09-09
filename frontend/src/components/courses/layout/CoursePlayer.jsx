@@ -1,4 +1,4 @@
-import { Close, Delete, InfoRounded, Lock, PrintRounded, VideoLibraryRounded } from "@mui/icons-material";
+import { Close, Delete, InfoRounded, Lock, PrintRounded, TravelExploreRounded, VideoLibraryRounded } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
@@ -20,7 +20,6 @@ import {
   ListItemText,
   Rating,
   Stack,
-  Tooltip,
   Typography,
   useMediaQuery
 } from "@mui/material";
@@ -58,6 +57,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
   const [course, setCourse] = useState(courseItem)
 
   const isMyCourse = user?._id === course?.course_instructor?.instructorId
+  const isExternalCourse = Boolean(course?.externalCourse && course?.externalUrl)
 
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -81,9 +81,19 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
 
   const handleVideoChange = (video) => setCurrentVideo(video);
 
+  const handleOpenExternalCourse = () => {
+    if (!course?.externalUrl) return;
+    window.open(course.externalUrl, "_blank", "noopener,noreferrer");
+  };
+
 
   // handle course enrollment
   const handleEnrollCourse = () => {
+    if (isExternalCourse) {
+      handleOpenExternalCourse();
+      return;
+    }
+
     if (isGuest) {
       setTitle("Course Enrollment")
       setErrorMessage("access denied, please login to continue with your request!")
@@ -299,14 +309,16 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
     <Box bgcolor={'background.default'}>
       {/* Dialog for Player */}
       <Dialog
-        sx={{ backdropFilter: "blur(3px)" }}
         open={openPlayer}
         fullScreen
         keepMounted
         fullWidth
         maxWidth="lg"
         TransitionProps={{ unmountOnExit: true }}
-        sx={{ "& .MuiDialog-paper": { bgcolor: "background.default" } }}
+        sx={{
+          backdropFilter: "blur(3px)",
+          "& .MuiDialog-paper": { bgcolor: "background.default" },
+        }}
       >
         <Box
           sx={{
@@ -375,7 +387,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                   />
                 ) : (
                   <Typography textAlign="center" color="text.secondary">
-                    No video available
+                    {isExternalCourse ? "This external course opens on the provider website." : "No video available"}
                   </Typography>
                 )}
 
@@ -404,7 +416,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
 
 
                         {/* locked lectures, if user not enrolled */}
-                        {!courseItem?.currentUserEnrolled && !isMyCourse && (
+                        {!isExternalCourse && !courseItem?.currentUserEnrolled && !isMyCourse && (
                           <Box
                             mt={1}
                             display={'flex'}
@@ -441,7 +453,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                         </List>
 
                         {/* locked topics, if user not enrolled */}
-                        {!courseItem?.currentUserEnrolled && !isMyCourse && (
+                        {!isExternalCourse && !courseItem?.currentUserEnrolled && !isMyCourse && (
                           <Box
                             mt={1}
                             display={'flex'}
@@ -585,7 +597,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                         ) : (
                           <Box>
                             <Typography variant="body1">
-                              {course?.currentUserEnrolled ? "Course Certification" : "Course Enrollment"}
+                              {isExternalCourse ? "External Course Access" : course?.currentUserEnrolled ? "Course Certification" : "Course Enrollment"}
                             </Typography>
 
                             {/* certificate of completion */}
@@ -595,7 +607,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                                 color={'text.secondary'}
                                 className="text-success"
                                 fontWeight={'bold'}>
-                                Learn Free and Get Certificate</Typography>
+                                {isExternalCourse ? `Continue on ${course?.externalProvider || "the provider website"}` : "Learn Free and Get Certificate"}</Typography>
                             </Box>
                             {/* button enroll */}
                             <Box display={'flex'} justifyContent={'center'} mt={1} mb={1}>
@@ -614,13 +626,13 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                               ) : (
                                 <Button
                                   disabled={isFetching || errorMessage}
-                                  onClick={course?.currentUserEnrolled ? handleGetCertificate : handleEnrollCourse}
-                                  endIcon={isFetching ? <CircularProgress size={14} /> : !course?.currentUserEnrolled ? <VideoLibraryRounded /> : undefined}
+                                  onClick={isExternalCourse ? handleOpenExternalCourse : course?.currentUserEnrolled ? handleGetCertificate : handleEnrollCourse}
+                                  endIcon={isFetching ? <CircularProgress size={14} /> : isExternalCourse ? <TravelExploreRounded /> : !course?.currentUserEnrolled ? <VideoLibraryRounded /> : undefined}
                                   variant="contained"
                                   color={course?.currentUserEnrolled ? "secondary" : "primary"}
                                   size={'medium'}
                                   sx={{ borderRadius: 3 }}>
-                                  {course?.currentUserEnrolled ? `Get Certificate $${course?.price} ` : "Enroll Now Free"}
+                                  {isExternalCourse ? "Enroll Externally" : course?.currentUserEnrolled ? `Get Certificate $${course?.price} ` : "Enroll Now Free"}
                                 </Button>
                               )}
                             </Box>
@@ -630,7 +642,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                               display={'flex'}
                               justifyContent={'center'}
                             >
-                              <Typography variant="caption"> All Digital Certificates are Verifiable</Typography>
+                              <Typography variant="caption">{isExternalCourse ? "Course content is hosted outside Metatron" : " All Digital Certificates are Verifiable"}</Typography>
                             </Box>
                           </Box>
                         )}
@@ -662,7 +674,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
 
 
                         {/* locked lectures, if user not enrolled */}
-                        {!courseItem?.currentUserEnrolled && !isMyCourse && (
+                        {!isExternalCourse && !courseItem?.currentUserEnrolled && !isMyCourse && (
                           <Box
                             mt={1}
                             display={'flex'}
@@ -700,7 +712,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                         </List>
 
                         {/* locked topics, if user not enrolled */}
-                        {!courseItem?.currentUserEnrolled && !isMyCourse && (
+                        {!isExternalCourse && !courseItem?.currentUserEnrolled && !isMyCourse && (
                           <Box
                             mt={1}
                             display={'flex'}
@@ -832,7 +844,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                         ) : (
                           <Box>
                             <Typography variant="body1">
-                              {course?.currentUserEnrolled ? "Course Certification" : "Course Enrollment"}
+                              {isExternalCourse ? "External Course Access" : course?.currentUserEnrolled ? "Course Certification" : "Course Enrollment"}
                             </Typography>
 
                             {/* certificate of completion */}
@@ -842,7 +854,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                                 color={'text.secondary'}
                                 className="text-success"
                                 fontWeight={'bold'}>
-                                Learn Free and Get Certificate</Typography>
+                                {isExternalCourse ? `Continue on ${course?.externalProvider || "the provider website"}` : "Learn Free and Get Certificate"}</Typography>
                             </Box>
                             {/* button enroll */}
                             <Box display={'flex'} justifyContent={'center'} mt={1} mb={1}>
@@ -861,13 +873,13 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                               ) : (
                                 <Button
                                   disabled={isFetching || errorMessage}
-                                  onClick={course?.currentUserEnrolled ? handleGetCertificate : handleEnrollCourse}
-                                  endIcon={isFetching ? <CircularProgress size={14} /> : !course?.currentUserEnrolled ? <VideoLibraryRounded /> : undefined}
+                                  onClick={isExternalCourse ? handleOpenExternalCourse : course?.currentUserEnrolled ? handleGetCertificate : handleEnrollCourse}
+                                  endIcon={isFetching ? <CircularProgress size={14} /> : isExternalCourse ? <TravelExploreRounded /> : !course?.currentUserEnrolled ? <VideoLibraryRounded /> : undefined}
                                   variant="contained"
                                   color={course?.currentUserEnrolled ? "secondary" : "primary"}
                                   size="medium"
                                   sx={{ borderRadius: 3 }}>
-                                  {course?.currentUserEnrolled ? `Get Certificate $${course?.price} ` : "Enroll Now Free"}
+                                  {isExternalCourse ? "Enroll Externally" : course?.currentUserEnrolled ? `Get Certificate $${course?.price} ` : "Enroll Now Free"}
                                 </Button>
                               )}
                             </Box>
@@ -877,7 +889,7 @@ const CoursePlayer = ({ course: courseItem, openPlayer, setFocusedCourse, setTex
                               display={'flex'}
                               justifyContent={'center'}
                             >
-                              <Typography variant="caption"> All Digital Certificates are Verifiable</Typography>
+                              <Typography variant="caption">{isExternalCourse ? "Course content is hosted outside Metatron" : " All Digital Certificates are Verifiable"}</Typography>
                             </Box>
                           </Box>
                         )}

@@ -19,6 +19,7 @@ import CLanguge from "../../images/C.png";
 import CICD from "../../images/ci.jpeg";
 import Cocoapods from "../../images/cocopods.png";
 import CodingGeneral from "../../images/coding.png";
+import AppLogo from "../../images/logo_sm.png";
 import CryEngine from "../../images/cryengine.png";
 import Csharp from "../../images/cshap.png";
 import CssLogo from "../../images/css_2.png";
@@ -299,6 +300,7 @@ import Zustand from "../../images/zustand.png";
 
 
 const imageMap = {
+  Metatron: AppLogo,
   Zustand: Zustand,
   "YugaByte DB": YugaByteDB,
   WxPython: WxPy,

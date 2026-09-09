@@ -15,7 +15,7 @@ import { resetClearCurrentJobs } from "../../../redux/CurrentJobs";
 import { resetClearCurrentJobsTop } from "../../../redux/CurrentJobsTop";
 import { updateCurrentSnackBar } from "../../../redux/CurrentSnackBar";
 import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
-import { getImageMatch } from "../../utilities/getImageMatch";
+import { resolveVisualAsset } from "../../utilities/resolveVisualAsset";
 
 function JobStatsLayout({ isDarkMode, job,user }) {
 
@@ -118,7 +118,7 @@ function JobStatsLayout({ isDarkMode, job,user }) {
         alt=""
         className="border"
         sx={{ width: 42, height: 42 }}
-        src={getImageMatch(job?.logo)}
+        src={resolveVisualAsset(job?.logo, job?.skills?.[0])}
       />
 
       {/* job title */}

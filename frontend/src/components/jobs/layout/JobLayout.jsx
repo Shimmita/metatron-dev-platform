@@ -1,6 +1,5 @@
 import {
   AccessTimeFilledRounded,
-  ArrowCircleRightRounded,
   CalendarMonthRounded,
   Done,
   LocationOnRounded,
@@ -19,20 +18,32 @@ import {
   Chip,
   CircularProgress,
   Divider,
-  IconButton,
   Stack,
   Tooltip,
   Typography
 } from "@mui/material";
 import axios from "axios";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentJobs } from "../../../redux/CurrentJobs";
 import ApplyJobModal from "../../modal/ApplyJobModal";
 import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import { resolveVisualAsset } from "../../utilities/resolveVisualAsset";
 
 const MAX_APPLICANTS = 500;
+const JOB_PAGE_SIZE = 12;
+const appendUniqueById = (current = [], incoming = []) => {
+  const seen = new Set(current.map((item) => item?._id).filter(Boolean));
+  return [
+    ...current,
+    ...incoming.filter((item) => {
+      if (!item?._id || seen.has(item._id)) return false;
+      seen.add(item._id);
+      return true;
+    }),
+  ];
+};
 
 function JobLayout_2({
   job,
@@ -42,11 +53,15 @@ function JobLayout_2({
   setPageNumber,
   pageNumber,
   setErrorMessage,
-  isJobSearchGlobal
+  isJobSearchGlobal,
+  canLoadMore = true
 }) {
   const [openModal, setOpenApplyJobModal] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [hasMoreJobs, setHasMoreJobs] = useState(true);
   const [isCopiedStatus, setIsCopiedStatus] = useState(false);
+  const infiniteScrollRef = useRef(null);
+  const lastRequestedPageRef = useRef(0);
 
   const { user, isGuest } = useSelector((state) => state.currentUser);
   const dispatch = useDispatch();
@@ -65,13 +80,24 @@ function JobLayout_2({
     return `${parent[2]}/${parent[1]}/${parent[0]}`;
   };
 
-  const handleFetchMoreData = () => {
+  const handleFetchMoreData = useCallback(() => {
+    if (!hasMoreJobs || isFetching || isGuest) return;
+    if (lastRequestedPageRef.current === pageNumber) return;
+
+    lastRequestedPageRef.current = pageNumber;
     setIsFetching(true);
-    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/${user?._id}?page=${pageNumber}&limit=6`)
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/${user?._id}?page=${pageNumber}&limit=${JOB_PAGE_SIZE}`, {
+      withCredentials: true,
+    })
       .then((res) => {
         if (res?.data?.length > 0) {
-          dispatch(updateCurrentJobs([...jobs, ...res.data]));
+          dispatch(updateCurrentJobs(appendUniqueById(jobs || [], res.data)));
           setPageNumber((prev) => prev + 1);
+          if (res.data.length < JOB_PAGE_SIZE) {
+            setHasMoreJobs(false);
+          }
+        } else {
+          setHasMoreJobs(false);
         }
       })
       .catch((err) => {
@@ -79,7 +105,25 @@ function JobLayout_2({
         setErrorMessage(err?.code === "ERR_NETWORK" ? "System link lost" : err?.response?.data);
       })
       .finally(() => setIsFetching(false));
-  };
+  }, [dispatch, hasMoreJobs, isFetching, isGuest, jobs, pageNumber, setErrorMessage, setPageNumber, user?._id]);
+
+  useEffect(() => {
+    if (!isLastIndex || !canLoadMore || isJobSearchGlobal || !hasMoreJobs || isFetching || isGuest) return undefined;
+    const target = infiniteScrollRef.current;
+    if (!target) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          handleFetchMoreData();
+        }
+      },
+      { root: null, rootMargin: "420px 0px", threshold: 0.01 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [canLoadMore, handleFetchMoreData, hasMoreJobs, isFetching, isGuest, isJobSearchGlobal, isLastIndex]);
 
   const handleGetJobLink = async () => {
     const urlJob = `${window.location.origin}${window.location.pathname}?id=${job?._id}`;
@@ -122,7 +166,7 @@ function JobLayout_2({
           }}
         >
           <Avatar
-            src={getImageMatch(job?.logo)}
+            src={resolveVisualAsset(job?.logo, mandatorySkills[0])}
             sx={{
               width: 50,
               height: 50,
@@ -215,15 +259,25 @@ function JobLayout_2({
         </Stack>
       </Card>
 
-      {/* Infinite Scroll Controller */}
-      {isLastIndex && !isJobSearchGlobal && !isGuest && (
-        <IconButton
-          disabled={isFetching}
-          onClick={handleFetchMoreData}
-          sx={{ border: '1px solid', borderColor: 'divider', mt: 2 }}
-        >
-          {isFetching ? <CircularProgress size={24} /> : <ArrowCircleRightRounded color="primary" sx={{ fontSize: 32 }} />}
-        </IconButton>
+      {isLastIndex && canLoadMore && !isJobSearchGlobal && (
+        <Box ref={infiniteScrollRef} sx={{ display: "flex", justifyContent: "center", mt: 2, minHeight: 38 }}>
+          {isGuest ? (
+            <Typography variant="caption" color="text.secondary" textAlign="center" fontWeight={700}>
+              Sign in to keep exploring more jobs.
+            </Typography>
+          ) : isFetching ? (
+            <Stack direction="row" spacing={1} alignItems="center">
+              <CircularProgress size={18} />
+              <Typography variant="caption" color="text.secondary" fontWeight={700}>
+                Loading more jobs...
+              </Typography>
+            </Stack>
+          ) : !hasMoreJobs && (
+            <Typography variant="caption" color="text.secondary" textAlign="center" fontWeight={700}>
+              no more jobs available at the moment
+            </Typography>
+          )}
+        </Box>
       )}
 
       {/* show success snackbar when link copied  */}

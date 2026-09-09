@@ -1,5 +1,5 @@
 import { Close, InfoRounded, SchoolOutlined } from '@mui/icons-material';
-import { Box, Button, IconButton, Rating, Tooltip, Typography } from '@mui/material';
+import { Avatar, Box, Button, IconButton, Rating, Tooltip, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -15,6 +15,7 @@ import { updateCurrentSnackBar } from '../../../redux/CurrentSnackBar';
 import AlertGeneral from '../../alerts/AlertGeneral';
 import CustomDeviceIsSmall from '../../utilities/CustomDeviceIsSmall';
 import CustomDeviceTablet from '../../utilities/CustomDeviceTablet';
+import { resolveVisualAsset } from '../../utilities/resolveVisualAsset';
 
 const columnsHeader = [
 
@@ -187,7 +188,7 @@ export default function ManageCoursesTable({coursesData,setCourseManager,setText
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((course,index) => {
                 return (
-                  <TableRow hover tabIndex={-1} key={course}>
+                  <TableRow hover tabIndex={-1} key={course?._id || index}>
                     {columnsHeader.map((column) => {
                       return (
                         
@@ -199,11 +200,29 @@ export default function ManageCoursesTable({coursesData,setCourseManager,setText
                     
 
                           {/* course name */}
-                          {column.id==='course_name' && (
-                            <Box display={'flex'}  alignItems={'center'}>
-                            {course?.course_title}
-                            </Box>
-                        )} 
+	                          {column.id==='course_name' && (
+	                            <Box display={'flex'} alignItems={'center'} gap={1.25} minWidth={0}>
+	                              <Avatar
+	                                variant="rounded"
+	                                src={resolveVisualAsset(course?.course_logo?.logoLink, course?.course_video_topics?.[0])}
+	                                sx={{
+	                                  width: 34,
+	                                  height: 34,
+	                                  border: "1px solid rgba(255,255,255,0.12)",
+	                                  bgcolor: "background.paper",
+	                                  flexShrink: 0,
+	                                }}
+	                              />
+	                              <Box minWidth={0}>
+	                                <Typography variant="body2" fontWeight={800} noWrap>
+	                                  {course?.course_title}
+	                                </Typography>
+	                                <Typography variant="caption" color="text.secondary" noWrap>
+	                                  {course?.externalProvider || course?.course_category?.main || "Platform course"}
+	                                </Typography>
+	                              </Box>
+	                            </Box>
+	                        )} 
 
                         {/* students total */}
                           {column.id==='students_total' && (

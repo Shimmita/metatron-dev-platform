@@ -21,6 +21,7 @@ import {
     Tooltip,
     Typography,
 } from "@mui/material";
+import { resolveVisualAsset } from "../../utilities/resolveVisualAsset";
 
 const MetatronTable = ({
     myJobsPosted,
@@ -104,11 +105,11 @@ const MetatronTable = ({
                                                     <Tooltip title="Preview HUD" arrow>
                                                         {job?.status?.toLowerCase() === "active" ? (
                                                             <StyledBadgeActive overlap="circular" anchorOrigin={{ vertical: "bottom", horizontal: "right" }} variant="dot">
-                                                                <Avatar src={getImageMatch(job?.logo)} sx={{ width: 36, height: 36, border: '1px solid rgba(255,255,255,0.1)' }} />
+	                                                                <Avatar src={resolveVisualAsset(job?.logo, job?.skills?.[0])} sx={{ width: 36, height: 36, border: '1px solid rgba(255,255,255,0.1)' }} />
                                                             </StyledBadgeActive>
                                                         ) : (
                                                             <StyledBadgeInactive overlap="circular" anchorOrigin={{ vertical: "bottom", horizontal: "right" }} variant="dot">
-                                                                <Avatar src={getImageMatch(job?.logo)} sx={{ width: 36, height: 36, opacity: 0.7 }} />
+	                                                                <Avatar src={resolveVisualAsset(job?.logo, job?.skills?.[0])} sx={{ width: 36, height: 36, opacity: 0.7 }} />
                                                             </StyledBadgeInactive>
                                                         )}
                                                     </Tooltip>

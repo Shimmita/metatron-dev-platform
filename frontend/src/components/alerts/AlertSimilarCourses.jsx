@@ -13,6 +13,7 @@ import { SchoolRounded, MenuBookRounded } from "@mui/icons-material";
 import axios from "axios";
 import React, { useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { resolveVisualAsset } from "../utilities/resolveVisualAsset";
 
 export default function AlertSimilarCourses({
   openSimilarCourses,
@@ -152,8 +153,8 @@ export default function AlertSimilarCourses({
             >
               <Box display="flex" gap={1.5}>
                 {/* AVATAR */}
-                <Avatar
-                  src={course?.course_instructor?.instructorAvatar}
+	                <Avatar
+	                  src={resolveVisualAsset(course?.course_instructor?.instructorAvatar, course?.course_video_topics?.[0])}
                   sx={{
                     width: 44,
                     height: 44,

@@ -1,4 +1,4 @@
-import { Add, LockRounded } from "@mui/icons-material";
+import { Add, LockRounded, OpenInNewRounded } from "@mui/icons-material";
 import {
   Avatar,
   AvatarGroup,
@@ -23,6 +23,7 @@ import { updateCurrentEventsTop } from "../../../redux/CurrentEventsTop";
 import { updateCurrentSnackBar } from "../../../redux/CurrentSnackBar";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import { resolveVisualAsset } from "../../utilities/resolveVisualAsset";
 
 const getRequestMessage = (err, fallback = "Unable to complete RSVP.") => {
   if (err?.code === "ERR_NETWORK") return "Server unreachable. Please try again later.";
@@ -49,6 +50,8 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
   // if not true the false is default
   const isMyEvent = eventTop?.ownerId === user?._id || false
   const isUserMadeRSVP = eventTop?.users?.value.some((currentId) => currentId === user?._id)
+  const isExternalEvent = Boolean(eventTop?.externalEvent || (eventTop?.source?.name && `${eventTop?.ownerId || ""}`.startsWith("external-")));
+  const canViewExternalEvent = Boolean(isExternalEvent && isUserMadeRSVP && eventTop?.hostLink);
 
 
   const handleCountryName = (eventTop) => {
@@ -62,6 +65,11 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
 
   // handle creating of rsvp
   const handleCreateRSVP = () => {
+    if (canViewExternalEvent) {
+      window.open(eventTop.hostLink, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     if (isGuest) {
       setErrorMessage("access denied, please login to continue with your request!");
       return;
@@ -192,7 +200,7 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
             <ListItemAvatar>
               <Avatar
                 variant="rounded"
-                src={eventTop?.ownerAvatar}
+                src={resolveVisualAsset(eventTop?.ownerAvatar, eventTop?.topics?.[0] || eventTop?.skills?.[0])}
                 sx={{
                   background: "rgba(255,255,255,0.08)",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -238,9 +246,9 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
 
                   {/* event skills */}
                   <Box display={"flex"} mt={"2px"}>
-                    <AvatarGroup max={eventTop?.skills?.length}>
+                    <AvatarGroup max={4}>
                       {/* loop through the skills and their images matched using custom fn */}
-                      {eventTop?.skills?.map((skill) => (
+                      {eventTop?.skills?.slice(0, 4)?.map((skill) => (
                         <Tooltip title={skill} key={skill} arrow>
                           <Avatar
                             alt={skill}
@@ -279,8 +287,8 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
                   disableElevation
                   size="small"
                   onClick={handleCreateRSVP}
-                  startIcon={isFetching ? <CircularProgress size={13} /> : isGuest ? <LockRounded /> : <Add />}
-                  disabled={isUserMadeRSVP || isMyEvent || isFetching}
+                  startIcon={isFetching ? <CircularProgress size={13} /> : canViewExternalEvent ? <OpenInNewRounded /> : isGuest ? <LockRounded /> : <Add />}
+                  disabled={isMyEvent || isFetching || (isUserMadeRSVP && !canViewExternalEvent)}
                   sx={{
                     borderRadius: "10px",
                     background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
@@ -299,7 +307,7 @@ function FeaturedEvent({ isLoading, eventTop, isLastIndex, setErrorMessage }) {
                     }
                   }}
                 >
-                  {isGuest ? "Login" : isUserMadeRSVP ? "Saved" : "RSVP"}
+                  {isGuest ? "Login" : canViewExternalEvent ? "View" : isUserMadeRSVP ? "Saved" : "RSVP"}
                 </Button>
               </React.Fragment>
 

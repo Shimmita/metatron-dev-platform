@@ -44,12 +44,13 @@ import JobStatsLayout from "./layout/JobStatsLayouts";
 
 const drawerWidth = 240;
 const collapsedDrawerWidth = 70;
+const JOB_PAGE_SIZE = 12;
 
 export default function MiniDrawer() {
   const [openAlertGeneral, setOpenAlertGeneral] = useState(false)
   const [generalTitle, setGeneralTitle] = useState("")
   const [messageGeneral, setMessageGeneral] = useState("")
-  const [pageNumber, setPageNumber] = useState(-1)
+  const [pageNumber, setPageNumber] = useState(2)
   // redux states
   const {
     currentMode,
@@ -182,7 +183,7 @@ export default function MiniDrawer() {
       } else {
 
         axios
-          .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}${isGuest ? "/jobs/all/top/guest" : `/jobs/all/${user?._id}`}`, {
+          .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/${user?._id || "guest"}?page=1&limit=${JOB_PAGE_SIZE}`, {
             withCredentials: true,
           })
           .then((res) => {
@@ -192,7 +193,7 @@ export default function MiniDrawer() {
             }
 
             // update the page number for the next fetch
-            setPageNumber((prev) => prev + 1)
+            setPageNumber(2)
 
           })
           .catch(async (err) => {
@@ -784,6 +785,7 @@ export default function MiniDrawer() {
                         jobs={jobs}
                         setErrorMessage={setErrorMessage}
                         isJobSearchGlobal={isJobSearchGlobal}
+                        canLoadMore={textOption === "Explore Jobs" && !window.location.href?.includes("?")}
                       />
                     )}
                   </Box>

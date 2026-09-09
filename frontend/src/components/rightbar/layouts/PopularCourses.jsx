@@ -14,7 +14,7 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
 import React from "react";
 import { useSelector } from "react-redux";
-import Python from "../../../images/python.jpeg";
+import { resolveVisualAsset } from "../../utilities/resolveVisualAsset";
 
 function PopularCouses({ courseTop }) {
   // redux states
@@ -92,7 +92,7 @@ function PopularCouses({ courseTop }) {
             <ListItemAvatar>
               <Avatar
                 variant="rounded"
-                src={courseTop?.course_logo?.logoLink || Python}
+                src={resolveVisualAsset(courseTop?.course_logo?.logoLink, courseTop?.course_video_topics?.[0])}
                 sx={{
                   background: "rgba(255,255,255,0.08)",
                   border: "1px solid rgba(255,255,255,0.1)",

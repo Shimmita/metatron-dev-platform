@@ -7,7 +7,6 @@ import {
   LockRounded,
   MoreVertRounded,
   OpenInNewRounded,
-  RefreshRounded,
   VerifiedRounded,
 } from "@mui/icons-material";
 import {
@@ -19,7 +18,6 @@ import {
   CardContent,
   CircularProgress,
   Divider,
-  FormHelperText,
   IconButton,
   ListItemAvatar,
   Menu,
@@ -29,11 +27,10 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { handleUpdateIsPostDetailed } from "../../redux/AppUI";
 import {
-  resetClearCurrentPosts,
   updateCurrentPostDetails,
   updateCurrentPosts,
 } from "../../redux/CurrentPosts";
@@ -48,6 +45,19 @@ import { getElapsedTime } from "../utilities/getElapsedTime";
 import { getImageMatch } from "../utilities/getImageMatch";
 import CardFeedMore from "./CardFeedMore";
 import PostImagePreviewDialog from "./PostImagePreviewDialog";
+
+const POST_PAGE_SIZE = 12;
+const appendUniqueById = (current = [], incoming = []) => {
+  const seen = new Set(current.map((item) => item?._id).filter(Boolean));
+  return [
+    ...current,
+    ...incoming.filter((item) => {
+      if (!item?._id || seen.has(item._id)) return false;
+      seen.add(item._id);
+      return true;
+    }),
+  ];
+};
 
 const CardFeed = ({
   post,
@@ -71,6 +81,8 @@ const CardFeed = ({
   const [openImagePreview, setOpenImagePreview] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [hasMorePosts, setHasMorePosts] = useState(true);
+  const infiniteScrollRef = useRef(null);
+  const lastRequestedPageRef = useRef(0);
 
   const openMenu = Boolean(anchorEl);
   const handleClickMoreVertPost = (event) => setAnchorEl(event.currentTarget);
@@ -278,17 +290,16 @@ const CardFeed = ({
     }
   };
 
-  const handleFetchMoreData = () => {
-    if (!hasMorePosts) {
-      setPageNumber(1);
-      dispatch(resetClearCurrentPosts());
-    }
+  const handleFetchMoreData = useCallback(() => {
+    if (!hasMorePosts || isFetching || isGuest) return;
+    if (lastRequestedPageRef.current === pageNumber) return;
 
+    lastRequestedPageRef.current = pageNumber;
     setIsFetching(true);
 
     axios
       .get(
-        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all?page=${pageNumber}&limit=10`,
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/all?page=${pageNumber}&limit=${POST_PAGE_SIZE}`,
         {
           withCredentials: true,
         }
@@ -296,7 +307,10 @@ const CardFeed = ({
       .then((res) => {
         if (res?.data) {
           if (res.data.length > 0) {
-            dispatch(updateCurrentPosts([...posts, ...res.data]));
+            dispatch(updateCurrentPosts(appendUniqueById(posts, res.data)));
+            if (res.data.length < POST_PAGE_SIZE) {
+              setHasMorePosts(false);
+            }
           } else {
             setHasMorePosts(false);
           }
@@ -318,7 +332,25 @@ const CardFeed = ({
       .finally(() => {
         setIsFetching(false);
       });
-  };
+  }, [dispatch, hasMorePosts, isFetching, isGuest, pageNumber, posts, setErrorMessage, setPageNumber]);
+
+  useEffect(() => {
+    if (!isLastIndex || !hasMorePosts || isFetching || isGuest) return undefined;
+    const target = infiniteScrollRef.current;
+    if (!target) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          handleFetchMoreData();
+        }
+      },
+      { root: null, rootMargin: "420px 0px", threshold: 0.01 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [handleFetchMoreData, hasMorePosts, isFetching, isGuest, isLastIndex]);
 
   const postImageSrc = handlePostImagePresent();
 
@@ -738,6 +770,7 @@ const CardFeed = ({
 
       {isLastIndex && (
         <Box
+          ref={infiniteScrollRef}
           justifyContent={"center"}
           display={"flex"}
           flexDirection={"column"}
@@ -750,27 +783,21 @@ const CardFeed = ({
             background: "linear-gradient(135deg, rgba(214,178,94,0.13), rgba(255,255,255,0.035))",
           }}
         >
-          <Button
-            startIcon={isFetching ? <CircularProgress size={14} /> : <RefreshRounded />}
-            size="small"
-            variant={hasMorePosts ? "contained" : "outlined"}
-            disableElevation
-            className="fw-bold"
-            onClick={handleFetchMoreData}
-            disabled={isFetching}
-            sx={{
-              borderRadius: "8px",
-              alignSelf: "center",
-              minWidth: 170,
-            }}
-          >
-            {hasMorePosts ? "Load More" : "Refresh Now"}
-          </Button>
-
-          {!hasMorePosts && (
-            <Box justifyContent={"center"} display={"flex"}>
-              <FormHelperText>no more posts from the backend</FormHelperText>
-            </Box>
+          {isGuest ? (
+            <Typography variant="caption" color="text.secondary" textAlign="center" fontWeight={700}>
+              Sign in to keep exploring more posts.
+            </Typography>
+          ) : isFetching ? (
+            <Stack direction="row" spacing={1} alignItems="center" justifyContent="center">
+              <CircularProgress size={14} />
+              <Typography variant="caption" color="text.secondary" fontWeight={700}>
+                Loading more posts...
+              </Typography>
+            </Stack>
+          ) : !hasMorePosts && (
+            <Typography variant="caption" color="text.secondary" textAlign="center" fontWeight={700}>
+              no more posts available at the moment
+            </Typography>
           )}
         </Box>
       )}

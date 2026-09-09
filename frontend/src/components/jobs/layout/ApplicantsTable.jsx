@@ -8,7 +8,7 @@ import AlertInputMessage from '../../alerts/AlertInputMessage';
 import AlertMiniProfileView from '../../alerts/AlertMiniProfileView';
 import CustomCountryName from '../../utilities/CustomCountryName';
 import CustomDeviceIsSmall from '../../utilities/CustomDeviceIsSmall';
-import { getImageMatch } from '../../utilities/getImageMatch';
+import { resolveVisualAsset } from '../../utilities/resolveVisualAsset';
 import MetatronApplicantsTable from './ApplicantsTableBase';
 
 const columnsHeader = [
@@ -281,7 +281,7 @@ export default function ApplicantsTable({ setIsApplicantsTable, focusedJob }) {
             alt=""
             className="border"
             sx={{ width: 30, height: 30, }}
-            src={getImageMatch(focusedJob?.logo)}
+            src={resolveVisualAsset(focusedJob?.logo, focusedJob?.skills?.[0])}
           />
         </Box>
 

@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import { resolveVisualAsset } from "../../utilities/resolveVisualAsset";
 
 function JobLayoutHiring({ job, textOption = "", setIsApplicantsTable, setFocusedJob }) {
   const mandatorySkills = [...(job?.skills || [])];
@@ -73,7 +74,7 @@ function JobLayoutHiring({ job, textOption = "", setIsApplicantsTable, setFocuse
       {/* Top Section: Branding */}
       <Box sx={{ position: "relative" }}>
         <Avatar
-          src={getImageMatch(job?.logo)}
+	          src={resolveVisualAsset(job?.logo, mandatorySkills[0])}
           sx={{
             width: 56,
             height: 56,

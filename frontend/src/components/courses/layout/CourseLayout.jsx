@@ -6,7 +6,8 @@ import {
   GroupRounded,
   ShareRounded,
   LocalLibraryRounded,
-  LockRounded
+  LockRounded,
+  TravelExploreRounded,
 } from "@mui/icons-material";
 import {
   Avatar,
@@ -22,21 +23,27 @@ import {
 } from "@mui/material";
 import { lazy, useState } from "react";
 import { useSelector } from "react-redux";
-import pythonLogo from "../../../images/python.jpeg";
 import AlertSimilarCourses from "../../alerts/AlertSimilarCourses";
 import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
+import { resolveVisualAsset } from "../../utilities/resolveVisualAsset";
 const AccordionDescription = lazy(() => import("./AccordionDescription"));
 
 function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse, setErrorMessage }) {
   // redux state manager
   const { user, isGuest } = useSelector((state) => state.currentUser);
   const isMyCourse = user?._id === courseItem?.course_instructor?.instructorId
+  const isExternalCourse = Boolean(courseItem?.externalCourse && courseItem?.externalUrl)
   const [isOpenAccordion, setIsOpenAccordion] = useState(false)
   const [showSimilar, setShowSimilar] = useState(false)
   const [isCopiedStatus, setIsCopiedStatus] = useState(false);
 
 
   const handleOpenPlayer = () => {
+    if (isExternalCourse) {
+      window.open(courseItem.externalUrl, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     if (isGuest) {
       setErrorMessage?.("access denied, please login to continue with your request!");
       return;
@@ -106,7 +113,7 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse, setErr
           >
             <Stack direction="row" spacing={1.5} alignItems="flex-start">
               <Avatar
-                src={pythonLogo}
+                src={resolveVisualAsset(courseItem?.course_logo?.logoLink, courseItem?.course_video_topics?.[0])}
                 variant="rounded"
                 sx={{
                   width: 52,
@@ -122,7 +129,7 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse, setErr
                   {courseItem?.course_title}
                 </Typography>
                 <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.78)", fontWeight: 700 }}>
-                  Practical developer course
+                  {isExternalCourse ? `${courseItem?.externalProvider || "External provider"} course` : "Practical developer course"}
                 </Typography>
               </Box>
             </Stack>
@@ -142,8 +149,8 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse, setErr
 	            <Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
 	              <Box textAlign="left">
                 <LocalLibraryRounded sx={{ color: "primary.main", fontSize: 18 }} />
-                <Typography variant="caption" display="block" sx={{ fontWeight: 800, opacity: 0.7 }}>
-                  {courseItem?.course_video_lectures?.length} Modules
+                  <Typography variant="caption" display="block" sx={{ fontWeight: 800, opacity: 0.7 }}>
+                  {isExternalCourse ? "External" : `${courseItem?.course_video_lectures?.length} Modules`}
                 </Typography>
               </Box>
               <Divider orientation="vertical" flexItem sx={{ opacity: 0.1 }} />
@@ -168,7 +175,10 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse, setErr
                 "&:hover": { bgcolor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)" }
               }}
             >
-              <Avatar src={courseItem?.course_instructor?.instructorAvatar} sx={{ width: 32, height: 32 }} />
+              <Avatar
+                src={resolveVisualAsset(courseItem?.course_instructor?.instructorAvatar, courseItem?.course_video_topics?.[0])}
+                sx={{ width: 32, height: 32 }}
+              />
               <Box sx={{ textAlign: "left" }}>
                 <Typography variant="caption" sx={{ display: "block", color: "primary.main", fontWeight: 800, fontSize: "0.6rem" }}>
                   INSTRUCTOR
@@ -211,14 +221,14 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse, setErr
                 {/* ─── ENROLLMENT FOOTER ─── */}
                 <Box sx={{ textAlign: "center" }}>
                   <Typography variant="caption" sx={{ display: "block", mb: 1, opacity: 0.6, fontWeight: 700 }}>
-                    {isGuest ? "Login to Enroll" : isMyCourse ? "Creator Access" : "Free Full Access"}
+                    {isExternalCourse ? `Open on ${courseItem?.externalProvider || "provider"}` : isGuest ? "Login to Enroll" : isMyCourse ? "Creator Access" : "Free Full Access"}
                   </Typography>
 
                   <Button
                     fullWidth
                     variant="contained"
                     onClick={handleOpenPlayer}
-                    startIcon={isGuest ? <LockRounded /> : isMyCourse ? <VideoLibraryRounded /> : <PlayCircleFilledRounded />}
+                    startIcon={isExternalCourse ? <TravelExploreRounded /> : isGuest ? <LockRounded /> : isMyCourse ? <VideoLibraryRounded /> : <PlayCircleFilledRounded />}
                     sx={{
                       borderRadius: "8px",
                       py: 1,
@@ -228,7 +238,7 @@ function CourseLayout({ isDarkMode = false, courseItem, setFocusedCourse, setErr
                       boxShadow: "0 4px 12px rgba(214,178,94, 0.3)"
                     }}
                   >
-                    {isGuest ? "Login to Enroll" : isMyCourse ? "Enter Studio" : courseItem?.currentUserEnrolled ? "Continue Learning" : "Enroll & Start"}
+                    {isExternalCourse ? "Enroll Externally" : isGuest ? "Login to Enroll" : isMyCourse ? "Enter Studio" : courseItem?.currentUserEnrolled ? "Continue Learning" : "Enroll & Start"}
                   </Button>
                 </Box>
               </>

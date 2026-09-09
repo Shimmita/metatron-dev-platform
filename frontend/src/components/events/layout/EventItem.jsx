@@ -1,5 +1,4 @@
 import {
-  ArrowCircleRightRounded,
   BarChart,
   CheckCircleRounded,
   Delete,
@@ -7,6 +6,7 @@ import {
   InfoOutlined,
   LockRounded,
   LocationOnRounded,
+  OpenInNewRounded,
   ScheduleRounded,
   ShareRounded,
   SmartDisplayRounded,
@@ -24,13 +24,12 @@ import {
   CircularProgress,
   Collapse,
   Divider,
-  IconButton,
   Stack,
   Tooltip,
   Typography
 } from "@mui/material";
 import axios from "axios";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentEvents } from "../../../redux/CurrentEvents";
 import { resetClearCurrentEventsTop } from "../../../redux/CurrentEventsTop";
@@ -39,6 +38,7 @@ import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
 import MetatronSnackbar from "../../snackbar/MetatronSnackBar";
 import CustomCountryName from "../../utilities/CustomCountryName";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import { resolveVisualAsset } from "../../utilities/resolveVisualAsset";
 
 const getRequestMessage = (err, fallback = "Unable to update event.") => {
   if (err?.code === "ERR_NETWORK") return "Server unreachable. Please try again later.";
@@ -47,6 +47,18 @@ const getRequestMessage = (err, fallback = "Unable to update event.") => {
   if (payload?.message) return payload.message;
   if (payload?.error) return payload.error;
   return fallback;
+};
+const EVENT_PAGE_SIZE = 12;
+const appendUniqueById = (current = [], incoming = []) => {
+  const seen = new Set(current.map((item) => item?._id).filter(Boolean));
+  return [
+    ...current,
+    ...incoming.filter((item) => {
+      if (!item?._id || seen.has(item._id)) return false;
+      seen.add(item._id);
+      return true;
+    }),
+  ];
 };
 const firstName = (value = "") => value.trim().split(/\s+/)[0] || "Host";
 
@@ -57,6 +69,7 @@ function EventItem({
   isEventsManager = false,
   setIsEventsStats,
   setFocusedEvent,
+  canLoadMore = true,
   isRSVP = false,
   isLastIndex = false,
   setPageNumber,
@@ -64,14 +77,20 @@ function EventItem({
 }) {
   const [isFetching, setIsFetching] = useState(false);
   const [openMiniProfile, setOpenMiniProfile] = useState(false);
+  const [openHostInfo, setOpenHostInfo] = useState(false);
   const [isCopiedStatus, setIsCopiedStatus] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [hasMoreEvents, setHasMoreEvents] = useState(true);
+  const infiniteScrollRef = useRef(null);
+  const lastRequestedPageRef = useRef(0);
   const { user, isGuest } = useSelector((state) => state.currentUser);
   const { events: eventsData } = useSelector((state) => state.currentEvents);
   const isUserMadeRSVP = event?.users?.value.some(
     (currentId) => currentId === user?._id
   );
   const isMyOwnEvent = event?.ownerId === user?._id;
+  const isExternalEvent = Boolean(event?.externalEvent || (event?.source?.name && `${event?.ownerId || ""}`.startsWith("external-")));
+  const canViewExternalEvent = Boolean(isExternalEvent && isUserMadeRSVP && event?.hostLink);
   const handleToggleExpand = () => setIsExpanded(!isExpanded);
 
   const dateFormat = new Date(event?.dateHosted);
@@ -170,16 +189,25 @@ function EventItem({
     }
   };
 
-  const handleFetchMoreData = () => {
+  const handleFetchMoreData = useCallback(() => {
+    if (!hasMoreEvents || isFetching || isGuest) return;
+    if (lastRequestedPageRef.current === pageNumber) return;
+
+    lastRequestedPageRef.current = pageNumber;
     setIsFetching(true);
     axios
-      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/?page=${pageNumber}&limit=6`, {
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/?page=${pageNumber}&limit=${EVENT_PAGE_SIZE}`, {
         withCredentials: true,
       })
       .then((res) => {
         if (res?.data) {
           if (res.data.length > 0) {
-            dispatch(updateCurrentEvents([...eventsData, ...res.data]));
+            dispatch(updateCurrentEvents(appendUniqueById(eventsData || [], res.data)));
+            if (res.data.length < EVENT_PAGE_SIZE) {
+              setHasMoreEvents(false);
+            }
+          } else {
+            setHasMoreEvents(false);
           }
         }
         setPageNumber((prev) => prev + 1);
@@ -189,11 +217,35 @@ function EventItem({
         setErrorMessage(getRequestMessage(err, "Unable to load more events."));
       })
       .finally(() => setIsFetching(false));
+  }, [dispatch, eventsData, hasMoreEvents, isFetching, isGuest, pageNumber, setErrorMessage, setPageNumber]);
+
+  useEffect(() => {
+    if (!isLastIndex || !canLoadMore || !hasMoreEvents || isFetching || isGuest) return undefined;
+    const target = infiniteScrollRef.current;
+    if (!target) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          handleFetchMoreData();
+        }
+      },
+      { root: null, rootMargin: "420px 0px", threshold: 0.01 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [canLoadMore, handleFetchMoreData, hasMoreEvents, isFetching, isGuest, isLastIndex]);
+
+  const handleShowMiniProfile = () => {
+    if (isExternalEvent) {
+      setOpenHostInfo((prev) => !prev);
+      return;
+    }
+    setOpenMiniProfile(true);
   };
 
-  const handleShowMiniProfile = () => setOpenMiniProfile(true);
-
-  const handleStreamEvent = () => window.open(event?.hostLink, "_blank");
+  const handleStreamEvent = () => window.open(event?.hostLink, "_blank", "noopener,noreferrer");
 
   const handleGetEventLink = async () => {
     const urlEvent = `${window.location.href}?id=${event?._id}`;
@@ -343,7 +395,7 @@ function EventItem({
 
           {/* ─── OWNER INFO ─── */}
           <ButtonBase
-            onClick={!isGuest ? handleShowMiniProfile : undefined}
+            onClick={!isGuest || isExternalEvent ? handleShowMiniProfile : undefined}
             component="div" // Ensures layout stays consistent with Box
             sx={{
               display: "flex",
@@ -355,17 +407,17 @@ function EventItem({
               bgcolor: isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
               border: "1px solid transparent",
               transition: "all 0.2s ease-in-out",
-              cursor: isGuest ? "default" : "pointer",
+              cursor: isGuest && !isExternalEvent ? "default" : "pointer",
               "&:hover": {
                 bgcolor: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
                 borderColor: isDarkMode ? "rgba(214,178,94, 0.3)" : "rgba(214,178,94, 0.2)",
-                transform: isGuest ? "none" : "translateY(-1px)",
+                transform: isGuest && !isExternalEvent ? "none" : "translateY(-1px)",
               },
             }}
           >
             {/* Host Avatar with Status Glow */}
             <Avatar
-              src={event?.ownerAvatar}
+              src={resolveVisualAsset(event?.ownerAvatar, event?.topics?.[0] || event?.skills?.[0])}
               sx={{
                 width: 34,
                 height: 34,
@@ -407,6 +459,27 @@ function EventItem({
             </Box>
           </ButtonBase>
 
+          {isExternalEvent && (
+            <Collapse in={openHostInfo} timeout="auto" unmountOnExit>
+              <Box
+                sx={{
+                  mt: 1,
+                  p: 1.35,
+                  borderRadius: "8px",
+                  bgcolor: isDarkMode ? "rgba(214,178,94, 0.06)" : "rgba(214,178,94, 0.07)",
+                  border: "1px solid rgba(214,178,94,0.22)",
+                }}
+              >
+                <Typography variant="caption" sx={{ display: "block", color: "primary.main", fontWeight: 900 }}>
+                  {event?.ownerName || "Event Host"}
+                </Typography>
+                <Typography variant="caption" sx={{ display: "block", mt: 0.6, opacity: 0.78, lineHeight: 1.45 }}>
+                  {event?.hostAbout || event?.ownerSpecialize || "This host publishes the official details for this external technology event."}
+                </Typography>
+              </Box>
+            </Collapse>
+          )}
+
           <Divider sx={{ my: 2, opacity: 0.1 }} />
 
           {/* ─── RSVP STATUS PILL ─── */}
@@ -439,11 +512,11 @@ function EventItem({
                   fullWidth
                   variant="contained"
                   size="small"
-                  startIcon={isRSVP ? <SmartDisplayRounded /> : <BarChart />}
+                  startIcon={isRSVP ? isExternalEvent ? <OpenInNewRounded /> : <SmartDisplayRounded /> : <BarChart />}
                   onClick={isRSVP ? handleStreamEvent : handleEventsStats}
                   sx={{ borderRadius: "10px", fontWeight: 800, textTransform: "none" }}
                 >
-                  {isRSVP ? "Stream" : "Analytics"}
+                  {isRSVP ? isExternalEvent ? "View Event" : "Stream" : "Analytics"}
                 </Button>
                 <Button
                   fullWidth
@@ -480,16 +553,16 @@ function EventItem({
                 <Button
                   fullWidth
                   variant="contained"
-                  disabled={isFetching || isUserMadeRSVP || isMyOwnEvent}
-                  onClick={isGuest ? handleGuestRSVP : handleCreateRSVP}
-                  startIcon={isFetching ? <CircularProgress size={16} color="inherit" /> : isGuest ? <LockRounded /> : <CheckCircleRounded />}
+                  disabled={isFetching || isMyOwnEvent || (isUserMadeRSVP && !canViewExternalEvent)}
+                  onClick={isGuest ? handleGuestRSVP : canViewExternalEvent ? handleStreamEvent : handleCreateRSVP}
+                  startIcon={isFetching ? <CircularProgress size={16} color="inherit" /> : canViewExternalEvent ? <OpenInNewRounded /> : isGuest ? <LockRounded /> : <CheckCircleRounded />}
                   sx={{
                     borderRadius: "10px",
                     fontWeight: 800,
                     background: isUserMadeRSVP ? "rgba(214,178,94, 0.2)" : "primary.main",
                   }}
                 >
-                  {isMyOwnEvent ? "Owner" : isUserMadeRSVP ? "Joined" : "RSVP Now"}
+                  {isMyOwnEvent ? "Owner" : canViewExternalEvent ? "View Event" : isUserMadeRSVP ? "Joined" : "RSVP Now"}
                 </Button>
               </Stack>
             )}
@@ -497,12 +570,24 @@ function EventItem({
         </CardContent>
       </Card>
 
-      {/* ─── LOAD MORE ─── */}
-      {isLastIndex && !isGuest && (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 1 }}>
-          <IconButton onClick={handleFetchMoreData} sx={{ bgcolor: "primary.main", color: "white", "&:hover": { bgcolor: "primary.dark" } }}>
-            <ArrowCircleRightRounded />
-          </IconButton>
+      {isLastIndex && canLoadMore && (
+        <Box ref={infiniteScrollRef} sx={{ display: "flex", justifyContent: "center", mt: 1, minHeight: 38 }}>
+          {isGuest ? (
+            <Typography variant="caption" color="text.secondary" textAlign="center" fontWeight={700}>
+              Sign in to keep exploring more events.
+            </Typography>
+          ) : isFetching ? (
+            <Stack direction="row" spacing={1} alignItems="center">
+              <CircularProgress size={18} />
+              <Typography variant="caption" color="text.secondary" fontWeight={700}>
+                Loading more events...
+              </Typography>
+            </Stack>
+          ) : !hasMoreEvents && (
+            <Typography variant="caption" color="text.secondary" textAlign="center" fontWeight={700}>
+              no more events available at the moment
+            </Typography>
+          )}
         </Box>
       )}
 
@@ -517,7 +602,7 @@ function EventItem({
       )}
 
       {/* Profile HUD Alert */}
-      {openMiniProfile && (
+      {openMiniProfile && !isExternalEvent && (
         <AlertMiniProfileView openAlert={openMiniProfile} setOpenAlert={setOpenMiniProfile} userId={event?.ownerId} />
       )}
     </Box>

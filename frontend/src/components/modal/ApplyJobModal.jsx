@@ -1,8 +1,17 @@
 import {
   BoltRounded,
+  BusinessRounded,
   Close,
   CloudUploadRounded,
-  LockRounded
+  DescriptionRounded,
+  FactCheckRounded,
+  LaunchRounded,
+  LockRounded,
+  MyLocationRounded,
+  PaymentsRounded,
+  PlaceRounded,
+  VerifiedRounded,
+  WorkHistoryRounded
 } from "@mui/icons-material";
 import {
   Alert,
@@ -18,15 +27,14 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import AppLogo from "../../images/logo_sm.png";
 import { resetClearCurrentJobsTop } from "../../redux/CurrentJobsTop";
 import { updateCurrentSnackBar } from "../../redux/CurrentSnackBar";
 import { updateCurrentSuccessRedux } from "../../redux/CurrentSuccess";
 import { updateUserCurrentUserRedux } from "../../redux/CurrentUser";
-import CustomCountryName from "../utilities/CustomCountryName";
 import { getImageMatch } from "../utilities/getImageMatch";
+import { resolveVisualAsset } from "../utilities/resolveVisualAsset";
 import { ModalWorkflowSteps } from "./ModalShared";
 import './Progress.css';
 // styled modal
@@ -36,49 +44,41 @@ const StyledModalJob = styled(Modal)({
   justifyContent: "center",
 });
 
-// styled input
-const StyledInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
+const normalizeCountryName = (value = "") =>
+  `${value || ""}`
+    .replace(/^\+\d+\s+/, "")
+    .replace(/\([^)]*\)/g, "")
+    .replace(/[^a-zA-Z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
 
-const HeaderBar = styled(Box)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  gap: theme.spacing(2),
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  padding: theme.spacing(1.5),
-  flexWrap: "wrap",
-}));
+const isOpenCountryWhitelist = (value = "") => {
+  const normalized = normalizeCountryName(value);
+  return !normalized || normalized === "all" || normalized === "global" || normalized === "worldwide";
+};
 
-const SectionCard = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
-  border: `1px solid ${theme.palette.divider}`,
-  borderRadius: theme.shape.borderRadius,
-  padding: theme.spacing(2),
-  marginBottom: theme.spacing(2),
-  boxShadow: theme.palette.mode === 'dark'
-    ? '0 2px 8px rgba(0,0,0,0.15)'
-    : '0 2px 8px rgba(0,0,0,0.08)',
-}));
+const extractCountryCode = (value = "") => {
+  const parentheticalCode = `${value || ""}`.match(/\(([A-Z]{2})\)/i)?.[1];
+  const trimmed = `${value || ""}`.trim();
+  const directCode = /^[A-Z]{2}$/i.test(trimmed) ? trimmed : "";
 
-const SectionTitle = styled(Typography)(({ theme }) => ({
-  marginBottom: theme.spacing(1),
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
-  padding: theme.spacing(0.5, 1),
-  borderRadius: theme.shape.borderRadius,
-  display: 'inline-block',
-}));
+  return (parentheticalCode || directCode).toUpperCase();
+};
+
+const countryMatchesWhitelist = ({ country = "", countryCode = "", whitelist = "" } = {}) => {
+  if (isOpenCountryWhitelist(whitelist)) return true;
+
+  const normalizedCountry = normalizeCountryName(country);
+  const allowedCountry = normalizeCountryName(whitelist);
+  const normalizedCode = extractCountryCode(countryCode);
+  const allowedCode = extractCountryCode(whitelist);
+
+  return Boolean(
+    (normalizedCountry && normalizedCountry === allowedCountry) ||
+    (normalizedCode && allowedCode && normalizedCode === allowedCode)
+  );
+};
 
 
 const ApplyJobModal = ({
@@ -92,6 +92,7 @@ const ApplyJobModal = ({
   jobaccesstype,
   salary,
   skills,
+  logo,
   location,
   isPreview = false,
   isMyJob = false,
@@ -102,7 +103,13 @@ const ApplyJobModal = ({
   const [cvUpload, setCvUpload] = useState();
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [currentButton, setCurrentButton] = useState(user?.cvLink === "" ? 0 : 1)
+  const [jobApplicationSettings, setJobApplicationSettings] = useState({
+    jobGeographicApplicationRestriction: false,
+  });
+  const [detectedCountry, setDetectedCountry] = useState("");
+  const [detectedCountryCode, setDetectedCountryCode] = useState("");
+  const [detectedLocationCoordinates, setDetectedLocationCoordinates] = useState(null);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
 
   // extract cvLink and name it cvName
   const cvName = user?.cvLink || ""
@@ -111,19 +118,133 @@ const ApplyJobModal = ({
   const isDarkMode = currentMode === 'dark'
   const dispatch = useDispatch();
 
-  const handleCountryJob = (job) => {
-    const parent = job.split(" ");
-    const finalName =
-      parent.length > 2 ? `${parent[0]} ${parent[1]}` : parent[0];
-
-    return finalName;
-  };
+  const geographicRestrictionActive = Boolean(jobApplicationSettings.jobGeographicApplicationRestriction);
+  const whitelistOpen = isOpenCountryWhitelist(whitelist);
+  const detectedCountryMatches = countryMatchesWhitelist({
+    country: detectedCountry,
+    countryCode: detectedCountryCode,
+    whitelist,
+  });
+	  const detectedCountryLabel = detectedCountry
+	    ? `${detectedCountry}${detectedCountryCode ? ` (${detectedCountryCode})` : ""}`
+	    : detectedCountryCode;
+	  const skillList = Array.isArray(skills) ? skills.filter(Boolean) : [];
+	  const qualificationList = Array.isArray(requirements?.qualification)
+	    ? requirements.qualification.filter(Boolean)
+	    : [];
+	  const requirementList = Array.isArray(requirements?.description)
+	    ? requirements.description.filter(Boolean)
+	    : [];
+	  const isExternalApplication = Boolean(websiteLink?.trim());
+	  const cvReady = Boolean(cvUpload || user?.cvLink);
+	  const jobCity = location?.state || "Flexible location";
+		  const organisationLogo = resolveVisualAsset(organisation?.logo || logo, skillList[0]);
+	  const organisationName = organisation?.name || "Hiring team";
+	  const organisationAbout = organisation?.about || "This hiring team has not added an organisation profile yet.";
 
   // based on the whitelist job filter, show/hide action btns
   const isEligible =
-    whitelist === "All" ||
-    whitelist === "" ||
-    handleCountryJob(whitelist) === CustomCountryName(user?.country)
+    !geographicRestrictionActive ||
+    whitelistOpen ||
+    detectedCountryMatches
+
+  const resolveCurrentCountry = () =>
+    new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Location access is not supported by this browser."));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(resolve, reject, {
+        enableHighAccuracy: false,
+        timeout: 15000,
+        maximumAge: 10 * 60 * 1000,
+      });
+    });
+
+  const buildLocationEligibility = (overrides = {}) => ({
+    allowed: true,
+    country: detectedCountry,
+    countryCode: detectedCountryCode,
+    coordinates: detectedLocationCoordinates,
+    ...overrides,
+  });
+
+  const ensureLocationEligibility = async () => {
+    if (!geographicRestrictionActive || whitelistOpen) return buildLocationEligibility();
+
+    if ((detectedCountry || detectedCountryCode) && detectedLocationCoordinates) {
+      if (detectedCountryMatches) return buildLocationEligibility();
+      setErrorMessage(`This job is restricted to applicants in ${whitelist}. Your detected country is ${detectedCountryLabel || "unknown"}.`);
+      return { allowed: false };
+    }
+
+    setErrorMessage("");
+    setIsDetectingLocation(true);
+
+    try {
+      const position = await resolveCurrentCountry();
+      const res = await axios.get(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/application/location/country`,
+        {
+          params: {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+          },
+          withCredentials: true,
+        }
+      );
+
+      const country = res.data?.country || "";
+      const countryCode = res.data?.countryCode || "";
+      const coordinates = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      };
+      setDetectedCountry(country);
+      setDetectedCountryCode(countryCode);
+      setDetectedLocationCoordinates(coordinates);
+
+      if (!countryMatchesWhitelist({ country, countryCode, whitelist })) {
+        const countryLabel = country
+          ? `${country}${countryCode ? ` (${countryCode})` : ""}`
+          : countryCode;
+        setErrorMessage(`This job is restricted to applicants in ${whitelist}. Your detected country is ${countryLabel || "unknown"}.`);
+        return { allowed: false };
+      }
+
+      return buildLocationEligibility({ country, countryCode, coordinates });
+    } catch (error) {
+      setErrorMessage(error?.response?.data?.message || error?.message || "Please allow location access to continue with this country-restricted job.");
+      return { allowed: false };
+    } finally {
+      setIsDetectingLocation(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!openApplyJobModal) return;
+
+    setDetectedCountry("");
+    setDetectedCountryCode("");
+    setDetectedLocationCoordinates(null);
+    setErrorMessage("");
+
+    axios
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/application/settings`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        setJobApplicationSettings({
+          jobGeographicApplicationRestriction: Boolean(res.data?.jobGeographicApplicationRestriction),
+        });
+      })
+      .catch(() => {
+        setJobApplicationSettings({
+          jobGeographicApplicationRestriction: false,
+        });
+      });
+  }, [openApplyJobModal]);
 
   // handle cv file change, upload it to the backend
   const handleCVFile = (event) => {
@@ -166,19 +287,12 @@ const ApplyJobModal = ({
 
         setErrorMessage(err?.response.data);
       })
-      .finally(() => {
-        setIsUploading(false);
-        // set current button 
-        setCurrentButton(0)
-        // nullify cv upload state
-        setCvUpload(null);
-      });
-  };
-
-  // handle current cv btn selection
-  const handleCurrentCv = () => {
-    setCurrentButton(1)
-  }
+	      .finally(() => {
+	        setIsUploading(false);
+	        // nullify cv upload state
+	        setCvUpload(null);
+	      });
+	  };
 
   const handleCvDownloadResponse = async (res) => {
     const contentType = res.headers["content-type"] || "";
@@ -216,11 +330,8 @@ const ApplyJobModal = ({
 
   // handle current btn view cv
   const handleDownloadCv = () => {
-    // update focused btn
-    setCurrentButton(2)
-
-    // uploading status
-    setIsUploading(true)
+	    // uploading status
+	    setIsUploading(true)
 
     axios.post(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/cv/my/download`, { cvName }, {
       withCredentials: true,
@@ -249,10 +360,13 @@ const ApplyJobModal = ({
 
 
   // handle uploading of the application document
-  const handleJobApplication = () => {
+  const handleJobApplication = async () => {
 
     // clear any error message
     setErrorMessage("");
+
+    const locationEligibility = await ensureLocationEligibility();
+    if (!locationEligibility.allowed) return;
 
     // creating a jobItem object
     const jobItem = {
@@ -262,7 +376,11 @@ const ApplyJobModal = ({
         name: user.name,
         applicantID: user._id,
         gender: user.gender,
-        country: user.country,
+        country: geographicRestrictionActive && locationEligibility.country ? locationEligibility.country : user.country,
+        detectedCountry: geographicRestrictionActive ? locationEligibility.country || "" : "",
+        detectedCountryCode: geographicRestrictionActive ? locationEligibility.countryCode || "" : "",
+        locationCoordinates: geographicRestrictionActive ? locationEligibility.coordinates : undefined,
+        locationSource: geographicRestrictionActive ? "browser-geolocation" : "",
       },
     };
 
@@ -318,51 +436,54 @@ const ApplyJobModal = ({
   };
 
   // handle country length to only two names and code label
-  const handleCountryName = () => {
-    const parent = location?.country?.split(" ");
-    const countryCode = parent?.pop();
-    const finalName = parent?.length > 2 ? `${parent[0]} ${parent[1]} ${countryCode}` : location?.country;
-
-    return finalName.split("(")[0];
-  };
+	  const handleCountryName = () => {
+	    if (!location?.country) return "Global";
+	    const parent = location.country.split(" ");
+	    const countryCode = parent?.pop();
+	    const finalName = parent?.length > 2 ? `${parent[0]} ${parent[1]} ${countryCode}` : location?.country;
+	
+	    return finalName.split("(")[0].trim();
+	  };
+	
+	  const locationDisplay = [jobCity, handleCountryName()].filter(Boolean).join(", ");
 
 
   // handle showing of website iframe
-  const handleShowWebsite = () => {
+  const handleShowWebsite = async () => {
+    const locationEligibility = await ensureLocationEligibility();
+    if (!locationEligibility.allowed) return;
+
     window.open(websiteLink, "_blank")
     // close the modal
     setOpenApplyJobModal(false)
   }
 
-  // handle calculation of skills percentage 
-  const handleSkillsPercentage = () => {
-    const userSkills = user?.selectedSkills || []
-    let results = 0
-
-    // loop through user skill
-    for (const userSkill of userSkills) {
-      if (skills.includes(userSkill)) {
-        results = results + 1
-      }
-    }
-
-    return Math.ceil(results / skills.length * 100)
-
-  }
-
-
-  const Section = ({ title, children }) => (
-    <Box>
-      <Typography fontWeight={700} mb={1}>
-        {title}
-      </Typography>
-      {children}
-    </Box>
-  );
+	  const jobMetaCards = [
+	    {
+	      label: "Compensation",
+	      value: salary || "Not specified",
+	      icon: <PaymentsRounded />,
+	    },
+	    {
+	      label: "Work Mode",
+	      value: `${jobaccesstype?.access || "Flexible"} / ${jobaccesstype?.type || "Role"}`,
+	      icon: <WorkHistoryRounded />,
+	    },
+	    {
+	      label: "Location",
+	      value: locationDisplay,
+	      icon: <PlaceRounded />,
+	    },
+	    {
+	      label: "Apply Route",
+	      value: isExternalApplication ? "External portal" : "Metatron CV",
+	      icon: isExternalApplication ? <LaunchRounded /> : <DescriptionRounded />,
+	    },
+	  ];
 
   const applyWorkflowSteps = [
     { label: "Review", helper: "Role, company, compensation, and work mode", completed: Boolean(title && organisation?.name) },
-    { label: "Match", helper: "Skill fit and geographic eligibility", completed: Boolean(isEligible) },
+    { label: "Match", helper: geographicRestrictionActive ? "Skill fit and live country eligibility" : "Skill fit and open geographic access", completed: Boolean(isEligible) },
     { label: "Credentials", helper: websiteLink === "" ? "Attach or confirm your CV" : "Continue through employer portal", completed: Boolean(websiteLink || cvUpload || user?.cvLink) },
     { label: "Submit", helper: "Send application for recruiter review", completed: false },
   ];
@@ -409,250 +530,412 @@ const ApplyJobModal = ({
           flexDirection: 'column',
         }}
       >
-        {/* ─── HEADER: Identity & Metadata ─── */}
-        <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'rgba(255,255,255,0.01)' }}>
-          <Stack direction="row" spacing={2} alignItems="center">
+        <Box
+          sx={{
+            p: { xs: 1.75, sm: 2.25 },
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            background: isDarkMode
+              ? 'linear-gradient(135deg, rgba(214,178,94,0.13), rgba(13,20,32,0.96))'
+              : 'linear-gradient(135deg, rgba(255,255,255,0.98), rgba(214,178,94,0.10))',
+          }}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="flex-start">
             <Avatar
-              src={organisation.logo || AppLogo}
+              src={organisationLogo}
               variant="rounded"
               sx={{
-                width: 56,
-                height: 56,
-                borderRadius: 2.5,
-                border: '1px solid',
-                borderColor: 'divider',
-                boxShadow: '0 8px 20px rgba(0,0,0,0.2)'
+                width: 58,
+                height: 58,
+                borderRadius: "8px",
+                border: '1px solid rgba(214,178,94,0.35)',
+                bgcolor: 'background.paper',
+                boxShadow: isDarkMode ? '0 12px 32px rgba(0,0,0,0.35)' : '0 12px 24px rgba(139,111,42,0.12)',
+                p: 0.35,
+                flexShrink: 0,
               }}
             />
 
             <Box flex={1} minWidth={0}>
-              <Typography variant="body1" fontWeight={800} noWrap sx={{ letterSpacing: '-0.01em' }}>
+              <Stack direction="row" alignItems="center" spacing={0.75} mb={0.35}>
+                <BusinessRounded sx={{ color: 'primary.main', fontSize: 16 }} />
+                <Typography variant="caption" color="primary.main" fontWeight={900} noWrap>
+                  {organisationName}
+                </Typography>
+              </Stack>
+              <Typography variant="h6" fontWeight={900} lineHeight={1.18} sx={{ letterSpacing: 0 }}>
                 {title}
               </Typography>
-              <Typography variant="caption" color="primary" fontWeight={800} sx={{ display: 'block', mt: -0.2 }}>
-                {organisation.name}
-              </Typography>
-              <Typography variant="caption" sx={{ opacity: 0.6, display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-                {salary} P.M • {location.state}
-              </Typography>
+              <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap mt={1.1}>
+                {[jobaccesstype?.type, jobaccesstype?.access, handleCountryName(), isExternalApplication ? "External" : "Direct Apply"].filter(Boolean).map((tag) => (
+                  <Chip
+                    key={tag}
+                    size="small"
+                    label={tag}
+                    sx={{
+                      height: 24,
+                      borderRadius: "8px",
+                      fontSize: "0.68rem",
+                      fontWeight: 850,
+                      color: 'primary.main',
+                      border: '1px solid rgba(214,178,94,0.28)',
+                      bgcolor: 'rgba(214,178,94,0.09)',
+                    }}
+                  />
+                ))}
+              </Stack>
             </Box>
 
             <IconButton
               onClick={handleClosingModal}
               size="small"
-              sx={{ alignSelf: 'flex-start', bgcolor: 'action.hover' }}
+              sx={{
+                width: 34,
+                height: 34,
+                borderRadius: "8px",
+                bgcolor: isDarkMode ? 'rgba(255,255,255,0.06)' : 'rgba(5,8,18,0.05)',
+                flexShrink: 0,
+              }}
             >
               <Close sx={{ fontSize: 18 }} />
             </IconButton>
           </Stack>
+        </Box>
 
-          <Stack direction="row" spacing={1} justifyContent="center" mt={1.5} flexWrap="wrap" gap={1}>
-            {[jobaccesstype?.type, jobaccesstype?.access, handleCountryName()].map((tag) => (
-              <Box key={tag} sx={{ px: 1, py: 0.2, borderRadius: 1, bgcolor: 'rgba(214,178,94, 0.1)', border: '1px solid rgba(214,178,94, 0.2)' }}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 800, color: '#D6B25E' }}>{tag}</Typography>
-              </Box>
-            ))}
-	          </Stack>
-	        </Box>
+        <ModalWorkflowSteps
+          steps={applyWorkflowSteps}
+          activeStep={applyActiveStep}
+        />
 
-          <ModalWorkflowSteps
-            steps={applyWorkflowSteps}
-            activeStep={applyActiveStep}
-          />
-
-	        {/* ─── SCROLLABLE INTELLIGENCE ─── */}
         <Box
           sx={{
             flex: 1,
             overflowY: 'auto',
-            px: 2.5,
+            px: { xs: 1.5, sm: 2.25 },
             py: 2,
             '&::-webkit-scrollbar': { width: '4px' },
             '&::-webkit-scrollbar-thumb': { bgcolor: 'divider', borderRadius: '10px' },
           }}
         >
-          <Stack spacing={3}>
-            {/* Status Alerts */}
-            {(errorMessage || isUploading) && (
-              <Box>
-                {errorMessage && <Alert severity="error" sx={{ borderRadius: 2, fontSize: '0.75rem' }}>{errorMessage}</Alert>}
-                {isUploading && (
+          <Stack spacing={1.75}>
+            {(errorMessage || isUploading || isDetectingLocation || (geographicRestrictionActive && !whitelistOpen)) && (
+              <Stack spacing={1}>
+                {errorMessage && <Alert severity="error" sx={{ borderRadius: "8px", fontSize: '0.78rem' }}>{errorMessage}</Alert>}
+                {!errorMessage && geographicRestrictionActive && !whitelistOpen && (
+                  <Alert severity={detectedCountry || detectedCountryCode ? "info" : "warning"} icon={<MyLocationRounded />} sx={{ borderRadius: "8px", fontSize: '0.78rem' }}>
+                    {detectedCountry || detectedCountryCode
+                      ? `Detected country: ${detectedCountryLabel}. This job accepts applicants from ${whitelist}.`
+                      : `This job is country restricted to ${whitelist}. We will request your location before you continue.`}
+                  </Alert>
+                )}
+                {(isUploading || isDetectingLocation) && (
                   <Stack direction="row" spacing={2} py={1} justifyContent="center" alignItems="center">
                     <CircularProgress size={16} thickness={6} />
-                    <Typography variant="caption" fontWeight={700}>Synchronizing Credentials...</Typography>
+                    <Typography variant="caption" fontWeight={700}>
+                      {isDetectingLocation ? "Verifying Location..." : "Synchronizing Credentials..."}
+                    </Typography>
                   </Stack>
                 )}
-              </Box>
+              </Stack>
             )}
 
-            {/* About Section */}
-            <Box>
-              <Typography variant="overline" color="text.secondary" fontWeight={900} sx={{ opacity: 0.5 }}>About Us</Typography>
-              <Typography variant="body2" sx={{ mt: 1, opacity: 0.8, lineHeight: 1.7, fontSize: '0.825rem' }}>
-                {organisation.about}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))" },
+                gap: 1,
+              }}
+            >
+              {jobMetaCards.map((item) => (
+                <Box
+                  key={item.label}
+                  sx={{
+                    p: 1.25,
+                    minHeight: 82,
+                    borderRadius: "8px",
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    bgcolor: isDarkMode ? 'rgba(255,255,255,0.035)' : 'rgba(5,8,18,0.025)',
+                    minWidth: 0,
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" spacing={0.85}>
+                    <Box sx={{ color: 'primary.main', display: 'flex', '& .MuiSvgIcon-root': { fontSize: 18 } }}>
+                      {item.icon}
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" fontWeight={850} noWrap>
+                      {item.label}
+                    </Typography>
+                  </Stack>
+                  <Typography variant="body2" fontWeight={900} mt={0.85} lineHeight={1.3}>
+                    {item.value}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+
+            <Box
+              sx={{
+                p: 1.5,
+                borderRadius: "8px",
+                border: '1px solid',
+                borderColor: 'divider',
+                bgcolor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.74)',
+              }}
+            >
+              <Stack direction="row" alignItems="center" spacing={0.75} mb={0.75}>
+                <BusinessRounded sx={{ color: 'primary.main', fontSize: 18 }} />
+                <Typography variant="body2" fontWeight={900}>
+                  Organization Brief
+                </Typography>
+              </Stack>
+              <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.65, fontSize: '0.84rem' }}>
+                {organisationAbout}
               </Typography>
             </Box>
 
-            {/* Tech Stack / Skills */}
             <Box>
-              <Typography variant="overline" color="text.secondary" fontWeight={900} sx={{ opacity: 0.5 }}>Tech Stack</Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-                {skills?.map((skill, index) => (
+              <Stack direction="row" alignItems="center" spacing={0.75} mb={1}>
+                <VerifiedRounded sx={{ color: 'primary.main', fontSize: 18 }} />
+                <Typography variant="body2" fontWeight={900}>
+                  Required Stack
+                </Typography>
+              </Stack>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.85 }}>
+                {skillList.map((skill) => (
                   <Chip
-                    key={index}
+                    key={skill}
                     avatar={<Avatar src={getImageMatch(skill)} sx={{ p: 0.2 }} />}
                     label={skill}
-                    size="medium"
+                    size="small"
                     sx={{
-                      borderRadius: '6px',
+                      borderRadius: '8px',
                       fontSize: '0.75rem',
-                      fontWeight: 600,
-                      bgcolor: 'transparent',
+                      fontWeight: 800,
+                      bgcolor: isDarkMode ? 'rgba(255,255,255,0.035)' : 'rgba(5,8,18,0.025)',
                       border: '1px solid',
                       borderColor: 'divider'
                     }}
                   />
                 ))}
+                {skillList.length < 1 && (
+                  <Typography variant="caption" color="text.secondary">
+                    No specific stack listed.
+                  </Typography>
+                )}
               </Box>
             </Box>
 
-            {/* Requirements & Qualifications Unified */}
-            <Stack spacing={2.5}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))" },
+                gap: 1.25,
+              }}
+            >
               {[
-                { label: 'Candidate Qualifications', data: requirements?.qualification },
-                { label: 'Operational Requirements', data: requirements?.description }
+                { label: 'Candidate Qualifications', data: qualificationList, icon: <FactCheckRounded /> },
+                { label: 'Execution Requirements', data: requirementList, icon: <DescriptionRounded /> }
               ].map((section) => (
-                <Box key={section.label}>
-                  <Typography variant="overline" color="primary" fontWeight={900} sx={{ letterSpacing: '0.05rem' }}>
-                    {section.label}
-                  </Typography>
-                  <Stack spacing={1.5} mt={1.5}>
-                    {section.data?.map((item, index) => (
-                      <Stack key={index} direction="row" spacing={2} alignItems="flex-start">
-                        <Box sx={{
-                          mt: 0.9,
-                          width: 5,
-                          height: 5,
-                          borderRadius: '50%',
-                          bgcolor: 'primary.main',
-                          boxShadow: '0 0 8px #D6B25E',
-                          flexShrink: 0
-                        }} />
-                        <Typography variant="body2" sx={{ opacity: 0.85, fontSize: '0.8rem', lineHeight: 1.5 }}>
+                <Box
+                  key={section.label}
+                  sx={{
+                    p: 1.5,
+                    borderRadius: "8px",
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    bgcolor: isDarkMode ? 'rgba(255,255,255,0.028)' : 'rgba(255,255,255,0.68)',
+                    minWidth: 0,
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" spacing={0.75} mb={1.2}>
+                    <Box sx={{ color: 'primary.main', display: 'flex', '& .MuiSvgIcon-root': { fontSize: 18 } }}>
+                      {section.icon}
+                    </Box>
+                    <Typography variant="body2" fontWeight={900}>
+                      {section.label}
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={1}>
+                    {section.data.length > 0 ? section.data.map((item, index) => (
+                      <Stack key={`${section.label}-${index}`} direction="row" spacing={1.1} alignItems="flex-start">
+                        <Box
+                          sx={{
+                            mt: 0.15,
+                            width: 20,
+                            height: 20,
+                            borderRadius: "6px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                            bgcolor: 'rgba(214,178,94,0.12)',
+                            color: 'primary.main',
+                            border: '1px solid rgba(214,178,94,0.22)',
+                            fontSize: "0.68rem",
+                            fontWeight: 900,
+                          }}
+                        >
+                          {index + 1}
+                        </Box>
+                        <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.55 }}>
                           {item}
                         </Typography>
                       </Stack>
-                    ))}
+                    )) : (
+                      <Typography variant="caption" color="text.secondary">
+                        No extra details listed.
+                      </Typography>
+                    )}
                   </Stack>
                 </Box>
               ))}
-            </Stack>
+            </Box>
           </Stack>
         </Box>
 
-        {/* ─── ACTION FOOTER ─── */}
-        {/* ─── ACTION FOOTER ─── */}
         {!isPreview && (
-          <Box sx={{ p: 2.5, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'rgba(255,255,255,0.02)' }}>
+          <Box
+            sx={{
+              p: { xs: 1.5, sm: 2 },
+              borderTop: '1px solid',
+              borderColor: 'divider',
+              bgcolor: isDarkMode ? 'rgba(5,8,18,0.42)' : 'rgba(255,255,255,0.86)',
+            }}
+          >
             {!isEligible ? (
-              <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(245, 158, 11, 0.05)', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
-                <Typography variant="caption" sx={{ color: 'warning.main', textAlign: 'center', display: 'block', fontWeight: 700, letterSpacing: 0.5 }}>
-                  GEOGRAPHIC LOCK: APPLICATIONS RESTRICTED TO RECRUITER'S REGION
+              <Box sx={{ p: 1.35, borderRadius: "8px", bgcolor: 'rgba(245, 158, 11, 0.06)', border: '1px solid rgba(245, 158, 11, 0.24)' }}>
+                <Typography variant="caption" sx={{ color: 'warning.main', textAlign: 'center', display: 'block', fontWeight: 850 }}>
+                  This role is currently limited to applicants in {whitelist}.
                 </Typography>
               </Box>
             ) : (
-              <Stack spacing={2}>
-                {websiteLink === "" ? (
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} alignItems="stretch">
+                {!isExternalApplication ? (
                   <>
-                    {/* CV Metadata & Control Row */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', px: 0.5 }}>
-                      <Box>
-                        <Typography
-                          variant="caption"
-                          fontWeight={900}
-                          color={user?.cvLink || cvUpload ? "primary.main" : "text.secondary"}
-                          sx={{ display: 'block', lineHeight: 1 }}
-                        >
-                          {user?.cvLink || cvUpload ? "CREDENTIALS VERIFIED" : "CREDENTIALS REQUIRED"}
-                        </Typography>
-
-                        {/* Dynamic Metadata Text */}
-                        <Typography variant="caption" sx={{ fontSize: '0.65rem', opacity: 0.6, fontWeight: 600 }}>
-                          {cvUpload
-                            ? `Queued: ${cvUpload.name.substring(0, 15)}...`
-                            : user?.cvLink
-                              ? "Using stored profile CV"
-                              : "Please attach a PDF to proceed"}
-                        </Typography>
-                      </Box>
-
-                      <Stack direction="row" spacing={1}>
-                        {/* Upload/Update Toggle */}
-                        <Button
-                          component="label"
-                          size="small"
-                          variant="text"
-                          sx={{ fontSize: 11, fontWeight: 800, color: 'text.primary' }}
-                          startIcon={<CloudUploadRounded sx={{ fontSize: 16 }} />}
-                        >
-                          {user?.cvLink ? "REPLACE" : "ATTACH"}
-                          <input type="file" hidden accept="application/pdf" onChange={handleCVFile} />
-                        </Button>
-
-                        {/* Conditional View Button: Only shows if a link exists in the profile */}
-                        {user?.cvLink && (
-                          <Button
-                            size="small"
-                            variant="outlined"
-                            onClick={handleDownloadCv}
-                            sx={{
-                              fontSize: 10,
-                              fontWeight: 800,
-                              borderRadius: '6px',
-                              borderColor: 'divider',
-                              px: 1.5
-                            }}
+                    <Box
+                      sx={{
+                        flex: 1,
+                        minWidth: 0,
+                        p: 1.15,
+                        borderRadius: "8px",
+                        border: '1px solid',
+                        borderColor: cvReady ? 'rgba(214,178,94,0.34)' : 'divider',
+                        bgcolor: cvReady ? 'rgba(214,178,94,0.08)' : 'rgba(255,255,255,0.025)',
+                      }}
+                    >
+                      <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between">
+                        <Box minWidth={0}>
+                          <Typography
+                            variant="caption"
+                            fontWeight={900}
+                            color={cvReady ? "primary.main" : "text.secondary"}
+                            display="block"
                           >
-                            VIEW
-                          </Button>
-                        )}
+                            {cvReady ? "CV READY" : "CV REQUIRED"}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" noWrap display="block">
+                            {cvUpload
+                              ? cvUpload.name
+                              : user?.cvLink
+                                ? "Using stored profile CV"
+                                : "Attach a PDF resume"}
+                          </Typography>
+                        </Box>
+                        <DescriptionRounded sx={{ color: cvReady ? 'primary.main' : 'text.secondary', fontSize: 22, flexShrink: 0 }} />
                       </Stack>
                     </Box>
 
-                    {/* Final Submission Action */}
+                    <Stack direction="row" spacing={1} alignItems="stretch">
+                      <Button
+                        component="label"
+                        size="small"
+                        variant="outlined"
+                        sx={{
+                          borderRadius: "8px",
+                          fontWeight: 850,
+                          px: 1.4,
+                          whiteSpace: "nowrap",
+                        }}
+                        startIcon={<CloudUploadRounded sx={{ fontSize: 16 }} />}
+                      >
+                        {user?.cvLink ? "Replace" : "Attach"}
+                        <input type="file" hidden accept="application/pdf" onChange={handleCVFile} />
+                      </Button>
+
+                      {user?.cvLink && (
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={handleDownloadCv}
+                          sx={{
+                            borderRadius: "8px",
+                            fontWeight: 850,
+                            px: 1.4,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          View
+                        </Button>
+                      )}
+                    </Stack>
+
                     <Button
-                      fullWidth
                       variant="contained"
-                      disabled={(!cvUpload && !user?.cvLink) || isUploading || isMyJob}
+                      disabled={!cvReady || isUploading || isDetectingLocation || isMyJob}
                       onClick={handleJobApplication}
-                      endIcon={isMyJob ? <LockRounded /> : <BoltRounded />}
+                      endIcon={isMyJob ? <LockRounded /> : isUploading ? <CircularProgress size={14} color="inherit" /> : <BoltRounded />}
                       sx={{
-                        borderRadius: 2,
-                        py: 1.5,
+                        borderRadius: "8px",
+                        px: 2,
+                        minWidth: { xs: "100%", sm: 168 },
                         fontWeight: 900,
-                        fontSize: '0.8rem',
-                        letterSpacing: '0.05rem',
-                        boxShadow: isDarkMode ? '0 8px 24px rgba(214,178,94, 0.25)' : '0 4px 12px rgba(0,0,0,0.1)',
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 12px 30px rgba(214,178,94, 0.4)',
-                        }
+                        fontSize: '0.78rem',
+                        boxShadow: isDarkMode ? '0 10px 26px rgba(214,178,94, 0.22)' : '0 8px 18px rgba(139,111,42,0.14)',
                       }}
                     >
-                      {isMyJob ? "AUTHOR LISTING" : "SUBMIT APPLICATION"}
+                      {isMyJob ? "Author Listing" : "Submit"}
                     </Button>
                   </>
                 ) : (
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    onClick={handleShowWebsite}
-                    endIcon={<BoltRounded />}
-                    sx={{ borderRadius: 2, py: 1.5, fontWeight: 900 }}
-                  >
-                    CONTINUE TO EXTERNAL PORTAL
-                  </Button>
+                  <>
+                    <Box
+                      sx={{
+                        flex: 1,
+                        minWidth: 0,
+                        p: 1.15,
+                        borderRadius: "8px",
+                        border: '1px solid rgba(214,178,94,0.26)',
+                        bgcolor: 'rgba(214,178,94,0.075)',
+                      }}
+                    >
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <LaunchRounded sx={{ color: 'primary.main', fontSize: 20 }} />
+                        <Box minWidth={0}>
+                          <Typography variant="caption" color="primary.main" fontWeight={900} display="block">
+                            External Portal
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" noWrap display="block">
+                            Continue on the employer application site.
+                          </Typography>
+                        </Box>
+                      </Stack>
+                    </Box>
+                    <Button
+                      variant="contained"
+                      disabled={isDetectingLocation}
+                      onClick={handleShowWebsite}
+                      endIcon={isDetectingLocation ? <CircularProgress size={14} color="inherit" /> : <LaunchRounded />}
+                      sx={{
+                        borderRadius: "8px",
+                        px: 2,
+                        minWidth: { xs: "100%", sm: 210 },
+                        fontWeight: 900,
+                      }}
+                    >
+                      Continue
+                    </Button>
+                  </>
                 )}
               </Stack>
             )}

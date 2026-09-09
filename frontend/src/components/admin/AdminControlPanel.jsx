@@ -4,6 +4,7 @@ import {
   BlockRounded,
   CheckCircleRounded,
   CloseRounded,
+  CloudDownloadRounded,
   DeleteOutlineRounded,
   EmailRounded,
   EventRounded,
@@ -37,6 +38,7 @@ import {
   Pagination,
   Select,
   Stack,
+  Switch,
   Tab,
   Tabs,
   TextField,
@@ -48,6 +50,7 @@ import { alpha } from "@mui/material/styles";
 import axios from "axios";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
+import { resolveVisualAsset } from "../utilities/resolveVisualAsset";
 import { appColors, appGradients } from "../../utils/colors";
 
 const resourceOrder = ["users", "posts", "jobs", "events", "courses"];
@@ -217,15 +220,17 @@ const getRecordProfile = (resource, record) => {
     case "courses":
       return {
         title: record?.course_title || "Untitled course",
-        subtitle: record?.course_instructor?.instructorName || "Instructor",
+        subtitle: record?.externalCourse
+          ? `${record?.externalProvider || record?.course_instructor?.instructorName || "External provider"} course`
+          : record?.course_instructor?.instructorName || "Instructor",
         avatar: record?.course_logo?.logoLink || record?.course_instructor?.instructorAvatar,
         chips: [
           record?.course_category?.main || "Course",
-          `${formatNumber(record?.course_video_lectures?.length)} lessons`,
+          record?.externalCourse ? "External redirect" : `${formatNumber(record?.course_video_lectures?.length)} lessons`,
           `${formatNumber(record?.student_count)} students`,
           `$${record?.price || 0}`,
         ],
-        status: record?.course_edited ? "Updated" : "Published",
+        status: record?.externalCourse ? "External" : record?.course_edited ? "Updated" : "Published",
         statusColor: "info",
       };
     default:
@@ -240,6 +245,8 @@ const getRecordProfile = (resource, record) => {
 };
 
 const getOwnerUserId = (resource, record) => {
+  const sourceOwnerId = record?.ownerId || record?.course_instructor?.instructorId || "";
+  if (record?.source?.name && `${sourceOwnerId}`.startsWith("external-")) return "";
   if (resource === "users") return record?._id;
   if (resource === "posts") return record?.post_owner?.ownerId;
   if (resource === "events") return record?.ownerId;
@@ -292,6 +299,16 @@ export default function AdminControlPanel({ open, onClose }) {
   const [messageTarget, setMessageTarget] = useState(null);
   const [moderationReason, setModerationReason] = useState("");
   const [adminMessage, setAdminMessage] = useState("");
+  const [scrapingJobs, setScrapingJobs] = useState(false);
+  const [jobScrapeSummary, setJobScrapeSummary] = useState(null);
+  const [scrapingEvents, setScrapingEvents] = useState(false);
+  const [eventScrapeSummary, setEventScrapeSummary] = useState(null);
+  const [scrapingCourses, setScrapingCourses] = useState(false);
+  const [courseScrapeSummary, setCourseScrapeSummary] = useState(null);
+  const [adminSettings, setAdminSettings] = useState({
+    jobGeographicApplicationRestriction: false,
+  });
+  const [settingsBusy, setSettingsBusy] = useState(false);
   const isDesktop = useMediaQuery("(min-width:900px)");
 
   const activeMeta = resourceMeta[activeResource];
@@ -339,6 +356,24 @@ export default function AdminControlPanel({ open, onClose }) {
       .finally(() => setLoadingRecords(false));
   }, [activeResource, appliedSearch, open, page]);
 
+  const fetchAdminSettings = useCallback(() => {
+    if (!open) return Promise.resolve();
+
+    return axios
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/admin/settings`, { withCredentials: true })
+      .then((res) => {
+        setAdminSettings({
+          jobGeographicApplicationRestriction: Boolean(res.data?.jobGeographicApplicationRestriction),
+        });
+      })
+      .catch((err) => {
+        setNotice({
+          severity: "error",
+          message: err?.response?.data?.message || "Unable to load admin settings",
+        });
+      });
+  }, [open]);
+
   useEffect(() => {
     setPage(1);
   }, [activeResource, appliedSearch]);
@@ -346,7 +381,8 @@ export default function AdminControlPanel({ open, onClose }) {
   useEffect(() => {
     if (!open) return;
     fetchOverview();
-  }, [fetchOverview, open]);
+    fetchAdminSettings();
+  }, [fetchAdminSettings, fetchOverview, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -499,6 +535,112 @@ export default function AdminControlPanel({ open, onClose }) {
         });
       })
       .finally(() => setActionBusy(""));
+  };
+
+  const handleUpdateJobsFromWeb = () => {
+    setScrapingJobs(true);
+    setJobScrapeSummary(null);
+    axios
+      .post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/admin/jobs/scrape`,
+        { limit: 160, perSourceLimit: 35 },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        setJobScrapeSummary(res.data);
+        setNotice({
+          severity: "success",
+          message: res.data?.message || "Jobs updated from external sources",
+        });
+        return Promise.all([fetchOverview(), fetchRecords()]);
+      })
+      .catch((err) => {
+        setNotice({
+          severity: "error",
+          message: err?.response?.data?.message || "Unable to update jobs from the web",
+        });
+      })
+      .finally(() => setScrapingJobs(false));
+  };
+
+  const handleUpdateEventsFromWeb = () => {
+    setScrapingEvents(true);
+    setEventScrapeSummary(null);
+    axios
+      .post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/admin/events/scrape`,
+        { limit: 140, perSourceLimit: 35 },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        setEventScrapeSummary(res.data);
+        setNotice({
+          severity: "success",
+          message: res.data?.message || "Events updated from external sources",
+        });
+        return Promise.all([fetchOverview(), fetchRecords()]);
+      })
+      .catch((err) => {
+        setNotice({
+          severity: "error",
+          message: err?.response?.data?.message || "Unable to update events from the web",
+        });
+      })
+      .finally(() => setScrapingEvents(false));
+  };
+
+  const handleUpdateCoursesFromWeb = () => {
+    setScrapingCourses(true);
+    setCourseScrapeSummary(null);
+    axios
+      .post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/admin/courses/scrape`,
+        { limit: 140, perSourceLimit: 35 },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        setCourseScrapeSummary(res.data);
+        setNotice({
+          severity: "success",
+          message: res.data?.message || "Courses updated from external sources",
+        });
+        return Promise.all([fetchOverview(), fetchRecords()]);
+      })
+      .catch((err) => {
+        setNotice({
+          severity: "error",
+          message: err?.response?.data?.message || "Unable to update courses from the web",
+        });
+      })
+      .finally(() => setScrapingCourses(false));
+  };
+
+  const handleToggleJobGeoRestriction = (checked) => {
+    setSettingsBusy(true);
+    axios
+      .patch(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/admin/settings`,
+        { jobGeographicApplicationRestriction: checked },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        setAdminSettings({
+          jobGeographicApplicationRestriction: Boolean(res.data?.jobGeographicApplicationRestriction),
+        });
+        setNotice({
+          severity: "success",
+          message: checked
+            ? "Job geographic checks enabled for applications"
+            : "Job geographic checks disabled for applications",
+        });
+      })
+      .catch((err) => {
+        setNotice({
+          severity: "error",
+          message: err?.response?.data?.message || "Unable to update job application settings",
+        });
+      })
+      .finally(() => setSettingsBusy(false));
   };
 
   const renderActions = (record) => {
@@ -819,7 +961,70 @@ export default function AdminControlPanel({ open, onClose }) {
                   </Box>
                 </Stack>
 
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                  {activeResource === "jobs" && (
+                    <Tooltip title="Scrape latest tech jobs">
+                      <span>
+                        <Button
+                          variant="contained"
+                          disabled={scrapingJobs}
+                          onClick={handleUpdateJobsFromWeb}
+                          startIcon={scrapingJobs ? <CircularProgress size={15} color="inherit" /> : <CloudDownloadRounded />}
+                          sx={{
+                            minHeight: 40,
+                            borderRadius: "12px",
+                            textTransform: "none",
+                            fontWeight: 900,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {scrapingJobs ? "Updating" : "Update Jobs"}
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  )}
+                  {activeResource === "events" && (
+                    <Tooltip title="Scrape upcoming tech events">
+                      <span>
+                        <Button
+                          variant="contained"
+                          disabled={scrapingEvents}
+                          onClick={handleUpdateEventsFromWeb}
+                          startIcon={scrapingEvents ? <CircularProgress size={15} color="inherit" /> : <CloudDownloadRounded />}
+                          sx={{
+                            minHeight: 40,
+                            borderRadius: "12px",
+                            textTransform: "none",
+                            fontWeight: 900,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {scrapingEvents ? "Updating" : "Update Events"}
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  )}
+                  {activeResource === "courses" && (
+                    <Tooltip title="Scrape external tech courses">
+                      <span>
+                        <Button
+                          variant="contained"
+                          disabled={scrapingCourses}
+                          onClick={handleUpdateCoursesFromWeb}
+                          startIcon={scrapingCourses ? <CircularProgress size={15} color="inherit" /> : <CloudDownloadRounded />}
+                          sx={{
+                            minHeight: 40,
+                            borderRadius: "12px",
+                            textTransform: "none",
+                            fontWeight: 900,
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {scrapingCourses ? "Updating" : "Update Courses"}
+                        </Button>
+                      </span>
+                    </Tooltip>
+                  )}
                   <TextField
                     size="small"
                     placeholder={`Search ${activeMeta.label.toLowerCase()}`}
@@ -881,6 +1086,35 @@ export default function AdminControlPanel({ open, onClose }) {
 
               <Divider sx={{ borderColor: appColors.divider }} />
 
+              {activeResource === "jobs" && (
+                <Box sx={{ ...metricCardSx }}>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }}>
+                    <Stack direction="row" spacing={1.1} alignItems="center" minWidth={0}>
+                      <WorkRounded sx={{ color: appColors.success }} />
+                      <Box minWidth={0}>
+                        <Typography fontWeight={850} fontSize={14}>
+                          Geographic Application Check
+                        </Typography>
+                        <Typography color={appColors.textSecondary} fontSize={12}>
+                          {adminSettings.jobGeographicApplicationRestriction
+                            ? "Applicants must share location before country-restricted jobs accept submissions."
+                            : "Country restrictions are currently ignored during job applications."}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      {settingsBusy && <CircularProgress size={16} />}
+                      <Switch
+                        checked={adminSettings.jobGeographicApplicationRestriction}
+                        disabled={settingsBusy}
+                        onChange={(event) => handleToggleJobGeoRestriction(event.target.checked)}
+                        inputProps={{ "aria-label": "Toggle job geographic application check" }}
+                      />
+                    </Stack>
+                  </Stack>
+                </Box>
+              )}
+
               <Box
                 sx={{
                   display: "grid",
@@ -912,6 +1146,93 @@ export default function AdminControlPanel({ open, onClose }) {
                 </Box>
               </Box>
 
+              {activeResource === "jobs" && jobScrapeSummary && (
+                <Box sx={{ ...metricCardSx }}>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }}>
+                    <Stack direction="row" spacing={1.1} alignItems="center">
+                      <CloudDownloadRounded sx={{ color: appColors.success }} />
+                      <Box>
+                        <Typography fontWeight={850} fontSize={14}>
+                          Web Job Update
+                        </Typography>
+                        <Typography color={appColors.textSecondary} fontSize={12}>
+                          {formatNumber(jobScrapeSummary.fetched)} fetched | {formatNumber(jobScrapeSummary.structured)} structured | {formatNumber(jobScrapeSummary.inserted)} saved | {formatNumber(jobScrapeSummary.skipped)} skipped
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction="row" spacing={0.7} flexWrap="wrap" useFlexGap>
+                      {(jobScrapeSummary.sources || []).slice(0, 6).map((source) => (
+                        <Chip
+                          key={source.source}
+                          size="small"
+                          label={`${source.source}: ${formatNumber(source.fetched)}`}
+                          color={source.error ? "warning" : "success"}
+                          sx={{ height: 24, fontWeight: 800 }}
+                        />
+                      ))}
+                    </Stack>
+                  </Stack>
+                </Box>
+              )}
+
+              {activeResource === "events" && eventScrapeSummary && (
+                <Box sx={{ ...metricCardSx }}>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }}>
+                    <Stack direction="row" spacing={1.1} alignItems="center">
+                      <CloudDownloadRounded sx={{ color: appColors.accent }} />
+                      <Box>
+                        <Typography fontWeight={850} fontSize={14}>
+                          Web Event Update
+                        </Typography>
+                        <Typography color={appColors.textSecondary} fontSize={12}>
+                          {formatNumber(eventScrapeSummary.fetched)} fetched | {formatNumber(eventScrapeSummary.structured)} structured | {formatNumber(eventScrapeSummary.inserted)} saved | {formatNumber(eventScrapeSummary.skipped)} skipped
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction="row" spacing={0.7} flexWrap="wrap" useFlexGap>
+                      {(eventScrapeSummary.sources || []).slice(0, 6).map((source) => (
+                        <Chip
+                          key={source.source}
+                          size="small"
+                          label={`${source.source}: ${formatNumber(source.fetched)}`}
+                          color={source.error ? "warning" : "success"}
+                          sx={{ height: 24, fontWeight: 800 }}
+                        />
+                      ))}
+                    </Stack>
+                  </Stack>
+                </Box>
+              )}
+
+              {activeResource === "courses" && courseScrapeSummary && (
+                <Box sx={{ ...metricCardSx }}>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} justifyContent="space-between" alignItems={{ xs: "flex-start", sm: "center" }}>
+                    <Stack direction="row" spacing={1.1} alignItems="center">
+                      <CloudDownloadRounded sx={{ color: appColors.magenta }} />
+                      <Box>
+                        <Typography fontWeight={850} fontSize={14}>
+                          Web Course Update
+                        </Typography>
+                        <Typography color={appColors.textSecondary} fontSize={12}>
+                          {formatNumber(courseScrapeSummary.fetched)} fetched | {formatNumber(courseScrapeSummary.structured)} structured | {formatNumber(courseScrapeSummary.inserted)} saved | {formatNumber(courseScrapeSummary.skipped)} skipped
+                        </Typography>
+                      </Box>
+                    </Stack>
+                    <Stack direction="row" spacing={0.7} flexWrap="wrap" useFlexGap>
+                      {(courseScrapeSummary.sources || []).slice(0, 6).map((source) => (
+                        <Chip
+                          key={source.source}
+                          size="small"
+                          label={`${source.source}: ${formatNumber(source.fetched)}`}
+                          color={source.error ? "warning" : "success"}
+                          sx={{ height: 24, fontWeight: 800 }}
+                        />
+                      ))}
+                    </Stack>
+                  </Stack>
+                </Box>
+              )}
+
               {records.length === 0 ? (
                 <EmptyState loading={loadingRecords} label={activeMeta.label} />
               ) : (
@@ -921,8 +1242,8 @@ export default function AdminControlPanel({ open, onClose }) {
                     return (
                       <Box key={record._id} sx={recordRowSx}>
                         <Stack direction="row" spacing={1.35} minWidth={0} alignItems="center">
-                          <Avatar
-                            src={profile.avatar}
+	                          <Avatar
+	                            src={resolveVisualAsset(profile.avatar, profile.chips?.[0])}
                             alt={profile.title}
                             sx={{
                               width: 48,

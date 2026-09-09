@@ -34,7 +34,7 @@ import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../../utilities/CustomDeviceTablet";
 import CustomLandScape from "../../utilities/CustomLandscape";
 import CustomLandscapeWidest from "../../utilities/CustomLandscapeWidest";
-import { getImageMatch } from "../../utilities/getImageMatch";
+import { resolveVisualAsset } from "../../utilities/resolveVisualAsset";
 import { updateCurrentSuccessRedux } from "../../../redux/CurrentSuccess";
 import { ModalWorkflowSteps } from "../ModalShared";
 const LogoutAlert = lazy(() => import("../../alerts/LogoutAlert"));
@@ -66,7 +66,7 @@ const JobPostUpdateModal = ({ openModalJob, setOpenModalJob, job_updated,setMyCu
   const [webLink, setWebLink] = useState(job_updated?.website);
   const [posterAbout, setPosterAbout] = useState(job_updated?.organisation?.about);
   const [showCustomTitle, setShowCustomTitle] = useState(false);
-  const filePreview=getImageMatch(job_updated?.logo);
+  const filePreview=resolveVisualAsset(job_updated?.logo, jobMainSkill?.[0]);
   const freeLogo=job_updated?.logo;
    // To hold user input text for req
   const [reqText, setReqText] = useState("");

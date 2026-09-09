@@ -18,10 +18,22 @@ import ListItemText from "@mui/material/ListItemText";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import ApplyJobModal from "../../modal/ApplyJobModal";
-import CustomDeviceIsSmall from "../../utilities/CustomDeviceIsSmall";
 import { getImageMatch } from "../../utilities/getImageMatch";
+import { resolveVisualAsset } from "../../utilities/resolveVisualAsset";
 
 const MAX_APPLICANTS = 500
+const FALLBACK_SKILL_IMAGE = getImageMatch("");
+
+const getPrioritizedSkillBadges = (skills = []) => {
+  const uniqueSkills = [...new Set((skills || []).filter(Boolean))];
+
+  return uniqueSkills
+    .map((skill) => ({
+      skill,
+      image: getImageMatch(skill),
+    }))
+    .sort((a, b) => Number(b.image !== FALLBACK_SKILL_IMAGE) - Number(a.image !== FALLBACK_SKILL_IMAGE));
+};
 
 
 function FeaturedJobs({ isLoading, jobTop, isLastIndex, setErrorMessage }) {
@@ -40,6 +52,7 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex, setErrorMessage }) {
   const isMyJob = email === jobTop?.my_email || false
 
   const handleCountryName = (job) => {
+    if (!job?.location?.country) return "Global";
     const parent = job.location.country.split(" ");
     const finalName =
       parent.length > 2 ? `${parent[0]} ${parent[1]}` : parent[0];
@@ -63,23 +76,27 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex, setErrorMessage }) {
   const isMaxApplicants =
     jobTop?.applicants?.total === MAX_APPLICANTS ||
     jobTop?.applicants?.total === jobTop?.applicants_max
+  const prioritizedSkills = getPrioritizedSkillBadges(jobTop?.skills);
+  const visibleSkills = prioritizedSkills.slice(0, 4);
+  const hiddenSkillCount = Math.max(prioritizedSkills.length - visibleSkills.length, 0);
 
   return (
     <React.Fragment>
       {isLoadingRequest || isLoading ? (
         <List sx={{ width: "100%", background: "transparent" }}>
-          <ListItem sx={{
-            borderRadius: "12px",
-            mb: 0.8,
-            px: 1.2,
-            py: 1,
-            background: "rgba(255,255,255,0.02)",
-            border: "1px solid rgba(255,255,255,0.06)",
-            transition: "all 0.25s ease",
-
-            "&:hover": {
-              background: "rgba(214,178,94,0.06)",
-              borderColor: "rgba(214,178,94,0.3)",
+	          <ListItem sx={{
+	            borderRadius: "12px",
+	            mb: 0.8,
+	            px: 1.2,
+	            py: 1,
+	            background: "rgba(255,255,255,0.02)",
+	            border: "1px solid rgba(255,255,255,0.06)",
+	            transition: "all 0.25s ease",
+	            alignItems: "flex-start",
+	
+	            "&:hover": {
+	              background: "rgba(214,178,94,0.06)",
+	              borderColor: "rgba(214,178,94,0.3)",
             },
           }}>
             <ListItemAvatar>
@@ -127,7 +144,7 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex, setErrorMessage }) {
             <ListItemAvatar>
               <Avatar
                 variant="rounded"
-                src={getImageMatch(jobTop.logo)}
+                src={resolveVisualAsset(jobTop?.logo, visibleSkills[0]?.skill)}
                 sx={{
                   background: "rgba(255,255,255,0.08)",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -136,15 +153,17 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex, setErrorMessage }) {
                 aria-label="avatar"
               />
             </ListItemAvatar>
-            <ListItemText
-              primary={
-                <Typography
-                  fontSize={13}
-                  fontWeight={600}
-                  color="#FFFDF7"
-                >
-                  {jobTop?.title}
-                </Typography>
+	            <ListItemText
+	              sx={{ minWidth: 0, mr: 1 }}
+	              primary={
+	                <Typography
+	                  fontSize={13}
+	                  fontWeight={600}
+	                  color="#FFFDF7"
+	                  noWrap
+	                >
+	                  {jobTop?.title}
+	                </Typography>
               }
               secondary={
                 <Box>
@@ -172,28 +191,49 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex, setErrorMessage }) {
                   </Box>
 
                   {/* job skills */}
-                  <Box display={"flex"} mt={"2px"}>
-                    <AvatarGroup max={jobTop?.skills?.length}>
-                      {/* loop through the skills and their images matched using custom fn */}
-                      {jobTop?.skills?.map((skill) => (
-                        <Tooltip title={skill} key={skill} arrow>
-                          <Avatar
-                            alt={skill}
-                            className="border"
-                            sx={{
-                              width: 26,
-                              height: 26,
-                              border: "1px solid rgba(255,255,255,0.1)",
-                              background: "rgba(255,255,255,0.05)",
-                            }}
-                            src={getImageMatch(skill)}
-                          />
-                        </Tooltip>
-                      ))}
-                    </AvatarGroup>
-                  </Box>
-                </Box>
-              }
+	                  <Box display={"flex"} mt={"4px"} alignItems={"center"} gap={0.6} minWidth={0}>
+	                    <AvatarGroup
+	                      max={4}
+	                      sx={{
+	                        maxWidth: 116,
+	                        overflow: "hidden",
+	                        "& .MuiAvatar-root": {
+	                          width: 24,
+	                          height: 24,
+	                          fontSize: 10,
+	                          ml: "-5px",
+	                          border: "1px solid rgba(255,255,255,0.16)",
+	                          background: "rgba(255,255,255,0.05)",
+	                        },
+	                      }}
+	                    >
+	                      {/* loop through the skills and their images matched using custom fn */}
+	                      {visibleSkills.map(({ skill, image }) => (
+	                        <Tooltip title={skill} key={skill} arrow>
+	                          <Avatar
+	                            alt={skill}
+	                            className="border"
+	                            src={image}
+	                          />
+	                        </Tooltip>
+	                      ))}
+	                    </AvatarGroup>
+	                    {hiddenSkillCount > 0 && (
+	                      <Typography
+	                        variant="caption"
+	                        sx={{
+	                          color: "rgba(255,253,247,0.58)",
+	                          fontSize: 10,
+	                          fontWeight: 800,
+	                          flexShrink: 0,
+	                        }}
+	                      >
+	                        +{hiddenSkillCount}
+	                      </Typography>
+	                    )}
+	                  </Box>
+	                </Box>
+	              }
             />
 
             <Stack gap={1} alignItems={"center"} justifyContent={"flex-end"}>
@@ -257,6 +297,7 @@ function FeaturedJobs({ isLoading, jobTop, isLastIndex, setErrorMessage }) {
           jobaccesstype={jobTop?.jobtypeaccess}
           salary={jobTop?.salary}
           skills={jobTop?.skills}
+          logo={jobTop?.logo}
           location={jobTop?.location}
           isMyJob={isMyJob}
           whitelist={jobTop?.whitelist}

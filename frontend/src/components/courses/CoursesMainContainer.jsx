@@ -37,7 +37,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { styled, useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
-import React, { Suspense, useLayoutEffect, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -61,6 +61,18 @@ import CourseLayout from "./layout/CourseLayout";
 import CoursePlayer from "./layout/CoursePlayer";
 
 const drawerWidth = CustomDeviceIsSmall() ? 200 : 250;
+const COURSE_PAGE_SIZE = 12;
+const appendUniqueById = (current = [], incoming = []) => {
+  const seen = new Set(current.map((item) => item?._id).filter(Boolean));
+  return [
+    ...current,
+    ...incoming.filter((item) => {
+      if (!item?._id || seen.has(item._id)) return false;
+      seen.add(item._id);
+      return true;
+    }),
+  ];
+};
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -126,6 +138,11 @@ export default function CoursesMainContainer() {
   const [focusedCourse, setFocusedCourse] = useState(null)
   const [isCert, setIsCert] = useState(false)
   const [certData, setCertData] = useState(null)
+  const [pageNumber, setPageNumber] = useState(2)
+  const [hasMoreCourses, setHasMoreCourses] = useState(true)
+  const [isFetchingMore, setIsFetchingMore] = useState(false)
+  const courseInfiniteScrollRef = useRef(null)
+  const lastRequestedPageRef = useRef(0)
 
   // redux states
   const {
@@ -263,13 +280,15 @@ export default function CoursesMainContainer() {
       }
       else {
         axios
-          .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}${isGuest ? "/courses/all/top" : `/courses/all/${user?._id}`}`, {
+          .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/${user?._id || "guest"}?page=1&limit=${COURSE_PAGE_SIZE}`, {
             withCredentials: true,
           })
           .then((res) => {
             // update the redux of current events
             if (res?.data) {
               dispatch(updateCurrentCourses(res.data))
+              setPageNumber(2)
+              setHasMoreCourses(res.data.length === COURSE_PAGE_SIZE)
             }
           })
           .catch(async (err) => {
@@ -473,6 +492,55 @@ export default function CoursesMainContainer() {
     }
 
   }, [dispatch, textOption, user, isGuest, isJobSearchGlobal]);
+
+  const handleFetchMoreCourses = useCallback(() => {
+    if (isGuest || isFetchingMore || !hasMoreCourses || textOption !== "Explore Courses" || focusedCourse) return;
+    if (lastRequestedPageRef.current === pageNumber) return;
+
+    lastRequestedPageRef.current = pageNumber;
+    setIsFetchingMore(true);
+
+    axios
+      .get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/${user?._id || "guest"}?page=${pageNumber}&limit=${COURSE_PAGE_SIZE}`, {
+        withCredentials: true,
+      })
+      .then((res) => {
+        const nextCourses = Array.isArray(res?.data) ? res.data : [];
+        if (nextCourses.length > 0) {
+          dispatch(updateCurrentCourses(appendUniqueById(courses || [], nextCourses)));
+          setPageNumber((prev) => prev + 1);
+        }
+        if (nextCourses.length < COURSE_PAGE_SIZE) {
+          setHasMoreCourses(false);
+        }
+      })
+      .catch((err) => {
+        if (err?.response?.data.login) {
+          window.location.reload();
+          return;
+        }
+        setErrorMessage(err?.code === "ERR_NETWORK" ? "server unreachable" : err?.response?.data);
+      })
+      .finally(() => setIsFetchingMore(false));
+  }, [courses, dispatch, focusedCourse, hasMoreCourses, isFetchingMore, isGuest, pageNumber, textOption, user?._id]);
+
+  useEffect(() => {
+    if (isGuest || !hasMoreCourses || isFetching || isFetchingMore || textOption !== "Explore Courses" || focusedCourse || isCert) return undefined;
+    const target = courseInfiniteScrollRef.current;
+    if (!target) return undefined;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          handleFetchMoreCourses();
+        }
+      },
+      { root: null, rootMargin: "420px 0px", threshold: 0.01 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [focusedCourse, handleFetchMoreCourses, hasMoreCourses, isCert, isFetching, isFetchingMore, isGuest, textOption]);
 
 
 
@@ -1218,6 +1286,37 @@ export default function CoursesMainContainer() {
                                 setErrorMessage={setErrorMessage}
                               />
                             ))}
+
+                            {courses?.length > 0 && !focusedCourse && textOption === "Explore Courses" && (
+                              <Box
+                                ref={courseInfiniteScrollRef}
+                                sx={{
+                                  gridColumn: "1 / -1",
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                  minHeight: 46,
+                                  mt: 1,
+                                }}
+                              >
+                                {isGuest ? (
+                                  <Typography variant="caption" color="text.secondary" textAlign="center" fontWeight={700}>
+                                    Sign in to keep exploring more courses.
+                                  </Typography>
+                                ) : isFetchingMore ? (
+                                  <Stack direction="row" spacing={1} alignItems="center">
+                                    <CircularProgress size={18} />
+                                    <Typography variant="caption" color="text.secondary" fontWeight={700}>
+                                      Loading more courses...
+                                    </Typography>
+                                  </Stack>
+                                ) : !hasMoreCourses && (
+                                  <Typography variant="caption" color="text.secondary" textAlign="center" fontWeight={700}>
+                                    no more courses available at the moment
+                                  </Typography>
+                                )}
+                              </Box>
+                            )}
 
                             {/* rendered if are no events  */}
                             {courses?.length < 1 && (
