@@ -76,6 +76,21 @@ const App = () => {
             width: 0,
             height: 0,
           },
+          ".MuiMenu-paper, .MuiMenu-list, .MuiAutocomplete-listbox": {
+            scrollbarWidth: "thin",
+            msOverflowStyle: "auto",
+            overscrollBehavior: "contain",
+            WebkitOverflowScrolling: "touch",
+          },
+          ".MuiMenu-paper::-webkit-scrollbar, .MuiMenu-list::-webkit-scrollbar, .MuiAutocomplete-listbox::-webkit-scrollbar": {
+            display: "block",
+            width: 6,
+            height: 6,
+          },
+          ".MuiMenu-paper::-webkit-scrollbar-thumb, .MuiMenu-list::-webkit-scrollbar-thumb, .MuiAutocomplete-listbox::-webkit-scrollbar-thumb": {
+            background: "rgba(148,163,184,0.34)",
+            borderRadius: 999,
+          },
           "::selection": {
             backgroundColor: theme.palette.primary.main,
             color: "#080808",

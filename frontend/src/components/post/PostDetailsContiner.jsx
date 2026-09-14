@@ -22,7 +22,7 @@ import {
 } from "@mui/icons-material";
 
 import axios from "axios";
-import React, { lazy, useState } from "react";
+import React, { lazy, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   handleSetPostEditIdModal,
@@ -43,6 +43,7 @@ function PostDetailsContainer({
   isDrawerFocused = false,
   isPostEditMode = false,
   setIsPostEditMode,
+  isFullPageFocused = false,
 }) {
 
   // hold temporarily the post param, could mutate its values
@@ -50,6 +51,8 @@ function PostDetailsContainer({
   const [errorMessage, setErrorMessage] = useState("");
 
   const [comment, setComment] = useState("");
+  const commentComposerRef = useRef(null);
+  const commentInputRef = useRef(null);
   
   // redux states
   const { user } = useSelector((state) => state.currentUser);
@@ -61,6 +64,8 @@ function PostDetailsContainer({
 
   // complete sending of the comment to the backend
   const handleSendCommentNow = () => {
+    if (comment.trim().length < 1 || comment.length > MAX_TEXT_LENGTH) return;
+
      // current user info
       const reactingUserInfo = {
         userId: _id,
@@ -80,7 +85,7 @@ function PostDetailsContainer({
     )}`;
     // add the above properties to the userInfo that is being sent to the backend
     reactingUserInfo.message = message;
-    reactingUserInfo.minimessage = comment;
+    reactingUserInfo.minimessage = comment.trim();
     // add users to the liked clickers group and increment the value of clicks
     setIsUploading(true);
     // performing put request
@@ -147,19 +152,39 @@ function PostDetailsContainer({
 
   }
 
+  const handleFocusCommentComposer = () => {
+    commentComposerRef.current?.scrollIntoView?.({
+      behavior: "smooth",
+      block: "nearest",
+    });
+    window.setTimeout(() => {
+      commentInputRef.current?.focus?.();
+    }, 120);
+  };
+
 
   return (
   
     <Stack
       gap={1.25}
-      maxHeight={isDrawerFocused ? "100%" : "calc(100vh - 118px)"}
       sx={{
-        overflow: "auto",
+        height: isDrawerFocused
+          ? "100%"
+          : isFullPageFocused
+            ? { xs: "auto", lg: "calc(100dvh - 24px)" }
+            : "auto",
+        maxHeight: isDrawerFocused
+          ? "100%"
+          : isFullPageFocused
+            ? { xs: "none", lg: "calc(100dvh - 24px)" }
+            : "calc(100dvh - 118px)",
+        minHeight: 0,
+        overflow: "hidden",
         borderRadius: "8px",
         border: "1px solid rgba(255,255,255,0.10)",
         background: "linear-gradient(180deg, rgba(13,13,13,0.98), rgba(5,5,5,0.96))",
         p: { xs: 1, sm: 1.25 },
-        pb: { xs: 2, lg: 3 },
+        pb: { xs: 1, lg: 1.25 },
         "&::-webkit-scrollbar": {
           display: "none",
         },
@@ -232,7 +257,23 @@ function PostDetailsContainer({
           )}
 
           {/* card container */}
-          <Box p={isDrawerFocused ? 0 : 1}>
+          <Box
+            p={isDrawerFocused ? 0 : 1}
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              overflowY: "auto",
+              overscrollBehavior: "contain",
+              pr: { xs: 0, sm: 0.5 },
+              "&::-webkit-scrollbar": { width: 6 },
+              "&::-webkit-scrollbar-thumb": {
+                background: "rgba(148,163,184,0.28)",
+                borderRadius: 999,
+              },
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(148,163,184,0.28) transparent",
+            }}
+          >
             {/* render post details feed here */}
             <PostDetailsFeed
               postDetailedData={postDetailedData}
@@ -317,75 +358,142 @@ function PostDetailsContainer({
           )}
           
           {/* card container */}
-          <Box >
+          <Box
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                lg: "minmax(0, 1fr) minmax(340px, 0.9fr)",
+              },
+              gap: { xs: 1.25, lg: 1.25 },
+              alignItems: "stretch",
+              overflowY: { xs: "auto", lg: "hidden" },
+              overflowX: "hidden",
+              overscrollBehavior: "contain",
+              pr: { xs: 0, sm: 0.5, lg: 0 },
+              "&::-webkit-scrollbar": { width: 6 },
+              "&::-webkit-scrollbar-thumb": {
+                background: "rgba(148,163,184,0.28)",
+                borderRadius: 999,
+              },
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(148,163,184,0.28) transparent",
+            }}
+          >
             {/* render post details feed here */}
-            <PostDetailsFeed
-              postDetailedData={postDetailedData}
-              setPostDetailedData={setPostDetailedData}
-            />
+            <Box
+              sx={{
+                minHeight: 0,
+                overflowY: { xs: "visible", lg: "auto" },
+                overscrollBehavior: "contain",
+                pr: { lg: 0.5 },
+                "&::-webkit-scrollbar": { width: 6 },
+                "&::-webkit-scrollbar-thumb": {
+                  background: "rgba(148,163,184,0.28)",
+                  borderRadius: 999,
+                },
+                scrollbarWidth: "thin",
+                scrollbarColor: "rgba(148,163,184,0.28) transparent",
+              }}
+            >
+              <PostDetailsFeed
+                postDetailedData={postDetailedData}
+                setPostDetailedData={setPostDetailedData}
+                showFullContent
+                isFocusedLayout
+                onCommentClick={handleFocusCommentComposer}
+              />
+            </Box>
 
-            <Box mt={1.25}>
+            <Box
+              sx={{
+                minHeight: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
+                overflow: { xs: "visible", lg: "hidden" },
+              }}
+            >
+              <Box
+                sx={{
+                  flex: 1,
+                  minHeight: 0,
+                  overflowY: { xs: "visible", lg: "auto" },
+                  overscrollBehavior: "contain",
+                  pr: { lg: 0.5 },
+                  "&::-webkit-scrollbar": { width: 6 },
+                  "&::-webkit-scrollbar-thumb": {
+                    background: "rgba(148,163,184,0.28)",
+                    borderRadius: 999,
+                  },
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "rgba(148,163,184,0.28) transparent",
+                }}
+              >
               <CommentContainer
                 post_comments={postDetailedData?.post_comments?.comments}
                 postId={postDetailedData?._id}
                 setPostDetailedData={setPostDetailedData}
               />
-            </Box>
-          </Box>
+              </Box>
 
-          {/* comment input text  */}
-          <Box
-            display={"flex"}
-            justifyContent={"space-between"}
-            alignItems={"center"}
-            width={"100%"}
-            p={1}
-            mb={1}
-            sx={{
-              position: "sticky",
-              bottom: 0,
-              zIndex: 2,
-              borderRadius: "8px",
-              border: "1px solid rgba(255,255,255,0.10)",
-              background: "rgba(13,13,13,0.94)",
-              backdropFilter: "blur(18px)",
-              boxShadow: "0 16px 40px rgba(0,0,0,0.22)",
-            }}
-          >
-            {/* input for comment */}
-            <Box width={"100%"} mx={1}>
-              <InputBase
-                multiline
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                maxRows={2}
-                disabled={isUploading}
-                className="w-100"
-                placeholder="Add a clear, useful comment..."
+              {/* comment input text  */}
+              <Box
+                ref={commentComposerRef}
+                display={"flex"}
+                justifyContent={"space-between"}
+                alignItems={"center"}
+                width={"100%"}
+                p={1}
                 sx={{
-                  fontSize: "small",
-                  color: "text.primary",
+                  zIndex: 2,
+                  flexShrink: 0,
+                  borderRadius: "8px",
+                  border: "1px solid rgba(255,255,255,0.10)",
+                  background: "linear-gradient(135deg, rgba(13,13,13,0.96), rgba(214,178,94,0.08))",
+                  backdropFilter: "blur(18px)",
+                  boxShadow: "none",
                 }}
-              />
-            </Box>
+              >
+                {/* input for comment */}
+                <Box width={"100%"} mx={1}>
+                  <InputBase
+                    inputRef={commentInputRef}
+                    multiline
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    maxRows={2}
+                    disabled={isUploading}
+                    className="w-100"
+                    placeholder="Add a clear, useful comment..."
+                    sx={{
+                      fontSize: "small",
+                      color: "text.primary",
+                    }}
+                  />
+                </Box>
 
-            {/* send comment button icon */}
-            <Box className=" rounded ms-1 pe-1" alignContent={"center"}>
-              {isUploading ? (
-                <CircularProgress size={17} />
-              ) : (
-                <Badge badgeContent={`${MAX_TEXT_LENGTH - comment.length}`}>
-                  <IconButton
-                    disabled={comment.length > MAX_TEXT_LENGTH || comment.length<1}
-                    onClick={handleSendCommentNow}
-                  >
-                    <SendOutlined
-                      color={comment.length <= MAX_TEXT_LENGTH ? "primary" : "inherit"}
-                      sx={{ width: 18, height: 18 }}
-                    />
-                  </IconButton>
-                </Badge>
-              )}
+                {/* send comment button icon */}
+                <Box className=" rounded ms-1 pe-1" alignContent={"center"}>
+                  {isUploading ? (
+                    <CircularProgress size={17} />
+                  ) : (
+                    <Badge badgeContent={`${MAX_TEXT_LENGTH - comment.length}`}>
+                      <IconButton
+                        disabled={comment.length > MAX_TEXT_LENGTH || comment.trim().length < 1}
+                        onClick={handleSendCommentNow}
+                      >
+                        <SendOutlined
+                          color={comment.length <= MAX_TEXT_LENGTH && comment.trim().length > 0 ? "primary" : "inherit"}
+                          sx={{ width: 18, height: 18 }}
+                        />
+                      </IconButton>
+                    </Badge>
+                  )}
+                </Box>
+              </Box>
             </Box>
           </Box>
 

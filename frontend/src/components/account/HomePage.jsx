@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import Feed from "../feed/Feed";
 import Navbar from "../navbar/Navbar";
@@ -8,12 +9,15 @@ import Sidebar from "../sidebar/Sidebar";
 
 function Homepage() {
   const location = useLocation();
+  const { isPostDetailed } = useSelector((state) => state.appUI);
   const isWorkspaceRoute = [
     "/jobs",
     "/events",
     "/courses/available",
     "/courses/instructor",
   ].some((route) => location.pathname.startsWith(route));
+  const isFocusedPostRoute = location.pathname.startsWith("/posts/details");
+  const isFocusedPostShell = !isWorkspaceRoute && (isPostDetailed || isFocusedPostRoute);
 
   useEffect(() => {
     const handleSidebarWheel = (event) => {
@@ -73,27 +77,35 @@ function Homepage() {
         backgroundAttachment: "fixed",
       }}
     >
-      {!isWorkspaceRoute && <Navbar />}
+      {!isWorkspaceRoute && !isFocusedPostShell && <Navbar />}
       <Box
         sx={{
           width: "100%",
-          maxWidth: isWorkspaceRoute ? "none" : { xs: "100%", lg: "1128px", xl: "1188px" },
+          maxWidth: isWorkspaceRoute
+            ? "none"
+            : isFocusedPostShell
+              ? { xs: "100%", lg: "1160px", xl: "1240px" }
+              : { xs: "100%", lg: "1128px", xl: "1188px" },
           mx: "auto",
-          px: isWorkspaceRoute ? { xs: 0, lg: 0 } : { xs: 1, sm: 1.5, md: 2, lg: 1.5, xl: 0 },
-          pb: { xs: 10, lg: 4 },
+          px: isWorkspaceRoute
+            ? { xs: 0, lg: 0 }
+            : isFocusedPostShell
+              ? { xs: 0.75, sm: 1.25, lg: 2 }
+              : { xs: 1, sm: 1.5, md: 2, lg: 1.5, xl: 0 },
+          pb: isFocusedPostShell ? { xs: 1, lg: 2 } : { xs: 10, lg: 4 },
           display: "flex",
           flexWrap: "nowrap",
           justifyContent: "center",
           alignItems: "flex-start",
-          gap: { xs: 0, sm: 1.5, md: 2, lg: 2 },
+          gap: isFocusedPostShell ? 0 : { xs: 0, sm: 1.5, md: 2, lg: 2 },
           overflowX: "hidden",
-          height: { lg: isWorkspaceRoute ? "100vh" : "calc(100vh - 56px)" },
+          height: { lg: isWorkspaceRoute || isFocusedPostShell ? "100vh" : "calc(100vh - 56px)" },
           overflowY: { lg: "hidden" },
         }}
       >
-        <Sidebar />
+        {!isFocusedPostShell && <Sidebar />}
         <Feed />
-        <Righbar />
+        {!isFocusedPostShell && <Righbar />}
       </Box>
     </Box>
   );

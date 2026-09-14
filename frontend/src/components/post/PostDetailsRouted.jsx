@@ -3,7 +3,7 @@ import axios from "axios";
 import { useLayoutEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { handleShowingSpeedDial } from "../../redux/AppUI";
+import { handleShowingSpeedDial, handleUpdateIsPostDetailed } from "../../redux/AppUI";
 import PageNotFound from "../notfound/PageNotFound";
 import PostRoutedFeed from "./PostRoutedFeed";
 
@@ -27,6 +27,7 @@ function PostDetailsRouted() {
   useLayoutEffect(() => {
     // close the showing of the speed dial
     dispatch(handleShowingSpeedDial(false));
+    dispatch(handleUpdateIsPostDetailed(true));
 
     // set is fetching to true
     setIsUploading(true);
@@ -47,31 +48,37 @@ function PostDetailsRouted() {
         if (err?.code === "ERR_NETWORK") {
           setErrorMessage("server is unreachable");
         }
-        setErrorMessage(err?.response.data);
+        setErrorMessage(err?.response?.data || "Unable to load post.");
       })
       .finally(() => {
         // set is fetching to false
         setIsUploading(false);
       });
+    return () => {
+      dispatch(handleShowingSpeedDial(true));
+      dispatch(handleUpdateIsPostDetailed(false));
+    };
   }, [postId, dispatch]);
 
   return (
     <Box
       sx={{
         width: "100%",
-        maxWidth: { xs: "100%", lg: 580 },
+        maxWidth: { xs: "100%", lg: 1160, xl: 1240 },
         mx: "auto",
-        minHeight: "calc(100vh - 72px)",
-        px: { xs: 1, sm: 1.25, lg: 0 },
-        pt: { xs: 1, sm: 1.5 },
+        minHeight: "100dvh",
+        px: { xs: 0.5, sm: 1, lg: 0 },
+        py: { xs: 0.75, sm: 1.25, lg: 1.5 },
       }}
     >
       <Box
         sx={{
+          height: { xs: "auto", lg: "calc(100dvh - 24px)" },
+          minHeight: { xs: "calc(100dvh - 16px)", lg: 0 },
           border: "1px solid",
           borderColor: isDarkMode ? "rgba(255,255,255,0.10)" : "rgba(139,111,42,0.12)",
           borderRadius: "8px",
-          overflowX: "hidden",
+          overflow: { xs: "visible", lg: "hidden" },
           background: isDarkMode ? "rgba(8,8,8,0.82)" : "rgba(255,255,255,0.88)",
           "&::-webkit-scrollbar": {
             display: "none",

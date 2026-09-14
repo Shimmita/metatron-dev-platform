@@ -9,6 +9,9 @@ export default function CommentContainer({ post_comments,postId,setPostDetailedD
     <Box
       sx={{
         overflow: "visible",
+        borderRadius: "8px",
+        border: "1px solid rgba(255,255,255,0.10)",
+        background: "linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.018))",
       }}
     >
       <Stack
@@ -17,9 +20,10 @@ export default function CommentContainer({ post_comments,postId,setPostDetailedD
         justifyContent="space-between"
         gap={1}
         sx={{
-          px: 1,
+          px: { xs: 1, sm: 1.25 },
           py: 1,
           borderBottom: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(214,178,94,0.045)",
         }}
       >
         <Box display="flex" alignItems="center" gap={1}>

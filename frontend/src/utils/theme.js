@@ -3,6 +3,32 @@ import { appColors, appGradients } from "./colors";
 
 const createAppTheme = (mode = "dark") => {
   const isDark = mode === "dark";
+  const scrollableOverlayPaper = {
+    maxHeight: "min(420px, calc(100dvh - 96px))",
+    overflowY: "auto",
+    overscrollBehavior: "contain",
+    WebkitOverflowScrolling: "touch",
+    "&::-webkit-scrollbar": { width: 6 },
+    "&::-webkit-scrollbar-thumb": {
+      background: "rgba(148,163,184,0.34)",
+      borderRadius: 999,
+    },
+    scrollbarWidth: "thin",
+    scrollbarColor: "rgba(148,163,184,0.34) transparent",
+  };
+  const compactScrollableList = {
+    maxHeight: "min(384px, calc(100dvh - 120px))",
+    overflowY: "auto",
+    overscrollBehavior: "contain",
+    WebkitOverflowScrolling: "touch",
+    "&::-webkit-scrollbar": { width: 6 },
+    "&::-webkit-scrollbar-thumb": {
+      background: "rgba(148,163,184,0.34)",
+      borderRadius: 999,
+    },
+    scrollbarWidth: "thin",
+    scrollbarColor: "rgba(148,163,184,0.34) transparent",
+  };
 
   const palette = {
     mode,
@@ -171,7 +197,28 @@ const createAppTheme = (mode = "dark") => {
       },
 
       /* ─── Menus & Popovers (Readability Fix) ─── */
+      MuiSelect: {
+        defaultProps: {
+          MenuProps: {
+            PaperProps: {
+              sx: scrollableOverlayPaper,
+            },
+            MenuListProps: {
+              sx: compactScrollableList,
+            },
+          },
+        },
+      },
+
       MuiMenu: {
+        defaultProps: {
+          PaperProps: {
+            sx: scrollableOverlayPaper,
+          },
+          MenuListProps: {
+            sx: compactScrollableList,
+          },
+        },
         styleOverrides: {
           paper: {
             background: isDark
@@ -185,9 +232,10 @@ const createAppTheme = (mode = "dark") => {
               : "0 22px 55px rgba(20,15,5,0.16)",
             marginTop: "8px",
             borderRadius: 8,
-            overflow: "hidden",
+            ...scrollableOverlayPaper,
             color: isDark ? appColors.textPrimary : "#171717",
           },
+          list: compactScrollableList,
         },
       },
 
@@ -205,6 +253,7 @@ const createAppTheme = (mode = "dark") => {
               : "0 22px 55px rgba(20,15,5,0.16)",
             borderRadius: 8,
             color: isDark ? appColors.textPrimary : "#171717",
+            ...scrollableOverlayPaper,
           },
         },
       },
@@ -222,12 +271,12 @@ const createAppTheme = (mode = "dark") => {
               ? "0 24px 70px rgba(0,0,0,0.72)"
               : "0 22px 55px rgba(20,15,5,0.16)",
             color: isDark ? appColors.textPrimary : "#171717",
-            overflow: "hidden",
+            ...scrollableOverlayPaper,
           },
           listbox: {
             padding: 6,
             background: "transparent",
-            maxHeight: 280,
+            ...compactScrollableList,
             "& .MuiAutocomplete-option": {
               borderRadius: 8,
               margin: "3px 0",

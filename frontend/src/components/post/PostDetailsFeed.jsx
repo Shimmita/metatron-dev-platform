@@ -35,11 +35,11 @@ import React, { lazy, useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import AlertReportPost from "../alerts/AlertReportPost";
 import CardFeedMore from "../custom/CardFeedMore";
+import PostMediaCarousel, { getPostMediaItems } from "../custom/PostMediaCarousel";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
-import { getImageMatch } from "../utilities/getImageMatch";
 const AlertMiniProfileView = lazy(() =>
   import("../alerts/AlertMiniProfileView")
 );
@@ -87,6 +87,9 @@ const PostDetailsFeed = ({
   postDetailedData,
   setPostDetailedData,
   isPostEditMode = false,
+  showFullContent = false,
+  isFocusedLayout = false,
+  onCommentClick,
 }) => {
 
 
@@ -123,7 +126,7 @@ const PostDetailsFeed = ({
   const { count: post_comment_count } = postDetailedData?.post_comments || {};
 
   // extract the counts of github clicks
-  const { clicks: post_github_clicks } = postDetailedData.post_github || {};
+  const { clicks: post_github_clicks, link: post_github_link } = postDetailedData.post_github || {};
 
   const post_likes = post_clicks;
 
@@ -138,11 +141,15 @@ const PostDetailsFeed = ({
       (commentors) => commentors.userId === _id
     );
 
+  const currentUserClickedGithub = postDetailedData?.post_github?.clickers?.some(
+    (clickerId) => clickerId === _id
+  );
+
     
   // controls the length of description shown for each devices
   const max_description = CustomDeviceIsSmall() ? 122 : 220;
   const details = postDetailedData?.post_body || "";
-  const detailsLong = details.length > max_description;
+  const detailsLong = !showFullContent && details.length > max_description;
 
   // get country name
   const country = CustomCountryName(postDetailedData?.post_location?.country);
@@ -248,18 +255,39 @@ const PostDetailsFeed = ({
     setIsFullDescription((prev) => !prev);
   };
 
-  // handle the image incorporated in the post for some is free logo
-  // other is custom uploaded to the cloud
-  const handlePostImagePresent = () => {
-    // if the url name of the image present in the logo names use getImage fn
-    const arrayFreeLogoName = getImageMatch("", true)[0];
-    if (arrayFreeLogoName?.includes(postDetailedData?.post_url)) {
-      // they used free logo images, return the matching image using getImage
-      return getImageMatch(postDetailedData?.post_url);
-    }
+  const handleGithubClicks = () => {
+    if (!post_github_link) return;
 
-    // the user possibly uploaded the image to cloud thus return the url incorporated
-    return postDetailedData?.post_url;
+    let message = "viewed your github link";
+    let minimessage = postDetailedData?.post_title?.substring(0, 40) + "...";
+
+    reactingUserInfo.message = message;
+    reactingUserInfo.minimessage = minimessage;
+    setIsUploading(true);
+
+    axios
+      .put(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/posts/update/github`,
+        reactingUserInfo,
+        {
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        setPostDetailedData(res.data);
+        window.open(post_github_link, "__blank__");
+      })
+      .catch(async (err) => {
+        if (err?.code === "ERR_NETWORK") {
+          setMessageResponse("Server Unreachable");
+          return;
+        }
+
+        setMessageResponse(err?.response?.data || "Unable to open GitHub link.");
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
   };
 
   // handle updating of the post
@@ -313,7 +341,7 @@ const PostDetailsFeed = ({
       setOpenMiniProfileAlert(true)
       }
 
-  const postImageSrc = handlePostImagePresent();
+  const postMediaItems = getPostMediaItems(postDetailedData);
   const categoryTags = [
     postDetailedData?.post_category?.sub1,
     postDetailedData?.post_category?.sub2,
@@ -337,9 +365,16 @@ const PostDetailsFeed = ({
       onClick: handlePostLikes,
     },
     {
-      icon: <GitHub sx={{ width: 18, height: 18 }} />,
+      icon: (
+        <GitHub
+          sx={{ width: 18, height: 18 }}
+          color={currentUserClickedGithub ? "primary" : undefined}
+        />
+      ),
       count: post_github_clicks,
       title: "Github",
+      onClick: handleGithubClicks,
+      disabled: !post_github_link,
     },
     {
       icon: (
@@ -350,6 +385,7 @@ const PostDetailsFeed = ({
       ),
       count: post_comment_count,
       title: "comment",
+      onClick: onCommentClick,
     },
   ];
 
@@ -392,22 +428,28 @@ const PostDetailsFeed = ({
         sx={{
           opacity: openMenu && !isDarkMode ? 0.88 : 1,
           borderRadius: "8px",
-          border: "1px solid rgba(255,255,255,0.10)",
+          border: isFocusedLayout ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(255,255,255,0.10)",
           background: isDarkMode
-            ? "linear-gradient(180deg, rgba(18,18,18,0.96), rgba(5,5,5,0.98))"
+            ? isFocusedLayout
+              ? "rgba(10,10,10,0.72)"
+              : "linear-gradient(180deg, rgba(18,18,18,0.96), rgba(5,5,5,0.98))"
             : "rgba(255,255,255,0.96)",
-          boxShadow: isDarkMode
-            ? "0 18px 48px rgba(0,0,0,0.28)"
-            : "0 14px 34px rgba(139,111,42,0.08)",
+          boxShadow: isFocusedLayout
+            ? "none"
+            : isDarkMode
+              ? "0 18px 48px rgba(0,0,0,0.28)"
+              : "0 14px 34px rgba(139,111,42,0.08)",
           overflow: "hidden",
         }}
       >
-        <Box
-          sx={{
-            height: 3,
-            background: "linear-gradient(90deg, #8B6F2A, #D6B25E, rgba(255,242,194,0.86))",
-          }}
-        />
+        {!isFocusedLayout && (
+          <Box
+            sx={{
+              height: 3,
+              background: "linear-gradient(90deg, #8B6F2A, #D6B25E, rgba(255,242,194,0.86))",
+            }}
+          />
+        )}
         <CardHeader
           sx={{
             px: { xs: 1.25, sm: 1.75 },
@@ -516,38 +558,70 @@ const PostDetailsFeed = ({
         <Box>
           <CardContent sx={{ px: { xs: 1.5, sm: 2 }, py: 2 }}>
             <Box mb={2} width={"100%"}>
-              <Box mb={1} display="flex" justifyContent="center">
-                {/* post specialization */}
-                <Typography
-                  variant="caption"
-                  textAlign={"center"}
-                  fontWeight={900}
-                  color="primary.main"
-                  sx={{
-                    px: 1.25,
-                    py: 0.45,
-                    borderRadius: "8px",
-                    background: "rgba(214,178,94,0.10)",
-                    border: "1px solid rgba(214,178,94,0.22)",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {postDetailedData.post_category.main}
-                </Typography>
-              </Box>
-
+              <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" mb={1.25}>
+                {postDetailedData?.post_category?.main && (
+                  <Box
+                    sx={{
+                      px: 1.1,
+                      py: 0.4,
+                      borderRadius: "8px",
+                      background: "linear-gradient(135deg, rgba(214,178,94,0.14), rgba(255,255,255,0.035))",
+                      border: "1px solid rgba(214,178,94,0.25)",
+                    }}
+                  >
+                    <Typography variant="caption" color="primary.main" fontWeight={900}>
+                      {postDetailedData.post_category.main}
+                    </Typography>
+                  </Box>
+                )}
+                {locationLabel && (
+                  <Box
+                    sx={{
+                      px: 1,
+                      py: 0.35,
+                      borderRadius: "8px",
+                      background: isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(139,111,42,0.05)",
+                      border: "1px solid rgba(214,178,94,0.14)",
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      {locationLabel}
+                    </Typography>
+                  </Box>
+                )}
+              </Stack>
               <Box
                 display={"flex"}
-                justifyContent={"center"}
-                alignItems={"center"}
+                justifyContent={"flex-start"}
+                alignItems={"flex-start"}
                 gap={1}
               >
-                <CodeRounded sx={{ color: "primary.main", fontSize: 20 }} />
+                <CodeRounded sx={{ color: "primary.main", fontSize: 20, mt: 0.35 }} />
                 {/* title of the post */}
-                <Typography variant="h6" fontWeight={900} textAlign="center" lineHeight={1.25}>
+                <Typography variant="h6" fontWeight={900} lineHeight={1.25}>
                   {postDetailedData.post_title}
                 </Typography>
               </Box>
+              {!isPostEditMode && categoryTags.length > 0 && (
+                <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" mt={1.25}>
+                  {categoryTags.map((tag) => (
+                    <Box
+                      key={tag}
+                      sx={{
+                        px: 1,
+                        py: 0.3,
+                        borderRadius: "8px",
+                        background: isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(139,111,42,0.06)",
+                        border: "1px solid rgba(214,178,94,0.16)",
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        #{tag}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              )}
             </Box>
 
             {isPostEditMode ? (
@@ -620,8 +694,8 @@ const PostDetailsFeed = ({
                     variant={"body2"}
                     maxWidth="100%"
                   >
-                    {!isFullDescription && handleDetailsLength()}
-                    {detailsLong && !isFullDescription && (
+                    {showFullContent || isFullDescription ? details : handleDetailsLength()}
+                    {detailsLong && !isFullDescription && !showFullContent && (
                       <Typography
                         variant="body2"
                         component={"span"}
@@ -632,64 +706,21 @@ const PostDetailsFeed = ({
                         &nbsp; Read more
                       </Typography>
                     )}
-                    {isFullDescription && details}
                   </Typography>
                 </Box>
               </CardActionArea>
             )}
 
-            {!isPostEditMode && categoryTags.length > 0 && (
-              <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" mt={1.25}>
-                {categoryTags.map((tag) => (
-                  <Box
-                    key={tag}
-                    sx={{
-                      px: 1,
-                      py: 0.3,
-                      borderRadius: "8px",
-                      background: isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(139,111,42,0.06)",
-                      border: "1px solid rgba(214,178,94,0.16)",
-                    }}
-                  >
-                    <Typography variant="caption" color="text.secondary">
-                      #{tag}
-                    </Typography>
-                  </Box>
-                ))}
-              </Stack>
-            )}
           </CardContent>
 
           {/* display image or log if is not in edit mode */}
 
-          {!isPostEditMode && postImageSrc && (
-            <Box display={"flex"} justifyContent={"center"} width={"100%"} px={{ xs: 1.5, sm: 2 }} pb={2}>
-              <Box
-                sx={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  background: "rgba(255,255,255,0.03)",
-                  aspectRatio: { xs: "4 / 3", sm: "16 / 9" },
-                }}
-              >
-                <Box
-                  component="img"
-                  sx={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                  }}
-                  src={postImageSrc}
-                  loading="lazy"
-                  alt={postDetailedData?.post_title || "Post media"}
-                />
-              </Box>
-            </Box>
+          {!isPostEditMode && (
+            <PostMediaCarousel
+              items={postMediaItems}
+              title={postDetailedData?.post_title}
+              isFocusedLayout={isFocusedLayout}
+            />
           )}
         </Box>
 
@@ -704,20 +735,24 @@ const PostDetailsFeed = ({
           sx={{
             borderTop: "1px solid rgba(255,255,255,0.08)",
               background: "rgba(255,255,255,0.02)",
+              position: "relative",
+              zIndex: 1,
             }}
           >
             <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" justifyContent="center" width="100%">
-              {actionItems.map(({ icon, count, title, onClick }) => (
+              {actionItems.map(({ icon, count, title, onClick, disabled }) => (
                 <Tooltip key={title} title={title} arrow>
                   <span>
                     <Button
                       onClick={onClick}
-                      disabled={isUploading || isGuest || !onClick}
+                      type="button"
+                      disabled={isUploading || isGuest || disabled}
+                      onMouseDown={(event) => event.stopPropagation()}
                       variant="text"
                       startIcon={icon}
                       endIcon={title === "Github" ? <OpenInNewRounded sx={{ width: 14, height: 14 }} /> : undefined}
                       sx={{
-                        minWidth: { xs: "48%", sm: 118 },
+                        minWidth: { xs: "31%", sm: 118 },
                         px: 1.5,
                         py: 0.6,
                         borderRadius: "8px",

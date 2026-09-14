@@ -143,7 +143,12 @@ function PostDetailsInDrawer({
 
   return (
     <Stack 
-    gap={1} 
+    gap={1}
+    sx={{
+      height: "100%",
+      minHeight: 0,
+      overflow: "hidden",
+    }}
     >
       
     <Box
@@ -202,7 +207,23 @@ function PostDetailsInDrawer({
     )}
 
     {/* card container */}
-    <Box p={isDrawerFocused ? 0 : 2}>
+    <Box
+      p={isDrawerFocused ? 0 : 2}
+      sx={{
+        flex: 1,
+        minHeight: 0,
+        overflowY: "auto",
+        overscrollBehavior: "contain",
+        pr: { xs: 0, sm: 0.5 },
+        "&::-webkit-scrollbar": { width: 6 },
+        "&::-webkit-scrollbar-thumb": {
+          background: "rgba(148,163,184,0.28)",
+          borderRadius: 999,
+        },
+        scrollbarWidth: "thin",
+        scrollbarColor: "rgba(148,163,184,0.28) transparent",
+      }}
+    >
     {/* render post details feed here */}
     <PostDetailsFeed
         postDetailedData={postDetailedData}
@@ -228,6 +249,7 @@ function PostDetailsInDrawer({
         p={1}
         mb={5}
         sx={{
+          flexShrink: 0,
           borderRadius: "8px",
           border: "1px solid rgba(255,255,255,0.10)",
           background: "rgba(255,255,255,0.055)",

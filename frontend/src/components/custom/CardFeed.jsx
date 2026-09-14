@@ -42,9 +42,9 @@ import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
-import { getImageMatch } from "../utilities/getImageMatch";
 import CardFeedMore from "./CardFeedMore";
 import PostImagePreviewDialog from "./PostImagePreviewDialog";
+import PostMediaCarousel, { getPostMediaItems } from "./PostMediaCarousel";
 
 const POST_PAGE_SIZE = 12;
 const appendUniqueById = (current = [], incoming = []) => {
@@ -79,6 +79,7 @@ const CardFeed = ({
   const [postWholeReport, setPostWholeReport] = useState("");
   const [openAlertGeneral, setOpenAlertGeneral] = useState(false);
   const [openImagePreview, setOpenImagePreview] = useState(false);
+  const [selectedImageSrc, setSelectedImageSrc] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [hasMorePosts, setHasMorePosts] = useState(true);
   const infiniteScrollRef = useRef(null);
@@ -170,7 +171,6 @@ const CardFeed = ({
     .join(" • ");
   const popupMeta = [post?.post_category?.main, locationLabel, getElapsedTime(post?.createdAt)]
     .filter(Boolean);
-  const engagementSummary = actionItems => actionItems.reduce((sum, item) => sum + (item.count || 0), 0);
   const actionLabel = (value) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
 
   useEffect(() => {
@@ -236,15 +236,6 @@ const CardFeed = ({
     setIsFullDescription((prev) => !prev);
   };
 
-  const handlePostImagePresent = () => {
-    const arrayFreeLogoName = getImageMatch("", true)[0];
-    if (arrayFreeLogoName?.includes(post?.post_url)) {
-      return getImageMatch(post?.post_url);
-    }
-
-    return post?.post_url;
-  };
-
   const handleShowFullPostComments = () => {
     dispatch(handleUpdateIsPostDetailed(true));
     setPostDetailedData(post);
@@ -254,8 +245,9 @@ const CardFeed = ({
     setOpenMiniProfileAlert(true);
   }, []);
 
-  const handleOpenImagePreview = () => {
-    if (postImageSrc) {
+  const handleOpenImagePreview = (item) => {
+    if (item?.src || postImageSrc) {
+      setSelectedImageSrc(item?.src || postImageSrc);
       setOpenImagePreview(true);
     }
   };
@@ -265,12 +257,13 @@ const CardFeed = ({
   };
 
   const handleDownloadImage = async () => {
-    if (!postImageSrc) {
+    const imageSrc = selectedImageSrc || postImageSrc;
+    if (!imageSrc) {
       return;
     }
 
     try {
-      const response = await fetch(postImageSrc);
+      const response = await fetch(imageSrc);
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -286,7 +279,7 @@ const CardFeed = ({
       link.remove();
       window.URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      window.open(postImageSrc, "_blank", "noopener,noreferrer");
+      window.open(imageSrc, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -352,7 +345,8 @@ const CardFeed = ({
     return () => observer.disconnect();
   }, [handleFetchMoreData, hasMorePosts, isFetching, isGuest, isLastIndex]);
 
-  const postImageSrc = handlePostImagePresent();
+  const postMediaItems = getPostMediaItems(post);
+  const postImageSrc = postMediaItems[0]?.src || "";
 
   const actionItems = [
     {
@@ -561,7 +555,7 @@ const CardFeed = ({
 
       <CardContent sx={{ pt: 0.5, pb: postImageSrc ? 2 : 2.5 }}>
         <Box mb={1.2}>
-          <Box display="flex" alignItems="center" justifyContent="space-between" gap={1} flexWrap="wrap">
+          <Box display="flex" alignItems="center" gap={0.75} flexWrap="wrap">
             <Box display="flex" gap={0.75} flexWrap="wrap">
               {locationLabel && (
                 <Box
@@ -594,9 +588,6 @@ const CardFeed = ({
                 </Box>
               )}
             </Box>
-            <Typography variant="caption" color="text.secondary" fontWeight={700}>
-              {engagementSummary(actionItems)} signals
-            </Typography>
           </Box>
 
           <Box mt={1.25} display="flex" alignItems="flex-start" gap={1}>
@@ -672,54 +663,11 @@ const CardFeed = ({
         </CardActionArea>
       </CardContent>
 
-      {postImageSrc && (
-        <Box px={2} pb={2} display="flex" flexDirection="column" justifyContent="center" width="100%">
-          <CardActionArea
-            onClick={handleOpenImagePreview}
-            sx={{
-              width: "100%",
-              borderRadius: "8px",
-              overflow: "hidden",
-              border: "1px solid",
-              borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(139,111,42,0.12)",
-              background: "rgba(255,255,255,0.02)",
-              backdropFilter: "blur(10px)",
-              borderTop: "1px solid rgba(255,255,255,0.06)",
-            }}
-          >
-            <Box
-              sx={{
-                position: "relative",
-                width: "100%",
-                borderRadius: "8px",
-                overflow: "hidden",
-                border: "1px solid rgba(255,255,255,0.08)",
-                background: isDarkMode ? "#050505" : "rgba(255,255,255,0.7)",
-                aspectRatio: { xs: "4 / 3", sm: post?.post_type === "image" ? "4 / 3" : "16 / 9" },
-                maxHeight: { sm: 560 },
-              }}
-            >
-              <Box
-                component="img"
-                src={postImageSrc}
-                alt={post?.post_title}
-                loading="lazy"
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                  transition: "transform 0.4s ease",
-
-                  "&:hover": {
-                    transform: "scale(1.03)",
-                  },
-                }}
-              />
-            </Box>
-          </CardActionArea>
-        </Box>
-      )}
+      <PostMediaCarousel
+        items={postMediaItems}
+        title={post?.post_title}
+        onImageClick={handleOpenImagePreview}
+      />
 
       <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
       <Box
@@ -742,7 +690,7 @@ const CardFeed = ({
                   startIcon={icon}
                   endIcon={key === "github" && post_github_link ? <OpenInNewRounded sx={{ width: 14, height: 14 }} /> : undefined}
                   sx={{
-                    minWidth: { xs: "48%", sm: 120 },
+                    minWidth: { xs: "31%", sm: 120 },
                     px: 1.5,
                     py: 0.6,
                     justifyContent: "center",
@@ -836,7 +784,7 @@ const CardFeed = ({
      <PostImagePreviewDialog
     details={details}
     postTitle={post?.post_title}
-    postImageSrc={postImageSrc}
+    postImageSrc={selectedImageSrc || postImageSrc}
     open={openImagePreview}
     onClose={handleCloseImagePreview}
     onDownload={handleDownloadImage}

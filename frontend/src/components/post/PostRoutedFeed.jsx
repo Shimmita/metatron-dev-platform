@@ -8,24 +8,28 @@ import {
   IconButton,
   InputBase,
   Stack,
+  Tooltip,
   Typography,
 } from "@mui/material";
 
-import { ArrowBackRounded, Close, SendOutlined } from "@mui/icons-material";
+import { ArrowBackRounded, Close, ForumRounded, SendOutlined } from "@mui/icons-material";
 
 import axios from "axios";
-import React, { lazy, useState } from "react";
+import React, { lazy, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import CustomCountryName from "../utilities/CustomCountryName";
 import PostDetailsFeed from "./PostDetailsFeed";
 import { useNavigate } from "react-router-dom";
 
 const CommentContainer = lazy(() => import("./CommentContainer"));
+const MAX_TEXT_LENGTH = 100;
 
 function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [comment, setComment] = useState("");
+  const commentComposerRef = useRef(null);
+  const commentInputRef = useRef(null);
   const navigate=useNavigate()
   // axios default credentials
   axios.defaults.withCredentials = true;
@@ -38,6 +42,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
 
   // complete sending of the comment to the backend
   const handleSendCommentNow = () => {
+    if (comment.trim().length < 1 || comment.length > MAX_TEXT_LENGTH) return;
     
       // current user info
       const reactingUserInfo = {
@@ -58,7 +63,7 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
     )}`;
     // add the above properties to the userInfo that is being sent to the backend
     reactingUserInfo.message = message;
-    reactingUserInfo.minimessage = comment;
+    reactingUserInfo.minimessage = comment.trim();
     // add users to the liked clickers group and increment the value of clicks
     setIsUploading(true);
     // performing post request
@@ -93,9 +98,26 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
       navigate('/explore')
     }
 
+  const handleFocusCommentComposer = () => {
+    commentComposerRef.current?.scrollIntoView?.({
+      behavior: "smooth",
+      block: "nearest",
+    });
+    window.setTimeout(() => {
+      commentInputRef.current?.focus?.();
+    }, 120);
+  };
+
 
   return (
-    <Stack gap={1.25}>
+    <Stack
+      gap={1.25}
+      sx={{
+        height: { xs: "auto", lg: "100%" },
+        minHeight: 0,
+        overflow: { xs: "visible", lg: "hidden" },
+      }}
+    >
 
       {/* display error */}
       {errorMessage && (
@@ -130,95 +152,165 @@ function PostRoutedFeed({ postDetailedData, setPostDetailedData }) {
           background: "linear-gradient(135deg, rgba(13,13,13,0.94), rgba(214,178,94,0.08))",
         }}
       >
-        <Box minWidth={0}>
-          <Typography variant="body2" fontWeight={900}>
-            Focused Post
-          </Typography>
-          <Typography variant="caption" color="text.secondary" noWrap>
-            Opened from notifications
-          </Typography>
+        <Box display="flex" alignItems="center" gap={1} minWidth={0}>
+          <ForumRounded sx={{ color: "primary.main", fontSize: 18 }} />
+          <Box minWidth={0}>
+            <Typography variant="body2" fontWeight={900}>
+              Focused Post
+            </Typography>
+            <Typography variant="caption" color="text.secondary" noWrap>
+              {postDetailedData?.post_comments?.count || 0} comments in discussion
+            </Typography>
+          </Box>
         </Box>
+        <Tooltip title="Back to feed" arrow>
           <Button
           onClick={handleBackToFeed}
           startIcon={<ArrowBackRounded />} 
           size="small"
           variant="contained"
-          sx={{ borderRadius: "8px", flexShrink: 0 }}
+          sx={{ borderRadius: "8px", flexShrink: 0, fontWeight: 900 }}
         >
             Back to feed
           </Button>
+        </Tooltip>
       </Box>
 
       {/* card container */}
-      <Box p={0}>
-        {/* render post details feed here */}
-        <PostDetailsFeed
-          postDetailedData={postDetailedData}
-          setPostDetailedData={setPostDetailedData}
-        />
-
-        {!isGuest && (
-          <React.Fragment>
-
-        {/* all user comments container pass the comments of the post */}
-        <Box mt={1}>
-          <CommentContainer
-            post_comments={postDetailedData?.post_comments.comments}
-          />
-        </Box>
-
-        {/* comment input text  */}
       <Box
-        display={"flex"}
-        justifyContent={"space-between"}
-        alignItems={"center"}
-        width={"100%"}
-        p={2}
-        mt={1}
         sx={{
-          borderRadius: "8px",
-          border: "1px solid rgba(255,255,255,0.10)",
-          background: "rgba(255,255,255,0.055)",
+          flex: 1,
+          minHeight: 0,
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            lg: "minmax(0, 1fr) minmax(340px, 0.9fr)",
+          },
+          gap: { xs: 1.25, lg: 1.25 },
+          alignItems: "stretch",
+          overflowY: { xs: "auto", lg: "hidden" },
+          overflowX: "hidden",
+          overscrollBehavior: "contain",
+          "&::-webkit-scrollbar": { width: 6 },
+          "&::-webkit-scrollbar-thumb": {
+            background: "rgba(148,163,184,0.28)",
+            borderRadius: 999,
+          },
+          scrollbarWidth: "thin",
+          scrollbarColor: "rgba(148,163,184,0.28) transparent",
         }}
       >
-        {/* input for comment */}
-        <Box className='rounded' width={"100%"}>
-          <InputBase
-            multiline
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            maxRows={2}
-            disabled={isUploading}
-            className="w-100 rounded"
-            placeholder="Add a clear, useful comment..."
-            sx={{
-              fontSize: "small",
-            }}
+        <Box
+          sx={{
+            minHeight: 0,
+            overflowY: { xs: "visible", lg: "auto" },
+            overscrollBehavior: "contain",
+            pr: { lg: 0.5 },
+            "&::-webkit-scrollbar": { width: 6 },
+            "&::-webkit-scrollbar-thumb": {
+              background: "rgba(148,163,184,0.28)",
+              borderRadius: 999,
+            },
+            scrollbarWidth: "thin",
+            scrollbarColor: "rgba(148,163,184,0.28) transparent",
+          }}
+        >
+          <PostDetailsFeed
+            postDetailedData={postDetailedData}
+            setPostDetailedData={setPostDetailedData}
+            showFullContent
+            isFocusedLayout
+            onCommentClick={handleFocusCommentComposer}
           />
         </Box>
 
-        {/* send comment button icon */}
-        <Box className=" t rounded ms-1" alignContent={"center"}>
-          {isUploading ? (
-            <CircularProgress size={17} />
-          ) : (
-            <Badge badgeContent={`${100 - comment.length}`}>
-              <IconButton
-                disabled={comment.length > 100}
-                onClick={handleSendCommentNow}
-              >
-                <SendOutlined
-                  color={comment.length <= 100 ? "primary" : "inherit"}
-                  sx={{ width: 18, height: 18 }}
+        <Box
+          sx={{
+            minHeight: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            overflow: { xs: "visible", lg: "hidden" },
+          }}
+        >
+          <Box
+            sx={{
+              flex: 1,
+              minHeight: 0,
+              overflowY: { xs: "visible", lg: "auto" },
+              overscrollBehavior: "contain",
+              pr: { lg: 0.5 },
+              "&::-webkit-scrollbar": { width: 6 },
+              "&::-webkit-scrollbar-thumb": {
+                background: "rgba(148,163,184,0.28)",
+                borderRadius: 999,
+              },
+              scrollbarWidth: "thin",
+              scrollbarColor: "rgba(148,163,184,0.28) transparent",
+            }}
+          >
+            <CommentContainer
+              post_comments={postDetailedData?.post_comments?.comments}
+              postId={postDetailedData?._id}
+              setPostDetailedData={setPostDetailedData}
+            />
+          </Box>
+
+          {!isGuest && (
+            <Box
+              ref={commentComposerRef}
+              display={"flex"}
+              justifyContent={"space-between"}
+              alignItems={"center"}
+              width={"100%"}
+              p={1}
+              sx={{
+                zIndex: 2,
+                flexShrink: 0,
+                borderRadius: "8px",
+                border: "1px solid rgba(255,255,255,0.10)",
+                background: "linear-gradient(135deg, rgba(13,13,13,0.96), rgba(214,178,94,0.08))",
+                backdropFilter: "blur(18px)",
+                boxShadow: "none",
+              }}
+            >
+              <Box className='rounded' width={"100%"} mx={1}>
+                <InputBase
+                  inputRef={commentInputRef}
+                  multiline
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  maxRows={2}
+                  disabled={isUploading}
+                  className="w-100 rounded"
+                  placeholder="Add a clear, useful comment..."
+                  sx={{
+                    fontSize: "small",
+                    color: "text.primary",
+                  }}
                 />
-              </IconButton>
-            </Badge>
+              </Box>
+
+              <Box className=" t rounded ms-1" alignContent={"center"}>
+                {isUploading ? (
+                  <CircularProgress size={17} />
+                ) : (
+                  <Badge badgeContent={`${MAX_TEXT_LENGTH - comment.length}`}>
+                    <IconButton
+                      disabled={comment.length > MAX_TEXT_LENGTH || comment.trim().length < 1}
+                      onClick={handleSendCommentNow}
+                    >
+                      <SendOutlined
+                        color={comment.length <= MAX_TEXT_LENGTH && comment.trim().length > 0 ? "primary" : "inherit"}
+                        sx={{ width: 18, height: 18 }}
+                      />
+                    </IconButton>
+                  </Badge>
+                )}
+              </Box>
+            </Box>
           )}
         </Box>
-      </Box>
-          </React.Fragment>
-        )}
-
       </Box>
 
     </Stack>

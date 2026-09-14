@@ -98,7 +98,7 @@ export default function PostReaction({ reaction }) {
     dispatch(showMessagingDrawer());
 
     // navigate
-    navigate("posts/details/" + reaction?.postId);
+    navigate("/posts/details/" + reaction?.postId);
   };
 
   const ReactionIcon = reaction?.message?.toLowerCase().includes("github")

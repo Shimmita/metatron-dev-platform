@@ -47,7 +47,7 @@ const FeedDefaultContent = () => {
   const [pageNumber, setPageNumber] = useState(2);
 
   const { posts } = useSelector((state) => state.currentPosts);
-  const { currentMode, isDefaultSpeedDial } = useSelector(
+  const { currentMode, isDefaultSpeedDial, isPostDetailed } = useSelector(
     (state) => state.appUI
   );
   const { user, isGuest } = useSelector((state) => state.currentUser);
@@ -274,12 +274,14 @@ const FeedDefaultContent = () => {
   return (
     <Box
       sx={{
-        minHeight: "calc(100vh - 120px)",
-        px: { xs: 1, sm: 1.25, lg: 0 },
+        minHeight: postDetailedData ? "100%" : "calc(100vh - 120px)",
+        px: postDetailedData ? 0 : { xs: 1, sm: 1.25, lg: 0 },
         width: "100%",
-        maxWidth: { xs: "100%", lg: 540, xl: 580 },
+        maxWidth: postDetailedData || isPostDetailed
+          ? { xs: "100%", lg: 1160, xl: 1240 }
+          : { xs: "100%", lg: 540, xl: 580 },
         mx: "auto",
-        pb: { xs: 1, lg: 2 },
+        pb: postDetailedData ? 0 : { xs: 1, lg: 2 },
       }}
     >
       {/* 🔥 POST DETAIL VIEW */}
@@ -292,6 +294,7 @@ const FeedDefaultContent = () => {
           <PostDetailsContainer
             postDetailedData={postDetailedData}
             setPostDetailedData={setPostDetailedData}
+            isFullPageFocused
           />
         </Box>
       ) : (

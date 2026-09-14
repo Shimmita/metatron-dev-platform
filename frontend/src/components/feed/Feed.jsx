@@ -44,6 +44,8 @@ const Feed = () => {
     "/courses/available",
     "/courses/instructor",
   ].some((route) => location.pathname.startsWith(route));
+  const isFocusedPostRoute = location.pathname.startsWith("/posts/details");
+  const isFocusedPostView = isPostDetailed || isFocusedPostRoute;
 
   useLayoutEffect(() => {
     dispatch(handleShowingSpeedDial(true));
@@ -60,18 +62,22 @@ const Feed = () => {
       component="main"
       sx={{
         width: "100%",
-        maxWidth: isWorkspaceRoute ? "100%" : { xs: "100%", lg: 540, xl: 580 },
+        maxWidth: isWorkspaceRoute || isFocusedPostView
+          ? "100%"
+          : { xs: "100%", lg: 540, xl: 580 },
         minWidth: 0,
-        flex: isWorkspaceRoute ? "1 1 100%" : { sm: "1 1 0", lg: "0 0 540px", xl: "0 0 580px" },
+        flex: isWorkspaceRoute || isFocusedPostView
+          ? "1 1 100%"
+          : { sm: "1 1 0", lg: "0 0 540px", xl: "0 0 580px" },
         minHeight: { xs: "100vh", lg: 0 },
         height: { lg: "100%" },
-        overflowY: { lg: "auto" },
+        overflowY: { lg: isFocusedPostView ? "hidden" : "auto" },
         overflowX: "hidden",
         overscrollBehavior: { lg: "contain" },
         display: "flex",
         flexDirection: "column",
         // Keep the last feed items clear of the floating navigation dock.
-        pb: isDefaultBottomNav ? { xs: 14, md: 15, lg: 16 } : 0,
+        pb: isDefaultBottomNav && !isFocusedPostView ? { xs: 14, md: 15, lg: 16 } : 0,
         transition: "padding 0.3s ease",
       }}
     >
@@ -124,7 +130,7 @@ const Feed = () => {
         )}
 
         {/* Optimized Bottom Navigation */}
-        {isDefaultBottomNav && !isLoadingPostLaunch && (
+        {isDefaultBottomNav && !isLoadingPostLaunch && !isFocusedPostView && (
           <Suspense fallback={null}>
             <BottomNav />
           </Suspense>

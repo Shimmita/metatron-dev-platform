@@ -1,5 +1,6 @@
 import {
   CloudUploadRounded,
+  DeleteRounded,
   DiamondRounded,
   PostAddRounded,
   Settings
@@ -8,13 +9,15 @@ import {
   Avatar,
   Box,
   Button,
+  IconButton,
   MenuItem,
   styled,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { lazy, useEffect, useState } from "react";
+import { lazy, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { updateCurrentBottomNav } from "../../redux/CurrentBottomNav";
@@ -26,7 +29,15 @@ import SubsectionTech from "../data/SubsectionTech";
 import BrowserCompress from "../utilities/BrowserCompress";
 import CourseIcon from "../utilities/CourseIcon";
 import { getImageMatch } from "../utilities/getImageMatch";
-import { ModalBody, ModalHeader, ModalShell, SectionCard, SectionTitle, StatusBanner } from "./ModalShared";
+import {
+  ModalBody,
+  ModalHeader,
+  ModalShell,
+  ModalWorkflowSteps,
+  SectionCard,
+  SectionTitle,
+  StatusBanner
+} from "./ModalShared";
 
 const LogoutAlert = lazy(() => import("../alerts/LogoutAlert"));
 const AlertInput = lazy(() => import("../alerts/AlertInput"));
@@ -49,6 +60,8 @@ const StyledInput = styled("input")({
 
 // array for image names and values
 const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
+const MAX_POST_IMAGES = 3;
+const MAX_IMAGE_DESCRIPTION = 140;
 
 const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [postCategory, setPostCategory] = useState("");
@@ -58,7 +71,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [gitHub, setGitHub] = useState("");
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
-  const [fileUpload, setFileUpload] = useState(null);
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const uploadedImagesRef = useRef([]);
   const [filePreview, setFilePreview] = useState(null);
   const [freeLogo, setFreeLogo] = useState("");
   const [isFreeLogo, setIsFreeLogo] = useState(false);
@@ -160,7 +174,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   // handle showing free logo menu
   const handleShowFreeLogo = () => {
     // clear file uploaded if any
-    setFileUpload(null);
+    uploadedImages.forEach((image) => URL.revokeObjectURL(image.preview));
+    setUploadedImages([]);
     // set true link video full
     setIsFreeLogo(true);
   };
@@ -191,13 +206,61 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     handleCloseFreeLogo()
 
     // update file events
-    const file = event.target.files[0];
-    // compress the file using the custom utility created
-    const compressedFile = await BrowserCompress(file);
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+    if (uploadedImages.length + files.length > MAX_POST_IMAGES) {
+      setErrorMessage(`You can attach up to ${MAX_POST_IMAGES} images`);
+      event.target.value = "";
+      return;
+    }
 
-    setFileUpload(compressedFile);
-    // create an object from URI of the image for local preview
-    setFilePreview(URL.createObjectURL(compressedFile));
+    // compress the file using the custom utility created
+    const compressedFiles = await Promise.all(
+      files.map(async (file) => {
+        const compressedFile = await BrowserCompress(file);
+        return compressedFile || file;
+      })
+    );
+
+    setUploadedImages(
+      (currentImages) => [
+        ...currentImages,
+        ...compressedFiles.map((file, index) => ({
+          file,
+          preview: URL.createObjectURL(file),
+          description: "",
+          position: currentImages.length + index + 1,
+        })),
+      ]
+    );
+    setFilePreview(null);
+    event.target.value = "";
+  };
+
+  const handleImageDescriptionChange = (index, value) => {
+    setUploadedImages((currentImages) =>
+      currentImages.map((image, imageIndex) =>
+        imageIndex === index
+          ? { ...image, description: value.slice(0, MAX_IMAGE_DESCRIPTION) }
+          : image
+      )
+    );
+  };
+
+  const handleRemoveUploadedImage = (index) => {
+    const imageToRemove = uploadedImages[index];
+    if (imageToRemove?.preview) {
+      URL.revokeObjectURL(imageToRemove.preview);
+    }
+
+    setUploadedImages((currentImages) =>
+      currentImages
+        .filter((_, imageIndex) => imageIndex !== index)
+        .map((image, imageIndex) => ({
+          ...image,
+          position: imageIndex + 1,
+        }))
+    );
   };
 
   // handle core missing fields
@@ -210,7 +273,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       setErrorMessage("Description field is required");
       return false;
     }
-    if (postCategory?.trim === "") {
+    if (postCategory?.trim() === "") {
       setErrorMessage("specialisation field is required");
       return false;
     }
@@ -252,7 +315,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       return false;
     }
 
-    if (!freeLogo && !fileUpload) {
+    if (!freeLogo && uploadedImages.length === 0) {
       setErrorMessage("provide image for this post");
       return false;
     }
@@ -273,9 +336,15 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       // append post body after stringify it due to form data
       formData.append("post", JSON.stringify(post));
 
-      // check if file is present then upload append it for upload
-      if (fileUpload) {
-        formData.append("image", fileUpload);
+      // check if files are present then append them for upload
+      if (uploadedImages.length > 0) {
+        formData.append(
+          "post_image_descriptions",
+          JSON.stringify(uploadedImages.map((image) => image.description.trim()))
+        );
+        uploadedImages.forEach((image) => {
+          formData.append("images", image.file);
+        });
       }
 
       // performing post request
@@ -331,6 +400,72 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     setOpenModalTech(false);
   };
 
+  useEffect(() => {
+    uploadedImagesRef.current = uploadedImages;
+  }, [uploadedImages]);
+
+  useEffect(() => {
+    return () => {
+      uploadedImagesRef.current.forEach((image) => URL.revokeObjectURL(image.preview));
+    };
+  }, []);
+
+  const hasCoreDetails = Boolean(
+    title.trim() &&
+    title.length <= 50 &&
+    description.trim() &&
+    description.length <= 1000
+  );
+  const hasSpecialisation = Boolean(postCategory && (!postCategory.includes("Zero") || other.trim()));
+  const hasBackendDetails = !postCategory.includes("Backend") || Boolean(backend && database);
+  const hasFrontendDetails =
+    !postCategory.includes("Frontend") || Boolean(frontend && frontendUI);
+  const hasFullstackDetails =
+    postCategory !== "Fullstack App Development" ||
+    Boolean(frontend && frontendUI && backend && database);
+  const hasSimpleCategoryDetails =
+    ![
+      "Containerization and Orchestration",
+      "Artificial Intelligence",
+      "Data Science and Analytics",
+      "Cybersecurity Engineering",
+      "Desktop App Development",
+      "Game App Development",
+      "Programming Languages",
+      "Cloud Computing",
+      "DevOps Engineering",
+      "UI/UX Design",
+      "Native Android App Development",
+      "Native IOS App Development",
+      "Multiplatform Mobile Development",
+      "Database Administration",
+    ].includes(postCategory) || Boolean(category1 || database);
+  const hasCategoryDetails = Boolean(
+    hasSpecialisation &&
+    hasBackendDetails &&
+    hasFrontendDetails &&
+    hasFullstackDetails &&
+    hasSimpleCategoryDetails
+  );
+  const hasMedia = Boolean(freeLogo || uploadedImages.length > 0);
+  const techWorkflowSteps = [
+    { label: "Post details", helper: "Title and professional summary" },
+    { label: "Tech focus", helper: "Specialisation and stack details" },
+    { label: "Media", helper: `Add 1-${MAX_POST_IMAGES} image cards` },
+    { label: "Reach", helper: "Optional repository and community" },
+    { label: "Publish", helper: "Review readiness and submit" },
+  ];
+  const techStepChecks = [
+    hasCoreDetails,
+    hasCategoryDetails,
+    hasMedia,
+    true,
+    hasCoreDetails && hasCategoryDetails && hasMedia,
+  ];
+  const techActiveStepIndex = techStepChecks.findIndex((isReady) => !isReady);
+  const techActiveStep =
+    techActiveStepIndex === -1 ? techWorkflowSteps.length - 1 : techActiveStepIndex;
+
 
   return (
     <ModalShell
@@ -349,6 +484,14 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         errorMessage={errorMessage}
         onDismiss={() => setErrorMessage("")}
         isUploading={isUploading}
+      />
+
+      <ModalWorkflowSteps
+        steps={techWorkflowSteps.map((step, index) => ({
+          ...step,
+          completed: techStepChecks[index],
+        }))}
+        activeStep={techActiveStep}
       />
 
       <ModalBody>
@@ -371,6 +514,36 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 placeholder="React CheatSheet"
                 fullWidth
                 onChange={(e) => setTitle(e.target.value)}
+              />
+            </Box>
+          </SectionCard>
+
+          <SectionCard>
+            <SectionTitle variant="h6">Post Description</SectionTitle>
+            <Typography
+              variant="body2"
+              mb={2}
+              color={"text.secondary"}>
+              Write a concise, professional summary that explains the context, the technical decisions, and the value of what you are sharing.
+            </Typography>
+
+            <Box mb={2}>
+              <TextField
+                minRows={5}
+                multiline
+                disabled={isUploading}
+                contentEditable={false}
+                error={description.length > 1000}
+                id="description-body-post"
+                label={
+                  <p>
+                    {`Description  ${1000 - description.length} characters`} *
+                  </p>
+                }
+                fullWidth
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Summarize the milestone, approach, tools used, and what kind of feedback or collaboration you are looking for."
               />
             </Box>
           </SectionCard>
@@ -417,7 +590,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
             {/* other category */}
             {postCategory.includes('Zero') && (
               <Box className="mb-2">
-                <Typography variant="body2" mb={2} color={"text.secondary"} mb={2}>
+                <Typography variant="body2" mb={2} color={"text.secondary"}>
                   You have selected option other, provide the other specialization or category
                   that your post aims to address.
                 </Typography>
@@ -1091,26 +1264,153 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
 
 
           <SectionCard>
-            <SectionTitle variant="h6">Post Image</SectionTitle>
+            <SectionTitle variant="h6">Post Media</SectionTitle>
             <Typography
               gutterBottom
               mb={2}
               variant="body2"
               color={"text.secondary"}>
-              Add a clear cover image that helps people understand your update quickly as they scroll through the feed.
+              Add up to {MAX_POST_IMAGES} images. Each image can include a brief note that explains what people are looking at.
             </Typography>
 
             {/* preview the file uploaded from storage */}
-            {(fileUpload || freeLogo) && (
+            {freeLogo && (
               <Box display={"flex"} justifyContent={"center"}>
                 <img
                   src={filePreview}
-                  alt=""
+                  alt="Selected post logo"
                   className="rounded"
                   style={{
                     maxWidth: 100,
                   }}
                 />
+              </Box>
+            )}
+
+            {uploadedImages.length > 0 && (
+              <Box mb={2}>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  gap={1}
+                  mb={1}
+                >
+                  <Typography variant="caption" color="text.secondary" fontWeight={800}>
+                    {uploadedImages.length}/{MAX_POST_IMAGES} images added
+                  </Typography>
+                  {uploadedImages.length > 1 && (
+                    <Typography variant="caption" color="primary.main" fontWeight={900}>
+                      Scroll to review
+                    </Typography>
+                  )}
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    overflowX: uploadedImages.length > 1 ? "auto" : "hidden",
+                    scrollSnapType: uploadedImages.length > 1 ? "x mandatory" : "none",
+                    pb: uploadedImages.length > 1 ? 0.75 : 0,
+                    "&::-webkit-scrollbar": { height: 6 },
+                    "&::-webkit-scrollbar-thumb": {
+                      background: "rgba(214,178,94,0.34)",
+                      borderRadius: 999,
+                    },
+                    scrollbarWidth: "thin",
+                    scrollbarColor: "rgba(214,178,94,0.34) transparent",
+                  }}
+                >
+                  {uploadedImages.map((image, index) => (
+                    <Box
+                      key={`${image.file.name}-${index}`}
+                      sx={{
+                        flex:
+                          uploadedImages.length > 1
+                            ? { xs: "0 0 86%", sm: "0 0 58%", md: "0 0 46%" }
+                            : "1 1 100%",
+                        minWidth: 0,
+                        scrollSnapAlign: "start",
+                        border: "1px solid rgba(139,111,42,0.14)",
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        background: "rgba(255,255,255,0.56)",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          position: "relative",
+                          aspectRatio: "4 / 3",
+                          background: "rgba(0,0,0,0.06)",
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src={image.preview}
+                          alt={`Uploaded media ${index + 1}`}
+                          sx={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            display: "block",
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            position: "absolute",
+                            top: 8,
+                            left: 8,
+                            px: 1,
+                            py: 0.35,
+                            borderRadius: "8px",
+                            background: "rgba(3,7,18,0.72)",
+                            color: "#fff",
+                            backdropFilter: "blur(12px)",
+                            border: "1px solid rgba(255,255,255,0.18)",
+                          }}
+                        >
+                          <Typography variant="caption" fontWeight={900}>
+                            Image {index + 1}
+                          </Typography>
+                        </Box>
+                        <Tooltip title="Remove image" arrow>
+                          <IconButton
+                            size="small"
+                            disabled={isUploading}
+                            onClick={() => handleRemoveUploadedImage(index)}
+                            sx={{
+                              position: "absolute",
+                              top: 6,
+                              right: 6,
+                              color: "#fff",
+                              background: "rgba(3,7,18,0.66)",
+                              border: "1px solid rgba(255,255,255,0.18)",
+                              "&:hover": {
+                                background: "rgba(239,68,68,0.72)",
+                              },
+                            }}
+                          >
+                            <DeleteRounded sx={{ width: 16, height: 16 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+
+                      <Box p={1}>
+                        <TextField
+                          fullWidth
+                          multiline
+                          minRows={2}
+                          disabled={isUploading}
+                          value={image.description}
+                          label={`Image ${index + 1} brief ${MAX_IMAGE_DESCRIPTION - image.description.length}`}
+                          placeholder="Add a short note for this image"
+                          onChange={(e) => handleImageDescriptionChange(index, e.target.value)}
+                        />
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
               </Box>
             )}
 
@@ -1180,9 +1480,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               <Button
                 component="label"
                 role={undefined}
-                variant={fileUpload ? "outlined" : "text"}
+                variant={uploadedImages.length > 0 ? "outlined" : "text"}
                 disableElevation
-                disabled={isUploading}
+                disabled={isUploading || uploadedImages.length >= MAX_POST_IMAGES}
                 tabIndex={-1}
                 id="upload_text_btn"
                 sx={{
@@ -1192,12 +1492,15 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                 }}
                 startIcon={<CloudUploadRounded />}
               >
-                Upload
+                {uploadedImages.length >= MAX_POST_IMAGES
+                  ? "Maximum reached"
+                  : uploadedImages.length > 0
+                    ? `Add image ${uploadedImages.length + 1}`
+                    : "Add image"}
                 <StyledInput
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
-                  multiple
                 />
               </Button>
             </Box>
@@ -1269,37 +1572,6 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   ))}
 
               </TextField>
-            </Box>
-          </SectionCard>
-
-          <SectionCard>
-            <SectionTitle variant="h6">Post Description</SectionTitle>
-            {/* description */}
-            <Typography
-              variant="body2"
-              mb={2}
-              color={"text.secondary"}>
-              Write a concise, professional summary that explains the context, the technical decisions, and the value of what you are sharing.
-            </Typography>
-
-            <Box mb={2}>
-              <TextField
-                minRows={5}
-                multiline
-                disabled={isUploading}
-                contentEditable={false}
-                error={description.length > 1000}
-                id="description-body-post"
-                label={
-                  <p>
-                    {`Description  ${1000 - description.length} characters`} *
-                  </p>
-                }
-                fullWidth
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Summarize the milestone, approach, tools used, and what kind of feedback or collaboration you are looking for."
-              />
             </Box>
           </SectionCard>
 

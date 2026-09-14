@@ -257,7 +257,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
         alignItems="flex-start"
         sx={{
           borderBottom: "1px solid rgba(255,255,255,0.07)",
-          background: "linear-gradient(90deg, rgba(255,255,255,0.018), transparent)",
+          background: "linear-gradient(90deg, rgba(255,255,255,0.024), transparent)",
           alignItems: "flex-start",
           px: { xs: 0.75, sm: 1 },
           py: 1.4,
@@ -266,7 +266,7 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
           },
         }}
       >
-        <ListItemAvatar onClick={handleMiniProfileView}>
+        <ListItemAvatar onClick={handleMiniProfileView} sx={{ minWidth: { xs: 44, sm: 52 } }}>
           <Avatar
             alt=""
             src={commenter?.avatar}
@@ -283,7 +283,9 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
             <Box
               display={"flex"}
               justifyContent={"space-between"}
-              alignItems={"center"}
+              alignItems={"flex-start"}
+              gap={1}
+              flexWrap="wrap"
             >
               <Typography
                 variant={"body2"}
@@ -331,7 +333,13 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                 <Typography
                   variant={"body2"}
                   component={'span'}
-                  sx={{ color: "text.primary", fontSize:'small', lineHeight: 1.75 }}
+                  sx={{
+                    color: "text.primary",
+                    fontSize:'small',
+                    lineHeight: 1.75,
+                    overflowWrap: "anywhere",
+                    whiteSpace: "pre-line",
+                  }}
                 >
                   {commenter?.minimessage}
 
@@ -425,11 +433,21 @@ export default function CommentUser({ comment: commenter, postId, setPostDetaile
                   ) : (
                     <Badge badgeContent={`${MAX_TEXT_LENGTH - replyText.length}`}>
                       <IconButton
-                        disabled={replyText.length > MAX_TEXT_LENGTH || replyText===commenter?.minimessage}
+                        disabled={
+                          replyText.trim().length < 1 ||
+                          replyText.length > MAX_TEXT_LENGTH ||
+                          replyText === commenter?.minimessage
+                        }
                         onClick={isEditing ? handleCompleteUpdateComment: handleCompleteSendingReply}
                       >
                         <SendOutlined
-                          color={replyText.length <= MAX_TEXT_LENGTH && replyText!==commenter?.minimessage ? "primary" : "inherit"}
+                          color={
+                            replyText.trim().length > 0 &&
+                            replyText.length <= MAX_TEXT_LENGTH &&
+                            replyText !== commenter?.minimessage
+                              ? "primary"
+                              : "inherit"
+                          }
                           sx={{ width: 16, height: 16 }}
                         />
                       </IconButton>

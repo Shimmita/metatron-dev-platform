@@ -13,35 +13,36 @@ const FeedDefaultSearch = () => {
 
   // Redux states
   const { posts, isPostSearch } = useSelector((state) => state.currentPosts);
-  const { currentMode, isDefaultSpeedDial } = useSelector((state) => state.appUI);
+  const { currentMode } = useSelector((state) => state.appUI);
   const isDarkMode = currentMode === 'dark';
 
-  /* ─── THE FIX: Wrap dispatch in useEffect ─── */
   useEffect(() => {
-    // Only hide it if it's currently showing
-    if (isDefaultSpeedDial) {
-      dispatch(handleShowingSpeedDial(false));
-    }
+    dispatch(handleShowingSpeedDial(false));
 
-    // OPTIONAL: Bring it back when the user leaves this page
     return () => {
       dispatch(handleShowingSpeedDial(true));
     };
-  }, [dispatch]); // Empty dependency array means this runs once on mount
+  }, [dispatch]);
 
   const handleRefreshHome = () => {
     navigate('/explore');
   };
 
   return (
-    <Box sx={{ overflow: 'hidden' }}>
+    <Box
+      sx={{
+        overflow: postDetailedData ? { xs: "visible", lg: "hidden" } : "hidden",
+        width: "100%",
+      }}
+    >
       {postDetailedData ? (
         <Box
           sx={{
-            p: 1,
+            p: { xs: 0.5, sm: 1, lg: 0 },
             border: isDarkMode ? '1px solid' : 'none',
             borderColor: 'divider',
-            overflowY: "auto",
+            borderRadius: "8px",
+            overflowY: { xs: "visible", lg: "hidden" },
             "&::-webkit-scrollbar": { display: "none" },
             scrollbarWidth: "none",
           }}
@@ -49,6 +50,7 @@ const FeedDefaultSearch = () => {
           <PostDetailsContainer
             postDetailedData={postDetailedData}
             setPostDetailedData={setPostDetailedData}
+            isFullPageFocused
           />
         </Box>
       ) : (
