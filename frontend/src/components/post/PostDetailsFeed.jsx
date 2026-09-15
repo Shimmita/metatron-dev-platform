@@ -35,6 +35,7 @@ import React, { lazy, useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import AlertReportPost from "../alerts/AlertReportPost";
 import CardFeedMore from "../custom/CardFeedMore";
+import PostDocumentPreview, { getPostDocumentItems } from "../custom/PostDocumentPreview";
 import PostMediaCarousel, { getPostMediaItems } from "../custom/PostMediaCarousel";
 import CustomCountryName from "../utilities/CustomCountryName";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -342,6 +343,7 @@ const PostDetailsFeed = ({
       }
 
   const postMediaItems = getPostMediaItems(postDetailedData);
+  const postDocumentItems = getPostDocumentItems(postDetailedData);
   const categoryTags = [
     postDetailedData?.post_category?.sub1,
     postDetailedData?.post_category?.sub2,
@@ -350,7 +352,17 @@ const PostDetailsFeed = ({
   ].filter((item) => item && !item.toLowerCase().includes("other"));
   const locationLabel = [country, postDetailedData?.post_location?.state]
     .filter(Boolean)
-    .join(" | ");
+    .join(" • ");
+  const ownerNameDisplay = handleName();
+  const ownerTitleDisplay = CustomDeviceSmallest()
+    ? handleOccupation()
+    : `${postDetailedData.post_owner.ownertitle}`;
+  const postedAtLabel = getElapsedTime(postDetailedData?.createdAt);
+  const primaryMeta = [
+    postDetailedData?.post_category?.main,
+    locationLabel,
+    postedAtLabel,
+  ].filter(Boolean);
   const actionLabel = (value) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
   const actionItems = [
     {
@@ -428,10 +440,10 @@ const PostDetailsFeed = ({
         sx={{
           opacity: openMenu && !isDarkMode ? 0.88 : 1,
           borderRadius: "8px",
-          border: isFocusedLayout ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(255,255,255,0.10)",
+          border: isFocusedLayout ? "1px solid rgba(214,178,94,0.18)" : "1px solid rgba(255,255,255,0.10)",
           background: isDarkMode
             ? isFocusedLayout
-              ? "rgba(10,10,10,0.72)"
+              ? "linear-gradient(180deg, rgba(18,18,18,0.82), rgba(6,6,6,0.94))"
               : "linear-gradient(180deg, rgba(18,18,18,0.96), rgba(5,5,5,0.98))"
             : "rgba(255,255,255,0.96)",
           boxShadow: isFocusedLayout
@@ -440,6 +452,8 @@ const PostDetailsFeed = ({
               ? "0 18px 48px rgba(0,0,0,0.28)"
               : "0 14px 34px rgba(139,111,42,0.08)",
           overflow: "hidden",
+          width: "100%",
+          maxWidth: "100%",
         }}
       >
         {!isFocusedLayout && (
@@ -452,10 +466,15 @@ const PostDetailsFeed = ({
         )}
         <CardHeader
           sx={{
-            px: { xs: 1.25, sm: 1.75 },
-            py: 1.5,
+            px: { xs: 1.25, sm: 1.75, md: isFocusedLayout ? 2 : 1.75 },
+            py: { xs: 1.25, sm: 1.5 },
             borderBottom: "1px solid rgba(255,255,255,0.08)",
             "& .MuiCardHeader-content": { minWidth: 0 },
+            "& .MuiCardHeader-action": {
+              alignSelf: "flex-start",
+              mt: 0,
+              mr: 0,
+            },
           }}
           avatar={
               <IconButton onClick={isGuest ? null:handleOpenMiniProfile} sx={{ p: 0 }}>
@@ -478,13 +497,15 @@ const PostDetailsFeed = ({
           }
           action={
             <Box flexDirection={"row"} display={"flex"} alignItems={"center"} gap={0.5}>
-              <Typography
-                className={postBelongsCurrentUser && "me-3"}
-                variant="caption"
-                color="text.secondary"
-              >
-                {getElapsedTime(postDetailedData?.createdAt)}
-              </Typography>
+              {!isFocusedLayout && (
+                <Typography
+                  className={postBelongsCurrentUser && "me-3"}
+                  variant="caption"
+                  color="text.secondary"
+                >
+                  {postedAtLabel}
+                </Typography>
+              )}
 
               {isGuest ? (
                 <Box px={2}>
@@ -534,31 +555,64 @@ const PostDetailsFeed = ({
           title={
             <Box display="flex" alignItems="center" gap={1} minWidth={0}>
               <Typography fontWeight={900} variant={"body2"} noWrap>
-                {handleName()}
+                {ownerNameDisplay}
               </Typography>
               <VerifiedRounded color="primary" sx={{ width: 18, height: 18 }} />
             </Box>
           }
           subheader={
-            <Box>
-              {/*occupation title */}
-              <Typography variant="caption" color="text.secondary" noWrap>
-                {CustomDeviceSmallest()
-                  ? handleOccupation()
-                  : `${postDetailedData.post_owner.ownertitle}`}
+            <Box minWidth={0}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                noWrap
+                sx={{ display: "block" }}
+              >
+                {ownerTitleDisplay}
               </Typography>
-              {/* location */}
-              <Typography variant="caption" color="text.secondary" noWrap>
-                {locationLabel}
-              </Typography>
+              {isFocusedLayout && primaryMeta.length > 0 && (
+                <Stack
+                  direction="row"
+                  spacing={0.75}
+                  useFlexGap
+                  flexWrap="wrap"
+                  mt={0.7}
+                >
+                  {primaryMeta.map((item) => (
+                    <Box
+                      key={item}
+                      sx={{
+                        px: 0.85,
+                        py: 0.25,
+                        borderRadius: "8px",
+                        background: isDarkMode
+                          ? "rgba(255,255,255,0.045)"
+                          : "rgba(139,111,42,0.055)",
+                        border: "1px solid rgba(214,178,94,0.14)",
+                        maxWidth: "100%",
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary" noWrap>
+                        {item}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Stack>
+              )}
             </Box>
           }
         />
 
         <Box>
-          <CardContent sx={{ px: { xs: 1.5, sm: 2 }, py: 2 }}>
-            <Box mb={2} width={"100%"}>
-              <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" mb={1.25}>
+          <CardContent
+            sx={{
+              px: { xs: 1.25, sm: 2, md: isFocusedLayout ? 2.25 : 2 },
+              py: { xs: 1.5, sm: 2 },
+            }}
+          >
+            <Stack spacing={isFocusedLayout ? 1.35 : 1.25} width="100%">
+              {!isFocusedLayout && (
+                <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
                 {postDetailedData?.post_category?.main && (
                   <Box
                     sx={{
@@ -589,21 +643,32 @@ const PostDetailsFeed = ({
                     </Typography>
                   </Box>
                 )}
-              </Stack>
+                </Stack>
+              )}
               <Box
                 display={"flex"}
                 justifyContent={"flex-start"}
                 alignItems={"flex-start"}
                 gap={1}
+                minWidth={0}
               >
                 <CodeRounded sx={{ color: "primary.main", fontSize: 20, mt: 0.35 }} />
                 {/* title of the post */}
-                <Typography variant="h6" fontWeight={900} lineHeight={1.25}>
+                <Typography
+                  component="h2"
+                  variant={isFocusedLayout ? "h5" : "h6"}
+                  fontWeight={900}
+                  lineHeight={1.25}
+                  sx={{
+                    overflowWrap: "anywhere",
+                    letterSpacing: 0,
+                  }}
+                >
                   {postDetailedData.post_title}
                 </Typography>
               </Box>
               {!isPostEditMode && categoryTags.length > 0 && (
-                <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap" mt={1.25}>
+                <Stack direction="row" spacing={0.75} useFlexGap flexWrap="wrap">
                   {categoryTags.map((tag) => (
                     <Box
                       key={tag}
@@ -622,7 +687,6 @@ const PostDetailsFeed = ({
                   ))}
                 </Stack>
               )}
-            </Box>
 
             {isPostEditMode ? (
               <Box
@@ -678,19 +742,33 @@ const PostDetailsFeed = ({
               >
                 <Box
                   display={"flex"}
-                  justifyContent={"center"}
+                  justifyContent={"flex-start"}
                   width={"100%"}
                   sx={{
                     borderRadius: "8px",
-                    border: "1px solid rgba(255,255,255,0.07)",
-                    background: isDarkMode ? "rgba(255,255,255,0.035)" : "rgba(139,111,42,0.035)",
-                    px: { xs: 1.25, sm: 1.5 },
-                    py: 1.35,
+                    border: isFocusedLayout
+                      ? "1px solid rgba(214,178,94,0.16)"
+                      : "1px solid rgba(255,255,255,0.07)",
+                    background: isFocusedLayout
+                      ? isDarkMode
+                        ? "rgba(255,255,255,0.045)"
+                        : "rgba(139,111,42,0.045)"
+                      : isDarkMode
+                        ? "rgba(255,255,255,0.035)"
+                        : "rgba(139,111,42,0.035)",
+                    px: { xs: 1.25, sm: 1.5, md: isFocusedLayout ? 1.75 : 1.5 },
+                    py: { xs: 1.35, sm: isFocusedLayout ? 1.65 : 1.35 },
                   }}
                 >
                   <Typography
                     color={isDarkMode ? 'text.secondary' : "text.primary"}
-                    sx={{ fontSize:'0.9rem', lineHeight: 1.8, whiteSpace: "pre-line" }}
+                    sx={{
+                      fontSize: isFocusedLayout ? "0.875rem" : "0.825rem",
+                      lineHeight: isFocusedLayout ? 1.85 : 1.8,
+                      whiteSpace: "pre-line",
+                      overflowWrap: "anywhere",
+                      letterSpacing: 0,
+                    }}
                     variant={"body2"}
                     maxWidth="100%"
                   >
@@ -710,17 +788,24 @@ const PostDetailsFeed = ({
                 </Box>
               </CardActionArea>
             )}
-
+            </Stack>
           </CardContent>
 
           {/* display image or log if is not in edit mode */}
 
           {!isPostEditMode && (
-            <PostMediaCarousel
-              items={postMediaItems}
-              title={postDetailedData?.post_title}
-              isFocusedLayout={isFocusedLayout}
-            />
+            <React.Fragment>
+              <PostMediaCarousel
+                items={postMediaItems}
+                title={postDetailedData?.post_title}
+                isFocusedLayout={isFocusedLayout}
+              />
+              <PostDocumentPreview
+                documents={postDocumentItems}
+                postId={postDetailedData?._id}
+                isFocusedLayout={isFocusedLayout}
+              />
+            </React.Fragment>
           )}
         </Box>
 
@@ -752,8 +837,9 @@ const PostDetailsFeed = ({
                       startIcon={icon}
                       endIcon={title === "Github" ? <OpenInNewRounded sx={{ width: 14, height: 14 }} /> : undefined}
                       sx={{
-                        minWidth: { xs: "31%", sm: 118 },
-                        px: 1.5,
+                        minWidth: { xs: 78, sm: 118 },
+                        flex: { xs: "1 1 calc(33.333% - 8px)", sm: "0 0 auto" },
+                        px: { xs: 1, sm: 1.5 },
                         py: 0.6,
                         borderRadius: "8px",
                         color: "text.secondary",
@@ -766,7 +852,13 @@ const PostDetailsFeed = ({
                         },
                       }}
                     >
-                      {actionLabel(title)} {count || 0}
+                      <Box
+                        component="span"
+                        sx={{ display: { xs: "none", sm: "inline" } }}
+                      >
+                        {actionLabel(title)}{" "}
+                      </Box>
+                      {count || 0}
                     </Button>
                   </span>
                 </Tooltip>

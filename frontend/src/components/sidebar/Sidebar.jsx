@@ -186,6 +186,7 @@ const Sidebar = () => {
     <Box
       sx={{
         width: { sm: 210, md: 260, lg: 248, xl: 260 },
+        flexBasis: { lg: 248, xl: 260 },
         flexShrink: 0,
         mt: { sm: 1.5, md: 2 },
         display: {

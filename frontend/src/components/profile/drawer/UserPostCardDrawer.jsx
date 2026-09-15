@@ -1,4 +1,4 @@
-import { FavoriteRounded, ForumRounded, GitHub, MoreVertRounded, RefreshOutlined, Remove } from "@mui/icons-material";
+import { FavoriteRounded, ForumRounded, GitHub, MoreVertRounded, PictureAsPdfRounded, RefreshOutlined, Remove } from "@mui/icons-material";
 import { Box, Button, CardActionArea, CircularProgress, FormHelperText, IconButton, Menu, Tooltip } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -67,6 +67,9 @@ export default function UserPostCardDrawer({
     // the user possibly uploaded the image to cloud thus return the url incorporated
     return post?.post_url;
   };
+
+  const postImage = handlePostImagePresent();
+  const hasDocument = Array.isArray(post?.post_documents) && post.post_documents.length > 0;
 
   // handle the updating of the post of the current user
   const handleUpdateMyPost = () => {
@@ -190,13 +193,30 @@ export default function UserPostCardDrawer({
         mb={1}
         display={'flex'}
         justifyContent={'center'}>
-        <CardMedia
-          component="img"
-          className="rounded"
-          sx={{ maxHeight: 60, maxWidth:60}}
-          image={handlePostImagePresent()}
-          alt=""
-        />
+        {postImage ? (
+          <CardMedia
+            component="img"
+            className="rounded"
+            sx={{ maxHeight: 60, maxWidth:60}}
+            image={postImage}
+            alt=""
+          />
+        ) : hasDocument && (
+          <Box
+            className="rounded"
+            sx={{
+              width: 60,
+              height: 60,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "1px solid rgba(214,178,94,0.2)",
+              background: "rgba(214,178,94,0.08)",
+            }}
+          >
+            <PictureAsPdfRounded color="primary" sx={{ width: 30, height: 30 }} />
+          </Box>
+        )}
         </Box>
   
           {/* post title */}

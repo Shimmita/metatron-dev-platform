@@ -2,6 +2,7 @@ import {
   CloudUploadRounded,
   DeleteRounded,
   DiamondRounded,
+  PictureAsPdfRounded,
   PostAddRounded,
   Settings
 } from "@mui/icons-material";
@@ -29,6 +30,7 @@ import SubsectionTech from "../data/SubsectionTech";
 import BrowserCompress from "../utilities/BrowserCompress";
 import CourseIcon from "../utilities/CourseIcon";
 import { getImageMatch } from "../utilities/getImageMatch";
+import { PdfCanvasViewer } from "../custom/PostDocumentPreview";
 import {
   ModalBody,
   ModalHeader,
@@ -62,6 +64,12 @@ const StyledInput = styled("input")({
 const [logoNamesOptions, logoValueOptions] = getImageMatch("", true);
 const MAX_POST_IMAGES = 3;
 const MAX_IMAGE_DESCRIPTION = 140;
+const MAX_POST_PDF_SIZE = 20 * 1024 * 1024;
+
+const formatFileSize = (bytes = 0) => {
+  if (!bytes) return "0 MB";
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
 
 const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [postCategory, setPostCategory] = useState("");
@@ -72,7 +80,9 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   const [description, setDescription] = useState("");
   const [title, setTitle] = useState("");
   const [uploadedImages, setUploadedImages] = useState([]);
+  const [uploadedPdf, setUploadedPdf] = useState(null);
   const uploadedImagesRef = useRef([]);
+  const uploadedPdfRef = useRef(null);
   const [filePreview, setFilePreview] = useState(null);
   const [freeLogo, setFreeLogo] = useState("");
   const [isFreeLogo, setIsFreeLogo] = useState(false);
@@ -263,6 +273,44 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     );
   };
 
+  const handlePdfFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+    if (!isPdf) {
+      setErrorMessage("Only PDF files can be attached");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > MAX_POST_PDF_SIZE) {
+      setErrorMessage("PDF file must be 20MB or smaller");
+      event.target.value = "";
+      return;
+    }
+
+    if (uploadedPdf?.preview) {
+      URL.revokeObjectURL(uploadedPdf.preview);
+    }
+
+    setUploadedPdf({
+      file,
+      name: file.name,
+      size: file.size,
+      preview: URL.createObjectURL(file),
+    });
+    event.target.value = "";
+  };
+
+  const handleRemoveUploadedPdf = () => {
+    if (uploadedPdf?.preview) {
+      URL.revokeObjectURL(uploadedPdf.preview);
+    }
+
+    setUploadedPdf(null);
+  };
+
   // handle core missing fields
   const handleEmptyFields = () => {
     if (title?.trim() === "") {
@@ -315,8 +363,8 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
       return false;
     }
 
-    if (!freeLogo && uploadedImages.length === 0) {
-      setErrorMessage("provide image for this post");
+    if (!freeLogo && uploadedImages.length === 0 && !uploadedPdf) {
+      setErrorMessage("Provide an image or PDF for this post");
       return false;
     }
 
@@ -345,6 +393,10 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
         uploadedImages.forEach((image) => {
           formData.append("images", image.file);
         });
+      }
+
+      if (uploadedPdf) {
+        formData.append("documents", uploadedPdf.file);
       }
 
       // performing post request
@@ -405,8 +457,15 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
   }, [uploadedImages]);
 
   useEffect(() => {
+    uploadedPdfRef.current = uploadedPdf;
+  }, [uploadedPdf]);
+
+  useEffect(() => {
     return () => {
       uploadedImagesRef.current.forEach((image) => URL.revokeObjectURL(image.preview));
+      if (uploadedPdfRef.current?.preview) {
+        URL.revokeObjectURL(uploadedPdfRef.current.preview);
+      }
     };
   }, []);
 
@@ -447,11 +506,11 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
     hasFullstackDetails &&
     hasSimpleCategoryDetails
   );
-  const hasMedia = Boolean(freeLogo || uploadedImages.length > 0);
+  const hasMedia = Boolean(freeLogo || uploadedImages.length > 0 || uploadedPdf);
   const techWorkflowSteps = [
     { label: "Post details", helper: "Title and professional summary" },
     { label: "Tech focus", helper: "Specialisation and stack details" },
-    { label: "Media", helper: `Add 1-${MAX_POST_IMAGES} image cards` },
+    { label: "Media", helper: `Add images or a PDF up to ${formatFileSize(MAX_POST_PDF_SIZE)}` },
     { label: "Reach", helper: "Optional repository and community" },
     { label: "Publish", helper: "Review readiness and submit" },
   ];
@@ -1270,7 +1329,7 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               mb={2}
               variant="body2"
               color={"text.secondary"}>
-              Add up to {MAX_POST_IMAGES} images. Each image can include a brief note that explains what people are looking at.
+              Add up to {MAX_POST_IMAGES} images or attach one PDF document up to {formatFileSize(MAX_POST_PDF_SIZE)} for specs, case studies, diagrams, or technical write-ups.
             </Typography>
 
             {/* preview the file uploaded from storage */}
@@ -1414,6 +1473,52 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
               </Box>
             )}
 
+            {uploadedPdf && (
+              <Box
+                mb={2}
+                sx={{
+                  border: "1px solid rgba(139,111,42,0.16)",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  background: "rgba(255,255,255,0.56)",
+                }}
+              >
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  gap={1}
+                  p={1}
+                  sx={{
+                    borderBottom: "1px solid rgba(139,111,42,0.12)",
+                    background: "rgba(255,255,255,0.62)",
+                  }}
+                >
+                  <Box display="flex" alignItems="center" gap={1} minWidth={0}>
+                    <PictureAsPdfRounded color="primary" sx={{ width: 20, height: 20 }} />
+                    <Box minWidth={0}>
+                      <Typography variant="body2" fontWeight={900} noWrap>
+                        {uploadedPdf.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        PDF - {formatFileSize(uploadedPdf.size)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Tooltip title="Remove PDF" arrow>
+                    <IconButton
+                      size="small"
+                      disabled={isUploading}
+                      onClick={handleRemoveUploadedPdf}
+                    >
+                      <DeleteRounded color="primary" sx={{ width: 17, height: 17 }} />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+                <PdfCanvasViewer viewUrl={uploadedPdf.preview} fileName={uploadedPdf.name} />
+              </Box>
+            )}
+
             {/* shown if free logo is true */}
             {isFreeLogo && (
               <Box
@@ -1501,6 +1606,28 @@ const PostTechModal = ({ openModalTech, setOpenModalTech }) => {
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
+                />
+              </Button>
+
+              <Button
+                component="label"
+                role={undefined}
+                variant={uploadedPdf ? "outlined" : "text"}
+                disableElevation
+                disabled={isUploading}
+                tabIndex={-1}
+                sx={{
+                  textTransform: "capitalize",
+                  borderRadius: "20px",
+                  fontWeight: "bold",
+                }}
+                startIcon={<PictureAsPdfRounded />}
+              >
+                {uploadedPdf ? "Replace PDF" : "Add PDF"}
+                <StyledInput
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  onChange={handlePdfFileChange}
                 />
               </Button>
             </Box>

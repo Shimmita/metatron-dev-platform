@@ -64,11 +64,11 @@ const Feed = () => {
         width: "100%",
         maxWidth: isWorkspaceRoute || isFocusedPostView
           ? "100%"
-          : { xs: "100%", lg: 540, xl: 580 },
+          : { xs: "100%", lg: 680, xl: 760 },
         minWidth: 0,
         flex: isWorkspaceRoute || isFocusedPostView
           ? "1 1 100%"
-          : { sm: "1 1 0", lg: "0 0 540px", xl: "0 0 580px" },
+          : { sm: "1 1 0", lg: "1 1 620px", xl: "1 1 720px" },
         minHeight: { xs: "100vh", lg: 0 },
         height: { lg: "100%" },
         overflowY: { lg: isFocusedPostView ? "hidden" : "auto" },

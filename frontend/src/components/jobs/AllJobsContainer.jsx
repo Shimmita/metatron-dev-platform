@@ -84,7 +84,7 @@ export default function MiniDrawer() {
     !isGuest && isJobSearchGlobal ? "Search Jobs" : "Explore Jobs"
   );
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false : true);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!isMobile);
 
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");

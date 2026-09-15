@@ -169,7 +169,7 @@ export default function EventsContainer() {
     !isGuest && isJobSearchGlobal ? "Search Events" : "Explore Events"
   );
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!isMobile);
 
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");

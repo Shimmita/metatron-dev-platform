@@ -4,9 +4,15 @@ import {
   AutoGraphRounded,
   BoltRounded,
   CalendarMonthRounded,
+  CheckCircleRounded,
+  ChecklistRounded,
+  ConnectWithoutContactRounded,
+  DataObjectRounded,
   ErrorOutlineRounded,
+  FilterListRounded,
   HubRounded,
   InsightsRounded,
+  PersonSearchRounded,
   PublicRounded,
   QueryStatsRounded,
   RocketLaunchRounded,
@@ -16,7 +22,7 @@ import {
 } from "@mui/icons-material";
 import { Box, Button, Chip, Stack, Typography } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useMemo, useState } from "react";
 import { RotatingLines } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -39,12 +45,15 @@ import MobileTabCorousel from "../rightbar/MobileTabCorousel";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceTablet from "../utilities/CustomDeviceTablet";
 
+const PostTechModal = lazy(() => import("../modal/PostTechModal"));
 const FEED_PAGE_SIZE = 12;
 
 const FeedDefaultContent = () => {
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [pageNumber, setPageNumber] = useState(2);
+  const [activeFeedFilter, setActiveFeedFilter] = useState("all");
+  const [openPostModal, setOpenPostModal] = useState(false);
 
   const { posts } = useSelector((state) => state.currentPosts);
   const { currentMode, isDefaultSpeedDial, isPostDetailed } = useSelector(
@@ -70,6 +79,7 @@ const FeedDefaultContent = () => {
   const navigate = useNavigate();
   const isDarkMode = currentMode === "dark";
   const firstName = user?.name?.split(" ")?.[0] || "Builder";
+  const userSkills = Array.isArray(user?.selectedSkills) ? user.selectedSkills : [];
   const metricValue = (value) => value === null || value === undefined ? "..." : formatMetric(value);
   const rawMetric = (value) => Number(value) || 0;
   const analytics = platformAnalytics.analytics || {};
@@ -89,6 +99,29 @@ const FeedDefaultContent = () => {
     { label: "Courses", value: metricValue(platformTotals.courses), status: "Courses", icon: <SchoolRounded fontSize="small" /> },
     { label: "Build posts", value: metricValue(platformTotals.posts), status: "Posts", icon: <ArticleRounded fontSize="small" /> },
   ];
+  const profileSignals = [
+    {
+      label: "Specialisation",
+      ready: Boolean(user?.specialisationTitle),
+      value: user?.specialisationTitle || "Not set",
+    },
+    {
+      label: "Skills",
+      ready: userSkills.length > 0,
+      value: userSkills.length ? `${userSkills.length} selected` : "Add core stack",
+    },
+    {
+      label: "Repository",
+      ready: Boolean(user?.gitHub),
+      value: user?.gitHub ? "Linked" : "Missing",
+    },
+    {
+      label: "Portfolio",
+      ready: Boolean(user?.portfolio || user?.linkedin),
+      value: user?.portfolio || user?.linkedin ? "Visible" : "Missing",
+    },
+  ];
+  const completedProfileSignals = profileSignals.filter((signal) => signal.ready).length;
   const analyticsCards = [
     {
       label: "Opportunity Index",
@@ -174,6 +207,36 @@ const FeedDefaultContent = () => {
       icon: <CalendarMonthRounded fontSize="small" />,
     },
   ].filter((card) => platformTotals[card.metricKey] === null || Number(platformTotals[card.metricKey]) > 0);
+  const quickActions = [
+    {
+      title: "Share Build",
+      copy: "Publish a milestone, PDF spec, architecture note, or project drop.",
+      action: "Create Post",
+      icon: <DataObjectRounded fontSize="small" />,
+      onClick: () => isGuest ? navigate("/auth/login") : setOpenPostModal(true),
+    },
+    {
+      title: "Track Demand",
+      copy: "Scan active roles and compare the market against your current stack.",
+      action: "Open Jobs",
+      icon: <PersonSearchRounded fontSize="small" />,
+      onClick: () => handleDashboardRoute("/jobs", 1),
+    },
+    {
+      title: "Sharpen Stack",
+      copy: "Move from signal to learning paths, certificates, and technical depth.",
+      action: "View Courses",
+      icon: <ChecklistRounded fontSize="small" />,
+      onClick: () => handleDashboardRoute("/courses/available", 3),
+    },
+    {
+      title: "Enter Rooms",
+      copy: "Find sessions, communities, and conversations around real work.",
+      action: "See Events",
+      icon: <ConnectWithoutContactRounded fontSize="small" />,
+      onClick: () => handleDashboardRoute("/events", 2),
+    },
+  ];
 
   const handleDashboardRoute = (route, navPosition) => {
     navigate(route);
@@ -184,6 +247,44 @@ const FeedDefaultContent = () => {
     `${metricValue(platformTotals.posts)} build posts`,
     "Live career signal",
   ];
+  const feedFilterOptions = useMemo(() => {
+    const categoryCounts = new Map();
+    const hasDocuments = posts?.some((post) => post?.post_documents?.length > 0);
+
+    posts?.forEach((post) => {
+      const category = post?.post_category?.main;
+      if (!category) return;
+      categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
+    });
+
+    const categoryOptions = [...categoryCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 4)
+      .map(([category, count]) => ({
+        key: `category:${category}`,
+        label: category,
+        count,
+      }));
+
+    return [
+      { key: "all", label: "All", count: posts?.length || 0 },
+      ...(hasDocuments
+        ? [{ key: "documents", label: "Documents", count: posts.filter((post) => post?.post_documents?.length > 0).length }]
+        : []),
+      ...categoryOptions,
+    ];
+  }, [posts]);
+  const visiblePosts = useMemo(() => {
+    if (activeFeedFilter === "all") return posts || [];
+    if (activeFeedFilter === "documents") {
+      return (posts || []).filter((post) => post?.post_documents?.length > 0);
+    }
+    if (activeFeedFilter.startsWith("category:")) {
+      const category = activeFeedFilter.replace("category:", "");
+      return (posts || []).filter((post) => post?.post_category?.main === category);
+    }
+    return posts || [];
+  }, [activeFeedFilter, posts]);
 
   // ensure speed dial is visible
   if (!isDefaultSpeedDial) {
@@ -279,7 +380,7 @@ const FeedDefaultContent = () => {
         width: "100%",
         maxWidth: postDetailedData || isPostDetailed
           ? { xs: "100%", lg: 1160, xl: 1240 }
-          : { xs: "100%", lg: 540, xl: 580 },
+          : { xs: "100%", lg: 680, xl: 760 },
         mx: "auto",
         pb: postDetailedData ? 0 : { xs: 1, lg: 2 },
       }}
@@ -330,20 +431,20 @@ const FeedDefaultContent = () => {
                 direction={{ xs: "column", md: "row" }}
                 justifyContent="space-between"
                 gap={2}
-                alignItems={{ xs: "flex-start", md: "center" }}
+                alignItems={{ xs: "stretch", md: "flex-start" }}
               >
-                <Box minWidth={0}>
+                <Box minWidth={0} flex={1}>
                   <Stack direction="row" alignItems="center" spacing={1} mb={1}>
                     <RocketLaunchRounded sx={{ color: "primary.main", fontSize: 18 }} />
                     <Typography variant="overline" color="primary.main">
-                      Metatron Dev Console
+                      Explore Command Center
                     </Typography>
                   </Stack>
-                    <Typography variant="h5" fontWeight={900} lineHeight={1.12}>
-                    Build, learn, connect, and move faster, {firstName}.
+                  <Typography variant="h5" fontWeight={900} lineHeight={1.12}>
+                    Good to see you, {firstName}. Your technical signal starts here.
                   </Typography>
-                    <Typography variant="body2" color="text.secondary" mt={0.75} maxWidth={500}>
-                    A focused technology feed for project drops, hiring signals, courses, events, and practical community momentum.
+                  <Typography variant="body2" color="text.secondary" mt={0.75} maxWidth={560}>
+                    A working surface for builders: market demand, learning paths, community activity, and proof-of-work posts in one place.
                   </Typography>
                   <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap mt={1.5}>
                     {feedStatusChips.map((chip) => (
@@ -362,15 +463,44 @@ const FeedDefaultContent = () => {
                     ))}
                   </Stack>
                 </Box>
-                <Button
-                  disableElevation
-                  variant="contained"
-                  onClick={() => handleDashboardRoute("/jobs", 1)}
-                  startIcon={<WorkRounded fontSize="small" />}
-                  sx={{ flexShrink: 0, minWidth: { xs: "100%", sm: 150, md: 140 } }}
+                <Box
+                  sx={{
+                    width: { xs: "100%", md: 230 },
+                    borderRadius: "8px",
+                    border: "1px solid rgba(214,178,94,0.16)",
+                    background: isDarkMode ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.76)",
+                    p: 1.15,
+                  }}
                 >
-                  Find Gigs
-                </Button>
+                  <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={900}>
+                      Profile Signal
+                    </Typography>
+                    <Typography variant="body2" color="primary.main" fontWeight={900}>
+                      {completedProfileSignals}/{profileSignals.length}
+                    </Typography>
+                  </Stack>
+                  <Box
+                    sx={{
+                      mt: 1,
+                      height: 7,
+                      borderRadius: 999,
+                      overflow: "hidden",
+                      background: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(139,111,42,0.12)",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: `${(completedProfileSignals / profileSignals.length) * 100}%`,
+                        height: "100%",
+                        background: "linear-gradient(90deg, #8B6F2A, #D6B25E, #FFF2C2)",
+                      }}
+                    />
+                  </Box>
+                  <Typography variant="caption" color="text.secondary" display="block" mt={1}>
+                    {isGuest ? "Sign in to build a trusted technocrat profile." : "Stronger profiles create better discovery and collaboration loops."}
+                  </Typography>
+                </Box>
               </Stack>
 
               <Box
@@ -404,6 +534,50 @@ const FeedDefaultContent = () => {
                     <Typography variant="caption" color="text.secondary">
                       {stat.label}
                     </Typography>
+                  </Box>
+                ))}
+              </Box>
+
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", lg: "repeat(4, minmax(0, 1fr))" },
+                  gap: 1,
+                  mt: 1.25,
+                }}
+              >
+                {quickActions.map((item) => (
+                  <Box
+                    key={item.title}
+                    sx={{
+                      borderRadius: "8px",
+                      border: "1px solid rgba(255,255,255,0.09)",
+                      background: isDarkMode ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.84)",
+                      p: 1.1,
+                      minHeight: 138,
+                      display: "flex",
+                      flexDirection: "column",
+                      minWidth: 0,
+                    }}
+                  >
+                    <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+                      <Box sx={{ color: "primary.main", display: "flex" }}>{item.icon}</Box>
+                      <CheckCircleRounded sx={{ color: "primary.main", fontSize: 15, opacity: 0.72 }} />
+                    </Stack>
+                    <Typography variant="body2" fontWeight={900} mt={1}>
+                      {item.title}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, flex: 1, lineHeight: 1.45 }}>
+                      {item.copy}
+                    </Typography>
+                    <Button
+                      size="small"
+                      variant="text"
+                      onClick={item.onClick}
+                      sx={{ justifyContent: "flex-start", px: 0, mt: 1, color: "primary.main" }}
+                    >
+                      {item.action}
+                    </Button>
                   </Box>
                 ))}
               </Box>
@@ -502,6 +676,72 @@ const FeedDefaultContent = () => {
                   ))}
                 </Box>
               </Box>
+
+              {!isGuest && (
+                <Box
+                  sx={{
+                    mt: 1.25,
+                    borderRadius: "8px",
+                    border: "1px solid rgba(214,178,94,0.16)",
+                    background: isDarkMode ? "rgba(255,255,255,0.035)" : "rgba(255,255,255,0.78)",
+                    p: 1.15,
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1} mb={1}>
+                    <Stack direction="row" alignItems="center" gap={0.75}>
+                      <ChecklistRounded sx={{ color: "primary.main", fontSize: 18 }} />
+                      <Typography variant="body2" fontWeight={900}>
+                        Credibility Matrix
+                      </Typography>
+                    </Stack>
+                    <Typography variant="caption" color="text.secondary" fontWeight={800}>
+                      Proof readiness
+                    </Typography>
+                  </Stack>
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: { xs: "repeat(2, minmax(0, 1fr))", sm: "repeat(4, minmax(0, 1fr))" },
+                      gap: 1,
+                    }}
+                  >
+                    {profileSignals.map((signal) => (
+                      <Box
+                        key={signal.label}
+                        sx={{
+                          borderRadius: "8px",
+                          border: signal.ready
+                            ? "1px solid rgba(214,178,94,0.22)"
+                            : "1px solid rgba(255,255,255,0.08)",
+                          background: signal.ready
+                            ? "rgba(214,178,94,0.08)"
+                            : isDarkMode
+                              ? "rgba(255,255,255,0.035)"
+                              : "rgba(247,243,234,0.7)",
+                          p: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        <Stack direction="row" alignItems="center" gap={0.6}>
+                          <CheckCircleRounded
+                            sx={{
+                              color: signal.ready ? "primary.main" : "text.disabled",
+                              fontSize: 15,
+                              flexShrink: 0,
+                            }}
+                          />
+                          <Typography variant="caption" color="text.secondary" fontWeight={900} noWrap>
+                            {signal.label}
+                          </Typography>
+                        </Stack>
+                        <Typography variant="caption" color={signal.ready ? "primary.main" : "text.secondary"} fontWeight={900} noWrap display="block" mt={0.6}>
+                          {signal.value}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                </Box>
+              )}
             </Box>
           </Box>
 
@@ -561,6 +801,56 @@ const FeedDefaultContent = () => {
             </Box>
           </Stack>
 
+          {feedFilterOptions.length > 1 && (
+            <Box
+              sx={{
+                mt: 1.5,
+                borderRadius: "8px",
+                border: "1px solid rgba(255,255,255,0.09)",
+                background: isDarkMode ? "rgba(255,255,255,0.035)" : "rgba(255,255,255,0.86)",
+                p: 1,
+              }}
+            >
+              <Stack direction="row" alignItems="center" gap={0.75} mb={1}>
+                <FilterListRounded sx={{ color: "primary.main", fontSize: 17 }} />
+                <Typography variant="caption" color="text.secondary" fontWeight={900}>
+                  Feed Filters
+                </Typography>
+              </Stack>
+              <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
+                {feedFilterOptions.map((option) => {
+                  const isActive = activeFeedFilter === option.key;
+
+                  return (
+                    <Chip
+                      key={option.key}
+                      clickable
+                      size="small"
+                      label={`${option.label} ${option.count}`}
+                      onClick={() => setActiveFeedFilter(option.key)}
+                      sx={{
+                        borderRadius: "8px",
+                        maxWidth: "100%",
+                        fontWeight: 850,
+                        color: isActive ? "#080808" : "text.secondary",
+                        background: isActive
+                          ? "linear-gradient(135deg, #8B6F2A, #D6B25E, #FFF2C2)"
+                          : isDarkMode
+                            ? "rgba(255,255,255,0.045)"
+                            : "rgba(139,111,42,0.06)",
+                        border: "1px solid rgba(214,178,94,0.16)",
+                        "& .MuiChip-label": {
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                        },
+                      }}
+                    />
+                  );
+                })}
+              </Stack>
+            </Box>
+          )}
+
           {/* 🔥 LOADER */}
           {isFetching && (
             <Stack alignItems="center" mt={6} spacing={1}>
@@ -613,12 +903,12 @@ const FeedDefaultContent = () => {
               )}
 
               {/* POSTS */}
-              {posts.map((post, index) => (
+              {visiblePosts.map((post, index) => (
                 <CardFeed
                   key={post?._id || index}
                   post={post}
                   posts={posts}
-                  isLastIndex={index === posts.length - 1}
+                  isLastIndex={activeFeedFilter === "all" && index === visiblePosts.length - 1}
                   setPostDetailedData={setPostDetailedData}
                   pageNumber={pageNumber}
                   setPageNumber={setPageNumber}
@@ -626,6 +916,32 @@ const FeedDefaultContent = () => {
                   setErrorMessage={setErrorMessage}
                 />
               ))}
+
+              {visiblePosts.length === 0 && (
+                <Box
+                  sx={{
+                    minHeight: 220,
+                    borderRadius: "8px",
+                    border: "1px solid rgba(214,178,94,0.16)",
+                    background: isDarkMode ? "rgba(255,255,255,0.035)" : "rgba(255,255,255,0.88)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    px: 2,
+                  }}
+                >
+                  <Stack alignItems="center" spacing={1} maxWidth={360}>
+                    <FilterListRounded sx={{ color: "primary.main", fontSize: 30 }} />
+                    <Typography variant="body2" fontWeight={900}>
+                      No posts match this signal yet
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Switch filters or publish a relevant build note to establish the lane.
+                    </Typography>
+                  </Stack>
+                </Box>
+              )}
             </Stack>
           )}
 
@@ -658,6 +974,12 @@ const FeedDefaultContent = () => {
             </Box>
           )}
         </>
+      )}
+      {openPostModal && (
+        <PostTechModal
+          openModalTech={openPostModal}
+          setOpenModalTech={setOpenPostModal}
+        />
       )}
     </Box>
   );

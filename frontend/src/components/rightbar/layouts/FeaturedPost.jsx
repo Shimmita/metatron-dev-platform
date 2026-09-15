@@ -1,4 +1,4 @@
-import { FavoriteRounded, Flag, ForumRounded, GitHub } from "@mui/icons-material";
+import { FavoriteRounded, Flag, ForumRounded, GitHub, PictureAsPdfRounded } from "@mui/icons-material";
 import {
   Avatar,
   Box,
@@ -35,6 +35,9 @@ function FeaturedPost({ post,isLastIndex }) {
         return post?.post_url;
       };
 
+      const postImage = handlePostImagePresent();
+      const hasDocument = Array.isArray(post?.post_documents) && post.post_documents.length > 0;
+
       const postCategoryLength=()=>{
        let category= post?.post_category.main
 
@@ -51,7 +54,22 @@ function FeaturedPost({ post,isLastIndex }) {
     <Box display={'flex'} justifyContent={'space-around'} alignItems={'center'}>
       {/* image preview of the post */}
       <Box className={'rounded'} sx={{ border:'1px solid', borderColor:'divider' }}>
-    <Avatar alt="" src={handlePostImagePresent()} variant="rounded" sx={{ width:80, height:80 }}/>
+    {postImage ? (
+      <Avatar alt="" src={postImage} variant="rounded" sx={{ width:80, height:80 }}/>
+    ) : hasDocument && (
+      <Box
+        sx={{
+          width: 80,
+          height: 80,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "rgba(214,178,94,0.08)",
+        }}
+      >
+        <PictureAsPdfRounded color="primary" sx={{ width: 34, height: 34 }} />
+      </Box>
+    )}
       </Box>
           <Stack gap={1} justifyContent={'center'}>
            

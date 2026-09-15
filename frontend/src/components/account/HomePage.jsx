@@ -85,19 +85,19 @@ function Homepage() {
             ? "none"
             : isFocusedPostShell
               ? { xs: "100%", lg: "1160px", xl: "1240px" }
-              : { xs: "100%", lg: "1128px", xl: "1188px" },
+              : { xs: "100%", lg: "1280px", xl: "1420px" },
           mx: "auto",
           px: isWorkspaceRoute
             ? { xs: 0, lg: 0 }
             : isFocusedPostShell
               ? { xs: 0.75, sm: 1.25, lg: 2 }
-              : { xs: 1, sm: 1.5, md: 2, lg: 1.5, xl: 0 },
+              : { xs: 1, sm: 1.5, md: 2, lg: 2, xl: 2.5 },
           pb: isFocusedPostShell ? { xs: 1, lg: 2 } : { xs: 10, lg: 4 },
           display: "flex",
           flexWrap: "nowrap",
           justifyContent: "center",
           alignItems: "flex-start",
-          gap: isFocusedPostShell ? 0 : { xs: 0, sm: 1.5, md: 2, lg: 2 },
+          gap: isFocusedPostShell ? 0 : { xs: 0, sm: 1.5, md: 2, lg: 2, xl: 2.5 },
           overflowX: "hidden",
           height: { lg: isWorkspaceRoute || isFocusedPostShell ? "100vh" : "calc(100vh - 56px)" },
           overflowY: { lg: "hidden" },

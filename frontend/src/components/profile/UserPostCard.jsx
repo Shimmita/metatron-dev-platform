@@ -1,4 +1,4 @@
-import { FavoriteRounded, ForumRounded, GitHub } from "@mui/icons-material";
+import { FavoriteRounded, ForumRounded, GitHub, PictureAsPdfRounded } from "@mui/icons-material";
 import { Box, Button, CardActionArea, Stack, Divider } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -34,6 +34,9 @@ export default function UserPostCard({
     return post?.post_url;
   };
 
+  const postImage = handlePostImagePresent();
+  const hasDocument = Array.isArray(post?.post_documents) && post.post_documents.length > 0;
+
   return (
     <Card 
       elevation={0} 
@@ -48,17 +51,33 @@ export default function UserPostCard({
       }}
     >
       <CardActionArea onClick={handlePostDetails} sx={{ p: 0.5 }}>
-        <CardMedia
-          component="img"
-          sx={{ 
-            height: 140, 
-            borderRadius: "10px",
-            objectFit: "cover",
-            filter: "brightness(0.9)",
-          }}
-          image={handlePostImagePresent()}
-          alt={post?.post_title}
-        />
+        {postImage ? (
+          <CardMedia
+            component="img"
+            sx={{
+              height: 140,
+              borderRadius: "10px",
+              objectFit: "cover",
+              filter: "brightness(0.9)",
+            }}
+            image={postImage}
+            alt={post?.post_title}
+          />
+        ) : hasDocument && (
+          <Box
+            sx={{
+              height: 140,
+              borderRadius: "10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "1px solid rgba(214,178,94,0.2)",
+              background: "linear-gradient(135deg, rgba(214,178,94,0.12), rgba(255,255,255,0.04))",
+            }}
+          >
+            <PictureAsPdfRounded color="primary" sx={{ width: 44, height: 44 }} />
+          </Box>
+        )}
         <CardContent sx={{ px: 1, pb: 1 }}>
           {/* Title & Category Stack */}
           <Stack spacing={0.5} alignItems="center">

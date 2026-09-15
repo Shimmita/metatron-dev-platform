@@ -167,7 +167,7 @@ export default function AllJobsHiringManager() {
   // holds drawer status
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false : true);
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!isMobile);
 
   // focused job for assessment and fetch prospective applicants
   const [focusedJob, setFocusedJob] = useState({})

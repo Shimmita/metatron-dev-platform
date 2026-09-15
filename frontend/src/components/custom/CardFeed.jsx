@@ -43,6 +43,7 @@ import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
 import CustomDeviceSmallest from "../utilities/CustomDeviceSmallest";
 import { getElapsedTime } from "../utilities/getElapsedTime";
 import CardFeedMore from "./CardFeedMore";
+import PostDocumentPreview, { getPostDocumentItems } from "./PostDocumentPreview";
 import PostImagePreviewDialog from "./PostImagePreviewDialog";
 import PostMediaCarousel, { getPostMediaItems } from "./PostMediaCarousel";
 
@@ -346,6 +347,7 @@ const CardFeed = ({
   }, [handleFetchMoreData, hasMorePosts, isFetching, isGuest, isLastIndex]);
 
   const postMediaItems = getPostMediaItems(post);
+  const postDocumentItems = getPostDocumentItems(post);
   const postImageSrc = postMediaItems[0]?.src || "";
 
   const actionItems = [
@@ -669,6 +671,8 @@ const CardFeed = ({
         onImageClick={handleOpenImagePreview}
       />
 
+      <PostDocumentPreview documents={postDocumentItems} postId={post?._id} />
+
       <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
       <Box
         display="flex"
@@ -781,21 +785,21 @@ const CardFeed = ({
         />
       )}
 
-     <PostImagePreviewDialog
-    details={details}
-    postTitle={post?.post_title}
-    postImageSrc={selectedImageSrc || postImageSrc}
-    open={openImagePreview}
-    onClose={handleCloseImagePreview}
-    onDownload={handleDownloadImage}
-    detailsLong={detailsLong}
-    handleCloseImagePreview={handleCloseImagePreview}
-    post={post}
-    handleDownloadImage={handleDownloadImage}
-    openImagePreview={openImagePreview}
-    categoryTags={categoryTags}
-    popupMeta={popupMeta}
-     />
+      <PostImagePreviewDialog
+        details={details}
+        postTitle={post?.post_title}
+        postImageSrc={selectedImageSrc || postImageSrc}
+        open={openImagePreview}
+        onClose={handleCloseImagePreview}
+        onDownload={handleDownloadImage}
+        detailsLong={detailsLong}
+        handleCloseImagePreview={handleCloseImagePreview}
+        post={post}
+        handleDownloadImage={handleDownloadImage}
+        openImagePreview={openImagePreview}
+        categoryTags={categoryTags}
+        popupMeta={popupMeta}
+      />
     </Card>
   );
 };

@@ -61,17 +61,6 @@ const PostMediaCarousel = ({
 
   return (
     <Box px={{ xs: 1.25, sm: 2 }} pb={isFocusedLayout ? 1.5 : 2} width="100%">
-      {hasMultipleImages && (
-        <Box display="flex" justifyContent="space-between" alignItems="center" gap={1} mb={1}>
-          <Typography variant="caption" color="text.secondary" fontWeight={800}>
-            {items.length} images attached
-          </Typography>
-          <Typography variant="caption" color="primary.main" fontWeight={900}>
-            {activeIndex + 1} of {items.length}
-          </Typography>
-        </Box>
-      )}
-
       <Box
         sx={{
           position: "relative",
@@ -104,7 +93,7 @@ const PostMediaCarousel = ({
             <Box
               component="img"
               src={activeItem.src}
-              alt={`${title} ${activeIndex + 1}`}
+              alt={activeItem.description || title}
               loading="lazy"
               sx={{
                 width: "100%",
@@ -114,24 +103,6 @@ const PostMediaCarousel = ({
                 transition: "opacity 0.18s ease",
               }}
             />
-            <Box
-              sx={{
-                position: "absolute",
-                top: 8,
-                left: 8,
-                px: 1,
-                py: 0.35,
-                borderRadius: "8px",
-                background: "rgba(3,7,18,0.72)",
-                color: "#fff",
-                backdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,255,255,0.18)",
-              }}
-            >
-              <Typography variant="caption" fontWeight={900}>
-                {activeIndex + 1}/{items.length}
-              </Typography>
-            </Box>
           </Box>
         </CardActionArea>
 
@@ -202,7 +173,7 @@ const PostMediaCarousel = ({
               key={`${item.src}-dot-${index}`}
               component="button"
               type="button"
-              aria-label={`Show image ${index + 1}`}
+              aria-label="Show media item"
               onClick={() => setActiveIndex(index)}
               sx={{
                 width: index === activeIndex ? 18 : 7,

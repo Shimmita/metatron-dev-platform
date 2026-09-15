@@ -176,7 +176,7 @@ export default function CoursesMainContainer() {
     !isGuest && isJobSearchGlobal ? "Course Search" : "Explore Courses"
   );
   const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false : true);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!isMobile);
 
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");

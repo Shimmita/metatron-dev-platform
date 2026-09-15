@@ -214,6 +214,7 @@ const RightbarAll = () => {
     <Box
       sx={{
         width: { sm: 230, md: 280, lg: 300, xl: 316 },
+        flexBasis: { lg: 300, xl: 316 },
         flexShrink: 0,
         mt: { sm: 1.5, md: 2 },
         display: {

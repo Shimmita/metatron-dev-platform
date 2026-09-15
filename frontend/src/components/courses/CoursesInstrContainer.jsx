@@ -151,7 +151,7 @@ import ManageCoursesTable from "./layout/ManageCoursesTable";
   
     const [textOption, setTextOption] = useState("Uploaded Courses");
     const [isDrawerPane, setIsDrawerPane] = useState(isMobile ? false:true);
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(!isMobile);
    
   
     const [isFetching, setIsFetching] = useState(false);
