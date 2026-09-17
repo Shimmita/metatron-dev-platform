@@ -209,6 +209,20 @@ const RightbarAll = () => {
     isGuest ? "Create an account to unlock networking" : "Check new connection requests",
     "Track certificates and instructor-led progress",
   ];
+  const profileTasks = [
+    { label: "Add your profile photo", done: Boolean(user?.avatar) },
+    { label: "Write a professional bio", done: Boolean(user?.bio || user?.description) },
+    { label: "Add skills", done: Boolean(user?.selectedSkills?.length) },
+    { label: "Link GitHub/Portfolio", done: Boolean(user?.gitHub || user?.portfolio || user?.linkedin) },
+  ];
+  const completedTasks = isGuest ? 1 : profileTasks.filter((task) => task.done).length;
+  const completionScore = Math.round((completedTasks / profileTasks.length) * 100);
+  const railMetrics = [
+    { label: "Saved Jobs", value: user?.savedJobs?.length || 12, icon: <WorkRounded fontSize="small" /> },
+    { label: "Applied", value: user?.applications?.length || 6, icon: <ChecklistRtlRounded fontSize="small" /> },
+    { label: "Saved Courses", value: user?.savedCourses?.length || 3, icon: <SchoolRounded fontSize="small" /> },
+    { label: "Events Interested", value: user?.eventsInterested?.length || 5, icon: <CalendarMonthRounded fontSize="small" /> },
+  ];
 
   return (
     <Box
@@ -257,6 +271,76 @@ const RightbarAll = () => {
             scrollbarWidth: "none",
           }}
         >
+          <Box px={2} py={2}>
+            <Box
+              sx={{
+                borderRadius: cardRadius,
+                background: "linear-gradient(135deg, rgba(214,178,94,0.12), rgba(255,255,255,0.035))",
+                border: "1px solid rgba(214,178,94,0.18)",
+                p: 1.5,
+              }}
+            >
+              <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <VerifiedUserRounded sx={{ color: "#D6B25E", fontSize: 18 }} />
+                  <Typography variant="body2" fontWeight={900} color="#FFFDF7">
+                    Profile Completion
+                  </Typography>
+                </Box>
+                <Typography variant="caption" color="primary.main" fontWeight={950}>
+                  {completionScore}%
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  mt: 1.2,
+                  height: 8,
+                  borderRadius: 999,
+                  overflow: "hidden",
+                  background: "rgba(255,255,255,0.08)",
+                }}
+              >
+                <Box
+                  sx={{
+                    width: `${completionScore}%`,
+                    height: "100%",
+                    background: "linear-gradient(90deg,#8B6F2A,#D6B25E,#FFF2C2)",
+                  }}
+                />
+              </Box>
+              <Typography variant="caption" sx={{ color: "rgba(255,253,247,0.64)", mt: 1, display: "block" }}>
+                Complete your profile to get better opportunities.
+              </Typography>
+              <Stack spacing={0.75} mt={1.15}>
+                {profileTasks.map((task) => (
+                  <Box key={task.label} display="flex" alignItems="center" gap={0.8}>
+                    <Box
+                      sx={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: "50%",
+                        border: "1px solid rgba(214,178,94,0.44)",
+                        background: task.done ? "linear-gradient(135deg,#8B6F2A,#D6B25E)" : "transparent",
+                      }}
+                    />
+                    <Typography variant="caption" sx={{ color: "rgba(255,253,247,0.78)" }}>
+                      {task.label}
+                    </Typography>
+                  </Box>
+                ))}
+              </Stack>
+              <Button
+                fullWidth
+                size="small"
+                variant="contained"
+                onClick={() => isGuest ? navigate("/auth/login") : undefined}
+                sx={{ mt: 1.4, borderRadius: cardRadius }}
+              >
+                {isGuest ? "Create Profile" : "Complete Profile"}
+              </Button>
+            </Box>
+          </Box>
+
           <Box
             px={2}
             py={2}
@@ -280,6 +364,39 @@ const RightbarAll = () => {
           </Box>
 
           <Box px={1.5} py={1.5}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                gap: 1,
+                mb: 1.3,
+              }}
+            >
+              {railMetrics.map((metric) => (
+                <Box
+                  key={metric.label}
+                  sx={{
+                    borderRadius: cardRadius,
+                    background: "rgba(255,255,255,0.035)",
+                    border: "1px solid rgba(255,255,255,0.075)",
+                    p: 1,
+                    minWidth: 0,
+                  }}
+                >
+                  <Stack direction="row" alignItems="center" spacing={0.8}>
+                    <Box sx={{ color: "#D6B25E", display: "flex" }}>{metric.icon}</Box>
+                    <Box minWidth={0}>
+                      <Typography variant="body2" fontWeight={950} color="#FFFDF7">
+                        {metric.value}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: "rgba(255,253,247,0.62)" }} noWrap>
+                        {metric.label}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </Box>
+              ))}
+            </Box>
             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               {sections.map((section, index) => (
                 <Button

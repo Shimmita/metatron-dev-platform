@@ -1,9 +1,13 @@
 import {
   AssignmentTurnedInRounded,
   ArticleRounded,
+  AutoAwesomeRounded,
+  BookmarkRounded,
   CalendarMonthRounded,
   DashboardRounded,
+  FolderRounded,
   GroupsRounded,
+  PeopleAltRounded,
   PsychologyRounded,
   RocketLaunchRounded,
   SchoolRounded,
@@ -67,7 +71,7 @@ const Sidebar = () => {
     isTabSideBar,
     isLoadingPostLaunch: isLoadingRequest,
   } = useSelector((state) => state.appUI);
-  const { user, isGuest, usersCount } = useSelector((state) => state.currentUser);
+  const { user, isGuest } = useSelector((state) => state.currentUser);
   const { position } = useSelector((state) => state.currentBottomNav);
 
   const theme = useTheme();
@@ -151,13 +155,13 @@ const Sidebar = () => {
 
   const primaryNavItems = [
     {
-      label: "Dashboard",
-      description: "Career signals, content, and platform activity",
+      label: "Home",
+      description: "Dashboard, signals and platform activity",
       icon: <DashboardRounded fontSize="small" />,
       route: "/explore",
     },
     {
-      label: "Tech Gigs",
+      label: "Jobs",
       description: "Verified openings and hiring activity",
       icon: <WorkRounded fontSize="small" />,
       route: "/jobs",
@@ -175,9 +179,48 @@ const Sidebar = () => {
       route: "/events",
     },
     {
-      label: "Content",
-      description: "Posts, projects and proof-of-work updates",
+      label: "Community",
+      description: "Posts, people and collaboration updates",
+      icon: <GroupsRounded fontSize="small" />,
+      route: "/explore",
+    },
+    {
+      label: "People",
+      description: "Builders, mentors and technical operators",
+      icon: <PeopleAltRounded fontSize="small" />,
+      route: "/explore",
+    },
+    {
+      label: "Projects",
+      description: "Proof-of-work and shipped ideas",
+      icon: <FolderRounded fontSize="small" />,
+      route: "/explore",
+    },
+    {
+      label: "Resources",
+      description: "Guides, posts and practical references",
       icon: <ArticleRounded fontSize="small" />,
+      route: "/explore",
+    },
+    {
+      label: "AI Assistant",
+      description: "Personal guidance and build support",
+      icon: <AutoAwesomeRounded fontSize="small" />,
+      route: "/explore",
+      badge: "NEW",
+    },
+  ];
+  const spaceItems = [
+    {
+      label: "Dashboard",
+      description: "Your private career workspace",
+      icon: <DashboardRounded fontSize="small" />,
+      route: "/explore",
+    },
+    {
+      label: "Saved Items",
+      description: "Jobs, courses, events and references",
+      icon: <BookmarkRounded fontSize="small" />,
       route: "/explore",
     },
   ];
@@ -253,63 +296,55 @@ const Sidebar = () => {
               ) : (
                 <Stack spacing={2.5}>
                   {/* ─── IDENTITY BLOCK ─── */}
-                  <Box display={"flex"} alignItems={"center"} gap={2.5}>
+                  {!isGuest && (
+                    <Box display={"flex"} alignItems={"center"} gap={2.5}>
 
-                    <Avatar
-                      alt={user?.name || "Profile"}
-                      src={user?.avatar}
-                      sx={{
-                        width: 70,
-                        height: 70,
-                        background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
-                        boxShadow: isDarkMode
-                          ? "0 0 25px rgba(214,178,94,0.2)"
-                          : "0 8px 16px rgba(214,178,94,0.15)",
-                        border: "2px solid",
-                        borderColor: "background.paper"
-                      }}
-                    />
+                      <Avatar
+                        alt={user?.name || "Profile"}
+                        src={user?.avatar}
+                        sx={{
+                          width: 70,
+                          height: 70,
+                          background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
+                          boxShadow: isDarkMode
+                            ? "0 0 25px rgba(214,178,94,0.2)"
+                            : "0 8px 16px rgba(214,178,94,0.15)",
+                          border: "2px solid",
+                          borderColor: "background.paper"
+                        }}
+                      />
 
-                    <Box flex={1} minWidth={0}>
-                      <Typography
-                        variant="body1"
-                        fontWeight={900}
-                        color="text.primary"
-                        sx={{ lineHeight: 1.1, fontSize: '1.05rem', letterSpacing: '-0.01em' }}
-                      >
-                        {user?.name || "Guest Mode"}
-                      </Typography>
+                      <Box flex={1} minWidth={0}>
+                        <Typography
+                          variant="body1"
+                          fontWeight={900}
+                          color="text.primary"
+                          sx={{ lineHeight: 1.1, fontSize: '1.05rem', letterSpacing: '-0.01em' }}
+                        >
+                          {user?.name || "Guest Mode"}
+                        </Typography>
 
-                      <Typography
-                        variant="caption"
-                        color="primary"
-                        fontWeight={700}
-                        sx={{ display: "block", mt: 0.3, opacity: 0.9, textTransform: 'uppercase', fontSize: '0.65rem' }}
-                      >
-                        {isGuest ? "Public platform preview" : user?.specialisationTitle}
-                      </Typography>
+                        <Typography
+                          variant="caption"
+                          color="primary"
+                          fontWeight={700}
+                          sx={{ display: "block", mt: 0.3, opacity: 0.9, textTransform: 'uppercase', fontSize: '0.65rem' }}
+                        >
+                          {user?.specialisationTitle}
+                        </Typography>
 
-                      {/* Metadata Badges */}
-                      <Box mt={1} display="flex" flexWrap="wrap" gap={0.5}>
-                        {isGuest ? (
-                          <Box sx={{ px: 1, py: 0.2, borderRadius: 1, bgcolor: 'rgba(214,178,94, 0.1)', border: '1px solid rgba(214,178,94, 0.2)' }}>
-                            <Typography variant="caption" sx={{ color: "primary.main", fontWeight: 800, fontSize: '0.6rem' }}>
-                              {usersCount || "Many"} DEVELOPERS ON METATRON
-                            </Typography>
-                          </Box>
-                        ) : (
-                          <>
-                            <Typography variant="caption" sx={{ opacity: 0.6, fontSize: '0.7rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                              {user?.county && `${user.county} •`} {CustomCountryName(user?.country)}
-                            </Typography>
-                            <Typography variant="caption" sx={{ width: '100%', opacity: 0.8, fontWeight: 800, color: 'text.secondary', fontSize: '0.65rem' }}>
-                              {user?.network_count || 0} NETWORK CONNECTIONS
-                            </Typography>
-                          </>
-                        )}
+                        {/* Metadata Badges */}
+                        <Box mt={1} display="flex" flexWrap="wrap" gap={0.5}>
+                          <Typography variant="caption" sx={{ opacity: 0.6, fontSize: '0.7rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            {user?.county && `${user.county} •`} {CustomCountryName(user?.country)}
+                          </Typography>
+                          <Typography variant="caption" sx={{ width: '100%', opacity: 0.8, fontWeight: 800, color: 'text.secondary', fontSize: '0.65rem' }}>
+                            {user?.network_count || 0} NETWORK CONNECTIONS
+                          </Typography>
+                        </Box>
                       </Box>
                     </Box>
-                  </Box>
+                  )}
 
                   {isGuest && (
                     <Box
@@ -428,8 +463,76 @@ const Sidebar = () => {
                         }
                       }}
                     >
-                      <Box textAlign={"left"}>
-                        <Typography variant="body2" fontWeight={700}>
+                        <Box textAlign={"left"}>
+                        <Box display="flex" alignItems="center" gap={0.75}>
+                          <Typography variant="body2" fontWeight={850}>
+                            {item.label}
+                          </Typography>
+                          {item.badge && (
+                            <Box
+                              component="span"
+                              sx={{
+                                px: 0.7,
+                                py: 0.1,
+                                borderRadius: "6px",
+                                background: "linear-gradient(135deg,#8B6F2A,#D6B25E,#FFF2C2)",
+                                color: "#080808",
+                                fontSize: 9,
+                                fontWeight: 950,
+                              }}
+                            >
+                              {item.badge}
+                            </Box>
+                          )}
+                        </Box>
+                        <Typography variant="caption" color="text.secondary">
+                          {item.description}
+                        </Typography>
+                      </Box>
+                    </Button>
+                  ))}
+                </Stack>
+
+                <Divider sx={{ my: 1.4, borderColor: "rgba(255,255,255,0.08)" }} />
+
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "rgba(255,253,247,0.52)",
+                    fontWeight: 950,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.12em",
+                    display: "block",
+                    mb: 1,
+                  }}
+                >
+                  Your Space
+                </Typography>
+                <Stack spacing={1}>
+                  {spaceItems.map((item) => (
+                    <Button
+                      key={item.label}
+                      onClick={() => navigate(item.route)}
+                      startIcon={item.icon}
+                      fullWidth
+                      variant="text"
+                      sx={{
+                        justifyContent: "flex-start",
+                        alignItems: "flex-start",
+                        borderRadius: cardRadius,
+                        px: 1.25,
+                        py: 1,
+                        color: "text.primary",
+                        background: "rgba(255,255,255,0.025)",
+                        border: "1px solid rgba(255,255,255,0.07)",
+                        "&:hover": {
+                          background: "rgba(214,178,94,0.08)",
+                          borderColor: "rgba(214,178,94,0.4)",
+                        },
+                      }}
+                    >
+                      <Box textAlign="left">
+                        <Typography variant="body2" fontWeight={850}>
                           {item.label}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">

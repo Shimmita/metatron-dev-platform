@@ -1,6 +1,7 @@
 import React from "react";
 import {
   HomeOutlined, HomeRounded,
+  GroupsOutlined, GroupsRounded,
   SchoolOutlined, SchoolRounded,
   TvRounded, TvTwoTone,
   WorkOutlineOutlined, WorkRounded,
@@ -31,10 +32,11 @@ const BottomNav = () => {
   };
 
   const navItems = [
-    { label: "Feed", path: "/explore", icon: <HomeOutlined />, activeIcon: <HomeRounded />, title: "Dashboard Feed", action: "home" },
-    { label: "Gigs", path: "/jobs", icon: <WorkOutlineOutlined />, activeIcon: <WorkRounded />, title: "Tech Gigs" },
-    { label: "Events", path: "/events", icon: <TvTwoTone />, activeIcon: <TvRounded />, title: "Tech Events" },
-    { label: "Learn", path: "/courses/available", icon: <SchoolOutlined />, activeIcon: <SchoolRounded />, title: "Tech Courses" },
+    { label: "Home", path: "/explore", pos: 0, icon: <HomeOutlined />, activeIcon: <HomeRounded />, title: "Dashboard Feed", action: "home" },
+    { label: "Jobs", path: "/jobs", pos: 1, icon: <WorkOutlineOutlined />, activeIcon: <WorkRounded />, title: "Tech Jobs" },
+    { label: "Courses", path: "/courses/available", pos: 3, icon: <SchoolOutlined />, activeIcon: <SchoolRounded />, title: "Tech Courses" },
+    { label: "Events", path: "/events", pos: 2, icon: <TvTwoTone />, activeIcon: <TvRounded />, title: "Tech Events" },
+    { label: "Community", path: "/explore", pos: 4, icon: <GroupsOutlined />, activeIcon: <GroupsRounded />, title: "Builder Community", action: "home" },
   ];
 
   return (
@@ -55,7 +57,7 @@ const BottomNav = () => {
         showLabels
         sx={{
           pointerEvents: "auto",
-          width: { xs: "calc(100vw - 24px)", sm: 430, lg: 520 },
+          width: { xs: "calc(100vw - 24px)", sm: 500, lg: 560 },
           maxWidth: "calc(100vw - 32px)",
           height: { xs: 66, lg: 58 },
           borderRadius: "8px",
@@ -105,12 +107,13 @@ const BottomNav = () => {
           }
         }}
       >
-        {navItems.map((item, index) => (
-          <Tooltip key={index} title={item.title} arrow disableInteractive>
+        {navItems.map((item) => (
+          <Tooltip key={item.label} title={item.title} arrow disableInteractive>
             <BottomNavigationAction
+              value={item.pos}
               label={item.label}
-              onClick={() => handleNavClick(item.path, index, item.action)}
-              icon={React.cloneElement(position === index ? item.activeIcon : item.icon, {
+              onClick={() => handleNavClick(item.path, item.pos, item.action)}
+              icon={React.cloneElement(position === item.pos ? item.activeIcon : item.icon, {
                 sx: { fontSize: 24, transition: "inherit" }
               })}
             />

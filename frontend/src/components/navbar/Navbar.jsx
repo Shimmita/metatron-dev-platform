@@ -2,6 +2,7 @@ import {
   Close,
   EmailRounded,
   ErrorOutline,
+  KeyboardArrowDownRounded,
   FilterListRounded,
   MenuRounded,
   NotificationsRounded,
@@ -16,8 +17,10 @@ import {
   Box,
   Button,
   CircularProgress,
+  Divider,
   IconButton,
   InputBase,
+  Stack,
   styled,
   Toolbar,
   Tooltip,
@@ -68,7 +71,7 @@ const MetatronToolBar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
   justifyContent: "space-between",
   width: "100%",
-  maxWidth: "1188px",
+  maxWidth: "1420px",
   margin: "0 auto",
   [theme.breakpoints.down("lg")]: {
     maxWidth: "100%",
@@ -102,8 +105,8 @@ const LogoContent = styled(Box)({
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: '8px',
-  backgroundColor: alpha(theme.palette.common.white, 0.08),
-  border: "1px solid rgba(255,255,255,0.12)",
+  backgroundColor: alpha(theme.palette.common.white, 0.075),
+  border: "1px solid rgba(214,178,94,0.18)",
   boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
   '&:hover': {
     backgroundColor: alpha(theme.palette.common.white, 0.12),
@@ -126,11 +129,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     padding: theme.spacing(1, 1, 1, 0),
     // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    paddingRight: theme.spacing(9),
     transition: theme.transitions.create('width'),
     [theme.breakpoints.up('sm')]: {
-      width: '30ch',
+      width: '42ch',
       '&:focus': {
-        width: '38ch',
+        width: '50ch',
       },
     },
   },
@@ -590,16 +594,30 @@ const Navbar = () => {
               />
 
               <Button onClick={handleHome} sx={{ px: 0.5 }}>
-                <Typography
-                  sx={{
-                    fontWeight: 900,
-                    fontSize: 15,
-                    letterSpacing: "0.08em",
-                    color: "#FFFDF7",
-                  }}
-                >
-                  METATRON
-                </Typography>
+                <Box textAlign="left">
+                  <Typography
+                    sx={{
+                      fontWeight: 950,
+                      fontSize: 18,
+                      letterSpacing: "0.06em",
+                      color: "#FFFDF7",
+                      lineHeight: 1,
+                    }}
+                  >
+                    METATRON
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontWeight: 850,
+                      fontSize: 10,
+                      letterSpacing: "0.13em",
+                      color: "rgba(255,253,247,0.62)",
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    BUILD · LEARN · CONNECT · GROW
+                  </Typography>
+                </Box>
               </Button>
             </Box>
           </LogoContent>
@@ -689,6 +707,18 @@ const Navbar = () => {
               >
                 <form className="d-flex" onSubmit={handleSubmitGlobalSearch}>
                   <Search>
+                    <SearchRounded
+                      sx={{
+                        position: "absolute",
+                        left: 12,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        width: 20,
+                        height: 20,
+                        color: "rgba(255,253,247,0.62)",
+                        pointerEvents: "none",
+                      }}
+                    />
                     <StyledInputBase
                       placeholder="Search jobs, courses, events, people..."
                       inputProps={{ 'aria-label': 'search' }}
@@ -701,6 +731,24 @@ const Navbar = () => {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        right: 8,
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        px: 0.8,
+                        py: 0.25,
+                        borderRadius: "6px",
+                        background: "rgba(255,255,255,0.08)",
+                        border: "1px solid rgba(255,255,255,0.08)",
+                        color: "rgba(255,253,247,0.72)",
+                        fontSize: 11,
+                        fontWeight: 900,
+                      }}
+                    >
+                      Ctrl + K
+                    </Box>
                   </Search>
                   <Box
                     display={'flex'}
@@ -746,6 +794,31 @@ const Navbar = () => {
                 </form>
               </Box>
             </SearchBar>
+          )}
+
+          {!showMobileSearch && (
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1.2}
+              sx={{ display: { xs: "none", lg: "flex" }, ml: 2 }}
+            >
+              <Button
+                onClick={handleHome}
+                endIcon={<KeyboardArrowDownRounded />}
+                sx={{ color: "#FFFDF7", fontWeight: 900, px: 1 }}
+              >
+                Explore
+              </Button>
+              <Button
+                onClick={() => isGuest ? handleNavigateLogin() : navigate("/explore")}
+                endIcon={<KeyboardArrowDownRounded />}
+                sx={{ color: "#FFFDF7", fontWeight: 900, px: 1 }}
+              >
+                Create
+              </Button>
+              <Divider orientation="vertical" flexItem sx={{ borderColor: "rgba(255,255,255,0.10)" }} />
+            </Stack>
           )}
 
           {/* shown in small devices and tabs */}
