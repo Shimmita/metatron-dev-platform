@@ -41,6 +41,9 @@ export default function GlobalAppBar({
   handleShowDarkMode, 
   handleShowingProfileDrawer,
   isDrawerPane = true,
+  title = "METATRON JOBS",
+  subtitle = "Tech Gig Marketplace",
+  searchAction = null,
 }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -86,7 +89,9 @@ export default function GlobalAppBar({
         {/* Center: Branding & Sector Info */}
         <Box 
           sx={{ 
-            flexGrow: 1, 
+            flexGrow: 1,
+            minWidth: 0,
+            px: { xs: 0.75, sm: 1.25 },
             display: 'flex', 
             flexDirection: 'column', 
             alignItems: 'center',
@@ -105,7 +110,7 @@ export default function GlobalAppBar({
               WebkitTextFillColor: "transparent",
             }}
           >
-            METATRON JOBS
+            {title}
           </Typography>
           <Typography
             variant="caption"
@@ -118,12 +123,13 @@ export default function GlobalAppBar({
               mt: -0.35
             }}
           >
-            {textOption || "Tech Gig Marketplace"}
+            {textOption || subtitle}
           </Typography>
         </Box>
 
         {/* Right Actions: HUD Controls */}
-        <Box display="flex" gap={1} alignItems="center">
+        <Box display="flex" gap={1} alignItems="center" justifyContent="flex-end">
+          {searchAction}
           <Tooltip title="Back to Home">
             <IconButton
               onClick={handleNavigateHome}

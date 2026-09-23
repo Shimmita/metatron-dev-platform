@@ -1,7 +1,6 @@
 import React from "react";
 import {
   HomeOutlined, HomeRounded,
-  GroupsOutlined, GroupsRounded,
   SchoolOutlined, SchoolRounded,
   TvRounded, TvTwoTone,
   WorkOutlineOutlined, WorkRounded,
@@ -27,6 +26,7 @@ const BottomNav = () => {
       if (!isSidebarRighbar) dispatch(handleSidebarRightbar());
       dispatch(handleShowingSpeedDial(true));
     } else {
+      dispatch(handleShowingSpeedDial(false));
       if (isSidebarRighbar) dispatch(handleSidebarRightbar());
     }
   };
@@ -36,7 +36,6 @@ const BottomNav = () => {
     { label: "Jobs", path: "/jobs", pos: 1, icon: <WorkOutlineOutlined />, activeIcon: <WorkRounded />, title: "Tech Jobs" },
     { label: "Courses", path: "/courses/available", pos: 3, icon: <SchoolOutlined />, activeIcon: <SchoolRounded />, title: "Tech Courses" },
     { label: "Events", path: "/events", pos: 2, icon: <TvTwoTone />, activeIcon: <TvRounded />, title: "Tech Events" },
-    { label: "Community", path: "/explore", pos: 4, icon: <GroupsOutlined />, activeIcon: <GroupsRounded />, title: "Builder Community", action: "home" },
   ];
 
   return (

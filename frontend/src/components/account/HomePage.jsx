@@ -13,6 +13,7 @@ function Homepage() {
   const isWorkspaceRoute = [
     "/jobs",
     "/events",
+    "/community",
     "/courses/available",
     "/courses/instructor",
   ].some((route) => location.pathname.startsWith(route));

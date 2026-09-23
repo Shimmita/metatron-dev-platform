@@ -2,7 +2,6 @@ import {
   Close,
   EmailRounded,
   ErrorOutline,
-  KeyboardArrowDownRounded,
   FilterListRounded,
   MenuRounded,
   NotificationsRounded,
@@ -17,10 +16,8 @@ import {
   Box,
   Button,
   CircularProgress,
-  Divider,
   IconButton,
   InputBase,
-  Stack,
   styled,
   Toolbar,
   Tooltip,
@@ -794,31 +791,6 @@ const Navbar = () => {
                 </form>
               </Box>
             </SearchBar>
-          )}
-
-          {!showMobileSearch && (
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={1.2}
-              sx={{ display: { xs: "none", lg: "flex" }, ml: 2 }}
-            >
-              <Button
-                onClick={handleHome}
-                endIcon={<KeyboardArrowDownRounded />}
-                sx={{ color: "#FFFDF7", fontWeight: 900, px: 1 }}
-              >
-                Explore
-              </Button>
-              <Button
-                onClick={() => isGuest ? handleNavigateLogin() : navigate("/explore")}
-                endIcon={<KeyboardArrowDownRounded />}
-                sx={{ color: "#FFFDF7", fontWeight: 900, px: 1 }}
-              >
-                Create
-              </Button>
-              <Divider orientation="vertical" flexItem sx={{ borderColor: "rgba(255,255,255,0.10)" }} />
-            </Stack>
           )}
 
           {/* shown in small devices and tabs */}

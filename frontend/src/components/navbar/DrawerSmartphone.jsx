@@ -13,10 +13,10 @@ import {
   Typography
 } from "@mui/material";
 import {
-  ArticleRounded,
   CalendarMonthRounded,
   CloseRounded,
   DashboardRounded,
+  GroupsRounded,
   SchoolRounded,
   WorkRounded,
 } from "@mui/icons-material";
@@ -111,7 +111,7 @@ const DrawerSmartphone = ({
     { label: "Tech Gigs", route: "/jobs", nav: 1, icon: <WorkRounded fontSize="small" /> },
     { label: "Events", route: "/events", nav: 2, icon: <CalendarMonthRounded fontSize="small" /> },
     { label: "Courses", route: "/courses/available", nav: 3, icon: <SchoolRounded fontSize="small" /> },
-    { label: "Content", route: "/explore", nav: 0, icon: <ArticleRounded fontSize="small" /> },
+    { label: "Community", route: "/community", nav: 4, icon: <GroupsRounded fontSize="small" /> },
   ];
 
   const handleNavigate = (item) => {

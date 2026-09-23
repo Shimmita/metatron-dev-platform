@@ -16,11 +16,11 @@ const FeedDefaultSearch = lazy(() => import("./FeedDefaultSearch"));
 const PostDetailsRouted = lazy(() => import("../post/PostDetailsRouted"));
 const AllJobsHiringManager = lazy(() => import("../jobs/AllJobsHiringManager"));
 const AllJobsContainer = lazy(() => import("../jobs/AllJobsContainer"));
+const CommunityPage = lazy(() => import("../group/CommunityPage"));
 const PageNotFound = lazy(() => import("../notfound/PageNotFound"));
 const PostDetailsContainer = lazy(() => import("../post/PostDetailsContiner"));
 const FeedDefaultContent = lazy(() => import("./FeedDefaultContent"));
 const BottomNav = lazy(() => import("../bottom/BottomNav"));
-const AlertGroupCommunity = lazy(() => import("../alerts/AlertGroupCommunity"));
 const AlertTutorial = lazy(() => import("../alerts/AlertTutorial"));
 
 const Feed = () => {
@@ -36,26 +36,27 @@ const Feed = () => {
   } = useSelector((state) => state.appUI);
   const { messageSnackPostTech } = useSelector((state) => state.currentSnackBar);
 
-  const [openCommunity, setOpenCommunity] = React.useState(user?.isGroupTutorial || false);
   const isWorkspaceRoute = [
     "/jobs",
     "/jobs/hiring",
     "/events",
+    "/community",
     "/courses/available",
     "/courses/instructor",
   ].some((route) => location.pathname.startsWith(route));
+  const isCommunityRoute = location.pathname.startsWith("/community");
   const isFocusedPostRoute = location.pathname.startsWith("/posts/details");
   const isFocusedPostView = isPostDetailed || isFocusedPostRoute;
 
   useLayoutEffect(() => {
-    dispatch(handleShowingSpeedDial(true));
+    dispatch(handleShowingSpeedDial(!isWorkspaceRoute));
 
     if (location.pathname === "/" || location.pathname === "/explore") {
       dispatch(updateCurrentBottomNav(0));
       dispatch(handleSidebarRightbar(true));
       dispatch(handleIsJobsGlobalResults(false));
     }
-  }, [dispatch, location.pathname]); // Reset on route change
+  }, [dispatch, isWorkspaceRoute, location.pathname]); // Reset on route change
 
   return (
     <Box
@@ -71,13 +72,13 @@ const Feed = () => {
           : { sm: "1 1 0", lg: "1 1 620px", xl: "1 1 720px" },
         minHeight: { xs: "100vh", lg: 0 },
         height: { lg: "100%" },
-        overflowY: { lg: isFocusedPostView ? "hidden" : "auto" },
+        overflowY: { lg: isFocusedPostView || isCommunityRoute ? "hidden" : "auto" },
         overflowX: "hidden",
         overscrollBehavior: { lg: "contain" },
         display: "flex",
         flexDirection: "column",
         // Keep the last feed items clear of the floating navigation dock.
-        pb: isDefaultBottomNav && !isFocusedPostView ? { xs: 14, md: 15, lg: 16 } : 0,
+        pb: isDefaultBottomNav && !isFocusedPostView && !isCommunityRoute ? { xs: 14, md: 15, lg: 16 } : 0,
         transition: "padding 0.3s ease",
       }}
     >
@@ -101,6 +102,7 @@ const Feed = () => {
           <Route path="/explore" element={<GuestCheck><FeedDefaultContent /></GuestCheck>} />
           <Route path="/" element={<GuestCheck><FeedDefaultContent /></GuestCheck>} />
           <Route path="/events" element={<GuestCheck><EventsContainer /></GuestCheck>} />
+          <Route path="/community" element={<GuestCheck><CommunityPage /></GuestCheck>} />
           <Route path="/courses/available" element={<GuestCheck><CoursesMainContainer /></GuestCheck>} />
           <Route path="/courses/instructor" element={<GuestCheck><CoursesInstrContainer /></GuestCheck>} />
           <Route path="/jobs" element={<GuestCheck><AllJobsContainer /></GuestCheck>} />
@@ -139,7 +141,6 @@ const Feed = () => {
         {/* Notifications & Tutorials */}
         {messageSnackPostTech && <SnackBarPostSuccess messageSnackPostTech={messageSnackPostTech} />}
         {user?.isTutorial && <AlertTutorial />}
-        {openCommunity && <AlertGroupCommunity openGroup={openCommunity} setOpenGroup={setOpenCommunity} />}
       </Suspense>
     </Box>
   );

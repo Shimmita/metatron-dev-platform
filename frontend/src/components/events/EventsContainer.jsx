@@ -3,7 +3,6 @@ import {
   AutoAwesome,
   CheckCircle,
   EventAvailableRounded,
-  FindInPageRounded,
   HomeRounded,
   HubRounded,
   InfoRounded,
@@ -54,6 +53,7 @@ import { appGradients } from "../../utils/colors";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertJobSearch from "../alerts/AlertJobSearch";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
+import PageSearchAction from "../navbar/PageSearchAction";
 import EventsAddModal from "../modal/EventsAddModal";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
@@ -446,6 +446,12 @@ export default function EventsContainer() {
       // set text to default explore events
       setTextOption('Explore Events')
     }
+
+    const handleOpenSearch = () => {
+      dispatch(handleIsJobsGlobalResults(false));
+      setTextOption("Search Events");
+      setOpenAlert(true);
+    }
   
      // handle navigate to login
     const handleNavigateLogin=()=>{
@@ -553,7 +559,7 @@ export default function EventsContainer() {
                 </IconButton>
               </Box>
 
-              <Box width={"100%"} minWidth={0}>
+              <Box sx={{ flex: 1, minWidth: 0, px: { xs: 0.75, sm: 1 } }}>
                 <Typography
                   noWrap
                   component="div"
@@ -587,6 +593,13 @@ export default function EventsContainer() {
                 gap={1} 
                 alignItems={'center'} 
                 justifyContent={'flex-end'}>
+                <PageSearchAction
+                  label="Events"
+                  helper="Topic, category, country"
+                  count={eventsData?.length || 0}
+                  onClick={handleOpenSearch}
+                  isDarkMode={isDarkMode}
+                />
                 <Tooltip arrow title="Back to Home">
                   <IconButton
                     onClick={handleNavigateHome}
@@ -750,7 +763,6 @@ export default function EventsContainer() {
                 "Explore Events",
               ] : [
                 "Explore Events",
-                "Search Events",
                 "Create Events",
                 "Nearby Events",
                 "AI Selection",
@@ -810,23 +822,19 @@ export default function EventsContainer() {
                           sx={{width:22,height:22}}
                         />
                       ) : index === 1 ? (
-                        <FindInPageRounded
-                          color={text === textOption ? "primary" : "inherit"}
-                        />
-                      ) : index === 2 ? (
                         <Add
                           color={text === textOption ? "primary" : "inherit"}
                         />
-                      ) : index === 3 ? (
+                      ) : index === 2 ? (
                         <MyLocationRounded
                           color={text === textOption ? "primary" : "inherit"}
                         />
-                      ) : index === 4 ? (
+                      ) : index === 3 ? (
                         <AutoAwesome
                         color={text === textOption ? "primary" : "inherit"}
                       />
                        
-                      ) :index===5 ? (
+                      ) :index===4 ? (
                         <CheckCircle
                         color={text === textOption ? "primary" : "inherit"}
                       />

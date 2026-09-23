@@ -37,6 +37,7 @@ import AlertJobSearch from "../alerts/AlertJobSearch";
 import GlobalDrawer from "../drawer/MetatronDrawer";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
 import GlobalAppBar from "../navbar/GlobalNavBar";
+import PageSearchAction from "../navbar/PageSearchAction";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import MetatronSnackbar from "../snackbar/MetatronSnackBar";
 import JobLayout from "./layout/JobLayout";
@@ -502,6 +503,12 @@ export default function MiniDrawer() {
     setTextOption('Explore Jobs')
   }
 
+  const handleOpenSearch = () => {
+    dispatch(handleIsJobsGlobalResults(false));
+    setTextOption("Search Jobs");
+    setOpenAlert(true);
+  }
+
   // handle navigate to login
   const handleNavigateLogin = () => {
     navigate("/auth/login")
@@ -561,6 +568,15 @@ export default function MiniDrawer() {
           textOption={textOption}
           isGuest={isGuest}
           user={user}
+          searchAction={(
+            <PageSearchAction
+              label="Jobs"
+              helper="Role, stack, level, country"
+              count={jobs?.length || 0}
+              onClick={handleOpenSearch}
+              isDarkMode={isDarkMode}
+            />
+          )}
         />
 
         {/* ---------- Drawer ---------- */}

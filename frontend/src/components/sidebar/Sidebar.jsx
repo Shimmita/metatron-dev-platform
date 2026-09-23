@@ -19,7 +19,6 @@ import {
 } from "@mui/icons-material";
 import {
   Avatar,
-  AvatarGroup,
   Box,
   Button,
   Divider,
@@ -78,7 +77,19 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const isDarkMode = currentMode === "dark";
   const cardRadius = `${Math.max(theme.shape.borderRadius - 2, 8)}px`;
-  const selectedSkillsCount = user?.selectedSkills?.length || 0;
+  const selectedSkills = Array.isArray(user?.selectedSkills) ? user.selectedSkills : [];
+  const selectedSkillsCount = selectedSkills.length;
+  const displayedSkills = selectedSkills.slice(0, 6);
+  const hiddenSkillsCount = Math.max(selectedSkillsCount - displayedSkills.length, 0);
+  const userLocation = [user?.county, CustomCountryName(user?.country)].filter(Boolean).join(" / ");
+  const profileSignalScore = isGuest
+    ? 0
+    : Math.round((
+      (user?.avatar ? 1 : 0) +
+      (user?.specialisationTitle ? 1 : 0) +
+      (selectedSkillsCount > 0 ? 1 : 0) +
+      (user?.network_count > 0 ? 1 : 0)
+    ) / 4 * 100);
   const guestOverviewItems = [
     {
       label: "Tech gigs",
@@ -182,7 +193,7 @@ const Sidebar = () => {
       label: "Community",
       description: "Posts, people and collaboration updates",
       icon: <GroupsRounded fontSize="small" />,
-      route: "/explore",
+      route: "/community",
     },
     {
       label: "People",
@@ -273,7 +284,7 @@ const Sidebar = () => {
           <BoxAvatarContent>
             <Box
               width={"100%"}
-              px={2} // Increased padding for better breathing room
+              px={2}
               py={2.5}
               sx={{
                 background: isDarkMode
@@ -295,54 +306,259 @@ const Sidebar = () => {
                 </Box>
               ) : (
                 <Stack spacing={2.5}>
-                  {/* ─── IDENTITY BLOCK ─── */}
                   {!isGuest && (
-                    <Box display={"flex"} alignItems={"center"} gap={2.5}>
+                    <Box
+                      sx={{
+                        borderRadius: "8px",
+                        border: "1px solid",
+                        borderColor: isDarkMode ? "rgba(214,178,94,0.22)" : "rgba(139,111,42,0.18)",
+                        background: isDarkMode
+                          ? "linear-gradient(145deg, rgba(255,255,255,0.07), rgba(214,178,94,0.07))"
+                          : "linear-gradient(145deg, rgba(255,255,255,0.94), rgba(255,248,229,0.84))",
+                        boxShadow: isDarkMode
+                          ? "0 18px 42px rgba(0,0,0,0.28)"
+                          : "0 14px 34px rgba(139,111,42,0.12)",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <Box sx={{ p: 1.25 }}>
+                        <Stack direction="row" alignItems="center" spacing={1.25}>
+                          <Box sx={{ position: "relative", flexShrink: 0 }}>
+                            <Avatar
+                              alt={user?.name || "Profile"}
+                              src={user?.avatar}
+                              sx={{
+                                width: 64,
+                                height: 64,
+                                background: "linear-gradient(135deg,#8B6F2A,#D6B25E,#FFF2C2)",
+                                color: "#080808",
+                                fontWeight: 950,
+                                border: "3px solid",
+                                borderColor: isDarkMode ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.95)",
+                                boxShadow: "0 12px 26px rgba(214,178,94,0.22)",
+                              }}
+                            />
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                right: -2,
+                                bottom: -2,
+                                width: 22,
+                                height: 22,
+                                borderRadius: "50%",
+                                display: "grid",
+                                placeItems: "center",
+                                color: "#080808",
+                                background: user?.isVerified
+                                  ? "linear-gradient(135deg,#8B6F2A,#D6B25E,#FFF2C2)"
+                                  : isDarkMode ? "#1f2937" : "#F7F3EA",
+                                border: "2px solid",
+                                borderColor: isDarkMode ? "#111" : "#fff",
+                              }}
+                            >
+                              <VerifiedUserRounded sx={{ fontSize: 14 }} />
+                            </Box>
+                          </Box>
 
-                      <Avatar
-                        alt={user?.name || "Profile"}
-                        src={user?.avatar}
-                        sx={{
-                          width: 70,
-                          height: 70,
-                          background: "linear-gradient(135deg,#8B6F2A,#D6B25E)",
-                          boxShadow: isDarkMode
-                            ? "0 0 25px rgba(214,178,94,0.2)"
-                            : "0 8px 16px rgba(214,178,94,0.15)",
-                          border: "2px solid",
-                          borderColor: "background.paper"
-                        }}
-                      />
+                          <Box minWidth={0} flex={1}>
+                            <Stack direction="row" alignItems="center" spacing={0.75} mb={0.35}>
+                              <Typography
+                                variant="body1"
+                                fontWeight={950}
+                                color="text.primary"
+                                noWrap
+                                sx={{ lineHeight: 1.12, fontSize: "1rem" }}
+                              >
+                                {user?.name || "Developer Profile"}
+                              </Typography>
+                              <Tooltip title={user?.isVerified ? "Verified profile" : "Verification pending"} arrow>
+                                <Box
+                                  sx={{
+                                    width: 7,
+                                    height: 7,
+                                    borderRadius: "50%",
+                                    flexShrink: 0,
+                                    background: user?.isVerified ? "#D6B25E" : "text.disabled",
+                                  }}
+                                />
+                              </Tooltip>
+                            </Stack>
+                            <Typography
+                              variant="caption"
+                              color="primary.main"
+                              fontWeight={900}
+                              sx={{ display: "block", lineHeight: 1.25 }}
+                            >
+                              {user?.specialisationTitle || "Set your specialization"}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              noWrap
+                              sx={{ display: "block", mt: 0.35, fontWeight: 750 }}
+                            >
+                              {userLocation || "Location not set"}
+                            </Typography>
+                          </Box>
+                        </Stack>
 
-                      <Box flex={1} minWidth={0}>
-                        <Typography
-                          variant="body1"
-                          fontWeight={900}
-                          color="text.primary"
-                          sx={{ lineHeight: 1.1, fontSize: '1.05rem', letterSpacing: '-0.01em' }}
+                        <Box
+                          sx={{
+                            mt: 1.35,
+                            p: 1,
+                            borderRadius: "8px",
+                            background: isDarkMode ? "rgba(255,255,255,0.045)" : "rgba(255,255,255,0.7)",
+                            border: "1px solid",
+                            borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(139,111,42,0.12)",
+                          }}
                         >
-                          {user?.name || "Guest Mode"}
-                        </Typography>
+                          <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1}>
+                            <Typography variant="caption" color="text.secondary" fontWeight={900}>
+                              Profile Signal
+                            </Typography>
+                            <Typography variant="caption" color="primary.main" fontWeight={950}>
+                              {profileSignalScore}%
+                            </Typography>
+                          </Stack>
+                          <Box
+                            sx={{
+                              mt: 0.75,
+                              height: 6,
+                              borderRadius: 999,
+                              overflow: "hidden",
+                              background: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(139,111,42,0.12)",
+                            }}
+                          >
+                            <Box
+                              sx={{
+                                width: `${profileSignalScore}%`,
+                                height: "100%",
+                                background: "linear-gradient(90deg,#8B6F2A,#D6B25E,#FFF2C2)",
+                              }}
+                            />
+                          </Box>
+                        </Box>
 
-                        <Typography
-                          variant="caption"
-                          color="primary"
-                          fontWeight={700}
-                          sx={{ display: "block", mt: 0.3, opacity: 0.9, textTransform: 'uppercase', fontSize: '0.65rem' }}
+                        <Box
+                          sx={{
+                            mt: 1,
+                            display: "grid",
+                            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+                            gap: 0.75,
+                          }}
                         >
-                          {user?.specialisationTitle}
-                        </Typography>
-
-                        {/* Metadata Badges */}
-                        <Box mt={1} display="flex" flexWrap="wrap" gap={0.5}>
-                          <Typography variant="caption" sx={{ opacity: 0.6, fontSize: '0.7rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            {user?.county && `${user.county} •`} {CustomCountryName(user?.country)}
-                          </Typography>
-                          <Typography variant="caption" sx={{ width: '100%', opacity: 0.8, fontWeight: 800, color: 'text.secondary', fontSize: '0.65rem' }}>
-                            {user?.network_count || 0} NETWORK CONNECTIONS
-                          </Typography>
+                          {profileCompletionItems.map((item) => (
+                            <Box
+                              key={item.label}
+                              sx={{
+                                p: 0.85,
+                                minWidth: 0,
+                                borderRadius: "8px",
+                                background: isDarkMode ? "rgba(255,255,255,0.035)" : "rgba(247,243,234,0.72)",
+                                border: "1px solid",
+                                borderColor: isDarkMode ? "rgba(255,255,255,0.07)" : "rgba(139,111,42,0.1)",
+                              }}
+                            >
+                              <Box sx={{ color: "primary.main", display: "flex", mb: 0.45 }}>
+                                {item.icon}
+                              </Box>
+                              <Typography variant="caption" color="text.secondary" noWrap sx={{ display: "block", fontWeight: 850 }}>
+                                {item.label}
+                              </Typography>
+                              <Typography variant="caption" color="text.primary" noWrap sx={{ display: "block", fontWeight: 950 }}>
+                                {item.value}
+                              </Typography>
+                            </Box>
+                          ))}
                         </Box>
                       </Box>
+
+                      {user?.account !== "Organisation" && (
+                        <Box
+                          sx={{
+                            px: 1.25,
+                            py: 1.1,
+                            borderTop: "1px solid",
+                            borderColor: isDarkMode ? "rgba(255,255,255,0.08)" : "rgba(139,111,42,0.12)",
+                            background: isDarkMode ? "rgba(0,0,0,0.16)" : "rgba(255,255,255,0.46)",
+                          }}
+                        >
+                          <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1} mb={0.9}>
+                            <Stack direction="row" alignItems="center" spacing={0.6} minWidth={0}>
+                              <PsychologyRounded sx={{ color: "primary.main", fontSize: 17, flexShrink: 0 }} />
+                              <Typography variant="caption" color="text.secondary" fontWeight={950} noWrap>
+                                Core Stack
+                              </Typography>
+                            </Stack>
+                            <Typography variant="caption" color="primary.main" fontWeight={950}>
+                              {selectedSkillsCount || "0"}
+                            </Typography>
+                          </Stack>
+
+                          {selectedSkillsCount > 0 ? (
+                            <Stack direction="row" flexWrap="wrap" useFlexGap gap={0.65}>
+                              {displayedSkills.map((skill, index) => (
+                                <Tooltip title={skill} arrow key={`${skill}-${index}`}>
+                                  <Box
+                                    sx={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: 0.55,
+                                      maxWidth: "100%",
+                                      px: 0.75,
+                                      py: 0.45,
+                                      borderRadius: "8px",
+                                      background: isDarkMode ? "rgba(255,255,255,0.055)" : "rgba(255,255,255,0.84)",
+                                      border: "1px solid",
+                                      borderColor: isDarkMode ? "rgba(214,178,94,0.16)" : "rgba(139,111,42,0.16)",
+                                    }}
+                                  >
+                                    <Avatar
+                                      alt={skill}
+                                      src={getImageMatch(skill)}
+                                      sx={{ width: 18, height: 18, bgcolor: "background.default" }}
+                                    />
+                                    <Typography variant="caption" fontWeight={900} noWrap sx={{ maxWidth: 82 }}>
+                                      {skill}
+                                    </Typography>
+                                  </Box>
+                                </Tooltip>
+                              ))}
+                              {hiddenSkillsCount > 0 && (
+                                <Box
+                                  sx={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    px: 0.8,
+                                    py: 0.45,
+                                    borderRadius: "8px",
+                                    color: "#080808",
+                                    background: "linear-gradient(135deg,#8B6F2A,#D6B25E,#FFF2C2)",
+                                    fontSize: 11,
+                                    fontWeight: 950,
+                                  }}
+                                >
+                                  +{hiddenSkillsCount}
+                                </Box>
+                              )}
+                            </Stack>
+                          ) : (
+                            <Box
+                              sx={{
+                                p: 1,
+                                borderRadius: "8px",
+                                background: isDarkMode ? "rgba(255,255,255,0.035)" : "rgba(247,243,234,0.72)",
+                                border: "1px dashed",
+                                borderColor: isDarkMode ? "rgba(214,178,94,0.22)" : "rgba(139,111,42,0.2)",
+                              }}
+                            >
+                              <Typography variant="caption" color="text.secondary" lineHeight={1.4}>
+                                Add your primary skills to sharpen course, job, and collaborator matching.
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      )}
                     </Box>
                   )}
 
@@ -376,47 +592,6 @@ const Sidebar = () => {
                     </Box>
                   )}
 
-                  {/* ─── TECH STACK BLOCK ─── */}
-                  {!isGuest && user?.account !== "Organisation" && (
-                    <Box
-                      sx={{
-                        p: 1.5,
-                        borderRadius: 2,
-                        bgcolor: 'rgba(255,255,255,0.02)',
-                        border: '1px solid',
-                        borderColor: 'divider'
-                      }}
-                    >
-                      <Typography variant="overline" sx={{ color: "text.secondary", fontWeight: 900, fontSize: '0.65rem', display: 'block', mb: 1 }}>
-                        Verified Capabilities
-                      </Typography>
-
-                      <Box display={"flex"} alignItems={"center"} gap={1.5}>
-                        <AvatarGroup
-                          max={5}
-                          sx={{
-                            '& .MuiAvatar-root': { width: 32, height: 32, fontSize: 12, border: '2px solid', borderColor: 'background.paper' }
-                          }}
-                        >
-                          {user?.selectedSkills?.map((skill, index) => (
-                            <Tooltip title={skill} arrow key={index}>
-                              <Avatar
-                                alt={skill}
-                                sx={{ bgcolor: 'background.default' }}
-                                src={getImageMatch(skill)}
-                              />
-                            </Tooltip>
-                          ))}
-                        </AvatarGroup>
-
-                        {user?.selectedSkills?.length > 5 && (
-                          <Typography variant="caption" fontWeight={700} color="primary">
-                            +{user.selectedSkills.length - 5} MORE
-                          </Typography>
-                        )}
-                      </Box>
-                    </Box>
-                  )}
                 </Stack>
               )}
             </Box>

@@ -3,7 +3,6 @@ import {
   HomeRounded,
   InfoRounded,
   LocalLibraryOutlined,
-  ManageSearchOutlined,
   Menu,
   Person,
   PictureAsPdfOutlined,
@@ -53,6 +52,7 @@ import { appGradients } from "../../utils/colors";
 import AlertGeneral from "../alerts/AlertGeneral";
 import AlertJobSearch from "../alerts/AlertJobSearch";
 import ParentNotifMessageDrawer from "../messaging/ParentNotifMessageDrawer";
+import PageSearchAction from "../navbar/PageSearchAction";
 import ProfileDrawer from "../profile/drawer/ProfileDrawer";
 import SnackBarSuccess from "../snackbar/SnackBarSuccess";
 import CustomDeviceIsSmall from "../utilities/CustomDeviceIsSmall";
@@ -598,6 +598,12 @@ export default function CoursesMainContainer() {
     navigate("/explore");
   }
 
+  const handleOpenSearch = () => {
+    dispatch(handleIsJobsGlobalResults(false));
+    setTextOption("Course Search");
+    setOpenAlert(true);
+  }
+
   const courseMetrics = [
     ["Learning assets", isCert ? certData?.length || 0 : courses?.length || 0, "Items in this view"],
     ["Workspace", textOption, "Current learning lane"],
@@ -606,7 +612,6 @@ export default function CoursesMainContainer() {
   ];
 
   const courseQuickModes = [
-    { label: "Course Search", icon: <ManageSearchOutlined /> },
     { label: "AI Selection", icon: <AutoAwesomeOutlined /> },
     { label: "Enrolled Courses", icon: <VideoLibraryOutlined /> },
     { label: "My Certifications", icon: <PrintRounded /> },
@@ -695,7 +700,7 @@ export default function CoursesMainContainer() {
             </Box>
 
             {/* main jobs title and the current selection */}
-            <Box width={"100%"}>
+            <Box sx={{ flex: 1, minWidth: 0, px: { xs: 0.75, sm: 1 } }}>
               <Typography
                 noWrap
                 component="div"
@@ -727,6 +732,13 @@ export default function CoursesMainContainer() {
             </Box>
 
             <Box display={'flex'} gap={1} alignItems={'center'} justifyContent={'flex-end'}>
+              <PageSearchAction
+                label="Courses"
+                helper="Skill, specialization, provider"
+                count={isCert ? certData?.length || 0 : courses?.length || 0}
+                onClick={handleOpenSearch}
+                isDarkMode={isDarkMode}
+              />
               <Tooltip arrow title="Back to Home">
                 <IconButton
                   onClick={handleNavigateHome}
@@ -896,7 +908,6 @@ export default function CoursesMainContainer() {
               "Explore Courses",
             ] : [
               "Explore Courses",
-              "Course Search",
               // "Popular Courses",
               "AI Selection",
               //"PDF Resources",
@@ -955,26 +966,21 @@ export default function CoursesMainContainer() {
                           color={text === textOption ? "primary" : "inherit"}
                           sx={{ width: 25, height: 25 }}
                         />
-                      ) : index === 1 ? (
-                        <ManageSearchOutlined
-                          color={text === textOption ? "primary" : "inherit"}
-                          sx={{ width: 24, height: 24 }}
-                        />
-                      ) : index === 10 ? (
+                      ) : index === 8 ? (
                         <WavesOutlined
                           color={text === textOption ? "primary" : "inherit"}
                           sx={{ width: 20, height: 20 }}
                         />
-                      ) : index === 2 ? (
+                      ) : index === 1 ? (
                         <AutoAwesomeOutlined
                           color={text === textOption ? "primary" : "inherit"}
                           sx={{ width: 26, height: 26 }}
                         />
 
-                      ) : index === 11 ? (
+                      ) : index === 9 ? (
                         <PictureAsPdfOutlined
                           color={text === textOption ? "primary" : "inherit"}
-                        />) : index === 3 ? (
+                        />) : index === 2 ? (
                           <VideoLibraryOutlined
                             color={text === textOption ? "primary" : "inherit"}
                           />) : (

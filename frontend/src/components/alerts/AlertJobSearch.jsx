@@ -16,7 +16,6 @@ import {
   IconButton,
   MenuItem,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import {
@@ -57,6 +56,7 @@ export default function AlertJobSearch({
 
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.currentUser);
+  const searchUserId = user?._id || "guest";
 
   /* ───────── CLOSE ───────── */
   const handleCloseAlert = () => {
@@ -96,8 +96,8 @@ export default function AlertJobSearch({
         isEventSearch
           ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/events/all/search`
           : isCourseSearch
-          ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/search/${user?._id}`
-          : `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search/${user?._id}`,
+          ? `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/courses/all/search/${searchUserId}`
+          : `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/jobs/all/search/${searchUserId}`,
         isEventSearch
           ? eventObject
           : isCourseSearch

@@ -18,7 +18,7 @@ import {
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import Slide from "@mui/material/Slide";
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -34,7 +34,6 @@ import {
   updateCurrentPeopleModal,
 } from "../../redux/CurrentModal";
 import { updateCurrentPostsFromSearch } from "../../redux/CurrentPosts";
-import AlertGroupCommunity from "./AlertGroupCommunity";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -48,17 +47,13 @@ export default function AlertGlobalSearch({
   message,
   setMessage,
 }) {
-  const { isSidebarRighbar, currentMode } = useSelector(
+  const { isSidebarRighbar } = useSelector(
     (state) => state.appUI
   );
   const { globalSearchResults } = useSelector(
     (state) => state.currentGlobalSearch
   );
 
-  const [showGroups, setShowGroups] = useState(false);
-  const [groupNames, setGroupNames] = useState([]);
-
-  const isDarkMode = currentMode === "dark";
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -127,8 +122,10 @@ export default function AlertGlobalSearch({
   };
 
   const handleShowGroup = () => {
-    setGroupNames(globalSearchResults?.groups?.data);
-    setShowGroups(true);
+    handleClose();
+    dispatch(updateCurrentBottomNav(4));
+    if (isSidebarRighbar) dispatch(handleSidebarRightbar());
+    navigate("/community");
   };
 
   /* ---------------- CARD ---------------- */
@@ -294,15 +291,6 @@ export default function AlertGlobalSearch({
         </Box>
       </DialogContent>
 
-      {/* GROUP MODAL */}
-      {showGroups && (
-        <AlertGroupCommunity
-          isDarkMode={isDarkMode}
-          openGroup={showGroups}
-          setOpenGroup={setShowGroups}
-          search={groupNames}
-        />
-      )}
     </Dialog>
   );
 }
