@@ -1,0 +1,116 @@
+import axios from "axios";
+import { useCallback, useLayoutEffect } from "react";
+import { useDispatch } from "react-redux";
+import { resetDefaultBottomNav } from "../../redux/AppUI";
+import { resetAllSigningStateDetails } from "../../redux/CompleteSigning";
+import { resetClearChatBot } from "../../redux/CurrentChatBot";
+import { resetClearCurrentConnectTop } from "../../redux/CurrentConnect";
+import { resetClearCurrentConnectNotif } from "../../redux/CurrentConnectNotif";
+import { resetClearConversations } from "../../redux/CurrentConversations";
+import { resetClearCurrentCourses } from "../../redux/CurrentCourses";
+import { resetClearCurrentGlobalSearch } from "../../redux/CurrentGlobalSearch";
+import { resetClearCurrentGroupCommunities } from "../../redux/CurrentGroups";
+import { resetClearCurrentJobFeedBack } from "../../redux/CurrentJobFeedBack";
+import { resetJobSearch } from "../../redux/CurrentJobSearch";
+import { resetClearPeopleData } from "../../redux/CurrentModal";
+import { resetClearCurrentNetwork } from "../../redux/CurrentNetwork";
+import { resetClearCurrentPostReactions } from "../../redux/CurrentPostReactions";
+import { resetClearCurrentReport } from "../../redux/CurrentPostReported";
+import { resetClearCurrentPosts } from "../../redux/CurrentPosts";
+import { resetClearCurrentPostsTop } from "../../redux/CurrentPostsTop";
+import { resetClearCurrentProfileView } from "../../redux/CurrentProfileView";
+import { resetClearCurrentSnack } from "../../redux/CurrentSnackBar";
+import { resetClearCurrentSuccessRedux } from "../../redux/CurrentSuccess";
+import { resetClearCurrentUserRedux, resetClearTempUserIDRedux, updateUserCountRedux } from "../../redux/CurrentUser";
+
+const GuestCheck = ({ children }) => {
+  const dispatch = useDispatch();
+  // axios defaults with credentials to true
+  axios.defaults.withCredentials = true;
+  // handle redux clearance
+  const handleClearReduxData=useCallback(()=>{
+          // clear any persisted user data
+          dispatch(resetClearCurrentUserRedux())
+    
+          // temp user Id 
+          dispatch(resetClearTempUserIDRedux())
+    
+          // reset all pending signin details
+          dispatch(resetAllSigningStateDetails())
+    
+          // clear bottom nav details
+          dispatch(resetDefaultBottomNav())
+    
+          // reset chat bot
+          dispatch(resetClearChatBot())
+    
+          //reset connect requests
+          dispatch(resetClearCurrentConnectTop()) 
+    
+          // clear connect Notifications
+          dispatch(resetClearCurrentConnectNotif())
+    
+          // reset clear conversations
+          dispatch(resetClearConversations())
+    
+          // reset courses
+          dispatch(resetClearCurrentCourses())
+
+          // reset clear global search
+          dispatch(resetClearCurrentGlobalSearch())
+    
+          // reset clear communities
+          dispatch(resetClearCurrentGroupCommunities())
+    
+          // reset clear
+          dispatch(resetClearCurrentJobFeedBack())
+    
+          // reset clear job search
+          dispatch(resetJobSearch())
+    
+          // clear modal people details
+          dispatch(resetClearPeopleData())
+    
+          // clear network of people
+          dispatch(resetClearCurrentNetwork())
+    
+          // clear post reaction
+          dispatch(resetClearCurrentPostReactions())
+    
+          // clear post reports
+          dispatch(resetClearCurrentReport())
+    
+          // clear posts
+          dispatch(resetClearCurrentPosts())
+    
+          // clear posts top insights
+          dispatch(resetClearCurrentPostsTop())
+    
+          // clear profile view
+          dispatch(resetClearCurrentProfileView())
+    
+          // clear snack bars
+          dispatch(resetClearCurrentSnack())
+          
+          // clear success msg any
+          dispatch(resetClearCurrentSuccessRedux())
+  },[dispatch])
+
+ 
+  // use layout effect to check the validity of the request
+  useLayoutEffect(()=>{
+    axios.get(`${process.env.REACT_APP_BACKEND_BASE_ROUTE}/valid`)
+    .then(res=>dispatch(updateUserCountRedux(res.data.usersCount)))
+    .catch((err)=>{
+        // clear redux since user session expired. request be guest user
+      handleClearReduxData()
+      // update user count
+      dispatch(updateUserCountRedux(err?.response?.data?.usersCount))
+    })
+  },[handleClearReduxData,dispatch])
+  
+  // check login status before proceeding
+  return children
+};
+
+export default GuestCheck;

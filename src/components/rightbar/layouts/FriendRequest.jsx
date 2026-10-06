@@ -1,0 +1,508 @@
+import { Close, PersonAddRounded } from "@mui/icons-material";
+import {
+  AvatarGroup,
+  Box,
+  CardActionArea,
+  CircularProgress,
+  Divider,
+  IconButton,
+  Skeleton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import ListItemText from "@mui/material/ListItemText";
+import axios from "axios";
+import React, { useCallback, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { updateCurrentConnectID } from "../../../redux/CurrentConnect";
+import { updateCurrentConnectNotifID } from "../../../redux/CurrentConnectNotif";
+import { updateMessageConnectRequest } from "../../../redux/CurrentSnackBar";
+import { updateUserCurrentUserRedux } from "../../../redux/CurrentUser";
+import AlertMiniProfileView from "../../alerts/AlertMiniProfileView";
+import SnackbarConnect from "../../snackbar/SnackbarConnect";
+import CustomCountryName from "../../utilities/CustomCountryName";
+import { getElapsedTime } from "../../utilities/getElapsedTime";
+import { getImageMatch } from "../../utilities/getImageMatch";
+
+function FriendRequest({
+  isLoadingRequest = false,
+  connect_request,
+  isAcceptFriends = false,
+}) {
+  const [showMiniProfile, setShowMiniProfile] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
+  const dispatch = useDispatch();
+
+  // redux states
+  const { user } = useSelector((state) => state.currentUser);
+  const { messageConnectRequestSent } = useSelector(
+    (state) => state.currentSnackBar
+  );
+  const displayName = connect_request?.name?.trim()?.split(/\s+/)?.[0] || "Member";
+
+  const {
+    _id: currentUserId,
+    name,
+    avatar,
+    country,
+    county,
+    specialisationTitle: title,
+  } = user || {};
+
+  // handle creating of the connect request
+  const handleSendConnectRequest = () => {
+    // id of the target user requesting connect. its still the id of the connect request object
+    const { _id: targetID } = connect_request || {};
+
+    const dataUserAcknowLedging = {
+      senderId: currentUserId,
+      targetId: targetID,
+      country: CustomCountryName(country),
+      state: county,
+      name,
+      avatar,
+      title,
+      message: "requesting to connect",
+    };
+
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request and passing data for body request
+    axios
+      .post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/create`,
+        dataUserAcknowLedging
+      )
+      .then((res) => {
+        // update the redux of current post
+        if (res?.data && res.data) {
+          dispatch(updateMessageConnectRequest(res.data));
+
+          // update redux by remove the user from request friend list by passing the ID
+          // of the connect suggestion object.
+          dispatch(updateCurrentConnectID(targetID));
+        }
+      })
+      .catch(async (err) => {
+        if (err?.code === "ERR_NETWORK") {
+          dispatch(
+            updateMessageConnectRequest(
+              "server is unreachable check your internet"
+            )
+          );
+          return;
+        }
+        dispatch(updateMessageConnectRequest(err?.response?.data));
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  };
+
+  // handle showing of the user profile
+  const handleShowMiniProfile = useCallback(() => {
+    setShowMiniProfile(true);
+  }, []);
+
+  // handle accept friend request from senders which came in notif section
+  // handle the connect request
+  const handleAcceptConnectRequestFriends = () => {
+    // accept option, the current user should add the senderId in their network
+    // connect request is for validation that the request exists in the db and updating db connectRequests
+    const { _id: connectRequestID, senderId } = connect_request || {};
+
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request and passing
+    axios
+      .post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/accept/${connectRequestID}/${senderId}/${currentUserId}`
+      )
+      .then((res) => {
+        // update the redux of current post
+        if (res?.data && res.data) {
+          // update the current logged in user redux since their network count changed
+          dispatch(updateUserCurrentUserRedux(res.data.targetUser));
+
+          // update message of snackbar in redux
+          dispatch(updateMessageConnectRequest(res.data.message));
+
+          // update redux by remove the user from request friend list.
+          dispatch(updateCurrentConnectNotifID(connectRequestID));
+        }
+      })
+      .catch(async (err) => {
+        if (err?.code === "ERR_NETWORK") {
+          dispatch(
+            updateMessageConnectRequest(
+              "server is unreachable check your internet"
+            )
+          );
+          return;
+        }
+
+        dispatch(updateMessageConnectRequest(err?.response?.data));
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  };
+
+  // handle rejecting the user from accepting the connect request
+
+  // id of the connect request object
+  const { _id: connectRequestID } = connect_request || {};
+
+  const handleRejectConnectRequest = () => {
+    // set is fetching to true
+    setIsFetching(true);
+
+    // performing post request
+    axios
+      .post(
+        `${process.env.REACT_APP_BACKEND_BASE_ROUTE}/connections/connection/reject/${connectRequestID}`
+      )
+      .then((res) => {
+        // update the redux of current post
+        if (res?.data && res.data) {
+          dispatch(updateMessageConnectRequest(res.data));
+
+          // update redux by remove the user from request friend list.
+          dispatch(updateCurrentConnectNotifID(connectRequestID));
+        }
+      })
+      .catch(async (err) => {
+        alert(err?.response?.data);
+        if (err?.code === "ERR_NETWORK") {
+          dispatch(
+            updateMessageConnectRequest(
+              "server is unreachable check your internet"
+            )
+          );
+          return;
+        }
+        dispatch(
+          updateMessageConnectRequest(
+            "server is unreachable check your internet."
+          )
+        );
+      })
+      .finally(() => {
+        // set is fetching to false
+        setIsFetching(false);
+      });
+  };
+
+  // check if the user is the current user
+  const isCurrentUser = connectRequestID === currentUserId;
+
+
+
+  return (
+    <React.Fragment>
+      {isLoadingRequest ? (
+        <List sx={{ width: "100%", background: "transparent" }}>
+          <ListItem sx={{
+            borderRadius: "12px",
+            mb: 0.8,
+            px: 1.2,
+            py: 1,
+            background: "rgba(255,255,255,0.02)",
+            border: "1px solid rgba(255,255,255,0.06)",
+            transition: "all 0.25s ease",
+
+            "&:hover": {
+              background: "rgba(214,178,94,0.06)",
+              borderColor: "rgba(214,178,94,0.3)",
+            },
+          }}>
+            <ListItemAvatar>
+              <Skeleton animation="wave" variant="circular" />
+            </ListItemAvatar>
+            <CardActionArea>
+              <ListItemText
+                primary={<Skeleton width={"70%"} animation="wave" />}
+                secondary={<Skeleton width={"50%"} animation="wave" />}
+              />
+            </CardActionArea>
+
+            <Box ml={2}>
+              <Skeleton
+                variant="rectangular"
+                sx={{ borderRadius: "20px" }}
+                width={35}
+                height={15}
+              />
+            </Box>
+          </ListItem>
+          <Divider variant="inset" component="li" />
+        </List>
+      ) : (
+        <List
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: "100%",
+            background: "transparent",
+            p: 1,
+          }}>
+          <ListItem
+            className="rounded"
+            sx={{
+              borderRadius: "8px",
+              mb: 0.8,
+              px: 1.2,
+              py: 1,
+              background: "rgba(255,255,255,0.02)",
+              border: "1px solid rgba(255,255,255,0.06)",
+              transition: "all 0.25s ease",
+
+              "&:hover": {
+                background: "rgba(214,178,94,0.06)",
+                borderColor: "rgba(214,178,94,0.3)",
+              },
+            }}>
+            <ListItemAvatar onClick={handleShowMiniProfile}>
+              {isAcceptFriends ? (
+                <Avatar
+                  variant="rounded"
+                  src={connect_request?.avatar}
+                  sx={{
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "white",
+                    width: 40,
+                    height: 40,
+                    borderRadius: "8px",
+                  }}
+                  alt={connect_request?.name?.split(" ")[0]}
+                  aria-label="avatar"
+                />
+              ) : (
+                <Tooltip title={'profile'} arrow>
+                  <Avatar
+                    src={connect_request?.avatar}
+                    variant="rounded"
+                    sx={{
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      color: "white",
+                      width: 40,
+                      height: 40,
+                      borderRadius: "8px",
+                    }}
+                    alt={connect_request?.name?.split(" ")[0]}
+                    aria-label="avatar"
+                  />
+                </Tooltip>
+              )}
+            </ListItemAvatar>
+            <ListItemText
+              primary={
+                <Typography
+                  fontWeight={"bold"}
+                  variant="body2"
+                  sx={{
+                    color: "#FFFDF7",
+                    fontWeight: 900,
+                    fontSize: 13,
+                    letterSpacing: 0,
+                  }}
+                >
+                  {displayName}
+                </Typography>
+              }
+              secondary={
+                <Box>
+                  {/* location of the user */}
+                  {isAcceptFriends ? (
+                    <React.Fragment>
+                      <Typography variant="body2" sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}>
+                        {connect_request?.title}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}>
+                        {connect_request?.country} | {connect_request?.state}
+                      </Typography>
+                      <br />
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}
+                      >
+                        - is {connect_request?.message} -
+                      </Typography>
+                    </React.Fragment>
+                  ) : (
+                    <React.Fragment>
+                      {/* specialisation of the user */}
+                      <Typography variant="body2" sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}>
+                        {connect_request?.specialisationTitle}
+                      </Typography>
+
+                      <Typography variant="caption" sx={{ color: "rgba(255,253,247,0.65)", fontSize: 12 }}>
+                        {connect_request?.county} | {" "}
+                        {CustomCountryName(connect_request?.country)}
+                      </Typography>
+
+                      {/* skills of the user */}
+                      {connect_request?.selectedSkills?.length > 1 && (
+                        <Box display={'flex'} mt={"2px"}>
+                          <AvatarGroup
+                            max={connect_request?.selectedSkills?.length}
+                          >
+                            {/* loop through the skills and their images matched using custom fn */}
+                            {connect_request?.selectedSkills?.map(
+                              (skill, index) => (
+                                <Tooltip title={skill} arrow key={index}>
+                                  <Avatar
+                                    alt={skill}
+                                    className="border"
+                                    sx={{
+                                      width: 26,
+                                      height: 26,
+                                      border: "1px solid rgba(255,255,255,0.1)",
+                                      background: "rgba(255,255,255,0.05)",
+                                    }} src={getImageMatch(skill)}
+                                  />
+                                </Tooltip>
+                              )
+                            )}
+                          </AvatarGroup>
+                        </Box>
+                      )}
+                    </React.Fragment>
+                  )}
+                </Box>
+              }
+            />
+
+            <Box>
+              {isFetching ? (
+                <CircularProgress size={16} />
+              ) : (
+                <React.Fragment>
+                  {isAcceptFriends ? (
+                    <Stack
+                      justifyContent={"center"}
+                      alignItems={"center"}
+                      gap={1}
+                    >
+                      {/* time  */}
+                      <Box>
+                        <Typography variant="caption" sx={{
+                          color: "rgba(255,253,247,0.5)",
+                          fontSize: 11,
+                        }}>
+                          {getElapsedTime(connect_request?.createdAt)}
+                        </Typography>
+                      </Box>
+
+                      {/* action btn accepting request */}
+                      <Stack
+                        direction={"row"}
+                        gap={"3px"}
+                        alignItems={"center"}
+                      >
+                        <Tooltip arrow title={"connect"}>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              color: "#D6B25E",
+                              "&:hover": { background: "rgba(214,178,94,0.1)" }
+                            }}
+                            onClick={handleAcceptConnectRequestFriends}
+                          >
+                            <PersonAddRounded
+                              sx={{ width: 18, height: 18 }} />
+                          </IconButton>
+                        </Tooltip>
+
+                        {/* action btn rejecting request */}
+                        <Tooltip arrow title={"dismiss"}>
+                          <IconButton
+                            size="small"
+                            onClick={handleRejectConnectRequest}
+                            sx={{
+                              color: "rgba(255,255,255,0.6)",
+                              "&:hover": {
+                                color: "#D6B25E",
+                                background: "rgba(214,178,94,0.08)",
+                              }
+                            }}
+                          >
+                            <Close sx={{ width: 17, height: 17 }} />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    </Stack>
+                  ) : (
+                    <React.Fragment>
+                      {/* action btn initiating lets connect to the target user */}
+                      {isCurrentUser ? (
+                        <Box display={"flex"} justifyContent={"center"}>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                          >
+                            You
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Tooltip arrow title={"connect"}>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              borderRadius: "8px",
+                              border: "1px solid rgba(255,255,255,0.08)",
+                              background: "rgba(255,255,255,0.03)",
+                              color: "rgba(255,255,255,0.7)",
+
+                              "&:hover": {
+                                background: "rgba(214,178,94,0.08)",
+                                borderColor: "rgba(214,178,94,0.4)",
+                                color: "#D6B25E",
+                              }
+                            }}
+                            onClick={handleSendConnectRequest}
+                          >
+                            <PersonAddRounded sx={{ width: 18, height: 18 }} />
+                          </IconButton>
+                        </Tooltip>
+                      )}
+                    </React.Fragment>
+                  )}
+                </React.Fragment>
+              )}
+            </Box>
+          </ListItem>
+          {/* show divider is is not last item */}
+        </List>
+      )}
+
+      {/* will display mini-profile if state is true */}
+      <AlertMiniProfileView
+        openAlert={showMiniProfile}
+        userId={
+          !isAcceptFriends ? connect_request._id : connect_request.senderId
+        }
+        setOpenAlert={setShowMiniProfile}
+      />
+
+      {/* snackbar detailing if there is a message */}
+      {messageConnectRequestSent && (
+        <SnackbarConnect message={messageConnectRequestSent} />
+      )}
+    </React.Fragment>
+  );
+}
+
+export default React.memo(FriendRequest);

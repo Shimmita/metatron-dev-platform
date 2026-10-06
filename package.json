@@ -1,0 +1,72 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/poppins": "^5.2.6",
+    "@mui/icons-material": "^5.16.1",
+    "@mui/material": "^5.17.1",
+    "@paypal/react-paypal-js": "^8.8.3",
+    "@reduxjs/toolkit": "^2.2.6",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "browser-image-compression": "^2.0.2",
+    "cloudinary-react": "^1.8.1",
+    "dayjs": "^1.11.13",
+    "firebase": "^11.0.1",
+    "framer-motion": "^12.38.0",
+    "html2pdf.js": "^0.11.1",
+    "node-vibrant": "^4.0.3",
+    "pdfjs-dist": "^3.11.174",
+    "process": "^0.11.10",
+    "react": "^18.3.1",
+    "react-bootstrap": "^2.10.4",
+    "react-dom": "^18.3.1",
+    "react-dropzone": "^14.3.5",
+    "react-extract-colors": "^1.5.1",
+    "react-loader-spinner": "^6.1.6",
+    "react-redux": "^9.1.2",
+    "react-responsive-carousel": "^3.2.23",
+    "react-router-dom": "^6.24.1",
+    "react-scripts": "^5.0.1",
+    "react-virtualized": "^9.22.5",
+    "react-window": "^1.8.10",
+    "redux-persist": "^6.0.0",
+    "simple-peer": "^9.11.1",
+    "socket.io-client": "^4.7.4",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-private-property-in-object": "^7.27.1"
+  }
+}

@@ -1,0 +1,31 @@
+const SpecialisationTech = [
+  "Internet of Things (IoT)",
+  "Artificial Intelligence",
+  "DevOps Engineering",
+  "Computer Networks",
+  "Block Chain and Web3",
+  "Data Science and Analytics",
+  "UI/UX Design",
+  "Cybersecurity Engineering",
+  "Cloud Computing",
+  "Game App Development",
+  "Native Android App Development",
+  "Native IOS App Development",
+  "Frontend App Development",
+  "Platform Engineering",
+  "Arduino, Raspberry Pi and PLU",
+  "Site Reliability Engineering",
+  "Backend App Development",
+  "Containerisation and Orchestration",
+  "Fullstack App Development",
+  "Database Administration",
+  "Programming Languages",
+  "Multiplatform Mobile Development",
+  "Desktop App Development",
+  "System Administration",
+  "System Design and Principles",
+  "ICT Technical Support",
+  "Zero Matched, Other"
+].sort();
+
+export default SpecialisationTech;
